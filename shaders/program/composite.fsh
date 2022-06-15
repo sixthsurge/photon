@@ -130,6 +130,10 @@ vec3 lightTranslucents(
 ) {
 	vec3 radiance = vec3(0.0);
 
+	// Self-emission
+
+	radiance += 4.0 * material.emission;
+
 	// Sunlight/moonlight
 
 #if defined WORLD_OVERWORLD || defined WORLD_END

@@ -36,7 +36,7 @@ void main() {
 	texCoord = gl_MultiTexCoord0.xy;
 	lmCoord  = gl_MultiTexCoord1.xy * rcp(240.0);
 	tint     = gl_Color;
-	blockId  = max(uint(mc_Entity.x - 10000.0), BLOCK_TRANSLUCENT);
+	blockId  = uint(max0(mc_Entity.x - 10000.0));
 
 	tbnMatrix[2] = mat3(gbufferModelViewInverse) * normalize(gl_NormalMatrix * gl_Normal);
 #ifdef MC_NORMAL_MAP
