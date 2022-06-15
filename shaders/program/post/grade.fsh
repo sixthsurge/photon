@@ -20,7 +20,6 @@ flat in mat3 whiteBalanceMatrix;
 //--// Uniforms //------------------------------------------------------------//
 
 uniform usampler2D colortex1; // Scene data
-uniform sampler2D colortex2;  // depth-luminance linear model
 uniform sampler2D colortex3;
 uniform sampler2D colortex8;  // Scene history and exposure
 

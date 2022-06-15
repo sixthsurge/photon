@@ -53,6 +53,7 @@ uniform vec2 viewTexelSize;
 //--// Includes //------------------------------------------------------------//
 
 #include "/block.properties"
+#include "/entity.properties"
 
 #include "/include/fragment/textureFormat.glsl"
 
