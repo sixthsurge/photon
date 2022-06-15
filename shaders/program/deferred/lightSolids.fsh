@@ -202,7 +202,7 @@ void main() {
 #if defined WORLD_OVERWORLD
 	float cloudShadow = getCloudShadow(colortex7, scenePos);
 #else
-	#define cloudShadow 1.0
+	float cloudShadow = 1.0;
 #endif
 
 	float sssDepth;

@@ -142,7 +142,7 @@ vec3 lightTranslucents(
 #if defined WORLD_OVERWORLD
 	float cloudShadow = getCloudShadow(colortex7, scenePos);
 #else
-	#define cloudShadow 1.0
+	float cloudShadow = 1.0;
 #endif
 
 	float sssDepth;
@@ -194,12 +194,12 @@ vec3 lightTranslucents(
 }
 
 vec3 blendLayers(vec3 background, vec3 foreground, vec3 tint, float alpha) {
-	/*
+#if   BLENDING_METHOD == BLENDING_METHOD_MIX
 	return mix(background, foreground, alpha);
-	/*/
-	background *= (1.0 - alpha) * mix(vec3(1.0), tint, alpha);
-	return background + foreground * step(0.0, alpha);
-	//*/
+#elif BLENDING_METHOD == BLENDING_METHOD_TINTED
+	background *= (1.0 - alpha) + tint * alpha;
+	return mix(background, foreground, alpha);
+#endif
 }
 
 void main() {

@@ -161,6 +161,7 @@ void main() {
 #if TAA_UPSCALING_FACTOR > 1
 	float confidence; // Confidence-of-quality factor, see "A Survey of Temporal Antialiasing Techniques" section 5.1
 	vec3 current = textureCatmullRom(colortex3, adjustedCoord, confidence).rgb;
+	if (minOf(current) < 0.0) current = texture(colortex3, adjustedCoord).rgb;// fix black outline around very bright objects
 #else
 	vec3 current = texelFetch(colortex3, srcTexel, 0).rgb;
 #endif

@@ -229,6 +229,10 @@ const float sunPathRotation = -40.0; // [-40.0 -35.0 -30.0 -25.0 -20.0 -15.0 -10
   #define HARDCODED_EMISSION
   #define HARDCODED_SSS
 
+  #define BLENDING_METHOD_MIX 0
+  #define BLENDING_METHOD_TINTED 1
+  #define BLENDING_METHOD BLENDING_METHOD_TINTED // [BLENDING_METHOD_MIX BLENDING_METHOD_TINTED]
+
 // Override MC_NORMAL_MAP and MC_SPECULAR_MAP instead of using the settings directly (so that the options in the shader selection screen work correctly instead of breaking the pack)
 #if defined MC_NORMAL_MAP && !defined NORMAL_MAP
 	#undef MC_NORMAL_MAP
