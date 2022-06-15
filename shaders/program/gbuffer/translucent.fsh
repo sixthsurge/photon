@@ -6,11 +6,6 @@
 layout (location = 0) out vec4 fragColor;
 layout (location = 1) out uvec4 encoded;
 
-#ifdef GBUFFERS_TEXTURED
-/* RENDERTARGETS: 0,1,2 */
-layout (location = 2) out vec3 velocityOut;
-#endif
-
 //--// Inputs //--------------------------------------------------------------//
 
 in vec2 texCoord;
@@ -19,10 +14,6 @@ in vec4 tint;
 
 flat in uint blockId;
 flat in mat3 tbnMatrix;
-
-#ifdef GBUFFERS_ENTITIES
-in vec3 velocity;
-#endif
 
 //--// Uniforms //------------------------------------------------------------//
 
@@ -116,8 +107,4 @@ void main() {
 
 	encoded.x = packUnorm4x8(data[0]);
 	encoded.y = packUnorm4x8(data[1]);
-
-#if defined GBUFFERS_TEXTURED
-	velocityOut = velocity;
-#endif
 }

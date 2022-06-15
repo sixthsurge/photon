@@ -9,15 +9,10 @@ out vec4 tint;
 flat out uint blockId;
 flat out mat3 tbnMatrix;
 
-#if defined GBUFFERS_TEXTURED
-out vec3 velocity;
-#endif
-
 //--// Inputs //--------------------------------------------------------------//
 
 #define attribute in
 attribute vec4 at_tangent;
-attribute vec3 at_velocity;
 attribute vec3 mc_Entity;
 
 //--// Uniforms //------------------------------------------------------------//
@@ -47,10 +42,6 @@ void main() {
 #ifdef MC_NORMAL_MAP
 	tbnMatrix[0] = mat3(gbufferModelViewInverse) * normalize(gl_NormalMatrix * at_tangent.xyz);
 	tbnMatrix[1] = cross(tbnMatrix[0], tbnMatrix[2]) * sign(at_tangent.w);
-#endif
-
-#if defined GBUFFERS_TEXTURED
-	velocity = at_velocity;
 #endif
 
 	vec3 viewPos = transform(gl_ModelViewMatrix, gl_Vertex.xyz);
