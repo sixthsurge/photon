@@ -208,7 +208,7 @@ const float sunPathRotation = -40.0; // [-40.0 -35.0 -30.0 -25.0 -20.0 -15.0 -10
   #define TAA_VARIANCE_CLIPPING // More aggressive neighborhood clipping method which further reduces ghosting but can introduce flickering artifacts
   #define TAA_BLEND_WEIGHT 0.125 // The maximum weight given to the current frame by the temporal AA. Higher values result in reduced ghosting and blur but jittering is more obvious [0.025 0.05 0.075 0.1 0.125 0.15 0.175 0.2 0.225 0.25]
   #define TAA_CONFIDENCE_REJECTION 5.0 // Controls the impact of the "confidence-of-quality" factor on temporal upscaling. Tradeoff between image clarity and time taken to converge [0.0 0.5 1.0 1.5 2.0 2.5 3.0 3.5 4.0 4.5 5.0 5.5 6.0 6.5 7.0 7.5 8.0 8.5 9.0 9.5 10.0]
-  #define TAA_OFFCENTER_REJECTION 0.20 // Reduces blur when moving quickly. Too much offcenter rejection results in aliasing and jittering in motion [0.01 0.02 0.03 0.04 0.05 0.06 0.07 0.08 0.09 0.10 0.11 0.12 0.13 0.14 0.15 0.16 0.17 0.18 0.19 0.20 0.21 0.22 0.23 0.25]
+  #define TAA_OFFCENTER_REJECTION 0.17 // Reduces blur when moving quickly. Too much offcenter rejection results in aliasing and jittering in motion [0.01 0.02 0.03 0.04 0.05 0.06 0.07 0.08 0.09 0.10 0.11 0.12 0.13 0.14 0.15 0.16 0.17 0.18 0.19 0.20 0.21 0.22 0.23 0.25]
   #define TAA_FLICKER_REDUCTION 1.00 // Reduces flickering caused by aggressive clipping [0.0 0.05 0.1 0.15 0.2 0.25 0.3 0.35 0.4 0.45 0.5 0.55 0.6 0.65 0.7 0.75 0.8 0.85 0.9 0.95 1.0]
 
 //--// Vignette

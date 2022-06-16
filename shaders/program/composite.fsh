@@ -117,6 +117,10 @@ vec3 getCloudsAerialPerspective(vec3 cloudsScattering, vec3 cloudData, vec3 rayD
 	return mix((1.0 - cloudData.b) * clearSky, cloudsScattering, transmittance);
 }
 
+float getSkylightFalloff(float skylight) {
+	return pow4(skylight);
+}
+
 vec3 lightTranslucents(
 	Material material,
 	vec3 scenePos,
@@ -180,7 +184,7 @@ vec3 lightTranslucents(
 
 	vec3 bsdf = material.albedo * rcpPi;
 
-	radiance += bsdf * skyIrradiance;
+	radiance += bsdf * skyIrradiance * getSkylightFalloff(lmCoord.y);
 
 	// Blocklight
 
