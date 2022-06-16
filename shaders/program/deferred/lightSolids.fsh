@@ -118,18 +118,19 @@ uniform vec3 lightDir;
 
 const float indirectRenderScale = 0.01 * INDIRECT_RENDER_SCALE;
 
-vec3 getSubsurfaceScattering(vec3 albedo, float sssAmount, float sssDepth, float NoL, float LoV) {
-	const float sssIntensity  = 4.0;
-	const float sssDensity    = 6.0;
+vec3 getSubsurfaceScattering(vec3 albedo, float sssAmount, float sssDepth, float LoV) {
+	const float sssIntensity  = 2.0;
+	const float sssDensity    = 12.0;
 
 	if (sssAmount < eps) return vec3(0.0);
 
 	float phase = 0.7 * henyeyGreensteinPhase(-LoV, 0.35) + 0.3 * henyeyGreensteinPhase(-LoV, -0.12);
 
-	vec3 coeff = clamp01(albedo * inversesqrt(getLuminance(albedo)));
-	     coeff = sssDensity * coeff - sssDensity;
+	vec3 coeff = mix(vec3(0.0), normalize(albedo), sqrt(sqrt(sqrt(length(albedo)))));
+	     coeff = (sssDensity * coeff - sssDensity) / sssAmount;
 
-	vec3 sss = sssIntensity * albedo * exp(min(coeff * sssDepth / sssAmount, 0.0)) * phase;
+	vec3 silverLining = 1.2 * exp(3.0 * coeff * sssDepth) * henyeyGreensteinPhase(-LoV, 0.5);
+	vec3 sss = albedo * sssIntensity * (exp(coeff * sssDepth) * phase + silverLining);
 
 	return sss;
 }
@@ -229,19 +230,12 @@ void main() {
 
 		vec3 visibility = NoL * shadows;
 
-		vec3 diffuse = diffuseBrdf(material.albedo, material.f0.x, material.n, material.roughness, NoL, NoV, NoH, LoV);
+		vec3 bsdf = diffuseBrdf(material.albedo, material.f0.x, material.n, material.roughness, NoL, NoV, NoH, LoV) * (1.0 - float(material.isMetal))
+		          + specularBrdf(material, NoL, NoV, NoH, LoV, LoH, lightRadius);
 
-		vec3 sss  = getSubsurfaceScattering(albedo, material.sssAmount, sssDepth, NoL, LoV);
+		vec3 sss  = getSubsurfaceScattering(albedo, material.sssAmount, sssDepth, LoV);
 
-#ifdef AO_IN_SUNLIGHT
-		diffuse *= gtao.w;
-#endif
-		diffuse *= 1.0 - 0.75 * material.sssAmount;
-		diffuse *= 1.0 - float(material.isMetal);
-
-		vec3 specular = specularBrdf(material, NoL, NoV, NoH, LoV, LoH, lightRadius);
-
-		radiance += directIrradiance * cloudShadow * ((diffuse + specular) * visibility + material.sssAmount * sss);
+		radiance += directIrradiance * cloudShadow * (bsdf * visibility + sss);
 	}
 #endif
 

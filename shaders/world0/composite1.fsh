@@ -168,7 +168,7 @@ mat2x3 raymarchFog(vec3 worldStartPos, vec3 worldEndPos, bool isSky, float dithe
 
 	vec2 densityAtSeaLevel;
 	densityAtSeaLevel.x = 0.3 * timeSunrise + 0.3 * timeNoon + 0.3 * timeSunset + 0.4 * timeMidnight;
-	densityAtSeaLevel.y = 80.0 * timeSunrise + 0.5 * timeNoon + 50.0 * timeSunset + 40.0 * timeMidnight;
+	densityAtSeaLevel.y = 4.0 * timeSunrise + 0.1 * timeNoon + 0.5 * timeSunset + 0.3 * timeMidnight;
 
 	mat2x3 scatteringCoeff = mat2x3(
 		(airScatteringCoefficients[0] * fogScale) * densityAtSeaLevel.x,

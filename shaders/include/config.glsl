@@ -62,7 +62,7 @@ const float sunPathRotation = -40.0; // [-40.0 -35.0 -30.0 -25.0 -20.0 -15.0 -10
   #define AIR_FOG_VL
   #define AIR_FOG_DENSITY 1.0 // []
 
-//#define DISTANCE_FADE
+  #define DISTANCE_FADE
 
 //--// Sky
 

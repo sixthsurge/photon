@@ -100,7 +100,7 @@ void main() {
 #endif
 
 #ifdef VIGNETTE
-    fragColor *= vignette(coord);
+    //fragColor *= vignette(coord);
 #endif
 
 	fragColor = linearToSrgb(fragColor);

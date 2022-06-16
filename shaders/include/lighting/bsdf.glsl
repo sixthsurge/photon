@@ -116,7 +116,7 @@ vec3 specularBrdf(
 	float LoH,
 	float lightRadius
 ) {
-	vec3 f = material.isMetal ? vec3(fresnelDielectric(LoH, material.n)) : fresnelSchlick(LoH, material.f0);
+	vec3 f = material.isMetal ? fresnelSchlick(LoH, material.f0) : vec3(fresnelDielectric(LoH, material.n));
 
 	if (all(lessThan(f, vec3(1e-2)))) return vec3(0.0);
 
@@ -125,7 +125,7 @@ vec3 specularBrdf(
 	float NoHSq = getNoHSquared(NoL, NoV, LoV, lightRadius);
 	float alphaSq = material.roughness * material.roughness;
 
-	float d = distributionGgx(min(NoHSq, 1.0), alphaSq);
+	float d = distributionGgx(NoHSq, alphaSq);
 	float v = visibilitySmithGgxCorrelated(max(NoL, 1e-2), max(NoV, 1e-2), alphaSq);
 
 	return (d * v) * f * albedoTint;
