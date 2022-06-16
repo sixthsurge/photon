@@ -124,7 +124,7 @@ vec3 getSubsurfaceScattering(vec3 albedo, float sssAmount, float sssDepth, float
 
 	if (sssAmount < eps) return vec3(0.0);
 
-	float phase = 0.7 * henyeyGreensteinPhase(-LoV, 0.35) + 0.3 * henyeyGreensteinPhase(-LoV, -0.12);
+	float phase = 0.6 * henyeyGreensteinPhase(-LoV, 0.6) + 0.4 * henyeyGreensteinPhase(-LoV, -0.3);
 
 	vec3 coeff = mix(vec3(0.0), normalize(albedo), sqrt(sqrt(sqrt(length(albedo)))));
 	     coeff = (sssDensity * coeff - sssDensity) / sssAmount;

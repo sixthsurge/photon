@@ -15,7 +15,7 @@
 const float rrtGlowGain  = 0.1 * RRT_GLOW_GAIN;   // default: 0.05
 const float rrtGlowMid   = 0.08 * RRT_GLOW_MID;   // default: 0.08
 
-const float rrtRedScale  = 0.95 * RRT_RED_SCALE;  // default: 0.82
+const float rrtRedScale  = 1.0 * RRT_RED_SCALE;  // default: 0.82
 const float rrtRedPivot  = 0.03;                  // default: 0.03
 const float rrtRedHue    = 0.0;                   // default: 0.0
 const float rrtRedWidth  = 135.0 * RRT_RED_WIDTH; // default: 135.0

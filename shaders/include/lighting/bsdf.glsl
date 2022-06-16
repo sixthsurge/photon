@@ -44,7 +44,7 @@ float getNoHSquared(
 	float NoH = NoV + newNoL;
 	float HoH = 2.0 * newLoV + 2.0;
 
-	return max(0.0, NoH * NoH / HoH);
+	return clamp01(NoH * NoH / HoH);
 }
 
 float distributionGgx(float NoHSq, float alphaSq) {
