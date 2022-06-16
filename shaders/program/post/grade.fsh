@@ -59,7 +59,7 @@ uniform vec2 windowSize;
 //--// Functions //-----------------------------------------------------------//
 
 vec3 tonemapAces(vec3 rgb) {
-	rgb *= 1.37; // Match the exposure to the RRT
+	rgb *= 1.7; // Match the exposure to the RRT
 	rgb = acesRrt(rgb);
 	rgb = acesOdt(rgb);
 
@@ -67,7 +67,7 @@ vec3 tonemapAces(vec3 rgb) {
 }
 
 vec3 tonemapAcesFit(vec3 rgb) {
-	rgb *= 1.37; // Match the exposure to the RRT
+	rgb *= 1.7; // Match the exposure to the RRT
 	rgb = rrtSweeteners(rgb * ap1ToAp0);
 	rgb = rrtAndOdtFit(rgb);
 
@@ -138,6 +138,6 @@ void main() {
 	fragColor *= globalExposure;
 #endif
 
-	fragColor = tonemapHejlBurgess(fragColor);
+	fragColor = tonemap(fragColor);
 	fragColor = fragColor * ap1ToR709;
 }
