@@ -23,6 +23,8 @@ screen.shadows                         = Shadows
 
 screen.temporal                        = Temporal AA
 
+screen.waving                          = Waving Blocks
+
 profile.fast                           = §bFast
 profile.fancy                          = §dFancy
 
@@ -231,6 +233,11 @@ value.TEXTURE_FORMAT.TEXTURE_FORMAT_OLD = Old PBR / SEUS PBR
 
 option.NORMAL_MAP                      = Normal Mapping
 option.SPECULAR_MAP                    = Specular Mapping
+
+# Waving Blocks
+
+option.WAVING_PLANTS                   = Waving Plants
+option.WAVING_LEAVES                   = Waving Leaves
 
 #----# Water #-------------------------------------------------------------------------------------#
 

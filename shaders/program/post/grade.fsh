@@ -59,7 +59,7 @@ uniform vec2 windowSize;
 //--// Functions //-----------------------------------------------------------//
 
 vec3 tonemapAces(vec3 rgb) {
-	rgb *= 1.8; // Match the exposure to the RRT
+	rgb *= 2.0; // Match the exposure to the RRT
 	rgb = acesRrt(rgb);
 	rgb = acesOdt(rgb);
 
@@ -67,7 +67,7 @@ vec3 tonemapAces(vec3 rgb) {
 }
 
 vec3 tonemapAcesFit(vec3 rgb) {
-	rgb *= 1.8; // Match the exposure to the RRT
+	rgb *= 2.0; // Match the exposure to the RRT
 	rgb = rrtSweeteners(rgb * ap1ToAp0);
 	rgb = rrtAndOdtFit(rgb);
 
@@ -116,6 +116,21 @@ vec3 adjustContrast(vec3 rgb, const float contrast) {
 vec3 adjustSaturation(vec3 rgb, float saturation) {
 	vec3 greyscale = vec3(getLuminance(rgb));
 	return mix(greyscale, rgb, saturation);
+}
+
+// Vibrance filter from Belmu
+vec3 adjustVibrance(vec3 rgb, const float vibrance) {
+	float minComponent = minOf(rgb);
+	float maxComponent = maxOf(rgb);
+	float lightness    = 0.5 * (minComponent + maxComponent);
+	float saturation   = (1.0 - clamp01(maxComponent - minComponent)) * clamp01(1.0 - maxComponent) * getLuminance(rgb) * 5.0;
+
+	// vibrance
+	rgb = mix(rgb, mix(vec3(lightness), rgb, vibrance), saturation);
+	// negative vibrance
+	rgb = mix(rgb, vec3(lightness), min((1.0 - lightness) * (1.0 - vibrance) * 0.5 * abs(vibrance), 1.0));
+
+	return rgb;
 }
 
 void main() {

@@ -1,2 +1,2 @@
-#version 400 compatibility
+#version 410 compatibility
 #include "/program/fullscreenQuad.vsh"

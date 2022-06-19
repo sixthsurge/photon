@@ -243,6 +243,12 @@ const float sunPathRotation = -40.0; // [-40.0 -35.0 -30.0 -25.0 -20.0 -15.0 -10
 	#undef MC_SPECULAR_MAP
 #endif
 
+//--// Waving Blocks
+
+  #define WAVING_PLANTS
+  #define WAVING_LEAVES
+
+
 //--// Water //---------------------------------------------------------------//
 
   #define WATER_STYLE_REALISTIC 0

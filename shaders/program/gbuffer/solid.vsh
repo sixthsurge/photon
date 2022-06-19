@@ -19,19 +19,41 @@ out vec3 velocity;
 attribute vec4 at_tangent;
 attribute vec3 at_velocity;
 attribute vec3 mc_Entity;
+attribute vec2 mc_midTexCoord;
 
 //--// Uniforms //------------------------------------------------------------//
 
+uniform sampler2D noisetex;
+
 //--// Camera uniforms
+
+uniform float near;
+uniform float far;
+
+uniform vec3 cameraPosition;
 
 uniform mat4 gbufferModelView;
 uniform mat4 gbufferModelViewInverse;
+uniform mat4 gbufferProjection;
+uniform mat4 gbufferProjectionInverse;
+
+//--// Time uniforms
+
+uniform float frameTimeCounter;
+
+uniform float rainStrength;
 
 //--// Custom uniforms
 
 uniform vec2 taaOffset;
 
 //--// Includes //------------------------------------------------------------//
+
+#include "/block.properties"
+
+#include "/include/vertex/windAnimation.glsl"
+
+#include "/include/utility/spaceConversion.glsl"
 
 //--// Functions //-----------------------------------------------------------//
 
@@ -55,6 +77,16 @@ void main() {
 #endif
 
 	vec3 viewPos = transform(gl_ModelViewMatrix, gl_Vertex.xyz);
+
+#ifdef GBUFFERS_TERRAIN
+	bool isTopVertex = texCoord.y < mc_midTexCoord.y;
+
+	vec3 scenePos  = viewToSceneSpace(viewPos);
+	     scenePos += animateVertex(scenePos + cameraPosition, isTopVertex, lmCoord.y, blockId);
+
+	viewPos = sceneToViewSpace(scenePos);
+#endif
+
 	vec4 clipPos = project(gl_ProjectionMatrix, viewPos);
 
 #ifdef TAA

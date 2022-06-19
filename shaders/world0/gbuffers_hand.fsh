@@ -1,4 +1,4 @@
-#version 400 compatibility
+#version 410 compatibility
 #define GBUFFERS_ENTITIES
 #define GBUFFERS_HAND
 #define WORLD_OVERWORLD

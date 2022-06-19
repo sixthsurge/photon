@@ -1,4 +1,4 @@
-#version 400 compatibility
+#version 410 compatibility
 
 /*
  * Program description:

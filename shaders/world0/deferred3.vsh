@@ -1,4 +1,4 @@
-#version 400 compatibility
+#version 410 compatibility
 #include "/include/global.glsl"
 
 //--// Outputs //-------------------------------------------------------------//
