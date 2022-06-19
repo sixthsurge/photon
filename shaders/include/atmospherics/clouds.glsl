@@ -13,6 +13,7 @@ struct Ray {
 
 struct CloudLayer {
 	vec2 offset;
+	vec2 wind;
 	float radius;
 	float thickness;
 	float frequency;
@@ -84,7 +85,10 @@ float getCumulusCloudsDensity(
 	float detailFade = 0.6 - 0.35 * smoothstep(0.05, 0.3, altitudeFraction);
 
 	for (int i = 0; i < detailIterations; ++i) {
+		pos.xz += 0.5 * layer.wind;
+
 		density -= detailAmplitude * texture(depthtex0, pos * detailFrequency + curl).x * dampen(1.0 - density);
+
 		detailAmplitude *= detailFade;
 		detailFrequency *= 8.0;
 		curl *= 10.0;
@@ -335,10 +339,8 @@ vec4 drawClouds(Ray ray, vec3 lightDir, float dither, float distanceToTerrain) {
 #endif
 
 	for (int i = 0; i < CLOUDS_CUMULUS_LAYERS; ++i) {
-		vec2 wind = windSpeed * vec2(cos(windAngle), sin(windAngle));
-
-		// Random xz offset for this layer, plus wind and camera offset
-		layer.offset = 1e4 * R2(i) + wind * t + cameraPosition.xz * CLOUDS_SCALE;
+		layer.wind = windSpeed * vec2(cos(windAngle), sin(windAngle)) * t;
+		layer.offset = 1e4 * R2(i) + layer.wind + cameraPosition.xz * CLOUDS_SCALE;
 
 		// Scale primary step count so that fewer steps are taken through thinner layers
 		const float layer0Thickness = CLOUDS_CUMULUS_ALTITUDE * CLOUDS_CUMULUS_THICKNESS;
@@ -415,10 +417,8 @@ vec2 getCloudShadows(Ray ray) {
 #endif
 
 	for (int i = 0; i < CLOUDS_CUMULUS_LAYERS; ++i) {
-		vec2 wind = windSpeed * vec2(cos(windAngle), sin(windAngle));
-
-		// Random xz offset for this layer, plus wind and camera offset
-		layer.offset = 1e4 * R2(i) + wind * t + cameraPosition.xz * CLOUDS_SCALE;
+		layer.wind = windSpeed * vec2(cos(windAngle), sin(windAngle)) * t;
+		layer.offset = 1e4 * R2(i) + layer.wind + cameraPosition.xz * CLOUDS_SCALE;
 
 		vec3 origin = ray.origin + ray.dir * raySphereIntersection(ray.origin, ray.dir, layer.radius).y;
 		float opticalDepth = getCumulusCloudsOpticalDepth(Ray(origin, ray.dir), layer, 0.5, stepCount);

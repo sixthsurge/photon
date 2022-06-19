@@ -46,7 +46,7 @@ const float sunPathRotation = -40.0; // [-40.0 -35.0 -30.0 -25.0 -20.0 -15.0 -10
   #define CLOUDS_CUMULUS_WISPINESS 1.0 // [0.0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0 1.1 1.2 1.3 1.4 1.5 1.6 1.7 1.8 1.9 2.0]
   #define CLOUDS_CUMULUS_SWIRLINESS 1.0 // [0.0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0 1.1 1.2 1.3 1.4 1.5 1.6 1.7 1.8 1.9 2.0]
   #define CLOUDS_CUMULUS_LOCAL_COVERAGE_VARIATION 0.5 // Amount of local variation in cloud coverage [0.0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0]
-  #define CLOUDS_CUMULUS_WIND_SPEED 8.0 // The speed at which clouds move [0.0 1.0 2.0 3.0 4.0 5.0 6.0 7.0 8.0 9.0 10.0 11.0 12.0 13.0 14.0 15.0 16.0]
+  #define CLOUDS_CUMULUS_WIND_SPEED 10.0 // The speed at which clouds move [0.0 1.0 2.0 3.0 4.0 5.0 6.0 7.0 8.0 9.0 10.0 11.0 12.0 13.0 14.0 15.0 16.0]
   #define CLOUDS_CUMULUS_WIND_BEARING 30.0 // The bearing on which clouds move [0.0 10.0 20.0 30.0 40.0 50.0 60.0 70.0 80.0 90.0 100.0 110.0 120.0 130.0 140.0 150.0 160.0 170.0 180.0 190.0 200.0 210.0 220.0 230.0 240.0 250.0 260.0 270.0 280.0 290.0 300.0 310.0 320.0 330.0 340.0 350.0 360.0]
   #define CLOUDS_CUMULUS_LAYER_SPACING 800.0 // The size of the gap between the first two cloud layers
   #define CLOUDS_CUMULUS_LAYER_THICKNESS_FALLOFF 1.0 // How much thicker or thinner each subsequent cloud layer gets [0.0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0 1.1 1.2 1.3 1.4 1.5 1.6 1.7 1.8 1.9 2.0]
