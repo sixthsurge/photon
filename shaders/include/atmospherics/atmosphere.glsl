@@ -52,7 +52,6 @@ const vec3 airMieCoefficient      = vec3(1.666442358e-06, 1.812685127e-06, 1.958
 const vec3 airOzoneCoefficient    = vec3(8.304280072e-07, 1.314911970e-06, 5.440679729e-08) * r709ToAp1Unlit;
 /*/
 // Coefficients for AP1 primaries
-
 const vec3 airRayleighCoefficient = vec3(8.059375432e-06, 1.671209429e-05, 4.080133294e-05);
 const vec3 airMieCoefficient      = vec3(1.666442358e-06, 1.812685127e-06, 1.958927896e-06);
 const vec3 airOzoneCoefficient    = vec3(8.304280072e-07, 1.31491197e-06,  5.440679729e-08);

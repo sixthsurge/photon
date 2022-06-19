@@ -70,6 +70,8 @@ uniform float sunAngle;
 
 //--// Custom uniforms
 
+uniform float biomeCave;
+
 uniform vec2 viewSize;
 uniform vec2 viewTexelSize;
 
@@ -84,6 +86,7 @@ uniform vec3 lightDir;
 
 #include "/include/atmospherics/atmosphere.glsl"
 
+#include "/include/fragment/fog.glsl"
 #include "/include/fragment/material.glsl"
 #include "/include/fragment/textureFormat.glsl"
 
@@ -130,7 +133,8 @@ vec3 lightTranslucents(
 	vec2 lmCoord,
 	vec3 ambientIrradiance,
 	vec3 directIrradiance,
-	vec3 skyIrradiance
+	vec3 skyIrradiance,
+	vec3 clearSky
 ) {
 	vec3 radiance = vec3(0.0);
 
@@ -194,6 +198,10 @@ vec3 lightTranslucents(
 
 	radiance += bsdf * ambientIrradiance;
 
+#ifdef DISTANCE_FADE
+	radiance = distanceFade(radiance, clearSky, scenePos, -viewerDir);
+#endif
+
 	return radiance;
 }
 
@@ -216,6 +224,7 @@ void main() {
 	radiance              = texelFetch(colortex3, texel, 0).rgb;
 
 #if defined WORLD_OVERWORLD
+	vec3 clearSky         = texelFetch(colortex6, texel, 0).rgb;
 	vec4 clouds           = texelFetch(colortex11, texel, 0);
 #endif
 
@@ -272,7 +281,7 @@ void main() {
 
 	} else if (isTranslucent) { // Translucents
 	 	vec3 background = radiance;
-		vec3 foreground = lightTranslucents(material, scenePosFront, normal, flatNormal, -worldDir, lmCoord, ambientIrradiance, directIrradiance, skyIrradiance);
+		vec3 foreground = lightTranslucents(material, scenePosFront, normal, flatNormal, -worldDir, lmCoord, ambientIrradiance, directIrradiance, skyIrradiance, clearSky);
 		radiance = blendLayers(background, foreground, albedo, translucentColor.a);
 	} else { // Solids
 
