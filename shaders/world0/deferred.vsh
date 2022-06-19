@@ -17,7 +17,8 @@ flat out vec3 ambientIrradiance;
 flat out vec3 directIrradiance;
 flat out vec3 skyIrradiance;
 
-flat out float airMieTurbidity;
+flat out float airRayleighDensity;
+flat out float airMieDensity;
 flat out float cloudsCirrusCoverage;
 flat out float cloudsCumulusCoverage;
 
@@ -33,6 +34,8 @@ uniform ivec2 eyeBrightnessSmooth;
 
 uniform int worldDay;
 uniform int worldTime;
+
+uniform float wetness;
 
 uniform float sunAngle;
 
@@ -70,7 +73,7 @@ void main() {
 	vec3 rayDir = cloudsMoonlit ? moonDir : sunDir;
 
 	cloudsDirectIrradiance  = cloudsMoonlit ? moonIrradiance : sunIrradiance;
-	cloudsDirectIrradiance *= getAtmosphereTransmittance(rayOrigin, rayDir, airMieTurbidity);
+	cloudsDirectIrradiance *= getAtmosphereTransmittance(rayOrigin, rayDir);
 	cloudsDirectIrradiance *= 1.0 - pulse(float(worldTime), 12850.0, 50.0) - pulse(float(worldTime), 23150.0, 50.0);
 
 	gl_Position = vec4(gl_Vertex.xy * 2.0 - 1.0, 0.0, 1.0);

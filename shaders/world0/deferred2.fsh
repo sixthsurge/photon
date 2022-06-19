@@ -22,8 +22,6 @@ in vec2 coord;
 flat in vec3 directIrradiance;
 flat in vec3 skyIrradiance;
 
-flat in float airMieTurbidity;
-
 //--// Uniforms //------------------------------------------------------------//
 
 uniform sampler2D colortex0;  // Vanilla sky (sun, moon and custom skies)
@@ -249,20 +247,19 @@ vec3 getCloudsAerialPerspective(vec3 cloudsScattering, vec3 cloudData, vec3 rayD
 
 	vec3 transmittance;
 	if (rayOrigin.y < length(rayEnd)) {
-		vec3 trans0 = getAtmosphereTransmittance(rayOrigin, rayDir, 1.0);
-		vec3 trans1 = getAtmosphereTransmittance(rayEnd,    rayDir, 1.0);
+		vec3 trans0 = getAtmosphereTransmittance(rayOrigin, rayDir);
+		vec3 trans1 = getAtmosphereTransmittance(rayEnd,    rayDir);
 
 		transmittance = clamp01(trans0 / trans1);
 	} else {
-		vec3 trans0 = getAtmosphereTransmittance(rayOrigin, -rayDir, 1.0);
-		vec3 trans1 = getAtmosphereTransmittance(rayEnd,    -rayDir, 1.0);
+		vec3 trans0 = getAtmosphereTransmittance(rayOrigin, -rayDir);
+		vec3 trans1 = getAtmosphereTransmittance(rayEnd,    -rayDir);
 
 		transmittance = clamp01(trans1 / trans0);
 	}
 
 	return mix((1.0 - cloudData.b) * clearSky, cloudsScattering, transmittance);
 }
-uniform sampler2D colortex4;
 
 void main() {
 	ivec2 texel = ivec2(gl_FragCoord.xy);
@@ -275,8 +272,8 @@ void main() {
 
 	vec4 cloudData = upscaleClouds(texel, vec3(coord, depth));
 
-	atmosphereScattering = sunIrradiance * getAtmosphereScattering(rayDir, sunDir, airMieTurbidity)
-	                     + moonIrradiance * getAtmosphereScattering(rayDir, moonDir, airMieTurbidity);
+	atmosphereScattering = sunIrradiance * getAtmosphereScattering(rayDir, sunDir)
+	                     + moonIrradiance * getAtmosphereScattering(rayDir, moonDir);
 
 	if (depth != 1.0) return;
 
@@ -312,7 +309,7 @@ void main() {
 
 	// Atmosphere
 
-	vec3 atmosphereTransmittance = getAtmosphereTransmittance(rayDir.y, planetRadius, airMieTurbidity);
+	vec3 atmosphereTransmittance = getAtmosphereTransmittance(rayDir.y, planetRadius);
 
 	radiance = radiance * atmosphereTransmittance + atmosphereScattering;
 

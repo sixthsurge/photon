@@ -186,7 +186,7 @@ vec4 texture4D(sampler3D sampler, vec4 coord, const ivec4 res) {
 	return mix(s0, s1, f);
 }
 
-vec3 getAtmosphereScattering(float nu, float mu, float muS, float turbidity) {
+vec3 getAtmosphereScattering(float nu, float mu, float muS) {
 #ifdef HIDE_PLANET_SURFACE
 	const float minMu = 0.01;
 	mu = max(mu, minMu);
@@ -194,7 +194,7 @@ vec3 getAtmosphereScattering(float nu, float mu, float muS, float turbidity) {
 
 	vec4 coord;
 	coord.xyz = getAtmosphereScatteringTexCoord(nu, mu, muS);
-	coord.w   = getAtmosphereTurbidityTexCoord(turbidity);
+	coord.w   = getAtmosphereTurbidityTexCoord(1.0);
 
 	vec3 scattering;
 
@@ -209,12 +209,12 @@ vec3 getAtmosphereScattering(float nu, float mu, float muS, float turbidity) {
 	return scattering;
 }
 
-vec3 getAtmosphereScattering(vec3 rayDir, vec3 lightDir, float turbidity) {
+vec3 getAtmosphereScattering(vec3 rayDir, vec3 lightDir) {
 	float nu = dot(rayDir, lightDir);
 	float mu = rayDir.y;
 	float muS = lightDir.y;
 
-	return getAtmosphereScattering(nu, mu, muS, turbidity);
+	return getAtmosphereScattering(nu, mu, muS);
 }
 #endif
 
@@ -237,10 +237,10 @@ vec2 getAtmosphereTransmittanceTexCoord(float mu, float r) {
 	return vec2(uMu, uR);
 }
 
-vec3 getAtmosphereTransmittance(float mu, float r, float turbidity) {
+vec3 getAtmosphereTransmittance(float mu, float r) {
 	vec3 coord;
 	coord.xy = getAtmosphereTransmittanceTexCoord(mu, r);
-	coord.z  = getAtmosphereTurbidityTexCoord(turbidity);
+	coord.z  = getAtmosphereTurbidityTexCoord(1.0);
 
 	return texture(ATMOSPHERE_TRANSMITTANCE_LUT, coord).rgb;
 }
@@ -257,7 +257,7 @@ float chapmanFunctionApprox(float x, float cosTheta) {
 	}
 }
 
-vec3 getAtmosphereTransmittance(float mu, float r, float turbidity) {
+vec3 getAtmosphereTransmittance(float mu, float r) {
 	// Transmittance is 0 if ray intersects ground
 	float discriminant = r * r * (mu * mu - 1.0) + atmosphereLowerLimitRadiusSq;
 	if (mu < 0.0 && discriminant >= 0.0) return vec3(0.0);
@@ -272,21 +272,18 @@ vec3 getAtmosphereTransmittance(float mu, float r, float turbidity) {
 	airmass.x *= chapmanFunctionApprox(r * rcpScaleHeights.x, mu);
 	airmass.y *= chapmanFunctionApprox(r * rcpScaleHeights.y, mu);
 
-	// Account for turbidity
-	airmass.y *= turbidity;
-
 	// Approximate ozone density as rayleigh density
 	return clamp01(exp(-airExtinctionCoefficients * airmass.xyx));
 }
 #endif
 
-vec3 getAtmosphereTransmittance(vec3 rayOrigin, vec3 rayDir, float turbidity) {
+vec3 getAtmosphereTransmittance(vec3 rayOrigin, vec3 rayDir) {
 	float rSq = dot(rayOrigin, rayOrigin);
 	float rcpR = inversesqrt(rSq);
 	float mu = dot(rayOrigin, rayDir) * rcpR;
 	float r = rSq * rcpR;
 
-	return getAtmosphereTransmittance(mu, r, turbidity);
+	return getAtmosphereTransmittance(mu, r);
 }
 
 #endif // INCLUDE_ATMOSPHERE_ATMOSPHERE

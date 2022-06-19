@@ -106,13 +106,13 @@ vec3 getCloudsAerialPerspective(vec3 cloudsScattering, vec3 cloudData, vec3 rayD
 
 	vec3 transmittance;
 	if (rayOrigin.y < length(rayEnd)) {
-		vec3 trans0 = getAtmosphereTransmittance(rayOrigin, rayDir, 1.0);
-		vec3 trans1 = getAtmosphereTransmittance(rayEnd,    rayDir, 1.0);
+		vec3 trans0 = getAtmosphereTransmittance(rayOrigin, rayDir);
+		vec3 trans1 = getAtmosphereTransmittance(rayEnd,    rayDir);
 
 		transmittance = clamp01(trans0 / trans1);
 	} else {
-		vec3 trans0 = getAtmosphereTransmittance(rayOrigin, -rayDir, 1.0);
-		vec3 trans1 = getAtmosphereTransmittance(rayEnd,    -rayDir, 1.0);
+		vec3 trans0 = getAtmosphereTransmittance(rayOrigin, -rayDir);
+		vec3 trans1 = getAtmosphereTransmittance(rayEnd,    -rayDir);
 
 		transmittance = clamp01(trans1 / trans0);
 	}

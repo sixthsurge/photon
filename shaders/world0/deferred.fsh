@@ -23,7 +23,7 @@ flat in vec3 ambientIrradiance;
 flat in vec3 directIrradiance;
 flat in vec3 skyIrradiance;
 
-flat in float airMieTurbidity;
+flat in float airMieDensity;
 flat in float cloudsCirrusCoverage;
 flat in float cloudsCumulusCoverage;
 
@@ -80,13 +80,13 @@ vec3 getCloudsAerialPerspective(vec3 cloudsScattering, vec3 cloudData, vec3 rayD
 
 	vec3 transmittance;
 	if (rayOrigin.y < length(rayEnd)) {
-		vec3 trans0 = getAtmosphereTransmittance(rayOrigin, rayDir, 1.0);
-		vec3 trans1 = getAtmosphereTransmittance(rayEnd,    rayDir, 1.0);
+		vec3 trans0 = getAtmosphereTransmittance(rayOrigin, rayDir);
+		vec3 trans1 = getAtmosphereTransmittance(rayEnd,    rayDir);
 
 		transmittance = clamp01(trans0 / trans1);
 	} else {
-		vec3 trans0 = getAtmosphereTransmittance(rayOrigin, -rayDir, 1.0);
-		vec3 trans1 = getAtmosphereTransmittance(rayEnd,    -rayDir, 1.0);
+		vec3 trans0 = getAtmosphereTransmittance(rayOrigin, -rayDir);
+		vec3 trans1 = getAtmosphereTransmittance(rayEnd,    -rayDir);
 
 		transmittance = clamp01(trans1 / trans0);
 	}
@@ -112,7 +112,7 @@ void main() {
 			break;
 
 		case 3:
-			radiance = vec3(airMieTurbidity, cloudsCirrusCoverage, cloudsCumulusCoverage);
+			radiance = vec3(airMieDensity, cloudsCirrusCoverage, cloudsCumulusCoverage);
 			break;
 		}
 	} else {
@@ -122,10 +122,10 @@ void main() {
 
 		// Atmosphere
 
-		vec3 atmosphereScattering = sunIrradiance * getAtmosphereScattering(rayDir, sunDir, airMieTurbidity)
-		                          + moonIrradiance * getAtmosphereScattering(rayDir, moonDir, airMieTurbidity);
+		vec3 atmosphereScattering = sunIrradiance * getAtmosphereScattering(rayDir, sunDir)
+		                          + moonIrradiance * getAtmosphereScattering(rayDir, moonDir);
 
-		vec3 atmosphereTransmittance = getAtmosphereTransmittance(rayDir.y, planetRadius, airMieTurbidity);
+		vec3 atmosphereTransmittance = getAtmosphereTransmittance(rayDir.y, planetRadius);
 
 		radiance = radiance * atmosphereTransmittance + atmosphereScattering;
 

@@ -12,13 +12,13 @@ void paletteSetup() {
 
 	// Sunlight/moonlight
 	directIrradiance  = sunAngle < 0.5 ? sunIrradiance : moonIrradiance;
-	directIrradiance *= getAtmosphereTransmittance(lightDir.y, planetRadius, airMieTurbidity);
+	directIrradiance *= getAtmosphereTransmittance(lightDir.y, planetRadius);
 	directIrradiance *= clamp01(rcp(0.02) * lightDir.y); // fade away during day/night transition
 
 	// Skylight
 	const vec3 up = vec3(0.0, 1.0, 0.0);
-	skyIrradiance = sunIrradiance * getAtmosphereScattering(up, sunDir, airMieTurbidity)
-	              + moonIrradiance * getAtmosphereScattering(up, moonDir, airMieTurbidity);
+	skyIrradiance = sunIrradiance * getAtmosphereScattering(up, sunDir)
+	              + moonIrradiance * getAtmosphereScattering(up, moonDir);
 	skyIrradiance = tau * skyIrradiance;
 }
 

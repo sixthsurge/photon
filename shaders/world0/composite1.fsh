@@ -20,8 +20,6 @@ in vec2 coord;
 flat in vec3 directIrradiance;
 flat in vec3 skyIrradiance;
 
-flat in float airMieTurbidity;
-
 //--// Uniforms //------------------------------------------------------------//
 
 uniform sampler2D noisetex;
@@ -172,12 +170,12 @@ mat2x3 raymarchFog(vec3 worldStartPos, vec3 worldEndPos, bool isSky, float dithe
 
 	mat2x3 scatteringCoeff = mat2x3(
 		(airScatteringCoefficients[0] * fogScale) * densityAtSeaLevel.x,
-		(airScatteringCoefficients[1] * fogScale) * densityAtSeaLevel.y * airMieTurbidity
+		(airScatteringCoefficients[1] * fogScale) * densityAtSeaLevel.y
 	);
 
 	mat2x3 extinctionCoeff = mat2x3(
 		(airExtinctionCoefficients[0] * fogScale) * densityAtSeaLevel.x,
-		(airExtinctionCoefficients[1] * fogScale) * densityAtSeaLevel.y * airMieTurbidity
+		(airExtinctionCoefficients[1] * fogScale) * densityAtSeaLevel.y
 	);
 
 	//--// Raymarching loop

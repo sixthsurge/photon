@@ -17,7 +17,7 @@ uniform sampler2D colortex4; // Sky capture, color palette and weather propertie
 void main() {
 	coord = gl_MultiTexCoord0.xy;
 
-	vec3 weather = texelFetch(colortex4, ivec2(255, 3), 0).xyz;
+	vec3 weather = texelFetch(colortex4, ivec2(255, 3), 0).rgb;
 	cloudsCirrusCoverage = weather.y;
 	cloudsCumulusCoverage = weather.z;
 
