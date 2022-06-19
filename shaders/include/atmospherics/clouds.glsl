@@ -70,7 +70,7 @@ float getCumulusCloudsDensity(
 	const vec4 cloudGradient = vec4(0.2, 0.2, 0.85, 0.2);
 	density *= smoothstep(0.0, cloudGradient.x, altitudeFraction);
 	density *= smoothstep(0.0, cloudGradient.y, 1.0 - altitudeFraction);
-	density -= smoothstep(cloudGradient.z, 1.0, 1.0 - altitudeFraction) * 0.2;
+	density -= smoothstep(cloudGradient.z, 1.0, 1.0 - altitudeFraction) * 0.1;
 	density -= smoothstep(cloudGradient.w, 1.0, altitudeFraction) * 0.6;
 
 	if (density < eps) return 0.0;
@@ -79,9 +79,9 @@ float getCumulusCloudsDensity(
 	vec3 curl = 0.1 * texture(depthtex2, 0.002 * pos).xyz * smoothstep(0.4, 1.0, 1.0 - altitudeFraction) * CLOUDS_CUMULUS_SWIRLINESS;
 
 	// 3D worley noise for detail
-	float detailAmplitude = 0.5 * CLOUDS_CUMULUS_WISPINESS;
-	float detailFrequency = 0.001;
-	float detailFade = 0.7 - 0.4 * smoothstep(0.05, 0.3, altitudeFraction);
+	float detailAmplitude = 0.47 * CLOUDS_CUMULUS_WISPINESS;
+	float detailFrequency = 0.0008;
+	float detailFade = 0.6 - 0.35 * smoothstep(0.05, 0.3, altitudeFraction);
 
 	for (int i = 0; i < detailIterations; ++i) {
 		density -= detailAmplitude * texture(depthtex0, pos * detailFrequency + curl).x * dampen(1.0 - density);

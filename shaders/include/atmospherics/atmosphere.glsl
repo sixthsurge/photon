@@ -45,16 +45,17 @@ const float airMieEnergyParameter = 3000.0; // Energy parameter for Klein-Nishin
 
 const vec2 airScaleHeights = vec2(8.4e3, 1.25e3); // m
 
-/*
+//*
 // Coefficients for rec.709 primaries transformed to AP1
 const vec3 airRayleighCoefficient = vec3(8.059375432e-06, 1.671209429e-05, 4.080133294e-05) * r709ToAp1Unlit;
 const vec3 airMieCoefficient      = vec3(1.666442358e-06, 1.812685127e-06, 1.958927896e-06) * r709ToAp1Unlit;
 const vec3 airOzoneCoefficient    = vec3(8.304280072e-07, 1.314911970e-06, 5.440679729e-08) * r709ToAp1Unlit;
 /*/
 // Coefficients for AP1 primaries
-const vec3 airRayleighCoefficient = vec3(9.710858649e-06, 1.938742207e-05, 3.272004687e-05);
-const vec3 airMieCoefficient      = vec3(1.706326657e-05, 1.839274591e-05, 1.925690776e-05);
-const vec3 airOzoneCoefficient    = vec3(1.393143975e-06, 1.042323902e-06, 1.450839875e-07);
+
+const vec3 airRayleighCoefficient = vec3(8.059375432e-06, 1.671209429e-05, 4.080133294e-05);
+const vec3 airMieCoefficient      = vec3(1.666442358e-06, 1.812685127e-06, 1.958927896e-06);
+const vec3 airOzoneCoefficient    = vec3(8.304280072e-07, 1.31491197e-06,  5.440679729e-08);
 //*/
 
 const mat2x3 airScatteringCoefficients = mat2x3(airRayleighCoefficient, airMieAlbedo * airMieCoefficient);

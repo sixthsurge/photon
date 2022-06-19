@@ -79,6 +79,15 @@ float getHardcodedEmission(vec3 albedo, uint blockId) {
 
 float getHardcodedSss(uint blockId) {
 	switch (blockId) {
+	case ENTITY_WEAK_SSS:
+#ifdef ENTITY_SSS
+	case BLOCK_WEAK_SSS:
+#endif
+		return 0.2;
+
+	case BLOCK_STRONG_SSS:
+		return 1.0;
+
 	case BLOCK_SMALL_PLANT:
 		return 0.5;
 
@@ -89,12 +98,6 @@ float getHardcodedSss(uint blockId) {
 		return 0.5;
 
 	case BLOCK_LEAVES:
-		return 1.0;
-
-	case BLOCK_WEAK_SSS:
-		return 0.1;
-
-	case BLOCK_STRONG_SSS:
 		return 1.0;
 
 	default:

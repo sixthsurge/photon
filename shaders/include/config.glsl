@@ -228,6 +228,7 @@ const float sunPathRotation = -40.0; // [-40.0 -35.0 -30.0 -25.0 -20.0 -15.0 -10
 
   #define HARDCODED_EMISSION
   #define HARDCODED_SSS
+  #define ENTITY_SSS
 
   #define BLENDING_METHOD_MIX 0
   #define BLENDING_METHOD_TINTED 1

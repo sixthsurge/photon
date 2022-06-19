@@ -119,20 +119,18 @@ uniform vec3 lightDir;
 const float indirectRenderScale = 0.01 * INDIRECT_RENDER_SCALE;
 
 vec3 getSubsurfaceScattering(vec3 albedo, float sssAmount, float sssDepth, float LoV) {
-	const float sssIntensity  = 2.0;
+	const float sssIntensity  = 3.0;
 	const float sssDensity    = 12.0;
 
 	if (sssAmount < eps) return vec3(0.0);
 
-	float phase = 0.6 * henyeyGreensteinPhase(-LoV, 0.6) + 0.4 * henyeyGreensteinPhase(-LoV, -0.3);
-
-	vec3 coeff = mix(vec3(0.0), normalize(albedo), sqrt(sqrt(sqrt(length(albedo)))));
+	vec3 coeff = mix(vec3(0.0), normalize(albedo), sqrt(sqrt(length(albedo))));
 	     coeff = (sssDensity * coeff - sssDensity) / sssAmount;
 
-	vec3 silverLining = 1.2 * exp(3.0 * coeff * sssDepth) * henyeyGreensteinPhase(-LoV, 0.5);
-	vec3 sss = albedo * sssIntensity * (exp(coeff * sssDepth) * phase + silverLining);
+	vec3 sss1 = exp(3.0 * coeff * sssDepth) * henyeyGreensteinPhase(-LoV, 0.5);
+	vec3 sss2 = exp(1.0 * coeff * sssDepth) * (0.6 * henyeyGreensteinPhase(-LoV, 0.4) + 0.4 * henyeyGreensteinPhase(-LoV, -0.2));
 
-	return sss;
+	return albedo * sssIntensity * sssAmount * (sss1 + sss2);
 }
 
 float getSkylightFalloff(float skylight) {
@@ -230,8 +228,12 @@ void main() {
 
 		vec3 visibility = NoL * shadows;
 
-		vec3 bsdf = diffuseBrdf(material.albedo, material.f0.x, material.n, material.roughness, NoL, NoV, NoH, LoV) * (1.0 - float(material.isMetal))
-		          + specularBrdf(material, NoL, NoV, NoH, LoV, LoH, lightRadius);
+		vec3 bsdf  = diffuseBrdf(material.albedo, material.f0.x, material.n, material.roughness, NoL, NoV, NoH, LoV);
+		     bsdf *= float(!material.isMetal) * (1.0 - material.sssAmount);
+#ifdef AO_IN_SUNLIGHT
+			 bsdf *= gtao.w;
+#endif
+		     bsdf += specularBrdf(material, NoL, NoV, NoH, LoV, LoH, lightRadius);
 
 		vec3 sss  = getSubsurfaceScattering(albedo, material.sssAmount, sssDepth, LoV);
 
