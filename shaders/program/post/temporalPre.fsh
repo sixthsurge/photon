@@ -8,10 +8,11 @@
 
 //--// Outputs //-------------------------------------------------------------//
 
-/* RENDERTARGETS: 6,7,13 */
-layout (location = 0) out vec3 aabbMin;
-layout (location = 1) out vec3 aabbMax;
-layout (location = 2) out vec2 depthStore;
+/* RENDERTARGETS: 5,6,7,13 */
+layout (location = 0) out float responsiveAa;
+layout (location = 1) out vec3 aabbMin;
+layout (location = 2) out vec3 aabbMax;
+layout (location = 3) out vec2 depthStore;
 
 //--// Uniforms //------------------------------------------------------------//
 
@@ -39,6 +40,8 @@ void main() {
 
 	depthStore.x = 1.0 - texelFetch(depthtex0, texel, 0).x;
 	depthStore.y = 1.0 - texelFetch(depthtex1, texel, 0).x;
+
+	responsiveAa = float(depthStore.x != depthStore.y);
 
     // Fetch 3x3 neighborhood
     // a b c

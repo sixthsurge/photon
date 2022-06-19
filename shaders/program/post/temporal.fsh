@@ -25,6 +25,7 @@ flat in float histogramSelectedBin;
 
 uniform sampler2D colortex2;  // Motion vectors for entities
 uniform sampler2D colortex3;  // Scene radiance
+uniform sampler2D colortex5;  // Responsive AA flag
 uniform sampler2D colortex6;  // AABB min
 uniform sampler2D colortex7;  // AABB max
 uniform sampler2D colortex8;  // Scene history
@@ -177,6 +178,9 @@ void main() {
 	vec3 aabbMin = texture(colortex6, adjustedCoord).rgb;
 	vec3 aabbMax = texture(colortex7, adjustedCoord).rgb;
 
+	// Increases responsiveness behind translucents at expense of image quality
+	float responsiveAa = texture(colortex5, adjustedCoord).x;
+
 #ifndef TAA_SKIP_CLIPPING
 	bool historyClipped;
 
@@ -206,6 +210,8 @@ void main() {
 #ifndef TAA_SKIP_CLIPPING
 	alpha *= 1.0 - TAA_FLICKER_REDUCTION * flickerReduction;
 #endif
+
+	alpha  = mix(alpha, 0.1, responsiveAa);
 
 	alpha  = 1.0 - alpha;
 	alpha *= offcenterRejection;

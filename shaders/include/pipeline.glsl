@@ -7,7 +7,7 @@
 (lighting)
 3  | rgb11f  | taa render scale  | scene radiance (deferred -> composite)
 4  | rgb11f  | 256x128           | sky capture, lighting color palette, dynamic weather properties (deferred -> composite)
-5  | rgba16  | taa render scale  | low-res clouds (deferred), indirect lighting data (deferred)
+5  | rgba16  | taa render scale  | low-res clouds (deferred), indirect lighting data (deferred), responsive aa flag (composite)
 6  | rgb16f  | taa render scale  | atmosphere scattering (deferred -> composite), volumetric fog scattering (composite), taa min color (composite)
 7  | rgb16f  | taa render scale  | cloud shadow map (deferred -> composite), volumetric fog transmittance (composite), taa max color (composite)
 
