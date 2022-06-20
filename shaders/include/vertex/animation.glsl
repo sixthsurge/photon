@@ -14,15 +14,14 @@ vec3 getWindDisplacement(vec3 worldPos, float windSpeed, float windStrength, boo
 
 	worldPos = 32.0 * worldPos + 3.0 * t + vec3(0.0, goldenAngle, 2.0 * goldenAngle);
 	vec3 wobble = sin(worldPos) + 0.5 * sin(2.0 * worldPos) + 0.25 * sin(4.0 * worldPos);
-	     wobble *= 0.1;
 
 	if (isTallPlantTopVertex) { gust *= 2.0; wobble *= 0.5; }
 
-	return windStrength * (gust + wobble);
+	return windStrength * (gust + 0.1 * wobble);
 }
 
 vec3 animateVertex(vec3 worldPos, bool isTopVertex, float skylight, uint blockId) {
-	float windSpeed = 0.35;
+	float windSpeed = 0.3;
 	float windStrength = sqr(skylight) * (0.25 + 0.5 * rainStrength);
 
 	switch (blockId) {
