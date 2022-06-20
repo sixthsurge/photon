@@ -51,9 +51,9 @@ uniform vec2 taaOffset;
 
 #include "/block.properties"
 
-#include "/include/vertex/windAnimation.glsl"
-
 #include "/include/utility/spaceConversion.glsl"
+
+#include "/include/vertex/animation.glsl"
 
 //--// Functions //-----------------------------------------------------------//
 

@@ -1,5 +1,5 @@
-#if !defined INCLUDE_VERTEX_WINDANIMATION
-#define INCLUDE_VERTEX_WINDANIMATION
+#if !defined INCLUDE_VERTEX_ANIMATION
+#define INCLUDE_VERTEX_ANIMATION
 
 vec3 getWindDisplacement(vec3 worldPos, float windSpeed, float windStrength, bool isTallPlantTopVertex) {
 	const float windAngle = 30.0 * (tau / 360.0);
@@ -51,4 +51,4 @@ vec3 animateVertex(vec3 worldPos, bool isTopVertex, float skylight, uint blockId
 	}
 }
 
-#endif // INCLUDE_VERTEX_WINDANIMATION
+#endif // INCLUDE_VERTEX_ANIMATION
