@@ -97,10 +97,13 @@ float getHardcodedSss(uint blockId) {
 #endif
 		return 0.2;
 
-	case BLOCK_STRONG_SSS:
+	case BLOCK_MEDIUM_SSS:
 #ifdef ENTITY_SSS
 	case ENTITY_STRONG_SSS:
 #endif
+		return 0.6;
+
+	case BLOCK_STRONG_SSS:
 		return 1.0;
 
 	default:

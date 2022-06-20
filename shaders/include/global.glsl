@@ -45,6 +45,9 @@ float minOf(vec4 v) { return min(v.x, min(v.y, min(v.z, v.w))); }
 float lengthSquared(vec2 v) { return dot(v, v); }
 float lengthSquared(vec3 v) { return dot(v, v); }
 
+vec2 normalizeSafe(vec2 v) { return v == vec2(0.0) ? v : normalize(v); }
+vec3 normalizeSafe(vec3 v) { return v == vec3(0.0) ? v : normalize(v); }
+
 // Source: https://iquilezles.org/www/articles/texture/texture.htm
 vec4 textureSmooth(sampler2D sampler, vec2 coord) {
 	vec2 res = vec2(textureSize(sampler, 0));
