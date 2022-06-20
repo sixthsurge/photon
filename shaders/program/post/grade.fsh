@@ -178,8 +178,15 @@ void main() {
 #endif
 
 #ifdef GRADE
-	fragColor = pow(fragColor, vec3(0.95));
+	fragColor *= GRADE_BRIGHTNESS;
+	fragColor  = adjustVibrance(fragColor, GRADE_VIBRANCE);
+	fragColor  = adjustSaturation(fragColor, GRADE_SATURATION);
+	fragColor  = adjustContrast(fragColor, GRADE_CONTRAST);
+	fragColor  = pow(fragColor, vec3(GRADE_GAMMA_CURVE));
+	fragColor *= whiteBalanceMatrix;
 #endif
+
+	fragColor = pow(fragColor, vec3(0.95));
 
 	fragColor = tonemap(fragColor);
 	fragColor = fragColor * ap1ToR709;

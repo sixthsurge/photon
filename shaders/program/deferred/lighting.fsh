@@ -278,5 +278,5 @@ void main() {
 	radiance = distanceFade(radiance, clearSky, scenePos, worldDir);
 #endif
 
-	radiance += 10.0 * material.emission;
+	radiance += 4.0 * material.emission;
 }

@@ -1,3 +1,10 @@
+option.INFO                            = Photon
+value.INFO.0                           = §dby SixthSurge
+value.INFO.1                           = §bby SixthSurge
+
+profile.fast                           = §bFast
+profile.fancy                          = §dFancy
+
 screen.atmos                           = Atmospherics
 screen.light                           = Light & Shadow
 screen.post                            = Post-Processing
@@ -15,22 +22,16 @@ screen.misc.comment                    = Options that did not fit into the above
 screen.clouds                          = Clouds
 screen.fog                             = Fog
 screen.sky                             = Sky
-
 screen.cloudsCumulus                   = Cumulus Clouds
 screen.cloudsCirrus                    = Cirrus Clouds
-
 screen.shadows                         = Shadows
-
+screen.bloom                           = Bloom
+screen.bloom.comment                   = Glowing effect around bright areas
+screen.colorGrading                    = Color Grading
+screen.colorGrading.comment            = Custom color grading
+screen.exposure                        = Exposure
 screen.temporal                        = Temporal AA
-
-screen.waving                          = Waving Blocks
-
-profile.fast                           = §bFast
-profile.fancy                          = §dFancy
-
-option.INFO                            = Photon
-value.INFO.0                           = §dby SixthSurge
-value.INFO.1                           = §bby SixthSurge
+screen.wavingBlocks                    = Waving Blocks
 
 #----# Atmosphere #--------------------------------------------------------------------------------#
 
@@ -88,6 +89,7 @@ option.VANILLA_MOON                    = Vanilla Moon
 
 # Stars
 option.STARS_COVERAGE                  = Stars Coverage
+option.STARS_INTENSITY                 = Stars Brightness
 
 #----# Lighting #----------------------------------------------------------------------------------#
 
@@ -179,20 +181,21 @@ option.RRT_SAT_FACTOR                  = RRT Saturation
 option.ODT_SAT_FACTOR                  = ODT Saturation
 
 # Bloom
-
 option.BLOOM                           = Enabled
-option.BLOOM_INTENSITY                 = Intensity
+option.BLOOM_INTENSITY                 = Strength
+option.BLOOM_RADIUS                    = Radius
+option.BLOOM_TILES                     = Tiles
 
 option.BLOOM_UPSAMPLING_FILTER         = Bloom Upsampling Filter
 value.BLOOM_UPSAMPLING_FILTER.texture  = §bLinear
 value.BLOOM_UPSAMPLING_FILTER.textureBicubic = §dBicubic
 
 # Purkinje Shift
-option.PURKINJE_SHIFT                  = Enabled
-option.PURKINJE_SHIFT_INTENSITY        = Intensity
+option.PURKINJE_SHIFT                  = Purkinje Shift
 
 # Color Grading
 option.GRADE                           = Enabled
+option.GRADE_BRIGHTNESS                = Brightness
 option.GRADE_CONTRAST                  = Contrast
 option.GRADE_GAMMA_CURVE               = Gamma Curve
 option.GRADE_SATURATION                = Saturation
@@ -211,9 +214,11 @@ option.CAMERA_MANUAL_EXPOSURE_USE_SCREEN_BRIGHTNESS = Manual Exposure Uses Brigh
 option.CAMERA_MANUAL_EXPOSURE_VALUE    = Manual Exposure Value
 
 option.HISTOGRAM_BINS                  = Histogram Bins
-option.HISTOGRAM_IGNORE_DIM            = Ignore Dim Fraction
-option.HISTOGRAM_IGNORE_BRIGHT         = Ignore Bright Fraction
+option.HISTOGRAM_IGNORE_DIM            = Ignore Dim Range
+option.HISTOGRAM_IGNORE_BRIGHT         = Ignore Bright Range
 option.HISTOGRAM_VIEW                  = View Histogram
+
+option.CAMERA_LOCAL_EXPOSURE           = Local Exposure
 
 # Image Sharpening
 option.CAS                             = Contrast Adaptive Sharpening
