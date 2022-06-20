@@ -93,4 +93,11 @@ vec4 unpackUnormArb(uint pack, const uvec4 bits) {
 	return vec4(unshifted) * rcp(vec4(maxValue));
 }
 
+#ifdef MC_GL_VENDOR_INTEL
+	#define packUnorm4x8(data) packUnormArb(data, uvec4(8, 8, 8, 8))
+	#define unpackUnorm4x8(pack) unpackUnormArb(pack, uvec4(8, 8, 8, 8))
+	#define packUnorm2x16(data) packUnormArb(vec4(data, 0.0, 0.0), uvec4(16, 16, 0, 0))
+	#define unpackUnorm2x16(pack) unpackUnormArb(pack, uvec4(16, 16, 0, 0)).xy
+#endif
+
 #endif // INCLUDE_UTILITY_ENCODING
