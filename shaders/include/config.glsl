@@ -187,7 +187,7 @@ const float sunPathRotation = -40.0; // [-40.0 -35.0 -30.0 -25.0 -20.0 -15.0 -10
 
   #define CAMERA_EXPOSURE_MIN -1.0 // [-6.0 -5.0 -4.0 -3.0 -2.0 -1.0 0.0 1.0 2.0 3.0 4.0 5.0 6.0 7.0 8.0 9.0 10.0 11.0 12.0 13.0 14.0 15.0 16.0 17.0]
   #define CAMERA_EXPOSURE_MAX 4.0 // [-6.0 -5.0 -4.0 -3.0 -2.0 -1.0 0.0 1.0 2.0 3.0 4.0 5.0 6.0 7.0 8.0 9.0 10.0 11.0 12.0 13.0 14.0 15.0 16.0 17.0]
-  #define CAMERA_EXPOSURE_BIAS 1.0 // [-2.0 -1.5 -1.0 -0.5 0.0 0.5 1.0 1.5 2.0]
+  #define CAMERA_EXPOSURE_BIAS 0.0 // [-2.0 -1.5 -1.0 -0.5 0.0 0.5 1.0 1.5 2.0]
   #define CAMERA_EXPOSURE_RATE_DIM_TO_BRIGHT 2.0 // [0.5 1.0 1.5 2.0 2.5 3.0 3.5 4.0 4.5 5.0 5.5 6.0]
   #define CAMERA_EXPOSURE_RATE_BRIGHT_TO_DIM 1.0 // [0.5 1.0 1.5 2.0 2.5 3.0 3.5 4.0 4.5 5.0 5.5 6.0]
 
@@ -199,8 +199,8 @@ const float sunPathRotation = -40.0; // [-40.0 -35.0 -30.0 -25.0 -20.0 -15.0 -10
   #define CAMERA_MANUAL_EXPOSURE_VALUE 1.0 // [-6.0 -5.0 -4.0 -3.0 -2.0 -1.0 0.0 1.0 2.0 3.0 4.0 5.0 6.0 7.0 8.0 9.0 10.0 11.0 12.0 13.0 14.0 15.0 16.0 17.0]
 
   #define HISTOGRAM_BINS 32 // [32 64 128]
-  #define HISTOGRAM_IGNORE_DIM 0.75 // [0.0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9]
-  #define HISTOGRAM_IGNORE_BRIGHT 0.2 // [0.0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9]
+  #define HISTOGRAM_IGNORE_DIM 0.2 // [0.0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9]
+  #define HISTOGRAM_IGNORE_BRIGHT 0.6 // [0.0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9]
 //#define HISTOGRAM_VIEW
 
 //--// Image Sharpening
