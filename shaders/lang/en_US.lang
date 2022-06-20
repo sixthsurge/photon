@@ -178,6 +178,15 @@ option.RRT_RED_WIDTH                   = RRT Red Width
 option.RRT_SAT_FACTOR                  = RRT Saturation
 option.ODT_SAT_FACTOR                  = ODT Saturation
 
+# Bloom
+
+option.BLOOM                           = Enabled
+option.BLOOM_INTENSITY                 = Intensity
+
+option.BLOOM_UPSAMPLING_FILTER         = Bloom Upsampling Filter
+value.BLOOM_UPSAMPLING_FILTER.texture  = §bLinear
+value.BLOOM_UPSAMPLING_FILTER.textureBicubic = §dBicubic
+
 # Purkinje Shift
 option.PURKINJE_SHIFT                  = Enabled
 option.PURKINJE_SHIFT_INTENSITY        = Intensity

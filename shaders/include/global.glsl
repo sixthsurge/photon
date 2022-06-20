@@ -45,9 +45,27 @@ float minOf(vec4 v) { return min(v.x, min(v.y, min(v.z, v.w))); }
 float lengthSquared(vec2 v) { return dot(v, v); }
 float lengthSquared(vec3 v) { return dot(v, v); }
 
+// Source: https://iquilezles.org/www/articles/texture/texture.htm
+vec4 textureSmooth(sampler2D sampler, vec2 coord) {
+	vec2 res = vec2(textureSize(sampler, 0));
+
+	coord = coord * res + 0.5;
+
+	vec2 i, f = modf(coord, i);
+	f = f * f * f * (f * (f * 6.0 - 15.0) + 10.0);
+	coord = i + f;
+
+	coord = (coord - 0.5) / res;
+	return texture(sampler, coord);
+}
+
 //--// Remapping functions
 
 float linearStep(float edge0, float edge1, float x) {
+	return clamp01((x - edge0) / (edge1 - edge0));
+}
+
+vec2 linearStep(vec2 edge0, vec2 edge1, vec2 x) {
 	return clamp01((x - edge0) / (edge1 - edge0));
 }
 

@@ -20,7 +20,7 @@ flat in mat3 whiteBalanceMatrix;
 //--// Uniforms //------------------------------------------------------------//
 
 uniform usampler2D colortex1; // Scene data
-uniform sampler2D colortex3;
+uniform sampler2D colortex2;  // Bloom tiles
 uniform sampler2D colortex8;  // Scene history and exposure
 
 //--// Camera uniforms
@@ -57,6 +57,25 @@ uniform vec2 windowSize;
 #include "/include/utility/spaceConversion.glsl"
 
 //--// Functions //-----------------------------------------------------------//
+
+vec3 getBloom() {
+	vec3 tileSum = vec3(0.0);
+
+	float weight = 1.0;
+	float weightSum = 0.0;
+
+	for (int i = 1; i < BLOOM_TILES; ++i) {
+		float tileSize = exp2(-i);
+		float tileOffset = 2.0 * tileSize - tileSize;
+
+		tileSum += BLOOM_UPSAMPLING_FILTER(colortex2, coord * tileSize + tileOffset).rgb * weight;
+		weightSum += weight;
+
+		weight *= BLOOM_RADIUS;
+	}
+
+	return tileSum / weightSum;
+}
 
 vec3 tonemapAces(vec3 rgb) {
 	rgb *= 2.0; // Match the exposure to the RRT
@@ -140,6 +159,11 @@ void main() {
 	fragColor       = texelFetch(colortex8, texel, 0).rgb;
 
 	float blocklight = unpackUnorm4x8(sceneData.y).z;
+
+#ifdef BLOOM
+	vec3 bloom = getBloom();
+	fragColor = mix(fragColor, bloom, 0.1);
+#endif
 
 #ifdef PURKINJE_SHIFT
 	// Reduce purkinje shift intensity around blocklight sources to preserve their colour

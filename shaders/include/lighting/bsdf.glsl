@@ -48,7 +48,7 @@ float getNoHSquared(
 }
 
 float distributionGgx(float NoHSq, float alphaSq) {
-	return alphaSq / (pi * sqr(1.0 - NoHSq + NoHSq * alphaSq));
+	return alphaSq / max(pi * sqr(1.0 - NoHSq + NoHSq * alphaSq), eps);
 }
 
 float v1SmithGgx(float cosTheta, float alphaSq) {
