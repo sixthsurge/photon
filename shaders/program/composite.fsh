@@ -140,7 +140,7 @@ vec3 lightTranslucents(
 
 	// Self-emission
 
-	radiance += 10.0 * material.emission;
+	radiance += 16.0 * material.emission;
 
 	// Sunlight/moonlight
 

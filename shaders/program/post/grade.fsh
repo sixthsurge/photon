@@ -78,7 +78,7 @@ vec3 getBloom() {
 }
 
 vec3 tonemapAces(vec3 rgb) {
-	rgb *= 2.0; // Match the exposure to the RRT
+	rgb *= 2.4; // Match the exposure to the RRT
 	rgb = acesRrt(rgb);
 	rgb = acesOdt(rgb);
 
@@ -86,7 +86,7 @@ vec3 tonemapAces(vec3 rgb) {
 }
 
 vec3 tonemapAcesFit(vec3 rgb) {
-	rgb *= 2.0; // Match the exposure to the RRT
+	rgb *= 2.4; // Match the exposure to the RRT
 	rgb = rrtSweeteners(rgb * ap1ToAp0);
 	rgb = rrtAndOdtFit(rgb);
 
@@ -182,11 +182,9 @@ void main() {
 	fragColor  = adjustVibrance(fragColor, GRADE_VIBRANCE);
 	fragColor  = adjustSaturation(fragColor, GRADE_SATURATION);
 	fragColor  = adjustContrast(fragColor, GRADE_CONTRAST);
-	fragColor  = pow(fragColor, vec3(GRADE_GAMMA_CURVE));
-	fragColor *= whiteBalanceMatrix;
 #endif
 
-	fragColor = pow(fragColor, vec3(0.95));
+	fragColor *= whiteBalanceMatrix;
 
 	fragColor = tonemap(fragColor);
 	fragColor = fragColor * ap1ToR709;

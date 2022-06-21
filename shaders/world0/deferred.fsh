@@ -58,6 +58,8 @@ uniform float worldAge;
 
 uniform float biomeCave;
 
+uniform float moonPhaseBrightness;
+
 uniform vec3 sunDir;
 uniform vec3 moonDir;
 
@@ -123,7 +125,7 @@ void main() {
 		// Atmosphere
 
 		vec3 atmosphereScattering = sunIrradiance * getAtmosphereScattering(rayDir, sunDir)
-		                          + moonIrradiance * getAtmosphereScattering(rayDir, moonDir);
+		                          + moonIrradiance * getAtmosphereScattering(rayDir, moonDir) * moonPhaseBrightness;
 
 		vec3 atmosphereTransmittance = getAtmosphereTransmittance(rayDir.y, planetRadius);
 

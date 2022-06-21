@@ -75,6 +75,8 @@ uniform float biomeCave;
 
 uniform float timeNoon;
 
+uniform float moonPhaseBrightness;
+
 uniform vec2 viewSize;
 uniform vec2 viewTexelSize;
 
@@ -273,7 +275,7 @@ void main() {
 	vec4 cloudData = upscaleClouds(texel, vec3(coord, depth));
 
 	atmosphereScattering = sunIrradiance * getAtmosphereScattering(rayDir, sunDir)
-	                     + moonIrradiance * getAtmosphereScattering(rayDir, moonDir);
+	                     + moonIrradiance * getAtmosphereScattering(rayDir, moonDir) * moonPhaseBrightness;
 
 	if (depth != 1.0) return;
 

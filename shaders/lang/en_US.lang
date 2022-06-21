@@ -194,14 +194,13 @@ value.BLOOM_UPSAMPLING_FILTER.textureBicubic = §dBicubic
 option.PURKINJE_SHIFT                  = Purkinje Shift
 
 # Color Grading
-option.GRADE                           = Enabled
+option.WHITE_BALANCE                   = White Balance
+suffix.WHITE_BALANCE                   = K
+option.GRADE                           = Custom Color Grade
 option.GRADE_BRIGHTNESS                = Brightness
 option.GRADE_CONTRAST                  = Contrast
-option.GRADE_GAMMA_CURVE               = Gamma Curve
 option.GRADE_SATURATION                = Saturation
 option.GRADE_VIBRANCE                  = Vibrance
-option.GRADE_WHITE_BALANCE             = White Balance
-suffix.GRADE_WHITE_BALANCE             = K
 
 # Exposure
 option.CAMERA_EXPOSURE_MIN             = Minimum Exposure

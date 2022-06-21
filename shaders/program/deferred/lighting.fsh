@@ -133,6 +133,14 @@ vec3 getSubsurfaceScattering(vec3 albedo, float sssAmount, float sssDepth, float
 	return albedo * sssIntensity * sssAmount * (sss1 + sss2);
 }
 
+float getBlocklightFalloff(float blocklight, float ao) {
+	float falloff  = rcp(16.0 - 15.0 * blocklight);
+	      falloff  = linearStep(rcp(16.0), 1.0, falloff);
+	      falloff *= mix(ao, 1.0, falloff);
+
+	return falloff;
+}
+
 float getSkylightFalloff(float skylight) {
 	return pow4(skylight);
 }
@@ -267,17 +275,17 @@ void main() {
 
 	// Blocklight
 
-	float dist = 15.0 - 15.0 * lmCoord.x;
-	radiance += 8.0 * blackbody(3500.0) * bsdf * rcp(1.0 + dist) * mix(gtao.x * dampen(gtao.x), 1.0, pow5(lmCoord.x));
+	float blocklightFalloff = getBlocklightFalloff(lmCoord.x, gtao.w);
+	radiance += 16.0 * blackbody(3500.0) * bsdf * blocklightFalloff;
 
 	// Ambient light
 
-	radiance += ambientIrradiance * bsdf * gtao.x;
+	radiance += ambientIrradiance * bsdf * gtao.w;
 #endif
 
 #ifdef DISTANCE_FADE
 	radiance = distanceFade(radiance, clearSky, scenePos, worldDir);
 #endif
 
-	radiance += 10.0 * material.emission;
+	radiance += 16.0 * material.emission;
 }

@@ -18,6 +18,8 @@ uniform int worldTime;
 
 uniform bool cloudsMoonlit;
 
+uniform float moonPhaseBrightness;
+
 uniform vec3 sunDir;
 uniform vec3 moonDir;
 
@@ -35,7 +37,7 @@ void main() {
 	vec3 rayOrigin = vec3(0.0, planetRadius + CLOUDS_CUMULUS_ALTITUDE, 0.0);
 	vec3 rayDir = cloudsMoonlit ? moonDir : sunDir;
 
-	directIrradiance  = cloudsMoonlit ? moonIrradiance : sunIrradiance;
+	directIrradiance  = cloudsMoonlit ? moonIrradiance * moonPhaseBrightness : sunIrradiance;
 	directIrradiance *= getAtmosphereTransmittance(rayOrigin, rayDir);
 	directIrradiance *= 1.0 - pulse(float(worldTime), 12850.0, 50.0) - pulse(float(worldTime), 23150.0, 50.0);
 

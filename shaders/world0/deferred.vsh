@@ -48,6 +48,8 @@ uniform float timeNoon;
 uniform float timeSunrise;
 uniform float timeMidight;
 
+uniform float moonPhaseBrightness;
+
 uniform vec3 lightDir;
 uniform vec3 sunDir;
 uniform vec3 moonDir;
