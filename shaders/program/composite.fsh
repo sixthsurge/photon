@@ -269,7 +269,7 @@ void main() {
 	bool isWater = blockId == BLOCK_WATER;
 	bool isTranslucent = depthFront != depthBack;
 
-	albedo = srgbToLinear(isTranslucent ? translucentColor.rgb : albedo);
+	albedo = srgbToLinear(isTranslucent ? translucentColor.rgb : albedo) * r709ToAp1;
 	Material material = getMaterial(albedo, blockId);
 
 #ifdef MC_SPECULAR_MAP

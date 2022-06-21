@@ -42,7 +42,7 @@ float getHardcodedEmission(vec3 albedo, uint blockId) {
 		return 0.10 * smoothstep(0.25, 0.4, 0.3 * hsl.y + 0.7 * dampen(hsl.z));
 
 	case BLOCK_TORCH:
-		return 0.66 * step(0.5, 0.2 * pulseHue(hsl.x, 30.0, 40.0) + 0.32 * hsl.y + 0.6 * hsl.z);
+		return step(0.5, 0.2 * pulseHue(hsl.x, 30.0, 40.0) + 0.32 * hsl.y + 0.6 * hsl.z);
 
 	case BLOCK_REDSTONE_COMPONENT:
 		float redness = albedo.r * rcp(albedo.g + albedo.b);

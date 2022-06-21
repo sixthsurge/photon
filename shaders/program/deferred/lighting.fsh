@@ -267,7 +267,8 @@ void main() {
 
 	// Blocklight
 
-	radiance += 4.0 * blackbody(3750.0) * bsdf * pow5(lmCoord.x) * mix(gtao.x * dampen(gtao.x), 1.0, pow5(lmCoord.x));
+	float dist = 15.0 - 15.0 * lmCoord.x;
+	radiance += 8.0 * blackbody(3500.0) * bsdf * rcp(1.0 + dist) * mix(gtao.x * dampen(gtao.x), 1.0, pow5(lmCoord.x));
 
 	// Ambient light
 
