@@ -32,13 +32,43 @@ const int colortex11Format = RGBA16F;
 const int colortex12Format = R8I;
 const int colortex13Format = RG16F;
 
-#ifdef SPECULAR_MAP
-	const int colortex1Format = RGBA32UI;
-#else
-	#ifdef NORMAL_MAP
-		const int colortex1Format = RGB32UI;
+// Select texture format for colortex1 based on how much data is required
+// This is formatted like this because OF doesn't detect #if defined so I can't use #elif or ||
+#ifdef MC_GL_VENDOR_INTEL 
+	// Use floating point texture format for colortex1, even though it stores unsigned integers
+	// This really shouldn't work, but it seems to be required to work properly on Intel and Mesa drivers
+	#ifdef SPECULAR_MAP
+		const int colortex1Format = RGBA32F;
 	#else
-		const int colortex1Format = RG32UI;
+		#ifdef NORMAL_MAP
+			const int colortex1Format = RGB32F;
+		#else
+			const int colortex1Format = RG32F;
+		#endif
+	#endif
+#else
+	#ifdef MC_GL_VENDOR_MESA
+	 	// Mesa drivers also require the floating point texture format hack
+		#ifdef SPECULAR_MAP
+			const int colortex1Format = RGBA32F;
+		#else
+			#ifdef NORMAL_MAP
+				const int colortex1Format = RGB32F;
+			#else
+				const int colortex1Format = RG32F;
+			#endif
+		#endif
+	#else
+		// Use the correct texture format for colortex1
+		#ifdef SPECULAR_MAP
+			const int colortex1Format = RGBA32UI;
+		#else
+			#ifdef NORMAL_MAP
+				const int colortex1Format = RGB32UI;
+			#else
+				const int colortex1Format = RG32UI;
+			#endif
+		#endif
 	#endif
 #endif
 
