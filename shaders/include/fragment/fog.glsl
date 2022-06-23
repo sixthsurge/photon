@@ -3,7 +3,7 @@
 
 #include "/include/fragment/aces/matrices.glsl"
 
-const vec3 caveFogColor = vec3(0.05);
+const vec3 caveFogColor = vec3(0.08);
 
 float getSphericalFog(float viewerDistance, float fogStartDistance, float fogDensity) {
 	return exp2(-fogDensity * max0(viewerDistance - fogStartDistance));
@@ -48,11 +48,13 @@ vec3 applyCommonFog(vec3 radiance, vec3 scenePos, vec3 clearSky, float viewerDis
 // exponential fog effects specific to each dimension
 #if   defined WORLD_OVERWORLD
 vec3 applySimpleFog(vec3 radiance, vec3 scenePos, vec3 clearSky) {
+	clearSky = mix(clearSky, caveFogColor, biomeCave); // fix border fog underground
+
 	float viewerDistance = length(scenePos);
 
 #ifdef CAVE_FOG
 	// cave fog
-	float caveFog = getSphericalFog(viewerDistance, 0.0, 0.002 * biomeCave);
+	float caveFog = getSphericalFog(viewerDistance, 0.0, 0.0033 * biomeCave);
 	radiance = mix(caveFogColor, radiance, caveFog);
 #endif
 

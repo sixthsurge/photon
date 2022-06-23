@@ -333,7 +333,5 @@ void main() {
 	float undergroundSkyFade = biomeCave * smoothstep(-0.1, 0.1, 0.4 - rayDir.y);
 	radiance = mix(radiance, caveFogColor, undergroundSkyFade);
 
-	atmosphereScattering = mix(atmosphereScattering, caveFogColor, undergroundSkyFade);
-
 	radiance *= 1.0 - blindness;
 }
