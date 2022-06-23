@@ -24,6 +24,7 @@ screen.fog                             = Fog
 screen.sky                             = Sky
 screen.cloudsCumulus                   = Cumulus Clouds
 screen.cloudsCirrus                    = Cirrus Clouds
+screen.lightSources                    = Light Sources
 screen.shadows                         = Shadows
 screen.bloom                           = Bloom
 screen.bloom.comment                   = Glowing effect around bright areas
@@ -33,12 +34,15 @@ screen.exposure                        = Exposure
 screen.temporal                        = Temporal AA
 screen.wavingBlocks                    = Waving Blocks
 
+screen.sunlightTint                    = Sunlight Tint
+screen.moonlightTint                   = Moonlight Tint
+screen.ambientLightTint                = Ambient Light Tint
+
 #----# Atmosphere #--------------------------------------------------------------------------------#
 
 option.SEA_LEVEL                       = Sea Level
 option.WORLD_TIME_ANIMATION            = World Time Animation
-option.HIDE_PLANET_SURFACE             = Hide Planet Surface
-
+option.MOON_PHASE_AFFECTS_BRIGHTNESS   = Moon Phase Affects Brightness
 
 # Clouds
 
@@ -77,7 +81,8 @@ value.CLOUDS_CUMULUS_QUALITY.CLOUDS_CUMULUS_QUALITY_FABULOUS = §6§oFabulous
 
 # Cirrus Clouds
 
-# Sun and Moon
+# Sky
+
 option.SUN_ANGULAR_RADIUS              = Sun Angular Radius
 suffix.SUN_ANGULAR_RADIUS              = °
 
@@ -87,13 +92,12 @@ suffix.MOON_ANGULAR_RADIUS             = °
 option.VANILLA_SUN                     = Vanilla Sun
 option.VANILLA_MOON                    = Vanilla Moon
 
-# Stars
+option.HIDE_PLANET_SURFACE             = Hide Planet Surface
+
 option.STARS_COVERAGE                  = Stars Coverage
 option.STARS_INTENSITY                 = Stars Brightness
 
 #----# Lighting #----------------------------------------------------------------------------------#
-
-option.AO_IN_SUNLIGHT                  = AO in Sunlight
 
 # SSPT
 option.SSPT                            = Enabled
@@ -194,13 +198,13 @@ value.BLOOM_UPSAMPLING_FILTER.textureBicubic = §dBicubic
 option.PURKINJE_SHIFT                  = Purkinje Shift
 
 # Color Grading
-option.WHITE_BALANCE                   = White Balance
-suffix.WHITE_BALANCE                   = K
-option.GRADE                           = Custom Color Grade
+option.GRADE                           = Enabled
 option.GRADE_BRIGHTNESS                = Brightness
 option.GRADE_CONTRAST                  = Contrast
 option.GRADE_SATURATION                = Saturation
 option.GRADE_VIBRANCE                  = Vibrance
+option.GRADE_WHITE_BALANCE             = White Balance
+suffix.GRADE_WHITE_BALANCE             = K
 
 # Exposure
 option.CAMERA_EXPOSURE_MIN             = Minimum Exposure
@@ -220,8 +224,7 @@ option.HISTOGRAM_VIEW                  = View Histogram
 option.CAMERA_LOCAL_EXPOSURE           = Local Exposure
 
 # Image Sharpening
-option.CAS                             = Contrast Adaptive Sharpening
-option.CAS_STRENGTH                    = Strength
+option.CAS                             = Image Sharpening
 
 # Temporal AA
 option.TAA                             = Enabled

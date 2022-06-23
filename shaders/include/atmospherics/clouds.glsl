@@ -45,8 +45,11 @@ float getCloudsPhaseMulti(float cosTheta, vec3 anisotropy) {
 	     + 0.2 * henyeyGreensteinPhase(cosTheta, -anisotropy.z);
 }
 
-float getCloudsPowderRatio(float density) {
-	return 2.0 * density / (density + 0.15);
+float getCloudsPowderRatio(float density, float cosTheta) {
+	float powder = pi * density / (density + 0.15);
+	      powder = mix(powder, 1.0, sqr(clamp01(cosTheta)));
+
+	return powder;
 }
 
 float getCumulusCloudsDensity(
@@ -61,7 +64,7 @@ float getCumulusCloudsDensity(
 	// 2D noise to determine where to place clouds
 	vec2 noise2D;
 	noise2D.x = texture(noisetex, 0.000002 * pos.xz).x; // perlin noise for local coverage
-	noise2D.y = texture(noisetex, 0.000024 * pos.xz * rcp(CLOUDS_CUMULUS_SIZE)).w; // perlin-worley-ish noise for shape
+	noise2D.y = texture(noisetex, 0.00002 * pos.xz * rcp(CLOUDS_CUMULUS_SIZE)).w; // perlin-worley-ish noise for shape
 
 	float density;
 	density = clamp01(mix(layer.minCoverage, layer.maxCoverage, noise2D.x));
@@ -80,23 +83,23 @@ float getCumulusCloudsDensity(
 	vec3 curl = 0.1 * texture(depthtex2, 0.002 * pos).xyz * smoothstep(0.4, 1.0, 1.0 - altitudeFraction) * CLOUDS_CUMULUS_SWIRLINESS;
 
 	// 3D worley noise for detail
-	float detailAmplitude = 0.47 * CLOUDS_CUMULUS_WISPINESS;
+	float detailAmplitude = 0.5 * CLOUDS_CUMULUS_WISPINESS;
 	float detailFrequency = 0.0008;
 	float detailFade = 0.6 - 0.35 * smoothstep(0.05, 0.3, altitudeFraction);
 
 	for (int i = 0; i < detailIterations; ++i) {
 		pos.xz += 0.5 * layer.wind;
 
-		density -= detailAmplitude * texture(depthtex0, pos * detailFrequency + curl).x * dampen(1.0 - density);
+		density -= sqr(texture(depthtex0, pos * detailFrequency + curl).x) * detailAmplitude * dampen(1.0 - density);
 
 		detailAmplitude *= detailFade;
 		detailFrequency *= 8.0;
-		curl *= 10.0;
+		curl *= 3.0;
 	}
 
-	// Use 0.5 for remaining detail iterations
+	// Account for remaining detail iterations
 	for (int i = detailIterations; i < CLOUDS_CUMULUS_DETAIL_ITERATIONS; ++i) {
-		density -= detailAmplitude * 0.5 * dampen(1.0 - density);
+		density -= detailAmplitude * 0.25 * dampen(1.0 - density);
 		detailAmplitude *= detailFade;
 	}
 
@@ -148,7 +151,7 @@ vec2 getCumulusCloudsScattering(
 	float sigmaT = lightingInfo.density;
 
 	float powder = 1.0;
-	float powderRatio = getCloudsPowderRatio(density);
+	float powderRatio = getCloudsPowderRatio(density, lightingInfo.cosTheta);
 
 	vec2 scattering = vec2(0.0);
 
@@ -164,10 +167,10 @@ vec2 getCumulusCloudsScattering(
 		anisotropy *= 0.8;
 		phaseSun = getCloudsPhaseMulti(lightingInfo.cosTheta, anisotropy);
 
-		sigmaS *= 0.65;
+		sigmaS *= 0.5;
 		sigmaT *= 0.5;
 		powder *= powderRatio;
-		powderRatio = 0.5 * powderRatio + 0.5 * sqrt(powderRatio);
+		powderRatio = sqrt(powderRatio);
 	}
 
 	float scatteringIntegral = (1.0 - stepTransmittance) / lightingInfo.density;
@@ -203,7 +206,7 @@ vec4 drawCumulusClouds(
 
 	float stepLength = rayLength * rcp(float(primaryStepCount));
 
-	vec3 rayPos = ray.origin + ray.dir * (dists.x + stepLength * dither);
+	vec3 rayOrigin = ray.origin + ray.dir * (dists.x + stepLength * dither);
 	vec3 rayStep = ray.dir * stepLength;
 
 	vec2 scattering = vec2(0.0); // x = sunlight, y = skylight
@@ -213,9 +216,10 @@ vec4 drawCumulusClouds(
 
 	//--// Raymarching loop
 
-	for (uint i = 0; i < primaryStepCount; ++i, rayPos += rayStep) {
+	for (uint i = 0; i < primaryStepCount; ++i) {
 		if (transmittance < transmittanceThreshold) break;
 
+		vec3 rayPos = rayOrigin + rayStep * i;
 		float altitudeFraction = (length(rayPos) - layer.radius) * rcp(layer.thickness);
 
 		float density = getCumulusCloudsDensity(layer, rayPos, altitudeFraction, CLOUDS_CUMULUS_DETAIL_ITERATIONS);
@@ -246,12 +250,8 @@ vec4 drawCumulusClouds(
 			CLOUDS_CUMULUS_AMBIENT_STEPS
 		);
 
-		float groundOpticalDepth = getCumulusCloudsOpticalDepth(
-			Ray(rayPos, vec3(0.0, -1.0, 0.0)),
-			layer,
-			hash.w,
-			CLOUDS_CUMULUS_AMBIENT_STEPS
-		);
+		// Approximate ground optical depth using altitude fraction and density from this sample
+		float groundOpticalDepth = density * altitudeFraction * layer.thickness;
 
 		float stepOpticalDepth = lightingInfo.density * density * stepLength;
 		float stepTransmittance = exp(-stepOpticalDepth);

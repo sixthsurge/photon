@@ -20,7 +20,7 @@ const float rrtRedPivot  = 0.03;                  // default: 0.03
 const float rrtRedHue    = 0.0;                   // default: 0.0
 const float rrtRedWidth  = 135.0 * RRT_RED_WIDTH; // default: 135.0
 
-const float rrtSatFactor = 0.95 * RRT_SAT_FACTOR; // default: 0.96
+const float rrtSatFactor = 0.96 * RRT_SAT_FACTOR; // default: 0.96
 const float odtSatFactor = 1.0 * ODT_SAT_FACTOR; // default: 0.93
 
 const float rrtGammaCurve = 0.96;

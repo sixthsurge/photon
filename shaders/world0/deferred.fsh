@@ -23,7 +23,7 @@ flat in vec3 ambientIrradiance;
 flat in vec3 directIrradiance;
 flat in vec3 skyIrradiance;
 
-flat in float airMieDensity;
+flat in float airMieTurbidity;
 flat in float cloudsCirrusCoverage;
 flat in float cloudsCumulusCoverage;
 
@@ -114,7 +114,7 @@ void main() {
 			break;
 
 		case 3:
-			radiance = vec3(airMieDensity, cloudsCirrusCoverage, cloudsCumulusCoverage);
+			radiance = vec3(airMieTurbidity, cloudsCirrusCoverage, cloudsCumulusCoverage);
 			break;
 		}
 	} else {

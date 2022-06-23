@@ -148,7 +148,7 @@ vec3 lightTranslucents(
 	float NoL = dot(normal, lightDir) * step(0.0, dot(flatNormal, lightDir));
 
 #if defined WORLD_OVERWORLD
-	float cloudShadow = getCloudShadow(colortex7, scenePos);
+	float cloudShadow = getCloudShadows(colortex7, scenePos);
 #else
 	float cloudShadow = 1.0;
 #endif

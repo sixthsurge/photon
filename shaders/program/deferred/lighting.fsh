@@ -134,8 +134,8 @@ vec3 getSubsurfaceScattering(vec3 albedo, float sssAmount, float sssDepth, float
 }
 
 float getBlocklightFalloff(float blocklight, float ao) {
-	float falloff  = rcp(16.0 - 15.0 * blocklight);
-	      falloff  = linearStep(rcp(16.0), 1.0, falloff);
+	float falloff  = rcp(sqr(16.0 - 15.0 * blocklight));
+	      falloff  = linearStep(rcp(sqr(16.0)), 1.0, falloff);
 	      falloff *= mix(ao, 1.0, falloff);
 
 	return falloff;
@@ -207,7 +207,7 @@ void main() {
 	float NoL = dot(normal, lightDir) * step(0.0, dot(flatNormal, lightDir));
 
 #if defined WORLD_OVERWORLD
-	float cloudShadow = getCloudShadow(colortex7, scenePos);
+	float cloudShadow = getCloudShadows(colortex7, scenePos);
 #else
 	float cloudShadow = 1.0;
 #endif
@@ -237,10 +237,7 @@ void main() {
 		vec3 visibility = NoL * shadows;
 
 		vec3 bsdf  = diffuseBrdf(material.albedo, material.f0.x, material.n, material.roughness, NoL, NoV, NoH, LoV);
-		     bsdf *= float(!material.isMetal) * (1.0 - material.sssAmount);
-#ifdef AO_IN_SUNLIGHT
-			 bsdf *= gtao.w;
-#endif
+		     bsdf *= (1.0 - 0.75 * material.sssAmount);
 		     bsdf += specularBrdf(material, NoL, NoV, NoH, LoV, LoH, lightRadius);
 
 		vec3 sss  = getSubsurfaceScattering(albedo, material.sssAmount, sssDepth, LoV);
@@ -252,7 +249,7 @@ void main() {
 #if defined SSPT
 
 #else
-	vec3 bsdf = albedo * rcpPi * (1.0 - float(material.isMetal));
+	vec3 bsdf = albedo * rcpPi;
 
 	// Bounced light
 
@@ -276,7 +273,7 @@ void main() {
 	// Blocklight
 
 	float blocklightFalloff = getBlocklightFalloff(lmCoord.x, gtao.w);
-	radiance += 16.0 * blackbody(3500.0) * bsdf * blocklightFalloff;
+	radiance += 30.0 * blackbody(3750.0) * bsdf * blocklightFalloff;
 
 	// Ambient light
 

@@ -17,8 +17,7 @@ flat out vec3 ambientIrradiance;
 flat out vec3 directIrradiance;
 flat out vec3 skyIrradiance;
 
-flat out float airRayleighDensity;
-flat out float airMieDensity;
+flat out float airMieTurbidity;
 flat out float cloudsCirrusCoverage;
 flat out float cloudsCumulusCoverage;
 

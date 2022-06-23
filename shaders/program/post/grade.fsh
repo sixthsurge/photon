@@ -167,7 +167,7 @@ void main() {
 
 #ifdef PURKINJE_SHIFT
 	// Reduce purkinje shift intensity around blocklight sources to preserve their colour
-	float purkinjeIntensity = PURKINJE_SHIFT_INTENSITY - PURKINJE_SHIFT_INTENSITY * cube(blocklight);
+	float purkinjeIntensity = 0.1 - 0.1 * cube(blocklight);
 	fragColor = purkinjeShift(fragColor, purkinjeIntensity);
 #endif
 
@@ -182,9 +182,8 @@ void main() {
 	fragColor  = adjustVibrance(fragColor, GRADE_VIBRANCE);
 	fragColor  = adjustSaturation(fragColor, GRADE_SATURATION);
 	fragColor  = adjustContrast(fragColor, GRADE_CONTRAST);
-#endif
-
 	fragColor *= whiteBalanceMatrix;
+#endif
 
 	fragColor = tonemap(fragColor);
 	fragColor = fragColor * ap1ToR709;

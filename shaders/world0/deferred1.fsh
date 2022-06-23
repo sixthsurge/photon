@@ -69,6 +69,7 @@ uniform vec3 moonDir;
 #include "/include/atmospherics/clouds.glsl"
 
 #include "/include/utility/checkerboard.glsl"
+#include "/include/utility/dithering.glsl"
 #include "/include/utility/random.glsl"
 #include "/include/utility/spaceConversion.glsl"
 
@@ -146,8 +147,7 @@ void main() {
 
 	vec3 lightDir = cloudsMoonlit ? moonDir : sunDir;
 
-	float dither = texelFetch(noisetex, ivec2(viewTexel & 511), 0).b;
-	      dither = R1(frameCounter / CLOUDS_UPSCALING_FACTOR, dither);
+	float dither = interleavedGradientNoise(vec2(viewTexel), frameCounter / CLOUDS_UPSCALING_FACTOR);
 
 	cloudData = drawClouds(ray, lightDir, dither, depth < 1.0 ? length(viewPos) : -1.0);
 

@@ -196,7 +196,7 @@ mat2x3 raymarchFog(vec3 worldStartPos, vec3 worldEndPos, bool isSky, float dithe
 #endif
 
 #ifdef CLOUD_SHADOWS
-		shadow *= getCloudShadow(colortex7, worldPos - cameraPosition);
+		shadow *= getCloudShadows(colortex7, worldPos - cameraPosition);
 #endif
 
 		vec2 density = getFogDensity(worldPos) * stepLength;

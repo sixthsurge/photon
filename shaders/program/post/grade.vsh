@@ -36,7 +36,9 @@ void main() {
 
 	globalExposure = texelFetch(colortex8, ivec2(0), 0).a;
 
-	whiteBalanceMatrix = getWhiteBalanceMatrix(WHITE_BALANCE);
+#ifdef GRADE
+	whiteBalanceMatrix = getWhiteBalanceMatrix(GRADE_WHITE_BALANCE);
+#endif
 
 	gl_Position = vec4(gl_Vertex.xy * 2.0 - 1.0, 0.0, 1.0);
 }

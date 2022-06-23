@@ -69,8 +69,8 @@ const vec3 sunColor = vec3(1.026186824, 0.9881671071, 1.015787125); // Color of 
 const vec3 sunTint  = vec3(SUNLIGHT_TINT_R, SUNLIGHT_TINT_G, SUNLIGHT_TINT_B);
 const vec3 moonTint = vec3(MOONLIGHT_TINT_R, MOONLIGHT_TINT_G, MOONLIGHT_TINT_B);
 
-const vec3 sunIrradiance  = SUNLIGHT_INTENSITY * sunColor * sunTint;
-const vec3 moonIrradiance = MOONLIGHT_INTENSITY * sunColor * moonTint;
+const vec3 sunIrradiance  = 70.0 * SUNLIGHT_INTENSITY * sunColor * sunTint;
+const vec3 moonIrradiance = 1.0 * MOONLIGHT_INTENSITY * sunColor * moonTint;
 
 const vec3 sunRadiance  = sunIrradiance / coneAngleToSolidAngle(sunAngularRadius);
 const vec3 moonRadiance = moonIrradiance / coneAngleToSolidAngle(moonAngularRadius);

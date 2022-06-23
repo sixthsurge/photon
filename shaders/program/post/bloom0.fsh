@@ -42,7 +42,7 @@ void main() {
 
 	vec2 windowCoord = (coord - tileOffset) * tileScale;
 
-	if (clamp01(windowCoord) != windowCoord || tileIndex > float(BLOOM_TILES)) discard;
+	if (clamp01(windowCoord) != windowCoord || tileIndex > float(BLOOM_TILES)) { bloomTile = vec3(0.0); return; };
 
 	float pixelSize = windowTexelSize.x * tileScale;
 

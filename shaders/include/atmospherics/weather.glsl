@@ -13,8 +13,7 @@ float noise1D(float x) {
 void weatherSetup() {
 #ifdef DYNAMIC_WEATHER
 #else
-	airRayleighDensity    = 1.0;
-	airMieDensity         = 1.0;
+	airMieTurbidity         = 1.0;
 	cloudsCirrusCoverage  = 1.0;
 	cloudsCumulusCoverage = 0.5;
 #endif

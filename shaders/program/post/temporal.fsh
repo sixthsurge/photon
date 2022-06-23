@@ -211,7 +211,7 @@ void main() {
 	alpha *= 1.0 - TAA_FLICKER_REDUCTION * flickerReduction;
 #endif
 
-	alpha  = mix(alpha, 0.1, responsiveAa);
+	alpha  = mix(alpha, 0.125, responsiveAa);
 
 	alpha  = 1.0 - alpha;
 	alpha *= offcenterRejection;

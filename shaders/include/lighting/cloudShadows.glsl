@@ -1,5 +1,5 @@
-#if !defined INCLUDE_LIGHTING_CLOUDSHADOWS
-#define INCLUDE_LIGHTING_CLOUDSHADOWS
+#if !defined INCLUDE_LIGHTING_CloudShadows
+#define INCLUDE_LIGHTING_CloudShadows
 
 const ivec2 cloudShadowRes = ivec2(256);
 const float cloudShadowIntensity = 0.85;
@@ -21,7 +21,7 @@ vec3 unprojectCloudShadowmap(vec2 cloudShadowPos) {
 	return transform(shadowModelViewInverse, shadowViewPos);
 }
 
-float getCloudShadow(sampler2D cloudShadowmap, vec3 scenePos) {
+float getCloudShadows(sampler2D cloudShadowmap, vec3 scenePos) {
 #ifndef CLOUD_SHADOWS
 	return 1.0;
 #else
@@ -35,4 +35,4 @@ float getCloudShadow(sampler2D cloudShadowmap, vec3 scenePos) {
 #endif
 }
 
-#endif // INCLUDE_LIGHTING_CLOUDSHADOWS
+#endif // INCLUDE_LIGHTING_CloudShadows
