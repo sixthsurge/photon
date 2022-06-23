@@ -40,7 +40,7 @@ void main() {
 	ivec2[2] tileBounds;
 	tileBounds[0] = ivec2(tileSize * windowSize);
 	tileBounds[1] = ivec2((tileSize + tileSize) * windowSize - 1.0);
-	if (clamp(texel, tileBounds[0], tileBounds[1]) != texel || tileIndex > BLOOM_TILES) return;
+	if (clamp(texel, tileBounds[0], tileBounds[1]) != texel || tileIndex > BLOOM_TILES) { bloomTile = vec3(0.0); return; }
 
 	bloomTile = vec3(0.0);
 	for (int y = -3; y <= 3; ++y) {
