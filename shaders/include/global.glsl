@@ -48,6 +48,12 @@ float lengthSquared(vec3 v) { return dot(v, v); }
 vec2 normalizeSafe(vec2 v) { return v == vec2(0.0) ? v : normalize(v); }
 vec3 normalizeSafe(vec3 v) { return v == vec3(0.0) ? v : normalize(v); }
 
+// Euclidian distance is defined as sqrt(a^2 + b^2 + ...). This function instead does
+// cbrt(|a|^3 + |b|^3 + ...). This results in smaller distances along the diagonal axes
+float cubicLength(vec2 v) {
+	return pow(cube(abs(v.x)) + cube(abs(v.y)), rcp(3.0));
+}
+
 // Source: https://iquilezles.org/www/articles/texture/texture.htm
 vec4 textureSmooth(sampler2D sampler, vec2 coord) {
 	vec2 res = vec2(textureSize(sampler, 0));

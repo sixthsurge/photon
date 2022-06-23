@@ -45,6 +45,8 @@ uniform float eyeAltitude;
 uniform float near;
 uniform float far;
 
+uniform float blindness;
+
 uniform vec3 cameraPosition;
 
 uniform mat4 gbufferModelView;
@@ -273,7 +275,7 @@ void main() {
 			vec3 worldEndPos = worldPos;
 			mat2x3 fogData = raymarchFog(worldStartPos, worldEndPos, depth == 1.0, dither);
 
-			fogScattering = fogData[0];
+			fogScattering = fogData[0] * (1.0 - blindness);
 			fogTransmittance = fogData[1];
 
 			break;

@@ -36,10 +36,14 @@ uniform sampler2D depthtex1;
 
 //--// Camera uniforms
 
+uniform int isEyeInWater;
+
 uniform float eyeAltitude;
 
 uniform float near;
 uniform float far;
+
+uniform float blindness;
 
 uniform vec3 cameraPosition;
 uniform vec3 previousCameraPosition;
@@ -328,4 +332,8 @@ void main() {
 	// beyond the render distance
 	float undergroundSkyFade = biomeCave * smoothstep(-0.1, 0.1, 0.4 - rayDir.y);
 	radiance = mix(radiance, caveFogColor, undergroundSkyFade);
+
+	atmosphereScattering = mix(atmosphereScattering, caveFogColor, undergroundSkyFade);
+
+	radiance *= 1.0 - blindness;
 }

@@ -97,6 +97,11 @@ option.HIDE_PLANET_SURFACE             = Hide Planet Surface
 option.STARS_COVERAGE                  = Stars Coverage
 option.STARS_INTENSITY                 = Stars Brightness
 
+# Fog
+
+option.BORDER_FOG                      = Border Fog
+option.CAVE_FOG                        = Cave Fog
+
 #----# Lighting #----------------------------------------------------------------------------------#
 
 # SSPT

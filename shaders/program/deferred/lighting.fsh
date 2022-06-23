@@ -62,6 +62,8 @@ uniform float eyeAltitude;
 uniform float near;
 uniform float far;
 
+uniform float blindness;
+
 uniform vec3 cameraPosition;
 
 uniform mat4 gbufferModelView;
@@ -273,16 +275,14 @@ void main() {
 	// Blocklight
 
 	float blocklightFalloff = getBlocklightFalloff(lmCoord.x, gtao.w);
-	radiance += 30.0 * blackbody(3750.0) * bsdf * blocklightFalloff;
+	radiance += 60.0 * blackbody(3750.0) * bsdf * blocklightFalloff;
 
 	// Ambient light
 
 	radiance += ambientIrradiance * bsdf * gtao.w;
 #endif
 
-#ifdef DISTANCE_FADE
-	radiance = distanceFade(radiance, clearSky, scenePos, worldDir);
-#endif
+	radiance += 32.0 * material.emission;
 
-	radiance += 16.0 * material.emission;
+	radiance = applySimpleFog(radiance, scenePos, clearSky);
 }

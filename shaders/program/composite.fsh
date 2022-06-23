@@ -48,6 +48,8 @@ uniform float eyeAltitude;
 uniform float near;
 uniform float far;
 
+uniform float blindness;
+
 uniform vec3 cameraPosition;
 
 uniform mat4 gbufferModelView;
@@ -138,10 +140,6 @@ vec3 lightTranslucents(
 ) {
 	vec3 radiance = vec3(0.0);
 
-	// Self-emission
-
-	radiance += 16.0 * material.emission;
-
 	// Sunlight/moonlight
 
 #if defined WORLD_OVERWORLD || defined WORLD_END
@@ -185,22 +183,20 @@ vec3 lightTranslucents(
 #endif
 
 	// Skylight
-
 	vec3 bsdf = material.albedo * rcpPi;
 
 	radiance += bsdf * skyIrradiance * getSkylightFalloff(lmCoord.y);
 
 	// Blocklight
-
 	radiance += 4.0 * blackbody(3750.0) * bsdf * pow5(lmCoord.x);
 
 	// Ambient light
-
 	radiance += bsdf * ambientIrradiance;
 
-#ifdef DISTANCE_FADE
-	radiance = distanceFade(radiance, clearSky, scenePos, -viewerDir);
-#endif
+	radiance += 32.0 * material.emission;
+
+	// Simple fog
+	radiance = applySimpleFog(radiance, scenePos, clearSky);
 
 	return radiance;
 }

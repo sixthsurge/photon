@@ -64,7 +64,8 @@ const float sunPathRotation = -40.0; // [-40.0 -35.0 -30.0 -25.0 -20.0 -15.0 -10
   #define AIR_FOG_VL
   #define AIR_FOG_DENSITY 1.0 // []
 
-  #define DISTANCE_FADE
+  #define BORDER_FOG // Thick fog hugging the edges of the render distance to hide the chunk borders
+  #define CAVE_FOG // Light, slightly glowing fog applied underground. This makes large caverns feel a lot more atmospheric, and helps you to see the shape of the cavern
 
 //--// Sky
 
@@ -185,7 +186,7 @@ const float sunPathRotation = -40.0; // [-40.0 -35.0 -30.0 -25.0 -20.0 -15.0 -10
 //--// Exposure
 
   #define CAMERA_EXPOSURE_BIAS 0.0 // [-2.0 -1.5 -1.0 -0.5 0.0 0.5 1.0 1.5 2.0]
-  #define CAMERA_EXPOSURE_MIN 0.0 // [-6.0 -5.0 -4.0 -3.0 -2.0 -1.0 0.0 1.0 2.0 3.0 4.0 5.0 6.0 7.0 8.0 9.0 10.0 11.0 12.0 13.0 14.0 15.0 16.0 17.0]
+  #define CAMERA_EXPOSURE_MIN 1.0 // [-6.0 -5.0 -4.0 -3.0 -2.0 -1.0 0.0 1.0 2.0 3.0 4.0 5.0 6.0 7.0 8.0 9.0 10.0 11.0 12.0 13.0 14.0 15.0 16.0 17.0]
   #define CAMERA_EXPOSURE_MAX 4.0 // [-6.0 -5.0 -4.0 -3.0 -2.0 -1.0 0.0 1.0 2.0 3.0 4.0 5.0 6.0 7.0 8.0 9.0 10.0 11.0 12.0 13.0 14.0 15.0 16.0 17.0]
   #define CAMERA_EXPOSURE_RATE_DIM_TO_BRIGHT 2.0 // [0.5 1.0 1.5 2.0 2.5 3.0 3.5 4.0 4.5 5.0 5.5 6.0]
   #define CAMERA_EXPOSURE_RATE_BRIGHT_TO_DIM 1.0 // [0.5 1.0 1.5 2.0 2.5 3.0 3.5 4.0 4.5 5.0 5.5 6.0]

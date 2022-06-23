@@ -71,11 +71,7 @@ vec3 getSceneLighting(
 
 	radiance += bsdf * skylight * skylightFalloff * ao;
 
-	// Self-emission
-
-	radiance += material.emission;
-
-	return radiance;
+	return radiance + material.emission;
 }
 
 #endif // INCLUDE_LIGHTING_LIGHTING
