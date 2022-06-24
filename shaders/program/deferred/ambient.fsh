@@ -249,7 +249,7 @@ void main() {
 	float depthDelta  = abs(linearizeDepth(depth) - linearizeDepth(historyDepth));
 	float depthWeight = exp(-10.0 * depthDelta) * float(historyDepth < 1.0);
 
-	float pixelAge  = min(historyData.z * 65535.0, float(GTAO_ACCUMULATED_FRAMES));
+	float pixelAge  = min(historyData.z * 65535.0, float(GTAO_ACCUMULATION_LIMIT));
 	      pixelAge *= float(clamp01(previousScreenPos.xy) == previousScreenPos.xy);
 		  pixelAge *= depthWeight;
 

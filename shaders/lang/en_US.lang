@@ -24,6 +24,7 @@ screen.fog                             = Fog
 screen.sky                             = Sky
 screen.cloudsCumulus                   = Cumulus Clouds
 screen.cloudsCirrus                    = Cirrus Clouds
+screen.gtao                            = Ambient Occlusion
 screen.lightSources                    = Light Sources
 screen.shadows                         = Shadows
 screen.bloom                           = Bloom
@@ -111,6 +112,10 @@ option.SSPT_FILTER                     = SSPT Filter
 
 # GTAO
 option.GTAO                            = Enabled
+option.GTAO_RADIUS                     = Radius
+option.GTAO_SLICES                     = Slices
+option.GTAO_HORIZON_STEPS              = Horizon Steps
+option.GTAO_ACCUMULATION_LIMIT         = Accumulation Limit
 option.SH_SKYLIGHT                     = SH Skylight
 
 # Light Sources

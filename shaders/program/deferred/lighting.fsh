@@ -17,7 +17,7 @@ in vec2 coord;
 flat in vec3 ambientIrradiance;
 flat in vec3 directIrradiance;
 
-#if defined SH_SKYLIGHT && defined GTAO
+#ifdef SH_SKYLIGHT
 flat in vec3[9] skySh;
 #else
 flat in vec3 skyIrradiance;
