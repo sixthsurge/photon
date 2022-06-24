@@ -194,7 +194,12 @@ void main() {
 
 #ifdef GTAO
 	float ao = gtao.w;
-	vec3 bentNormal = decodeUnitVector(gtao.xy);
+
+	vec3 bentNormal;
+	bentNormal.xy = gtao.xy * 2.0 - 1.0;
+	bentNormal.z  = sqrt(clamp01(1.0 - dot(bentNormal.xy, bentNormal.xy)));
+
+	bentNormal = mat3(gbufferModelViewInverse) * bentNormal;
 #else
 	float ao = 1.0;
 	vec3 bentNormal = normal;

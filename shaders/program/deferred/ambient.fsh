@@ -196,7 +196,7 @@ vec4 calculateGtao(
 
 	visibility = multiBounceApprox(visibility * (1.0 / float(GTAO_SLICES)));
 	bentNormal = normalize(normalize(bentNormal) - 0.5 * viewDir);
-	bentNormal = mat3(gbufferModelViewInverse) * bentNormal;
+	bentNormal = bentNormal;
 
     return vec4(bentNormal, visibility);
 }
@@ -229,7 +229,7 @@ void main() {
 
 	vec3 viewNormal = mat3(gbufferModelView) * normal;
 
-#if defined SSPT
+#if   defined SSPT
 
 #elif defined GTAO
     vec4 gtao = calculateGtao(
@@ -256,14 +256,16 @@ void main() {
 	float historyWeight = pixelAge / (pixelAge + 1.0);
 
 	// Reconstruct bent normal
-	historyData.xyz = decodeUnitVector(historyData.xy);
+	historyData.xy = historyData.xy * 2.0 - 1.0;
+	historyData.z  = sqrt(clamp01(1.0 - dot(historyData.xy, historyData.xy)));
 
 	// Blend with previous frame
-	historyData.xyz = normalize(mix(gtao.xyz, historyData.xyz, historyWeight));
+	historyData.xyz = mix(gtao.xyz, historyData.xyz, historyWeight);
 	historyData.w   = mix(gtao.w, historyData.w, historyWeight);
 
 	// Store data for next frame
-	historyData.xy = encodeUnitVector(historyData.xyz);
-	historyData.z  = clamp01(pixelAge * rcp(65535.0) + rcp(65535.0));
+	historyData.xy *= rcpLength(historyData.xyz);
+	historyData.xy  = historyData.xy * 0.5 + 0.5;
+	historyData.z   = clamp01(pixelAge * rcp(65535.0) + rcp(65535.0));
 #endif
 }
