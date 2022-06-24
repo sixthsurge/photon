@@ -65,4 +65,7 @@ float pow1d5(float x) {
 	return x * sqrt(x);
 }
 
+float rcpLength(vec2 v) { return inversesqrt(dot(v, v)); }
+float rcpLength(vec3 v) { return inversesqrt(dot(v, v)); }
+
 #endif // INCLUDE_UTILITY_FASTMATH

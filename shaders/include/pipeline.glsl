@@ -34,7 +34,7 @@ const int colortex13Format = RG16F;
 
 // Select texture format for colortex1 based on how much data is required
 // This is formatted like this because OF doesn't detect #if defined so I can't use #elif or ||
-#ifdef MC_GL_VENDOR_INTEL 
+#ifdef MC_GL_VENDOR_INTEL
 	// Use floating point texture format for colortex1, even though it stores unsigned integers
 	// This really shouldn't work, but it seems to be required to work properly on Intel and Mesa drivers
 	#ifdef SPECULAR_MAP
@@ -81,6 +81,8 @@ const bool colortex5Clear  = false;
 const bool colortex6Clear  = false;
 const bool colortex7Clear  = false;
 const bool colortex8Clear  = false;
+const bool colortex9Clear  = false;
+const bool colortex10Clear  = false;
 const bool colortex11Clear = false;
 const bool colortex12Clear = false;
 const bool colortex13Clear = false;

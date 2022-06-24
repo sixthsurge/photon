@@ -1,6 +1,6 @@
 /*
  * Program description:
- * Calculate indirect lighting; SSPT or GTAO
+ * Calculate ambient lighting; SSPT or GTAO
  */
 
 #include "/include/global.glsl"
@@ -26,6 +26,7 @@ in vec2 coord;
 uniform sampler2D noisetex;
 
 uniform usampler2D colortex1; // Scene data
+uniform sampler2D colortex2;  // Motion vectors
 uniform sampler2D colortex4;  // Sky capture
 uniform sampler2D colortex8;  // Scene history
 uniform sampler2D colortex9;  // History irradiance
@@ -84,6 +85,19 @@ uniform bool worldAgeChanged;
 #include "/include/utility/sphericalHarmonics.glsl"
 
 //--// Functions //-----------------------------------------------------------//
+
+/*
+ * data packing:
+ *
+ * GTAO:
+ * colortex10
+ * x: bent normal X
+ * y: bent normal Y
+ * z: pixelAge
+ * w: visibility
+ *
+ * SSPT:
+ */
 
 const float indirectRenderScale = 0.01 * INDIRECT_RENDER_SCALE;
 
@@ -182,7 +196,7 @@ vec4 calculateGtao(
 
 	visibility = multiBounceApprox(visibility * (1.0 / float(GTAO_SLICES)));
 	bentNormal = normalize(normalize(bentNormal) - 0.5 * viewDir);
-	bentNormal = (mat3(gbufferModelViewInverse) * bentNormal) * 0.5 + 0.5;
+	bentNormal = mat3(gbufferModelViewInverse) * bentNormal;
 
     return vec4(bentNormal, visibility);
 }
@@ -204,7 +218,7 @@ void main() {
 	vec3 viewPos = screenToViewSpace(screenPos, true);
 	vec3 viewDir = normalize(viewPos);
 
-	if (depth == 1.0) return;
+	if (depth == 1.0) { historyData = vec4(0.5, 0.5, 0.0, 1.0); return; }
 
 #ifdef MC_NORMAL_MAP
 	vec4 normalData = unpackUnormArb(encoded.z, uvec4(12, 12, 7, 1));
@@ -225,11 +239,31 @@ void main() {
         R2(frameCounter, vec2(dither))
     );
 
-	// Temporal accumulation
+	//--// Temporal accumulation
 
-    vec3 previousScreenPos = reproject(screenPos);
+    vec3 previousScreenPos = reproject(screenPos, colortex2);
 
-	historyData = gtao;
+	historyData = textureSmooth(colortex10, previousScreenPos.xy * indirectRenderScale);
+	float historyDepth = 1.0 - textureSmooth(colortex13, previousScreenPos.xy).y;
 
+	float depthDelta  = abs(linearizeDepth(depth) - linearizeDepth(historyDepth));
+	float depthWeight = exp(-10.0 * depthDelta) * float(historyDepth < 1.0);
+
+	float pixelAge  = min(historyData.z * 65535.0, float(GTAO_ACCUMULATED_FRAMES));
+	      pixelAge *= float(clamp01(previousScreenPos.xy) == previousScreenPos.xy);
+		  pixelAge *= depthWeight;
+
+	float historyWeight = pixelAge / (pixelAge + 1.0);
+
+	// Reconstruct bent normal
+	historyData.xyz = decodeUnitVector(historyData.xy);
+
+	// Blend with previous frame
+	historyData.xyz = normalize(mix(gtao.xyz, historyData.xyz, historyWeight));
+	historyData.w   = mix(gtao.w, historyData.w, historyWeight);
+
+	// Store data for next frame
+	historyData.xy = encodeUnitVector(historyData.xyz);
+	historyData.z  = clamp01(pixelAge * rcp(65535.0) + rcp(65535.0));
 #endif
 }

@@ -1,3 +1,3 @@
 #version 410 compatibility
 #define WORLD_OVERWORLD
-#include "/program/deferred/indirect.fsh"
+#include "/program/deferred/ambient.fsh"

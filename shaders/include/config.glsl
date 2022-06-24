@@ -95,8 +95,9 @@ const float sunPathRotation = -40.0; // [-40.0 -35.0 -30.0 -25.0 -20.0 -15.0 -10
 
   #define GTAO // Ground-truth based ambient occlusion (GTAO). This option is ignored when SSPT is enabled
   #define GTAO_RADIUS 0.5
-  #define GTAO_SLICES 20 // [1 2 3 4 5 6 7 8]
+  #define GTAO_SLICES 2 // [1 2 3 4 5 6 7 8]
   #define GTAO_HORIZON_STEPS 3 // [3 4 5 6 7 8]
+  #define GTAO_ACCUMULATED_FRAMES 16 // [0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33]
 
   #define SH_SKYLIGHT // Uses spherical harmonics encoding for directional skylight in the Overworld, which provides a much more natural result. This works well with GTAO. This option is ignored when SSPT is enabled, since SSPT provides a similar result with almost no performance cost over regular SSPT. Small performance cost
 

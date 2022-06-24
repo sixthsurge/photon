@@ -192,6 +192,14 @@ void main() {
 	albedo = overlayId == 1 ? 2.0 * albedo * overlays.rgb : albedo; // damage overlay
 	albedo = srgbToLinear(albedo) * r709ToAp1Unlit;
 
+#ifdef GTAO
+	float ao = gtao.w;
+	vec3 bentNormal = decodeUnitVector(gtao.xy);
+#else
+	float ao = 1.0;
+	vec3 bentNormal = normal;
+#endif
+
 	// Get material
 
 	Material material = getMaterial(albedo, blockId);
@@ -258,28 +266,28 @@ void main() {
 	const float bounceAlbedo = 0.5;
 	const vec3 bounceWeights = vec3(0.2, 0.6, 0.2); // fraction of light that bounces off each axis
 
-	radiance += directIrradiance * bsdf * gtao.x * dot(max0(-normal), bounceWeights) * bounceAlbedo * rcpPi * pow8(lmCoord.y);
+	radiance += directIrradiance * bsdf * ao * dot(max0(-normal), bounceWeights) * bounceAlbedo * rcpPi * pow8(lmCoord.y);
 
 	// Skylight
 
 	float skylightFalloff = getSkylightFalloff(lmCoord.y);
 
 #ifdef SH_SKYLIGHT
-	vec3 skylight = evaluateSphericalHarmonicsIrradiance(skySh, gtao.xyz * 2.0 - 1.0, gtao.w);
+	vec3 skylight = evaluateSphericalHarmonicsIrradiance(skySh, bentNormal, ao);
 #else
-	vec3 skylight = mix(skyIrradiance, vec3(skyIrradiance.b * sqrt(2.0)), rcpPi) * gtao.w;
+	vec3 skylight = mix(skyIrradiance, vec3(skyIrradiance.b * sqrt(2.0)), rcpPi) * ao;
 #endif
 
 	radiance += skylight * skylightFalloff * bsdf;
 
 	// Blocklight
 
-	float blocklightFalloff = getBlocklightFalloff(lmCoord.x, gtao.w);
+	float blocklightFalloff = getBlocklightFalloff(lmCoord.x, ao);
 	radiance += 60.0 * blackbody(3750.0) * bsdf * blocklightFalloff;
 
 	// Ambient light
 
-	radiance += ambientIrradiance * bsdf * gtao.w;
+	radiance += ambientIrradiance * bsdf * ao;
 #endif
 
 	radiance += 32.0 * material.emission;
