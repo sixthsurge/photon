@@ -118,6 +118,7 @@ vec3 specularBrdf(
 ) {
 	vec3 f = material.isMetal ? fresnelSchlick(LoH, material.f0) : vec3(fresnelDielectric(LoH, material.n));
 
+	if (NoL <= 0.0) return vec3(0.0);
 	if (all(lessThan(f, vec3(1e-2)))) return vec3(0.0);
 
 	vec3 albedoTint = material.isHardcodedMetal ? material.albedo : vec3(1.0);
