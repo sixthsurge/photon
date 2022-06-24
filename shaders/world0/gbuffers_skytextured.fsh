@@ -31,8 +31,7 @@ uniform int renderStage;
 //--// Functions //-----------------------------------------------------------//
 
 void main() {
-	fragColor.rgb = texture(gtexture, texCoord).rgb;
-
+	vec2 adjustedCoord = texCoord;
 	vec2 offset;
 
 	switch (renderStage) {
@@ -53,8 +52,10 @@ void main() {
 	 	// alpha of 3 <=> moon
 		fragColor.a = 3.0 / 255.0;
 
-		// Cut out the moon itself (discard the halo around it)
+		// Cut out the moon itself (discard the halo around it) and flip moon texture along the
+		// diagonal
 		offset = fract(vec2(4.0, 2.0) * texCoord);
+		adjustedCoord = adjustedCoord + vec2(0.25, 0.5) * ((1.0 - offset.yx) - offset);
 		offset = offset * 2.0 - 1.0;
 		if (maxOf(abs(offset)) > 0.25) discard;
 
@@ -69,4 +70,6 @@ void main() {
 	default:
 		discard;
 	}
+
+	fragColor.rgb = texture(gtexture, adjustedCoord).rgb;
 }

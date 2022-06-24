@@ -66,6 +66,8 @@ uniform int frameCounter;
 
 uniform int worldTime;
 
+uniform int moonPhase;
+
 uniform float frameTime;
 
 uniform float sunAngle;
@@ -94,6 +96,9 @@ uniform vec3 moonDir;
 #define WORLD_OVERWORLD
 
 #define ATMOSPHERE_SCATTERING_LUT colortex2
+
+#include "/block.properties"
+#include "/entity.properties"
 
 #include "/include/atmospherics/atmosphere.glsl"
 #include "/include/atmospherics/sky.glsl"

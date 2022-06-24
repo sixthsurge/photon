@@ -1,7 +1,10 @@
 #if !defined INCLUDE_ATMOSPHERE_SKY
 #define INCLUDE_ATMOSPHERE_SKY
 
+#include "/include/lighting/bsdf.glsl"
+
 #include "/include/utility/fastMath.glsl"
+#include "/include/utility/geometry.glsl"
 #include "/include/utility/random.glsl"
 
 vec3 drawSun(vec3 rayDir) {
@@ -12,7 +15,41 @@ vec3 drawSun(vec3 rayDir) {
 	float centerToEdge = max0(sunAngularRadius - acosApprox(nu));
 	vec3 limbDarkening = pow(vec3(1.0 - sqr(1.0 - centerToEdge)), 0.5 * alpha);
 
-	return step(0.0, centerToEdge) * sunRadiance * limbDarkening;
+	return 0.08 * step(0.0, centerToEdge) * sunRadiance * limbDarkening; // magically darkening the sun to prevent it from overloading bloom
+}
+
+vec3 drawMoon(vec3 rayDir) {
+	const float moonAlbedo    = 0.3;
+	const float moonF0        = 0.04;
+	const float moonN         = (1.0 + sqrt(moonF0)) / (1.0 - sqrt(moonF0));
+	const float moonRoughness = 0.8;
+
+	float distanceToMoon = raySphereIntersection(-moonDir, rayDir, moonAngularRadius).x;
+
+	if (distanceToMoon < 0.0) return vec3(0.0);
+
+	// Get moon normal
+	vec3 normal = normalize(rayDir * distanceToMoon - moonDir);
+
+	// Get light direction which orbits around moon
+	float lightAngle = 0.125 * tau * float(moonPhase);
+
+	vec3 leftDir = normalize(cross(vec3(0.0, 1.0, 0.0), rayDir));
+	vec3 lightDir = cos(lightAngle) * -rayDir + sin(lightAngle) * leftDir;
+
+	float NoL = dot(normal, lightDir);
+	float NoV = dot(normal, -rayDir);
+	float LoV = dot(lightDir, -rayDir);
+	float halfwayNorm = inversesqrt(2.0 * LoV + 2.0);
+	float NoH = (NoL + NoV) * halfwayNorm;
+
+	vec3 irradiance = sunIrradiance * max0(NoL);
+
+	vec3 bsdf = diffuseBrdf(vec3(moonAlbedo), moonF0, moonN, moonRoughness, NoL, NoV, NoH, LoV);
+
+	float glow = 0.04 * pow4(max0(-NoL)); // Subtle glow on dark side of the moon
+
+	return (irradiance * bsdf + glow) * vec3(MOONLIGHT_TINT_R, MOONLIGHT_TINT_G, MOONLIGHT_TINT_B);
 }
 
 // Stars based on https://www.shadertoy.com/view/Md2SR3

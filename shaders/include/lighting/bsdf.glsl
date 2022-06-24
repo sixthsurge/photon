@@ -1,6 +1,8 @@
 #if !defined INCLUDE_LIGHTING_BSDF
 #define INCLUDE_LIGHTING_BSDF
 
+#include "/include/fragment/material.glsl"
+
 #include "/include/utility/fastMath.glsl"
 
 // GGX spherical area light approximation from Horizon: Zero Dawn
