@@ -32,20 +32,26 @@ void main() {
 	#error "This program should be disabled if bloom is disabled"
 #endif
 
-	ivec2 texel = ivec2(gl_FragCoord.xy);
-
 	float tileIndex = ceil(-log2(coord.x));
-	float tileSize = exp2(-tileIndex);
+	float tileScale = exp2(tileIndex);
+	float tileOffset = rcp(tileScale);
 
-	ivec2[2] tileBounds;
-	tileBounds[0] = ivec2(tileSize * windowSize);
-	tileBounds[1] = ivec2((tileSize + tileSize) * windowSize - 1.0);
-	if (clamp(texel, tileBounds[0], tileBounds[1]) != texel || tileIndex > BLOOM_TILES) { bloomTile = vec3(0.0); return; }
+	vec2 windowCoord = (coord - tileOffset) * tileScale;
+
+	if (clamp01(windowCoord) != windowCoord || tileIndex > float(BLOOM_TILES)) { bloomTile = vec3(0.0); return; };
+
+	vec2 padAmount = 1.0 * windowTexelSize * tileScale;
+	windowCoord = linearStep(padAmount, 1.0 - padAmount, windowCoord);
+
+	float pixelSize = tileScale * windowTexelSize.y;
 
 	bloomTile = vec3(0.0);
+
 	for (int y = -3; y <= 3; ++y) {
 		float weight = binomialWeights7[abs(y)];
-		ivec2 texel = clamp(texel + ivec2(0, y), tileBounds[0], tileBounds[1]);
-		bloomTile += texelFetch(colortex2, texel, 0).rgb * weight;
+
+		vec2 sampleCoord = clamp01(windowCoord + vec2(0.0, y * pixelSize));
+
+		bloomTile += texture(colortex2, sampleCoord * rcp(tileScale) + tileOffset).rgb * weight;
 	}
 }

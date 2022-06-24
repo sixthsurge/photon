@@ -10,6 +10,11 @@
 /* RENDERTARGETS: 2 */
 layout (location = 0) out vec3 fragColor;
 
+#ifdef BLOOMY_FOG
+/* RENDERTARGETS: 2,14 */
+layout (location = 1) out vec4 bloomyFog;
+#endif
+
 //--// Inputs //--------------------------------------------------------------//
 
 in vec2 coord;
@@ -21,7 +26,11 @@ flat in mat3 whiteBalanceMatrix;
 
 uniform usampler2D colortex1; // Scene data
 uniform sampler2D colortex2;  // Bloom tiles
+uniform sampler2D colortex5;  // Bloomy fog amount
 uniform sampler2D colortex8;  // Scene history and exposure
+uniform sampler2D colortex14; // Bloomy fog color
+
+uniform sampler2D depthtex0;
 
 //--// Camera uniforms
 
@@ -34,11 +43,21 @@ uniform float near;
 uniform float far;
 
 uniform vec3 cameraPosition;
+uniform vec3 previousCameraPosition;
 
 uniform mat4 gbufferModelView;
 uniform mat4 gbufferModelViewInverse;
 uniform mat4 gbufferProjection;
 uniform mat4 gbufferProjectionInverse;
+
+uniform mat4 gbufferPreviousModelView;
+uniform mat4 gbufferPreviousProjection;
+
+//--// Time uniforms
+
+uniform float frameTime;
+
+uniform float rainStrength;
 
 //--// Custom uniforms
 
@@ -46,8 +65,11 @@ uniform vec2 taaOffset;
 
 uniform vec2 viewSize;
 uniform vec2 windowSize;
+uniform vec2 windowTexelSize;
 
 //--// Includes //------------------------------------------------------------//
+
+#define TEMPORAL_REPROJECTION
 
 #include "/include/fragment/aces/aces.glsl"
 
@@ -58,23 +80,86 @@ uniform vec2 windowSize;
 
 //--// Functions //-----------------------------------------------------------//
 
-vec3 getBloom() {
+vec3 getBloom(out vec3 fogBloom) {
 	vec3 tileSum = vec3(0.0);
 
 	float weight = 1.0;
 	float weightSum = 0.0;
 
+#if defined BLOOMY_FOG || defined BLOOMY_RAIN
+	const float fogBloomRadius = 1.5;
+
+	fogBloom = vec3(0.0); // large-scale bloom for bloomy fog
+	float fogBloomWeight = 1.0;
+	float fogBloomWeightSum = 0.0;
+#endif
+
 	for (int i = 1; i < BLOOM_TILES; ++i) {
 		float tileSize = exp2(-i);
-		float tileOffset = 2.0 * tileSize - tileSize;
 
-		tileSum += BLOOM_UPSAMPLING_FILTER(colortex2, coord * tileSize + tileOffset).rgb * weight;
+		vec2 padAmount = 2.0 * windowTexelSize * rcp(tileSize);
+
+		vec2 tileCoord = mix(padAmount, 1.0 - padAmount, coord) * tileSize + tileSize;
+
+		vec3 tile = BLOOM_UPSAMPLING_FILTER(colortex2, tileCoord).rgb;
+
+		tileSum += tile * weight;
 		weightSum += weight;
 
 		weight *= BLOOM_RADIUS;
+
+#if defined BLOOMY_FOG || defined BLOOMY_RAIN
+		fogBloom += tile * fogBloomWeight;
+
+		fogBloomWeightSum += fogBloomWeight;
+		fogBloomWeight *= fogBloomRadius;
+#endif
 	}
 
+#if defined BLOOMY_FOG || defined BLOOMY_RAIN
+	fogBloom *= rcp(fogBloomWeightSum);
+#endif
+
 	return tileSum / weightSum;
+}
+
+vec4 getBloomyFog(vec3 fogBloom) {
+#if   defined WORLD_OVERWORLD
+	// Apply bloomy fog only in darker areas
+	float luminance = getLuminance(fragColor);
+
+	float bloomyFogStrength = 0.4 - 0.3 * linearStep(0.05, 1.0, luminance);
+	float bloomyFogDensity  = 0.01;
+#elif defined WORLD_NETHER
+
+#elif defined WORLD_END
+
+#endif
+
+	float depth = texture(depthtex0, coord * renderScale).x;
+	float viewerDistance = length(screenToViewSpace(vec3(coord, depth), false));
+
+	float fogAmount = (1.0 - exp(-bloomyFogDensity * viewerDistance)) * bloomyFogStrength * BLOOMY_FOG_INTENSITY;
+	if (linearizeDepth(depth) < MC_HAND_DEPTH) fogAmount = 0.0;
+
+	vec2 previousScreenPos = reproject(vec3(coord, depth)).xy;
+	vec4 previousBloomyFog = texture(colortex14, previousScreenPos);
+
+	const vec2 updateSpeed = vec2(25.0, 12.0); // fog amount, fog bloom
+
+	// Offcenter rejection from Jessie, which is originally from Zombye
+	// Reduces blur in motion
+	vec2 pixelOffset = 1.0 - abs(2.0 * fract(windowSize * previousScreenPos) - 1.0);
+	float offcenterRejection = sqrt(pixelOffset.x * pixelOffset.y) * 0.5 + 0.5;
+
+	vec2 blendWeight  = exp(-frameTime * updateSpeed) * offcenterRejection;
+		 blendWeight *= float(clamp01(previousScreenPos) == previousScreenPos);
+	     blendWeight *= 1.0 - float(any(isnan(previousBloomyFog)));
+
+	fogAmount = mix(fogAmount, previousBloomyFog.w,   blendWeight.x);
+	fogBloom  = mix(fogBloom,  previousBloomyFog.rgb, blendWeight.y);
+
+	return vec4(fogBloom, fogAmount);
 }
 
 vec3 tonemapAces(vec3 rgb) {
@@ -161,11 +246,18 @@ void main() {
 	float blocklight = unpackUnorm4x8(sceneData.y).z;
 
 #ifdef BLOOM
-	vec3 bloom = getBloom();
-	fragColor = mix(fragColor, bloom, 0.1);
+	vec3 fogBloom;
+	vec3 bloom = getBloom(fogBloom);
+
+#ifdef BLOOMY_FOG
+	bloomyFog = getBloomyFog(fogBloom);
+	fragColor = mix(fragColor, bloomyFog.rgb, bloomyFog.a);
 #endif
 
-#ifdef PURKINJE_SHIFT
+	fragColor = mix(fragColor, bloom, BLOOM_INTENSITY);
+#endif
+
+#if defined PURKINJE_SHIFT && defined WORLD_OVERWORLD
 	// Reduce purkinje shift intensity around blocklight sources to preserve their colour
 	float purkinjeIntensity = 0.1 - 0.1 * cube(blocklight);
 	fragColor = purkinjeShift(fragColor, purkinjeIntensity);

@@ -7,7 +7,7 @@
 (lighting)
 3  | rgb11f  | taa render scale  | scene radiance (deferred -> composite)
 4  | rgb11f  | 256x128           | sky capture, lighting color palette, dynamic weather properties (deferred -> composite)
-5  | rgba16  | taa render scale  | low-res clouds (deferred), indirect lighting data (deferred), responsive aa flag (composite)
+5  | rgba16  | taa render scale  | low-res clouds (deferred), indirect lighting data (deferred), bloomy fog and responsive aa flag (composite)
 6  | rgb16f  | taa render scale  | atmosphere scattering (deferred -> composite), volumetric fog scattering (composite), taa min color (composite)
 7  | rgb16f  | taa render scale  | cloud shadow map (deferred -> composite), volumetric fog transmittance (composite), taa max color (composite)
 
@@ -18,6 +18,7 @@
 11 | rgb16f  | taa render scale  | clouds history
 12 | rg8     | taa render scale  | clouds pixel age
 13 | rg16f   | taa render scale  | previous frame depth
+14 | rgba16f | fullscreen        | bloomy fog
 
 const int colortex0Format  = RGBA8;
 const int colortex2Format  = RGB16F;
@@ -31,6 +32,7 @@ const int colortex10Format = RGBA16;
 const int colortex11Format = RGBA16F;
 const int colortex12Format = R8I;
 const int colortex13Format = RG16F;
+const int colortex14Format = RGBA16F;
 
 // Select texture format for colortex1 based on how much data is required
 // This is formatted like this because OF doesn't detect #if defined so I can't use #elif or ||
@@ -82,10 +84,11 @@ const bool colortex6Clear  = false;
 const bool colortex7Clear  = false;
 const bool colortex8Clear  = false;
 const bool colortex9Clear  = false;
-const bool colortex10Clear  = false;
+const bool colortex10Clear = false;
 const bool colortex11Clear = false;
 const bool colortex12Clear = false;
 const bool colortex13Clear = false;
+const bool colortex14Clear = false;
 
 const vec4 colortex0ClearColor = vec4(0.0, 0.0, 0.0, 0.0);
 

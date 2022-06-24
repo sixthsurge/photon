@@ -44,7 +44,10 @@ void main() {
 
 	if (clamp01(windowCoord) != windowCoord || tileIndex > float(BLOOM_TILES)) { bloomTile = vec3(0.0); return; };
 
-	float pixelSize = windowTexelSize.x * tileScale;
+	vec2 padAmount = 1.0 * windowTexelSize * tileScale;
+	windowCoord = linearStep(padAmount, 1.0 - padAmount, windowCoord);
+
+	float pixelSize = tileScale * windowTexelSize.x;
 
 	bloomTile = vec3(0.0);
 

@@ -246,7 +246,7 @@ void main() {
 	historyData = textureSmooth(colortex10, previousScreenPos.xy * indirectRenderScale);
 	float historyDepth = 1.0 - textureSmooth(colortex13, previousScreenPos.xy).y;
 
-	float depthDelta  = abs(linearizeDepth(depth) - linearizeDepth(historyDepth));
+	float depthDelta  = abs(linearizeDepth(previousScreenPos.z) - linearizeDepth(historyDepth));
 	float depthWeight = exp(-10.0 * depthDelta) * float(historyDepth < 1.0);
 
 	float pixelAge  = min(historyData.z * 65535.0, float(GTAO_ACCUMULATION_LIMIT));

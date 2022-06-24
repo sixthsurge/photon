@@ -22,9 +22,6 @@ const float sunPathRotation = -40.0; // [-40.0 -35.0 -30.0 -25.0 -20.0 -15.0 -10
   #define SEA_LEVEL 63.0 // The y coordinate of the sea/ground. -60.0: Superflat post-1.18. 4.0: Superflat pre-1.18. 63.0: Normal. [-60.0 4.0 63.0]
   #define MOON_PHASE_AFFECTS_BRIGHTNESS // Night time brightness is affected by the moon phase
 
-  #ifdef MOON_PHASE_AFFECTS_BRIGHTNESS
-  #endif
-
 //--// Clouds
 
   #define CLOUDS_UPSCALING_FACTOR 8 // Renders clouds at a lower resolution and uses checkerboard upscaling to fill in the rest. This does not take into account the TAA upscaling factor, so if the clouds upscaling factor is 8x and the TAA upscaling factor is 2x, then the clouds are actually being upscaled to 16x their source resolution [1 2 4 8 16]
@@ -65,7 +62,9 @@ const float sunPathRotation = -40.0; // [-40.0 -35.0 -30.0 -25.0 -20.0 -15.0 -10
   #define AIR_FOG_DENSITY 1.0 // []
 
   #define BORDER_FOG // Thick fog hugging the edges of the render distance to hide the chunk borders
-  #define CAVE_FOG // Light, slightly glowing fog applied underground. This makes large caverns feel a lot more atmospheric, and helps you to see the shape of the cavern
+  #define CAVE_FOG // Light, slightly glowing fog applied underground. This makes large caverns feel a lot more atmospheric, and helps you to see the shape of the cave
+  #define BLOOMY_FOG // Intense bloom in fog. This gives the appearance of light from bright objects scattering within the fog, and illuminates the area behind them. Almost no performance cost
+  #define BLOOMY_FOG_INTENSITY 1.0 // Adjusts the intensity of "bloomy fog" [0.0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0 1.1 1.2 1.3 1.4 1.5 1.6 1.7 1.8 1.9 2.0]
 
 //--// Sky
 
@@ -146,11 +145,6 @@ const float sunPathRotation = -40.0; // [-40.0 -35.0 -30.0 -25.0 -20.0 -15.0 -10
   #define SHADOW_BIAS 1.3 // [0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0 1.1 1.2 1.3 1.4 1.5 1.6 1.7 1.8 1.9 2.0]
   #define SHADOW_DEPTH_SCALE 0.2
   #define SHADOW_DISTORTION 0.85
-
-  #ifdef ENTITY_SHADOWS
-  #endif
-  #ifdef BLOCK_ENTITY_SHADOWS
-  #endif
 
 //--// Post-Processing //-----------------------------------------------------//
 
@@ -274,5 +268,18 @@ const float sunPathRotation = -40.0; // [-40.0 -35.0 -30.0 -25.0 -20.0 -15.0 -10
   #define DEBUG_VIEW DEBUG_VIEW_NONE // [DEBUG_VIEW_NONE DEBUG_VIEW_SAMPLER]
   #define DEBUG_SAMPLER colortex0 // [colortex0 colortex1 colortex2 colortex3 colortex4 colortex5 colortex6 colortex7 colortex8 colortex9 colortex10 colortex11 colortex12 colortex13 colortex14 colortex15 depthtex0 depthtex1 depthtex2 shadowtex0 shadowtex1 shadowcolor0 shadowcolor1]
   #define DEBUG_SAMPLER_EXPOSURE 1.0 // [0.00001 0.0001 0.001 0.01 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0 1.1 1.2 1.3 1.4 1.5 1.6 1.7 1.8 1.9 2.0 2.1 2.2 2.3 2.4 2.5 2.6 2.7 2.8 2.9 3.0 3.1 3.2 3.3 3.4 3.5 3.6 3.7 3.8 3.9 4.0 4.1 4.2 4.3 4.4 4.5 4.6 4.7 4.8 4.9 5.0 5.1 5.2 5.3 5.4 5.5 5.6 5.7 5.8 5.9 6.0 6.1 6.2 6.3 6.4 6.5 6.6 6.7 6.8 6.9 7.0 7.1 7.2 7.3 7.4 7.5 7.6 7.7 7.8 7.9 8.0 8.1 8.2 8.3 8.4 8.5 8.6 8.7 8.8 8.9 9.0 9.1 9.2 9.3 9.4 9.5 9.6 9.7 9.8 9.9 10.0]
+
+  // Required so that OptiFine detects them
+
+  #ifdef MOON_PHASE_AFFECTS_BRIGHTNESS
+  #endif
+
+  #ifdef ENTITY_SHADOWS
+  #endif
+  #ifdef BLOCK_ENTITY_SHADOWS
+  #endif
+
+  #ifdef PURKINJE_SHIFT
+  #endif
 
 #endif // INCLUDE_CONFIG

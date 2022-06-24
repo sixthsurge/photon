@@ -15,7 +15,7 @@ screen.misc                            = Misc
 screen.atmos.comment                   = Options for atmospheric effects, including clouds, fog and the sky
 screen.light.comment                   = Options for lighting effects
 screen.post.comment                    = Options for post-processing effects, including camera effects, color grading and temporal upscaling
-screen.terrain.comment                 = Options for terrain, including normal/specular mapping ("PBR") and waving foliage
+screen.terrain.comment                 = Options for effects applied to terrain, including normal/specular mapping ("PBR") and waving blocks
 screen.water.comment                   = Options for water
 screen.misc.comment                    = Options that did not fit into the above categories, as well as debugging options
 
@@ -102,6 +102,8 @@ option.STARS_INTENSITY                 = Stars Brightness
 
 option.BORDER_FOG                      = Border Fog
 option.CAVE_FOG                        = Cave Fog
+option.BLOOMY_FOG                      = Bloomy Fog
+option.BLOOMY_FOG_INTENSITY            = Bloomy Fog Strength
 
 #----# Lighting #----------------------------------------------------------------------------------#
 

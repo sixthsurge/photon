@@ -193,7 +193,7 @@ vec3 lightTranslucents(
 	// Ambient light
 	radiance += bsdf * ambientIrradiance;
 
-	radiance += 32.0 * material.emission;
+	radiance += 256.0 * material.emission;
 
 	// Simple fog
 	radiance = applySimpleFog(radiance, scenePos, clearSky);
