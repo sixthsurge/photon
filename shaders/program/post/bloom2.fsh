@@ -1,6 +1,6 @@
 /*
  * Program description:
- * Downsample + blur horizontally
+ * Blur vertically
  */
 
 #include "/include/global.glsl"
@@ -16,13 +16,9 @@ in vec2 coord;
 
 //--// Uniforms //------------------------------------------------------------//
 
-uniform sampler2D colortex14; // Bloom buffer
+uniform sampler2D colortex14; // Bloom tiles
 
 //--// Functions //-----------------------------------------------------------//
-
-/*
-const bool colortex14MipmapEnabled = true;
-*/
 
 const vec4 binomialWeights7 = vec4(0.3125, 0.234375, 0.09375, 0.015625);
 
@@ -43,15 +39,15 @@ void main() {
 	vec2 padAmount = 1.0 * rcp(vec2(960.0, 540.0)) * tileScale;
 	tileCoord = linearStep(padAmount, 1.0 - padAmount, tileCoord);
 
-	float pixelSize = tileScale.x * rcp(960.0);
+	float pixelSize = rcp(1080.0);
 
 	bloom = vec3(0.0);
 
-	for (int x = -3; x <= 3; ++x) {
-		float weight = binomialWeights7[abs(x)];
+	for (int y = -3; y <= 3; ++y) {
+		float weight = binomialWeights7[abs(y)];
 
-		vec2 sampleCoord = clamp01(tileCoord + vec2(x * pixelSize, 0.0));
+		vec2 sampleCoord = clamp01(tileCoord * rcp(tileScale) + tileOffset + vec2(0.0, y * pixelSize));
 
-		bloom += texture(colortex14, sampleCoord * vec2(1.0, 0.5)).rgb * weight;
+		bloom += textureLod(colortex14, sampleCoord, 0).rgb * weight;
 	}
 }

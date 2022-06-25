@@ -18,7 +18,8 @@
 11 | rgb16f  | taa render scale  | clouds history
 12 | rg8     | taa render scale  | clouds pixel age
 13 | rg16f   | taa render scale  | previous frame depth
-14 | rgba16f | fullscreen        | bloomy fog
+14 | rgb11f  | 960x1080          | bloom buffer
+15 | rgba16f | fullscreen        | bloomy fog
 
 const int colortex0Format  = RGBA8;
 const int colortex2Format  = RGB16F;
@@ -32,7 +33,29 @@ const int colortex10Format = RGBA16;
 const int colortex11Format = RGBA16F;
 const int colortex12Format = R8I;
 const int colortex13Format = RG16F;
-const int colortex14Format = RGBA16F;
+const int colortex14Format = R11F_G11F_B10F;
+const int colortex15Format = RGBA16F;
+
+const int shadowcolor0Format = RGB8;
+
+const bool colortex0Clear  = true;
+const bool colortex1Clear  = true;
+const bool colortex2Clear  = true;
+const bool colortex3Clear  = false;
+const bool colortex4Clear  = false;
+const bool colortex5Clear  = false;
+const bool colortex6Clear  = false;
+const bool colortex7Clear  = false;
+const bool colortex8Clear  = false;
+const bool colortex9Clear  = false;
+const bool colortex10Clear = false;
+const bool colortex11Clear = false;
+const bool colortex12Clear = false;
+const bool colortex13Clear = false;
+const bool colortex14Clear = false;
+const bool colortex15Clear = false;
+
+const vec4 colortex0ClearColor = vec4(0.0, 0.0, 0.0, 0.0);
 
 // Select texture format for colortex1 based on how much data is required
 // This is formatted like this because OF doesn't detect #if defined so I can't use #elif or ||
@@ -73,24 +96,4 @@ const int colortex14Format = RGBA16F;
 		#endif
 	#endif
 #endif
-
-const bool colortex0Clear  = true;
-const bool colortex1Clear  = true;
-const bool colortex2Clear  = true;
-const bool colortex3Clear  = false;
-const bool colortex4Clear  = false;
-const bool colortex5Clear  = false;
-const bool colortex6Clear  = false;
-const bool colortex7Clear  = false;
-const bool colortex8Clear  = false;
-const bool colortex9Clear  = false;
-const bool colortex10Clear = false;
-const bool colortex11Clear = false;
-const bool colortex12Clear = false;
-const bool colortex13Clear = false;
-const bool colortex14Clear = false;
-
-const vec4 colortex0ClearColor = vec4(0.0, 0.0, 0.0, 0.0);
-
-const int shadowcolor0Format = RGB8;
 */

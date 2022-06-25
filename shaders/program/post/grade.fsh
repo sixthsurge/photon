@@ -11,7 +11,7 @@
 layout (location = 0) out vec3 fragColor;
 
 #ifdef BLOOMY_FOG
-/* RENDERTARGETS: 2,14 */
+/* RENDERTARGETS: 2,15 */
 layout (location = 1) out vec4 bloomyFog;
 #endif
 
@@ -28,7 +28,8 @@ uniform usampler2D colortex1; // Scene data
 uniform sampler2D colortex2;  // Bloom tiles
 uniform sampler2D colortex5;  // Bloomy fog amount
 uniform sampler2D colortex8;  // Scene history and exposure
-uniform sampler2D colortex14; // Bloomy fog color
+uniform sampler2D colortex14; // Bloom tiles
+uniform sampler2D colortex15; // Bloomy fog color
 
 uniform sampler2D depthtex0;
 
@@ -95,13 +96,14 @@ vec3 getBloom(out vec3 fogBloom) {
 #endif
 
 	for (int i = 1; i < BLOOM_TILES; ++i) {
-		float tileSize = exp2(-i);
+		vec2 tileSize = exp2(-i) * vec2(2.0, 1.0);
+		vec2 tileOffset = vec2(0.0, tileSize.y);
 
-		vec2 padAmount = 2.0 * windowTexelSize * rcp(tileSize);
+		vec2 padAmount = 2.0 * rcp(vec2(960.0, 540.0)) * rcp(tileSize);
 
-		vec2 tileCoord = mix(padAmount, 1.0 - padAmount, coord) * tileSize + tileSize;
+		vec2 tileCoord = mix(padAmount, 1.0 - padAmount, coord) * tileSize + tileOffset;
 
-		vec3 tile = BLOOM_UPSAMPLING_FILTER(colortex2, tileCoord).rgb;
+		vec3 tile = BLOOM_UPSAMPLING_FILTER(colortex14, tileCoord).rgb;
 
 		tileSum += tile * weight;
 		weightSum += weight;
@@ -142,8 +144,8 @@ vec4 getBloomyFog(vec3 fogBloom) {
 	float fogAmount = (1.0 - exp(-bloomyFogDensity * viewerDistance)) * bloomyFogStrength * BLOOMY_FOG_INTENSITY;
 	if (linearizeDepth(depth) < MC_HAND_DEPTH) fogAmount = 0.0;
 
-	vec2 previousScreenPos = reproject(vec3(coord, depth)).xy;
-	vec4 previousBloomyFog = texture(colortex14, previousScreenPos);
+	vec2 previousScreenPos = reproject(vec3(coord, 1.0)).xy;
+	vec4 previousBloomyFog = texture(colortex15, previousScreenPos);
 
 	const vec2 updateSpeed = vec2(25.0, 12.0); // fog amount, fog bloom
 
