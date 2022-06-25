@@ -244,7 +244,6 @@ void main() {
 
 	// Pick the biggest of the two offsets.
 	finalOffset = max(finalOffset,subPixelOffsetFinal);
-	d
 
 	//--// Final read
 

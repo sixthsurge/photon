@@ -149,8 +149,8 @@ const float sunPathRotation = -40.0; // [-40.0 -35.0 -30.0 -25.0 -20.0 -15.0 -10
 //--// Post-Processing //-----------------------------------------------------//
 
   #define tonemap tonemapAcesFit // [tonemapAcesFit tonemapAces tonemapHejlBurgess tonemapReinhardJodie]
-  #define FXAA
-  #define PURKINJE_SHIFT
+  #define PURKINJE_SHIFT // Simulates the effect of low lighting on human vision; desaturating all colors and darkening red hues in dark areas
+  #define FXAA // Softens edges. Works in conjunction with TAA, helping it especially in motion. Especially helpful with TAAU
 
 //--// ACES
 
@@ -201,7 +201,7 @@ const float sunPathRotation = -40.0; // [-40.0 -35.0 -30.0 -25.0 -20.0 -15.0 -10
 
 //--// Image Sharpening
 
-  #define CAS
+  #define CAS // Sharpens the final image
   #define CAS_STRENGTH 0.0 // [0.0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0]
 
 //--// Temporal AA

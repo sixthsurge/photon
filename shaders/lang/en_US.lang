@@ -27,6 +27,9 @@ screen.cloudsCirrus                    = Cirrus Clouds
 screen.gtao                            = Ambient Occlusion
 screen.lightSources                    = Light Sources
 screen.shadows                         = Shadows
+screen.camera                          = Camera
+screen.color                           = Color
+screen.imageQuality                    = Image Quality
 screen.bloom                           = Bloom
 screen.bloom.comment                   = Glowing effect around bright areas
 screen.colorGrading                    = Color Grading
@@ -236,7 +239,7 @@ option.HISTOGRAM_VIEW                  = View Histogram
 option.CAMERA_LOCAL_EXPOSURE           = Local Exposure
 
 # Image Sharpening
-option.CAS                             = Image Sharpening
+option.CAS                             = Contrast-Adaptive Sharpening
 
 # Temporal AA
 option.TAA                             = Enabled
