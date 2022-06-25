@@ -149,6 +149,7 @@ const float sunPathRotation = -40.0; // [-40.0 -35.0 -30.0 -25.0 -20.0 -15.0 -10
 //--// Post-Processing //-----------------------------------------------------//
 
   #define tonemap tonemapAcesFit // [tonemapAcesFit tonemapAces tonemapHejlBurgess tonemapReinhardJodie]
+  #define FXAA
   #define PURKINJE_SHIFT
 
 //--// ACES

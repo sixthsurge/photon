@@ -29,7 +29,7 @@ const int colortex11Format = RGBA16F;
 const int colortex12Format = R8I;
 const int colortex13Format = RG16F;
 const int colortex14Format = R32F;
-const int colortex15Format = RGBA16F;
+const int colortex15Format = R11F_G11F_B10F;
 
 const int shadowcolor0Format = RGB8;
 
