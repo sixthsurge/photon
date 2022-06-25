@@ -6,6 +6,10 @@ float linearizeDepth(float depth) {
 	return (near * far) / (depth * (near - far) + far);
 }
 
+float reverseLinearDepth(float linearZ) {
+	return (far + near) / (far - near) + (2.0 * far * near) / (linearZ * (far - near));
+}
+
 vec3 screenToViewSpace(vec3 screenPos, bool handleJitter) {
 	vec3 ndcPos = 2.0 * screenPos - 1.0;
 

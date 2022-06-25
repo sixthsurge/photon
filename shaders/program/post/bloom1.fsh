@@ -7,7 +7,7 @@
 
 //--// Outputs //-------------------------------------------------------------//
 
-/* RENDERTARGETS: 14 */
+/* RENDERTARGETS: 15 */
 layout (location = 0) out vec3 bloom;
 
 //--// Inputs //--------------------------------------------------------------//
@@ -16,12 +16,12 @@ in vec2 coord;
 
 //--// Uniforms //------------------------------------------------------------//
 
-uniform sampler2D colortex14; // Bloom buffer
+uniform sampler2D colortex15; // Bloom buffer
 
 //--// Functions //-----------------------------------------------------------//
 
 /*
-const bool colortex14MipmapEnabled = true;
+const bool colortex15MipmapEnabled = true;
 */
 
 const vec4 binomialWeights7 = vec4(0.3125, 0.234375, 0.09375, 0.015625);
@@ -52,6 +52,6 @@ void main() {
 
 		vec2 sampleCoord = clamp01(tileCoord + vec2(x * pixelSize, 0.0));
 
-		bloom += texture(colortex14, sampleCoord * vec2(1.0, 0.5)).rgb * weight;
+		bloom += texture(colortex15, sampleCoord * vec2(1.0, 0.5)).rgb * weight;
 	}
 }

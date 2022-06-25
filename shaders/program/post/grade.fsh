@@ -10,11 +10,6 @@
 /* RENDERTARGETS: 2 */
 layout (location = 0) out vec3 fragColor;
 
-#ifdef BLOOMY_FOG
-/* RENDERTARGETS: 2,15 */
-layout (location = 1) out vec4 bloomyFog;
-#endif
-
 //--// Inputs //--------------------------------------------------------------//
 
 in vec2 coord;
@@ -28,10 +23,8 @@ uniform usampler2D colortex1; // Scene data
 uniform sampler2D colortex2;  // Bloom tiles
 uniform sampler2D colortex5;  // Bloomy fog amount
 uniform sampler2D colortex8;  // Scene history and exposure
-uniform sampler2D colortex14; // Bloom tiles
-uniform sampler2D colortex15; // Bloomy fog color
-
-uniform sampler2D depthtex0;
+uniform sampler2D colortex14; // Temporally stable linear depth
+uniform sampler2D colortex15; // Bloom tiles
 
 //--// Camera uniforms
 
@@ -103,7 +96,7 @@ vec3 getBloom(out vec3 fogBloom) {
 
 		vec2 tileCoord = mix(padAmount, 1.0 - padAmount, coord) * tileSize + tileOffset;
 
-		vec3 tile = BLOOM_UPSAMPLING_FILTER(colortex14, tileCoord).rgb;
+		vec3 tile = BLOOM_UPSAMPLING_FILTER(colortex15, tileCoord).rgb;
 
 		tileSum += tile * weight;
 		weightSum += weight;
@@ -125,7 +118,7 @@ vec3 getBloom(out vec3 fogBloom) {
 	return tileSum / weightSum;
 }
 
-vec4 getBloomyFog(vec3 fogBloom) {
+float getBloomyFog(float linearZ) {
 #if   defined WORLD_OVERWORLD
 	// Apply bloomy fog only in darker areas
 	float luminance = getLuminance(fragColor);
@@ -138,30 +131,10 @@ vec4 getBloomyFog(vec3 fogBloom) {
 
 #endif
 
-	float depth = texture(depthtex0, coord * renderScale).x;
+	float depth = reverseLinearDepth(linearZ);
 	float viewerDistance = length(screenToViewSpace(vec3(coord, depth), false));
 
-	float fogAmount = (1.0 - exp(-bloomyFogDensity * viewerDistance)) * bloomyFogStrength * BLOOMY_FOG_INTENSITY;
-	if (linearizeDepth(depth) < MC_HAND_DEPTH) fogAmount = 0.0;
-
-	vec2 previousScreenPos = reproject(vec3(coord, 1.0)).xy;
-	vec4 previousBloomyFog = texture(colortex15, previousScreenPos);
-
-	const vec2 updateSpeed = vec2(25.0, 12.0); // fog amount, fog bloom
-
-	// Offcenter rejection from Jessie, which is originally from Zombye
-	// Reduces blur in motion
-	vec2 pixelOffset = 1.0 - abs(2.0 * fract(windowSize * previousScreenPos) - 1.0);
-	float offcenterRejection = sqrt(pixelOffset.x * pixelOffset.y) * 0.5 + 0.5;
-
-	vec2 blendWeight  = exp(-frameTime * updateSpeed) * offcenterRejection;
-		 blendWeight *= float(clamp01(previousScreenPos) == previousScreenPos);
-	     blendWeight *= 1.0 - float(any(isnan(previousBloomyFog)));
-
-	fogAmount = mix(fogAmount, previousBloomyFog.w,   blendWeight.x);
-	fogBloom  = mix(fogBloom,  previousBloomyFog.rgb, blendWeight.y);
-
-	return vec4(fogBloom, fogAmount);
+	return bloomyFogStrength * BLOOMY_FOG_INTENSITY * (1.0 - exp(-bloomyFogDensity * viewerDistance));
 }
 
 vec3 tonemapAces(vec3 rgb) {
@@ -244,6 +217,7 @@ void main() {
 
 	uvec2 sceneData = texelFetch(colortex1, ivec2(texel * renderScale), 0).xy;
 	fragColor       = texelFetch(colortex8, texel, 0).rgb;
+	float linearZ   = texelFetch(colortex14, texel, 0).x;
 
 	float blocklight = unpackUnorm4x8(sceneData.y).z;
 
@@ -252,8 +226,8 @@ void main() {
 	vec3 bloom = getBloom(fogBloom);
 
 #ifdef BLOOMY_FOG
-	bloomyFog = getBloomyFog(fogBloom);
-	fragColor = mix(fragColor, bloomyFog.rgb, bloomyFog.a);
+	float bloomyFog = getBloomyFog(linearZ);
+	fragColor = mix(fragColor, fogBloom, bloomyFog);
 #endif
 
 	fragColor = mix(fragColor, bloom, BLOOM_INTENSITY);

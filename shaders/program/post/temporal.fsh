@@ -7,8 +7,9 @@
 
 //--// Outputs //-------------------------------------------------------------//
 
-/* RENDERTARGETS: 8 */
+/* RENDERTARGETS: 8,14 */
 layout (location = 0) out vec4 result;
+layout (location = 1) out float temporalDepth;
 
 //--// Inputs //--------------------------------------------------------------//
 
@@ -29,6 +30,7 @@ uniform sampler2D colortex5;  // Responsive AA flag
 uniform sampler2D colortex6;  // AABB min
 uniform sampler2D colortex7;  // AABB max
 uniform sampler2D colortex8;  // Scene history
+uniform sampler2D colortex14; // Temporally stable linear depth
 
 uniform sampler2D depthtex0;
 
@@ -178,8 +180,9 @@ void main() {
 	vec3 aabbMin = texture(colortex6, adjustedCoord).rgb;
 	vec3 aabbMax = texture(colortex7, adjustedCoord).rgb;
 
-	// Increases responsiveness behind translucents at expense of image quality
-	float responsiveAa = texture(colortex5, adjustedCoord).x;
+	// Increases responsiveness behind translucents at the expense of quality
+	vec3 depthTaaInfo = texture(colortex5, adjustedCoord).xyz;
+	float responsiveAa = depthTaaInfo.x;
 
 #ifndef TAA_SKIP_CLIPPING
 	bool historyClipped;
@@ -219,8 +222,14 @@ void main() {
 
 	result.rgb = mix(history, current, alpha);
 	result.a   = pixelAge * offcenterRejection; // recover more quickly
+
+	// Calculate temporally stable linear depth
+	temporalDepth = textureSmooth(colortex14, previousCoord).x;
+	temporalDepth = clamp(temporalDepth, depthTaaInfo.y * far, depthTaaInfo.z * far);
+	temporalDepth = mix(temporalDepth, linearizeDepth(depth), alpha);
 #else
 	result.rgb = texelFetch(colortex3, srcTexel, 0).rgb;
+	temporalDepth = linearizeDepth(depth);
 #endif
 
 #ifdef HISTOGRAM_VIEW

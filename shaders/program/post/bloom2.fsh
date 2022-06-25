@@ -7,7 +7,7 @@
 
 //--// Outputs //-------------------------------------------------------------//
 
-/* RENDERTARGETS: 14 */
+/* RENDERTARGETS: 15 */
 layout (location = 0) out vec3 bloom;
 
 //--// Inputs //--------------------------------------------------------------//
@@ -16,7 +16,7 @@ in vec2 coord;
 
 //--// Uniforms //------------------------------------------------------------//
 
-uniform sampler2D colortex14; // Bloom tiles
+uniform sampler2D colortex15; // Bloom tiles
 
 //--// Functions //-----------------------------------------------------------//
 
@@ -48,6 +48,6 @@ void main() {
 
 		vec2 sampleCoord = clamp01(tileCoord * rcp(tileScale) + tileOffset + vec2(0.0, y * pixelSize));
 
-		bloom += textureLod(colortex14, sampleCoord, 0).rgb * weight;
+		bloom += textureLod(colortex15, sampleCoord, 0).rgb * weight;
 	}
 }
