@@ -20,7 +20,6 @@ flat in mat3 whiteBalanceMatrix;
 //--// Uniforms //------------------------------------------------------------//
 
 uniform usampler2D colortex1; // Scene data
-uniform sampler2D colortex2;  // Bloom tiles
 uniform sampler2D colortex5;  // Bloomy fog amount
 uniform sampler2D colortex8;  // Scene history and exposure
 uniform sampler2D colortex14; // Temporally stable linear depth
@@ -36,16 +35,10 @@ uniform ivec2 eyeBrightnessSmooth;
 uniform float near;
 uniform float far;
 
-uniform vec3 cameraPosition;
-uniform vec3 previousCameraPosition;
-
 uniform mat4 gbufferModelView;
 uniform mat4 gbufferModelViewInverse;
 uniform mat4 gbufferProjection;
 uniform mat4 gbufferProjectionInverse;
-
-uniform mat4 gbufferPreviousModelView;
-uniform mat4 gbufferPreviousProjection;
 
 //--// Time uniforms
 
@@ -63,8 +56,6 @@ uniform vec2 windowTexelSize;
 
 //--// Includes //------------------------------------------------------------//
 
-#define TEMPORAL_REPROJECTION
-
 #include "/include/fragment/aces/aces.glsl"
 
 #include "/include/utility/bicubic.glsl"
@@ -73,6 +64,19 @@ uniform vec2 windowTexelSize;
 #include "/include/utility/spaceConversion.glsl"
 
 //--// Functions //-----------------------------------------------------------//
+
+#define getExposureFromEv100(ev100) exp2(-(ev100)) / 1.2
+#define getExposureFromLuminance(l) calibration / (l)
+#define getLuminanceFromExposure(e) calibration / (e)
+
+const float K = 12.5; // Light-meter calibration constant
+const float sensitivity = 100.0; // ISO
+const float calibration = exp2(CAMERA_EXPOSURE_BIAS) * K / sensitivity / 1.2;
+
+const float minLuminance = getLuminanceFromExposure(getExposureFromEv100(CAMERA_EXPOSURE_MIN));
+const float maxLuminance = getLuminanceFromExposure(getExposureFromEv100(CAMERA_EXPOSURE_MAX));
+const float minLogLuminance = log2(minLuminance);
+const float maxLogLuminance = log2(maxLuminance);
 
 vec3 getBloom(out vec3 fogBloom) {
 	vec3 tileSum = vec3(0.0);
@@ -240,7 +244,7 @@ void main() {
 #endif
 
 #ifdef CAMERA_LOCAL_EXPOSURE
-	fragColor *= getLocalExposure(depth);
+	fragColor *= getLocalExposure(linearZ);
 #else
 	fragColor *= globalExposure;
 #endif

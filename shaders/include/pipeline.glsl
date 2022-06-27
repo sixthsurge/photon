@@ -1,7 +1,7 @@
 /*
 0  | rgba8   | fullscreen        | overlays, vanilla sky (solid -> deferred), translucent albedo (translucent -> composite)
 1  | rg32ui  | fullscreen        | gbuffer data (solid -> composite)
-2  | rgb16f  | fullscreen        | velocity vectors (solid -> composite), post-processing color (composite)
+2  | rgba16f | fullscreen        | velocity vectors (solid -> composite), post-processing color (composite)
 3  | rgb11f  | taa render scale  | scene radiance (deferred -> composite)
 4  | rgb11f  | 256x128           | sky capture, lighting color palette, dynamic weather properties (deferred -> composite)
 5  | rgba16  | taa render scale  | low-res clouds (deferred), indirect lighting data (deferred), responsive aa flag and depth min/max (composite)

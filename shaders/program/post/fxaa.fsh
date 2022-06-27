@@ -51,19 +51,19 @@ void main() {
 
 	//--// Detecting where to apply AA
 
-    // Fetch 3x3 neighborhood
-    // a b c
-    // d e f
-    // g h i
-    vec3 a = texelFetch(colortex2, texel + ivec2(-1,  1), 0).rgb;
-    vec3 b = texelFetch(colortex2, texel + ivec2( 0,  1), 0).rgb;
-    vec3 c = texelFetch(colortex2, texel + ivec2( 1,  1), 0).rgb;
-    vec3 d = texelFetch(colortex2, texel + ivec2(-1,  0), 0).rgb;
-    vec3 e = texelFetch(colortex2, texel, 0).rgb;
-    vec3 f = texelFetch(colortex2, texel + ivec2( 1,  0), 0).rgb;
-    vec3 g = texelFetch(colortex2, texel + ivec2(-1, -1), 0).rgb;
-    vec3 h = texelFetch(colortex2, texel + ivec2( 0, -1), 0).rgb;
-    vec3 i = texelFetch(colortex2, texel + ivec2( 1, -1), 0).rgb;
+	// Fetch 3x3 neighborhood
+	// a b c
+	// d e f
+	// g h i
+	vec3 a = texelFetch(colortex2, texel + ivec2(-1,  1), 0).rgb;
+	vec3 b = texelFetch(colortex2, texel + ivec2( 0,  1), 0).rgb;
+	vec3 c = texelFetch(colortex2, texel + ivec2( 1,  1), 0).rgb;
+	vec3 d = texelFetch(colortex2, texel + ivec2(-1,  0), 0).rgb;
+	vec3 e = texelFetch(colortex2, texel, 0).rgb;
+	vec3 f = texelFetch(colortex2, texel + ivec2( 1,  0), 0).rgb;
+	vec3 g = texelFetch(colortex2, texel + ivec2(-1, -1), 0).rgb;
+	vec3 h = texelFetch(colortex2, texel + ivec2( 0, -1), 0).rgb;
+	vec3 i = texelFetch(colortex2, texel + ivec2( 1, -1), 0).rgb;
 
 	// Luma at the current fragment
 	float luma = getLuma(e);
@@ -167,13 +167,8 @@ void main() {
 	bool reachedBoth = reached1 && reached2;
 
 	// If the side is not reached, we continue to explore in this direction
-	if (!reached1) {
-		uv1 -= offset;
-	}
-
-	if (!reached2) {
-		uv2 += offset;
-	}
+	if (!reached1) uv1 -= offset;
+	if (!reached2) uv2 += offset;
 
 	//--// Iterating
 

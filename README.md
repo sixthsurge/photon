@@ -12,7 +12,7 @@ Photon should be compatible with all Nvidia and AMD graphics cards on Windows an
 
 ### Minecraft versions
 
-Minimum supported Minecraft version: **1.16.5** (or **1.17 for 5th gen Intel iGPU's and below**)
+Minimum supported Minecraft version: **1.16.5** (or **1.17 for 5th gen Intel iGPUs and below**)
 
 Sadly, the developer of OptiFine no longer backports newer features to older Minecraft versions, and Photon relies on some relatively recent OptiFine additions to work, so **I cannot make Photon compatible with older Minecraft versions**.
 

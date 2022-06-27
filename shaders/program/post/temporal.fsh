@@ -75,7 +75,7 @@ uniform vec2 taaOffset;
 
 /*
 const bool colortex3MipmapEnabled = true;
- */
+*/
 
 vec3 getClosestFragment(ivec2 texel, float depth) {
 	ivec2 texel1 = texel + ivec2(-2, -2);

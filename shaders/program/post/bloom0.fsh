@@ -29,6 +29,10 @@ const bool colortex8MipMapEnabled = true;
 */
 
 void main() {
+#ifndef BLOOM
+	#error "This program should be disabled if bloom is disabled"
+#endif
+
 	if (coord.y < 0.5) {
 		const vec2 padAmount = rcp(vec2(960.0, 540.0));
 		vec2 windowCoord = linearStep(padAmount, 1.0 - padAmount, vec2(1.0, 2.0) * coord);
