@@ -368,6 +368,8 @@ vec4 drawClouds(Ray ray, vec3 lightDir, float dither, float distanceToTerrain) {
 		layer.minCoverage = max0(layer.minCoverage * CLOUDS_CUMULUS_LAYER_COVERAGE_FALLOFF);
 		layer.maxCoverage = max0(layer.maxCoverage * CLOUDS_CUMULUS_LAYER_COVERAGE_FALLOFF);
 
+		lightingInfo.density *= CLOUDS_CUMULUS_DENSITY_FALLOFF;
+
 		layerSpacing *= CLOUDS_CUMULUS_LAYER_SPACING_FALLOFF;
 		windSpeed *= 1.3;
 		windAngle += 0.3;
@@ -429,6 +431,8 @@ vec2 getCloudShadows(Ray ray) {
 		layer.thickness *= CLOUDS_CUMULUS_LAYER_THICKNESS_FALLOFF;
 		layer.minCoverage = max0(layer.minCoverage * CLOUDS_CUMULUS_LAYER_COVERAGE_FALLOFF);
 		layer.maxCoverage = max0(layer.maxCoverage * CLOUDS_CUMULUS_LAYER_COVERAGE_FALLOFF);
+
+		density *= CLOUDS_CUMULUS_DENSITY_FALLOFF;
 
 		layerSpacing *= CLOUDS_CUMULUS_LAYER_SPACING_FALLOFF;
 		windSpeed *= 1.3;

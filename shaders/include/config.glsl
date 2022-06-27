@@ -53,6 +53,7 @@ const float sunPathRotation = -40.0; // [-40.0 -35.0 -30.0 -25.0 -20.0 -15.0 -10
   #define CLOUDS_CUMULUS_LAYER_THICKNESS_FALLOFF 1.0 // How much thicker or thinner each subsequent cloud layer gets [0.0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0 1.1 1.2 1.3 1.4 1.5 1.6 1.7 1.8 1.9 2.0]
   #define CLOUDS_CUMULUS_LAYER_COVERAGE_FALLOFF 1.0 // How much higher or lower the cloud coverage gets for each subsequent layer [0.0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0 1.1 1.2 1.3 1.4 1.5 1.6 1.7 1.8 1.9 2.0]
   #define CLOUDS_CUMULUS_LAYER_SPACING_FALLOFF 1.4
+  #define CLOUDS_CUMULUS_DENSITY_FALLOFF 1.0 // How much denser or lighter each subsequent cloud layer gets [0.0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0 1.1 1.2 1.3 1.4 1.5 1.6 1.7 1.8 1.9 2.0]
 
 //--// Fog
 
