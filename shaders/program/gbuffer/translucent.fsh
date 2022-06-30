@@ -61,7 +61,7 @@ void main() {
 	if (clamp01(coord) != coord) discard;
 #endif
 
-#if WATER_STYLE == WATER_STYLE_REALISTIC
+#ifdef PROCEDURAL_WATER
 	if (blockId == BLOCK_WATER) {
 		fragColor = vec4(0.0);
 	} else {
@@ -93,7 +93,7 @@ void main() {
 		encoded.w = packUnorm4x8(specularTex);
 #endif
 
-#if WATER_STYLE != WATER_STYLE_VANILLA
+#ifdef PROCEDURAL_WATER
 	}
 #endif
 

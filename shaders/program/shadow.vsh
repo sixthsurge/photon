@@ -10,7 +10,6 @@ flat out vec4 tint;
 
 //--// Inputs //--------------------------------------------------------------//
 
-#define attribute in
 attribute vec3 mc_Entity;
 attribute vec2 mc_midTexCoord;
 

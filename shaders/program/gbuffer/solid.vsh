@@ -15,7 +15,6 @@ out vec3 velocity;
 
 //--// Inputs //--------------------------------------------------------------//
 
-#define attribute in
 attribute vec4 at_tangent;
 attribute vec3 at_velocity;
 attribute vec3 mc_Entity;

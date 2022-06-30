@@ -10,7 +10,7 @@
 //--// Outputs //-------------------------------------------------------------//
 
 /* RENDERTARGETS: 7 */
-layout (location = 0) out vec2 cloudShadow;
+layout (location = 0) out float cloudShadow;
 
 //--// Inputs //--------------------------------------------------------------//
 

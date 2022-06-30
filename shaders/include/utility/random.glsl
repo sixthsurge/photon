@@ -14,6 +14,10 @@ float R1(int n, float seed) {
 float R1(int n) {
 	return R1(n, 0.5);
 }
+float R1Next(float u) {
+    const float alpha = 1.0 / phi1;
+	return fract(u + alpha);
+}
 
 vec2 R2(int n, vec2 seed) {
     const vec2 alpha = 1.0 / vec2(phi2, phi2 * phi2);
@@ -22,6 +26,10 @@ vec2 R2(int n, vec2 seed) {
 vec2 R2(int n) {
 	return R2(n, vec2(0.5));
 }
+vec2 R2Next(vec2 u) {
+    const vec2 alpha = 1.0 / vec2(phi2, phi2 * phi2);
+    return fract(u + alpha);
+}
 
 vec3 R3(int n, vec3 seed) {
     const vec3 alpha = 1.0 / vec3(phi3, phi3 * phi3, phi3 * phi3 * phi3);
@@ -29,6 +37,10 @@ vec3 R3(int n, vec3 seed) {
 }
 vec3 R3(int n) {
 	return R3(n, vec3(0.5));
+}
+vec3 R3Next(vec3 u) {
+    const vec3 alpha = 1.0 / vec3(phi3, phi3 * phi3, phi3 * phi3 * phi3);
+	return fract(u + alpha);
 }
 
 //----------------------------------------------------------------------------//

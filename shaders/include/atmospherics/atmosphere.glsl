@@ -158,13 +158,13 @@ vec3 getAtmosphereScatteringTexCoord(float nu, float mu, float muS) {
 	//--// Mapping for muS
 
 	// Distance to the atmosphere outer limit for the ray (atmosphereLowerLimitRadius, muS)
-	float d = raySphereIntersection(muS, atmosphereLowerLimitRadius, atmosphereUpperLimitRadius).y;
+	float d = intersectSphere(muS, atmosphereLowerLimitRadius, atmosphereUpperLimitRadius).y;
 	float dMin = atmosphereThickness;
 	float dMax = H;
 	float a = (d - dMin) / (dMax - dMin);
 
 	// Distance to the atmosphere upper limit for the ray (atmosphereLowerLimitRadius, minMuS)
-	float D = raySphereIntersection(minMuS, atmosphereLowerLimitRadius, atmosphereUpperLimitRadius).y;
+	float D = intersectSphere(minMuS, atmosphereLowerLimitRadius, atmosphereUpperLimitRadius).y;
 	float A = (D - dMin) / (dMax - dMin);
 
 	// An ad-hoc function equal to 0 for muS = minMuS (because then d = D and thus a = A, equal
@@ -227,7 +227,7 @@ vec2 getAtmosphereTransmittanceTexCoord(float mu, float r) {
 	float rho = sqrt(max0(r * r - atmosphereLowerLimitRadiusSq));
 
 	// Distance to the atmosphere upper limit and its minimum and maximum values over all mu
-	float d = raySphereIntersection(mu, r, atmosphereUpperLimitRadius).y;
+	float d = intersectSphere(mu, r, atmosphereUpperLimitRadius).y;
 	float dMin = atmosphereUpperLimitRadius - r;
 	float dMax = rho + H;
 

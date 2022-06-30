@@ -139,9 +139,7 @@ void main() {
 
 		vec3 cloudsLightDir = cloudsMoonlit ? moonDir : sunDir;
 
-		float dither = texelFetch(noisetex, ivec2(texel & 511), 0).b;
-
-		vec4 cloudData = drawClouds(ray, cloudsLightDir, dither, -1.0);
+		vec4 cloudData = drawClouds(ray, cloudsLightDir, 0.5, -1.0, true);
 
 		vec3 cloudsScattering = mat2x3(cloudsDirectIrradiance, skyIrradiance) * cloudData.xy;
 		     cloudsScattering = getCloudsAerialPerspective(cloudsScattering, cloudData.rgb, rayDir, atmosphereScattering, cloudData.w);

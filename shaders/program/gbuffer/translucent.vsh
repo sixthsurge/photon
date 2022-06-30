@@ -11,7 +11,6 @@ flat out mat3 tbnMatrix;
 
 //--// Inputs //--------------------------------------------------------------//
 
-#define attribute in
 attribute vec4 at_tangent;
 attribute vec3 mc_Entity;
 

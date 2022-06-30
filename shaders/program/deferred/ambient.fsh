@@ -8,10 +8,6 @@
 //--// Outputs //-------------------------------------------------------------//
 
 #ifdef SSPT
-/* RENDERTARGETS: 5,9,10 */
-layout (location = 0) out vec4 data;
-layout (location = 1) out vec3 historyIrradiance;
-layout (location = 2) out vec4 historyData;
 #else
 /* RENDERTARGETS: 10 */
 layout (location = 0) out vec4 historyData;
@@ -68,7 +64,6 @@ uniform bool worldAgeChanged;
 
 //--// Includes //------------------------------------------------------------//
 
-#define RAYTRACE_REVERSE_Z
 #define TEMPORAL_REPROJECTION
 
 #include "/include/atmospherics/skyProjection.glsl"

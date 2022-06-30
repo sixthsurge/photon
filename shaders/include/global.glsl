@@ -1,7 +1,11 @@
 #if !defined INCLUDE_GLOBAL
 #define INCLUDE_GLOBAL
 
-//--// Settings //------------------------------------------------------------//
+//--// Macros //-------------------------------------------------------------//
+
+#ifndef MC_GL_VENDOR_INTEL
+	#define attribute in
+#endif
 
 #include "/include/config.glsl"
 
@@ -16,10 +20,6 @@ const float goldenRatio = 0.5 + 0.5 * sqrt(5.0);
 const float goldenAngle = tau / goldenRatio / goldenRatio;
 
 const float renderScale = inversesqrt(float(TAA_UPSCALING_FACTOR));
-
-#ifndef MC_HAND_DEPTH
-	#define MC_HAND_DEPTH 0.56
-#endif
 
 //--// Functions //-----------------------------------------------------------//
 

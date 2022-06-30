@@ -149,7 +149,7 @@ void main() {
 
 	float dither = interleavedGradientNoise(vec2(viewTexel), frameCounter / CLOUDS_UPSCALING_FACTOR);
 
-	cloudData = drawClouds(ray, lightDir, dither, depth < 1.0 ? length(viewPos) : -1.0);
+	cloudData = drawClouds(ray, lightDir, dither, depth < 1.0 ? length(viewPos) : -1.0, false);
 
 	// Scale scattering and apparent distance to fit in a normalized integer format
 	cloudData.xy *= 1e-2;

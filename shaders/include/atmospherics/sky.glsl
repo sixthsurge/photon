@@ -24,7 +24,7 @@ vec3 drawMoon(vec3 rayDir) {
 	const float moonN         = (1.0 + sqrt(moonF0)) / (1.0 - sqrt(moonF0));
 	const float moonRoughness = 0.8;
 
-	float distanceToMoon = raySphereIntersection(-moonDir, rayDir, moonAngularRadius).x;
+	float distanceToMoon = intersectSphere(-moonDir, rayDir, moonAngularRadius).x;
 
 	if (distanceToMoon < 0.0) return vec3(0.0);
 

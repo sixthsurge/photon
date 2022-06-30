@@ -192,8 +192,8 @@ vec4 drawCumulusClouds(
 	const float transmittanceThreshold = 0.075; // raymarch is terminated when transmittance is below this threshold
 
 	float rayLength;
-	vec2 dists = raySphericalShellIntersection(ray.origin, ray.dir, layer.radius, layer.radius + layer.thickness);
-	bool planetIntersected = raySphereIntersection(ray.origin, ray.dir, planetRadius).y >= 0.0 && lengthSquared(ray.origin) > sqr(planetRadius);
+	vec2 dists = intersectSphericalShell(ray.origin, ray.dir, layer.radius, layer.radius + layer.thickness);
+	bool planetIntersected = intersectSphere(ray.origin, ray.dir, planetRadius).y >= 0.0 && lengthSquared(ray.origin) > sqr(planetRadius);
 	if (dists.y < 0.0 || planetIntersected && ray.origin.y < layer.radius) return vec4(0.0, 0.0, 1.0, 1e6);
 
 	if (distanceToTerrain >= 0.0) {
@@ -283,7 +283,7 @@ vec4 drawCumulusClouds(
 
 //--//
 
-vec4 drawClouds(Ray ray, vec3 lightDir, float dither, float distanceToTerrain) {
+vec4 drawClouds(Ray ray, vec3 lightDir, float dither, float distanceToTerrain, bool isReflection) {
 	/*
 	 * x: sunlight
 	 * y: skylight
@@ -304,6 +304,7 @@ vec4 drawClouds(Ray ray, vec3 lightDir, float dither, float distanceToTerrain) {
 #endif
 
 	float primaryStepCount = mix(primaryStepCountH, primaryStepCountZ, abs(ray.dir.y));
+	if (isReflection) primaryStepCount = 10;
 
 	//--// Lighting parameters
 
@@ -382,7 +383,7 @@ vec4 drawClouds(Ray ray, vec3 lightDir, float dither, float distanceToTerrain) {
 	// If no cloud encountered, take distance to middle of first cloud layer (helps reprojection a lot)
 	if (result.w > 1e5) {
 		const float cloudVolumeMiddle = planetRadius + CLOUDS_CUMULUS_ALTITUDE * (1.0 + 0.5 * CLOUDS_CUMULUS_THICKNESS);
-		vec2 dists = raySphereIntersection(ray.dir.y, ray.origin.y, cloudVolumeMiddle);
+		vec2 dists = intersectSphere(ray.dir.y, ray.origin.y, cloudVolumeMiddle);
 		result.w = ray.origin.y < cloudVolumeMiddle ? dists.y : dists.x;
 	}
 
@@ -391,7 +392,7 @@ vec4 drawClouds(Ray ray, vec3 lightDir, float dither, float distanceToTerrain) {
 
 //--// cloud shadows
 
-vec2 getCloudShadows(Ray ray) {
+float getCloudShadows(Ray ray) {
 	float transmittance = 1.0;
 	float density = CLOUDS_CUMULUS_DENSITY * 0.1 * (0.6 + 0.4 * abs(sunDir.y)); // Allow light to travel further through the cloud when the sun is nearer the horizon
 
@@ -422,7 +423,7 @@ vec2 getCloudShadows(Ray ray) {
 		layer.wind = windSpeed * vec2(cos(windAngle), sin(windAngle)) * t;
 		layer.offset = 1e4 * R2(i) + layer.wind + cameraPosition.xz * CLOUDS_SCALE;
 
-		vec3 origin = ray.origin + ray.dir * raySphereIntersection(ray.origin, ray.dir, layer.radius).y;
+		vec3 origin = ray.origin + ray.dir * intersectSphere(ray.origin, ray.dir, layer.radius).y;
 		float opticalDepth = getCumulusCloudsOpticalDepth(Ray(origin, ray.dir), layer, 0.5, stepCount);
 		transmittance *= exp(-density * opticalDepth);
 
@@ -439,7 +440,7 @@ vec2 getCloudShadows(Ray ray) {
 		windAngle += 0.3;
 	}
 
-	return vec2(transmittance, 0.0);
+	return transmittance;
 }
 
 #endif // INCLUDE_ATMOSPHERE_CLOUDS

@@ -36,6 +36,7 @@ screen.colorGrading                    = Color Grading
 screen.colorGrading.comment            = Custom color grading
 screen.exposure                        = Exposure
 screen.temporal                        = Temporal AA
+screen.reflections                     = Reflections
 screen.wavingBlocks                    = Waving Blocks
 
 screen.sunlightTint                    = Sunlight Tint
@@ -266,17 +267,23 @@ value.TEXTURE_FORMAT.TEXTURE_FORMAT_OLD = Old PBR / SEUS PBR
 option.NORMAL_MAP                      = Normal Mapping
 option.SPECULAR_MAP                    = Specular Mapping
 
+# Reflections
+
+option.SSR                             = Enabled
+option.SSR_ROUGH                       = Roughness Support
+option.SSR_PREVIOUS_FRAME              = Reflect Previous Frame
+option.SSR_RAY_COUNT                   = Ray Count
+option.SSR_INTERSECTION_STEPS_SMOOTH   = Intersection Steps - Smooth
+option.SSR_INTERSECTION_STEPS_ROUGH    = Intersection Steps - Rough
+option.SSR_REFINEMENT_STEPS            = Refinement Steps
+option.SSR_ROUGHNESS_THRESHOLD         = Roughness Threshold
+
 # Waving Blocks
 
 option.WAVING_PLANTS                   = Waving Plants
 option.WAVING_LEAVES                   = Waving Leaves
 
 #----# Water #-------------------------------------------------------------------------------------#
-
-value.WATER_STYLE.WATER_STYLE_REALISTIC = Realistic
-value.WATER_STYLE.WATER_STYLE_VANILLA   = Vanilla
-
-option.WATER_STYLE                     = Water Style
 
 #----# Misc #--------------------------------------------------------------------------------------#
 

@@ -252,7 +252,7 @@ void main() {
 		vec3 visibility = NoL * shadows;
 
 		vec3 bsdf  = diffuseBrdf(material.albedo, material.f0.x, material.n, material.roughness, NoL, NoV, NoH, LoV);
-		     bsdf *= (1.0 - 0.75 * material.sssAmount);
+		     bsdf *= float(!material.isMetal) * (1.0 - 0.75 * material.sssAmount);
 		     bsdf += specularBrdf(material, NoL, NoV, NoH, LoV, LoH, lightRadius);
 
 		vec3 sss  = getSubsurfaceScattering(albedo, material.sssAmount, sssDepth, LoV);
@@ -264,7 +264,7 @@ void main() {
 #if defined SSPT
 
 #else
-	vec3 bsdf = albedo * rcpPi;
+	vec3 bsdf = albedo * rcpPi * float(!material.isMetal);
 
 	// Bounced light
 

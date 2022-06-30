@@ -53,11 +53,11 @@ float distributionGgx(float NoHSq, float alphaSq) {
 	return alphaSq / max(pi * sqr(1.0 - NoHSq + NoHSq * alphaSq), eps);
 }
 
-float v1SmithGgx(float cosTheta, float alphaSq) {
+float V1SmithGgx(float cosTheta, float alphaSq) {
 	return 1.0 / (cosTheta + sqrt((-cosTheta * alphaSq + cosTheta) * cosTheta + alphaSq));
 }
 
-float visibilitySmithGgxCorrelated(float NoL, float NoV, float alphaSq) {
+float V2SmithGgx(float NoL, float NoV, float alphaSq) {
     float ggxL = NoV * sqrt((-NoL * alphaSq + NoL) * NoL + alphaSq);
     float ggxV = NoL * sqrt((-NoV * alphaSq + NoV) * NoV + alphaSq);
     return 0.5 / (ggxL + ggxV);
@@ -129,7 +129,7 @@ vec3 specularBrdf(
 	float alphaSq = material.roughness * material.roughness;
 
 	float d = distributionGgx(NoHSq, alphaSq);
-	float v = visibilitySmithGgxCorrelated(max(NoL, 1e-2), max(NoV, 1e-2), alphaSq);
+	float v = V2SmithGgx(max(NoL, 1e-2), max(NoV, 1e-2), alphaSq);
 
 	return (d * v) * f * albedoTint;
 }

@@ -243,11 +243,11 @@ void main() {
 	fragColor = purkinjeShift(fragColor, purkinjeIntensity);
 #endif
 
-#ifdef CAMERA_LOCAL_EXPOSURE
-	fragColor *= getLocalExposure(linearZ);
-#else
+//#ifdef CAMERA_LOCAL_EXPOSURE
+//	fragColor *= getLocalExposure(linearZ);
+//#else
 	fragColor *= globalExposure;
-#endif
+//#endif
 
 #ifdef GRADE
 	fragColor *= GRADE_BRIGHTNESS;

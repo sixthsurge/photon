@@ -1,7 +1,48 @@
 #if !defined INCLUDE_UTILITY_GEOMETRY
 #define INCLUDE_UTILITY_GEOMETRY
 
-vec2 raySphereIntersection(float mu, float r, float sphereRadius) {
+// Sphere/AABB intersection functions are based on https://www.scratchapixel.com
+
+// Returns +-1
+vec3 signNonZero(vec3 v) {
+	return vec3(
+		v.x >= 0.0 ? 1.0 : -1.0,
+		v.y >= 0.0 ? 1.0 : -1.0,
+		v.z >= 0.0 ? 1.0 : -1.0
+	);
+}
+
+vec2 intersectBox(vec3 rayOrigin, vec3 rayDir, mat2x3 bounds) {
+	float tMin, tMax, tMinY, tMaxY, tMinZ, tMaxZ;
+
+	vec3  rcpRayDir  = rcp(rayDir);
+	ivec3 rayDirSign = ivec3(signNonZero(rayDir) * 0.5 + 0.5);
+
+	tMin =  (bounds[    rayDirSign.x].x - rayOrigin.x) * rcpRayDir.x;
+	tMax =  (bounds[1 - rayDirSign.x].x - rayOrigin.x) * rcpRayDir.x;
+	tMinY = (bounds[    rayDirSign.y].y - rayOrigin.y) * rcpRayDir.y;
+	tMaxY = (bounds[1 - rayDirSign.y].y - rayOrigin.y) * rcpRayDir.y;
+	tMinZ = (bounds[    rayDirSign.z].z - rayOrigin.z) * rcpRayDir.z;
+	tMaxZ = (bounds[1 - rayDirSign.z].z - rayOrigin.z) * rcpRayDir.z;
+
+	if ((tMin > tMaxY) || (tMinY > tMax))
+		return vec2(-1.0);
+	if (tMinY > tMin)
+		tMin = tMinY;
+	if (tMaxY < tMax)
+		tMax = tMaxY;
+
+	if ((tMin > tMaxZ) || (tMinZ > tMax))
+		return vec2(-1.0);
+	if (tMinZ > tMin)
+		tMin = tMinZ;
+	if (tMaxZ < tMax)
+		tMax = tMaxZ;
+
+	return vec2(tMin, tMax);
+}
+
+vec2 intersectSphere(float mu, float r, float sphereRadius) {
 	float discriminant = r * r * (mu * mu - 1.0) + sqr(sphereRadius);
 
 	if (discriminant < 0.0) return vec2(-1.0);
@@ -10,7 +51,7 @@ vec2 raySphereIntersection(float mu, float r, float sphereRadius) {
 	return -r * mu + vec2(-discriminant, discriminant);
 }
 
-vec2 raySphereIntersection(vec3 rayOrigin, vec3 rayDir, float sphereRadius) {
+vec2 intersectSphere(vec3 rayOrigin, vec3 rayDir, float sphereRadius) {
 	float b = dot(rayOrigin, rayDir);
 	float discriminant = sqr(b) - dot(rayOrigin, rayOrigin) + sqr(sphereRadius);
 
@@ -20,9 +61,9 @@ vec2 raySphereIntersection(vec3 rayOrigin, vec3 rayDir, float sphereRadius) {
 	return -b + vec2(-discriminant, discriminant);
 }
 
-vec2 raySphericalShellIntersection(vec3 rayOrigin, vec3 rayDir, float innerSphereRadius, float outerSphereRadius) {
-	vec2 innerSphereDists = raySphereIntersection(rayOrigin, rayDir, innerSphereRadius);
-	vec2 outerSphereDists = raySphereIntersection(rayOrigin, rayDir, outerSphereRadius);
+vec2 intersectSphericalShell(vec3 rayOrigin, vec3 rayDir, float innerSphereRadius, float outerSphereRadius) {
+	vec2 innerSphereDists = intersectSphere(rayOrigin, rayDir, innerSphereRadius);
+	vec2 outerSphereDists = intersectSphere(rayOrigin, rayDir, outerSphereRadius);
 
 	bool innerSphereIntersected = innerSphereDists.y >= 0.0;
 	bool outerSphereIntersected = outerSphereDists.y >= 0.0;

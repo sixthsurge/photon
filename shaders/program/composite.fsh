@@ -7,8 +7,10 @@
 
 //--// Outputs //-------------------------------------------------------------//
 
-/* RENDERTARGETS: 3 */
+/* RENDERTARGETS: 3,9 */
 layout (location = 0) out vec3 radiance;
+layout (location = 1) out vec4 reflectionHistory;
+
 
 //--// Inputs //--------------------------------------------------------------//
 
@@ -24,7 +26,10 @@ uniform sampler2D colortex3;  // Scene radiance
 uniform sampler2D colortex4;  // Sky capture, lighting color palette
 uniform sampler2D colortex6;  // Clear sky
 uniform sampler2D colortex7;  // Cloud shadows
+uniform sampler2D colortex8;  // Scene history
+uniform sampler2D colortex9;  // SSR history
 uniform sampler2D colortex11; // Clouds
+uniform sampler2D colortex13; // Previous frame depth
 
 uniform sampler2D depthtex0;
 uniform sampler2D depthtex1;
@@ -51,11 +56,15 @@ uniform float far;
 uniform float blindness;
 
 uniform vec3 cameraPosition;
+uniform vec3 previousCameraPosition;
 
 uniform mat4 gbufferModelView;
 uniform mat4 gbufferModelViewInverse;
 uniform mat4 gbufferProjection;
 uniform mat4 gbufferProjectionInverse;
+
+uniform mat4 gbufferPreviousModelView;
+uniform mat4 gbufferPreviousProjection;
 
 //--// Shadow uniforms
 
@@ -83,24 +92,35 @@ uniform vec3 lightDir;
 
 //--// Includes //------------------------------------------------------------//
 
+#define TEMPORAL_REPROJECTION
+
 #include "/block.properties"
 #include "/entity.properties"
 
 #include "/include/atmospherics/atmosphere.glsl"
+#include "/include/atmospherics/skyProjection.glsl"
 
 #include "/include/fragment/fog.glsl"
 #include "/include/fragment/material.glsl"
+#include "/include/fragment/raytracer.glsl"
 #include "/include/fragment/textureFormat.glsl"
 
 #include "/include/lighting/bsdf.glsl"
 #include "/include/lighting/cloudShadows.glsl"
 #include "/include/lighting/shadowMapping.glsl"
 
+#include "/include/utility/bicubic.glsl"
 #include "/include/utility/color.glsl"
 #include "/include/utility/encoding.glsl"
+#include "/include/utility/sampling.glsl"
 #include "/include/utility/spaceConversion.glsl"
 
 //--// Functions //-----------------------------------------------------------//
+
+/*
+const bool colortex3MipmapEnabled = true;
+const bool colortex8MipmapEnabled = true;
+*/
 
 vec3 getCloudsAerialPerspective(vec3 cloudsScattering, vec3 cloudData, vec3 rayDir, vec3 clearSky, float apparentDistance) {
 	vec3 rayOrigin = vec3(0.0, planetRadius + CLOUDS_SCALE * (eyeAltitude - SEA_LEVEL), 0.0);
@@ -210,6 +230,182 @@ vec3 blendLayers(vec3 background, vec3 foreground, vec3 tint, float alpha) {
 #endif
 }
 
+mat3 getTbnMatrix(vec3 normal) {
+	vec3 tangent   = normalize(cross(vec3(0.0, 1.0, 0.0), normal));
+	vec3 bitangent = normalize(cross(tangent, normal));
+	return mat3(tangent, bitangent, normal);
+}
+
+vec3 getRadianceAlongRay(
+	vec3 screenPos,
+	vec3 viewPos,
+	vec3 rayDir,
+	float dither,
+	float mipLevel,
+	float skylightFalloff,
+	inout float hitDistance
+) {
+	vec3 viewDir = mat3(gbufferModelView) * rayDir;
+
+	vec3 hitPos;
+	bool hit = raytraceIntersection(
+		depthtex0,
+		screenPos,
+		viewPos,
+		viewDir,
+		1.0,
+		dither,
+		mipLevel == 0.0 ? SSR_INTERSECTION_STEPS_SMOOTH : SSR_INTERSECTION_STEPS_ROUGH,
+		SSR_REFINEMENT_STEPS,
+		false,
+		hitPos
+	);
+
+	vec3 skyRadiance = textureBicubic(colortex4, projectSky(rayDir)).rgb * skylightFalloff;
+
+	if (hit) {
+		vec3 viewHitPos = screenToViewSpace(hitPos, true);
+		hitDistance += distance(viewPos, viewHitPos);
+
+		float borderAttenuation = (hitPos.x * hitPos.y - hitPos.x) * (hitPos.x * hitPos.y - hitPos.y);
+		      borderAttenuation = smoothstep(0.0, 0.025, dampen(borderAttenuation));
+
+#ifdef SSR_PREVIOUS_FRAME
+		hitPos = reproject(hitPos);
+		vec3 radiance = textureLod(colortex8, hitPos.xy, int(mipLevel)).rgb;
+#else
+		vec3 radiance = textureLod(colortex3, hitPos.xy, int(mipLevel)).rgb;
+#endif
+
+		return mix(skyRadiance, radiance, borderAttenuation);
+	} else { // Sky reflection
+		return skyRadiance;
+	}
+}
+
+vec3 reprojectSpecular(
+	vec3 screenPos,
+	float roughness,
+	float hitDistance
+) {
+	// Reprojection method from Samuel
+	if (roughness < 0.33) {
+		vec3 pos = screenToViewSpace(screenPos, false);
+		     pos = pos + normalize(pos) * hitDistance;
+             pos = viewToSceneSpace(pos);
+
+		vec3 cameraOffset = linearizeDepth(screenPos.z) < MC_HAND_DEPTH
+			? vec3(0.0)
+			: cameraPosition - previousCameraPosition;
+
+		vec3 previousPos = transform(gbufferPreviousModelView, pos + cameraOffset);
+		     previousPos = projectAndDivide(gbufferPreviousProjection, previousPos);
+
+		return previousPos * 0.5 + 0.5;
+	} else {
+		return reproject(screenPos);
+	}
+}
+
+vec3 getSpecularReflections(
+	Material material,
+	vec3 screenPos,
+	vec3 viewPos,
+	vec3 worldDir,
+	vec3 worldNormal,
+	float skylight
+) {
+	bool hasReflections = (material.f0.x - material.f0.x * material.roughness * SSR_ROUGHNESS_THRESHOLD) > 0.015; // based on Kneemund's method
+	if (!hasReflections) return vec3(0.0);
+
+	float alphaSq = sqr(material.roughness);
+	float skylightFalloff = pow8(skylight);
+
+	float dither = R1(frameCounter, texelFetch(noisetex, ivec2(gl_FragCoord.xy) & 511, 0).b);
+
+	float hitDistance = 0.0;
+
+#ifdef SSR_ROUGH
+	vec2 hash = R2(
+		SSR_RAY_COUNT * frameCounter,
+		vec2(
+			texelFetch(noisetex, ivec2(gl_FragCoord.xy)                     & 511, 0).b,
+			texelFetch(noisetex, ivec2(gl_FragCoord.xy + vec2(239.0, 23.0)) & 511, 0).b
+		)
+	);
+
+	if (material.roughness > 5e-2) { // Rough reflection
+	 	float mipLevel = sqrt(4.0 * dampen(material.roughness));
+
+		mat3 tbn = getTbnMatrix(worldNormal);
+		vec3 tangentDir = worldDir * tbn;
+
+		vec3 reflection = vec3(0.0);
+
+		for (int i = 0; i < SSR_RAY_COUNT; ++i) {
+			vec3 microfacetNormal = tbn * sampleGgxVndf(-tangentDir, vec2(material.roughness), hash);
+			vec3 rayDir = reflect(worldDir, microfacetNormal);
+
+			vec3 radiance = getRadianceAlongRay(screenPos, viewPos, rayDir, dither, mipLevel, skylightFalloff, hitDistance);
+
+			float MoV = clamp01(dot(microfacetNormal, -worldDir));
+			float NoL = max(1e-2, dot(worldNormal, rayDir));
+			float NoV = max(1e-2, dot(worldNormal, -worldDir));
+
+			vec3 fresnel = material.isMetal ? fresnelSchlick(MoV, material.f0) : vec3(fresnelDielectric(MoV, material.n));
+			float v1 = V1SmithGgx(NoV, alphaSq);
+			float v2 = V2SmithGgx(NoL, NoV, alphaSq);
+
+			reflection += radiance * fresnel * (2.0 * NoL * v2 / v1);
+
+			hash = R2Next(hash);
+		}
+
+		float norm = rcp(float(SSR_RAY_COUNT));
+		reflection *= norm;
+		hitDistance *= norm;
+
+		//--// Temporal accumulation
+
+		float accumulationLimit = 16.0 * dampen(material.roughness); // Maximum accumulated frames
+
+		vec3 previousScreenPos = reprojectSpecular(screenPos, material.roughness, hitDistance);
+
+		reflectionHistory = textureSmooth(colortex9, previousScreenPos.xy);
+		float historyDepth = 1.0 - textureSmooth(colortex13, previousScreenPos.xy).x;
+
+		float depthDelta  = abs(linearizeDepth(screenPos.z) - linearizeDepth(historyDepth));
+		float depthWeight = exp(-10.0 * depthDelta) * float(historyDepth < 1.0);
+
+		float pixelAge  = min(reflectionHistory.a, accumulationLimit);
+		      pixelAge *= float(clamp01(previousScreenPos.xy) == previousScreenPos.xy);
+			  pixelAge *= depthWeight;
+			  pixelAge += 1.0;
+
+		float alpha = rcp(pixelAge);
+
+		reflectionHistory.rgb = mix(reflectionHistory.rgb, reflection, alpha);
+		reflectionHistory.a   = pixelAge;
+
+		return reflectionHistory.rgb;
+	}
+#endif
+
+	//--// Mirror-like reflection
+
+	reflectionHistory = vec4(0.0);
+
+	vec3 rayDir = reflect(worldDir, worldNormal);
+
+	vec3 radiance = getRadianceAlongRay(screenPos, viewPos, rayDir, dither, 0.0, skylightFalloff, hitDistance);
+
+	float NoV = clamp01(dot(worldNormal, -worldDir));
+
+	vec3 fresnel = material.isMetal ? fresnelSchlick(NoV, material.f0) : vec3(fresnelDielectric(NoV, material.n));
+
+	return radiance * fresnel;
+}
+
 void main() {
 	ivec2 texel = ivec2(gl_FragCoord.xy);
 
@@ -234,7 +430,8 @@ void main() {
 
 	// Transformations
 
-	vec3 viewPosFront = screenToViewSpace(vec3(coord, depthFront), true);
+	vec3 screenPosFront = vec3(coord, depthFront);
+	vec3 viewPosFront = screenToViewSpace(screenPosFront, true);
 	vec3 scenePosFront = viewToSceneSpace(viewPosFront);
 
 	float viewerDistance = length(viewPosFront);
@@ -282,6 +479,12 @@ void main() {
 	} else { // Solids
 
 	}
+
+	// SSR
+
+#ifdef SSR
+	radiance += getSpecularReflections(material, screenPosFront, viewPosFront, worldDir, normal, lmCoord.y);
+#endif
 
 	// Blend with clouds
 
