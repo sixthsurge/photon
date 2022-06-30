@@ -61,11 +61,9 @@ void main() {
 	if (clamp01(coord) != coord) discard;
 #endif
 
-#ifdef PROCEDURAL_WATER
 	if (blockId == BLOCK_WATER) {
 		fragColor = vec4(0.0);
 	} else {
-#endif
 		fragColor = texture(gtexture, texCoord, lodBias);
 
 #ifdef MC_NORMAL_MAP
@@ -92,10 +90,7 @@ void main() {
 #ifdef MC_SPECULAR_MAP
 		encoded.w = packUnorm4x8(specularTex);
 #endif
-
-#ifdef PROCEDURAL_WATER
 	}
-#endif
 
 	float dither = interleavedGradientNoise(gl_FragCoord.xy, frameCounter);
 

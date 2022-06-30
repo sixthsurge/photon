@@ -26,6 +26,7 @@ uniform float biomeCave;
 
 //--// Includes //------------------------------------------------------------//
 
+#include "/include/utility/bicubic.glsl"
 #include "/include/utility/color.glsl"
 #include "/include/utility/dithering.glsl"
 
@@ -93,11 +94,15 @@ uniform vec3 cameraPosition;
 void main() {
     ivec2 texel = ivec2(gl_FragCoord.xy);
 
+    if (abs(MC_RENDER_QUALITY - 1.0) < 1e-2) {
 #ifdef CAS
-	fragColor = textureCas(colortex2, texel, CAS_STRENGTH);
+        fragColor = textureCas(colortex2, texel, CAS_STRENGTH);
 #else
-	fragColor = texelFetch(colortex2, texel, 0).rgb;
+        fragColor = texelFetch(colortex2, texel, 0).rgb;
 #endif
+    } else {
+        fragColor = textureCatmullRom(colortex2, coord).rgb;
+    }
 
 #ifdef VIGNETTE
     //fragColor *= vignette(coord);
