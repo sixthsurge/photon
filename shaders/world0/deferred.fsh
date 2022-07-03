@@ -52,6 +52,8 @@ uniform int frameCounter;
 
 uniform int moonPhase;
 
+uniform float frameTimeCounter;
+
 uniform float sunAngle;
 
 uniform float rainStrength;

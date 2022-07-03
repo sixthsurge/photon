@@ -21,28 +21,28 @@ float getBorderFog(vec3 scenePos, vec3 worldDir) {
 
 // fog effects shared by all dimensions
 vec3 applyCommonFog(vec3 radiance, vec3 scenePos, vec3 clearSky, float viewerDistance) {
-	const vec3 lavaFogColor         = 16.0 * pow(vec3(0.839, 0.373, 0.075), vec3(2.2)) * r709ToAp1;
-	const vec3 powderedSnowFogColor = 0.05 * pow(vec3(0.957, 0.988, 0.988), vec3(2.2)) * r709ToAp1;
+	const vec3 lavaFogColor = 16.0 * pow(vec3(0.839, 0.373, 0.075), vec3(2.2)) * r709ToAp1;
+	const vec3 snowFogColor = 0.05 * pow(vec3(0.957, 0.988, 0.988), vec3(2.2)) * r709ToAp1;
 
 	scenePos -= gbufferModelViewInverse[3].xyz; // Account for view bobbing
 	vec3 worldDir = scenePos * rcp(viewerDistance);
 
 #ifdef BORDER_FOG
 	// border fog
-	float fog = getBorderFog(scenePos, worldDir);
-	radiance = mix(clearSky, radiance, fog);
+	float borderFog = getBorderFog(scenePos, worldDir);
+	radiance = mix(clearSky, radiance, borderFog);
 #endif
 
 	// blindness fog
 	radiance *= getSphericalFog(viewerDistance, 2.0, 4.0 * blindness);
 
 	// lava fog
-	fog = getSphericalFog(viewerDistance, 0.33, 3.0 * float(isEyeInWater == 2));
-	radiance = mix(lavaFogColor, radiance, fog);
+	float lavaFog = getSphericalFog(viewerDistance, 0.33, 3.0 * float(isEyeInWater == 2));
+	radiance = mix(lavaFogColor, radiance, lavaFog);
 
 	// powdered snow fog
-	fog = getSphericalFog(viewerDistance, 0.5, 5.0 * float(isEyeInWater == 3));
-	radiance = mix(powderedSnowFogColor, radiance, fog);
+	float snowFog = getSphericalFog(viewerDistance, 0.5, 5.0 * float(isEyeInWater == 3));
+	radiance = mix(powderedSnowFogColor, radiance, snowFog);
 
 	return radiance;
 }
