@@ -89,6 +89,8 @@ uniform vec3 moonDir;
 void main() {
 	ivec2 texel = ivec2(gl_FragCoord.xy);
 
+	radiance = vec3(0.0);
+
 	if (texel.x == skyCaptureRes.x) {
 		switch (texel.y) {
 		case 0:
@@ -109,8 +111,6 @@ void main() {
 		}
 	} else {
 		vec3 rayDir = unprojectSky(coord);
-
-		radiance = vec3(0.0);
 
 		/* -- atmosphere -- */
 

@@ -187,7 +187,7 @@ vec3 getShadows(
 	// Prevents peter panning, but can cause shadows to be shortened or misaligned on edges
 	float biasScale = 1.0 + 2.0 * pow5(max0(dot(normal, lightDir))); // Intended to fix the 'blob' of shadow acne that appears when the sun is near the horizon
 	vec3 shadowNormal = diagonal(shadowProjection).xyz * (mat3(shadowModelView) * normal);
-	vec3 shadowClipPos1 = shadowClipPos + SHADOW_BIAS * biasScale * sqr(distortionFactor) * vec3(0.0, 0.0, -1.0) * 0.005;
+	vec3 shadowClipPos1 = shadowClipPos + SHADOW_BIAS * biasScale * sqr(distortionFactor) * shadowNormal;
 
 	vec3 shadowScreenPos = distortShadowSpace(shadowClipPos1, distortionFactor) * 0.5 + 0.5;
 

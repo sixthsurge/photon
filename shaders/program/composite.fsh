@@ -184,7 +184,7 @@ vec3 traceSpecularRay(
 		hitPos
 	);
 
-	vec3 skyRadiance = textureBicubic(colortex4, projectSky(rayDir)).rgb * skylightFalloff * float(isEyeInWater == 0);
+	vec3 skyRadiance = texture(colortex4, projectSky(rayDir)).rgb * skylightFalloff * float(isEyeInWater == 0);
 
 	if (hit) {
 		float borderAttenuation = (hitPos.x * hitPos.y - hitPos.x) * (hitPos.x * hitPos.y - hitPos.y);
