@@ -42,7 +42,7 @@ vec3 applyCommonFog(vec3 radiance, vec3 scenePos, vec3 clearSky, float viewerDis
 
 	// powdered snow fog
 	float snowFog = getSphericalFog(viewerDistance, 0.5, 5.0 * float(isEyeInWater == 3));
-	radiance = mix(powderedSnowFogColor, radiance, snowFog);
+	radiance = mix(snowFogColor, radiance, snowFog);
 
 	return radiance;
 }

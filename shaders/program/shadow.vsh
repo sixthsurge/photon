@@ -3,6 +3,7 @@
 //--// Outputs //-------------------------------------------------------------//
 
 out vec2 texCoord;
+out vec3 worldPos;
 
 flat out uint blockId;
 flat out vec3 normal;
@@ -50,8 +51,11 @@ void main() {
 
 	vec3 shadowViewPos = transform(gl_ModelViewMatrix, gl_Vertex.xyz), shadowClipPos;
 
-	vec3 scenePos  = transform(shadowModelViewInverse, shadowViewPos);
-	     scenePos += animateVertex(scenePos + cameraPosition, texCoord.y < mc_midTexCoord.y, rcp(240.0) * gl_MultiTexCoord1.y, blockId);
+	vec3 scenePos = transform(shadowModelViewInverse, shadowViewPos);
+
+	worldPos  = scenePos + cameraPosition;
+	worldPos += animateVertex(scenePos, texCoord.y < mc_midTexCoord.y, rcp(240.0) * gl_MultiTexCoord1.y, blockId);
+	scenePos  = worldPos - cameraPosition;
 
 	shadowViewPos = transform(shadowModelView, scenePos);
 	shadowClipPos = projectOrtho(gl_ProjectionMatrix, shadowViewPos);
