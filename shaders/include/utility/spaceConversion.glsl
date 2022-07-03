@@ -38,6 +38,12 @@ vec3 sceneToViewSpace(vec3 scenePos) {
 	return transform(gbufferModelView, scenePos);
 }
 
+mat3 getTbnMatrix(vec3 normal) {
+	vec3 tangent   = normal.y == 1.0 ? vec3(1.0, 0.0, 0.0) : normalize(cross(vec3(0.0, 1.0, 0.0), normal));
+	vec3 bitangent = normalize(cross(tangent, normal));
+	return mat3(tangent, bitangent, normal);
+}
+
 #if defined TEMPORAL_REPROJECTION
 vec3 reproject(vec3 screenPos) {
 	vec3 pos = screenToViewSpace(screenPos, false);

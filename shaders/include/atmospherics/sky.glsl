@@ -1,6 +1,8 @@
 #if !defined INCLUDE_ATMOSPHERE_SKY
 #define INCLUDE_ATMOSPHERE_SKY
 
+#include "/include/atmospherics/atmosphere.glsl"
+
 #include "/include/lighting/bsdf.glsl"
 
 #include "/include/utility/fastMath.glsl"
@@ -24,6 +26,18 @@ vec3 drawMoon(vec3 rayDir) {
 	const float moonN         = (1.0 + sqrt(moonF0)) / (1.0 - sqrt(moonF0));
 	const float moonRoughness = 0.8;
 
+	const Material moonMaterial = Material(
+		vec3(moonAlbedo), // albedo
+		vec3(moonF0),     // f0
+		vec3(0.0),        // emission
+		moonRoughness,    // roughness
+		moonN,            // n
+		0.0,              // sssAmount
+		0.0,              // porosity
+		false,            // isMetal
+		false             // isHardcodedMetal
+	);
+
 	float distanceToMoon = intersectSphere(-moonDir, rayDir, moonAngularRadius).x;
 
 	if (distanceToMoon < 0.0) return vec3(0.0);
@@ -45,14 +59,15 @@ vec3 drawMoon(vec3 rayDir) {
 
 	vec3 irradiance = sunIrradiance * max0(NoL);
 
-	vec3 bsdf = diffuseBrdf(vec3(moonAlbedo), moonF0, moonN, moonRoughness, NoL, NoV, NoH, LoV);
+	vec3 bsdf = diffuseHammon(moonMaterial, NoL, NoV, NoH, LoV);
 
 	float glow = 0.04 * pow4(max0(-NoL)); // Subtle glow on dark side of the moon
 
 	return (irradiance * bsdf + glow) * vec3(MOONLIGHT_TINT_R, MOONLIGHT_TINT_G, MOONLIGHT_TINT_B);
 }
 
-// Stars based on https://www.shadertoy.com/view/Md2SR3
+//----------------------------------------------------------------------------//
+// based on https://www.shadertoy.com/view/Md2SR3
 
 vec3 unstableStarField(vec2 coord) {
 	const float threshold = 1.0 - 0.006 * STARS_COVERAGE;
@@ -96,6 +111,28 @@ vec3 drawStars(vec3 rayDir) {
 	     coord *= 600.0 - 400.0 * STARS_SCALE;
 
 	return stableStarField(coord) * (1.0 - timeNoon);
+}
+
+//----------------------------------------------------------------------------//
+
+vec3 getCloudsAerialPerspective(vec3 cloudsScattering, vec3 cloudData, vec3 rayDir, vec3 clearSky, float apparentDistance) {
+	vec3 rayOrigin = vec3(0.0, planetRadius + CLOUDS_SCALE * (eyeAltitude - SEA_LEVEL), 0.0);
+	vec3 rayEnd    = rayOrigin + apparentDistance * rayDir;
+
+	vec3 transmittance;
+	if (rayOrigin.y < length(rayEnd)) {
+		vec3 trans0 = getAtmosphereTransmittance(rayOrigin, rayDir);
+		vec3 trans1 = getAtmosphereTransmittance(rayEnd,    rayDir);
+
+		transmittance = clamp01(trans0 / trans1);
+	} else {
+		vec3 trans0 = getAtmosphereTransmittance(rayOrigin, -rayDir);
+		vec3 trans1 = getAtmosphereTransmittance(rayEnd,    -rayDir);
+
+		transmittance = clamp01(trans1 / trans0);
+	}
+
+	return mix((1.0 - cloudData.b) * clearSky, cloudsScattering, transmittance);
 }
 
 #endif // INCLUDE_ATMOSPHERE_SKY

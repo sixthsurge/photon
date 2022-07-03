@@ -92,7 +92,7 @@ vec3 evaluateConvolvedSphericalHarmonics(vec3[9] f, vec3 kernel, vec3 direction)
 }
 
 // https://www.activision.com/cdn/research/Practical_Real_Time_Strategies_for_Accurate_Indirect_Occlusion_NEW%20VERSION_COLOR.pdf section 5
-vec3 evaluateSphericalHarmonicsIrradiance(vec3[9] skySh, vec3 bentNormal, float visibility) {
+vec3 evaluateSphericalHarmonicsIrradiance(vec3[9] sh, vec3 bentNormal, float visibility) {
 	float apertureAngleSinSq = clamp01(visibility);
 	float apertureAngleCosSq = 1.0 - apertureAngleSinSq;
 
@@ -102,7 +102,7 @@ vec3 evaluateSphericalHarmonicsIrradiance(vec3[9] skySh, vec3 bentNormal, float 
 	kernel.y = (sqrt(3.0 * pi) /  3.0) * (1.0 - apertureAngleCosSq * sqrt(apertureAngleCosSq));
 	kernel.z = (sqrt(5.0 * pi) / 16.0) * apertureAngleSinSq * (2.0 + 6.0 * apertureAngleCosSq);
 
-	return evaluateConvolvedSphericalHarmonics(skySh, kernel, bentNormal);
+	return evaluateConvolvedSphericalHarmonics(sh, kernel, bentNormal);
 }
 
 #endif // INCLUDE_UTILITY_SPHERICALHARMONICS

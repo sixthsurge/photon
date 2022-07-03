@@ -12,7 +12,7 @@ flat out float cloudsCumulusCoverage;
 
 uniform sampler2D colortex4; // Sky capture, color palette and weather properties
 
-//--// Functions //-----------------------------------------------------------//
+//--// Program //-------------------------------------------------------------//
 
 void main() {
 	coord = gl_MultiTexCoord0.xy;

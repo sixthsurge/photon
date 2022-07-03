@@ -20,7 +20,7 @@ uniform sampler2D colortex2; // LDR linear scene color
 
 uniform vec2 windowTexelSize;
 
-//--// Functions //-----------------------------------------------------------//
+//--// Program //-------------------------------------------------------------//
 
 const int maxIterations = 12;
 const float[12] quality = float[12](1.0, 1.0, 1.0, 1.0, 1.0, 1.5, 2.0, 2.0, 2.0, 2.0, 4.0, 8.0);

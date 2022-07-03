@@ -1,20 +1,20 @@
 /*
-0  | rgba8   | fullscreen        | Overlays, vanilla sky (solid -> deferred), translucent albedo (translucent -> composite)
-1  | rg32ui  | fullscreen        | Gbuffer data (solid -> composite)
-2  | rgba16f | fullscreen        | Velocity vectors (solid -> composite), post-processing color (composite)
-3  | rgb11f  | taa render scale  | Scene radiance (deferred -> composite)
+0  | rgba8   | Fullscreen        | Overlays, vanilla sky (solid -> deferred), translucent albedo (translucent -> composite)
+1  | rg32ui  | Fullscreen        | Gbuffer data (solid -> composite)
+2  | rgb16f  | Fullscreen        | Velocity vectors (solid -> composite), post-processing color (composite)
+3  | rgb11f  | TAA render scale  | Scene radiance (deferred -> composite)
 4  | rgb11f  | 256x128           | Sky capture, lighting color palette, dynamic weather properties (deferred -> composite)
-5  | rgba16  | taa render scale  | Low-res clouds (deferred), indirect lighting data (deferred), responsive aa flag and depth min/max (composite)
-6  | rgb16f  | taa render scale  | Atmosphere scattering (deferred -> composite), volumetric fog scattering (composite), taa min color (composite)
-7  | rgb16f  | taa render scale  | Cloud shadow map (deferred -> composite), volumetric fog transmittance (composite), taa max color (composite)
-8  | rgba16f | fullscreen        | Scene history
-9  | rgba16f | sspt render scale | SSR history
-10 | rgba16f | sspt render scale | Indirect lighting history
-11 | rgb16f  | taa render scale  | Clouds history
-12 | rg8     | taa render scale  | Clouds pixel age
-13 | rg16f   | taa render scale  | Previous frame depth
-14 | r32f    | fullscreen        | Temporally stable linear depth
-15 | rgb11f  | 960x1080          | Bloom buffer
+5  | rgba16  | TAA render scale  | Low-res clouds (deferred), indirect lighting data (deferred), responsive aa flag and depth min/max (composite)
+6  | rgb16f  | TAA render scale  | Atmosphere scattering (deferred -> composite), volumetric fog scattering (composite), taa min color (composite)
+7  | rgb16f  | TAA render scale  | Shadow penumbra size, volumetric fog transmittance (composite), taa max color (composite)
+8  | rgba16f | Fullscreen        | Scene history
+9  | rgba16f | SSPT render scale | SSR history
+10 | rgba16f | SSPT render scale | Indirect lighting history
+11 | rgb16f  | TAA render scale  | Clouds history
+12 | rg8     | TAA render scale  | Clouds pixel age
+13 | rg16f   | TAA render scale  | Previous frame depth
+14 | r32f    | Fullscreen        | Temporally stable linear depth
+15 | rgb11f  | 960x1080          | Cloud shadow map, bloom buffer
 
 const int colortex0Format  = RGBA8;
 const int colortex2Format  = RGB16F;
@@ -32,7 +32,7 @@ const int colortex13Format = RG16F;
 const int colortex14Format = R32F;
 const int colortex15Format = R11F_G11F_B10F;
 
-const int shadowcolor0Format = RGB8;
+const int shadowcolor0Format = R11F_G11F_B10F;
 
 const bool colortex0Clear  = true;
 const bool colortex1Clear  = true;

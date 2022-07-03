@@ -97,58 +97,31 @@ uniform vec3 lightDir;
 
 //--// Includes //------------------------------------------------------------//
 
+#define PROGRAM_DEFERRED_LIGHTING
+
 #include "/block.properties"
 #include "/entity.properties"
-
-#include "/include/atmospherics/phaseFunctions.glsl"
 
 #include "/include/fragment/aces/matrices.glsl"
 #include "/include/fragment/fog.glsl"
 #include "/include/fragment/material.glsl"
 #include "/include/fragment/textureFormat.glsl"
 
-#include "/include/lighting/bsdf.glsl"
-#include "/include/lighting/cloudShadows.glsl"
-#include "/include/lighting/shadowMapping.glsl"
+#include "/include/lighting/lighting.glsl"
 
 #include "/include/utility/color.glsl"
 #include "/include/utility/encoding.glsl"
 #include "/include/utility/spaceConversion.glsl"
 #include "/include/utility/sphericalHarmonics.glsl"
 
-//--// Functions //-----------------------------------------------------------//
+//--// Program //-------------------------------------------------------------//
 
 const float indirectRenderScale = 0.01 * INDIRECT_RENDER_SCALE;
 
-vec3 getSubsurfaceScattering(vec3 albedo, float sssAmount, float sssDepth, float LoV) {
-	const float sssIntensity  = 3.0;
-	const float sssDensity    = 12.0;
-
-	if (sssAmount < eps) return vec3(0.0);
-
-	vec3 coeff = normalizeSafe(albedo) * sqrt(sqrt(length(albedo)));
-	     coeff = (sssDensity * coeff - sssDensity) / sssAmount;
-
-	vec3 sss1 = exp(3.0 * coeff * sssDepth) * henyeyGreensteinPhase(-LoV, 0.5);
-	vec3 sss2 = exp(1.0 * coeff * sssDepth) * (0.6 * henyeyGreensteinPhase(-LoV, 0.4) + 0.4 * henyeyGreensteinPhase(-LoV, -0.2));
-
-	return albedo * sssIntensity * sssAmount * (sss1 + sss2);
-}
-
-float getBlocklightFalloff(float blocklight, float ao) {
-	float falloff  = rcp(sqr(16.0 - 15.0 * blocklight));
-	      falloff  = linearStep(rcp(sqr(16.0)), 1.0, falloff);
-	      falloff *= mix(ao, 1.0, falloff);
-
-	return falloff;
-}
-
-float getSkylightFalloff(float skylight) {
-	return pow4(skylight);
-}
-
 void main() {
 	ivec2 texel = ivec2(gl_FragCoord.xy);
+
+	/* -- texture fetches -- */
 
 	float depth   = texelFetch(depthtex1, texel, 0).x;
 	vec4 overlays = texelFetch(colortex0, texel, 0);
@@ -160,15 +133,17 @@ void main() {
 	vec4 gtao = texture(colortex10, coord * indirectRenderScale);
 #endif
 
-	if (linearizeDepth(depth) < MC_HAND_DEPTH) depth += 0.38; // hand lighting fix from Capt Tatsu
+	if (depth == 1.0) return;
+
+	/* -- transformations -- */
+
+	if (linearizeDepth(depth) < MC_HAND_DEPTH) depth += 0.38; // Hand lighting fix from Capt Tatsu
 
 	vec3 viewPos = screenToViewSpace(vec3(coord, depth), true);
 	vec3 scenePos = viewToSceneSpace(viewPos);
 	vec3 worldDir = normalize(scenePos - gbufferModelViewInverse[3].xyz);
 
-	if (depth == 1.0) return;
-
-	// Unpack gbuffer data
+	/* -- unpack gbuffer -- */
 
 	mat2x4 data = mat2x4(
 		unpackUnorm4x8(encoded.x),
@@ -177,20 +152,22 @@ void main() {
 
 	vec3 albedo = data[0].xyz;
 	uint blockId = uint(data[0].w * 255.0);
-	vec3 flatNormal = decodeUnitVector(data[1].xy);
+	vec3 geometryNormal = decodeUnitVector(data[1].xy);
 	vec2 lmCoord = data[1].zw;
 
 #ifdef MC_NORMAL_MAP
 	vec4 normalData = unpackUnormArb(encoded.z, uvec4(12, 12, 7, 1));
 	vec3 normal = decodeUnitVector(normalData.xy);
 #else
-	#define normal flatNormal
+	#define normal geometryNormal
 #endif
 
 	uint overlayId = uint(255.0 * overlays.a);
 	albedo = overlayId == 0 ? albedo + overlays.rgb : albedo; // enchantment glint
 	albedo = overlayId == 1 ? 2.0 * albedo * overlays.rgb : albedo; // damage overlay
 	albedo = srgbToLinear(albedo) * r709ToAp1Unlit;
+
+	/* -- fetch ao/sspt -- */
 
 #ifdef GTAO
 	float ao = gtao.w;
@@ -205,7 +182,13 @@ void main() {
 	vec3 bentNormal = normal;
 #endif
 
-	// Get material
+#if defined SH_SKYLIGHT && defined GTAO
+	vec3 skylight = evaluateSphericalHarmonicsIrradiance(skySh, bentNormal, ao);
+#else
+	vec3 skylight = skyIrradiance * ao;
+#endif
+
+	/* -- get material -- */
 
 	Material material = getMaterial(albedo, blockId);
 
@@ -214,88 +197,21 @@ void main() {
 	decodeSpecularTex(specularTex, material);
 #endif
 
-	radiance = vec3(0.0);
+	/* -- lighting -- */
 
-	// Sunlight/moonlight
-
-#if defined WORLD_OVERWORLD || defined WORLD_END
-	float NoL = dot(normal, lightDir) * step(0.0, dot(flatNormal, lightDir));
-
-#if defined WORLD_OVERWORLD
-	float cloudShadow = getCloudShadows(colortex7, scenePos);
-#else
-	float cloudShadow = 1.0;
-#endif
-
-	float sssDepth;
-	vec3 shadows = calculateShadows(
+	radiance = getSceneLighting(
+		material,
 		scenePos,
-		flatNormal,
-		NoL,
-		lmCoord.y,
-		cloudShadow,
-		material.sssAmount,
-		blockId,
-		sssDepth
+		normal,
+		geometryNormal,
+		-worldDir,
+		ambientIrradiance,
+		directIrradiance,
+		skylight,
+		lmCoord,
+		ao,
+		blockId
 	);
-
-	if (maxOf(shadows) > eps|| material.sssAmount > eps) {
-		NoL = clamp01(NoL);
-		float NoV = clamp01(dot(normal, -worldDir));
-		float LoV = dot(lightDir, -worldDir);
-		float halfwayNorm = inversesqrt(2.0 * LoV + 2.0);
-		float NoH = (NoL + NoV) * halfwayNorm;
-		float LoH = LoV * halfwayNorm + halfwayNorm;
-
-		float lightRadius = (sunAngle < 0.5 ? SUN_ANGULAR_RADIUS : MOON_ANGULAR_RADIUS) * (tau / 360.0);
-
-		vec3 visibility = NoL * shadows;
-
-		vec3 bsdf  = diffuseBrdf(material.albedo, material.f0.x, material.n, material.roughness, NoL, NoV, NoH, LoV);
-		     bsdf *= float(!material.isMetal) * (1.0 - 0.75 * material.sssAmount);
-		     bsdf += specularBrdf(material, NoL, NoV, NoH, LoV, LoH, lightRadius);
-
-		vec3 sss  = getSubsurfaceScattering(albedo, material.sssAmount, sssDepth, LoV);
-
-		radiance += directIrradiance * cloudShadow * (bsdf * visibility + sss);
-	}
-#endif
-
-#if defined SSPT
-
-#else
-	vec3 bsdf = albedo * rcpPi * float(!material.isMetal);
-
-	// Bounced light
-
-	const float bounceAlbedo = 0.5;
-	const vec3 bounceWeights = vec3(0.2, 0.6, 0.2); // fraction of light that bounces off each axis
-
-	radiance += directIrradiance * bsdf * ao * dot(max0(-normal), bounceWeights) * bounceAlbedo * rcpPi * pow8(lmCoord.y);
-
-	// Skylight
-
-	float skylightFalloff = getSkylightFalloff(lmCoord.y);
-
-#ifdef SH_SKYLIGHT
-	vec3 skylight = evaluateSphericalHarmonicsIrradiance(skySh, bentNormal, ao);
-#else
-	vec3 skylight = mix(skyIrradiance, vec3(skyIrradiance.b * sqrt(2.0)), rcpPi) * ao;
-#endif
-
-	radiance += skylight * skylightFalloff * bsdf;
-
-	// Blocklight
-
-	float blocklightFalloff = getBlocklightFalloff(lmCoord.x, ao);
-	radiance += 60.0 * blackbody(3750.0) * bsdf * blocklightFalloff;
-
-	// Ambient light
-
-	radiance += ambientIrradiance * bsdf * ao;
-#endif
-
-	radiance += 32.0 * material.emission;
 
 	radiance = applySimpleFog(radiance, scenePos, clearSky);
 }

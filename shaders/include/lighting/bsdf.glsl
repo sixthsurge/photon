@@ -5,6 +5,64 @@
 
 #include "/include/utility/fastMath.glsl"
 
+float distributionGgx(float NoHSq, float alphaSq) {
+	return alphaSq / max(pi * sqr(1.0 - NoHSq + NoHSq * alphaSq), eps);
+}
+
+float v1SmithGgx(float cosTheta, float alphaSq) {
+	return 1.0 / (cosTheta + sqrt((-cosTheta * alphaSq + cosTheta) * cosTheta + alphaSq));
+}
+
+float v2SmithGgx(float NoL, float NoV, float alphaSq) {
+    float ggxL = NoV * sqrt((-NoL * alphaSq + NoL) * NoL + alphaSq);
+    float ggxV = NoL * sqrt((-NoV * alphaSq + NoV) * NoV + alphaSq);
+    return 0.5 / (ggxL + ggxV);
+}
+
+vec3 fresnelSchlick(float cosTheta, vec3 f0) {
+	float f = pow5(1.0 - cosTheta);
+	return f + f0 * (1.0 - f);
+}
+
+float fresnelDielectric(float cosTheta, float n) {
+	float gSq = sqr(n) + sqr(cosTheta) - 1.0;
+
+	if (gSq < 0.0) return 1.0; // Imaginary g => TIR
+
+	float g = sqrt(gSq);
+	float a = g - cosTheta;
+	float b = g + cosTheta;
+
+	return 0.5 * sqr(a / b) * (1.0 + sqr((b * cosTheta - 1.0) / (a * cosTheta + 1.0)));
+}
+
+// https://www.gdcvault.com/play/1024478/PBR-Diffuse-Lighting-for-GGX
+// Modified by Jessie to correctly account for fresnel
+vec3 diffuseHammon(
+	Material material,
+	float NoL,
+	float NoV,
+	float NoH,
+	float LoV
+) {
+	if (NoL <= 0.0 || material.isMetal) return vec3(0.0);
+
+	float facing = 0.5 * LoV + 0.5;
+
+	float fresnelNL = fresnelDielectric(max(NoL, 1e-2), material.n);
+	float fresnelNV = fresnelDielectric(max(NoV, 1e-2), material.n);
+	float f0 = material.f0.x;
+	float energyConservationFactor = 1.0 - (4.0 * sqrt(f0) + 5.0 * f0 * f0) * (1.0 / 9.0);
+
+	float singleRough = facing * (-0.2 * facing + 0.45) * (1.0 / NoH + 2.0);
+	float singleSmooth = (1.0 - fresnelNL) * (1.0 - fresnelNV) / energyConservationFactor;
+
+	float single = mix(singleSmooth, singleRough, material.roughness) * rcpPi;
+	float multi = 0.1159 * material.roughness;
+
+	return material.albedo * (material.albedo * multi + single);
+}
+
 // GGX spherical area light approximation from Horizon: Zero Dawn
 // https://www.guerrilla-games.com/read/decima-engine-advances-in-lighting-and-aa
 float getNoHSquared(
@@ -49,75 +107,18 @@ float getNoHSquared(
 	return clamp01(NoH * NoH / HoH);
 }
 
-float distributionGgx(float NoHSq, float alphaSq) {
-	return alphaSq / max(pi * sqr(1.0 - NoHSq + NoHSq * alphaSq), eps);
-}
-
-float V1SmithGgx(float cosTheta, float alphaSq) {
-	return 1.0 / (cosTheta + sqrt((-cosTheta * alphaSq + cosTheta) * cosTheta + alphaSq));
-}
-
-float V2SmithGgx(float NoL, float NoV, float alphaSq) {
-    float ggxL = NoV * sqrt((-NoL * alphaSq + NoL) * NoL + alphaSq);
-    float ggxV = NoL * sqrt((-NoV * alphaSq + NoV) * NoV + alphaSq);
-    return 0.5 / (ggxL + ggxV);
-}
-
-vec3 fresnelSchlick(float cosTheta, vec3 f0) {
-	float f = pow5(1.0 - cosTheta);
-	return f + f0 * (1.0 - f);
-}
-
-float fresnelDielectric(float cosTheta, float n) {
-	float gSq = sqr(n) + sqr(cosTheta) - 1.0;
-
-	if (gSq < 0.0) return 1.0; // Imaginary g => TIR
-
-	float g = sqrt(gSq);
-	float a = g - cosTheta;
-	float b = g + cosTheta;
-
-	return 0.5 * sqr(a / b) * (1.0 + sqr((b * cosTheta - 1.0) / (a * cosTheta + 1.0)));
-}
-
-// https://www.gdcvault.com/play/1024478/PBR-Diffuse-Lighting-for-GGX
-// Modified by Jessie to correctly account for fresnel
-vec3 diffuseBrdf(
-	vec3 albedo,
-	float f0,
-	float n,
-	float roughness,
-	float NoL,
-	float NoV,
-	float NoH,
-	float LoV
-) {
-	if (NoL <= 0.0) return vec3(0.0);
-
-	float facing = 0.5 * LoV + 0.5;
-
-	float fresnelNL = fresnelDielectric(max(NoL, 1e-2), n);
-	float fresnelNV = fresnelDielectric(max(NoV, 1e-2), n);
-	float energyConservationFactor = 1.0 - (4.0 * sqrt(f0) + 5.0 * f0 * f0) * (1.0 / 9.0);
-
-	float singleRough = facing * (-0.2 * facing + 0.45) * (1.0 / NoH + 2.0);
-	float singleSmooth = (1.0 - fresnelNL) * (1.0 - fresnelNV) / energyConservationFactor;
-
-	float single = mix(singleSmooth, singleRough, roughness) * rcpPi;
-	float multi = 0.1159 * roughness;
-
-	return albedo * (albedo * multi + single);
-}
-
-vec3 specularBrdf(
+vec3 getSpecularHighlight(
 	Material material,
 	float NoL,
 	float NoV,
 	float NoH,
 	float LoV,
-	float LoH,
-	float lightRadius
+	float LoH
 ) {
+#if   defined WORLD_OVERWORLD
+	float lightRadius = (sunAngle < 0.5) ? radians(SUN_ANGULAR_RADIUS) : radians(MOON_ANGULAR_RADIUS);
+#endif
+
 	vec3 f = material.isMetal ? fresnelSchlick(LoH, material.f0) : vec3(fresnelDielectric(LoH, material.n));
 
 	if (NoL <= 0.0) return vec3(0.0);
@@ -128,10 +129,10 @@ vec3 specularBrdf(
 	float NoHSq = getNoHSquared(NoL, NoV, LoV, lightRadius);
 	float alphaSq = material.roughness * material.roughness;
 
-	float d = distributionGgx(NoHSq, alphaSq);
-	float v = V2SmithGgx(max(NoL, 1e-2), max(NoV, 1e-2), alphaSq);
+	float d  = distributionGgx(NoHSq, alphaSq);
+	float v2 = v2SmithGgx(max(NoL, 1e-2), max(NoV, 1e-2), alphaSq);
 
-	return (d * v) * f * albedoTint;
+	return (d * v2) * f * albedoTint;
 }
 
 #endif // INCLUDE_LIGHTING_BSDF

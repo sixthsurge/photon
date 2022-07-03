@@ -57,6 +57,7 @@ value.CLOUDS_UPSCALING_FACTOR.1        = OFF
 value.CLOUDS_UPSCALING_FACTOR.2        = 2x
 value.CLOUDS_UPSCALING_FACTOR.4        = 4x
 value.CLOUDS_UPSCALING_FACTOR.8        = 8x
+value.CLOUDS_UPSCALING_FACTOR.9        = 9x
 value.CLOUDS_UPSCALING_FACTOR.16       = 16x
 
 option.CLOUDS_SCALE                    = Scale
@@ -284,6 +285,17 @@ option.WAVING_PLANTS                   = Waving Plants
 option.WAVING_LEAVES                   = Waving Leaves
 
 #----# Water #-------------------------------------------------------------------------------------#
+
+option.WATER_REFRACTION                = Refraction
+
+value.WATER_REFRACTION.WATER_REFRACTION_OFF          = OFF
+value.WATER_REFRACTION.WATER_REFRACTION_APPROXIMATED = Approximated
+value.WATER_REFRACTION.WATER_REFRACTION_RAYTRACED    = Ray-traced
+
+# Water Waves
+
+option.WATER_PARALLAX                  = Water Parallax
+option.WATER_DISPLACEMENT              = Water Displacement
 
 #----# Misc #--------------------------------------------------------------------------------------#
 

@@ -30,7 +30,7 @@ uniform float far;
 
 #include "/include/utility/color.glsl"
 
-//--// Functions //-----------------------------------------------------------//
+//--// Program //-------------------------------------------------------------//
 
 float linearizeDepth(float depth) {
 	// https://wiki.shaderlabs.org/wiki/Shader_tricks#Linearizing_depth

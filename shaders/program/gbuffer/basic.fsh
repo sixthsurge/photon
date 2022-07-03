@@ -19,7 +19,7 @@ uniform vec2 viewTexelSize;
 
 #include "/include/utility/encoding.glsl"
 
-//--// Functions //-----------------------------------------------------------//
+//--// Program //-------------------------------------------------------------//
 
 void main() {
 #if TAA_UPSCALING_FACTOR > 1

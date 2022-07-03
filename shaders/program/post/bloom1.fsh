@@ -18,7 +18,7 @@ in vec2 coord;
 
 uniform sampler2D colortex15; // Bloom buffer
 
-//--// Functions //-----------------------------------------------------------//
+//--// Program //-------------------------------------------------------------//
 
 /*
 const bool colortex15MipmapEnabled = true;

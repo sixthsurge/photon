@@ -13,7 +13,7 @@ uniform vec2 viewTexelSize;
 
 uniform vec2 taaOffset;
 
-//--// Functions //-----------------------------------------------------------//
+//--// Program //-------------------------------------------------------------//
 
 void main() {
 	lmCoord = gl_MultiTexCoord1.xy * rcp(240.0);

@@ -112,7 +112,7 @@ uniform vec3 moonDir;
 #include "/include/utility/dithering.glsl"
 #include "/include/utility/spaceConversion.glsl"
 
-//--// Functions //-----------------------------------------------------------//
+//--// Program //-------------------------------------------------------------//
 
 vec4 minOf(vec4 a, vec4 b, vec4 c, vec4 d, vec4 f) {
     return min(a, min(b, min(c, min(d, f))));
@@ -159,6 +159,9 @@ vec4 upscaleClouds(ivec2 dstTexel, vec3 screenPos) {
 #elif CLOUDS_UPSCALING_FACTOR == 8
 	const vec2 cloudsRenderScale = vec2(0.25, 0.5);
 	#define checkerboardOffsets checkerboardOffsets4x2
+#elif CLOUDS_UPSCALING_FACTOR == 9
+	const vec2 cloudsRenderScale = vec2(1.0 / 3.0);
+	#define checkerboardOffsets checkerboardOffsets3x3
 #elif CLOUDS_UPSCALING_FACTOR == 16
 	const vec2 cloudsRenderScale = vec2(0.25);
 	#define checkerboardOffsets checkerboardOffsets4x4
@@ -225,15 +228,10 @@ vec4 upscaleClouds(ivec2 dstTexel, vec3 screenPos) {
 	float x = max(float(pixelAge) - CLOUDS_UPSCALING_FACTOR, 1.0);
 	float historyWeight = min(x / (x + 1.0), CLOUDS_ACCUMULATION_LIMIT);
 
-	// Soften history sample for newer pixels
-	vec4 historySmooth = textureBicubic(colortex11, previousCoordClamped);
-	     historySmooth = mix(historySmooth, history, clamp01(historyWeight));
-		 historySmooth = invalidHistory ? history : mix(historySmooth, clamp(historySmooth, aabbMin, aabbMax), clampingStrength);
-
 	// Checkerboard upscaling
-	ivec2 offset0 = dstTexel & ivec2(rcp(cloudsRenderScale) - 1.0);
-	ivec2 offset1 = checkerboardOffsets[frameCounter & (CLOUDS_UPSCALING_FACTOR - 1)];
-	if (offset0 != offset1) current = historySmooth;
+	ivec2 offset0 = dstTexel % ivec2(rcp(cloudsRenderScale));
+	ivec2 offset1 = checkerboardOffsets[frameCounter % CLOUDS_UPSCALING_FACTOR];
+	if (offset0 != offset1) current = history;
 
 	// Velocity rejection
 	historyWeight *= exp(-length(velocity)) * 0.7 + 0.3;
@@ -252,26 +250,6 @@ vec4 upscaleClouds(ivec2 dstTexel, vec3 screenPos) {
 	return current;
 }
 
-vec3 getCloudsAerialPerspective(vec3 cloudsScattering, vec3 cloudData, vec3 rayDir, vec3 clearSky, float apparentDistance) {
-	vec3 rayOrigin = vec3(0.0, planetRadius + CLOUDS_SCALE * (eyeAltitude - SEA_LEVEL), 0.0);
-	vec3 rayEnd    = rayOrigin + apparentDistance * rayDir;
-
-	vec3 transmittance;
-	if (rayOrigin.y < length(rayEnd)) {
-		vec3 trans0 = getAtmosphereTransmittance(rayOrigin, rayDir);
-		vec3 trans1 = getAtmosphereTransmittance(rayEnd,    rayDir);
-
-		transmittance = clamp01(trans0 / trans1);
-	} else {
-		vec3 trans0 = getAtmosphereTransmittance(rayOrigin, -rayDir);
-		vec3 trans1 = getAtmosphereTransmittance(rayEnd,    -rayDir);
-
-		transmittance = clamp01(trans1 / trans0);
-	}
-
-	return mix((1.0 - cloudData.b) * clearSky, cloudsScattering, transmittance);
-}
-
 void main() {
 	ivec2 texel = ivec2(gl_FragCoord.xy);
 
@@ -288,7 +266,7 @@ void main() {
 
 	if (depth != 1.0) return;
 
-	// Space
+	/* -- space -- */
 
 	radiance = vec3(0.0);
 
@@ -318,13 +296,13 @@ void main() {
 	radiance += drawStars(rayDir);
 #endif
 
-	// Atmosphere
+	/* -- atmosphere -- */
 
 	vec3 atmosphereTransmittance = getAtmosphereTransmittance(rayDir.y, planetRadius);
 
 	radiance = radiance * atmosphereTransmittance + atmosphereScattering;
 
-	// Clouds
+	/* -- clouds -- */
 
 	vec3 cloudsScattering = mat2x3(directIrradiance, skyIrradiance) * cloudData.xy;
 	     cloudsScattering = getCloudsAerialPerspective(cloudsScattering, cloudData.rgb, rayDir, atmosphereScattering, cloudData.w);
@@ -333,7 +311,7 @@ void main() {
 
 	radiance = radiance * cloudsTransmittance + cloudsScattering;
 
-	// Fade lower part of sky into cave fog color when underground so that the sky isn't visible
+	// fade lower part of sky into cave fog color when underground so that the sky isn't visible
 	// beyond the render distance
 	float undergroundSkyFade = biomeCave * smoothstep(-0.1, 0.1, 0.4 - rayDir.y);
 	radiance = mix(radiance, caveFogColor, undergroundSkyFade);

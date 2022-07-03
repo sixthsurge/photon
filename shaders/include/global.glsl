@@ -21,7 +21,7 @@ const float goldenAngle = tau / goldenRatio / goldenRatio;
 
 const float renderScale = inversesqrt(float(TAA_UPSCALING_FACTOR));
 
-//--// Functions //-----------------------------------------------------------//
+//--// Program //-------------------------------------------------------------//
 
 #define rcp(x) (1.0 / (x))
 #define clamp01(x) clamp(x, 0.0, 1.0) // free on operation output

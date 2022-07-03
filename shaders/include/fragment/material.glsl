@@ -15,6 +15,9 @@ struct Material {
 	bool isHardcodedMetal;
 };
 
+const float airN   = 1.000293; // for 0°C and 1 atm
+const float waterN = 1.333;    // for 20°C
+
 float f0ToIor(float f0) {
 	float sqrtF0 = sqrt(f0) * 0.99999;
 	return (1.0 + sqrtF0) / (1.0 - sqrtF0);

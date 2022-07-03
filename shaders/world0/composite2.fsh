@@ -22,7 +22,7 @@ uniform sampler2D colortex3; // Scene radiance
 uniform sampler2D colortex6; // Fog scattering
 uniform sampler2D colortex7; // Fog transmittance
 
-//--// Functions //-----------------------------------------------------------//
+//--// Program //-------------------------------------------------------------//
 
 const float fogRenderScale = 0.01 * FOG_RENDER_SCALE;
 

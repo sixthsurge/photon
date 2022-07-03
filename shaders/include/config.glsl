@@ -24,7 +24,7 @@ const float sunPathRotation = -40.0; // [-40.0 -35.0 -30.0 -25.0 -20.0 -15.0 -10
 
 //--// Clouds
 
-  #define CLOUDS_UPSCALING_FACTOR 8 // Renders clouds at a lower resolution and uses checkerboard upscaling to fill in the rest. This does not take into account the TAA upscaling factor, so if the clouds upscaling factor is 8x and the TAA upscaling factor is 2x, then the clouds are actually being upscaled to 16x their source resolution [1 2 4 8 16]
+  #define CLOUDS_UPSCALING_FACTOR 9 // Renders clouds at a lower resolution and uses checkerboard upscaling to fill in the rest. This does not take into account the TAA upscaling factor, so if the clouds upscaling factor is 8x and the TAA upscaling factor is 2x, then the clouds are actually being upscaled to 16x their source resolution [1 2 4 8 9 16]
   #define CLOUDS_ACCUMULATION_LIMIT 0.9 // Maximum blend weight given to the previous frame's clouds. Higher values mean more stable clouds (less noise flickering) but more ghosting
   #define CLOUDS_SCALE 8.0 // Applied as a scale factor to all clouds, to bring the clouds from a realistic size and altitude to an altitude that is accessible during gameplay. If this value is 1.0, clouds are positioned realistically, with the first layer 800 blocks up by default. If this value is higher, then clouds will appear smaller and form closer to the ground. This also affects the size of cloud shadows // [1.0 2.0 3.0 4.0 5.0 6.0 7.0 8.0 9.0 10.0 11.0 12.0 13.0 14.0 15.0]
 
@@ -116,7 +116,7 @@ const float sunPathRotation = -40.0; // [-40.0 -35.0 -30.0 -25.0 -20.0 -15.0 -10
   #define MOONLIGHT_TINT_B 1.00 // [0.00 0.01 0.02 0.03 0.04 0.05 0.06 0.07 0.08 0.09 0.10 0.11 0.12 0.13 0.14 0.15 0.16 0.17 0.18 0.19 0.20 0.21 0.22 0.23 0.24 0.25 0.26 0.27 0.28 0.29 0.30 0.31 0.32 0.33 0.34 0.35 0.36 0.37 0.38 0.39 0.40 0.41 0.42 0.43 0.44 0.45 0.46 0.47 0.48 0.49 0.50 0.51 0.52 0.53 0.54 0.55 0.56 0.57 0.58 0.59 0.60 0.61 0.62 0.63 0.64 0.65 0.66 0.67 0.68 0.69 0.70 0.71 0.72 0.73 0.74 0.75 0.76 0.77 0.78 0.79 0.80 0.81 0.82 0.83 0.84 0.85 0.86 0.87 0.88 0.89 0.90 0.91 0.92 0.93 0.94 0.95 0.96 0.97 0.98 0.99 1.00]
 
   #define BLOCKLIGHT_INTENSITY 1.0 // [0.0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0 1.1 1.2 1.3 1.4 1.5 1.6 1.7 1.8 1.9 2.0]
-  #define BLOCKLIGHT_TEMPERATURE 3500.0 // [2000.0 2100.0 2200.0 2300.0 2400.0 2500.0 2600.0 2700.0 2800.0 2900.0 3000.0 3100.0 3200.0 3300.0 3400.0 3500.0 3600.0 3700.0 3800.0 3900.0 4000.0 4100.0 4200.0 4300.0 4400.0 4500.0 4600.0 4700.0 4800.0 4900.0 5000.0 5100.0 5200.0 5300.0 5400.0 5500.0 5600.0 5700.0 5800.0 5900.0 6000.0 6100.0 6200.0 6300.0 6400.0 6500.0 6600.0 6700.0 6800.0 6900.0 7000.0 7100.0 7200.0 7300.0 7400.0 7500.0 7600.0 7700.0 7800.0 7900.0 8000.0]
+  #define BLOCKLIGHT_TEMPERATURE 3800.0 // [2000.0 2100.0 2200.0 2300.0 2400.0 2500.0 2600.0 2700.0 2800.0 2900.0 3000.0 3100.0 3200.0 3300.0 3400.0 3500.0 3600.0 3700.0 3800.0 3900.0 4000.0 4100.0 4200.0 4300.0 4400.0 4500.0 4600.0 4700.0 4800.0 4900.0 5000.0 5100.0 5200.0 5300.0 5400.0 5500.0 5600.0 5700.0 5800.0 5900.0 6000.0 6100.0 6200.0 6300.0 6400.0 6500.0 6600.0 6700.0 6800.0 6900.0 7000.0 7100.0 7200.0 7300.0 7400.0 7500.0 7600.0 7700.0 7800.0 7900.0 8000.0]
 
   #define AMBIENT_LIGHT_INTENSITY 1.0 // [0.0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0 1.1 1.2 1.3 1.4 1.5 1.6 1.7 1.8 1.9 2.0]
   #define AMBIENT_LIGHT_TINT_R 1.00 // [0.00 0.01 0.02 0.03 0.04 0.05 0.06 0.07 0.08 0.09 0.10 0.11 0.12 0.13 0.14 0.15 0.16 0.17 0.18 0.19 0.20 0.21 0.22 0.23 0.24 0.25 0.26 0.27 0.28 0.29 0.30 0.31 0.32 0.33 0.34 0.35 0.36 0.37 0.38 0.39 0.40 0.41 0.42 0.43 0.44 0.45 0.46 0.47 0.48 0.49 0.50 0.51 0.52 0.53 0.54 0.55 0.56 0.57 0.58 0.59 0.60 0.61 0.62 0.63 0.64 0.65 0.66 0.67 0.68 0.69 0.70 0.71 0.72 0.73 0.74 0.75 0.76 0.77 0.78 0.79 0.80 0.81 0.82 0.83 0.84 0.85 0.86 0.87 0.88 0.89 0.90 0.91 0.92 0.93 0.94 0.95 0.96 0.97 0.98 0.99 1.00]
@@ -266,6 +266,16 @@ const float sunPathRotation = -40.0; // [-40.0 -35.0 -30.0 -25.0 -20.0 -15.0 -10
 
 //--// Water //---------------------------------------------------------------//
 
+  #define WATER_REFRACTION WATER_REFRACTION_APPROXIMATED // Screen-space water refraction. Gives the impression of light bending due to water waves. Approximated: "good enough" and essentially free. Raytraced: more accurate but slow
+
+  #define WATER_REFRACTION_OFF 0
+  #define WATER_REFRACTION_APPROXIMATED 1
+  #define WATER_REFRACTION_RAYTRACED 2
+
+//--// Water Waves
+
+  #define WATER_PARALLAX // Makes use of parallax occlusion mapping to add a better sense of depth to water waves. Small performance cost
+  #define WATER_DISPLACEMENT // Applies a subtle waving effect to the water geometry itself, so that the water line is not flat. Essentially no performance cost.
 
 //--// Misc //----------------------------------------------------------------//
 

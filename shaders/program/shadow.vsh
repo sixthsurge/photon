@@ -40,7 +40,7 @@ uniform float rainStrength;
 
 #include "/include/vertex/animation.glsl"
 
-//--// Functions //-----------------------------------------------------------//
+//--// Program //-------------------------------------------------------------//
 
 void main() {
 	texCoord = gl_MultiTexCoord0.xy;

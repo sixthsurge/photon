@@ -102,7 +102,7 @@ const float fogScale           = 100.0 * AIR_FOG_DENSITY;
 const vec2 fogFalloffStart     = vec2(30.0, 5.0);
 const vec2 fogFalloffHalfLife  = vec2(15.0, 8.0); // How many meters it takes for the fog density to halve (rayleigh, mie)
 
-//--// Functions //-----------------------------------------------------------//
+//--// Program //-------------------------------------------------------------//
 
 vec2 getFogDensity(vec3 worldPos) {
 	const vec2 mul = -rcp(fogFalloffHalfLife);

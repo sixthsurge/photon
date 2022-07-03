@@ -1,2 +1,2 @@
 #version 410 compatibility
-#include "/program/deferred/clearTex0.fsh"
+#include "/program/deferred/clearC0.fsh"

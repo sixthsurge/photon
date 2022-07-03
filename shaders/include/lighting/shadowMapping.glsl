@@ -11,6 +11,11 @@
 #include "/include/utility/random.glsl"
 #include "/include/utility/rotation.glsl"
 
+// disable colored shadows for translucents
+#if defined PROGRAM_COMPOSITE && defined SHADOW_COLOR
+	#undef SHADOW_COLOR
+#endif
+
 const float shadowTexelSize = rcp(float(shadowMapResolution));
 
 // Fake, lightmap-based shadows for outside of the shadow distance or when shadow mapping is disabled
@@ -20,7 +25,7 @@ float getDistantShadows(float skylight, float NoL, out float sssDepth) {
 }
 
 #ifndef SHADOW
-vec3 calculateShadows(
+vec3 getShadows(
 	vec3 scenePos,
 	vec3 normal,
 	float NoL,
@@ -33,26 +38,18 @@ vec3 calculateShadows(
 	return vec3(getDistantShadows(skylight, NoL, sssDepth));
 }
 #else
-vec3 shadowFast(vec3 shadowScreenPos) {
-	vec2 coord = shadowScreenPos.xy * vec2(shadowMapResolution) + 0.5;
-
-	vec2 i, f = modf(coord, i);
-	f = f * f * f * (f * (f * 6.0 - 15.0) + 10.0);
-	coord = i + f;
-
-	coord = coord * shadowTexelSize - (0.5 * shadowTexelSize);
-
-	float shadow = texture(shadowtex1, vec3(coord, shadowScreenPos.z));
+vec3 textureShadowBilinear(vec3 shadowScreenPos) {
+	float shadow = texture(shadowtex1, shadowScreenPos);
 
 #ifdef SHADOW_COLOR
-	vec3 color = texture(shadowcolor0, coord).rgb;
+	vec3 color = texture(shadowcolor0, shadowScreenPos.xy).rgb;
 	return shadow * color;
 #else
 	return vec3(shadow);
 #endif
 }
 
-vec3 shadowPcf(
+vec3 textureShadowPcf(
 	vec3 shadowScreenPos,
 	vec3 shadowClipPos,
 	float penumbraRadius,
@@ -73,9 +70,7 @@ vec3 shadowPcf(
 
 	float shadowSum = 0.0;
 	vec3 colorSum = vec3(0.0);
-	float colorWeightSum = 0.0;
-
-	bool colorSame = true; // True if all of the first 4 samples have the same color
+	bool colorsMatch = true; // True if all of the first 4 samples have the same color
 	vec3 lastColorSample = vec3(0.0);
 
 	// Perform first 4 iterations
@@ -88,12 +83,10 @@ vec3 shadowPcf(
 		shadowSum += texture(shadowtex1, vec3(coord, shadowScreenPos.z));
 #ifdef SHADOW_COLOR
 		vec3 colorSample = texelFetch(shadowcolor0, ivec2(coord * vec2(shadowMapResolution)), 0).rgb;
-		float colorWeight = float(lengthSquared(colorSample - 1.0) > eps);
-		colorSum += colorSample * colorWeight;
-		colorWeightSum += colorWeight;
+		colorSum += colorSample;
 
 		// Determine whether all of the samples so far have been the same color
-		colorSame = colorSame && all(lessThan(colorSample - lastColorSample, vec3(eps)));
+		colorsMatch = colorsMatch && all(lessThan(colorSample - lastColorSample, vec3(eps)));
 		lastColorSample = colorSample;
 #endif
 	}
@@ -101,8 +94,8 @@ vec3 shadowPcf(
 	// Exit early if outside shadow or inside shadow umbra
 
 #ifdef SHADOW_COLOR
-	if (shadowSum < eps || (shadowSum > 4.0 - eps && colorSame))
-		return 0.25 * shadowSum * (colorWeightSum == 0.0 ? vec3(1.0) : colorSum * rcp(colorWeightSum));
+	if (shadowSum < eps || (shadowSum > 4.0 - eps && colorsMatch))
+		return 0.0625 * shadowSum * colorSum;
 #else
 	if (shadowSum < eps || (shadowSum > 4.0 - eps))
 		return vec3(0.25 * shadowSum);
@@ -117,10 +110,7 @@ vec3 shadowPcf(
 
 		shadowSum += texture(shadowtex1, vec3(coord, shadowScreenPos.z));
 #ifdef SHADOW_COLOR
-		vec3 colorSample = texelFetch(shadowcolor0, ivec2(coord * vec2(shadowMapResolution)), 0).rgb;
-		float colorWeight = float(lengthSquared(colorSample - 1.0) > eps);
-		colorSum += colorSample * colorWeight;
-		colorWeightSum += colorWeight;
+		colorSum += texelFetch(shadowcolor0, ivec2(coord * vec2(shadowMapResolution)), 0).rgb;
 #endif
 	}
 
@@ -131,7 +121,7 @@ vec3 shadowPcf(
 	shadowSum  = linearStep(edge, 1.0 - edge, shadowSum * rcpStepCount);
 
 #ifdef SHADOW_COLOR
-	return shadowSum * (colorWeightSum == 0.0 ? vec3(1.0) : colorSum * rcp(colorWeightSum));
+	return shadowSum * colorSum * rcpStepCount;
 #else
 	return vec3(shadowSum);
 #endif
@@ -175,7 +165,7 @@ float getPenumbraRadiusFromBlockerDepth(float depth, float blockerDepth, float c
 	return (penumbraRadius + 0.125 * (1.0 - cloudShadow)) * shadowProjection[0].x;
 }
 
-vec3 calculateShadows(
+vec3 getShadows(
 	vec3 scenePos,
 	vec3 normal,
 	float NoL,
@@ -197,7 +187,7 @@ vec3 calculateShadows(
 	// Prevents peter panning, but can cause shadows to be shortened or misaligned on edges
 	float biasScale = 1.0 + 2.0 * pow5(max0(dot(normal, lightDir))); // Intended to fix the 'blob' of shadow acne that appears when the sun is near the horizon
 	vec3 shadowNormal = diagonal(shadowProjection).xyz * (mat3(shadowModelView) * normal);
-	vec3 shadowClipPos1 = shadowClipPos + SHADOW_BIAS * biasScale * sqr(distortionFactor) * shadowNormal;
+	vec3 shadowClipPos1 = shadowClipPos + SHADOW_BIAS * biasScale * sqr(distortionFactor) * vec3(0.0, 0.0, -1.0) * 0.005;
 
 	vec3 shadowScreenPos = distortShadowSpace(shadowClipPos1, distortionFactor) * 0.5 + 0.5;
 
@@ -220,7 +210,7 @@ vec3 calculateShadows(
 #endif
 
 #if   SHADOW_QUALITY == SHADOW_QUALITY_FAST
-	return shadowFast(shadowScreenPos) * distantShadow;
+	return textureShadowBilinear(shadowScreenPos) * distantShadow;
 #elif SHADOW_QUALITY == SHADOW_QUALITY_FANCY
 	float dither = interleavedGradientNoise(gl_FragCoord.xy, frameCounter);
 
@@ -235,7 +225,7 @@ vec3 calculateShadows(
 		return vec3(distantShadow);
 	}
 
-	return shadowPcf(
+	return textureShadowPcf(
 		shadowScreenPos,
 		shadowClipPos1,
 		penumbraRadius,

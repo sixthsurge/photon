@@ -17,7 +17,7 @@ in vec2 texCoord;
 
 uniform sampler2D gtexture;
 
-//--// Functions //-----------------------------------------------------------//
+//--// Program //-------------------------------------------------------------//
 
 void main() {
 	fragColor = texture(gtexture, texCoord, log2(renderScale));

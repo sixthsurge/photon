@@ -69,11 +69,10 @@ uniform vec3 moonDir;
 #include "/include/atmospherics/clouds.glsl"
 
 #include "/include/utility/checkerboard.glsl"
-#include "/include/utility/dithering.glsl"
 #include "/include/utility/random.glsl"
 #include "/include/utility/spaceConversion.glsl"
 
-//--// Functions //-----------------------------------------------------------//
+//--// Program //-------------------------------------------------------------//
 
 #if   CLOUDS_UPSCALING_FACTOR == 1
 	const vec2 cloudsRenderScale = vec2(1.0);
@@ -87,6 +86,9 @@ uniform vec3 moonDir;
 #elif CLOUDS_UPSCALING_FACTOR == 8
 	const vec2 cloudsRenderScale = vec2(0.25, 0.5);
 	#define checkerboardOffsets checkerboardOffsets4x2
+#elif CLOUDS_UPSCALING_FACTOR == 9
+	const vec2 cloudsRenderScale = vec2(1.0 / 3.0);
+	#define checkerboardOffsets checkerboardOffsets3x3
 #elif CLOUDS_UPSCALING_FACTOR == 16
 	const vec2 cloudsRenderScale = vec2(0.25);
 	#define checkerboardOffsets checkerboardOffsets4x4
@@ -123,7 +125,7 @@ float depthMax4x4(sampler2D depthSampler) {
 
 void main() {
 	ivec2 texel = ivec2(gl_FragCoord.xy);
-	ivec2 viewTexel = texel * ivec2(rcp(cloudsRenderScale)) + checkerboardOffsets[frameCounter & (CLOUDS_UPSCALING_FACTOR - 1)];
+	ivec2 viewTexel = texel * ivec2(rcp(cloudsRenderScale)) + checkerboardOffsets[frameCounter % CLOUDS_UPSCALING_FACTOR];
 
 	if (clamp(viewTexel, ivec2(0), ivec2(viewSize) + 1) != viewTexel) discard;
 
@@ -134,7 +136,7 @@ void main() {
 	float depth = depthMax2x2(depthtex1);
 #elif CLOUDS_UPSCALING_FACTOR == 8
 	float depth = depthMax4x2(depthtex1);
-#elif CLOUDS_UPSCALING_FACTOR == 16
+#elif CLOUDS_UPSCALING_FACTOR == 9 || CLOUDS_UPSCALING_FACTOR == 16
 	float depth = depthMax4x4(depthtex1);
 #endif
 
@@ -147,7 +149,8 @@ void main() {
 
 	vec3 lightDir = cloudsMoonlit ? moonDir : sunDir;
 
-	float dither = interleavedGradientNoise(vec2(viewTexel), frameCounter / CLOUDS_UPSCALING_FACTOR);
+	float dither = texelFetch(noisetex, ivec2(viewTexel & 511), 0).b;
+	      dither = R1(frameCounter / CLOUDS_UPSCALING_FACTOR, dither);
 
 	cloudData = drawClouds(ray, lightDir, dither, depth < 1.0 ? length(viewPos) : -1.0, false);
 

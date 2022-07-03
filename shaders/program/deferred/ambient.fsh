@@ -79,7 +79,7 @@ uniform bool worldAgeChanged;
 #include "/include/utility/spaceConversion.glsl"
 #include "/include/utility/sphericalHarmonics.glsl"
 
-//--// Functions //-----------------------------------------------------------//
+//--// Program //-------------------------------------------------------------//
 
 /*
  * data packing:

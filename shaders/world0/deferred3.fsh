@@ -75,7 +75,7 @@ uniform vec3 sunDir;
 
 #include "/include/lighting/cloudShadows.glsl"
 
-//--// Functions //-----------------------------------------------------------//
+//--// Program //-------------------------------------------------------------//
 
 void main() {
 #ifndef CLOUD_SHADOWS

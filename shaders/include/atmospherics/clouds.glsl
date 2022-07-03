@@ -106,7 +106,7 @@ float getCumulusCloudsDensity(
 	if (density < eps) return 0.0;
 
 	// Adjust density so that the clouds are wispy at the bottom and hard at the top
-	density  = 1.0 - pow(1.0 - density, 2.0 + 6.0 * altitudeFraction);
+	density  = 1.0 - pow(1.0 - density, 3.0 + 5.0 * altitudeFraction);
 	density *= 0.1 + 0.9 * smoothstep(0.2, 0.6, altitudeFraction);
 
 	return density;
@@ -341,7 +341,7 @@ vec4 drawClouds(Ray ray, vec3 lightDir, float dither, float distanceToTerrain, b
 
 	for (int i = 0; i < CLOUDS_CUMULUS_LAYERS; ++i) {
 		layer.wind = windSpeed * vec2(cos(windAngle), sin(windAngle)) * t;
-		layer.offset = 1e4 * R2(i) + layer.wind + cameraPosition.xz * CLOUDS_SCALE;
+		layer.offset = 1e6 * R2(i) + layer.wind + cameraPosition.xz * CLOUDS_SCALE;
 
 		// Scale primary step count so that fewer steps are taken through thinner layers
 		const float layer0Thickness = CLOUDS_CUMULUS_ALTITUDE * CLOUDS_CUMULUS_THICKNESS;
@@ -421,7 +421,7 @@ float getCloudShadows(Ray ray) {
 
 	for (int i = 0; i < CLOUDS_CUMULUS_LAYERS; ++i) {
 		layer.wind = windSpeed * vec2(cos(windAngle), sin(windAngle)) * t;
-		layer.offset = 1e4 * R2(i) + layer.wind + cameraPosition.xz * CLOUDS_SCALE;
+		layer.offset = 1e6 * R2(i) + layer.wind + cameraPosition.xz * CLOUDS_SCALE;
 
 		vec3 origin = ray.origin + ray.dir * intersectSphere(ray.origin, ray.dir, layer.radius).y;
 		float opticalDepth = getCumulusCloudsOpticalDepth(Ray(origin, ray.dir), layer, 0.5, stepCount);

@@ -42,9 +42,15 @@ uniform float eyeAltitude;
 
 uniform vec3 cameraPosition;
 
+//--// Shadow uniforms
+
+uniform mat3 shadowModelView;
+
 //--// Time uniforms
 
 uniform int frameCounter;
+
+uniform int moonPhase;
 
 uniform float sunAngle;
 
@@ -58,6 +64,7 @@ uniform float worldAge;
 
 uniform float biomeCave;
 
+uniform float timeNoon;
 uniform float moonPhaseBrightness;
 
 uniform vec3 sunDir;
@@ -67,34 +74,17 @@ uniform vec3 moonDir;
 
 #define WORLD_OVERWORLD
 #define PROGRAM_SKY_CAPTURE
-
 #define ATMOSPHERE_SCATTERING_LUT colortex2
+
+#include "/block.properties"
+#include "/entity.properties"
 
 #include "/include/atmospherics/atmosphere.glsl"
 #include "/include/atmospherics/clouds.glsl"
+#include "/include/atmospherics/sky.glsl"
 #include "/include/atmospherics/skyProjection.glsl"
 
-//--// Functions //-----------------------------------------------------------//
-
-vec3 getCloudsAerialPerspective(vec3 cloudsScattering, vec3 cloudData, vec3 rayDir, vec3 clearSky, float apparentDistance) {
-	vec3 rayOrigin = vec3(0.0, planetRadius + CLOUDS_SCALE * (eyeAltitude - SEA_LEVEL), 0.0);
-	vec3 rayEnd    = rayOrigin + apparentDistance * rayDir;
-
-	vec3 transmittance;
-	if (rayOrigin.y < length(rayEnd)) {
-		vec3 trans0 = getAtmosphereTransmittance(rayOrigin, rayDir);
-		vec3 trans1 = getAtmosphereTransmittance(rayEnd,    rayDir);
-
-		transmittance = clamp01(trans0 / trans1);
-	} else {
-		vec3 trans0 = getAtmosphereTransmittance(rayOrigin, -rayDir);
-		vec3 trans1 = getAtmosphereTransmittance(rayEnd,    -rayDir);
-
-		transmittance = clamp01(trans1 / trans0);
-	}
-
-	return mix((1.0 - cloudData.b) * clearSky, cloudsScattering, transmittance);
-}
+//--// Program //-------------------------------------------------------------//
 
 void main() {
 	ivec2 texel = ivec2(gl_FragCoord.xy);
@@ -122,7 +112,7 @@ void main() {
 
 		radiance = vec3(0.0);
 
-		// Atmosphere
+		/* -- atmosphere -- */
 
 		vec3 atmosphereScattering = sunIrradiance * getAtmosphereScattering(rayDir, sunDir)
 		                          + moonIrradiance * getAtmosphereScattering(rayDir, moonDir) * moonPhaseBrightness;
@@ -131,7 +121,7 @@ void main() {
 
 		radiance = radiance * atmosphereTransmittance + atmosphereScattering;
 
-		// Clouds
+		/* -- clouds -- */
 
 		Ray ray;
 		ray.origin = vec3(0.0, CLOUDS_SCALE * (eyeAltitude - SEA_LEVEL) + planetRadius, 0.0) + CLOUDS_SCALE;

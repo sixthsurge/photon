@@ -71,7 +71,7 @@ uniform vec2 taaOffset;
 #define TEMPORAL_REPROJECTION
 #include "/include/utility/spaceConversion.glsl"
 
-//--// Functions //-----------------------------------------------------------//
+//--// Program //-------------------------------------------------------------//
 
 /*
 const bool colortex3MipmapEnabled = true;

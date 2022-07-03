@@ -46,6 +46,7 @@ uniform sampler2DShadow shadowtex1;
 
 uniform int isEyeInWater;
 
+uniform ivec2 eyeBrightness;
 uniform ivec2 eyeBrightnessSmooth;
 
 uniform float eyeAltitude;
@@ -77,11 +78,17 @@ uniform mat4 shadowProjectionInverse;
 
 uniform int frameCounter;
 
+uniform int moonPhase;
+
+uniform float frameTimeCounter;
+
 uniform float sunAngle;
 
 //--// Custom uniforms
 
 uniform float biomeCave;
+
+uniform float timeNoon;
 
 uniform vec2 viewSize;
 uniform vec2 viewTexelSize;
@@ -89,24 +96,31 @@ uniform vec2 viewTexelSize;
 uniform vec2 taaOffset;
 
 uniform vec3 lightDir;
+uniform vec3 sunDir;
+uniform vec3 moonDir;
 
 //--// Includes //------------------------------------------------------------//
 
+#define PROGRAM_COMPOSITE
 #define TEMPORAL_REPROJECTION
 
 #include "/block.properties"
 #include "/entity.properties"
 
 #include "/include/atmospherics/atmosphere.glsl"
+#include "/include/atmospherics/sky.glsl"
 #include "/include/atmospherics/skyProjection.glsl"
 
 #include "/include/fragment/fog.glsl"
 #include "/include/fragment/material.glsl"
 #include "/include/fragment/raytracer.glsl"
 #include "/include/fragment/textureFormat.glsl"
+#include "/include/fragment/waterNormal.glsl"
+#include "/include/fragment/waterVolume.glsl"
 
 #include "/include/lighting/bsdf.glsl"
 #include "/include/lighting/cloudShadows.glsl"
+#include "/include/lighting/lighting.glsl"
 #include "/include/lighting/shadowMapping.glsl"
 
 #include "/include/utility/bicubic.glsl"
@@ -122,121 +136,30 @@ const bool colortex3MipmapEnabled = true;
 const bool colortex8MipmapEnabled = true;
 */
 
-vec3 getCloudsAerialPerspective(vec3 cloudsScattering, vec3 cloudData, vec3 rayDir, vec3 clearSky, float apparentDistance) {
-	vec3 rayOrigin = vec3(0.0, planetRadius + CLOUDS_SCALE * (eyeAltitude - SEA_LEVEL), 0.0);
-	vec3 rayEnd    = rayOrigin + apparentDistance * rayDir;
-
-	vec3 transmittance;
-	if (rayOrigin.y < length(rayEnd)) {
-		vec3 trans0 = getAtmosphereTransmittance(rayOrigin, rayDir);
-		vec3 trans1 = getAtmosphereTransmittance(rayEnd,    rayDir);
-
-		transmittance = clamp01(trans0 / trans1);
-	} else {
-		vec3 trans0 = getAtmosphereTransmittance(rayOrigin, -rayDir);
-		vec3 trans1 = getAtmosphereTransmittance(rayEnd,    -rayDir);
-
-		transmittance = clamp01(trans1 / trans0);
-	}
-
-	return mix((1.0 - cloudData.b) * clearSky, cloudsScattering, transmittance);
-}
-
-float getSkylightFalloff(float skylight) {
-	return pow4(skylight);
-}
-
-vec3 lightTranslucents(
-	Material material,
-	vec3 scenePos,
-	vec3 normal,
-	vec3 flatNormal,
-	vec3 viewerDir,
-	vec2 lmCoord,
-	vec3 ambientIrradiance,
-	vec3 directIrradiance,
-	vec3 skyIrradiance,
-	vec3 clearSky
+vec3 reprojectSpecular(
+	vec3 screenPos,
+	float roughness,
+	float hitDistance
 ) {
-	vec3 radiance = vec3(0.0);
+	if (roughness < 0.33) {
+		vec3 pos = screenToViewSpace(screenPos, false);
+		     pos = pos + normalize(pos) * hitDistance;
+             pos = viewToSceneSpace(pos);
 
-	// Sunlight/moonlight
+		vec3 cameraOffset = linearizeDepth(screenPos.z) < MC_HAND_DEPTH
+			? vec3(0.0)
+			: cameraPosition - previousCameraPosition;
 
-#if defined WORLD_OVERWORLD || defined WORLD_END
-	float NoL = dot(normal, lightDir) * step(0.0, dot(flatNormal, lightDir));
+		vec3 previousPos = transform(gbufferPreviousModelView, pos + cameraOffset);
+		     previousPos = projectAndDivide(gbufferPreviousProjection, previousPos);
 
-#if defined WORLD_OVERWORLD
-	float cloudShadow = getCloudShadows(colortex7, scenePos);
-#else
-	float cloudShadow = 1.0;
-#endif
-
-	float sssDepth;
-	vec3 shadows = calculateShadows(
-		scenePos,
-		flatNormal,
-		NoL,
-		lmCoord.y,
-		cloudShadow,
-		material.sssAmount,
-		0,
-		sssDepth
-	);
-
-	if (maxOf(shadows) > eps|| material.sssAmount > eps) {
-		NoL = clamp01(NoL);
-		float NoV = clamp01(dot(normal, viewerDir));
-		float LoV = dot(lightDir, viewerDir);
-		float halfwayNorm = inversesqrt(2.0 * LoV + 2.0);
-		float NoH = (NoL + NoV) * halfwayNorm;
-		float LoH = LoV * halfwayNorm + halfwayNorm;
-
-		float lightRadius = (sunAngle < 0.5 ? SUN_ANGULAR_RADIUS : MOON_ANGULAR_RADIUS) * (tau / 360.0);
-
-		vec3 visibility = NoL * shadows * cloudShadow;
-
-		vec3 diffuse  = diffuseBrdf(material.albedo, material.f0.x, material.n, material.roughness, NoL, NoV, NoH, LoV);
-		vec3 specular = specularBrdf(material, NoL, NoV, NoH, LoV, LoH, lightRadius);
-
-		radiance += directIrradiance * visibility * (diffuse + specular);
+		return previousPos * 0.5 + 0.5;
+	} else {
+		return reproject(screenPos);
 	}
-#endif
-
-	// Skylight
-	vec3 bsdf = material.albedo * rcpPi;
-
-	radiance += bsdf * skyIrradiance * getSkylightFalloff(lmCoord.y);
-
-	// Blocklight
-	radiance += 4.0 * blackbody(3750.0) * bsdf * pow5(lmCoord.x);
-
-	// Ambient light
-	radiance += bsdf * ambientIrradiance;
-
-	radiance += 256.0 * material.emission;
-
-	// Simple fog
-	radiance = applySimpleFog(radiance, scenePos, clearSky);
-
-	return radiance;
 }
 
-vec3 blendLayers(vec3 background, vec3 foreground, vec3 tint, float alpha) {
-#if   BLENDING_METHOD == BLENDING_METHOD_MIX
-	return mix(background, foreground, alpha);
-#elif BLENDING_METHOD == BLENDING_METHOD_TINTED
-	background *= (1.0 - alpha) + tint * alpha;
-	return mix(background, foreground, alpha);
-#endif
-}
-
-mat3 getTbnMatrix(vec3 normal) {
-	vec3 tangent   = normalize(cross(vec3(0.0, 1.0, 0.0), normal));
-	vec3 bitangent = normalize(cross(tangent, normal));
-	return mat3(tangent, bitangent, normal);
-}
-
-vec3 getRadianceAlongRay(
+vec3 traceSpecularRay(
 	vec3 screenPos,
 	vec3 viewPos,
 	vec3 rayDir,
@@ -261,49 +184,26 @@ vec3 getRadianceAlongRay(
 		hitPos
 	);
 
-	vec3 skyRadiance = textureBicubic(colortex4, projectSky(rayDir)).rgb * skylightFalloff;
+	vec3 skyRadiance = textureBicubic(colortex4, projectSky(rayDir)).rgb * skylightFalloff * float(isEyeInWater == 0);
 
 	if (hit) {
-		vec3 viewHitPos = screenToViewSpace(hitPos, true);
-		hitDistance += distance(viewPos, viewHitPos);
-
 		float borderAttenuation = (hitPos.x * hitPos.y - hitPos.x) * (hitPos.x * hitPos.y - hitPos.y);
-		      borderAttenuation = smoothstep(0.0, 0.025, dampen(borderAttenuation));
+		      borderAttenuation = dampen(linearStep(0.0, 0.005, borderAttenuation));
 
 #ifdef SSR_PREVIOUS_FRAME
 		hitPos = reproject(hitPos);
+		if (clamp01(hitPos) != hitPos) return skyRadiance;
 		vec3 radiance = textureLod(colortex8, hitPos.xy, int(mipLevel)).rgb;
 #else
 		vec3 radiance = textureLod(colortex3, hitPos.xy, int(mipLevel)).rgb;
 #endif
 
+		vec3 viewHitPos = screenToViewSpace(hitPos, true);
+		hitDistance += distance(viewPos, viewHitPos);
+
 		return mix(skyRadiance, radiance, borderAttenuation);
-	} else { // Sky reflection
-		return skyRadiance;
-	}
-}
-
-vec3 reprojectSpecular(
-	vec3 screenPos,
-	float roughness,
-	float hitDistance
-) {
-	// Reprojection method from Samuel
-	if (roughness < 0.33) {
-		vec3 pos = screenToViewSpace(screenPos, false);
-		     pos = pos + normalize(pos) * hitDistance;
-             pos = viewToSceneSpace(pos);
-
-		vec3 cameraOffset = linearizeDepth(screenPos.z) < MC_HAND_DEPTH
-			? vec3(0.0)
-			: cameraPosition - previousCameraPosition;
-
-		vec3 previousPos = transform(gbufferPreviousModelView, pos + cameraOffset);
-		     previousPos = projectAndDivide(gbufferPreviousProjection, previousPos);
-
-		return previousPos * 0.5 + 0.5;
 	} else {
-		return reproject(screenPos);
+		return skyRadiance;
 	}
 }
 
@@ -346,15 +246,15 @@ vec3 getSpecularReflections(
 			vec3 microfacetNormal = tbn * sampleGgxVndf(-tangentDir, vec2(material.roughness), hash);
 			vec3 rayDir = reflect(worldDir, microfacetNormal);
 
-			vec3 radiance = getRadianceAlongRay(screenPos, viewPos, rayDir, dither, mipLevel, skylightFalloff, hitDistance);
+			vec3 radiance = traceSpecularRay(screenPos, viewPos, rayDir, dither, mipLevel, skylightFalloff, hitDistance);
 
 			float MoV = clamp01(dot(microfacetNormal, -worldDir));
 			float NoL = max(1e-2, dot(worldNormal, rayDir));
 			float NoV = max(1e-2, dot(worldNormal, -worldDir));
 
 			vec3 fresnel = material.isMetal ? fresnelSchlick(MoV, material.f0) : vec3(fresnelDielectric(MoV, material.n));
-			float v1 = V1SmithGgx(NoV, alphaSq);
-			float v2 = V2SmithGgx(NoL, NoV, alphaSq);
+			float v1 = v1SmithGgx(NoV, alphaSq);
+			float v2 = v2SmithGgx(NoL, NoV, alphaSq);
 
 			reflection += radiance * fresnel * (2.0 * NoL * v2 / v1);
 
@@ -367,25 +267,25 @@ vec3 getSpecularReflections(
 
 		//--// Temporal accumulation
 
-		float accumulationLimit = 16.0 * dampen(material.roughness); // Maximum accumulated frames
-
 		vec3 previousScreenPos = reprojectSpecular(screenPos, material.roughness, hitDistance);
 
 		reflectionHistory = textureSmooth(colortex9, previousScreenPos.xy);
+
 		float historyDepth = 1.0 - textureSmooth(colortex13, previousScreenPos.xy).x;
 
 		float depthDelta  = abs(linearizeDepth(screenPos.z) - linearizeDepth(historyDepth));
 		float depthWeight = exp(-10.0 * depthDelta) * float(historyDepth < 1.0);
 
-		float pixelAge  = min(reflectionHistory.a, accumulationLimit);
-		      pixelAge *= float(clamp01(previousScreenPos.xy) == previousScreenPos.xy);
-			  pixelAge *= depthWeight;
-			  pixelAge += 1.0;
+		float offscreenWeight = float(clamp01(previousScreenPos.xy) == previousScreenPos.xy);
 
-		float alpha = rcp(pixelAge);
+		if (reflectionHistory != reflectionHistory) reflectionHistory.rgb = reflection;
 
-		reflectionHistory.rgb = mix(reflectionHistory.rgb, reflection, alpha);
-		reflectionHistory.a   = pixelAge;
+		float pixelAge = reflectionHistory.a * depthWeight * offscreenWeight + 1.0;
+
+		reflectionHistory.rgb = mix(reflectionHistory.rgb, reflection, rcp(pixelAge));
+
+		float accumulationLimit = 16.0 * dampen(material.roughness); // Maximum accumulated frames
+		reflectionHistory.a = min(pixelAge, accumulationLimit);
 
 		return reflectionHistory.rgb;
 	}
@@ -397,7 +297,7 @@ vec3 getSpecularReflections(
 
 	vec3 rayDir = reflect(worldDir, worldNormal);
 
-	vec3 radiance = getRadianceAlongRay(screenPos, viewPos, rayDir, dither, 0.0, skylightFalloff, hitDistance);
+	vec3 radiance = traceSpecularRay(screenPos, viewPos, rayDir, dither, 0.0, skylightFalloff, hitDistance);
 
 	float NoV = clamp01(dot(worldNormal, -worldDir));
 
@@ -406,8 +306,19 @@ vec3 getSpecularReflections(
 	return radiance * fresnel;
 }
 
+vec3 blendLayers(vec3 background, vec3 foreground, vec3 tint, float alpha) {
+#if   BLENDING_METHOD == BLENDING_METHOD_MIX
+	return mix(background, foreground, alpha);
+#elif BLENDING_METHOD == BLENDING_METHOD_TINTED
+	background *= (1.0 - alpha) + tint * alpha;
+	return mix(background, foreground, alpha);
+#endif
+}
+
 void main() {
 	ivec2 texel = ivec2(gl_FragCoord.xy);
+
+	/* -- texture fetches -- */
 
 	float depthFront      = texelFetch(depthtex0, texel, 0).x;
 	float depthBack       = texelFetch(depthtex1, texel, 0).x;
@@ -422,25 +333,28 @@ void main() {
 
 	if (depthFront == 1.0) return;
 
-	// Fetch lighting palette
+	/* -- fetch lighting palette -- */
 
 	vec3 ambientIrradiance = texelFetch(colortex4, ivec2(255, 0), 0).rgb;
 	vec3 directIrradiance  = texelFetch(colortex4, ivec2(255, 1), 0).rgb;
 	vec3 skyIrradiance     = texelFetch(colortex4, ivec2(255, 2), 0).rgb;
 
-	// Transformations
+	/* -- transformations -- */
 
-	vec3 screenPosFront = vec3(coord, depthFront);
-	vec3 viewPosFront = screenToViewSpace(screenPosFront, true);
-	vec3 scenePosFront = viewToSceneSpace(viewPosFront);
+	if (linearizeDepth(depthFront) < MC_HAND_DEPTH) depthFront += 0.38; // Hand lighting fix from Capt Tatsu
 
-	float viewerDistance = length(viewPosFront);
+	vec3 screenPos = vec3(coord, depthFront);
+	vec3 viewPos   = screenToViewSpace(screenPos, true);
+	vec3 scenePos  = viewToSceneSpace(viewPos);
+	vec3 worldPos  = scenePos + cameraPosition;
+
+	float viewerDistance = length(viewPos);
 
 	vec3 viewPosBack = screenToViewSpace(vec3(coord, depthBack), true);
 
-	vec3 worldDir = normalize(scenePosFront);
+	vec3 worldDir = normalize(scenePos);
 
-	// Unpack gbuffer data
+	/* -- unpack gbuffer -- */
 
 	mat2x4 data = mat2x4(
 		unpackUnorm4x8(encoded.x),
@@ -449,18 +363,20 @@ void main() {
 
 	vec3 albedo = data[0].xyz;
 	uint blockId = uint(data[0].w * 255.0);
-	vec3 flatNormal = decodeUnitVector(data[1].xy);
+	vec3 geometryNormal = decodeUnitVector(data[1].xy);
 	vec2 lmCoord = data[1].zw;
+
+	bool isWater = blockId == BLOCK_WATER;
+	bool isTranslucent = depthFront != depthBack;
 
 #ifdef MC_NORMAL_MAP
 	vec4 normalData = unpackUnormArb(encoded.z, uvec4(12, 12, 7, 1));
 	vec3 normal = decodeUnitVector(normalData.xy);
 #else
-	#define normal flatNormal
+	#define normal geometryNormal
 #endif
 
-	bool isWater = blockId == BLOCK_WATER;
-	bool isTranslucent = depthFront != depthBack;
+	/* -- get material -- */
 
 	albedo = srgbToLinear(isTranslucent ? translucentColor.rgb : albedo) * r709ToAp1;
 	Material material = getMaterial(albedo, blockId);
@@ -470,23 +386,127 @@ void main() {
 	decodeSpecularTex(specularTex, material);
 #endif
 
-	if (isWater) { // Water
+	if (isWater) {
+		material.f0 = vec3(0.02);
+		material.n = isEyeInWater == 1 ? airN / waterN : waterN / airN;
+		material.roughness = 0.002;
 
-	} else if (isTranslucent) { // Translucents
-	 	vec3 background = radiance;
-		vec3 foreground = lightTranslucents(material, scenePosFront, normal, flatNormal, -worldDir, lmCoord, ambientIrradiance, directIrradiance, skyIrradiance, clearSky);
-		radiance = blendLayers(background, foreground, albedo, translucentColor.a);
-	} else { // Solids
+		// shadows
 
-	}
+#if defined WORLD_OVERWORLD || defined WORLD_END
+		float NoL = dot(geometryNormal, lightDir);
 
-	// SSR
-
-#ifdef SSR
-	radiance += getSpecularReflections(material, screenPosFront, viewPosFront, worldDir, normal, lmCoord.y);
+#if defined WORLD_OVERWORLD
+		float cloudShadow = getCloudShadows(colortex7, scenePos);
+#else
+		float cloudShadow = 1.0;
 #endif
 
-	// Blend with clouds
+		float sssDepth;
+		vec3 shadows = getShadows(
+			scenePos,
+			geometryNormal,
+			NoL,
+			lmCoord.y,
+			cloudShadow,
+			1.0,
+			0,
+			sssDepth
+		);
+#else
+		vec3 shadows = vec3(0.0);
+#endif
+
+		// water normals
+
+		mat3 tbnMatrix = getTbnMatrix(geometryNormal);
+
+#ifdef WATER_PARALLAX
+		worldPos.xz = waterParallax(worldDir * tbnMatrix, worldPos.xz);
+#endif
+
+		vec3 tangentNormal = getWaterNormal(geometryNormal, worldPos);
+		normal = tbnMatrix * tangentNormal;
+
+		// refraction
+
+		vec2 refractedCoord = coord + 0.5 * tangentNormal.xy * inversesqrt(dot(viewPos, viewPos) + eps);
+
+		radiance  = texture(colortex3, refractedCoord).rgb;
+		depthBack = texture(depthtex1, refractedCoord * renderScale).x;
+		vec3 viewPosBack = screenToViewSpace(vec3(refractedCoord, depthBack), true);
+
+		// water volume
+
+		float LoV = dot(worldDir, lightDir);
+
+		float distanceTraveled = (isEyeInWater == 1) ? 0.0 : distance(viewPos, viewPosBack);
+
+		mat2x3 waterVolume = getSimpleWaterVolume(directIrradiance, skyIrradiance, ambientIrradiance, distanceTraveled, LoV, sssDepth, lmCoord.y, cloudShadow);
+
+		radiance = radiance * waterVolume[0] + waterVolume[1];
+
+		// water surface
+
+		NoL = clamp01(dot(normal, lightDir));
+		LoV = clamp01(dot(lightDir, -worldDir));
+		float NoV = clamp01(dot(normal, -worldDir));
+		float halfwayNorm = inversesqrt(2.0 * LoV + 2.0);
+		float NoH = (NoL + NoV) * halfwayNorm;
+		float LoH = LoV * halfwayNorm + halfwayNorm;
+
+		radiance *= 1.0 - fresnelDielectric(NoV, material.n);
+
+		if (maxOf(shadows) > eps) {
+			vec3 brdf = getSpecularHighlight(material, NoL, NoV, NoH, LoV, LoH);
+			radiance += directIrradiance * shadows * cloudShadow * NoL * brdf;
+		}
+	} else if (isTranslucent) {
+	 	vec3 background = radiance;
+		vec3 foreground = getSceneLighting(
+			material,
+			scenePos,
+			normal,
+			geometryNormal,
+			-worldDir,
+			ambientIrradiance,
+			directIrradiance,
+			skyIrradiance,
+			lmCoord,
+			1.0,
+			blockId
+		);
+
+		radiance = blendLayers(background, foreground, albedo, translucentColor.a);
+	}
+
+	/* -- reflections -- */
+
+#ifdef SSR
+	radiance += getSpecularReflections(material, screenPos, viewPos, worldDir, normal, lmCoord.y);
+#endif
+
+	/* -- simple fog -- */
+
+	if (isTranslucent) radiance = applySimpleFog(radiance, scenePos, clearSky);
+
+	// temporary! will add underwater VL later
+	if (isEyeInWater == 1) {
+		mat2x3 waterVolume = getSimpleWaterVolume(
+			directIrradiance,
+			skyIrradiance,
+			ambientIrradiance,
+			length(viewPos),
+			dot(worldDir, lightDir),
+			15.0 - 15.0 * float(eyeBrightnessSmooth.y) * rcp(240.0),
+			float(eyeBrightnessSmooth.y) * rcp(240.0),
+			1.0
+		);
+
+		radiance = radiance * waterVolume[0] + waterVolume[1];
+	}
+
+	/* -- blend with clouds -- */
 
 	if (clouds.w < viewerDistance * CLOUDS_SCALE) {
 		vec3 cloudsScattering = mat2x3(directIrradiance, skyIrradiance) * clouds.xy;

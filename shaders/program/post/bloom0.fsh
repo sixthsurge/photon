@@ -22,7 +22,7 @@ uniform sampler2D colortex8; // Scene history
 
 #include "/include/utility/bicubic.glsl"
 
-//--// Functions //-----------------------------------------------------------//
+//--// Program //-------------------------------------------------------------//
 
 /*
 const bool colortex8MipMapEnabled = true;

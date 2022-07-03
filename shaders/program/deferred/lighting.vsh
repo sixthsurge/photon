@@ -25,7 +25,7 @@ uniform sampler2D colortex4; // Sky capture, lighting color palette, dynamic wea
 #include "/include/utility/sampling.glsl"
 #include "/include/utility/sphericalHarmonics.glsl"
 
-//--// Functions //-----------------------------------------------------------//
+//--// Program //-------------------------------------------------------------//
 
 void main() {
 	coord = gl_MultiTexCoord0.xy;

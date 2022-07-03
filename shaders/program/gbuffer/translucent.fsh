@@ -51,7 +51,7 @@ uniform vec2 viewTexelSize;
 #include "/include/utility/dithering.glsl"
 #include "/include/utility/encoding.glsl"
 
-//--// Functions //-----------------------------------------------------------//
+//--// Program //-------------------------------------------------------------//
 
 const float lodBias = log2(renderScale);
 

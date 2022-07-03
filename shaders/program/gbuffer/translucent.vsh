@@ -29,7 +29,7 @@ uniform vec2 taaOffset;
 
 #include "/block.properties"
 
-//--// Functions //-----------------------------------------------------------//
+//--// Program //-------------------------------------------------------------//
 
 void main() {
 	texCoord = gl_MultiTexCoord0.xy;
