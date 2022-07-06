@@ -12,6 +12,7 @@ in vec3 worldPos;
 flat in uint blockId;
 flat in vec3 normal;
 flat in vec4 tint;
+flat in mat3 tbnMatrix;
 
 //--// Uniforms //------------------------------------------------------------//
 
@@ -54,8 +55,8 @@ uniform vec3 lightDir;
 const float airN   = 1.000293; // for 0°C and 1 atm
 const float waterN = 1.333;    // for 20°C
 
-// using the built-in GLSL refract() seems to cause NaNs on Intel drivers, but this with this
-// function, which does the exact same thing, is fine
+// using the built-in GLSL refract() seems to cause NaNs on Intel drivers, but with this
+// function, which does the exact same thing, it's fine
 vec3 refractSafe(vec3 I, vec3 N, float eta) {
 	float NoI = dot(N, I);
 	float k = 1.0 - eta * eta * (1.0 - NoI * NoI);
@@ -67,11 +68,13 @@ vec3 refractSafe(vec3 I, vec3 N, float eta) {
 }
 
 // https://medium.com/@evanwallace/rendering-realtime-caustics-in-webgl-2a99a29a0b2c
-float getWaterCaustics(vec3 worldPos, vec3 geometryNormal) {
+float getWaterCaustics() {
+#ifndef WATER_CAUSTICS
+	return 1.0;
+#else
 	const float distanceTraveled = 2.0; // distance for which caustics are calculated
 
-	mat3 tbnMatrix = getTbnMatrix(geometryNormal);
-	vec3 normal = tbnMatrix * getWaterNormal(geometryNormal, worldPos);
+	vec3 normal = tbnMatrix * getWaterNormal(normal, worldPos);
 
 	vec3 oldPos = worldPos;
 	vec3 newPos = worldPos + refractSafe(lightDir, normal, airN / waterN) * distanceTraveled;
@@ -82,12 +85,13 @@ float getWaterCaustics(vec3 worldPos, vec3 geometryNormal) {
 	if (oldArea == 0.0 || newArea == 0.0) return 1.0;
 
 	return inversesqrt(oldArea * rcp(newArea));
+#endif
 }
 
 void main() {
 	if (blockId == BLOCK_WATER) { // Water
 		shadowcolor0Out.x = 1.0; // Red value of 1.0 signifies water
-		shadowcolor0Out.y = getWaterCaustics(worldPos, normal);
+		shadowcolor0Out.y = getWaterCaustics();
 	} else {
 		vec4 baseTex = texture(tex, texCoord) * tint;
 		if (baseTex.a < 0.1) discard;

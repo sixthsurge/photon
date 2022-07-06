@@ -10,7 +10,7 @@ float quarticLength(vec2 v) {
 }
 
 float getShadowDistortionFactor(vec2 shadowClipPos) {
-	return quarticLength(shadowClipPos) + (1.0 - SHADOW_DISTORTION);
+	return quarticLength(shadowClipPos) * SHADOW_DISTORTION + (1.0 - SHADOW_DISTORTION);
 }
 
 vec3 distortShadowSpace(vec3 shadowClipPos, float distortionFactor) {

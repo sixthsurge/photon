@@ -19,7 +19,7 @@ void paletteSetup() {
 	const vec3 up = vec3(0.0, 1.0, 0.0);
 	skyIrradiance = sunIrradiance * getAtmosphereScattering(up, sunDir)
 	              + moonIrradiance * getAtmosphereScattering(up, moonDir) * moonPhaseBrightness;
-	skyIrradiance = tau * skyIrradiance;
+	skyIrradiance = tau * mix(skyIrradiance, vec3(skyIrradiance.b) * sqrt(2.0), rcpPi);
 }
 
 #endif // INCLUDE_ATMOSPHERE_PALETTE

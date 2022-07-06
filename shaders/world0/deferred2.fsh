@@ -81,6 +81,7 @@ uniform float biomeCave;
 
 uniform float timeNoon;
 
+uniform float lightningFlash;
 uniform float moonPhaseBrightness;
 
 uniform vec2 viewSize;
@@ -123,8 +124,8 @@ vec4 maxOf(vec4 a, vec4 b, vec4 c, vec4 d, vec4 f) {
 }
 
 vec3 reprojectClouds(vec2 coord, float distanceToCloud) {
-	const float windSpeed = CLOUDS_CUMULUS_WIND_SPEED / CLOUDS_SCALE;
-	const float windAngle = CLOUDS_CUMULUS_WIND_BEARING * tau / 360.0;
+	const float windSpeed = VCLOUD_LAYER0_WIND_SPEED / CLOUDS_SCALE;
+	const float windAngle = VCLOUD_LAYER0_WIND_ANGLE * tau / 360.0;
 
 	vec3 pos = screenToViewSpace(vec3(coord, 1.0), false);
 	     pos = mat3(gbufferModelViewInverse) * pos;
@@ -173,15 +174,15 @@ vec4 upscaleClouds(ivec2 dstTexel, vec3 screenPos) {
 	ivec2 srcTexel = ivec2(dstTexel * cloudsRenderScale);
 
 	// Fetch 3x3 neighborhood
-    vec4 a = texelFetch(colortex5, srcTexel + ivec2(-1, -1), 0);
-    vec4 b = texelFetch(colortex5, srcTexel + ivec2( 0, -1), 0);
-    vec4 c = texelFetch(colortex5, srcTexel + ivec2( 1, -1), 0);
-    vec4 d = texelFetch(colortex5, srcTexel + ivec2(-1,  0), 0);
-    vec4 e = texelFetch(colortex5, srcTexel, 0);
-    vec4 f = texelFetch(colortex5, srcTexel + ivec2( 1,  0), 0);
-    vec4 g = texelFetch(colortex5, srcTexel + ivec2(-1,  1), 0);
-    vec4 h = texelFetch(colortex5, srcTexel + ivec2( 0,  1), 0);
-    vec4 i = texelFetch(colortex5, srcTexel + ivec2( 1,  1), 0);
+	vec4 a = texelFetch(colortex5, srcTexel + ivec2(-1, -1), 0);
+	vec4 b = texelFetch(colortex5, srcTexel + ivec2( 0, -1), 0);
+	vec4 c = texelFetch(colortex5, srcTexel + ivec2( 1, -1), 0);
+	vec4 d = texelFetch(colortex5, srcTexel + ivec2(-1,  0), 0);
+	vec4 e = texelFetch(colortex5, srcTexel, 0);
+	vec4 f = texelFetch(colortex5, srcTexel + ivec2( 1,  0), 0);
+	vec4 g = texelFetch(colortex5, srcTexel + ivec2(-1,  1), 0);
+	vec4 h = texelFetch(colortex5, srcTexel + ivec2( 0,  1), 0);
+	vec4 i = texelFetch(colortex5, srcTexel + ivec2( 1,  1), 0);
 
 	// Soft minimum and maximum ("Hybrid Reconstruction Antialiasing")
 	//        b         a b c
@@ -205,8 +206,8 @@ vec4 upscaleClouds(ivec2 dstTexel, vec3 screenPos) {
 	vec4 historyClamped = clamp(history, aabbMin, aabbMax);
 
 	// Only clamp when moving fast or when close to or above clouds
-	float clampingStrength = smoothstep(0.8 * CLOUDS_CUMULUS_ALTITUDE, CLOUDS_CUMULUS_ALTITUDE, CLOUDS_SCALE * (eyeAltitude - SEA_LEVEL));
-	      clampingStrength = clamp01(clampingStrength + 0.2 * length(velocity));
+	float clampingStrength = smoothstep(0.8 * VCLOUD_LAYER0_ALTITUDE, VCLOUD_LAYER0_ALTITUDE, CLOUDS_SCALE * (eyeAltitude - SEA_LEVEL));
+	      clampingStrength = clamp01(clampingStrength);
 
 	history = mix(history, historyClamped, clampingStrength);
 
@@ -220,18 +221,21 @@ vec4 upscaleClouds(ivec2 dstTexel, vec3 screenPos) {
 	uint pixelAge = texelFetch(colortex12, ivec2(previousCoord * viewSize * cloudsRenderScale), 0).x;
 
 	if (invalidHistory) {
-		history = textureBicubic(colortex5, coord * cloudsRenderScale) * currentScale;
+		current = history = textureBicubic(colortex5, coord * cloudsRenderScale) * currentScale;
 		pixelAge = 0;
 	}
 
-	// Begin accumulating after a full frame is completed
-	float x = max(float(pixelAge) - CLOUDS_UPSCALING_FACTOR, 1.0);
-	float historyWeight = min(x / (x + 1.0), CLOUDS_ACCUMULATION_LIMIT);
+	float historyWeight = min(pixelAge / (pixelAge + 1.0), CLOUDS_ACCUMULATION_LIMIT);
+
+	// Soften history sample for newer pixels
+	vec4 historySmooth = textureBicubic(colortex11, previousCoordClamped);
+	     historySmooth = mix(historySmooth, history, clamp01(historyWeight));
+		 historySmooth = invalidHistory ? history : mix(historySmooth, clamp(historySmooth, aabbMin, aabbMax), clampingStrength);
 
 	// Checkerboard upscaling
 	ivec2 offset0 = dstTexel % ivec2(rcp(cloudsRenderScale));
 	ivec2 offset1 = checkerboardOffsets[frameCounter % CLOUDS_UPSCALING_FACTOR];
-	if (offset0 != offset1) current = history;
+	if (offset0 != offset1) current = historySmooth;
 
 	// Velocity rejection
 	historyWeight *= exp(-length(velocity)) * 0.7 + 0.3;
@@ -304,8 +308,10 @@ void main() {
 
 	/* -- clouds -- */
 
-	vec3 cloudsScattering = mat2x3(directIrradiance, skyIrradiance) * cloudData.xy;
-	     cloudsScattering = getCloudsAerialPerspective(cloudsScattering, cloudData.rgb, rayDir, atmosphereScattering, cloudData.w);
+	const vec3 cloudsLightningFlash = vec3(20.0);
+
+	vec3 cloudsScattering = mat2x3(directIrradiance, skyIrradiance + cloudsLightningFlash * lightningFlash) * cloudData.xy;
+	     cloudsScattering = cloudsAerialPerspective(cloudsScattering, cloudData.rgb, rayDir, atmosphereScattering, cloudData.w);
 
 	#define cloudsTransmittance cloudData.z
 

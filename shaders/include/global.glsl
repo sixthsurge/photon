@@ -16,6 +16,7 @@ const float pi          = acos(-1.0);
 const float tau         = 2.0 * pi;
 const float rcpPi       = 1.0 / pi;
 const float halfPi      = 0.5 * pi;
+const float degree      = tau / 360.0;
 const float goldenRatio = 0.5 + 0.5 * sqrt(5.0);
 const float goldenAngle = tau / goldenRatio / goldenRatio;
 
@@ -41,6 +42,8 @@ float maxOf(vec4 v) { return max(v.x, max(v.y, max(v.z, v.w))); }
 float minOf(vec2 v) { return min(v.x, v.y); }
 float minOf(vec3 v) { return min(v.x, min(v.y, v.z)); }
 float minOf(vec4 v) { return min(v.x, min(v.y, min(v.z, v.w))); }
+
+vec2 polar(float r, float theta) { return r * vec2(cos(theta), sin(theta)); }
 
 float lengthSquared(vec2 v) { return dot(v, v); }
 float lengthSquared(vec3 v) { return dot(v, v); }

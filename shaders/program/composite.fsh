@@ -11,7 +11,6 @@
 layout (location = 0) out vec3 radiance;
 layout (location = 1) out vec4 reflectionHistory;
 
-
 //--// Inputs //--------------------------------------------------------------//
 
 in vec2 coord;
@@ -25,11 +24,11 @@ uniform usampler2D colortex1; // Scene data
 uniform sampler2D colortex3;  // Scene radiance
 uniform sampler2D colortex4;  // Sky capture, lighting color palette
 uniform sampler2D colortex6;  // Clear sky
-uniform sampler2D colortex7;  // Cloud shadows
 uniform sampler2D colortex8;  // Scene history
 uniform sampler2D colortex9;  // SSR history
 uniform sampler2D colortex11; // Clouds
 uniform sampler2D colortex13; // Previous frame depth
+uniform sampler2D colortex15; // Cloud shadows
 
 uniform sampler2D depthtex0;
 uniform sampler2D depthtex1;
@@ -78,7 +77,12 @@ uniform mat4 shadowProjectionInverse;
 
 uniform int frameCounter;
 
+uniform int worldDay;
+uniform int worldTime;
 uniform int moonPhase;
+
+uniform float rainStrength;
+uniform float wetness;
 
 uniform float frameTimeCounter;
 
@@ -87,8 +91,14 @@ uniform float sunAngle;
 //--// Custom uniforms
 
 uniform float biomeCave;
+uniform float biomeTemperature;
+uniform float biomeHumidity;
+uniform float biomeMayRain;
 
+uniform float timeSunset;
 uniform float timeNoon;
+uniform float timeSunrise;
+uniform float timeMidight;
 
 uniform vec2 viewSize;
 uniform vec2 viewTexelSize;
@@ -110,6 +120,7 @@ uniform vec3 moonDir;
 #include "/include/atmospherics/atmosphere.glsl"
 #include "/include/atmospherics/sky.glsl"
 #include "/include/atmospherics/skyProjection.glsl"
+#include "/include/atmospherics/weather.glsl"
 
 #include "/include/fragment/fog.glsl"
 #include "/include/fragment/material.glsl"
@@ -215,7 +226,7 @@ vec3 getSpecularReflections(
 	vec3 worldNormal,
 	float skylight
 ) {
-	bool hasReflections = (material.f0.x - material.f0.x * material.roughness * SSR_ROUGHNESS_THRESHOLD) > 0.015; // based on Kneemund's method
+	bool hasReflections = (material.f0.x - material.f0.x * material.roughness * SSR_ROUGHNESS_THRESHOLD) > 0.01; // based on Kneemund's method
 	if (!hasReflections) return vec3(0.0);
 
 	float alphaSq = sqr(material.roughness);
@@ -331,8 +342,6 @@ void main() {
 	vec4 clouds           = texelFetch(colortex11, texel, 0);
 #endif
 
-	if (depthFront == 1.0) return;
-
 	/* -- fetch lighting palette -- */
 
 	vec3 ambientIrradiance = texelFetch(colortex4, ivec2(255, 0), 0).rgb;
@@ -368,6 +377,10 @@ void main() {
 
 	bool isWater = blockId == BLOCK_WATER;
 	bool isTranslucent = depthFront != depthBack;
+	bool isRainParticle = blockId == 253;
+	bool isSnowParticle = blockId == 254;
+
+	if (depthFront == 1.0 && !isRainParticle && !isSnowParticle) return;
 
 #ifdef MC_NORMAL_MAP
 	vec4 normalData = unpackUnormArb(encoded.z, uvec4(12, 12, 7, 1));
@@ -386,6 +399,21 @@ void main() {
 	decodeSpecularTex(specularTex, material);
 #endif
 
+	/* -- puddles -- */
+
+	getRainPuddles(
+		noisetex,
+		material.porosity,
+		lmCoord * float(!isWater),
+		worldPos,
+		geometryNormal,
+		normal,
+		material.albedo,
+		material.f0,
+		material.roughness
+	);
+	material.n = f0ToIor(material.f0.x);
+
 	if (isWater) {
 		material.f0 = vec3(0.02);
 		material.n = isEyeInWater == 1 ? airN / waterN : waterN / airN;
@@ -397,7 +425,7 @@ void main() {
 		float NoL = dot(geometryNormal, lightDir);
 
 #if defined WORLD_OVERWORLD
-		float cloudShadow = getCloudShadows(colortex7, scenePos);
+		float cloudShadow = getCloudShadows(colortex15, scenePos);
 #else
 		float cloudShadow = 1.0;
 #endif
@@ -461,6 +489,17 @@ void main() {
 			vec3 brdf = getSpecularHighlight(material, NoL, NoV, NoH, LoV, LoH);
 			radiance += directIrradiance * shadows * cloudShadow * NoL * brdf;
 		}
+	} else if (isRainParticle) {
+		const float particleThickness = 0.2;
+
+		vec3 transmittance = exp(-waterExtinctionCoeff * particleThickness);
+		vec3 scattering    = (directIrradiance + skyIrradiance) * isotropicPhase * (1.0 - transmittance) * rcp(waterExtinctionCoeff);
+
+		radiance = radiance * transmittance + scattering;
+		return;
+	} else if (isSnowParticle) {
+		radiance = mix(radiance, (directIrradiance + skyIrradiance) * rcpPi, 0.75);
+		return;
 	} else if (isTranslucent) {
 	 	vec3 background = radiance;
 		vec3 foreground = getSceneLighting(
@@ -468,6 +507,7 @@ void main() {
 			scenePos,
 			normal,
 			geometryNormal,
+			normal,
 			-worldDir,
 			ambientIrradiance,
 			directIrradiance,

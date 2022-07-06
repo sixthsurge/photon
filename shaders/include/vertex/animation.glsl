@@ -2,7 +2,7 @@
 #define INCLUDE_VERTEX_ANIMATION
 
 vec3 getWindDisplacement(vec3 worldPos, float windSpeed, float windStrength, bool isTallPlantTopVertex) {
-	const float windAngle = 30.0 * (tau / 360.0);
+	const float windAngle = 30.0 * degree;
 	const vec2 windDir = vec2(cos(windAngle), sin(windAngle));
 
 	float t = windSpeed * frameTimeCounter;

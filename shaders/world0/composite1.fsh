@@ -24,7 +24,7 @@ flat in vec3 skyIrradiance;
 
 uniform sampler2D noisetex;
 
-uniform sampler2D colortex7; // Cloud shadow map
+uniform sampler2D colortex15; // Cloud shadow map
 
 uniform sampler2D depthtex0;
 
@@ -65,14 +65,20 @@ uniform mat4 shadowProjectionInverse;
 
 uniform int frameCounter;
 
+uniform float rainStrength;
+
 //--// Custom uniforms
 
 uniform float biomeCave;
+uniform float biomeMayRain;
 
 uniform float timeSunrise;
 uniform float timeNoon;
 uniform float timeSunset;
 uniform float timeMidnight;
+
+uniform float desertSandstorm;
+uniform float lightningFlash;
 
 uniform vec2 viewSize;
 uniform vec2 viewTexelSize;
@@ -101,6 +107,12 @@ const float fogStepCountGrowth = 0.1;
 const float fogScale           = 100.0 * AIR_FOG_DENSITY;
 const vec2 fogFalloffStart     = vec2(30.0, 5.0);
 const vec2 fogFalloffHalfLife  = vec2(15.0, 8.0); // How many meters it takes for the fog density to halve (rayleigh, mie)
+const float fogLightningFlash  = 5.0;
+
+// desert sandstorm
+const float desertSandstormDensity = 0.15;
+const vec2 desertSandstormScatter  = desertSandstormDensity * vec2(0.2, 0.4); // rayleigh, mie
+const vec3 desertSandstormExtinct  = desertSandstormDensity * vec3(0.2, 0.3, 0.8);
 
 //--// Program //-------------------------------------------------------------//
 
@@ -180,6 +192,13 @@ mat2x3 raymarchFog(vec3 worldStartPos, vec3 worldEndPos, bool isSky, float dithe
 		(airExtinctionCoefficients[1] * fogScale) * densityAtSeaLevel.y
 	);
 
+#ifdef DESERT_SANDSTORM
+	scatteringCoeff[0] += desertSandstorm * desertSandstormScatter.x;
+	scatteringCoeff[1] += desertSandstorm * desertSandstormScatter.y;
+	extinctionCoeff[0] += desertSandstorm * desertSandstormExtinct;
+	extinctionCoeff[1] += desertSandstorm * desertSandstormExtinct;
+#endif
+
 	//--// Raymarching loop
 
 	vec3 transmittance = vec3(1.0);
@@ -198,7 +217,7 @@ mat2x3 raymarchFog(vec3 worldStartPos, vec3 worldEndPos, bool isSky, float dithe
 #endif
 
 #ifdef CLOUD_SHADOWS
-		shadow *= getCloudShadows(colortex7, worldPos - cameraPosition);
+		shadow *= getCloudShadows(colortex15, worldPos - cameraPosition);
 #endif
 
 		vec2 density = getFogDensity(worldPos) * stepLength;
@@ -230,6 +249,8 @@ mat2x3 raymarchFog(vec3 worldStartPos, vec3 worldEndPos, bool isSky, float dithe
 	phase.x = rayleighPhase(LoV).x;
 	phase.y = 0.7 * henyeyGreensteinPhase(LoV, 0.4) + 0.3 * henyeyGreensteinPhase(LoV, -0.2);
 
+	vec3 ambientIrradiance = skyIrradiance + fogLightningFlash * lightningFlash;
+
 	/*
 	// Single scattering
 	vec3 scattering  = directIrradiance * (directScattering * phase);
@@ -241,7 +262,7 @@ mat2x3 raymarchFog(vec3 worldStartPos, vec3 worldEndPos, bool isSky, float dithe
 
 	for (int i = 0; i < 4; ++i) {
 		scattering += scatteringStrength * directIrradiance * (directScattering * phase);
-		scattering += scatteringStrength * skyIrradiance * (ambientScattering * vec2(isotropicPhase));
+		scattering += scatteringStrength * ambientIrradiance * (ambientScattering * vec2(isotropicPhase));
 
 		scatteringStrength *= 0.5;
 		phase = mix(phase, vec2(isotropicPhase), 0.3);
@@ -250,8 +271,6 @@ mat2x3 raymarchFog(vec3 worldStartPos, vec3 worldEndPos, bool isSky, float dithe
 
 	return mat2x3(scattering, transmittance);
 }
-
-uniform sampler2D colortex3;
 
 void main() {
 	ivec2 fogTexel = ivec2(gl_FragCoord.xy);

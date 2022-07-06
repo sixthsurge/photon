@@ -8,9 +8,11 @@ out vec3 worldPos;
 flat out uint blockId;
 flat out vec3 normal;
 flat out vec4 tint;
+flat out mat3 tbnMatrix;
 
 //--// Inputs //--------------------------------------------------------------//
 
+attribute vec4 at_tangent;
 attribute vec3 mc_Entity;
 attribute vec2 mc_midTexCoord;
 
@@ -48,6 +50,12 @@ void main() {
 	blockId  = uint(mc_Entity.x - 10000.0);
 	normal   = mat3(shadowModelViewInverse) * normalize(gl_NormalMatrix * gl_Normal);
 	tint     = gl_Color;
+
+#ifdef WATER_CAUSTICS
+	tbnMatrix[0] = mat3(shadowModelViewInverse) * normalize(gl_NormalMatrix * at_tangent.xyz);
+	tbnMatrix[1] = cross(tbnMatrix[0], normal) * sign(at_tangent.w);
+	tbnMatrix[2] = normal;
+#endif
 
 	vec3 shadowViewPos = transform(gl_ModelViewMatrix, gl_Vertex.xyz), shadowClipPos;
 

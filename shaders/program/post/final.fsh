@@ -17,14 +17,38 @@ uniform sampler2D noisetex;
 
 #if DEBUG_VIEW == DEBUG_VIEW_SAMPLER
 uniform sampler2D DEBUG_SAMPLER;
-#else
-uniform sampler2D colortex2; // Post-processing color
 #endif
 
+uniform sampler2D colortex2; // Post-processing color
+
+//--// Camera uniforms
+
 uniform float blindness;
+
+uniform vec3 cameraPosition;
+
+//--// Time uniforms
+
+uniform int worldDay;
+uniform int worldTime;
+
+uniform float frameTimeCounter;
+
+uniform float rainStrength;
+uniform float wetness;
+
+//--// Custom uniforms
+
 uniform float biomeCave;
+uniform float biomeTemperature;
+uniform float biomeHumidity;
+uniform float biomeMayRain;
+
+uniform vec3 lightDir;
 
 //--// Includes //------------------------------------------------------------//
+
+#include "/include/atmospherics/weather.glsl"
 
 #include "/include/utility/bicubic.glsl"
 #include "/include/utility/color.glsl"
@@ -87,10 +111,6 @@ float vignette(vec2 coord) {
     return vignette;
 }
 
-uniform float eyeAltitude;
-uniform vec3 cameraPosition;
-
-#if DEBUG_VIEW == DEBUG_VIEW_NONE
 void main() {
     ivec2 texel = ivec2(gl_FragCoord.xy);
 
@@ -112,11 +132,8 @@ void main() {
 
     float dither = texelFetch(noisetex, texel & 511, 0).b;
 	fragColor = dither8Bit(fragColor, dither);
-}
-#elif DEBUG_VIEW == DEBUG_VIEW_SAMPLER
-void main() {
-	ivec2 texel = ivec2(gl_FragCoord.xy);
 
+#if   DEBUG_VIEW == DEBUG_VIEW_SAMPLER
 	if (clamp(texel, ivec2(0), ivec2(textureSize(DEBUG_SAMPLER, 0))) == texel) {
 		fragColor  = texelFetch(DEBUG_SAMPLER, texel, 0).rgb;
 		fragColor *= DEBUG_SAMPLER_EXPOSURE;
@@ -124,5 +141,53 @@ void main() {
 	} else {
 		fragColor = vec3(0.0);
 	}
-}
+#elif DEBUG_VIEW == DEBUG_VIEW_WEATHER // aesthetic progess bars
+    const int  barWidth           = 50;
+    const vec3 temperatureColor0  = vec3(0.20, 0.73, 1.00);
+    const vec3 temperatureColor1  = vec3(1.00, 0.67, 0.00);
+    const vec3 humidityColor0     = vec3(1.00, 0.85, 0.70);
+    const vec3 humidityColor1     = vec3(0.00, 0.60, 0.00);
+    const vec3 windStrengthColor0 = vec3(0.00, 0.80, 0.80);
+    const vec3 windStrengthColor1 = vec3(0.65, 0.20, 1.00);
+
+    vec3 weather = getWeather();
+    float displayVariable0, displayVariable1;
+
+    if (texel.x < barWidth) {
+        // Temperature bar
+        displayVariable0 = weather.x;
+        displayVariable1 = biomeTemperature * 0.5 + 0.5;
+
+        fragColor = linearToSrgb(mix(
+            srgbToLinear(temperatureColor0),
+            srgbToLinear(temperatureColor1),
+            cubicSmooth(coord.y)
+        ));
+    } else if (texel.x < 2 * barWidth) {
+        // Humidity bar
+        displayVariable0 = weather.y;
+        displayVariable1 = biomeHumidity * 0.5 + 0.5;
+
+        fragColor = linearToSrgb(mix(
+            srgbToLinear(humidityColor0),
+            srgbToLinear(humidityColor1),
+            cubicSmooth(coord.y)
+        ));
+    } else if (texel.x < 3 * barWidth) {
+        // Wind strength bar
+        displayVariable0 = weather.z;
+        displayVariable1 = wetness;
+
+        fragColor = linearToSrgb(mix(
+            srgbToLinear(windStrengthColor0),
+            srgbToLinear(windStrengthColor1),
+            cubicSmooth(coord.y)
+        ));
+    } else {
+        return;
+    }
+
+    if (abs(coord.y - displayVariable0) < 0.005) fragColor = vec3(1.0);
+    if (abs(coord.y - displayVariable1) < 0.005) fragColor = vec3(0.0);
 #endif
+}

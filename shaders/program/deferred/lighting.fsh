@@ -31,7 +31,7 @@ uniform sampler2D colortex0;  // Translucent overlays
 uniform usampler2D colortex1; // Scene data
 uniform sampler2D colortex3;  // Scene radiance
 uniform sampler2D colortex6;  // Clear sky
-uniform sampler2D colortex7;  // Cloud shadow map
+uniform sampler2D colortex15; // Cloud shadow map
 
 #ifdef SSPT
 uniform sampler2D colortex5;  // SSPT
@@ -82,11 +82,27 @@ uniform mat4 shadowProjectionInverse;
 
 uniform int frameCounter;
 
+uniform int worldDay;
+uniform int worldTime;
+
+uniform float frameTimeCounter;
+
 uniform float sunAngle;
+
+uniform float rainStrength;
+uniform float wetness;
 
 //--// Custom uniforms
 
 uniform float biomeCave;
+uniform float biomeTemperature;
+uniform float biomeHumidity;
+uniform float biomeMayRain;
+
+uniform float timeSunset;
+uniform float timeNoon;
+uniform float timeSunrise;
+uniform float timeMidight;
 
 uniform vec2 viewSize;
 uniform vec2 viewTexelSize;
@@ -101,6 +117,8 @@ uniform vec3 lightDir;
 
 #include "/block.properties"
 #include "/entity.properties"
+
+#include "/include/atmospherics/weather.glsl"
 
 #include "/include/fragment/aces/matrices.glsl"
 #include "/include/fragment/fog.glsl"
@@ -139,8 +157,9 @@ void main() {
 
 	if (linearizeDepth(depth) < MC_HAND_DEPTH) depth += 0.38; // Hand lighting fix from Capt Tatsu
 
-	vec3 viewPos = screenToViewSpace(vec3(coord, depth), true);
+	vec3 viewPos  = screenToViewSpace(vec3(coord, depth), true);
 	vec3 scenePos = viewToSceneSpace(viewPos);
+	vec3 worldPos = scenePos + cameraPosition;
 	vec3 worldDir = normalize(scenePos - gbufferModelViewInverse[3].xyz);
 
 	/* -- unpack gbuffer -- */
@@ -197,6 +216,21 @@ void main() {
 	decodeSpecularTex(specularTex, material);
 #endif
 
+	/* -- puddles -- */
+
+	getRainPuddles(
+		noisetex,
+		material.porosity,
+		lmCoord,
+		worldPos,
+		geometryNormal,
+		normal,
+		material.albedo,
+		material.f0,
+		material.roughness
+	);
+	material.n = f0ToIor(material.f0.x);
+
 	/* -- lighting -- */
 
 	radiance = getSceneLighting(
@@ -204,6 +238,7 @@ void main() {
 		scenePos,
 		normal,
 		geometryNormal,
+		bentNormal,
 		-worldDir,
 		ambientIrradiance,
 		directIrradiance,

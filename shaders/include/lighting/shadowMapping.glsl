@@ -175,7 +175,11 @@ vec3 getShadows(
 	uint blockId,
 	out float sssDepth
 ) {
+#if   SHADOW_QUALITY == SHADOW_QUALITY_FANCY && !defined FAKE_BOUNCED_SUNLIGHT
 	if (NoL < eps && sssAmount < eps) return vec3(0.0);
+#elif SHADOW_QUALITY == SHADOW_QUALITY_FAST
+	if (NoL < eps) return vec3(0.0);
+#endif
 
 	vec3 shadowViewPos = transform(shadowModelView, scenePos);
 	vec3 shadowClipPos = projectOrtho(shadowProjection, shadowViewPos);

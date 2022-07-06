@@ -16,8 +16,7 @@ layout (location = 0) out vec4 cloudData;
 
 in vec2 coord;
 
-flat in float cloudsCirrusCoverage;
-flat in float cloudsCumulusCoverage;
+flat in vec3 weather;
 
 //--// Uniforms //------------------------------------------------------------//
 
@@ -44,11 +43,15 @@ uniform mat4 gbufferProjectionInverse;
 
 //--// Time uniforms
 
+uniform int worldDay;
+uniform int worldTime;
+
 uniform int frameCounter;
 
 uniform float frameTimeCounter;
 
 uniform float rainStrength;
+uniform float wetness;
 
 //--// Custom uniforms
 
@@ -56,11 +59,21 @@ uniform bool cloudsMoonlit;
 
 uniform float worldAge;
 
+uniform float biomeTemperature;
+uniform float biomeHumidity;
+uniform float biomeMayRain;
+
+uniform float timeSunset;
+uniform float timeNoon;
+uniform float timeSunrise;
+uniform float timeMidight;
+
 uniform vec2 viewSize;
 uniform vec2 viewTexelSize;
 
 uniform vec2 taaOffset;
 
+uniform vec3 lightDir;
 uniform vec3 sunDir;
 uniform vec3 moonDir;
 
@@ -143,18 +156,26 @@ void main() {
 	vec3 screenPos = vec3(viewTexel * viewTexelSize, depth);
 	vec3 viewPos = screenToViewSpace(screenPos, false);
 
-	Ray ray;
-	ray.origin = vec3(0.0, CLOUDS_SCALE * (eyeAltitude - SEA_LEVEL) + planetRadius, 0.0) + CLOUDS_SCALE * gbufferModelViewInverse[3].xyz;
-	ray.dir    = mat3(gbufferModelViewInverse) * normalize(viewPos);
+	vec3 rayOrigin = vec3(0.0, CLOUDS_SCALE * (eyeAltitude - SEA_LEVEL) + planetRadius, 0.0) + CLOUDS_SCALE * gbufferModelViewInverse[3].xyz;
+	vec3 rayDir    = mat3(gbufferModelViewInverse) * normalize(viewPos);
 
-	vec3 lightDir = cloudsMoonlit ? moonDir : sunDir;
+	vec3 cloudsLightDir = cloudsMoonlit ? moonDir : sunDir;
 
 	float dither = texelFetch(noisetex, ivec2(viewTexel & 511), 0).b;
 	      dither = R1(frameCounter / CLOUDS_UPSCALING_FACTOR, dither);
 
-	cloudData = drawClouds(ray, lightDir, dither, depth < 1.0 ? length(viewPos) : -1.0, false);
+	cloudData = renderClouds(
+		rayOrigin,
+		rayDir,
+		cloudsLightDir,
+		dither,
+		(depth < 1.0)
+			? length(viewPos) * CLOUDS_SCALE
+			: -1.0,
+		false
+	);
 
-	// Scale scattering and apparent distance to fit in a normalized integer format
+	// Scale scattering and apparent distance to fit into a normalized integer format
 	cloudData.xy *= 1e-2;
 	cloudData.w  *= 1e-6;
 }

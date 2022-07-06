@@ -32,7 +32,7 @@ float getCloudShadows(sampler2D cloudShadowmap, vec3 scenePos) {
 	// fade out cloud shadows when:
 	// - the fragment is above the cloud layer
 	// - the sun is near the horizon
-	float altitudeFraction = (scenePos.y + eyeAltitude - SEA_LEVEL) * (CLOUDS_SCALE / CLOUDS_CUMULUS_THICKNESS) - CLOUDS_CUMULUS_ALTITUDE;
+	float altitudeFraction = (scenePos.y + eyeAltitude - SEA_LEVEL) * (CLOUDS_SCALE / VCLOUD_LAYER0_THICKNESS) - VCLOUD_LAYER0_ALTITUDE;
 	float cloudShadowFade  = smoothstep(0.0, 0.7, 1.0 - altitudeFraction);
 	      cloudShadowFade *= clamp01(30.0 * lightDir.y);
 

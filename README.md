@@ -18,7 +18,7 @@ Sadly, the developer of OptiFine no longer backports newer features to older Min
 
 ### Minecraft mods
 
-Photon does not explicitly aim for compatibility with modded Minecraft. Notably, the shaders are disabled in all modded dimensions, and shader effects like waving foliage will not be applied to modded blocks. That said, there is no reason why the shaders shouldn't be generally compatible with most smaller modpacks. If you do experience an issue, you may find a solution in the "list of common mod problems and fixes" in the \#troubleshooting channel of the [shaderLABS discord server](https://discord.gg/RpzWN9S).
+Photon does not explicitly aim for compatibility with modded Minecraft. Notably, the shaders are disabled in all modded dimensions, and shader effects like waving foliage will not be applied to modded blocks. That said, there is no reason why the shaders shouldn't be generally compatible with most smaller modpacks.
 
 ### Iris
 

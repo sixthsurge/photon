@@ -2,75 +2,69 @@
 #define INCLUDE_ATMOSPHERE_CLOUDS
 
 #include "/include/atmospherics/atmosphere.glsl"
+#include "/include/atmospherics/phaseFunctions.glsl"
+#include "/include/atmospherics/weather.glsl"
 
+#include "/include/utility/fastMath.glsl"
 #include "/include/utility/random.glsl"
 #include "/include/utility/sampling.glsl"
 
-struct Ray {
-	vec3 origin;
-	vec3 dir;
-};
+const float groundAlbedo = 0.4;
 
-struct CloudLayer {
-	vec2 offset;
-	vec2 wind;
+float cloudsPhaseSingle(float cosTheta) { // single scattering phase function
+	return 0.7 * kleinNishinaPhase(cosTheta, 2600.0)    // forwards lobe
+	     + 0.3 * henyeyGreensteinPhase(cosTheta, -0.2); // backwards lobe
+}
+
+float cloudsPhaseMulti(float cosTheta, vec3 g) { // multiple scattering phase function
+	return 0.65 * henyeyGreensteinPhase(cosTheta,  g.x)  // forwards lobe
+	     + 0.10 * henyeyGreensteinPhase(cosTheta,  g.y)  // forwards peak
+	     + 0.25 * henyeyGreensteinPhase(cosTheta, -g.z); // backwards lobe
+}
+
+/* -- volumetric clouds -- */
+
+struct CloudVolume {
 	float radius;
 	float thickness;
 	float frequency;
-	float minCoverage;
-	float maxCoverage;
-};
-
-struct CloudLightingInfo {
-	vec3 lightDir;
-	float albedo;
+	float coverage;
 	float density;
-	float cosTheta;
-	float phaseSun; // Single scattering phase function
-	float bouncedLight;
+	float cloudType; // blend between cumulus clouds (0.0) and stratus clouds (1.0)
+	float detailMul;
+	float curlMul;
+	vec2 randomOffset;
+	vec2 wind;
 };
 
-//--// volumetric cumulus-style clouds
-
-// Single scattering phase function
-float getCloudsPhaseSingle(float cosTheta) {
-	return 0.8 * kleinNishinaPhase(cosTheta, 2600.0)
-	     + 0.2 * henyeyGreensteinPhase(cosTheta, -0.2);
-}
-
-// Multiple scattering phase function
-float getCloudsPhaseMulti(float cosTheta, vec3 anisotropy) {
-	return 0.7 * henyeyGreensteinPhase(cosTheta,  anisotropy.x)
-	     + 0.1 * henyeyGreensteinPhase(cosTheta,  anisotropy.y)
-	     + 0.2 * henyeyGreensteinPhase(cosTheta, -anisotropy.z);
-}
-
-float getCloudsPowderRatio(float density, float cosTheta) {
+float cloudsPowderEffect(float density, float cosTheta) {
 	float powder = pi * density / (density + 0.15);
-	      powder = mix(powder, 1.0, sqr(clamp01(cosTheta)));
+	      powder = mix(powder, 1.0, 0.75 * sqr(cosTheta * 0.5 + 0.5));
 
 	return powder;
 }
 
-float getCumulusCloudsDensity(
-	CloudLayer layer,
-	vec3 pos,
-	float altitudeFraction,
-	int detailIterations
-) {
-	altitudeFraction *= 0.75;
-	pos.xz = pos.xz * layer.frequency + layer.offset;
+float volumetricCloudsDensity(CloudVolume volume, vec3 pos, float altitudeFraction, uint lod) {
+	const float localCoverageVariation = 0.3;
+	const float localTypeVariation     = 0.5;
+	const uint detailIterations        = 2;
+
+	pos.xz += cameraPosition.xz * CLOUDS_SCALE;
+
+	vec2 pos2D = pos.xz * volume.frequency + volume.randomOffset + volume.wind;
 
 	// 2D noise to determine where to place clouds
-	vec2 noise2D;
-	noise2D.x = texture(noisetex, 0.000002 * pos.xz).x; // perlin noise for local coverage
-	noise2D.y = texture(noisetex, 0.00002 * pos.xz * rcp(CLOUDS_CUMULUS_SIZE)).w; // perlin-worley-ish noise for shape
+	vec4 noise2D;
+	noise2D.xy = texture(noisetex, 0.000002 * pos2D).xw; // cloud type, cloud coverage
+	noise2D.zw = texture(noisetex, 0.00002 * pos2D).wx;  // base shape
 
-	float density;
-	density = clamp01(mix(layer.minCoverage, layer.maxCoverage, noise2D.x));
-	density = linearStep(1.0 - density, 1.0, noise2D.y);
+	float cloudType = clamp01(mix(volume.cloudType - localTypeVariation, volume.cloudType + localTypeVariation, noise2D.x));
+	float coverage  = clamp01(mix(volume.coverage - localCoverageVariation, volume.coverage + localCoverageVariation, noise2D.y));
+
+	float density = linearStep(1.0 - coverage, 1.0, mix(noise2D.z, noise2D.w * 0.5 + 0.4, 0.8 * cloudType));
 
 	// Attenuate and erode density over altitude
+	altitudeFraction *= mix(0.75, 1.25, sqr(cloudType));
 	const vec4 cloudGradient = vec4(0.2, 0.2, 0.85, 0.2);
 	density *= smoothstep(0.0, cloudGradient.x, altitudeFraction);
 	density *= smoothstep(0.0, cloudGradient.y, 1.0 - altitudeFraction);
@@ -80,367 +74,472 @@ float getCumulusCloudsDensity(
 	if (density < eps) return 0.0;
 
 	// Curl noise used to warp the 3D noise into swirling shapes
-	vec3 curl = 0.1 * texture(depthtex2, 0.002 * pos).xyz * smoothstep(0.4, 1.0, 1.0 - altitudeFraction) * CLOUDS_CUMULUS_SWIRLINESS;
+	vec3 curl = 0.1 * volume.curlMul * texture(depthtex2, 0.002 * pos).xyz * smoothstep(0.4, 1.0, 1.0 - altitudeFraction);
 
 	// 3D worley noise for detail
-	float detailAmplitude = 0.5 * CLOUDS_CUMULUS_WISPINESS;
-	float detailFrequency = 0.0008;
-	float detailFade = 0.6 - 0.35 * smoothstep(0.05, 0.3, altitudeFraction);
+	float detailAmplitude = mix(0.45, 0.35, cloudType) * volume.detailMul;
+	float detailFrequency = 0.0008 * volume.frequency;
+	float detailFade = 0.5 - 0.35 * smoothstep(0.05, 0.5, altitudeFraction);
 
-	for (int i = 0; i < detailIterations; ++i) {
-		pos.xz += 0.5 * layer.wind;
+	for (uint i = lod; i < detailIterations; ++i) {
+		pos.xz += 0.5 * volume.wind;
 
-		density -= sqr(texture(depthtex0, pos * detailFrequency + curl).x) * detailAmplitude * dampen(1.0 - density);
+		density -= sqr(texture(depthtex0, pos * detailFrequency + curl).x) * detailAmplitude * dampen(clamp01(1.0 - density));
 
 		detailAmplitude *= detailFade;
-		detailFrequency *= 8.0;
+		detailFrequency *= 4.0;
 		curl *= 3.0;
 	}
 
 	// Account for remaining detail iterations
-	for (int i = detailIterations; i < CLOUDS_CUMULUS_DETAIL_ITERATIONS; ++i) {
-		density -= detailAmplitude * 0.25 * dampen(1.0 - density);
+	for (uint i = 0u; i < min(lod, detailIterations); ++i) {
+		density -= detailAmplitude * 0.25 * dampen(clamp01(1.0 - density));
 		detailAmplitude *= detailFade;
 	}
 
 	if (density < eps) return 0.0;
 
 	// Adjust density so that the clouds are wispy at the bottom and hard at the top
-	density  = 1.0 - pow(1.0 - density, 3.0 + 5.0 * altitudeFraction);
-	density *= 0.1 + 0.9 * smoothstep(0.2, 0.6, altitudeFraction);
+	density  = 1.0 - pow(1.0 - density, 3.0 + 5.0 * altitudeFraction - 2.0 * cloudType);
+	density *= 0.1 + 0.9 * smoothstep(0.2, 0.7, altitudeFraction) * mix(1.0, 0.8, cloudType);
+
 
 	return density;
 }
 
-float getCumulusCloudsOpticalDepth(Ray ray, CloudLayer layer, float dither, uint stepCount) {
+float volumetricCloudsOpticalDepth(
+	CloudVolume volume,
+	vec3 rayOrigin,
+	vec3 rayDir,
+	float dither,
+	const uint stepCount
+) {
 	const float stepGrowth = 2.0;
 
-	vec3 rayPos = ray.origin;
-	float stepLength = 0.04 * layer.thickness * (6.0 / float(stepCount));
+	float stepLength = 0.04 * volume.thickness * (6.0 / float(stepCount));
+
+	vec3 rayPos = rayOrigin;
+	vec4 rayStep = vec4(rayDir, 1.0) * stepLength;
+	uint lod = 0;
+
 	float opticalDepth = 0.0;
-	int detailIterations = CLOUDS_CUMULUS_DETAIL_ITERATIONS;
 
-	for (uint i = 0; i < stepCount; ++i, rayPos += ray.dir * stepLength) {
-		vec3 ditheredPos = rayPos + ray.dir * stepLength * stepGrowth * dither;
+	for (uint i = 0u; i < stepCount; ++i, rayPos += rayStep.xyz) {
+		rayStep *= stepGrowth;
 
-		float altitudeFraction = (length(ditheredPos) - layer.radius) * rcp(layer.thickness);
+		vec3 ditheredPos = rayPos + rayStep.xyz * dither;
+
+		float altitudeFraction = (length(ditheredPos) - volume.radius) * rcp(volume.thickness);
 		if (clamp01(altitudeFraction) != altitudeFraction) break;
 
-		opticalDepth += getCumulusCloudsDensity(
-			layer,
-			ditheredPos,
-			altitudeFraction,
-			max(detailIterations--, 0)
-		) * stepLength;
-
-		stepLength *= stepGrowth;
+		opticalDepth += volumetricCloudsDensity(volume, ditheredPos, altitudeFraction, lod++) * rayStep.w;
 	}
 
 	return opticalDepth;
 }
 
-vec2 getCumulusCloudsScattering(
-	CloudLightingInfo lightingInfo,
+vec2 volumetricCloudsScattering(
+	CloudVolume volume,
 	float density,
 	float stepTransmittance,
-	float sunOpticalDepth,
+	float lightOpticalDepth,
 	float skyOpticalDepth,
-	float groundOpticalDepth
+	float groundOpticalDepth,
+	float cosTheta,
+	float bouncedLight
 ) {
-	float sigmaS = lightingInfo.density * lightingInfo.albedo;
-	float sigmaT = lightingInfo.density;
-
-	float powder = 1.0;
-	float powderRatio = getCloudsPowderRatio(density, lightingInfo.cosTheta);
-
+	float scatteringAlbedo = 1.0 - 0.33 * rainStrength;
 	vec2 scattering = vec2(0.0);
 
-	float phaseSun = lightingInfo.phaseSun;
-	vec3 anisotropy = pow(vec3(0.6, 0.9, 0.3), vec3(1.0 + sunOpticalDepth));
+	float sigmaS = volume.density * scatteringAlbedo;
+	float sigmaT = volume.density;
 
-	for (int i = 0; i < 8; ++i) {
-		scattering.x += sigmaS * exp(-sigmaT * sunOpticalDepth) * phaseSun * powder;
-		scattering.x += sigmaS * exp(-sigmaT * groundOpticalDepth) * lightingInfo.bouncedLight * powder;
-		scattering.y += sigmaS * exp(-sigmaT * skyOpticalDepth) * isotropicPhase * powder;
+	float powderEffect = cloudsPowderEffect(density, cosTheta);
 
-		// Multiple scattering phase function
-		anisotropy *= 0.8;
-		phaseSun = getCloudsPhaseMulti(lightingInfo.cosTheta, anisotropy);
+	float phase = cloudsPhaseSingle(cosTheta);
+	vec3 phaseG = pow(vec3(0.6, 0.9, 0.3), vec3(1.0 + lightOpticalDepth));
 
-		sigmaS *= 0.5;
-		sigmaT *= 0.5;
-		powder *= powderRatio;
-		powderRatio = sqrt(powderRatio);
+	for (uint i = 0u; i < 8u; ++i) {
+		scattering.x += sigmaS * exp(-sigmaT *  lightOpticalDepth) * phase;                         // direct light
+		scattering.x += sigmaS * exp(-sigmaT * groundOpticalDepth) * isotropicPhase * bouncedLight; // bounced light
+		scattering.y += sigmaS * exp(-sigmaT *    skyOpticalDepth) * isotropicPhase;                // skylight
+
+		sigmaS *= 0.55 * powderEffect;
+		sigmaT *= 0.4;
+		phaseG *= 0.8;
+		powderEffect = 0.5 * powderEffect + 0.5 * sqrt(powderEffect);
+
+		phase = cloudsPhaseMulti(cosTheta, phaseG);
 	}
 
-	float scatteringIntegral = (1.0 - stepTransmittance) / lightingInfo.density;
+	float scatteringIntegral = (1.0 - stepTransmittance) / volume.density;
 
 	return scattering * scatteringIntegral;
 }
 
-vec4 drawCumulusClouds(
-	Ray ray,
-	CloudLayer layer,
-	CloudLightingInfo lightingInfo,
+vec4 renderVolumetricClouds(
+	CloudVolume volume,
+	vec3 rayOrigin,
+	vec3 rayDir,
+	vec3 lightDir,
 	float dither,
 	float distanceToTerrain,
-	uint primaryStepCount
+	float cosTheta,
+	float bouncedLight,
+	uint primarySteps,
+	uint lightingSteps
 ) {
-	//--// Raymarching setup
+	/* -- raymarching setup -- */
 
-	const float distanceClip = 2e4;
-	const float transmittanceThreshold = 0.075; // raymarch is terminated when transmittance is below this threshold
+	const float maxRayLength     = 2e4;
+	const float minTransmittance = 0.075;
+	const float primaryStepsMulH = 1.0;
+	const float primaryStepsMulV = 0.5;
+	const uint ambientSteps      = 2;
 
-	float rayLength;
-	vec2 dists = intersectSphericalShell(ray.origin, ray.dir, layer.radius, layer.radius + layer.thickness);
-	bool planetIntersected = intersectSphere(ray.origin, ray.dir, planetRadius).y >= 0.0 && lengthSquared(ray.origin) > sqr(planetRadius);
-	if (dists.y < 0.0 || planetIntersected && ray.origin.y < layer.radius) return vec4(0.0, 0.0, 1.0, 1e6);
+	primarySteps = uint(float(primarySteps) * mix(primaryStepsMulH, primaryStepsMulV, abs(rayDir.y))); // take fewer steps when the ray points vertically
 
-	if (distanceToTerrain >= 0.0) {
-		rayLength = max0(distanceToTerrain * CLOUDS_SCALE - dists.x);
+	float r = length(rayOrigin);
 
-		if (length(ray.origin) < layer.radius && dists.y - dists.x > rayLength) return vec4(0.0, 0.0, 1.0, 1e6);
-	} else {
-		rayLength = min(dists.y - dists.x, distanceClip);
+	vec2 dists = intersectSphericalShell(rayOrigin, rayDir, volume.radius, volume.radius + volume.thickness);
+
+	bool planetIntersected = intersectSphere(rayOrigin, rayDir, planetRadius).y >= 0.0 && r > planetRadius;
+	bool terrainIntersected = distanceToTerrain >= 0.0 && r < volume.radius && distanceToTerrain < dists.y;
+
+	if (dists.y < 0.0                          // volume not intersected
+	 || planetIntersected && r < volume.radius // planet blocking clouds
+	 || terrainIntersected                     // terrain blocking clouds
+	) {
+		return vec4(0.0, 0.0, 1.0, 1e6);
 	}
 
-	float stepLength = rayLength * rcp(float(primaryStepCount));
+	float rayLength = (distanceToTerrain >= 0.0) ? distanceToTerrain : dists.y;
+	      rayLength = min(rayLength - dists.x, maxRayLength);
 
-	vec3 rayOrigin = ray.origin + ray.dir * (dists.x + stepLength * dither);
-	vec3 rayStep = ray.dir * stepLength;
+	float stepLength = rayLength * rcp(float(primarySteps));
 
-	vec2 scattering = vec2(0.0); // x = sunlight, y = skylight
+	vec3 rayPos = rayOrigin + rayDir * (dists.x + stepLength * dither);
+	vec3 rayStep = rayDir * stepLength;
+
+	vec2 scattering = vec2(0.0); // x: direct light, y: skylight
 	float transmittance = 1.0;
 
-	float distanceToCloud = 0.0; // This will store the distance to the first sample with a non-zero density
+	float distanceSum = 0.0;
+	float distanceWeightSum = 0.0;
 
-	//--// Raymarching loop
+	/* -- raymarching loop -- */
 
-	for (uint i = 0; i < primaryStepCount; ++i) {
-		if (transmittance < transmittanceThreshold) break;
+	for (uint i = 0u; i < primarySteps; ++i, rayPos += rayStep) {
+		if (transmittance < minTransmittance) break;
 
-		vec3 rayPos = rayOrigin + rayStep * i;
-		float altitudeFraction = (length(rayPos) - layer.radius) * rcp(layer.thickness);
+		float altitudeFraction = (length(rayPos) - volume.radius) * rcp(volume.thickness);
 
-		float density = getCumulusCloudsDensity(layer, rayPos, altitudeFraction, CLOUDS_CUMULUS_DETAIL_ITERATIONS);
+		float density = volumetricCloudsDensity(volume, rayPos, altitudeFraction, 0);
 
 		if (density < eps) continue;
 
-		// Fade away in the distance to hide the cutoff
-		float distanceToSample = distance(ray.origin, rayPos);
-		float distanceFade = smoothstep(0.95, 1.0, (distanceToSample - dists.x) * rcp(distanceClip));
+		// fade away in the distance to hide the cutoff
+		float distanceToSample = distance(rayOrigin, rayPos);
+		float distanceFade = smoothstep(0.95, 1.0, (distanceToSample - dists.x) * rcp(maxRayLength));
 
 		density *= 1.0 - distanceFade;
 
-		vec4 hash = hash4(abs(rayPos));
+		vec4 hash = hash4(fract(rayPos)); // used to dither the light rays
+		vec3 skyRayDir = cosineWeightedHemisphereSample(vec3(0.0, 1.0, 0.0), hash.xy);
 
-		float sunOpticalDepth = getCumulusCloudsOpticalDepth(
-			Ray(rayPos, lightingInfo.lightDir),
-			layer,
-			hash.x,
-			CLOUDS_CUMULUS_LIGHTING_STEPS
-		);
+		float lightOpticalDepth  = volumetricCloudsOpticalDepth(volume, rayPos, lightDir, hash.z, lightingSteps);
+		float skyOpticalDepth    = volumetricCloudsOpticalDepth(volume, rayPos, skyRayDir, hash.w, ambientSteps);
+		float groundOpticalDepth = density * altitudeFraction * volume.thickness * 0.75; // guess optical depth to ground using altitude fraction and density from this sample
 
-		vec3 skyRayDir = cosineWeightedHemisphereSample(vec3(0.0, 1.0, 0.0), hash.yz);
-
-		float skyOpticalDepth = getCumulusCloudsOpticalDepth(
-			Ray(rayPos, skyRayDir),
-			layer,
-			hash.w,
-			CLOUDS_CUMULUS_AMBIENT_STEPS
-		);
-
-		// Approximate ground optical depth using altitude fraction and density from this sample
-		float groundOpticalDepth = density * altitudeFraction * layer.thickness;
-
-		float stepOpticalDepth = lightingInfo.density * density * stepLength;
+		float stepOpticalDepth = density * volume.density * stepLength;
 		float stepTransmittance = exp(-stepOpticalDepth);
 
-		scattering += getCumulusCloudsScattering(
-			lightingInfo,
+		scattering += volumetricCloudsScattering(
+			volume,
 			density,
 			stepTransmittance,
-			sunOpticalDepth,
+			lightOpticalDepth,
 			skyOpticalDepth,
-			groundOpticalDepth
+			groundOpticalDepth,
+			cosTheta,
+			bouncedLight
 		) * transmittance;
 
 		transmittance *= stepTransmittance;
 
-		// Update distance to cloud
-		distanceToCloud = distanceToCloud == 0.0 ? distanceToSample : distanceToCloud;
+		// update distance to cloud
+		distanceSum += distanceToSample * density;
+		distanceWeightSum += density;
 	}
 
-	distanceToCloud = distanceToCloud == 0.0 ? 1e6 : distanceToCloud;
+	// remap the transmittance so that minTransmittance is 0
+	transmittance = linearStep(minTransmittance, 1.0, transmittance);
 
-	// Remap transmittance so that transmittanceThreshold is 0
-	transmittance = linearStep(transmittanceThreshold, 1.0, transmittance);
+	float distanceToCloud = distanceWeightSum == 0.0 ? 1e6 : distanceSum / distanceWeightSum;
 
 	return vec4(scattering, transmittance, distanceToCloud);
 }
 
-//--// planar cirrus-style clouds
+/* -- planar clouds -- */
 
-//--//
+/* -- */
 
-vec4 drawClouds(Ray ray, vec3 lightDir, float dither, float distanceToTerrain, bool isReflection) {
+vec4 renderClouds(
+	vec3 rayOrigin,
+	vec3 rayDir,
+	vec3 lightDir,
+	float dither,
+	float distanceToTerrain,
+	bool isReflection
+) {
 	/*
 	 * x: sunlight
 	 * y: skylight
 	 * z: transmittance
-	 * w: apparent distance
+	 * w: distance to cloud
 	 */
+
 	vec4 result = vec4(0.0, 0.0, 1.0, 1e6);
+	vec4 resultTemp;
 
-#if   CLOUDS_CUMULUS_QUALITY == CLOUDS_CUMULUS_QUALITY_FAST || defined PROGRAM_SKY_CAPTURE
-	const float primaryStepCountH = 20.0;
-	const float primaryStepCountZ = 12.0;
-#elif CLOUDS_CUMULUS_QUALITY == CLOUDS_CUMULUS_QUALITY_FANCY
-	const float primaryStepCountH = 36.0;
-	const float primaryStepCountZ = 24.0;
-#elif CLOUDS_CUMULUS_QUALITY == CLOUDS_CUMULUS_QUALITY_FABULOUS
-	const float primaryStepCountH = 80.0;
-	const float primaryStepCountZ = 40.0;
-#endif
-
-	float primaryStepCount = mix(primaryStepCountH, primaryStepCountZ, abs(ray.dir.y));
-	if (isReflection) primaryStepCount = 10;
-
-	//--// Lighting parameters
-
-	const float groundAlbedo = 0.4; // It could be cool to make this biome-dependent
-
-	CloudLightingInfo lightingInfo;
-	lightingInfo.lightDir     = lightDir;
-	lightingInfo.albedo       = 1.0 - 0.3 * rainStrength;
-	lightingInfo.density      = CLOUDS_CUMULUS_DENSITY * 0.1 * (0.6 + 0.4 * lightDir.y); // Allow light to travel further through the cloud when the sun is nearer the horizon
-	lightingInfo.cosTheta     = dot(ray.dir, lightDir);
-	lightingInfo.bouncedLight = groundAlbedo * lightDir.y * rcpPi * isotropicPhase;
-	lightingInfo.phaseSun     = getCloudsPhaseSingle(lightingInfo.cosTheta);
-
-	//--// Layer parameters
-
-	CloudLayer layer;
-	layer.frequency    = 1.0;
-	layer.radius       = planetRadius + CLOUDS_CUMULUS_ALTITUDE;
-	layer.thickness    = CLOUDS_CUMULUS_ALTITUDE * CLOUDS_CUMULUS_THICKNESS;
-	layer.minCoverage  = cloudsCumulusCoverage * CLOUDS_CUMULUS_COVERAGE - CLOUDS_CUMULUS_LOCAL_COVERAGE_VARIATION;
-	layer.maxCoverage  = cloudsCumulusCoverage * CLOUDS_CUMULUS_COVERAGE + CLOUDS_CUMULUS_LOCAL_COVERAGE_VARIATION;
-
-	float layerSpacing = CLOUDS_CUMULUS_LAYER_SPACING / CLOUDS_CUMULUS_LAYER_SPACING_FALLOFF;
-	float windSpeed    = CLOUDS_CUMULUS_WIND_SPEED;
-	float windAngle    = CLOUDS_CUMULUS_WIND_BEARING * tau / 360.0;
-
-	//--//
+	float cosTheta     = dot(rayDir, lightDir);
+	float bouncedLight = groundAlbedo * lightDir.y * rcpPi * isotropicPhase;
 
 #ifdef WORLD_TIME_ANIMATION
-	float t = worldAge;
+	float cloudsTime = worldAge;
 #else
-	float t = frameTimeCounter;
+	float cloudsTime = frameTimeCounter;
 #endif
 
-	for (int i = 0; i < CLOUDS_CUMULUS_LAYERS; ++i) {
-		layer.wind = windSpeed * vec2(cos(windAngle), sin(windAngle)) * t;
-		layer.offset = 1e6 * R2(i) + layer.wind + cameraPosition.xz * CLOUDS_SCALE;
+	/* -- volumetric clouds -- */
 
-		// Scale primary step count so that fewer steps are taken through thinner layers
-		const float layer0Thickness = CLOUDS_CUMULUS_ALTITUDE * CLOUDS_CUMULUS_THICKNESS;
-		uint layerStepCount = uint(ceil(float(primaryStepCount) * layer.thickness / layer0Thickness));
+	CloudVolume volume;
 
-		vec4 layerResult = drawCumulusClouds(
-			ray,
-			layer,
-			lightingInfo,
-			dither,
-			distanceToTerrain,
-			layerStepCount
-		);
+#ifdef VCLOUD_LAYER0 // layer 0 (cumulus/stratocumulus clouds)
+	volume.radius       = VCLOUD_LAYER0_ALTITUDE + planetRadius;
+	volume.thickness    = VCLOUD_LAYER0_THICKNESS;
+	volume.frequency    = VCLOUD_LAYER0_FREQUENCY;
+	volume.coverage     = vcloudLayer0Coverage(weather);
+	volume.density      = vcloudLayer0Density(weather);
+	volume.cloudType    = vcloudLayer0TypeBlend(weather);
+	volume.detailMul    = vcloudLayer0DetailMultiplier(weather);
+	volume.curlMul      = vcloudLayer0CurlMultiplier(weather);
+	volume.randomOffset = vec2(0.0);
+	volume.wind         = polar(VCLOUD_LAYER0_WIND_SPEED * cloudsTime, VCLOUD_LAYER0_WIND_ANGLE * degree);
 
-		// Blend with layer below
-		result.xy = result.xy + result.z * layerResult.xy;
-		result.z *= layerResult.z;
-		result.w  = min(result.w, layerResult.w);
+	result = renderVolumetricClouds(
+		volume,
+		rayOrigin,
+		rayDir,
+		lightDir,
+		dither,
+		distanceToTerrain,
+		cosTheta,
+		bouncedLight,
+		VCLOUD_LAYER0_PRIMARY_STEPS,
+		VCLOUD_LAYER0_LIGHTING_STEPS
+	);
+#endif
 
-		if (result.z < eps) return result;
+#ifdef VCLOUD_LAYER1 // layer 1 (altocumulus/altostratus clouds)
+	volume.radius       = VCLOUD_LAYER1_ALTITUDE + planetRadius;
+	volume.thickness    = VCLOUD_LAYER1_THICKNESS;
+	volume.frequency    = VCLOUD_LAYER1_FREQUENCY;
+	volume.coverage     = vcloudLayer1Coverage(weather);
+	volume.density      = VCLOUD_LAYER1_DENSITY * 0.1;
+	volume.cloudType    = vcloudLayer1TypeBlend(weather);
+	volume.detailMul    = VCLOUD_LAYER1_WISPINESS;
+	volume.curlMul      = VCLOUD_LAYER1_SWIRLINESS;
+	volume.randomOffset = vec2(631210.0, 814172.0);
+	volume.wind         = polar(VCLOUD_LAYER1_WIND_SPEED * cloudsTime, VCLOUD_LAYER1_WIND_ANGLE * degree);
 
-		// Update layer parameters for next layer
-		layer.radius += layerSpacing + layer.thickness;
-		layer.thickness *= CLOUDS_CUMULUS_LAYER_THICKNESS_FALLOFF;
-		layer.minCoverage = max0(layer.minCoverage * CLOUDS_CUMULUS_LAYER_COVERAGE_FALLOFF);
-		layer.maxCoverage = max0(layer.maxCoverage * CLOUDS_CUMULUS_LAYER_COVERAGE_FALLOFF);
+	resultTemp = renderVolumetricClouds(
+		volume,
+		rayOrigin,
+		rayDir,
+		lightDir,
+		dither,
+		distanceToTerrain,
+		cosTheta,
+		bouncedLight,
+		VCLOUD_LAYER1_PRIMARY_STEPS,
+		VCLOUD_LAYER1_LIGHTING_STEPS
+	);
 
-		lightingInfo.density *= CLOUDS_CUMULUS_DENSITY_FALLOFF;
+	result.xy = result.xy + result.z * resultTemp.xy;
+	result.z *= resultTemp.z;
+	result.w  = min(result.w, resultTemp.w);
+#endif
 
-		layerSpacing *= CLOUDS_CUMULUS_LAYER_SPACING_FALLOFF;
-		windSpeed *= 1.3;
-		windAngle += 0.3;
-	}
+#ifdef VCLOUD_LAYER2 // layer 2 (disabled by default)
+	volume.radius       = VCLOUD_LAYER2_ALTITUDE + planetRadius;
+	volume.thickness    = VCLOUD_LAYER2_THICKNESS;
+	volume.frequency    = VCLOUD_LAYER2_FREQUENCY;
+	volume.coverage     = VCLOUD_LAYER2_COVERAGE;
+	volume.density      = VCLOUD_LAYER2_DENSITY * 0.1;
+	volume.cloudType    = VCLOUD_LAYER2_TYPE_BLEND;
+	volume.detailMul    = VCLOUD_LAYER2_WISPINESS;
+	volume.curlMul      = VCLOUD_LAYER2_SWIRLINESS;
+	volume.randomOffset = vec2(-659843.0, 234920.0);
+	volume.wind         = polar(VCLOUD_LAYER2_WIND_SPEED * cloudsTime, VCLOUD_LAYER2_WIND_ANGLE * degree);
 
-	//--// Cirrus clouds
+	resultTemp = renderVolumetricClouds(
+		volume,
+		rayOrigin,
+		rayDir,
+		lightDir,
+		dither,
+		distanceToTerrain,
+		cosTheta,
+		bouncedLight,
+		VCLOUD_LAYER2_PRIMARY_STEPS,
+		VCLOUD_LAYER2_LIGHTING_STEPS
+	);
 
+	result.xy = result.xy + result.z * resultTemp.xy;
+	result.z *= resultTemp.z;
+	result.w  = min(result.w, resultTemp.w);
+#endif
 
+#ifdef VCLOUD_LAYER3 // layer 3 (disabled by default)
+	volume.radius       = VCLOUD_LAYER3_ALTITUDE + planetRadius;
+	volume.thickness    = VCLOUD_LAYER3_THICKNESS;
+	volume.frequency    = VCLOUD_LAYER3_FREQUENCY;
+	volume.coverage     = VCLOUD_LAYER3_COVERAGE;
+	volume.density      = VCLOUD_LAYER3_DENSITY * 0.1;
+	volume.cloudType    = VCLOUD_LAYER3_TYPE_BLEND;
+	volume.detailMul    = VCLOUD_LAYER3_WISPINESS;
+	volume.curlMul      = VCLOUD_LAYER3_SWIRLINESS;
+	volume.randomOffset = vec2(-979530.0, -122390.0);
+	volume.wind         = polar(VCLOUD_LAYER3_WIND_SPEED * cloudsTime, VCLOUD_LAYER3_WIND_ANGLE * degree);
+
+	resultTemp = renderVolumetricClouds(
+		volume,
+		rayOrigin,
+		rayDir,
+		lightDir,
+		dither,
+		distanceToTerrain,
+		cosTheta,
+		bouncedLight,
+		VCLOUD_LAYER3_PRIMARY_STEPS,
+		VCLOUD_LAYER3_LIGHTING_STEPS
+	);
+
+	result.xy = result.xy + result.z * resultTemp.xy;
+	result.z *= resultTemp.z;
+	result.w  = min(result.w, resultTemp.w);
+#endif
+
+	/* -- planar clouds -- */
 
 	// If no cloud encountered, take distance to middle of first cloud layer (helps reprojection a lot)
 	if (result.w > 1e5) {
-		const float cloudVolumeMiddle = planetRadius + CLOUDS_CUMULUS_ALTITUDE * (1.0 + 0.5 * CLOUDS_CUMULUS_THICKNESS);
-		vec2 dists = intersectSphere(ray.dir.y, ray.origin.y, cloudVolumeMiddle);
-		result.w = ray.origin.y < cloudVolumeMiddle ? dists.y : dists.x;
+		const float cloudVolumeMiddle = planetRadius + VCLOUD_LAYER0_ALTITUDE + VCLOUD_LAYER0_THICKNESS * 0.5;
+		vec2 dists = intersectSphere(rayDir.y, rayOrigin.y, cloudVolumeMiddle);
+		result.w = rayOrigin.y < cloudVolumeMiddle ? dists.y : dists.x;
 	}
 
 	return result;
 }
 
-//--// cloud shadows
+/* -- cloud shadows -- */
 
-float getCloudShadows(Ray ray) {
-	float transmittance = 1.0;
-	float density = CLOUDS_CUMULUS_DENSITY * 0.1 * (0.6 + 0.4 * abs(sunDir.y)); // Allow light to travel further through the cloud when the sun is nearer the horizon
+float getCloudVolumeShadow(CloudVolume volume, vec3 rayOrigin, vec3 rayDir) {
+	const uint stepCount = 8;
 
-	const int stepCount = 8;
+	vec2 dists   = intersectSphericalShell(rayOrigin, rayDir, volume.radius, volume.radius + volume.thickness);
+	     dists.x = max0(dists.x);
 
-	//--// Layer parameters
+	float rayLength = dists.y - dists.x;
+	float stepLength = rayLength * rcp(float(stepCount));
 
-	CloudLayer layer;
-	layer.frequency    = 1.0;
-	layer.radius       = planetRadius + CLOUDS_CUMULUS_ALTITUDE;
-	layer.thickness    = CLOUDS_CUMULUS_ALTITUDE * CLOUDS_CUMULUS_THICKNESS;
-	layer.minCoverage  = cloudsCumulusCoverage * CLOUDS_CUMULUS_COVERAGE - CLOUDS_CUMULUS_LOCAL_COVERAGE_VARIATION;
-	layer.maxCoverage  = cloudsCumulusCoverage * CLOUDS_CUMULUS_COVERAGE + CLOUDS_CUMULUS_LOCAL_COVERAGE_VARIATION;
+	vec3 rayPos = rayOrigin + rayDir * (dists.x * 0.5 + stepLength);
+	vec3 rayStep = rayDir * stepLength;
 
-	float layerSpacing = CLOUDS_CUMULUS_LAYER_SPACING / CLOUDS_CUMULUS_LAYER_SPACING_FALLOFF;
-	float windSpeed    = CLOUDS_CUMULUS_WIND_SPEED;
-	float windAngle    = CLOUDS_CUMULUS_WIND_BEARING * tau / 360.0;
+	float opticalDepth = 0.0;
 
-	//--//
-
-#ifdef WORLD_TIME_ANIMATION
-	float t = worldAge;
-#else
-	float t = frameTimeCounter;
-#endif
-
-	for (int i = 0; i < CLOUDS_CUMULUS_LAYERS; ++i) {
-		layer.wind = windSpeed * vec2(cos(windAngle), sin(windAngle)) * t;
-		layer.offset = 1e6 * R2(i) + layer.wind + cameraPosition.xz * CLOUDS_SCALE;
-
-		vec3 origin = ray.origin + ray.dir * intersectSphere(ray.origin, ray.dir, layer.radius).y;
-		float opticalDepth = getCumulusCloudsOpticalDepth(Ray(origin, ray.dir), layer, 0.5, stepCount);
-		transmittance *= exp(-density * opticalDepth);
-
-		// Update layer parameters for next layer
-		layer.radius += layerSpacing + layer.thickness;
-		layer.thickness *= CLOUDS_CUMULUS_LAYER_THICKNESS_FALLOFF;
-		layer.minCoverage = max0(layer.minCoverage * CLOUDS_CUMULUS_LAYER_COVERAGE_FALLOFF);
-		layer.maxCoverage = max0(layer.maxCoverage * CLOUDS_CUMULUS_LAYER_COVERAGE_FALLOFF);
-
-		density *= CLOUDS_CUMULUS_DENSITY_FALLOFF;
-
-		layerSpacing *= CLOUDS_CUMULUS_LAYER_SPACING_FALLOFF;
-		windSpeed *= 1.3;
-		windAngle += 0.3;
+	for (uint i = 0u; i < stepCount; ++i, rayPos += rayStep) {
+		float altitudeFraction = (length(rayPos) - volume.radius) * rcp(volume.thickness);
+		opticalDepth += volumetricCloudsDensity(volume, rayPos, altitudeFraction, 10);
 	}
 
-	return transmittance;
+	return exp(-volume.density * opticalDepth * stepLength);
+}
+
+float getCloudShadows(vec3 rayOrigin, vec3 rayDir) {
+	vec3 weather = getWeather();
+	float result = 1.0;
+
+#ifdef WORLD_TIME_ANIMATION
+	float cloudsTime = worldAge;
+#else
+	float cloudsTime = frameTimeCounter;
+#endif
+
+	CloudVolume volume;
+
+#if defined VCLOUD_LAYER0 && defined VCLOUD_LAYER0_SHADOW // layer 0 (cumulus/stratocumulus clouds)
+	volume.radius       = VCLOUD_LAYER0_ALTITUDE + planetRadius;
+	volume.thickness    = VCLOUD_LAYER0_THICKNESS;
+	volume.frequency    = VCLOUD_LAYER0_FREQUENCY;
+	volume.coverage     = vcloudLayer0Coverage(weather);
+	volume.density      = vcloudLayer0Density(weather);
+	volume.cloudType    = vcloudLayer0TypeBlend(weather);
+	volume.detailMul    = vcloudLayer0DetailMultiplier(weather);
+	volume.curlMul      = vcloudLayer0CurlMultiplier(weather);
+	volume.randomOffset = vec2(0.0);
+	volume.wind         = polar(VCLOUD_LAYER0_WIND_SPEED * cloudsTime, VCLOUD_LAYER0_WIND_ANGLE * degree);
+
+	result  = getCloudVolumeShadow(volume, rayOrigin, rayDir);
+#endif
+
+#if defined VCLOUD_LAYER1 && defined VCLOUD_LAYER1_SHADOW // layer 1 (altocumulus/altostratus clouds)
+	volume.radius       = VCLOUD_LAYER1_ALTITUDE + planetRadius;
+	volume.thickness    = VCLOUD_LAYER1_THICKNESS;
+	volume.frequency    = VCLOUD_LAYER1_FREQUENCY;
+	volume.coverage     = vcloudLayer1Coverage(weather);
+	volume.density      = VCLOUD_LAYER1_DENSITY * 0.1;
+	volume.cloudType    = vcloudLayer1TypeBlend(weather);
+	volume.detailMul    = VCLOUD_LAYER1_WISPINESS;
+	volume.curlMul      = VCLOUD_LAYER1_SWIRLINESS;
+	volume.randomOffset = vec2(631210.0, 814172.0);
+	volume.wind         = polar(VCLOUD_LAYER1_WIND_SPEED * cloudsTime, VCLOUD_LAYER1_WIND_ANGLE * degree);
+
+	result *= getCloudVolumeShadow(volume, rayOrigin, rayDir);
+#endif
+
+#if defined VCLOUD_LAYER2 && defined VCLOUD_LAYER2_SHADOW// layer 2 (disabled by default)
+	volume.radius       = VCLOUD_LAYER2_ALTITUDE + planetRadius;
+	volume.thickness    = VCLOUD_LAYER2_THICKNESS;
+	volume.frequency    = VCLOUD_LAYER2_FREQUENCY;
+	volume.coverage     = VCLOUD_LAYER2_COVERAGE;
+	volume.density      = VCLOUD_LAYER2_DENSITY * 0.1;
+	volume.cloudType    = VCLOUD_LAYER2_TYPE_BLEND;
+	volume.detailMul    = VCLOUD_LAYER2_WISPINESS;
+	volume.curlMul      = VCLOUD_LAYER2_SWIRLINESS;
+	volume.randomOffset = vec2(-659843.0, 234920.0);
+	volume.wind         = polar(VCLOUD_LAYER2_WIND_SPEED * cloudsTime, VCLOUD_LAYER2_WIND_ANGLE * degree);
+
+	result *= getCloudVolumeShadow(volume, rayOrigin, rayDir);
+#endif
+
+#if defined VCLOUD_LAYER3 && defined VCLOUD_LAYER3_SHADOW // layer 3 (disabled by default)
+	volume.radius       = VCLOUD_LAYER3_ALTITUDE + planetRadius;
+	volume.thickness    = VCLOUD_LAYER3_THICKNESS;
+	volume.frequency    = VCLOUD_LAYER3_FREQUENCY;
+	volume.coverage     = VCLOUD_LAYER3_COVERAGE;
+	volume.density      = VCLOUD_LAYER3_DENSITY * 0.1;
+	volume.cloudType    = VCLOUD_LAYER3_TYPE_BLEND;
+	volume.detailMul    = VCLOUD_LAYER3_WISPINESS;
+	volume.curlMul      = VCLOUD_LAYER3_SWIRLINESS;
+	volume.randomOffset = vec2(-979530.0, -122390.0);
+	volume.wind         = polar(VCLOUD_LAYER3_WIND_SPEED * cloudsTime, VCLOUD_LAYER3_WIND_ANGLE * degree);
+
+	result *= getCloudVolumeShadow(volume, rayOrigin, rayDir);
+#endif
+
+	return result;
 }
 
 #endif // INCLUDE_ATMOSPHERE_CLOUDS

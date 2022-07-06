@@ -45,8 +45,11 @@ uniform mat4 gbufferProjectionInverse;
 uniform float frameTime;
 
 uniform float rainStrength;
+uniform float wetness;
 
 //--// Custom uniforms
+
+uniform float eyeSkylight;
 
 uniform vec2 taaOffset;
 
@@ -124,11 +127,12 @@ vec3 getBloom(out vec3 fogBloom) {
 
 float getBloomyFog(float linearZ) {
 #if   defined WORLD_OVERWORLD
-	// Apply bloomy fog only in darker areas
+	// apply bloomy fog only in darker areas
 	float luminance = getLuminance(fragColor);
-
-	float bloomyFogStrength = 0.4 - 0.3 * linearStep(0.05, 1.0, luminance);
+	float bloomyFogStrength = 0.4 - 0.3 * linearStep(0.05, 1.0, luminance) + 0.4 * wetness * eyeSkylight;
 	float bloomyFogDensity  = 0.01;
+
+	//
 #elif defined WORLD_NETHER
 
 #elif defined WORLD_END
@@ -223,6 +227,7 @@ void main() {
 	fragColor       = texelFetch(colortex8, texel, 0).rgb;
 	float linearZ   = texelFetch(colortex14, texel, 0).x;
 
+	uint blockId     = uint(unpackUnorm4x8(sceneData.x).w * 255.0);
 	float blocklight = unpackUnorm4x8(sceneData.y).z;
 
 #ifdef BLOOM
@@ -233,6 +238,9 @@ void main() {
 	float bloomyFog = getBloomyFog(linearZ);
 	fragColor = mix(fragColor, fogBloom, bloomyFog);
 #endif
+
+	// bloomy rain/snow particles
+	if (blockId == 253 || blockId == 254) fragColor = mix(fragColor, fogBloom, 0.5);
 
 	fragColor = mix(fragColor, bloom, BLOOM_INTENSITY);
 #endif

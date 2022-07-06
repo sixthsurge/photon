@@ -32,9 +32,9 @@ uniform vec3 moonDir;
 void main() {
 	coord = gl_MultiTexCoord0.xy;
 
-	skyIrradiance   = texelFetch(colortex4, ivec2(255, 2), 0).rgb;
+	skyIrradiance = texelFetch(colortex4, ivec2(255, 2), 0).rgb;
 
-	vec3 rayOrigin = vec3(0.0, planetRadius + CLOUDS_CUMULUS_ALTITUDE, 0.0);
+	vec3 rayOrigin = vec3(0.0, planetRadius, 0.0);
 	vec3 rayDir = cloudsMoonlit ? moonDir : sunDir;
 
 	directIrradiance  = cloudsMoonlit ? moonIrradiance * moonPhaseBrightness : sunIrradiance;

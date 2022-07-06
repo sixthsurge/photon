@@ -116,7 +116,7 @@ vec3 getSpecularHighlight(
 	float LoH
 ) {
 #if   defined WORLD_OVERWORLD
-	float lightRadius = (sunAngle < 0.5) ? radians(SUN_ANGULAR_RADIUS) : radians(MOON_ANGULAR_RADIUS);
+	float lightRadius = (sunAngle < 0.5) ? (SUN_ANGULAR_RADIUS * degree) : (MOON_ANGULAR_RADIUS * degree);
 #endif
 
 	vec3 f = material.isMetal ? fresnelSchlick(LoH, material.f0) : vec3(fresnelDielectric(LoH, material.n));

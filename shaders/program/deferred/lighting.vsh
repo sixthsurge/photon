@@ -40,7 +40,7 @@ void main() {
 	for (uint band = 0; band < 9; ++band) skySh[band] = vec3(0.0);
 
 	// Sample into SH
-	const uint sampleCount = 128;
+	const uint sampleCount = 256;
 	for (uint i = 0; i < sampleCount; ++i) {
 		vec3 direction = uniformHemisphereSample(vec3(0.0, 1.0, 0.0), R2(int(i)));
 		vec3 radiance  = texture(colortex4, projectSky(direction)).rgb;

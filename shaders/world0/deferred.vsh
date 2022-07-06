@@ -11,15 +11,12 @@
 
 out vec2 coord;
 
+flat out vec3 weather;
 flat out vec3 cloudsDirectIrradiance;
 
 flat out vec3 ambientIrradiance;
 flat out vec3 directIrradiance;
 flat out vec3 skyIrradiance;
-
-flat out float airMieTurbidity;
-flat out float cloudsCirrusCoverage;
-flat out float cloudsCumulusCoverage;
 
 //--// Uniforms //------------------------------------------------------------//
 
@@ -29,11 +26,16 @@ uniform sampler3D colortex2; // Atmosphere scattering LUT
 
 uniform ivec2 eyeBrightnessSmooth;
 
+uniform vec3 cameraPosition;
+
 //--// Time uniforms
 
 uniform int worldDay;
 uniform int worldTime;
 
+uniform float frameTimeCounter;
+
+uniform float rainStrength;
 uniform float wetness;
 
 uniform float sunAngle;
@@ -41,6 +43,10 @@ uniform float sunAngle;
 //--// Custom uniforms
 
 uniform bool cloudsMoonlit;
+
+uniform float biomeTemperature;
+uniform float biomeHumidity;
+uniform float biomeMayRain;
 
 uniform float timeSunset;
 uniform float timeNoon;
@@ -67,15 +73,16 @@ uniform vec3 moonDir;
 void main() {
 	coord = gl_MultiTexCoord0.xy;
 
-	weatherSetup();
-	paletteSetup();
+	weather = getWeather();
 
-	vec3 rayOrigin = vec3(0.0, planetRadius + CLOUDS_CUMULUS_ALTITUDE, 0.0);
+	vec3 rayOrigin = vec3(0.0, planetRadius, 0.0);
 	vec3 rayDir = cloudsMoonlit ? moonDir : sunDir;
 
 	cloudsDirectIrradiance  = cloudsMoonlit ? moonIrradiance : sunIrradiance;
 	cloudsDirectIrradiance *= getAtmosphereTransmittance(rayOrigin, rayDir);
 	cloudsDirectIrradiance *= 1.0 - pulse(float(worldTime), 12850.0, 50.0) - pulse(float(worldTime), 23150.0, 50.0);
+
+	paletteSetup();
 
 	gl_Position = vec4(gl_Vertex.xy * 2.0 - 1.0, 0.0, 1.0);
 }
