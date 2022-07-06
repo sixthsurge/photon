@@ -225,7 +225,8 @@ vec4 upscaleClouds(ivec2 dstTexel, vec3 screenPos) {
 		pixelAge = 0;
 	}
 
-	float historyWeight = min(pixelAge / (pixelAge + 1.0), CLOUDS_ACCUMULATION_LIMIT);
+	float x = float(pixelAge);
+	float historyWeight = min(x / (x + 1.0), CLOUDS_ACCUMULATION_LIMIT);
 
 	// Soften history sample for newer pixels
 	vec4 historySmooth = textureBicubic(colortex11, previousCoordClamped);
