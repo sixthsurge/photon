@@ -28,6 +28,7 @@ vec3 f0ToIor(vec3 f0) {
 }
 
 float getHardcodedEmission(vec3 albedo, uint blockId) {
+#if defined PROGRAM_DEFERRED_LIGHTING
 	vec3 hsl = rgbToHsl(albedo);
 
 	switch (blockId) {
@@ -78,10 +79,13 @@ float getHardcodedEmission(vec3 albedo, uint blockId) {
 	default:
 		return 0.0;
 	}
+#else
+	return 0.0;
+#endif
 }
 
 float getHardcodedSss(uint blockId) {
-#if  defined PROGRAM_DEFERRED_LIGHTING
+#if defined PROGRAM_DEFERRED_LIGHTING
 	switch (blockId) {
 	case BLOCK_SMALL_PLANT:
 		return 0.5;
@@ -119,41 +123,30 @@ float getHardcodedSss(uint blockId) {
 }
 
 Material getMaterial(vec3 albedo, uint blockId) {
-#if  defined PROGRAM_DEFERRED_LIGHTING
-	switch (blockId) {
-	case BLOCK_SMALL_PLANT:
-		return 0.5;
+	float defaultF0 = 0.04;
+	float defaultN  = (1.0 + sqrt(defaultF0)) / (1.0 - sqrt(defaultF0));
 
-	case BLOCK_TALL_PLANT_LOWER:
-		return 0.5;
+	Material material = Material(
+		albedo,          // albedo
+		vec3(defaultF0), // f0
+		vec3(0.0),       // emission
+		0.8,             // roughness
+		defaultN,        // n
+		0.0,             // sssAmount
+		0.0,             // porosity
+		false,           // isMetal
+		false            // isHardcodedMetal
+	);
 
-	case BLOCK_TALL_PLANT_UPPER:
-		return 0.5;
-
-	case BLOCK_LEAVES:
-		return 1.0;
-
-	case BLOCK_WEAK_SSS:
-#ifdef ENTITY_SSS
-	case ENTITY_WEAK_SSS:
+#ifdef HARDCODED_EMISSION
+	material.emission = getHardcodedEmission(albedo, blockId) * albedo;
 #endif
-		return 0.2;
 
-	case BLOCK_MEDIUM_SSS:
-#ifdef ENTITY_SSS
-	case ENTITY_STRONG_SSS:
+#ifdef HARDCODED_SSS
+	material.sssAmount = getHardcodedSss(blockId);
 #endif
-		return 0.6;
 
-	case BLOCK_STRONG_SSS:
-		return 1.0;
-
-	default:
-		return 0.0;
-	}
-#else
-	return 0.0;
-#endif
+	return material;
 }
 
-#endif // INCLUDE_FRAGMENT_MATERIAL
+#endif // INCLUDE_FRAGMENT_MATERIAL#if !defined INCLUDE_FRAGMENT_MATERIAL
