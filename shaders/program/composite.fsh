@@ -401,18 +401,29 @@ void main() {
 
 	/* -- puddles -- */
 
+	// passing material struct members as inout parameters here seems to cause a driver crash on some Intel GPUs for some mysterious reason
+	vec3 newAlbedo     = material.albedo;
+	vec3 newF0         = material.f0;
+	float newRoughness = material.roughness;
+
 	getRainPuddles(
 		noisetex,
 		material.porosity,
-		lmCoord * float(!isWater),
+		lmCoord,
 		worldPos,
 		geometryNormal,
 		normal,
-		material.albedo,
-		material.f0,
-		material.roughness
+		newAlbedo,
+		newF0,
+		newRoughness
 	);
-	material.n = f0ToIor(material.f0.x);
+
+	material.albedo    = newAlbedo;
+	material.f0        = newF0;
+	material.roughness = newRoughness;
+	material.n         = f0ToIor(material.f0.x);
+
+	/* -- light translucent layer -- */
 
 	if (isWater) {
 		material.f0 = vec3(0.02);
