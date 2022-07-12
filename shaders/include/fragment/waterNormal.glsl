@@ -25,8 +25,8 @@ float getWaterHeight(vec2 coord) {
 	return height / amplitudeSum;
 }
 
-vec3 getWaterNormal(vec3 geometryNormal, vec3 worldPos) {
-	vec2 coord = worldPos.xz - worldPos.y;
+vec3 getWaterNormal(vec3 geometryNormal, vec3 positionWorld) {
+	vec2 coord = positionWorld.xz - positionWorld.y;
 
 	const float h = 0.1;
 	float wave0 = getWaterHeight(coord);
@@ -34,7 +34,7 @@ vec3 getWaterNormal(vec3 geometryNormal, vec3 worldPos) {
 	float wave2 = getWaterHeight(coord + vec2(0.0, h));
 
 	float normalInfluence  = 0.15 * smoothstep(0.0, 0.05, abs(geometryNormal.y));
-	      normalInfluence *= smoothstep(0.0, 0.1, abs(dot(geometryNormal, normalize(worldPos - cameraPosition)))); // prevent noise when looking horizontal
+	      normalInfluence *= smoothstep(0.0, 0.1, abs(dot(geometryNormal, normalize(positionWorld - cameraPosition)))); // prevent noise when looking horizontal
 
 	vec3 normal     = vec3(wave1 - wave0, wave2 - wave0, h);
 	     normal.xy *= normalInfluence;
@@ -42,11 +42,11 @@ vec3 getWaterNormal(vec3 geometryNormal, vec3 worldPos) {
 	return normalize(normal);
 }
 
-vec2 waterParallax(vec3 tangentDir, vec2 coord) {
+vec2 waterParallax(vec3 viewerDirTangent, vec2 coord) {
 	const int stepCount = 4;
 	const float parallaxScale = 1.0;
 
-	vec2 rayStep = tangentDir.xy * rcp(-tangentDir.z) * parallaxScale * rcp(float(stepCount));
+	vec2 rayStep = viewerDirTangent.xy * rcp(viewerDirTangent.z) * parallaxScale * rcp(float(stepCount));
 
 	float depthValue = getWaterHeight(coord);
 	float depthMarch = 0.0;

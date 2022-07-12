@@ -44,6 +44,11 @@ uniform float biomeTemperature;
 uniform float biomeHumidity;
 uniform float biomeMayRain;
 
+uniform float timeSunrise;
+uniform float timeNoon;
+uniform float timeSunset;
+uniform float timeMidnight;
+
 uniform vec3 lightDir;
 
 //--// Includes //------------------------------------------------------------//

@@ -7,7 +7,7 @@ layout (location = 0) out vec3 shadowcolor0Out;
 //--// Inputs //--------------------------------------------------------------//
 
 in vec2 texCoord;
-in vec3 worldPos;
+in vec3 positionWorld;
 
 flat in uint blockId;
 flat in vec3 normal;
@@ -74,10 +74,10 @@ float getWaterCaustics() {
 #else
 	const float distanceTraveled = 2.0; // distance for which caustics are calculated
 
-	vec3 normal = tbnMatrix * getWaterNormal(normal, worldPos);
+	vec3 normal = tbnMatrix * getWaterNormal(normal, positionWorld);
 
-	vec3 oldPos = worldPos;
-	vec3 newPos = worldPos + refractSafe(lightDir, normal, airN / waterN) * distanceTraveled;
+	vec3 oldPos = positionWorld;
+	vec3 newPos = positionWorld + refractSafe(lightDir, normal, airN / waterN) * distanceTraveled;
 
 	float oldArea = lengthSquared(dFdx(oldPos)) * lengthSquared(dFdy(oldPos));
 	float newArea = lengthSquared(dFdx(newPos)) * lengthSquared(dFdy(newPos));

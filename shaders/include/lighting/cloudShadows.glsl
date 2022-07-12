@@ -4,8 +4,8 @@
 const ivec2 cloudShadowRes = ivec2(256);
 const float cloudShadowIntensity = 0.85;
 
-vec2 projectCloudShadowmap(vec3 scenePos) {
-	vec2 cloudShadowPos  = transform(shadowModelView, scenePos).xy / far;
+vec2 projectCloudShadowmap(vec3 positionScene) {
+	vec2 cloudShadowPos  = transform(shadowModelView, positionScene).xy / far;
 	     cloudShadowPos /= 1.0 + length(cloudShadowPos);
 		 cloudShadowPos  = cloudShadowPos * 0.5 + 0.5;
 
@@ -16,25 +16,25 @@ vec3 unprojectCloudShadowmap(vec2 cloudShadowPos) {
 	cloudShadowPos  = cloudShadowPos * 2.0 - 1.0;
 	cloudShadowPos /= 1.0 - length(cloudShadowPos);
 
-	vec3 shadowViewPos = vec3(cloudShadowPos * far, 1.0);
+	vec3 positionShadowView = vec3(cloudShadowPos * far, 1.0);
 
-	return transform(shadowModelViewInverse, shadowViewPos);
+	return transform(shadowModelViewInverse, positionShadowView);
 }
 
-float getCloudShadows(sampler2D cloudShadowmap, vec3 scenePos) {
+float getCloudShadows(sampler2D cloudShadowmap, vec3 positionScene) {
 #ifndef CLOUD_SHADOWS
 	return 1.0;
 #else
-	vec2 cloudShadowPos = projectCloudShadowmap(scenePos) * vec2(cloudShadowRes) / vec2(textureSize(cloudShadowmap, 0));
+	vec2 cloudShadowPos = projectCloudShadowmap(positionScene) * vec2(cloudShadowRes) / vec2(textureSize(cloudShadowmap, 0));
 
 	if (clamp01(cloudShadowPos) != cloudShadowPos) return 1.0;
 
 	// fade out cloud shadows when:
 	// - the fragment is above the cloud layer
 	// - the sun is near the horizon
-	float altitudeFraction = (scenePos.y + eyeAltitude - SEA_LEVEL) * (CLOUDS_SCALE / VCLOUD_LAYER0_THICKNESS) - VCLOUD_LAYER0_ALTITUDE;
+	float altitudeFraction = (positionScene.y + eyeAltitude - SEA_LEVEL) * (CLOUDS_SCALE / CLOUDS_LAYER0_THICKNESS) - CLOUDS_LAYER0_ALTITUDE;
 	float cloudShadowFade  = smoothstep(0.0, 0.7, 1.0 - altitudeFraction);
-	      cloudShadowFade *= clamp01(30.0 * lightDir.y);
+	      cloudShadowFade *= smoothstep(0.1, 0.2, lightDir.y);
 
 	float cloudShadow = texture(cloudShadowmap, cloudShadowPos).x;
 	      cloudShadow = mix(1.0, cloudShadow, cloudShadowFade);

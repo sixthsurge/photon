@@ -107,9 +107,9 @@ float integrateArc(vec2 h, float n, float cosN) {
 
 float calculateMaximumHorizonAngle(
 	vec3 sliceDir,
-	vec3 viewDir,
-	vec3 screenPos,
-	vec3 viewPos,
+	vec3 viewerDir,
+	vec3 positionScreen,
+	vec3 positionView,
 	vec2 radius,
 	float dither
 ) {
@@ -118,18 +118,18 @@ float calculateMaximumHorizonAngle(
 	vec2 stepSize = radius * (1.0 / float(GTAO_HORIZON_STEPS));
 	vec2 rayStep = sliceDir.xy * stepSize;
 
-	screenPos.xy += sliceDir.xy * (stepSize * dither + length(viewTexelSize) * sqrt(2.0));
+	positionScreen.xy += sliceDir.xy * (stepSize * dither + length(viewTexelSize) * sqrt(2.0));
 
-	for (int i = 0; i < GTAO_HORIZON_STEPS; ++i, screenPos.xy += rayStep) {
-		float depth = texelFetch(depthtex1, ivec2(clamp01(screenPos.xy) * viewSize - 0.5), 0).x;
+	for (int i = 0; i < GTAO_HORIZON_STEPS; ++i, positionScreen.xy += rayStep) {
+		float depth = texelFetch(depthtex1, ivec2(clamp01(positionScreen.xy) * viewSize - 0.5), 0).x;
 
-		if (depth == screenPos.z || depth == 1.0 || linearizeDepth(depth) < MC_HAND_DEPTH) continue;
+		if (depth == positionScreen.z || depth == 1.0 || linearizeDepth(depth) < MC_HAND_DEPTH) continue;
 
-		vec3 viewSampleVec = screenToViewSpace(vec3(screenPos.xy, depth), true) - viewPos;
+		vec3 viewSampleVec = screenToViewSpace(vec3(positionScreen.xy, depth), true) - positionView;
 
 		float lenSq = dot(viewSampleVec, viewSampleVec);
 		float falloff = linearStep(1.0, 2.0, lenSq);
-		float cosTheta = dot(viewDir, viewSampleVec) * inversesqrt(lenSq);
+		float cosTheta = dot(viewerDir, viewSampleVec) * inversesqrt(lenSq);
 		      cosTheta = mix(cosTheta, -1.0, falloff);
 
 		const float beta = 0.0;
@@ -148,14 +148,14 @@ float multiBounceApprox(float visibility) {
 }
 
 vec4 calculateGtao(
-	vec3 screenPos,
-	vec3 viewPos,
+	vec3 positionScreen,
+	vec3 positionView,
 	vec3 normalView,
 	vec2 rng
 ) {
-	float rcpViewDistance = inversesqrt(dot(viewPos, viewPos));
+	float rcpViewDistance = inversesqrt(dot(positionView, positionView));
 
-	vec3 viewDir = viewPos * -rcpViewDistance;
+	vec3 viewerDir = positionView * -rcpViewDistance;
 
 	vec2 radius = GTAO_RADIUS * rcpViewDistance / vec2(1.0, aspectRatio);
 
@@ -167,31 +167,30 @@ vec4 calculateGtao(
 
 		vec3 sliceDir = vec3(cos(sliceAngle), sin(sliceAngle), 0.0);
 
-		vec3 orthoDir = sliceDir - dot(sliceDir, viewDir) * viewDir;
-		vec3 axis = cross(sliceDir, viewDir);
+		vec3 orthoDir = sliceDir - dot(sliceDir, viewerDir) * viewerDir;
+		vec3 axis = cross(sliceDir, viewerDir);
 		vec3 projectedNormal = normalView - axis * dot(normalView, axis);
 
 		float lenSq = dot(projectedNormal, projectedNormal);
 		float norm = inversesqrt(lenSq);
 
 		float sgnGamma = sign(dot(orthoDir, projectedNormal));
-		float cosGamma = clamp01(dot(projectedNormal, viewDir) * norm);
+		float cosGamma = clamp01(dot(projectedNormal, viewerDir) * norm);
 		float gamma = sgnGamma * acosApprox(cosGamma);
 
 		vec2 maxHorizonAngles;
-		maxHorizonAngles.x = calculateMaximumHorizonAngle(-sliceDir, viewDir, screenPos, viewPos, radius, rng.y);
-		maxHorizonAngles.y = calculateMaximumHorizonAngle( sliceDir, viewDir, screenPos, viewPos, radius, rng.y);
+		maxHorizonAngles.x = calculateMaximumHorizonAngle(-sliceDir, viewerDir, positionScreen, positionView, radius, rng.y);
+		maxHorizonAngles.y = calculateMaximumHorizonAngle( sliceDir, viewerDir, positionScreen, positionView, radius, rng.y);
 
 		maxHorizonAngles = gamma + clamp(vec2(-1.0, 1.0) * maxHorizonAngles - gamma, -halfPi, halfPi);
 		visibility += integrateArc(maxHorizonAngles, gamma, cosGamma) * lenSq * norm;
 
 		float bentAngle = dot(maxHorizonAngles, vec2(0.5));
-		bentNormal += viewDir * cos(bentAngle) + orthoDir * sin(bentAngle);
+		bentNormal += viewerDir * cos(bentAngle) + orthoDir * sin(bentAngle);
 	}
 
 	visibility = multiBounceApprox(visibility * (1.0 / float(GTAO_SLICES)));
-	bentNormal = normalize(normalize(bentNormal) - 0.5 * viewDir);
-	bentNormal = bentNormal;
+	bentNormal = normalize(normalize(bentNormal) - 0.5 * viewerDir);
 
     return vec4(bentNormal, visibility);
 }
@@ -209,9 +208,9 @@ void main() {
 
 	if (linearizeDepth(depth) < MC_HAND_DEPTH) depth += 0.38; // hand lighting fix from Capt Tatsu
 
-	vec3 screenPos = vec3(coord * rcp(indirectRenderScale), depth);
-	vec3 viewPos = screenToViewSpace(screenPos, true);
-	vec3 viewDir = normalize(viewPos);
+	vec3 positionScreen = vec3(coord * rcp(indirectRenderScale), depth);
+	vec3 positionView = screenToViewSpace(positionScreen, true);
+	vec3 viewerDir = normalize(positionView);
 
 	if (depth == 1.0) { historyData = vec4(0.5, 0.5, 0.0, 1.0); return; }
 
@@ -222,30 +221,30 @@ void main() {
 	vec3 normal = decodeUnitVector(unpackUnorm4x8(encoded.y).xy);
 #endif
 
-	vec3 viewNormal = mat3(gbufferModelView) * normal;
+	vec3 normalView = mat3(gbufferModelView) * normal;
 
 #if   defined SSPT
 
 #elif defined GTAO
     vec4 gtao = calculateGtao(
-        screenPos,
-        viewPos,
-        viewNormal,
+        positionScreen,
+        positionView,
+        normalView,
         R2(frameCounter, vec2(dither))
     );
 
 	//--// Temporal accumulation
 
-    vec3 previousScreenPos = reproject(screenPos, colortex2);
+    vec3 positionPreviousScreen = reproject(positionScreen, colortex2);
 
-	historyData = textureSmooth(colortex10, previousScreenPos.xy * indirectRenderScale);
-	float historyDepth = 1.0 - textureSmooth(colortex13, previousScreenPos.xy).y;
+	historyData = textureSmooth(colortex10, positionPreviousScreen.xy * indirectRenderScale);
+	float historyDepth = 1.0 - textureSmooth(colortex13, positionPreviousScreen.xy).y;
 
-	float depthDelta  = abs(linearizeDepth(previousScreenPos.z) - linearizeDepth(historyDepth));
+	float depthDelta  = abs(linearizeDepth(positionPreviousScreen.z) - linearizeDepth(historyDepth));
 	float depthWeight = exp(-10.0 * depthDelta) * float(historyDepth < 1.0);
 
 	float pixelAge  = min(historyData.z * 65535.0, float(GTAO_ACCUMULATION_LIMIT));
-	      pixelAge *= float(clamp01(previousScreenPos.xy) == previousScreenPos.xy);
+	      pixelAge *= float(clamp01(positionPreviousScreen.xy) == positionPreviousScreen.xy);
 		  pixelAge *= depthWeight;
 
 	float historyWeight = pixelAge / (pixelAge + 1.0);

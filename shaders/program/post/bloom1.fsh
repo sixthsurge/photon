@@ -52,6 +52,6 @@ void main() {
 
 		vec2 sampleCoord = clamp01(tileCoord + vec2(x * pixelSize, 0.0));
 
-		bloom += texture(colortex15, sampleCoord * vec2(1.0, 0.5)).rgb * weight;
+		bloom += textureLod(colortex15, sampleCoord * vec2(1.0, 0.5), int(tileIndex - 1.0)).rgb * weight;
 	}
 }

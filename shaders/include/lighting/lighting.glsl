@@ -19,7 +19,7 @@ vec3 getSubsurfaceScattering(vec3 albedo, float sssAmount, float sssDepth, float
 	if (sssAmount < eps) return vec3(0.0);
 
 	vec3 coeff = normalizeSafe(albedo) * sqrt(sqrt(length(albedo)));
-	     coeff = (sssDensity * coeff - sssDensity) / sssAmount;
+	     coeff = (clamp01(coeff) * sssDensity - sssDensity) / sssAmount;
 
 	vec3 sss1 = exp(3.0 * coeff * sssDepth) * henyeyGreensteinPhase(-LoV, 0.4);
 	vec3 sss2 = exp(1.0 * coeff * sssDepth) * (0.6 * henyeyGreensteinPhase(-LoV, 0.33) + 0.4 * henyeyGreensteinPhase(-LoV, -0.2));
@@ -53,7 +53,7 @@ float getFakeBouncedLight(vec3 bentNormal, float distanceTraveled, float ao) {
 
 vec3 getSceneLighting(
 	Material material,
-	vec3 scenePos,
+	vec3 positionScene,
 	vec3 normal,
 	vec3 geometryNormal,
 	vec3 bentNormal,
@@ -63,7 +63,8 @@ vec3 getSceneLighting(
 	vec3 skylight,
 	vec2 lmCoord,
 	float ao,
-	uint blockId
+	uint blockId,
+	out float distanceTraveled
 ) {
 	vec3 radiance = material.emission * emissionIntensity;
 
@@ -73,13 +74,12 @@ vec3 getSceneLighting(
 	float NoL = dot(normal, lightDir) * step(0.0, dot(geometryNormal, lightDir));
 
 #if defined WORLD_OVERWORLD && defined CLOUD_SHADOWS
-	float cloudShadow = getCloudShadows(colortex15, scenePos);
+	float cloudShadow = getCloudShadows(colortex15, positionScene);
 #else
 	float cloudShadow = 1.0;
 #endif
 
-	float distanceTraveled;
-	vec3 visibility = NoL * getShadows(scenePos, geometryNormal, NoL, lmCoord.y, cloudShadow, material.sssAmount, blockId, distanceTraveled);
+	vec3 visibility = NoL * getShadows(positionScene, geometryNormal, NoL, lmCoord.y, cloudShadow, material.sssAmount, blockId, distanceTraveled);
 
 	if (maxOf(visibility) > eps || material.sssAmount > eps) {
 		float NoV = clamp01(dot(normal, viewerDir));
@@ -92,11 +92,11 @@ vec3 getSceneLighting(
 		vec3 specular = getSpecularHighlight(material, NoL, NoV, NoH, LoV, LoH);
 		vec3 subsurface = getSubsurfaceScattering(material.albedo, material.sssAmount, distanceTraveled, LoV);
 
-		radiance += directIrradiance * ((diffuse + specular) * visibility + subsurface) * getCloudShadows(colortex15, scenePos);
+		radiance += directIrradiance * ((diffuse + specular) * visibility + subsurface) * getCloudShadows(colortex15, positionScene);
 	}
 #endif
 
-	vec3 bsdf = material.albedo * rcpPi;
+	vec3 bsdf = material.albedo * rcpPi * float(!material.isMetal);
 
 	// Blocklight
 

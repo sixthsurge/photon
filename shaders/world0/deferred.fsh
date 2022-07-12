@@ -72,7 +72,7 @@ uniform float biomeMayRain;
 uniform float timeSunset;
 uniform float timeNoon;
 uniform float timeSunrise;
-uniform float timeMidight;
+uniform float timeMidnight;
 
 uniform float lightningFlash;
 uniform float moonPhaseBrightness;
@@ -136,7 +136,7 @@ void main() {
 
 		vec4 cloudData = renderClouds(rayOrigin, rayDir, cloudsLightDir, 0.5, -1.0, true);
 
-		const vec3 cloudsLightningFlash = vec3(20.0);
+		const vec3 cloudsLightningFlash = vec3(10.0);
 
 		vec3 cloudsScattering = mat2x3(cloudsDirectIrradiance, skyIrradiance + cloudsLightningFlash * lightningFlash) * cloudData.xy;
 		     cloudsScattering = cloudsAerialPerspective(cloudsScattering, cloudData.rgb, rayDir, atmosphereScattering, cloudData.w);

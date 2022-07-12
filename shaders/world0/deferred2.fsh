@@ -124,8 +124,8 @@ vec4 maxOf(vec4 a, vec4 b, vec4 c, vec4 d, vec4 f) {
 }
 
 vec3 reprojectClouds(vec2 coord, float distanceToCloud) {
-	const float windSpeed = VCLOUD_LAYER0_WIND_SPEED / CLOUDS_SCALE;
-	const float windAngle = VCLOUD_LAYER0_WIND_ANGLE * tau / 360.0;
+	const float windSpeed = CLOUDS_LAYER0_WIND_SPEED / CLOUDS_SCALE;
+	const float windAngle = CLOUDS_LAYER0_WIND_ANGLE * tau / 360.0;
 
 	vec3 pos = screenToViewSpace(vec3(coord, 1.0), false);
 	     pos = mat3(gbufferModelViewInverse) * pos;
@@ -140,7 +140,7 @@ vec3 reprojectClouds(vec2 coord, float distanceToCloud) {
 	return previousPos * 0.5 + 0.5;
 }
 
-vec4 upscaleClouds(ivec2 dstTexel, vec3 screenPos) {
+vec4 upscaleClouds(ivec2 dstTexel, vec3 positionScreen) {
 	/*
 	 * x: sunlight
 	 * y: skylight
@@ -206,7 +206,7 @@ vec4 upscaleClouds(ivec2 dstTexel, vec3 screenPos) {
 	vec4 historyClamped = clamp(history, aabbMin, aabbMax);
 
 	// Only clamp when moving fast or when close to or above clouds
-	float clampingStrength = smoothstep(0.8 * VCLOUD_LAYER0_ALTITUDE, VCLOUD_LAYER0_ALTITUDE, CLOUDS_SCALE * (eyeAltitude - SEA_LEVEL));
+	float clampingStrength = smoothstep(0.8 * CLOUDS_LAYER0_ALTITUDE, CLOUDS_LAYER0_ALTITUDE, CLOUDS_SCALE * (eyeAltitude - SEA_LEVEL));
 	      clampingStrength = clamp01(clampingStrength);
 
 	history = mix(history, historyClamped, clampingStrength);
@@ -214,7 +214,7 @@ vec4 upscaleClouds(ivec2 dstTexel, vec3 screenPos) {
 	bool offscreen = clamp01(previousCoord.xy) != previousCoord.xy;
 
 	float historyDepth = texture(colortex13, previousCoordClamped).y;
-	bool disoccluded = screenPos.z == 1.0 && historyDepth > eps;
+	bool disoccluded = positionScreen.z == 1.0 && historyDepth > eps;
 
 	bool invalidHistory = offscreen || disoccluded || worldAgeChanged || any(isnan(history)) || any(isinf(history));
 
@@ -260,9 +260,9 @@ void main() {
 
 	float depth = texelFetch(depthtex1, texel, 0).x;
 
-	vec3 screenPos = vec3(coord, 1.0);
-	vec3 viewPos = screenToViewSpace(screenPos, true);
-	vec3 rayDir = mat3(gbufferModelViewInverse) * normalize(viewPos);
+	vec3 positionScreen = vec3(coord, 1.0);
+	vec3 positionView = screenToViewSpace(positionScreen, true);
+	vec3 rayDir = mat3(gbufferModelViewInverse) * normalize(positionView);
 
 	vec4 cloudData = upscaleClouds(texel, vec3(coord, depth));
 
@@ -277,7 +277,7 @@ void main() {
 
 	vec4 vanillaSky = texelFetch(colortex0, ivec2(gl_FragCoord.xy), 0); // Sun, moon and custom skies
 	vec3 vanillaSkyColor = srgbToLinear(vanillaSky.rgb) * r709ToAp1Unlit;
-	uint vanillaSkyId = uint(255.0 * vanillaSky.a);
+	uint vanillaSkyId = uint(vanillaSky.a + 0.5);
 
 #ifdef VANILLA_SUN
 	if (vanillaSkyId == 2) {
@@ -309,7 +309,7 @@ void main() {
 
 	/* -- clouds -- */
 
-	const vec3 cloudsLightningFlash = vec3(20.0);
+	const vec3 cloudsLightningFlash = vec3(10.0);
 
 	vec3 cloudsScattering = mat2x3(directIrradiance, skyIrradiance + cloudsLightningFlash * lightningFlash) * cloudData.xy;
 	     cloudsScattering = cloudsAerialPerspective(cloudsScattering, cloudData.rgb, rayDir, atmosphereScattering, cloudData.w);

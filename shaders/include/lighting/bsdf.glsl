@@ -115,6 +115,8 @@ vec3 getSpecularHighlight(
 	float LoV,
 	float LoH
 ) {
+	const float reflectionClamp = 4.0;
+
 #if   defined WORLD_OVERWORLD
 	float lightRadius = (sunAngle < 0.5) ? (SUN_ANGULAR_RADIUS * degree) : (MOON_ANGULAR_RADIUS * degree);
 #endif
@@ -132,7 +134,7 @@ vec3 getSpecularHighlight(
 	float d  = distributionGgx(NoHSq, alphaSq);
 	float v2 = v2SmithGgx(max(NoL, 1e-2), max(NoV, 1e-2), alphaSq);
 
-	return (d * v2) * f * albedoTint;
+	return min((d * v2) * f * albedoTint, reflectionClamp);
 }
 
 #endif // INCLUDE_LIGHTING_BSDF

@@ -75,23 +75,23 @@ void main() {
 #endif
 #endif
 
-	vec3 viewPos = transform(gl_ModelViewMatrix, gl_Vertex.xyz);
+	vec3 positionView = transform(gl_ModelViewMatrix, gl_Vertex.xyz);
 
 #ifdef GBUFFERS_TERRAIN
 	bool isTopVertex = texCoord.y < mc_midTexCoord.y;
 
-	vec3 scenePos  = viewToSceneSpace(viewPos);
-	     scenePos += animateVertex(scenePos + cameraPosition, isTopVertex, lmCoord.y, blockId);
+	vec3 positionScene  = viewToSceneSpace(positionView);
+	     positionScene += animateVertex(positionScene + cameraPosition, isTopVertex, lmCoord.y, blockId);
 
-	viewPos = sceneToViewSpace(scenePos);
+	positionView = sceneToViewSpace(positionScene);
 #endif
 
-	vec4 clipPos = project(gl_ProjectionMatrix, viewPos);
+	vec4 positionClip = project(gl_ProjectionMatrix, positionView);
 
 #ifdef TAA
-    clipPos.xy += taaOffset * clipPos.w;
-	clipPos.xy  = clipPos.xy * renderScale + clipPos.w * (renderScale - 1.0);
+    positionClip.xy += taaOffset * positionClip.w;
+	positionClip.xy  = positionClip.xy * renderScale + positionClip.w * (renderScale - 1.0);
 #endif
 
-	gl_Position = clipPos;
+	gl_Position = positionClip;
 }

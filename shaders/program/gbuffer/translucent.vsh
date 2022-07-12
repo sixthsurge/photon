@@ -4,22 +4,41 @@
 
 out vec2 texCoord;
 out vec2 lmCoord;
-out vec4 tint;
+out vec3 positionView;
+out vec3 positionScene;
+out vec3 viewerDirTangent;
 
 flat out uint blockId;
+flat out vec4 tint;
 flat out mat3 tbnMatrix;
 
 //--// Inputs //--------------------------------------------------------------//
 
 attribute vec4 at_tangent;
 attribute vec3 mc_Entity;
+attribute vec2 mc_midTexCoord;
 
 //--// Uniforms //------------------------------------------------------------//
 
+uniform sampler2D noisetex;
+
 //--// Camera uniforms
+
+uniform float near;
+uniform float far;
+
+uniform vec3 cameraPosition;
 
 uniform mat4 gbufferModelView;
 uniform mat4 gbufferModelViewInverse;
+uniform mat4 gbufferProjection;
+uniform mat4 gbufferProjectionInverse;
+
+//--// Time uniforms
+
+uniform float frameTimeCounter;
+
+uniform float rainStrength;
 
 //--// Custom uniforms
 
@@ -28,6 +47,10 @@ uniform vec2 taaOffset;
 //--// Includes //------------------------------------------------------------//
 
 #include "/block.properties"
+
+#include "/include/utility/spaceConversion.glsl"
+
+#include "/include/vertex/animation.glsl"
 
 //--// Program //-------------------------------------------------------------//
 
@@ -38,18 +61,20 @@ void main() {
 	blockId  = uint(max0(mc_Entity.x - 10000.0));
 
 	tbnMatrix[2] = mat3(gbufferModelViewInverse) * normalize(gl_NormalMatrix * gl_Normal);
-#ifdef MC_NORMAL_MAP
 	tbnMatrix[0] = mat3(gbufferModelViewInverse) * normalize(gl_NormalMatrix * at_tangent.xyz);
 	tbnMatrix[1] = cross(tbnMatrix[0], tbnMatrix[2]) * sign(at_tangent.w);
-#endif
 
-	vec3 viewPos = transform(gl_ModelViewMatrix, gl_Vertex.xyz);
-	vec4 clipPos = project(gl_ProjectionMatrix, viewPos);
+	positionView  = transform(gl_ModelViewMatrix, gl_Vertex.xyz);
+	positionScene = transform(gbufferModelViewInverse, positionView);
+
+	viewerDirTangent = normalize(gbufferModelViewInverse[3].xyz - positionScene) * tbnMatrix;
+
+	vec4 positionClip  = project(gl_ProjectionMatrix, positionView);
 
 #ifdef TAA
-    clipPos.xy += taaOffset * clipPos.w;
-	clipPos.xy  = clipPos.xy * renderScale + clipPos.w * (renderScale - 1.0);
+    positionClip.xy += taaOffset * positionClip.w;
+	positionClip.xy  = positionClip.xy * renderScale + positionClip.w * (renderScale - 1.0);
 #endif
 
-	gl_Position = clipPos;
+	gl_Position = positionClip;
 }

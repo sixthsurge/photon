@@ -88,7 +88,7 @@ vec3 getBloom(out vec3 fogBloom) {
 	float weightSum = 0.0;
 
 #if defined BLOOMY_FOG || defined BLOOMY_RAIN
-	const float fogBloomRadius = 1.5;
+	const float fogBloomRadius = 2.0;
 
 	fogBloom = vec3(0.0); // large-scale bloom for bloomy fog
 	float fogBloomWeight = 1.0;
@@ -99,7 +99,7 @@ vec3 getBloom(out vec3 fogBloom) {
 		vec2 tileSize = exp2(-i) * vec2(2.0, 1.0);
 		vec2 tileOffset = vec2(0.0, tileSize.y);
 
-		vec2 padAmount = 2.0 * rcp(vec2(960.0, 540.0)) * rcp(tileSize);
+		vec2 padAmount = 2.0 * rcp(vec2(960.0, 1080.0)) * rcp(tileSize);
 
 		vec2 tileCoord = mix(padAmount, 1.0 - padAmount, coord) * tileSize + tileOffset;
 
@@ -129,8 +129,8 @@ float getBloomyFog(float linearZ) {
 #if   defined WORLD_OVERWORLD
 	// apply bloomy fog only in darker areas
 	float luminance = getLuminance(fragColor);
-	float bloomyFogStrength = 0.4 - 0.3 * linearStep(0.05, 1.0, luminance) + 0.4 * wetness * eyeSkylight;
-	float bloomyFogDensity  = 0.01;
+	float bloomyFogStrength = 0.8 - 0.6 * linearStep(0.05, 1.0, luminance) + 0.4 * wetness * eyeSkylight;
+	float bloomyFogDensity  = 0.009;
 
 	//
 #elif defined WORLD_NETHER
@@ -176,7 +176,9 @@ vec3 tonemapReinhardJodie(vec3 rgb) {
 }
 
 // Source: http://www.diva-portal.org/smash/get/diva2:24136/FULLTEXT01.pdf
-vec3 purkinjeShift(vec3 rgb, float intensity) {
+vec3 purkinjeShift(vec3 rgb, float purkinjeIntensity) {
+	if (purkinjeIntensity == 0.0) return rgb;
+
 	const vec3 rodResponse = vec3(7.15e-5, 4.81e-1, 3.28e-1) * r709ToAp1Unlit;
 	vec3 xyz = rgb * ap1ToXyz;
 
@@ -184,7 +186,7 @@ vec3 purkinjeShift(vec3 rgb, float intensity) {
 
 	float purkinje = dot(rodResponse, scotopicLuminance * xyzToAp1);
 
-	rgb = mix(rgb, purkinje * vec3(0.5, 0.7, 1.0), exp2(-rcp(intensity) * purkinje));
+	rgb = mix(rgb, purkinje * vec3(0.5, 0.7, 1.0), exp2(-rcp(purkinjeIntensity) * purkinje));
 
 	return max0(rgb);
 }
@@ -245,9 +247,9 @@ void main() {
 	fragColor = mix(fragColor, bloom, BLOOM_INTENSITY);
 #endif
 
-#if defined PURKINJE_SHIFT && defined WORLD_OVERWORLD
+#if defined WORLD_OVERWORLD
 	// Reduce purkinje shift intensity around blocklight sources to preserve their colour
-	float purkinjeIntensity = 0.1 - 0.1 * cube(blocklight);
+	float purkinjeIntensity = PURKINJE_SHIFT_INTENSITY * (0.1 - 0.1 * cube(blocklight));
 	fragColor = purkinjeShift(fragColor, purkinjeIntensity);
 #endif
 

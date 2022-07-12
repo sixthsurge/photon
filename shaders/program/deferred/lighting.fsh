@@ -30,7 +30,9 @@ uniform sampler2D noisetex;
 uniform sampler2D colortex0;  // Translucent overlays
 uniform usampler2D colortex1; // Scene data
 uniform sampler2D colortex3;  // Scene radiance
+uniform sampler2D colortex4;  // Sky capture
 uniform sampler2D colortex6;  // Clear sky
+uniform sampler2D colortex8;  // Scene history
 uniform sampler2D colortex15; // Cloud shadow map
 
 #ifdef SSPT
@@ -65,11 +67,15 @@ uniform float far;
 uniform float blindness;
 
 uniform vec3 cameraPosition;
+uniform vec3 previousCameraPosition;
 
 uniform mat4 gbufferModelView;
 uniform mat4 gbufferModelViewInverse;
 uniform mat4 gbufferProjection;
 uniform mat4 gbufferProjectionInverse;
+
+uniform mat4 gbufferPreviousModelView;
+uniform mat4 gbufferPreviousProjection;
 
 //--// Shadow uniforms
 
@@ -82,6 +88,7 @@ uniform mat4 shadowProjectionInverse;
 
 uniform int frameCounter;
 
+uniform int moonPhase;
 uniform int worldDay;
 uniform int worldTime;
 
@@ -102,7 +109,7 @@ uniform float biomeMayRain;
 uniform float timeSunset;
 uniform float timeNoon;
 uniform float timeSunrise;
-uniform float timeMidight;
+uniform float timeMidnight;
 
 uniform vec2 viewSize;
 uniform vec2 viewTexelSize;
@@ -110,10 +117,13 @@ uniform vec2 viewTexelSize;
 uniform vec2 taaOffset;
 
 uniform vec3 lightDir;
+uniform vec3 sunDir;
+uniform vec3 moonDir;
 
 //--// Includes //------------------------------------------------------------//
 
 #define PROGRAM_DEFERRED_LIGHTING
+#define TEMPORAL_REPROJECTION
 
 #include "/block.properties"
 #include "/entity.properties"
@@ -126,6 +136,7 @@ uniform vec3 lightDir;
 #include "/include/fragment/textureFormat.glsl"
 
 #include "/include/lighting/lighting.glsl"
+#include "/include/lighting/reflections.glsl"
 
 #include "/include/utility/color.glsl"
 #include "/include/utility/encoding.glsl"
@@ -157,10 +168,11 @@ void main() {
 
 	if (linearizeDepth(depth) < MC_HAND_DEPTH) depth += 0.38; // Hand lighting fix from Capt Tatsu
 
-	vec3 viewPos  = screenToViewSpace(vec3(coord, depth), true);
-	vec3 scenePos = viewToSceneSpace(viewPos);
-	vec3 worldPos = scenePos + cameraPosition;
-	vec3 worldDir = normalize(scenePos - gbufferModelViewInverse[3].xyz);
+	vec3 positionView  = screenToViewSpace(vec3(coord, depth), true);
+	vec3 positionScene = viewToSceneSpace(positionView);
+	vec3 positionWorld = positionScene + cameraPosition;
+
+	vec3 viewerDir = normalize(gbufferModelViewInverse[3].xyz - positionScene);
 
 	/* -- unpack gbuffer -- */
 
@@ -181,7 +193,7 @@ void main() {
 	#define normal geometryNormal
 #endif
 
-	uint overlayId = uint(255.0 * overlays.a);
+	uint overlayId = uint(overlays.a + 0.5);
 	albedo = overlayId == 0 ? albedo + overlays.rgb : albedo; // enchantment glint
 	albedo = overlayId == 1 ? 2.0 * albedo * overlays.rgb : albedo; // damage overlay
 	albedo = srgbToLinear(albedo) * r709ToAp1Unlit;
@@ -222,7 +234,7 @@ void main() {
 		noisetex,
 		material.porosity,
 		lmCoord,
-		worldPos,
+		positionWorld,
 		geometryNormal,
 		normal,
 		material.albedo,
@@ -233,20 +245,43 @@ void main() {
 
 	/* -- lighting -- */
 
+	float distanceTraveled;
 	radiance = getSceneLighting(
 		material,
-		scenePos,
+		positionScene,
 		normal,
 		geometryNormal,
 		bentNormal,
-		-worldDir,
+		viewerDir,
 		ambientIrradiance,
 		directIrradiance,
 		skylight,
 		lmCoord,
 		ao,
-		blockId
+		blockId,
+		distanceTraveled
 	);
 
-	radiance = applySimpleFog(radiance, scenePos, clearSky);
+	/* -- reflections -- */
+
+#ifdef SSR
+	mat3 tbnMatrix = getTbnMatrix(normal);
+
+	vec3 viewerDirTangent = viewerDir * tbnMatrix;
+
+	radiance += getSpecularReflections(
+		material,
+		tbnMatrix,
+		vec3(coord, depth),
+		positionView,
+		normal,
+		viewerDir,
+		viewerDirTangent,
+		lmCoord.y
+	);
+#endif
+
+	/* -- fog -- */
+
+	radiance = applySimpleFog(radiance, positionScene, clearSky);
 }

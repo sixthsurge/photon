@@ -9,23 +9,23 @@ float quarticLength(vec2 v) {
 	return sqrt(sqrt(pow4(v.x) + pow4(v.y)));
 }
 
-float getShadowDistortionFactor(vec2 shadowClipPos) {
-	return quarticLength(shadowClipPos) * SHADOW_DISTORTION + (1.0 - SHADOW_DISTORTION);
+float getShadowDistortionFactor(vec2 positionShadowClip) {
+	return quarticLength(positionShadowClip) * SHADOW_DISTORTION + (1.0 - SHADOW_DISTORTION);
 }
 
-vec3 distortShadowSpace(vec3 shadowClipPos, float distortionFactor) {
-	return shadowClipPos * vec3(vec2(rcp(distortionFactor)), SHADOW_DEPTH_SCALE);
+vec3 distortShadowSpace(vec3 positionShadowClip, float distortionFactor) {
+	return positionShadowClip * vec3(vec2(rcp(distortionFactor)), SHADOW_DEPTH_SCALE);
 }
 
-vec3 distortShadowSpace(vec3 shadowClipPos) {
-	float distortionFactor = getShadowDistortionFactor(shadowClipPos.xy);
-	return distortShadowSpace(shadowClipPos, distortionFactor);
+vec3 distortShadowSpace(vec3 positionShadowClip) {
+	float distortionFactor = getShadowDistortionFactor(positionShadowClip.xy);
+	return distortShadowSpace(positionShadowClip, distortionFactor);
 }
 
-vec3 undistortShadowSpace(vec3 shadowClipPos) {
-	shadowClipPos.xy *= (1.0 - SHADOW_DISTORTION) / (1.0 - quarticLength(shadowClipPos.xy));
-	shadowClipPos.z  *= rcp(SHADOW_DEPTH_SCALE);
-	return shadowClipPos;
+vec3 undistortShadowSpace(vec3 positionShadowClip) {
+	positionShadowClip.xy *= (1.0 - SHADOW_DISTORTION) / (1.0 - quarticLength(positionShadowClip.xy));
+	positionShadowClip.z  *= rcp(SHADOW_DEPTH_SCALE);
+	return positionShadowClip;
 }
 
 #endif // INCLUDE_LIGHTING_SHADOWDISTORTION

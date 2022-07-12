@@ -4,6 +4,8 @@
 #include "/include/utility/fastMath.glsl"
 #include "/include/utility/random.glsl"
 
+const vec3 weatherBias = vec3(WEATHER_TEMPERATURE_BIAS, WEATHER_HUMIDITY_BIAS, WEATHER_WIND_STRENGTH_BIAS);
+
 // One dimensional value noise
 float noise1D(float x) {
 	float i, f = modf(x, i);
@@ -12,63 +14,120 @@ float noise1D(float x) {
 }
 
 vec3 getWeather() {
-#ifdef DYNAMIC_WEATHER
-	float weatherTime  = float(worldDay) + rcp(24000.0) * float(worldTime);
+#ifndef DYNAMIC_WEATHER
+	return vec3(0.5) + weatherBias;
 #else
-	const float weatherTime  = 0.0;
-#endif
+	const float dailyTemperatureMin    = 0.0;
+	const float dailyTemperatureMax    = 1.0;
+	const float dailyHumidityMin       = 0.3;
+	const float dailyHumidityMax       = 0.8;
+	const float biomeTemperatureWeight = 0.1;
+	const float biomeHumidityWeight    = 0.1;
 
+	float weatherTime  = WEATHER_VARIATION_SPEED * (float(worldDay) + rcp(24000.0) * float(worldTime));
+
+	// Daily weather
 	float temperature  = noise1D(rcp(goldenRatio) * weatherTime);
-		  temperature += 0.2 * biomeTemperature;
-
+	      temperature  = mix(dailyTemperatureMin, dailyTemperatureMax, temperature);
 	float humidity     = noise1D(rcp(goldenRatio) * weatherTime + 13.4625);
-	      humidity     = mix(0.25, 0.80, humidity);
-		  humidity    += 0.2 * biomeHumidity;
-		  humidity    += 0.8 * wetness;
-
+	      humidity     = mix(dailyHumidityMin, dailyHumidityMax, humidity);
 	float windStrength = noise1D(rcp(goldenRatio) * weatherTime + 29.7333);
-	      windStrength = mix(0.4, 0.6, windStrength) + 0.4 * rainStrength;
 
-	return vec3(temperature, humidity, windStrength) + vec3(TEMPERATURE_BIAS, HUMIDITY_BIAS, WIND_STRENGTH_BIAS);
+	// Time-of-day effects
+	temperature -= 0.33 * timeSunrise + 0.2 * timeMidnight;
+	humidity    -= 0.08 * timeSunset;
+
+	// Biome effects
+	temperature += biomeTemperature * biomeTemperatureWeight;
+	humidity    += biomeHumidity * biomeHumidityWeight;
+
+	// In-game weather effects
+	humidity    += wetness;
+	windStrength = 0.6 * windStrength + 0.4 * rainStrength;
+
+	return clamp01(vec3(temperature, humidity, windStrength) + weatherBias);
+#endif
 }
 
 /* -- clouds -- */
 
-// volumetric layer 0 (cumulus/stratocumulus)
+// layer 0 (cumulus, cumulus humilis, stratocumulus, stratus)
 
-float vcloudLayer0Coverage(vec3 weather) {
-	float temperatureWeight = 1.0 - 0.2 * linearStep(0.8, 1.0, weather.x);
-	float humidityWeight    = sqrt(max0(weather.y));
-	return 0.7 * VCLOUD_LAYER0_COVERAGE * temperatureWeight * humidityWeight;
+// higher humidity -> higher coverage
+// very high temperature -> lower coverage
+vec2 cloudsLayer0Coverage(vec3 weather) {
+	const vec2 localVariation = vec2(-0.2, 0.16);
+
+	float temperatureWeight = 1.0 + 0.4 * (1.0 - linearStep(0.0, 0.21, weather.x));
+	float humidityWeight    = 0.2 + 0.8 * sqrt(max0(weather.y));
+	float weatherWeight     = 1.0 + 0.15 * wetness;
+
+	float coverage = temperatureWeight * humidityWeight * weatherWeight;
+	      coverage = mix(0.5, coverage, CLOUDS_LAYER0_WEATHER_INFLUENCE) * CLOUDS_LAYER0_COVERAGE;
+
+	return coverage + localVariation;
 }
 
-float vcloudLayer0Density(vec3 weather) {
-	const float vcloudExtinctionCoeff = 0.1;
-	return (VCLOUD_LAYER0_DENSITY * vcloudExtinctionCoeff) * (0.5 + 0.5 * abs(lightDir.y));
+// lower temperature -> stratus
+// higher temperature + medium-low humidity -> cumulus humilis
+vec4 cloudsLayer0CloudType(vec3 weather) {
+	const vec2 localVariationSt    = vec2(-0.2, 0.2);
+	const vec2 localVariationCuHum = vec2(-0.2, 0.2);
+	const vec4 userSetting         = vec4(vec2(CLOUDS_LAYER0_STRATUS_AMOUNT), vec2(CLOUDS_LAYER0_CUMULUS_HUMILIS_AMOUNT)) * 2.0 - 1.0;
+
+	float st = 1.0 - sqr(linearStep(0.0, 0.5, weather.x));
+	float cuHum = linearStep(0.65, 0.8, weather.x) * (1.0 - linearStep(0.9, 1.0, weather.y));
+
+	return clamp01(vec4(st + localVariationSt, cuHum + localVariationCuHum) * (1.0 - CLOUDS_LAYER0_WEATHER_INFLUENCE) + userSetting);
 }
 
-float vcloudLayer0TypeBlend(vec3 weather) {
-	return 1.0 - linearStep(0.25, 0.45, weather.x);
+// allow light to travel further through the cloud when the sun is close to the horizon
+float cloudsLayer0Density(vec3 weather) {
+	const float cloudsExtinctionCoeff = 0.115;
+	return (CLOUDS_LAYER0_DENSITY * cloudsExtinctionCoeff) * (0.5 + 0.5 * abs(lightDir.y));
 }
 
-float vcloudLayer0DetailMultiplier(vec3 weather) {
-	return VCLOUD_LAYER0_WISPINESS;
-}
+// layer 1 (altocumulus, altostratus)
 
-float vcloudLayer0CurlMultiplier(vec3 weather) {
-	return VCLOUD_LAYER0_SWIRLINESS;
-}
+// high humidity -> high coverage
+// medium-high temperature -> high coverage
+vec2 cloudsLayer1Coverage(vec3 weather) {
+	const vec2 localVariation = vec2(-0.08, 0.08);
 
-// volumetric layer 1 (altocumulus/altostratus)
-
-float vcloudLayer1Coverage(vec3 weather) {
-	float temperatureWeight = linearStep(0.3, 0.6, weather.x);
+	float temperatureWeight = 0.4 + 0.6 * linearStep(0.4, 0.63, weather.x) * (1.0 - 0.25 * linearStep(0.81, 1.0, weather.x));
 	float humidityWeight    = linearStep(0.4, 0.6, weather.y);
-	return VCLOUD_LAYER1_COVERAGE * temperatureWeight * humidityWeight;
+	float weatherWeight     = 1.0 + 0.2 * wetness;
+
+	float coverage = temperatureWeight * humidityWeight * weatherWeight;
+	      coverage = mix(0.5, coverage, CLOUDS_LAYER1_WEATHER_INFLUENCE) * CLOUDS_LAYER1_COVERAGE;
+
+	return coverage + localVariation;
 }
 
-float vcloudLayer1TypeBlend(vec3 weather) {
-	return 0.5 - linearStep(0.15, 0.35, weather.x) + VCLOUD_LAYER0_TYPE_BLEND;
+vec4 cloudsLayer1CloudType(vec3 weather) {
+	return vec4(0.0);
+}
+
+// planar clouds
+
+// higher humidity -> higher coverage
+// lower temperature -> higher coverage
+float cloudsCirrusCoverage(vec3 weather) {
+	float temperatureWeight = 0.6 + 0.4 * sqr(linearStep(0.5, 0.9, weather.x))
+	                        + 0.4 * (1.0 - linearStep(0.0, 0.2, weather.x));
+	float humidityWeight    = 1.0 - 0.33 * linearStep(0.5, 0.75, weather.y);
+
+	return temperatureWeight * humidityWeight;
+}
+
+// higher temperature -> higher coverage
+// higher humidity -> higher coverage
+float cloudsCirrocumulusCoverage(vec3 weather) {
+	float temperatureWeight = 0.4 + 0.6 * linearStep(0.5, 0.8, weather.x);
+	float humidityWeight    = linearStep(0.4, 0.6, weather.y);
+	float weatherWeight     = 1.0 + 0.2 * wetness;
+
+	return temperatureWeight * humidityWeight * weatherWeight;
 }
 
 /* -- fog -- */
@@ -91,7 +150,7 @@ void getRainPuddles(
 	sampler2D noiseSampler,
 	float porosity,
 	vec2 lmCoord,
-	vec3 worldPos,
+	vec3 positionWorld,
 	vec3 geometryNormal,
 	inout vec3 normal,
 	inout vec3 albedo,
@@ -110,7 +169,7 @@ void getRainPuddles(
 
 	if (wetness < 0.0 || biomeMayRain < 0.0) return;
 
-	float puddle = texture(noiseSampler, worldPos.xz * puddleFrequency).w;
+	float puddle = texture(noiseSampler, positionWorld.xz * puddleFrequency).w;
 	      puddle = linearStep(0.45, 0.55, puddle) * wetness * biomeMayRain * max0(geometryNormal.y);
 
 	// prevent puddles from appearing indoors
@@ -126,12 +185,12 @@ void getRainPuddles(
 	roughness = min(roughness, mix(roughness, puddleRoughness, puddle));
 
 	const float h = 0.1;
-	float ripple0 = getRippleHeightmap(noiseSampler, worldPos.xz);
-	float ripple1 = getRippleHeightmap(noiseSampler, worldPos.xz + vec2(h, 0.0));
-	float ripple2 = getRippleHeightmap(noiseSampler, worldPos.xz + vec2(0.0, h));
+	float ripple0 = getRippleHeightmap(noiseSampler, positionWorld.xz);
+	float ripple1 = getRippleHeightmap(noiseSampler, positionWorld.xz + vec2(h, 0.0));
+	float ripple2 = getRippleHeightmap(noiseSampler, positionWorld.xz + vec2(0.0, h));
 
 	vec3 rippleNormal     = vec3(ripple1 - ripple0, ripple2 - ripple0, h);
-	     rippleNormal.xy *= 0.05 * smoothstep(0.0, 0.1, abs(dot(geometryNormal, normalize(worldPos - cameraPosition))));
+	     rippleNormal.xy *= 0.05 * smoothstep(0.0, 0.1, abs(dot(geometryNormal, normalize(positionWorld - cameraPosition))));
 	     rippleNormal     = normalize(rippleNormal);
 		 rippleNormal     = rippleNormal.xzy; // convert to world space
 

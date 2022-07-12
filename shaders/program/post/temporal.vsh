@@ -16,7 +16,7 @@ out vec2 coord;
 
 flat out float globalExposure;
 
-#ifdef HISTOGRAM_VIEW
+#if DEBUG_VIEW == DEBUG_VIEW_HISTOGRAM
 flat out vec4[HISTOGRAM_BINS / 4] histogramPdf;
 flat out float histogramSelectedBin;
 #endif
@@ -157,7 +157,7 @@ void main() {
 	globalExposure = mix(targetExposure, previousExposure, blendWeight);
 #endif
 
-#ifdef HISTOGRAM_VIEW
+#if DEBUG_VIEW == DEBUG_VIEW_HISTOGRAM
 	for (int i = 0; i < HISTOGRAM_BINS; ++i) histogramPdf[i >> 2][i & 3] = pdf[i];
 	histogramSelectedBin = getBinFromLuminance(luminance);
 #endif

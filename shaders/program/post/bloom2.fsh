@@ -36,7 +36,7 @@ void main() {
 
 	if (clamp01(tileCoord) != tileCoord || tileIndex > float(BLOOM_TILES)) { bloom = vec3(0.0); return; };
 
-	vec2 padAmount = 1.0 * rcp(vec2(960.0, 540.0)) * tileScale;
+	vec2 padAmount = 1.0 * rcp(vec2(960.0, 1080.0)) * tileScale;
 	tileCoord = linearStep(padAmount, 1.0 - padAmount, tileCoord);
 
 	float pixelSize = rcp(1080.0);
@@ -46,7 +46,11 @@ void main() {
 	for (int y = -3; y <= 3; ++y) {
 		float weight = binomialWeights7[abs(y)];
 
-		vec2 sampleCoord = clamp01(tileCoord * rcp(tileScale) + tileOffset + vec2(0.0, y * pixelSize));
+		vec2 offset = vec2(0.0, y * pixelSize) * tileScale;
+
+		vec2 sampleCoord = tileCoord + offset;
+		     sampleCoord = clamp(sampleCoord, padAmount, 1.0 - padAmount);
+			 sampleCoord = sampleCoord * rcp(tileScale) + tileOffset;
 
 		bloom += textureLod(colortex15, sampleCoord, 0).rgb * weight;
 	}

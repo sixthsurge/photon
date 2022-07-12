@@ -69,7 +69,7 @@ uniform float biomeMayRain;
 uniform float timeSunset;
 uniform float timeNoon;
 uniform float timeSunrise;
-uniform float timeMidight;
+uniform float timeMidnight;
 
 uniform float worldAge;
 

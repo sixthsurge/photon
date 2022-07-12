@@ -34,8 +34,7 @@ void main() {
 #endif
 
 	if (coord.y < 0.5) {
-		const vec2 padAmount = rcp(vec2(960.0, 540.0));
-		vec2 windowCoord = linearStep(padAmount, 1.0 - padAmount, vec2(1.0, 2.0) * coord);
+		vec2 windowCoord = vec2(1.0, 2.0) * coord;
 
 		int lod = int(textureQueryLod(colortex8, windowCoord).x);
 		bloom = textureBicubicLod(colortex8, windowCoord, lod).rgb;

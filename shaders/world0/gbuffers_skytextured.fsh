@@ -37,8 +37,8 @@ void main() {
 	switch (renderStage) {
 #ifdef VANILLA_SUN
 	case MC_RENDER_STAGE_SUN:
-	 	// alpha of 3 <=> sun
-		fragColor.a = 3.0 / 255.0;
+	 	// alpha of 2 <=> sun
+		fragColor.a = 2.0;
 
 		// Cut out the sun itself (discard the halo around it)
 		offset = texCoord * 2.0 - 1.0;
@@ -50,7 +50,7 @@ void main() {
 #ifdef VANILLA_MOON
 	case MC_RENDER_STAGE_MOON:
 	 	// alpha of 3 <=> moon
-		fragColor.a = 3.0 / 255.0;
+		fragColor.a = 3.0;
 
 		// Cut out the moon itself (discard the halo around it) and flip moon texture along the
 		// diagonal
@@ -64,7 +64,7 @@ void main() {
 
 	case MC_RENDER_STAGE_CUSTOM_SKY:
 	 	// alpha of 4 <=> custom sky
-		fragColor.a = 4.0 / 255.0;
+		fragColor.a = 4.0;
 		break;
 
 	default:

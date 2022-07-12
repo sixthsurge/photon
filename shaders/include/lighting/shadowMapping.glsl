@@ -26,7 +26,7 @@ float getDistantShadows(float skylight, float NoL, out float sssDepth) {
 
 #ifndef SHADOW
 vec3 getShadows(
-	vec3 scenePos,
+	vec3 positionScene,
 	vec3 normal,
 	float NoL,
 	float skylight,
@@ -38,11 +38,11 @@ vec3 getShadows(
 	return vec3(getDistantShadows(skylight, NoL, sssDepth));
 }
 #else
-vec3 textureShadowBilinear(vec3 shadowScreenPos) {
-	float shadow = texture(shadowtex1, shadowScreenPos);
+vec3 textureShadowBilinear(vec3 positionShadowScreen) {
+	float shadow = texture(shadowtex1, positionShadowScreen);
 
 #ifdef SHADOW_COLOR
-	vec3 color = texture(shadowcolor0, shadowScreenPos.xy).rgb;
+	vec3 color = texture(shadowcolor0, positionShadowScreen.xy).rgb;
 	return shadow * color;
 #else
 	return vec3(shadow);
@@ -50,8 +50,8 @@ vec3 textureShadowBilinear(vec3 shadowScreenPos) {
 }
 
 vec3 textureShadowPcf(
-	vec3 shadowScreenPos,
-	vec3 shadowClipPos,
+	vec3 positionShadowScreen,
+	vec3 positionShadowClip,
 	float penumbraRadius,
 	float distortionFactor,
 	float dither
@@ -76,11 +76,11 @@ vec3 textureShadowPcf(
 	// Perform first 4 iterations
 	for (uint i = 0; i < 4; ++i) {
 		vec2 offset = rotateAndScale * blueNoiseDisk[i];
-		vec2 coord  = shadowClipPos.xy + offset;
+		vec2 coord  = positionShadowClip.xy + offset;
 		     coord /= getShadowDistortionFactor(coord);
 		     coord  = coord * 0.5 + 0.5;
 
-		shadowSum += texture(shadowtex1, vec3(coord, shadowScreenPos.z));
+		shadowSum += texture(shadowtex1, vec3(coord, positionShadowScreen.z));
 #ifdef SHADOW_COLOR
 		vec3 colorSample = texelFetch(shadowcolor0, ivec2(coord * vec2(shadowMapResolution)), 0).rgb;
 		colorSum += colorSample;
@@ -104,11 +104,11 @@ vec3 textureShadowPcf(
 	// Perform remaining iterations
 	for (uint i = 4; i < stepCount; ++i) {
 		vec2 offset = rotateAndScale * blueNoiseDisk[i];
-		vec2 coord  = shadowClipPos.xy + offset;
+		vec2 coord  = positionShadowClip.xy + offset;
 		     coord /= getShadowDistortionFactor(coord);
 		     coord  = coord * 0.5 + 0.5;
 
-		shadowSum += texture(shadowtex1, vec3(coord, shadowScreenPos.z));
+		shadowSum += texture(shadowtex1, vec3(coord, positionShadowScreen.z));
 #ifdef SHADOW_COLOR
 		colorSum += texelFetch(shadowcolor0, ivec2(coord * vec2(shadowMapResolution)), 0).rgb;
 #endif
@@ -127,7 +127,7 @@ vec3 textureShadowPcf(
 #endif
 }
 
-float blockerSearch(vec3 shadowScreenPos, vec3 shadowClipPos, float dither, out float sssDepth) {
+float blockerSearch(vec3 positionShadowScreen, vec3 positionShadowClip, float dither, out float sssDepth) {
 	const uint stepCount = SHADOW_BLOCKER_SEARCH_STEPS;
 
 	float radius = SHADOW_BLOCKER_SEARCH_RADIUS * shadowProjection[0].x;
@@ -139,16 +139,16 @@ float blockerSearch(vec3 shadowScreenPos, vec3 shadowClipPos, float dither, out 
 	mat2 rotateAndScale = getRotationMatrix(tau * dither) * radius;
 
 	for (uint i = 0; i < stepCount; ++i) {
-		vec2 coord   = shadowClipPos.xy + rotateAndScale * blueNoiseDisk[i];
+		vec2 coord   = positionShadowClip.xy + rotateAndScale * blueNoiseDisk[i];
 		     coord /= getShadowDistortionFactor(coord);
 		     coord   = 0.5 * coord + 0.5;
 
 		float depth  = texelFetch(shadowtex0, ivec2(coord * shadowMapResolution), 0).x;
-		float weight = step(depth, shadowScreenPos.z);
+		float weight = step(depth, positionShadowScreen.z);
 
 		depthSum    += weight * depth;
 		weightSum   += weight;
-		depthSumSss += max0(shadowScreenPos.z - depth);
+		depthSumSss += max0(positionShadowScreen.z - depth);
 	}
 
 	depthSum = weightSum == 0.0 ? 0.0 : depthSum / weightSum;
@@ -166,7 +166,7 @@ float getPenumbraRadiusFromBlockerDepth(float depth, float blockerDepth, float c
 }
 
 vec3 getShadows(
-	vec3 scenePos,
+	vec3 positionScene,
 	vec3 normal,
 	float NoL,
 	float skylight,
@@ -181,26 +181,26 @@ vec3 getShadows(
 	if (NoL < eps) return vec3(0.0);
 #endif
 
-	vec3 shadowViewPos = transform(shadowModelView, scenePos);
-	vec3 shadowClipPos = projectOrtho(shadowProjection, shadowViewPos);
+	vec3 positionShadowView = transform(shadowModelView, positionScene);
+	vec3 positionShadowClip = projectOrtho(shadowProjection, positionShadowView);
 
-	float distortionFactor = getShadowDistortionFactor(shadowClipPos.xy);
+	float distortionFactor = getShadowDistortionFactor(positionShadowClip.xy);
 
 	// gri573's method to prevent peter panning
 	// Apply shadow bias in direction of normal rather than in direction of the light
 	// Prevents peter panning, but can cause shadows to be shortened or misaligned on edges
 	float biasScale = 1.0 + 2.0 * pow5(max0(dot(normal, lightDir))); // Intended to fix the 'blob' of shadow acne that appears when the sun is near the horizon
 	vec3 shadowNormal = diagonal(shadowProjection).xyz * (mat3(shadowModelView) * normal);
-	vec3 shadowClipPos1 = shadowClipPos + SHADOW_BIAS * biasScale * sqr(distortionFactor) * shadowNormal;
+	vec3 positionShadowClip1 = positionShadowClip + SHADOW_BIAS * biasScale * sqr(distortionFactor) * shadowNormal;
 
-	vec3 shadowScreenPos = distortShadowSpace(shadowClipPos1, distortionFactor) * 0.5 + 0.5;
+	vec3 positionShadowScreen = distortShadowSpace(positionShadowClip1, distortionFactor) * 0.5 + 0.5;
 
 	// Fake, lightmap-based shadows for outside of the shadow distance
 	float distantShadow = getDistantShadows(skylight, NoL, sssDepth);
-	if (clamp01(shadowScreenPos) != shadowScreenPos) return vec3(distantShadow);
+	if (clamp01(positionShadowScreen) != positionShadowScreen) return vec3(distantShadow);
 
 	// Fade into distant shadows in the distance
-	float distanceFade = smoothstep(0.45, 0.5, maxOf(abs(shadowScreenPos.xy - 0.5)));
+	float distanceFade = smoothstep(0.45, 0.5, maxOf(abs(positionShadowScreen.xy - 0.5)));
 	distantShadow = mix(1.0, distantShadow, distanceFade);
 
 #ifdef SHADOW_LEAK_PREVENTION
@@ -214,12 +214,12 @@ vec3 getShadows(
 #endif
 
 #if   SHADOW_QUALITY == SHADOW_QUALITY_FAST
-	return textureShadowBilinear(shadowScreenPos) * distantShadow;
+	return textureShadowBilinear(positionShadowScreen) * distantShadow;
 #elif SHADOW_QUALITY == SHADOW_QUALITY_FANCY
 	float dither = interleavedGradientNoise(gl_FragCoord.xy, frameCounter);
 
-	float blockerDepth = blockerSearch(shadowScreenPos, shadowClipPos, dither, sssDepth);
-	float penumbraRadius = getPenumbraRadiusFromBlockerDepth(shadowScreenPos.z, blockerDepth, cloudShadow);
+	float blockerDepth = blockerSearch(positionShadowScreen, positionShadowClip, dither, sssDepth);
+	float penumbraRadius = getPenumbraRadiusFromBlockerDepth(positionShadowScreen.z, blockerDepth, cloudShadow);
 
 	if (NoL < eps) {
 	 	// Now we can exit early for SSS blocks
@@ -230,8 +230,8 @@ vec3 getShadows(
 	}
 
 	return textureShadowPcf(
-		shadowScreenPos,
-		shadowClipPos1,
+		positionShadowScreen,
+		positionShadowClip1,
 		penumbraRadius,
 		distortionFactor,
 		dither

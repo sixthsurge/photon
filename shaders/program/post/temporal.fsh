@@ -17,7 +17,7 @@ in vec2 coord;
 
 flat in float globalExposure;
 
-#ifdef HISTOGRAM_VIEW
+#if DEBUG_VIEW == DEBUG_VIEW_HISTOGRAM
 flat in vec4[HISTOGRAM_BINS / 4] histogramPdf;
 flat in float histogramSelectedBin;
 #endif
@@ -123,7 +123,7 @@ float distanceToClip(vec3 history, vec3 aabbMin, vec3 aabbMax) {
 	return clamp01(distanceToClip);
 }
 
-#ifdef HISTOGRAM_VIEW
+#if DEBUG_VIEW == DEBUG_VIEW_HISTOGRAM
 void drawHistogram(ivec2 texel) {
 	const int width = 512;
 	const int height = 256;
@@ -232,7 +232,7 @@ void main() {
 	temporalDepth = linearizeDepth(depth);
 #endif
 
-#ifdef HISTOGRAM_VIEW
+#if DEBUG_VIEW == DEBUG_VIEW_HISTOGRAM
 	drawHistogram(dstTexel);
 #endif
 

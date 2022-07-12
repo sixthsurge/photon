@@ -1,22 +1,22 @@
 /*
-0  | rgba8   | Fullscreen        | Overlays, vanilla sky (solid -> deferred), translucent albedo (translucent -> composite)
-1  | rg32ui  | Fullscreen        | Gbuffer data (solid -> composite)
-2  | rgb16f  | Fullscreen        | Velocity vectors (solid -> composite), post-processing color (composite)
-3  | rgb11f  | TAA render scale  | Scene radiance (deferred -> composite)
-4  | rgb11f  | 256x128           | Sky capture, lighting color palette, dynamic weather properties (deferred -> composite)
-5  | rgba16  | TAA render scale  | Low-res clouds (deferred), indirect lighting data (deferred), responsive aa flag and depth min/max (composite)
-6  | rgb16f  | TAA render scale  | Atmosphere scattering (deferred -> composite), volumetric fog scattering (composite), taa min color (composite)
-7  | rgb16f  | TAA render scale  | Volumetric fog transmittance (composite), taa max color (composite)
-8  | rgba16f | Fullscreen        | Scene history
-9  | rgba16f | SSPT render scale | SSR history
-10 | rgba16f | SSPT render scale | Indirect lighting history
-11 | rgb16f  | TAA render scale  | Clouds history
-12 | rg8     | TAA render scale  | Clouds pixel age
-13 | rg16f   | TAA render scale  | Previous frame depth
-14 | r32f    | Fullscreen        | Temporally stable linear depth
-15 | rgb11f  | 960x1080          | Cloud shadow map, bloom buffer
+0  | rgba16f | fullscreen        | overlays, vanilla sky (solid -> deferred), forwardly rendered objects (translucent -> composite)
+1  | rg32ui  | fullscreen        | gbuffer data (solid -> composite)
+2  | rgb16f  | fullscreen        | velocity vectors (solid -> composite), post-processing color (composite)
+3  | rgb11f  | TAA render scale  | scene radiance (deferred -> composite)
+4  | rgb11f  | 256x128           | sky capture, lighting color palette, dynamic weather properties (deferred -> composite)
+5  | rgba16  | TAA render scale  | low-res clouds (deferred), indirect lighting data (deferred), responsive aa flag and depth min/max (composite)
+6  | rgb16f  | TAA render scale  | atmosphere scattering (deferred -> composite), volumetric fog scattering (composite), taa min color (composite)
+7  | rgb16f  | TAA render scale  | volumetric fog transmittance (composite), taa max color (composite)
+8  | rgba16f | fullscreen        | scene history
+9  | rgba16  | fullscreen        | water mask (translucent -> composite)
+10 | rgba16f | SSPT render scale | indirect lighting history
+11 | rgb16f  | TAA render scale  | clouds history
+12 | rg8     | TAA render scale  | clouds pixel age
+13 | rg16f   | TAA render scale  | previous frame depth
+14 | r32f    | fullscreen        | temporally stable linear depth
+15 | rgb11f  | 960x1080          | cloud shadow map, bloom buffer
 
-const int colortex0Format  = RGBA8;
+const int colortex0Format  = RGBA16F;
 const int colortex2Format  = RGB16F;
 const int colortex3Format  = R11F_G11F_B10F;
 const int colortex4Format  = R11F_G11F_B10F;
@@ -24,7 +24,7 @@ const int colortex5Format  = RGBA16;
 const int colortex6Format  = RGBA16F;
 const int colortex7Format  = RGB16F;
 const int colortex8Format  = RGBA16F;
-const int colortex9Format  = RGBA16F;
+const int colortex9Format  = RGBA16;
 const int colortex10Format = RGBA16;
 const int colortex11Format = RGBA16F;
 const int colortex12Format = R8I;
@@ -43,7 +43,7 @@ const bool colortex5Clear  = false;
 const bool colortex6Clear  = false;
 const bool colortex7Clear  = false;
 const bool colortex8Clear  = false;
-const bool colortex9Clear  = false;
+const bool colortex9Clear  = true;
 const bool colortex10Clear = false;
 const bool colortex11Clear = false;
 const bool colortex12Clear = false;
@@ -52,6 +52,7 @@ const bool colortex14Clear = false;
 const bool colortex15Clear = false;
 
 const vec4 colortex0ClearColor = vec4(0.0, 0.0, 0.0, 0.0);
+const vec4 colortex9ClearColor = vec4(0.0, 0.0, 0.0, 0.0);
 
 // Select texture format for colortex1 based on how much data is required
 // This is formatted like this because OF doesn't detect #if defined so I can't use #elif or ||

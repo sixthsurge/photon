@@ -38,12 +38,10 @@ screen.temporal                        = Temporal AA
 screen.reflections                     = Reflections
 screen.wavingBlocks                    = Waving Blocks
 
-screen.vcloud                          = Volumetric Clouds
-screen.pcloud                          = Planar Clouds
-screen.vcloudLayer0                    = Layer 0
-screen.vcloudLayer1                    = Layer 1
-screen.vcloudLayer2                    = Layer 2
-screen.vcloudLayer3                    = Layer 3
+screen.cloudsLayer0                    = Layer 0
+screen.cloudsLayer1                    = Layer 1
+screen.cloudsLayer2                    = Layer 2
+screen.cloudsLayer3                    = Layer 3
 
 screen.sunlightTint                    = Sunlight Tint
 screen.moonlightTint                   = Moonlight Tint
@@ -71,88 +69,103 @@ suffix.CLOUDS_SCALE                    = x
 
 # Layer 0
 
-option.VCLOUD_LAYER0                   = Enabled
-option.VCLOUD_LAYER0_SHADOW            = Casts Shadows
-option.VCLOUD_LAYER0_PRIMARY_STEPS     = Primary Steps
-option.VCLOUD_LAYER0_LIGHTING_STEPS    = Lighting Steps
-option.VCLOUD_LAYER0_ALTITUDE          = Altitude
-option.VCLOUD_LAYER0_THICKNESS         = Thickness
-option.VCLOUD_LAYER0_COVERAGE          = Coverage
-option.VCLOUD_LAYER0_DENSITY           = Density
-option.VCLOUD_LAYER0_TYPE_BLEND        = Cloud Type
-option.VCLOUD_LAYER0_FREQUENCY         = Frequency
-option.VCLOUD_LAYER0_WISPINESS         = Wispiness
-option.VCLOUD_LAYER0_SWIRLINESS        = Swirliness
-option.VCLOUD_LAYER0_WIND_SPEED        = Wind Speed
-option.VCLOUD_LAYER0_WIND_ANGLE        = Wind Angle
+option.CLOUDS_LAYER0                   = Enabled
+option.CLOUDS_LAYER0_SHADOW            = Casts Shadows
+option.CLOUDS_LAYER0_PRIMARY_STEPS     = Primary Steps
+option.CLOUDS_LAYER0_LIGHTING_STEPS    = Lighting Steps
+option.CLOUDS_LAYER0_ALTITUDE          = Altitude
+option.CLOUDS_LAYER0_THICKNESS         = Thickness
+option.CLOUDS_LAYER0_COVERAGE          = Coverage
+option.CLOUDS_LAYER0_FREQUENCY         = Frequency
+option.CLOUDS_LAYER0_DENSITY           = Density
+option.CLOUDS_LAYER0_STRATUS_AMOUNT    = Stratus Amount
+option.CLOUDS_LAYER0_CUMULUS_HUMILIS_AMOUNT = Cumulus Humilis Amount
+option.CLOUDS_LAYER0_WIND_SPEED        = Wind Speed
+option.CLOUDS_LAYER0_WIND_ANGLE        = Wind Angle
+option.CLOUDS_LAYER0_WEATHER_INFLUENCE = Weather Influence
 
-suffix.VCLOUD_LAYER0_ALTITUDE          = m
-suffix.VCLOUD_LAYER0_THICKNESS         = m
-suffix.VCLOUD_LAYER0_WIND_SPEED        = m/s
-suffix.VCLOUD_LAYER0_WIND_ANGLE        = °
+suffix.CLOUDS_LAYER0_ALTITUDE          = m
+suffix.CLOUDS_LAYER0_THICKNESS         = m
+suffix.CLOUDS_LAYER0_WIND_SPEED        = m/s
+suffix.CLOUDS_LAYER0_WIND_ANGLE        = °
 
 # Layer 1
-option.VCLOUD_LAYER1                   = Enabled
-option.VCLOUD_LAYER1_SHADOW            = Casts Shadows
-option.VCLOUD_LAYER1_PRIMARY_STEPS     = Primary Steps
-option.VCLOUD_LAYER1_LIGHTING_STEPS    = Lighting Steps
-option.VCLOUD_LAYER1_ALTITUDE          = Altitude
-option.VCLOUD_LAYER1_THICKNESS         = Thickness
-option.VCLOUD_LAYER1_COVERAGE          = Coverage
-option.VCLOUD_LAYER1_DENSITY           = Density
-option.VCLOUD_LAYER1_TYPE_BLEND        = Cloud Type
-option.VCLOUD_LAYER1_FREQUENCY         = Frequency
-option.VCLOUD_LAYER1_WISPINESS         = Wispiness
-option.VCLOUD_LAYER1_SWIRLINESS        = Swirliness
-option.VCLOUD_LAYER1_WIND_SPEED        = Wind Speed
-option.VCLOUD_LAYER1_WIND_ANGLE        = Wind Angle
 
-suffix.VCLOUD_LAYER1_ALTITUDE          = m
-suffix.VCLOUD_LAYER1_THICKNESS         = m
-suffix.VCLOUD_LAYER1_WIND_SPEED        = m/s
-suffix.VCLOUD_LAYER1_WIND_ANGLE        = °
+option.CLOUDS_LAYER1                   = Enabled
+option.CLOUDS_LAYER1_SHADOW            = Casts Shadows
+option.CLOUDS_LAYER1_PRIMARY_STEPS     = Primary Steps
+option.CLOUDS_LAYER1_LIGHTING_STEPS    = Lighting Steps
+option.CLOUDS_LAYER1_ALTITUDE          = Altitude
+option.CLOUDS_LAYER1_THICKNESS         = Thickness
+option.CLOUDS_LAYER1_COVERAGE          = Coverage
+option.CLOUDS_LAYER1_FREQUENCY         = Frequency
+option.CLOUDS_LAYER1_DENSITY           = Density
+option.CLOUDS_LAYER1_STRATUS_AMOUNT    = Stratus Amount
+option.CLOUDS_LAYER1_CUMULUS_HUMILIS_AMOUNT = Cumulus Humilis Amount
+option.CLOUDS_LAYER1_WIND_SPEED        = Wind Speed
+option.CLOUDS_LAYER1_WIND_ANGLE        = Wind Angle
+option.CLOUDS_LAYER1_WEATHER_INFLUENCE = Weather Influence
+
+suffix.CLOUDS_LAYER1_ALTITUDE          = m
+suffix.CLOUDS_LAYER1_THICKNESS         = m
+suffix.CLOUDS_LAYER1_WIND_SPEED        = m/s
+suffix.CLOUDS_LAYER1_WIND_ANGLE        = °
 
 # Layer 2
-option.VCLOUD_LAYER2                   = Enabled
-option.VCLOUD_LAYER2_SHADOW            = Casts Shadows
-option.VCLOUD_LAYER2_PRIMARY_STEPS     = Primary Steps
-option.VCLOUD_LAYER2_LIGHTING_STEPS    = Lighting Steps
-option.VCLOUD_LAYER2_ALTITUDE          = Altitude
-option.VCLOUD_LAYER2_THICKNESS         = Thickness
-option.VCLOUD_LAYER2_COVERAGE          = Coverage
-option.VCLOUD_LAYER2_DENSITY           = Density
-option.VCLOUD_LAYER2_TYPE_BLEND        = Cloud Type
-option.VCLOUD_LAYER2_FREQUENCY         = Frequency
-option.VCLOUD_LAYER2_WISPINESS         = Wispiness
-option.VCLOUD_LAYER2_SWIRLINESS        = Swirliness
-option.VCLOUD_LAYER2_WIND_SPEED        = Wind Speed
-option.VCLOUD_LAYER2_WIND_ANGLE        = Wind Angle
 
-suffix.VCLOUD_LAYER2_ALTITUDE          = m
-suffix.VCLOUD_LAYER2_THICKNESS         = m
-suffix.VCLOUD_LAYER2_WIND_SPEED        = m/s
-suffix.VCLOUD_LAYER2_WIND_ANGLE        = °
+option.CLOUDS_LAYER2                   = Enabled
+option.CLOUDS_LAYER2_MODE              = Layer Type
+option.CLOUDS_LAYER2_SHADOW            = Casts Shadows
+option.CLOUDS_LAYER2_PRIMARY_STEPS     = Primary Steps
+option.CLOUDS_LAYER2_LIGHTING_STEPS    = Lighting Steps
+option.CLOUDS_LAYER2_ALTITUDE          = Altitude
+option.CLOUDS_LAYER2_THICKNESS         = Thickness
+option.CLOUDS_LAYER2_COVERAGE          = Coverage
+option.CLOUDS_LAYER2_FREQUENCY         = Frequency
+option.CLOUDS_LAYER2_DENSITY           = Density
+option.CLOUDS_LAYER2_CIRRUS_AMOUNT     = Cirrus Amount (Planar)
+option.CLOUDS_LAYER2_CIRROCUMULUS_AMOUNT = Cirrocumulus Amount (Planar)
+option.CLOUDS_LAYER2_STRATUS_AMOUNT    = Stratus Amount (Vol.)
+option.CLOUDS_LAYER2_CUMULUS_HUMILIS_AMOUNT = Cumulus Humilis Amount (Vol.)
+option.CLOUDS_LAYER2_WIND_SPEED        = Wind Speed
+option.CLOUDS_LAYER2_WIND_ANGLE        = Wind Angle
+option.CLOUDS_LAYER2_WEATHER_INFLUENCE = Weather Influence
+
+value.CLOUDS_LAYER2_MODE.CLOUDS_MODE_VOLUMETRIC = Volumetric
+value.CLOUDS_LAYER2_MODE.CLOUDS_MODE_PLANAR = Planar
+
+suffix.CLOUDS_LAYER2_ALTITUDE          = m
+suffix.CLOUDS_LAYER2_THICKNESS         = m
+suffix.CLOUDS_LAYER2_WIND_SPEED        = m/s
+suffix.CLOUDS_LAYER2_WIND_ANGLE        = °
 
 # Layer 3
-option.VCLOUD_LAYER3                   = Enabled
-option.VCLOUD_LAYER3_SHADOW            = Casts Shadows
-option.VCLOUD_LAYER3_PRIMARY_STEPS     = Primary Steps
-option.VCLOUD_LAYER3_LIGHTING_STEPS    = Lighting Steps
-option.VCLOUD_LAYER3_ALTITUDE          = Altitude
-option.VCLOUD_LAYER3_THICKNESS         = Thickness
-option.VCLOUD_LAYER3_COVERAGE          = Coverage
-option.VCLOUD_LAYER3_DENSITY           = Density
-option.VCLOUD_LAYER3_TYPE_BLEND        = Cloud Type
-option.VCLOUD_LAYER3_FREQUENCY         = Frequency
-option.VCLOUD_LAYER3_WISPINESS         = Wispiness
-option.VCLOUD_LAYER3_SWIRLINESS        = Swirliness
-option.VCLOUD_LAYER3_WIND_SPEED        = Wind Speed
-option.VCLOUD_LAYER3_WIND_ANGLE        = Wind Angle
 
-suffix.VCLOUD_LAYER3_ALTITUDE          = m
-suffix.VCLOUD_LAYER3_THICKNESS         = m
-suffix.VCLOUD_LAYER3_WIND_SPEED        = m/s
-suffix.VCLOUD_LAYER3_WIND_ANGLE        = °
+option.CLOUDS_LAYER3                   = Enabled
+option.CLOUDS_LAYER3_MODE              = Layer Type
+option.CLOUDS_LAYER3_SHADOW            = Casts Shadows
+option.CLOUDS_LAYER3_PRIMARY_STEPS     = Primary Steps
+option.CLOUDS_LAYER3_LIGHTING_STEPS    = Lighting Steps
+option.CLOUDS_LAYER3_ALTITUDE          = Altitude
+option.CLOUDS_LAYER3_THICKNESS         = Thickness
+option.CLOUDS_LAYER3_COVERAGE          = Coverage
+option.CLOUDS_LAYER3_FREQUENCY         = Frequency
+option.CLOUDS_LAYER3_DENSITY           = Density
+option.CLOUDS_LAYER3_CIRRUS_AMOUNT     = Cirrus Amount (Planar)
+option.CLOUDS_LAYER3_CIRROCUMULUS_AMOUNT = Cirrocumulus Amount (Planar)
+option.CLOUDS_LAYER3_STRATUS_AMOUNT    = Stratus Amount (Vol.)
+option.CLOUDS_LAYER3_CUMULUS_HUMILIS_AMOUNT = Cumulus Humilis Amount (Vol.)
+option.CLOUDS_LAYER3_WIND_SPEED        = Wind Speed
+option.CLOUDS_LAYER3_WIND_ANGLE        = Wind Angle
+option.CLOUDS_LAYER3_WEATHER_INFLUENCE = Weather Influence
+
+value.CLOUDS_LAYER3_MODE.CLOUDS_MODE_VOLUMETRIC = Volumetric
+value.CLOUDS_LAYER3_MODE.CLOUDS_MODE_PLANAR = Planar
+
+suffix.CLOUDS_LAYER3_ALTITUDE          = m
+suffix.CLOUDS_LAYER3_THICKNESS         = m
+suffix.CLOUDS_LAYER3_WIND_SPEED        = m/s
+suffix.CLOUDS_LAYER3_WIND_ANGLE        = °
 
 # Sky
 
@@ -182,18 +195,22 @@ option.BLOOMY_FOG_INTENSITY            = Bloomy Fog Strength
 option.DYNAMIC_WEATHER                 = Dynamic Weather
 option.LIGHTNING_FLASHES               = Lightning Flashes
 option.DESERT_SANDSTORM                = Desert Sandstorm
-option.TEMPERATURE_BIAS                = Temperature Bias
-option.HUMIDITY_BIAS                   = Humidity Bias
-option.WIND_STRENGTH_BIAS              = Wind Strength Bias
+
+option.WEATHER_VARIATION_SPEED         = Variation Speed
+option.WEATHER_TEMPERATURE_BIAS        = Temperature Bias
+option.WEATHER_HUMIDITY_BIAS           = Humidity Bias
+option.WEATHER_WIND_STRENGTH_BIAS      = Wind Strength Bias
 
 #----# Lighting #----------------------------------------------------------------------------------#
 
 # SSPT
+
 option.SSPT                            = Enabled
 option.SSPT_SKYLIGHT                   = SSPT Skylight
 option.SSPT_FILTER                     = SSPT Filter
 
 # GTAO
+
 option.GTAO                            = Enabled
 option.GTAO_RADIUS                     = Radius
 option.GTAO_SLICES                     = Slices
@@ -202,6 +219,7 @@ option.GTAO_ACCUMULATION_LIMIT         = Accumulation Limit
 option.SH_SKYLIGHT                     = SH Skylight
 
 # Light Sources
+
 option.SUNLIGHT_INTENSITY              = Sunlight Intensity
 
 option.SUNLIGHT_TINT_R                 = Red
@@ -224,6 +242,7 @@ option.AMBIENT_LIGHT_TINT_G            = Green
 option.AMBIENT_LIGHT_TINT_B            = Blue
 
 # Shadow Mapping
+
 option.shadowMapResolution             = Shadow Resolution
 suffix.shadowMapResolution             = ²
 option.shadowDistance                  = Shadow Distance
@@ -270,6 +289,7 @@ value.tonemap.tonemapHejlBurgess       = Hejl-Burgess
 value.tonemap.tonemapReinhardJodie     = Reinhard-Jodie
 
 # ACES
+
 option.RRT_GLOW_GAIN                   = RRT Glow Gain
 option.RRT_GLOW_MID                    = RRT Glow Mid
 option.RRT_RED_SCALE                   = RRT Red Scale
@@ -278,6 +298,7 @@ option.RRT_SAT_FACTOR                  = RRT Saturation
 option.ODT_SAT_FACTOR                  = ODT Saturation
 
 # Bloom
+
 option.BLOOM                           = Enabled
 option.BLOOM_INTENSITY                 = Strength
 option.BLOOM_RADIUS                    = Radius
@@ -288,9 +309,11 @@ value.BLOOM_UPSAMPLING_FILTER.texture  = §bLinear
 value.BLOOM_UPSAMPLING_FILTER.textureBicubic = §dBicubic
 
 # Purkinje Shift
-option.PURKINJE_SHIFT                  = Purkinje Shift
+
+option.PURKINJE_SHIFT_INTENSITY        = Purkinje Shift Intensity
 
 # Color Grading
+
 option.GRADE                           = Enabled
 option.GRADE_BRIGHTNESS                = Brightness
 option.GRADE_CONTRAST                  = Contrast
@@ -300,6 +323,7 @@ option.GRADE_WHITE_BALANCE             = White Balance
 suffix.GRADE_WHITE_BALANCE             = K
 
 # Exposure
+
 option.CAMERA_EXPOSURE_MIN             = Minimum Exposure
 option.CAMERA_EXPOSURE_MAX             = Maximum Exposure
 option.CAMERA_EXPOSURE_BIAS            = Exposure Bias
@@ -312,14 +336,15 @@ option.CAMERA_MANUAL_EXPOSURE_VALUE    = Manual Exposure Value
 option.HISTOGRAM_BINS                  = Histogram Bins
 option.HISTOGRAM_IGNORE_DIM            = Ignore Dim Range
 option.HISTOGRAM_IGNORE_BRIGHT         = Ignore Bright Range
-option.HISTOGRAM_VIEW                  = View Histogram
 
 option.CAMERA_LOCAL_EXPOSURE           = Local Exposure
 
 # Image Sharpening
+
 option.CAS                             = Contrast-Adaptive Sharpening
 
 # Temporal AA
+
 option.TAA                             = Enabled
 option.TAA_UPSCALING_FACTOR            = Temporal Upscaling
 option.TAA_BLEND_WEIGHT                = Blend Weight
@@ -363,6 +388,7 @@ option.WAVING_LEAVES                   = Waving Leaves
 
 option.WATER_CAUSTICS                  = Caustics
 option.WATER_REFRACTION                = Refraction
+option.WATER_VOLUME_DENSITY            = Density
 
 value.WATER_REFRACTION.WATER_REFRACTION_OFF          = OFF
 value.WATER_REFRACTION.WATER_REFRACTION_APPROXIMATED = Approximated
@@ -378,11 +404,13 @@ option.WATER_DISPLACEMENT              = Water Displacement
 option.CAMERA_LOCAL_EXPOSURE_COMPARISON = Local Exposure Comparison
 
 # Debug View
+
 option.DEBUG_VIEW                      = Debug View
 
 value.DEBUG_VIEW.DEBUG_VIEW_NONE       = OFF
 value.DEBUG_VIEW.DEBUG_VIEW_SAMPLER    = Sampler
 value.DEBUG_VIEW.DEBUG_VIEW_WEATHER    = Weather
+value.DEBUG_VIEW.DEBUG_VIEW_HISTOGRAM  = Histogram
 
 option.DEBUG_SAMPLER                   = Sampler To View
 option.DEBUG_SAMPLER_EXPOSURE          = Sampler Exposure

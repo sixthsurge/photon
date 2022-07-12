@@ -46,7 +46,7 @@ void main() {
 	float depth0 = texelFetch(shadowtex0, texel, 0).x;
 	float depth1  = texelFetch(shadowtex1, texel, 0).x;
 
-	if (depth1 <= depth0 + 0.0005) { shadowcolor0Out = vec3(1.0); return; } // Solid
+	if (depth1 == depth0) { shadowcolor0Out = vec3(1.0); return; } // Solid
 
 	vec3 data = texelFetch(shadowcolor0, texel, 0).xyz;
 

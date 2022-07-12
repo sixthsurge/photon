@@ -66,7 +66,7 @@ uniform float biomeMayRain;
 uniform float timeSunset;
 uniform float timeNoon;
 uniform float timeSunrise;
-uniform float timeMidight;
+uniform float timeMidnight;
 
 uniform vec2 viewSize;
 uniform vec2 viewTexelSize;
@@ -153,11 +153,11 @@ void main() {
 	float depth = depthMax4x4(depthtex1);
 #endif
 
-	vec3 screenPos = vec3(viewTexel * viewTexelSize, depth);
-	vec3 viewPos = screenToViewSpace(screenPos, false);
+	vec3 positionScreen = vec3(viewTexel * viewTexelSize, depth);
+	vec3 positionView = screenToViewSpace(positionScreen, false);
 
 	vec3 rayOrigin = vec3(0.0, CLOUDS_SCALE * (eyeAltitude - SEA_LEVEL) + planetRadius, 0.0) + CLOUDS_SCALE * gbufferModelViewInverse[3].xyz;
-	vec3 rayDir    = mat3(gbufferModelViewInverse) * normalize(viewPos);
+	vec3 rayDir    = mat3(gbufferModelViewInverse) * normalize(positionView);
 
 	vec3 cloudsLightDir = cloudsMoonlit ? moonDir : sunDir;
 
@@ -170,12 +170,12 @@ void main() {
 		cloudsLightDir,
 		dither,
 		(depth < 1.0)
-			? length(viewPos) * CLOUDS_SCALE
+			? length(positionView) * CLOUDS_SCALE
 			: -1.0,
 		false
 	);
 
 	// Scale scattering and apparent distance to fit into a normalized integer format
-	cloudData.xy *= 1e-2;
-	cloudData.w  *= 1e-6;
+	cloudData.xy = clamp01(cloudData.xy * 1e-2);
+	cloudData.w  = clamp01(cloudData.w  * 1e-6);
 }

@@ -52,6 +52,21 @@ bool raytraceIntersection(
 
 	//--// Refinement loop
 
+	for (int i = 0; i < refinementSteps; ++i) {
+		stepLength *= 0.5;
+
+		float depthTolerance = 0.002;
+
+		float depth = texelFetch(depthSampler, ivec2(hitPos.xy * viewSize), 0).x;
+		      depth = reversedZ ? 1.0 - depth : depth;
+
+		if (depth < hitPos.z && abs(depthTolerance - (hitPos.z - depth)) < depthTolerance) {
+			hitPos -= rayVector * stepLength;
+		} else {
+			hitPos += rayVector * stepLength;
+		}
+	}
+
 	return true;
 }
 

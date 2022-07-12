@@ -82,9 +82,9 @@ void main() {
 
 	baseTex *= tint;
 #ifdef GBUFFERS_ENTITIES
-	if (baseTex.a < 0.102 && entityId != ENTITY_BOAT && entityId != ENTITY_LIGHTNING_BOLT) discard;
+	if (baseTex.a < 0.1 && entityId != ENTITY_BOAT && entityId != ENTITY_LIGHTNING_BOLT) discard;
 #else
-	if (baseTex.a < 0.102) discard;
+	if (baseTex.a < 0.1) discard;
 #endif
 
 #if defined GBUFFERS_ENTITIES
@@ -126,5 +126,10 @@ void main() {
 
 #if defined GBUFFERS_ENTITIES
 	velocityOut = velocity;
+#endif
+
+#if defined GBUFFERS_BEACONBEAM
+	// Discard the translucent edge part of the beam
+	if (baseTex.a < 0.99) discard;
 #endif
 }
