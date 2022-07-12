@@ -78,7 +78,7 @@ vec4 cloudsLayer0CloudType(vec3 weather) {
 	float st = 1.0 - sqr(linearStep(0.0, 0.5, weather.x));
 	float cuHum = linearStep(0.65, 0.8, weather.x) * (1.0 - linearStep(0.9, 1.0, weather.y));
 
-	return clamp01(vec4(st + localVariationSt, cuHum + localVariationCuHum) * (1.0 - CLOUDS_LAYER0_WEATHER_INFLUENCE) + userSetting);
+	return clamp01(vec4(st + localVariationSt, cuHum + localVariationCuHum) * CLOUDS_LAYER0_WEATHER_INFLUENCE + userSetting);
 }
 
 // allow light to travel further through the cloud when the sun is close to the horizon
