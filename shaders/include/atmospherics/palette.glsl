@@ -6,7 +6,7 @@
 
 void paletteSetup() {
 	// Added ambient lighting, so that you can see at all in caves
-	const float ambientIntensity = 0.05 * AMBIENT_LIGHT_INTENSITY;
+	const float ambientIntensity = 0.15 * AMBIENT_LIGHT_INTENSITY;
 	const vec3 ambientColor = vec3(AMBIENT_LIGHT_TINT_R, AMBIENT_LIGHT_TINT_G, AMBIENT_LIGHT_TINT_B);
 	ambientIrradiance = ambientIntensity * ambientColor * sqr(1.0 - rcp(240.0) * eyeBrightnessSmooth.y);
 

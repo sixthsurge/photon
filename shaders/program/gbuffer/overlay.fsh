@@ -23,10 +23,10 @@ void main() {
 	fragColor = texture(gtexture, texCoord, log2(renderScale));
 	if (fragColor.a < 0.1) discard;
 
-#if defined GBUFFERS_ARMOR_GLINT
+#if defined PROGRAM_GBUFFERS_ARMOR_GLINT
 	// alpha of 0 <=> enchantment glint
 	fragColor.a = 0.0;
-#elif defined GBUFFERS_DAMAGEDBLOCK
+#elif defined PROGRAM_GBUFFERS_DAMAGEDBLOCK
 	// alpha of 1 <=> damage overlay
 	fragColor.a = 1.0;
 #endif

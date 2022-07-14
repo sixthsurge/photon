@@ -19,7 +19,7 @@ void main() {
 	lmCoord = gl_MultiTexCoord1.xy * rcp(240.0);
 	tint    = gl_Color.rgb;
 
-#if defined GBUFFERS_LINE
+#if defined PROGRAM_GBUFFERS_LINE
 	// Ripped from vanilla 1.17's rendertype_lines.vsh
 
 	const float viewShrink = 1.0 - (1.0 / 256.0);

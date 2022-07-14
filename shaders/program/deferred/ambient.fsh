@@ -94,7 +94,7 @@ uniform bool worldAgeChanged;
  * SSPT:
  */
 
-const float indirectRenderScale = 0.01 * INDIRECT_RENDER_SCALE;
+const float indirectRenderScale = 0.01 * INDIRECT_RENDER_SCALE / renderScale;
 
 #ifdef SSPT
 #endif
@@ -198,7 +198,7 @@ vec4 calculateGtao(
 
 void main() {
 	ivec2 srcTexel = ivec2(gl_FragCoord.xy);
-    ivec2 dstTexel = ivec2(gl_FragCoord.xy * (renderScale / indirectRenderScale));
+    ivec2 dstTexel = ivec2(gl_FragCoord.xy * rcp(indirectRenderScale));
 
 	if (clamp(dstTexel, ivec2(0), ivec2(viewSize)) != dstTexel) discard;
 

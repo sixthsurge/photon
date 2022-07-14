@@ -32,6 +32,7 @@ uniform usampler2D colortex1; // Scene data
 uniform sampler2D colortex3;  // Scene radiance
 uniform sampler2D colortex4;  // Sky capture
 uniform sampler2D colortex6;  // Clear sky
+uniform sampler2D colortex7;  // Shadow penumbra mask
 uniform sampler2D colortex8;  // Scene history
 uniform sampler2D colortex15; // Cloud shadow map
 
@@ -48,8 +49,8 @@ uniform sampler2D depthtex1;
 #ifdef SHADOW
 #ifdef SHADOW_COLOR
 uniform sampler2D shadowcolor0;
+uniform sampler2DShadow shadowtex0;
 #endif
-uniform sampler2D shadowtex0;
 uniform sampler2DShadow shadowtex1;
 #endif
 
@@ -145,7 +146,7 @@ uniform vec3 moonDir;
 
 //--// Program //-------------------------------------------------------------//
 
-const float indirectRenderScale = 0.01 * INDIRECT_RENDER_SCALE;
+const float indirectRenderScale = 0.01 * INDIRECT_RENDER_SCALE / renderScale;
 
 void main() {
 	ivec2 texel = ivec2(gl_FragCoord.xy);
@@ -196,7 +197,7 @@ void main() {
 	uint overlayId = uint(overlays.a + 0.5);
 	albedo = overlayId == 0 ? albedo + overlays.rgb : albedo; // enchantment glint
 	albedo = overlayId == 1 ? 2.0 * albedo * overlays.rgb : albedo; // damage overlay
-	albedo = srgbToLinear(albedo) * r709ToAp1Unlit;
+	albedo = srgbToLinear(clamp01(albedo)) * r709ToAp1Unlit;
 
 	/* -- fetch ao/sspt -- */
 
@@ -213,7 +214,7 @@ void main() {
 	vec3 bentNormal = normal;
 #endif
 
-#if defined SH_SKYLIGHT && defined GTAO
+#ifdef SH_SKYLIGHT
 	vec3 skylight = evaluateSphericalHarmonicsIrradiance(skySh, bentNormal, ao);
 #else
 	vec3 skylight = skyIrradiance * ao;
@@ -245,7 +246,7 @@ void main() {
 
 	/* -- lighting -- */
 
-	float distanceTraveled;
+	float sssDepth;
 	radiance = getSceneLighting(
 		material,
 		positionScene,
@@ -259,13 +260,13 @@ void main() {
 		lmCoord,
 		ao,
 		blockId,
-		distanceTraveled
+		sssDepth
 	);
 
 	/* -- reflections -- */
 
 #ifdef SSR
-	mat3 tbnMatrix = getTbnMatrix(normal);
+	mat3 tbnMatrix = getTbnMatrix(geometryNormal);
 
 	vec3 viewerDirTangent = viewerDir * tbnMatrix;
 
@@ -283,5 +284,5 @@ void main() {
 
 	/* -- fog -- */
 
-	radiance = applySimpleFog(radiance, positionScene, clearSky);
+	radiance = applyFog(radiance, positionScene, clearSky);
 }

@@ -1,19 +1,18 @@
 #if !defined INCLUDE_CONFIG
 #define INCLUDE_CONFIG
 
+const float ambientOcclusionLevel = 0.0;
+
 const int noiseTextureResolution = 512;
 
-const int shadowMapResolution = 2048; // [1024 2048 4096]
+const bool shadowHardwareFiltering = true;
+const int shadowMapResolution      = 2048; // [1024 2048 4096]
+const float shadowDistance         = 144.0; // [64.0 80.0 96.0 112.0 128.0 144.0 160.0 176.0 192.0 208.0 224.0 240.0 256.0 320.0 384.0 512.0 768.0 1024.0]
+const float shadowIntervalSize     = 2.0;
+const float sunPathRotation        = -40.0; // [-40.0 -35.0 -30.0 -25.0 -20.0 -15.0 -10.0 -5.0 0.0 5.0 10.0 15.0 20.0 25.0 30.0 35.0 40.0]
 
-const float shadowDistance = 160.0; // [64.0 80.0 96.0 112.0 128.0 144.0 160.0 176.0 192.0 208.0 224.0 240.0 256.0 320.0 384.0 512.0 768.0 1024.0]
-//const float shadowDistanceRenderMul = 1.0; // This improves performance with high render distances, but it kills distant shadows
-
-const float shadowIntervalSize = 2.0;
-
-const bool shadowHardwareFiltering0 = false;
-const bool shadowHardwareFiltering1 = true;
-
-const float sunPathRotation = -40.0; // [-40.0 -35.0 -30.0 -25.0 -20.0 -15.0 -10.0 -5.0 0.0 5.0 10.0 15.0 20.0 25.0 30.0 35.0 40.0]
+// this really helps performance with higher render distances, but it also kills some distant shadows
+//const float shadowDistanceRenderMul = 1.0;
 
 //--// Atmospherics //--------------------------------------------------------//
 
@@ -137,6 +136,8 @@ const float sunPathRotation = -40.0; // [-40.0 -35.0 -30.0 -25.0 -20.0 -15.0 -10
 //--// Weather
 
 //--// Lighting //------------------------------------------------------------//
+
+  #define FAKE_BOUNCED_SUNLIGHT
 
 //--// Indirect Lighting
 
@@ -310,7 +311,6 @@ const float sunPathRotation = -40.0; // [-40.0 -35.0 -30.0 -25.0 -20.0 -15.0 -10
 
   #define SSR // Screen-space reflections. Makes water and shiny blocks reflect their environment. Big performance impact
   #define SSR_ROUGH // Makes reflections on rough surfaces actually appear rough. Big performance impact
-  #define SSR_PREVIOUS_FRAME // Reflected data is gathered from the previous frame, which creates a feedback loop wherein reflections can appear in reflections. Without this, translucents, fog, and other reflections will not appear in reflections
   #define SSR_RAY_COUNT 4 // Number of rays traced for rough reflections. More rays mean less noise but worse performance [1 2 3 4 5 6 7 8]
   #define SSR_INTERSECTION_STEPS_SMOOTH 16 // Adjusts the accuracy of smooth reflections, at the expense of performance [4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32]
   #define SSR_INTERSECTION_STEPS_ROUGH 8 // Adjusts the accuracy of rough reflections, at the expense of performance [4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32]
@@ -320,17 +320,21 @@ const float sunPathRotation = -40.0; // [-40.0 -35.0 -30.0 -25.0 -20.0 -15.0 -10
 //--// Water //---------------------------------------------------------------//
 
   #define WATER_CAUSTICS
-  #define WATER_REFRACTION WATER_REFRACTION_APPROXIMATED // Screen-space water refraction. Gives the impression of light bending due to water waves. Approximated: "good enough" and essentially free. Raytraced: more accurate but slow
-  #define WATER_VOLUME_DENSITY 1.00 // [0.00 0.01 0.02 0.03 0.04 0.05 0.06 0.07 0.08 0.09 0.10 0.11 0.12 0.13 0.14 0.15 0.16 0.17 0.18 0.19 0.20 0.21 0.22 0.23 0.24 0.25 0.26 0.27 0.28 0.29 0.30 0.31 0.32 0.33 0.34 0.35 0.36 0.37 0.38 0.39 0.40 0.41 0.42 0.43 0.44 0.45 0.46 0.47 0.48 0.49 0.50 0.51 0.52 0.53 0.54 0.55 0.56 0.57 0.58 0.59 0.60 0.61 0.62 0.63 0.64 0.65 0.66 0.67 0.68 0.69 0.70 0.71 0.72 0.73 0.74 0.75 0.76 0.77 0.78 0.79 0.80 0.81 0.82 0.83 0.84 0.85 0.86 0.87 0.88 0.89 0.90 0.91 0.92 0.93 0.94 0.95 0.96 0.97 0.98 0.99 1.00 1.01 1.02 1.03 1.04 1.05 1.06 1.07 1.08 1.09 1.10 1.11 1.12 1.13 1.14 1.15 1.16 1.17 1.18 1.19 1.20 1.21 1.22 1.23 1.24 1.25 1.26 1.27 1.28 1.29 1.30 1.31 1.32 1.33 1.34 1.35 1.36 1.37 1.38 1.39 1.40 1.41 1.42 1.43 1.44 1.45 1.46 1.47 1.48 1.49 1.50 1.51 1.52 1.53 1.54 1.55 1.56 1.57 1.58 1.59 1.60 1.61 1.62 1.63 1.64 1.65 1.66 1.67 1.68 1.69 1.70 1.71 1.72 1.73 1.74 1.75 1.76 1.77 1.78 1.79 1.80 1.81 1.82 1.83 1.84 1.85 1.86 1.87 1.88 1.89 1.90 1.91 1.92 1.93 1.94 1.95 1.96 1.97 1.98 1.99 2.00]
-
-  #define WATER_REFRACTION_OFF 0
-  #define WATER_REFRACTION_APPROXIMATED 1
-  #define WATER_REFRACTION_RAYTRACED 2
+  #define WATER_REFRACTION // Fakes the effects of refraction behind water. Gives the impression of light bending due to the waves
 
 //--// Water Waves
 
   #define WATER_PARALLAX // Makes use of parallax occlusion mapping to add a better sense of depth to water waves. Small performance cost
   #define WATER_DISPLACEMENT // Applies a subtle waving effect to the water geometry itself, so that the water line is not flat. Essentially no performance cost.
+//#define WATER_TEXTURE // Shows the vanilla water texture on water
+
+//--// Water Fog Coefficients
+
+  #define WATER_DENSITY 1.0 // [0.0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0 1.1 1.2 1.3 1.4 1.5 1.6 1.7 1.8 1.9 2.0]
+  #define WATER_SCATTERING_COEFF 1.0 // [0.0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0 1.1 1.2 1.3 1.4 1.5 1.6 1.7 1.8 1.9 2.0]
+  #define WATER_ABSORPTION_R 1.0 // [0.0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0 1.1 1.2 1.3 1.4 1.5 1.6 1.7 1.8 1.9 2.0]
+  #define WATER_ABSORPTION_G 1.0 // [0.0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0 1.1 1.2 1.3 1.4 1.5 1.6 1.7 1.8 1.9 2.0]
+  #define WATER_ABSORPTION_B 1.0 // [0.0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0 1.1 1.2 1.3 1.4 1.5 1.6 1.7 1.8 1.9 2.0]
 
 //--// Misc //----------------------------------------------------------------//
 

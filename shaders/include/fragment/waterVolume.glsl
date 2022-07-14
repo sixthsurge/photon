@@ -5,8 +5,8 @@
 
 #include "/include/fragment/aces/matrices.glsl"
 
-const vec3 waterAbsorptionCoeff = WATER_VOLUME_DENSITY * vec3(0.4, 0.14, 0.08) * r709ToAp1Unlit;
-const vec3 waterScatteringCoeff = WATER_VOLUME_DENSITY * vec3(0.03) * r709ToAp1Unlit;
+const vec3 waterAbsorptionCoeff = (vec3(0.4, 0.14, 0.08) * r709ToAp1Unlit) * WATER_DENSITY * vec3(WATER_ABSORPTION_R, WATER_ABSORPTION_G, WATER_ABSORPTION_B);
+const vec3 waterScatteringCoeff = (vec3(0.03) * r709ToAp1Unlit) * WATER_DENSITY * WATER_SCATTERING_COEFF;
 const vec3 waterExtinctionCoeff = waterAbsorptionCoeff + waterAbsorptionCoeff;
 
 mat2x3 getSimpleWaterVolume(
@@ -31,6 +31,7 @@ mat2x3 getSimpleWaterVolume(
 	     scattering *= (1.0 - transmittance) * waterScatteringCoeff / waterExtinctionCoeff;
 		 scattering *= 0.7 * henyeyGreensteinPhase(-LoV, 0.4) + 0.3 * isotropicPhase;
 		 scattering *= 1.0 + multipleScatteringEnergy;
+		 scattering *= 1.0 - blindness;
 
 	return mat2x3(scattering, transmittance);
 }

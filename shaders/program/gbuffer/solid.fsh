@@ -5,7 +5,7 @@
 /* RENDERTARGETS: 1 */
 layout (location = 0) out uvec4 encoded;
 
-#ifdef GBUFFERS_ENTITIES
+#ifdef PROGRAM_GBUFFERS_ENTITIES
 /* RENDERTARGETS: 1,2 */
 layout (location = 1) out vec3 velocityOut;
 #endif
@@ -19,7 +19,7 @@ in vec4 tint;
 flat in uint blockId;
 flat in mat3 tbnMatrix;
 
-#if defined GBUFFERS_ENTITIES
+#if defined PROGRAM_GBUFFERS_ENTITIES
 in vec3 velocity;
 #endif
 
@@ -39,7 +39,7 @@ uniform sampler2D normals;
 uniform sampler2D specular;
 #endif
 
-#ifdef GBUFFERS_ENTITIES
+#ifdef PROGRAM_GBUFFERS_ENTITIES
 uniform vec4 entityColor;
 uniform int entityId;
 #endif
@@ -81,13 +81,13 @@ void main() {
 #endif
 
 	baseTex *= tint;
-#ifdef GBUFFERS_ENTITIES
+#ifdef PROGRAM_GBUFFERS_ENTITIES
 	if (baseTex.a < 0.1 && entityId != ENTITY_BOAT && entityId != ENTITY_LIGHTNING_BOLT) discard;
 #else
 	if (baseTex.a < 0.1) discard;
 #endif
 
-#if defined GBUFFERS_ENTITIES
+#if defined PROGRAM_GBUFFERS_ENTITIES
 	baseTex.rgb = mix(baseTex.rgb, entityColor.rgb, entityColor.a);
 	baseTex.rgb = mix(baseTex.rgb, vec3(1.0), float(entityId == ENTITY_LIGHTNING_BOLT));
 #endif
@@ -103,7 +103,7 @@ void main() {
 
 	mat2x4 data;
 	data[0].xyz = baseTex.rgb;
-#if defined GBUFFERS_ENTITIES
+#if defined PROGRAM_GBUFFERS_ENTITIES
 	data[0].w   = float(entityId) * rcp(255.0);
 #else
 	data[0].w   = float(blockId) * rcp(255.0);
@@ -124,11 +124,11 @@ void main() {
 	encoded.w = packUnorm4x8(specularTex);
 #endif
 
-#if defined GBUFFERS_ENTITIES
+#if defined PROGRAM_GBUFFERS_ENTITIES
 	velocityOut = velocity;
 #endif
 
-#if defined GBUFFERS_BEACONBEAM
+#if defined PROGRAM_GBUFFERS_BEACONBEAM
 	// Discard the translucent edge part of the beam
 	if (baseTex.a < 0.99) discard;
 #endif

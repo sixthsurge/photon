@@ -1,4 +1,4 @@
 #version 410 compatibility
-#define GBUFFERS_BEACONBEAM
+#define PROGRAM_GBUFFERS_BEACONBEAM
 #define WORLD_OVERWORLD
 #include "/program/gbuffer/solid.fsh"

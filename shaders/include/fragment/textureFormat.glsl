@@ -23,7 +23,7 @@ void decodeSpecularTex(vec4 specularTex, inout Material material) {
 		material.porosity = specularTex.b * hasPorosity;
 		material.sssAmount = max(material.sssAmount, specularTex.b - specularTex.b * hasPorosity);
 		material.emission = max(material.emission, material.albedo * specularTex.a * float(specularTex.a != 1.0));
-	} else if (specularTex.g < 237.5 / 255.0) {
+	//} else if (specularTex.g < 237.5 / 255.0) {
 		// hardcoded metals
 	} else {
 		// generic metal

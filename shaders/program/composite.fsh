@@ -120,29 +120,38 @@ void main() {
 
 	/* -- transformations -- */
 
-	vec3 frontPosView = screenToViewSpace(vec3(coord, frontDepth), true);
-	vec3 frontPosScene = viewToSceneSpace(frontPosView);
+	vec3 positionScreen = vec3(coord, frontDepth);
+	vec3 positionView   = screenToViewSpace(positionScreen, true);
+	vec3 positionScene  = viewToSceneSpace(positionView);
 
-	vec3 backPosView = screenToViewSpace(vec3(coord, backDepth), true);
-
-	float viewerDistance = length(frontPosView);
-	vec3 viewerDir = (gbufferModelViewInverse[3].xyz - frontPosScene) * rcp(viewerDistance);
+	float viewerDistance = length(positionView);
+	vec3 viewerDir = (gbufferModelViewInverse[3].xyz - positionScene) * rcp(viewerDistance);
 
 	/* -- underwater effects -- */
 
 	if (waterMask.a > 0.5) {
-		vec3 refractedDir = decodeUnitVector(unpackUnorm2x8(waterMask.x));
-		vec2 lightingInfo = unpackUnorm2x8(waterMask.y);
-		float distanceToWater = waterMask.z * far;
-		float distanceThroughWater = max0(length(backPosView) - distanceToWater) * float(isEyeInWater != 1);
+		vec2 normalTangentXy       = unpackUnorm2x8(waterMask.x) * 2.0 - 1.0;
+		vec2 lightingInfo          = unpackUnorm2x8(waterMask.y);
+		float distanceToWater      = waterMask.z * far;
 
 		// water refraction
 
+#ifdef WATER_REFRACTION
+		const float refractionStrength = 0.5;
+		vec2 refractedCoord = coord + normalTangentXy * (refractionStrength * rcp(max(distanceToWater, 1.0)));
+
+		radiance         = texture(colortex3, refractedCoord).rgb;
+		backDepth        = texture(depthtex1, refractedCoord * renderScale).x;
+		vec3 backPosView = screenToViewSpace(vec3(refractedCoord, backDepth), true);
+#endif
+
 		// water volume
 
+		float distanceThroughWater = max0(length(backPosView) - distanceToWater) * float(isEyeInWater != 1);
 		float LoV = dot(viewerDir, lightDir);
 		float sssDepth = lightingInfo.x * 32.0;
-		float cloudShadow = getCloudShadows(colortex15, frontPosScene);
+		float skylight = lightingInfo.y;
+		float cloudShadow = getCloudShadows(colortex15, positionScene);
 
 		mat2x3 waterVolume = getSimpleWaterVolume(
 			directIrradiance,
@@ -151,12 +160,11 @@ void main() {
 			distanceThroughWater,
 			LoV,
 			sssDepth,
-			eyeSkylight,
+			skylight,
 			cloudShadow
 		);
 
-		radiance  = radiance * waterVolume[1] + waterVolume[0];
-		radiance *= lightingInfo.y;
+		radiance = radiance * waterVolume[1] + waterVolume[0];
 	}
 
 	/* -- blend layers -- */

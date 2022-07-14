@@ -39,13 +39,9 @@ vec3 traceSpecularRay(
 		float borderAttenuation = (hitPos.x * hitPos.y - hitPos.x) * (hitPos.x * hitPos.y - hitPos.y);
 		      borderAttenuation = dampen(linearStep(0.0, 0.005, borderAttenuation));
 
-#ifdef SSR_PREVIOUS_FRAME
 		hitPos = reproject(hitPos);
 		if (clamp01(hitPos) != hitPos) return skyRadiance;
 		vec3 radiance = textureLod(colortex8, hitPos.xy, int(mipLevel)).rgb;
-#else
-		vec3 radiance = textureLod(colortex3, hitPos.xy, int(mipLevel)).rgb;
-#endif
 
 		return mix(skyRadiance, radiance, borderAttenuation);
 	} else {
@@ -91,11 +87,14 @@ vec3 getSpecularReflections(
 			vec3 microfacetNormal = tbnMatrix * sampleGgxVndf(viewerDirTangent, vec2(material.roughness), hash);
 			vec3 rayDir = reflect(-viewerDir, microfacetNormal);
 
+			float NoL = dot(normal, rayDir);
+			if (NoL < eps) continue;
+
 			vec3 radiance = traceSpecularRay(positionScreen, positionView, rayDir, dither, mipLevel, skylightFalloff);
 
-			float MoV = clamp01(dot(microfacetNormal, viewerDir));
-			float NoL = max(1e-2, dot(normal, rayDir));
+			NoL       = max(1e-2, NoL);
 			float NoV = max(1e-2, dot(normal, viewerDir));
+			float MoV = clamp01(dot(microfacetNormal, viewerDir));
 
 			vec3 fresnel = material.isMetal ? fresnelSchlick(MoV, material.f0) : vec3(fresnelDielectric(MoV, material.n));
 			float v1 = v1SmithGgx(NoV, alphaSq);
@@ -114,9 +113,12 @@ vec3 getSpecularReflections(
 
 	vec3 rayDir = reflect(-viewerDir, normal);
 
-	vec3 radiance = traceSpecularRay(positionScreen, positionView, rayDir, dither, 0.0, skylightFalloff);
-
+	float NoL = dot(normal, rayDir);
 	float NoV = clamp01(dot(normal, viewerDir));
+
+	if (NoL < eps) return vec3(0.0);
+
+	vec3 radiance = traceSpecularRay(positionScreen, positionView, rayDir, dither, 0.0, skylightFalloff);
 
 	vec3 fresnel = material.isMetal ? fresnelSchlick(NoV, material.f0) : vec3(fresnelDielectric(NoV, material.n));
 

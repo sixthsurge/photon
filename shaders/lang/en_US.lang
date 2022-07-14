@@ -37,6 +37,8 @@ screen.exposure                        = Exposure
 screen.temporal                        = Temporal AA
 screen.reflections                     = Reflections
 screen.wavingBlocks                    = Waving Blocks
+screen.waterWaves                      = Water Waves
+screen.waterFog                        = Water Fog
 
 screen.cloudsLayer0                    = Layer 0
 screen.cloudsLayer1                    = Layer 1
@@ -372,7 +374,6 @@ value.TEXTURE_FORMAT.TEXTURE_FORMAT_OLD = Old PBR / SEUS PBR
 
 option.SSR                             = Enabled
 option.SSR_ROUGH                       = Roughness Support
-option.SSR_PREVIOUS_FRAME              = Reflect Previous Frame
 option.SSR_RAY_COUNT                   = Ray Count
 option.SSR_INTERSECTION_STEPS_SMOOTH   = Intersection Steps - Smooth
 option.SSR_INTERSECTION_STEPS_ROUGH    = Intersection Steps - Rough
@@ -388,16 +389,20 @@ option.WAVING_LEAVES                   = Waving Leaves
 
 option.WATER_CAUSTICS                  = Caustics
 option.WATER_REFRACTION                = Refraction
-option.WATER_VOLUME_DENSITY            = Density
-
-value.WATER_REFRACTION.WATER_REFRACTION_OFF          = OFF
-value.WATER_REFRACTION.WATER_REFRACTION_APPROXIMATED = Approximated
-value.WATER_REFRACTION.WATER_REFRACTION_RAYTRACED    = Ray-traced
+option.WATER_TEXTURE                   = Vanilla Water Texture
 
 # Water Waves
 
 option.WATER_PARALLAX                  = Water Parallax
 option.WATER_DISPLACEMENT              = Water Displacement
+
+# Water Fog
+
+option.WATER_DENSITY                   = Density
+option.WATER_SCATTERING_COEFF          = Scattering Coefficient
+option.WATER_ABSORPTION_R              = §cRed §fAbsorption
+option.WATER_ABSORPTION_G              = §aGreen §fAbsorption
+option.WATER_ABSORPTION_B              = §9Blue §fAbsorption
 
 #----# Misc #--------------------------------------------------------------------------------------#
 

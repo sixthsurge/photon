@@ -9,7 +9,7 @@ out vec4 tint;
 flat out uint blockId;
 flat out mat3 tbnMatrix;
 
-#if defined GBUFFERS_ENTITIES
+#if defined PROGRAM_GBUFFERS_ENTITIES
 out vec3 velocity;
 #endif
 
@@ -68,16 +68,16 @@ void main() {
 	tbnMatrix[1] = cross(tbnMatrix[0], tbnMatrix[2]) * sign(at_tangent.w);
 #endif
 
-#if defined GBUFFERS_ENTITIES
+#if defined PROGRAM_GBUFFERS_ENTITIES
 	velocity  = at_velocity;
-#if defined GBUFFERS_HAND
+#if defined PROGRAM_GBUFFERS_HAND
 	velocity *= MC_HAND_DEPTH;
 #endif
 #endif
 
 	vec3 positionView = transform(gl_ModelViewMatrix, gl_Vertex.xyz);
 
-#ifdef GBUFFERS_TERRAIN
+#ifdef PROGRAM_GBUFFERS_TERRAIN
 	bool isTopVertex = texCoord.y < mc_midTexCoord.y;
 
 	vec3 positionScene  = viewToSceneSpace(positionView);

@@ -49,7 +49,7 @@ vec3 applyCommonFog(vec3 radiance, vec3 positionScene, vec3 clearSky, float view
 
 // fog effects specific to each dimension
 #if   defined WORLD_OVERWORLD
-vec3 applySimpleFog(vec3 radiance, vec3 positionScene, vec3 clearSky) {
+vec3 applyFog(vec3 radiance, vec3 positionScene, vec3 clearSky) {
 	clearSky = mix(clearSky, caveFogColor, biomeCave); // fix border fog underground
 
 	float viewerDistance = length(positionScene);

@@ -16,10 +16,13 @@ flat in mat3 tbnMatrix;
 
 //--// Uniforms //------------------------------------------------------------//
 
-uniform sampler2D tex;
 uniform sampler2D noisetex;
 
+uniform sampler2D tex;
+
 //--// Camera uniforms
+
+uniform float blindness;
 
 uniform float near;
 uniform float far;
@@ -47,6 +50,7 @@ uniform vec3 lightDir;
 
 #include "/include/fragment/aces/matrices.glsl"
 #include "/include/fragment/waterNormal.glsl"
+#include "/include/fragment/waterVolume.glsl"
 
 #include "/include/utility/color.glsl"
 
@@ -74,7 +78,10 @@ float getWaterCaustics() {
 #else
 	const float distanceTraveled = 2.0; // distance for which caustics are calculated
 
-	vec3 normal = tbnMatrix * getWaterNormal(normal, positionWorld);
+	bool isStill = tbnMatrix[2].y > 0.99;
+	vec2 flowDir = isStill ? vec2(0.0) : normalize(tbnMatrix[2].xz);
+
+	vec3 normal = tbnMatrix * getWaterNormal(normal, positionWorld, flowDir);
 
 	vec3 oldPos = positionWorld;
 	vec3 newPos = positionWorld + refractSafe(lightDir, normal, airN / waterN) * distanceTraveled;
@@ -90,8 +97,7 @@ float getWaterCaustics() {
 
 void main() {
 	if (blockId == BLOCK_WATER) { // Water
-		shadowcolor0Out.x = 1.0; // Red value of 1.0 signifies water
-		shadowcolor0Out.y = getWaterCaustics();
+		shadowcolor0Out = exp(-waterExtinctionCoeff * 2.0) * getWaterCaustics();
 	} else {
 		vec4 baseTex = texture(tex, texCoord) * tint;
 		if (baseTex.a < 0.1) discard;

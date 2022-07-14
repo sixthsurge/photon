@@ -25,6 +25,7 @@ uniform sampler2D noisetex;
 uniform sampler2D depthtex1;
 
 uniform sampler2D colortex4;  // Sky capture
+uniform sampler2D colortex6;  // Clear sky
 uniform sampler2D colortex8;  // Scene history
 uniform sampler2D colortex15; // Cloud shadow map
 
@@ -121,6 +122,7 @@ uniform vec3 moonDir;
 #include "/include/fragment/material.glsl"
 #include "/include/fragment/textureFormat.glsl"
 #include "/include/fragment/waterNormal.glsl"
+#include "/include/fragment/waterVolume.glsl"
 
 #include "/include/lighting/lighting.glsl"
 #include "/include/lighting/reflections.glsl"
@@ -135,10 +137,8 @@ const float lodBias = log2(renderScale);
 const float waterOpacity = 0.02;
 
 void main() {
-#if TAA_UPSCALING_FACTOR > 1
 	vec2 coord = gl_FragCoord.xy * viewTexelSize;
 	if (clamp01(coord) != coord) discard;
-#endif
 
 	/* -- fetch lighting palette -- */
 
@@ -152,6 +152,8 @@ void main() {
 	vec3 normalTangent = vec3(0.0, 0.0, 1.0);
 	float materialAo   = 1.0;
 
+	vec4 baseTex = texture(gtexture, texCoord, lodBias) * tint;
+
 	if (blockId == BLOCK_WATER) {
 		material.albedo           = vec3(0.0);
 		material.f0               = vec3(0.02);
@@ -163,17 +165,25 @@ void main() {
 		material.isMetal          = false;
 		material.isHardcodedMetal = false;
 
-		vec3 positionWorld = positionScene + cameraPosition;
+#ifdef WATER_TEXTURE
+		float textureValue     = getLuminance(srgbToLinear(baseTex.rgb), luminanceWeightsR709);
+		float textureHighlight = linearStep(0.08, 0.3, textureValue);
 
-#ifdef WATER_PARALLAX
-		positionWorld.xz = waterParallax(normalize(viewerDirTangent), positionWorld.xz);
+		material.albedo     = clamp01(0.5 * exp(-2.0 * waterExtinctionCoeff) * (textureValue + 0.6 * textureHighlight));
+		material.roughness += 0.3 * textureHighlight;
 #endif
 
-		normalTangent = getWaterNormal(tbnMatrix[2], positionWorld);
+		vec3 positionWorld = positionScene + cameraPosition;
 
-		fragColor.a = waterOpacity;
+		bool isStill = abs(tbnMatrix[2].y) > 0.99;
+		vec2 flowDir = isStill ? vec2(0.0) : normalize(tbnMatrix[2].xz);
+
+#ifdef WATER_PARALLAX
+		positionWorld.xz = waterParallax(normalize(viewerDirTangent), positionWorld.xz, flowDir);
+#endif
+
+		normalTangent = getWaterNormal(tbnMatrix[2], positionWorld, flowDir);
 	} else {
-		vec4 baseTex = texture(gtexture, texCoord, lodBias) * tint;
 		if (baseTex.a < 0.1) discard;
 
 		vec3 albedo = srgbToLinear(baseTex.rgb) * baseTex.a * r709ToAp1Unlit;
@@ -207,16 +217,23 @@ void main() {
 	float viewerDistance = length(positionView);
 
 	vec3 normal = tbnMatrix * normalTangent;
+	vec3 flatNormal = tbnMatrix[2];
 	vec3 viewerDir = (gbufferModelViewInverse[3].xyz - positionScene) * rcp(viewerDistance);
+
+#if defined PROGRAM_GBUFFERS_TEXTURED
+	// no normal attribute
+	normal = vec3(0.0, 1.0, 0.0);
+	flatNormal = normal;
+#endif
 
 	/* -- lighting -- */
 
-	float distanceTraveled;
+	float sssDepth;
 	fragColor.rgb = getSceneLighting(
 		material,
 		positionScene,
 		normal,
-		tbnMatrix[2],
+		flatNormal,
 		normal,
 		viewerDir,
 		ambientIrradiance,
@@ -225,12 +242,12 @@ void main() {
 		lmCoord,
 		materialAo,
 		blockId,
-		distanceTraveled
+		sssDepth
 	);
 
 	/* -- reflections -- */
 
-#ifdef SSR
+#if defined SSR && defined PROGRAM_GBUFFERS_WATER
 	fragColor.rgb += getSpecularReflections(
 		material,
 		tbnMatrix,
@@ -243,21 +260,30 @@ void main() {
 	);
 #endif
 
-	fragColor.rgb *= rcp(fragColor.a);
+	/* -- fog -- */
+
+	vec3 clearSky = texelFetch(colortex6, ivec2(gl_FragCoord.xy), 0).rgb;
+	fragColor.rgb = applyFog(fragColor.rgb, positionScene, clearSky);
 
 	/* -- set water mask -- */
 
-	float eta = isEyeInWater == 1 ? airN / waterN : waterN / airN;
-	float NoV = dot(normal, viewerDir);
+	if (blockId == BLOCK_WATER) {
+		float eta = isEyeInWater == 1 ? airN / waterN : waterN / airN;
+		float NoV = dot(normal, viewerDir);
 
-	vec2 lightingInfo;
-	lightingInfo.x = clamp01(rcp(32.0) * distanceTraveled);
-	lightingInfo.y = 1.0 - fresnelDielectric(NoV, eta);
+		fragColor.a = max(fresnelDielectric(NoV, eta), eps);
 
-	vec3 refractedDir = refract(-viewerDir, normal - tbnMatrix[2], eta);
+		vec2 lightingInfo;
+		lightingInfo.x = clamp01(rcp(32.0) * sssDepth);
+		lightingInfo.y = lmCoord.y;
 
-	waterMask.x = packUnorm2x8(encodeUnitVector(refractedDir));
-	waterMask.y = packUnorm2x8(lightingInfo);
-	waterMask.z = clamp01(viewerDistance / far);
-	waterMask.w = float(blockId == BLOCK_WATER);
+		waterMask.x = packUnorm2x8(normalTangent.xy * 0.5 + 0.5);
+		waterMask.y = packUnorm2x8(lightingInfo);
+		waterMask.z = clamp01(viewerDistance / far);
+		waterMask.w = float(blockId == BLOCK_WATER);
+	} else {
+		waterMask = vec4(0.0);
+	}
+
+	fragColor.rgb *= rcp(fragColor.a);
 }

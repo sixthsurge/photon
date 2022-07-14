@@ -316,6 +316,7 @@ float cloudPlaneDensity(CloudLayer layer, vec2 coord, float altitudeFraction) {
 			  + 0.125 * curl2D(0.00008 * coord);
 
 	float density = 0.0;
+	float heightShaping = 1.0 - abs(1.0 - 2.0 * altitudeFraction);
 
 	/* -- cirrus clouds -- */
 
@@ -340,7 +341,7 @@ float cloudPlaneDensity(CloudLayer layer, vec2 coord, float altitudeFraction) {
 			coord += 0.3 * layer.wind;
 		}
 
-		density += cube(max0(cirrus));
+		density += cube(max0(cirrus)) * heightShaping;
 	}
 
 	/* -- cirrocumulus clouds -- */
@@ -356,10 +357,8 @@ float cloudPlaneDensity(CloudLayer layer, vec2 coord, float altitudeFraction) {
 		cirrocumulus -= 0.2 * texture(noisetex, coord * 0.00005 + 0.1 * curl).y;
 		cirrocumulus -= 0.1 * texture(noisetex, coord * 0.00010 + 0.4  * curl).y;
 
-		return cube(max0(cirrocumulus));
+		density += cube(max0(cirrocumulus)) * dampen(heightShaping);
 	}
-
-	float heightShaping = 1.0 - abs(1.0 - 2.0 * altitudeFraction);
 
 	return density * heightShaping;
 }
@@ -693,7 +692,7 @@ float cloudVolumeShadow(CloudLayer layer, vec3 rayOrigin, vec3 rayDir) {
 	float rayLength = dists.y - dists.x;
 	float stepLength = rayLength * rcp(float(stepCount));
 
-	vec3 rayPos = rayOrigin + rayDir * (dists.x * 0.5 + stepLength);
+	vec3 rayPos = rayOrigin + rayDir * (dists.x + 0.5 * stepLength);
 	vec3 rayStep = rayDir * stepLength;
 
 	float opticalDepth = 0.0;
@@ -732,7 +731,7 @@ float getCloudShadows(vec3 rayOrigin, vec3 rayDir) {
 
 	CloudLayer layer;
 
-#ifdef CLOUDS_LAYER0 // layer 0 (cumulus, cumulus humilis, stratocumulus, stratus)
+#if defined CLOUDS_LAYER0 && defined CLOUDS_LAYER0_SHADOW // layer 0 (cumulus, cumulus humilis, stratocumulus, stratus)
 	layer.radius       = CLOUDS_LAYER0_ALTITUDE + planetRadius;
 	layer.thickness    = CLOUDS_LAYER0_THICKNESS;
 	layer.frequency    = CLOUDS_LAYER0_FREQUENCY;
@@ -748,7 +747,7 @@ float getCloudShadows(vec3 rayOrigin, vec3 rayDir) {
 	if (result < 0.01) return 0.0;
 #endif
 
-#ifdef CLOUDS_LAYER1 // layer 1 (altocumulus, altostratus)
+#if defined CLOUDS_LAYER1 && defined CLOUDS_LAYER1_SHADOW // layer 1 (altocumulus, altostratus)
 	layer.radius       = CLOUDS_LAYER1_ALTITUDE + planetRadius;
 	layer.thickness    = CLOUDS_LAYER1_THICKNESS;
 	layer.frequency    = CLOUDS_LAYER1_FREQUENCY;
@@ -769,7 +768,7 @@ float getCloudShadows(vec3 rayOrigin, vec3 rayDir) {
 	float cirrusCoverage = cloudsCirrusCoverage(weather);
 	float cirrocumulusCoverage = cloudsCirrocumulusCoverage(weather);
 
-#ifdef CLOUDS_LAYER2 // layer 2 (cirrocumulus)
+#if defined CLOUDS_LAYER2 && defined CLOUDS_LAYER2_SHADOW // layer 2 (cirrocumulus)
 	layer.radius       = CLOUDS_LAYER2_ALTITUDE + planetRadius;
 	layer.thickness    = CLOUDS_LAYER2_THICKNESS;
 	layer.frequency    = CLOUDS_LAYER2_FREQUENCY;
@@ -793,7 +792,7 @@ float getCloudShadows(vec3 rayOrigin, vec3 rayDir) {
 	if (result < 0.01) return 0.0;
 #endif
 
-#ifdef CLOUDS_LAYER3 // layer 3 (cirrus)
+#if defined CLOUDS_LAYER3 && defined CLOUDS_LAYER3_SHADOW // layer 3 (cirrus)
 	layer.radius       = CLOUDS_LAYER3_ALTITUDE + planetRadius;
 	layer.thickness    = CLOUDS_LAYER3_THICKNESS;
 	layer.frequency    = CLOUDS_LAYER3_FREQUENCY;

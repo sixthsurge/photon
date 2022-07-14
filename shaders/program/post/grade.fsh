@@ -142,7 +142,9 @@ float getBloomyFog(float linearZ) {
 	float depth = reverseLinearDepth(linearZ);
 	float viewerDistance = length(screenToViewSpace(vec3(coord, depth), false));
 
-	return bloomyFogStrength * BLOOMY_FOG_INTENSITY * (1.0 - exp(-bloomyFogDensity * viewerDistance));
+	float fogAmount = bloomyFogStrength * BLOOMY_FOG_INTENSITY * (1.0 - exp(-bloomyFogDensity * viewerDistance));
+
+	return clamp01(fogAmount);
 }
 
 vec3 tonemapAces(vec3 rgb) {

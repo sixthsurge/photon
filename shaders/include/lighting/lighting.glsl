@@ -39,13 +39,13 @@ float getSkylightFalloff(float skylight) {
 	return pow4(skylight);
 }
 
-float getFakeBouncedLight(vec3 bentNormal, float distanceTraveled, float ao) {
+float getFakeBouncedLight(vec3 bentNormal, float sssDepth, float ao) {
 	const float bounceAlbedo = 0.5;
 	const float bounceBoost  = pi;
 	const float bounceMul    = bounceAlbedo * bounceBoost * rcpPi;
 
 	vec3 bounceDir = vec3(lightDir.xz, -lightDir.y).xzy;
-	float bounce0 = clamp01(dot(bentNormal, bounceDir)) * (1.0 - exp2(-0.125 * distanceTraveled));
+	float bounce0 = clamp01(dot(bentNormal, bounceDir)) * (1.0 - exp2(-0.125 * sssDepth));
 	float bounce1 = 0.33 * ao * clamp01(0.5 - 0.5 * bentNormal.y);
 
 	return (bounceAlbedo * rcpPi) * (bounce0 + bounce1) * dampen(clamp01(lightDir.y + 0.15));
@@ -64,7 +64,7 @@ vec3 getSceneLighting(
 	vec2 lmCoord,
 	float ao,
 	uint blockId,
-	out float distanceTraveled
+	out float sssDepth
 ) {
 	vec3 radiance = material.emission * emissionIntensity;
 
@@ -79,7 +79,7 @@ vec3 getSceneLighting(
 	float cloudShadow = 1.0;
 #endif
 
-	vec3 visibility = NoL * getShadows(positionScene, geometryNormal, NoL, lmCoord.y, cloudShadow, material.sssAmount, blockId, distanceTraveled);
+	vec3 visibility = NoL * calculateShadows(positionScene, geometryNormal, NoL, lmCoord.y, cloudShadow, blockId, sssDepth);
 
 	if (maxOf(visibility) > eps || material.sssAmount > eps) {
 		float NoV = clamp01(dot(normal, viewerDir));
@@ -90,7 +90,7 @@ vec3 getSceneLighting(
 
 		vec3 diffuse = diffuseHammon(material, NoL, NoV, NoH, LoV) * (1.0 - 0.75 * material.sssAmount);
 		vec3 specular = getSpecularHighlight(material, NoL, NoV, NoH, LoV, LoH);
-		vec3 subsurface = getSubsurfaceScattering(material.albedo, material.sssAmount, distanceTraveled, LoV);
+		vec3 subsurface = getSubsurfaceScattering(material.albedo, material.sssAmount, sssDepth, LoV);
 
 		radiance += directIrradiance * ((diffuse + specular) * visibility + subsurface) * getCloudShadows(colortex15, positionScene);
 	}
@@ -112,12 +112,13 @@ vec3 getSceneLighting(
 	radiance += skylight * skylightFalloff * skylightBoost * bsdf;
 
 #if defined WORLD_OVERWORLD && defined FAKE_BOUNCED_SUNLIGHT && SHADOW_QUALITY == SHADOW_QUALITY_FANCY
-	radiance += getFakeBouncedLight(bentNormal, distanceTraveled, ao) * directIrradiance * bsdf * (skylightFalloff * skylightFalloff * cloudShadow);
+	radiance += getFakeBouncedLight(bentNormal, sssDepth, ao) * directIrradiance * bsdf * (skylightFalloff * skylightFalloff * cloudShadow);
 #endif
 
 	// Ambient light
 
-	radiance += ambientIrradiance * bsdf;
+	radiance += ambientIrradiance * ao * bsdf;
+
 	return radiance;
 }
 
