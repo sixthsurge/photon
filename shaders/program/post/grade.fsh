@@ -172,6 +172,20 @@ vec3 tonemapHejlBurgess(vec3 rgb) {
 	return srgbToLinear(rgb); // Revert built-in sRGB conversion
 }
 
+// This is a tonemap operator made by Zombye for his old shader pack Ozius
+// It was given to me by Jessie
+vec3 tonemapOzius(vec3 rgb) {
+    const vec3 a = vec3(0.46, 0.46, 0.46);
+    const vec3 b = vec3(0.60, 0.60, 0.60);
+
+	rgb *= 1.6;
+
+    vec3 cr = mix(vec3(dot(rgb, luminanceWeightsAp1)), rgb, 0.5) + 1.0;
+
+    rgb = pow(rgb / (1.0 + rgb), a);
+    return pow(rgb * rgb * (-2.0 * rgb + 3.0), cr / b);
+}
+
 vec3 tonemapReinhardJodie(vec3 rgb) {
 	vec3 reinhard = rgb / (rgb + 1.0);
 	return mix(rgb / (getLuminance(rgb) + 1.0), reinhard, reinhard);

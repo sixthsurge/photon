@@ -273,6 +273,7 @@ option.tonemap                         = Tonemap Operator
 value.tonemap.tonemapAces              = Aces
 value.tonemap.tonemapAcesFit           = Aces Fit
 value.tonemap.tonemapHejlBurgess       = Hejl-Burgess
+value.tonemap.tonemapOzius             = Ozius
 value.tonemap.tonemapReinhardJodie     = Reinhard-Jodie
 
 # ACES
