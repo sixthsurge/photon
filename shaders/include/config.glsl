@@ -6,7 +6,7 @@ const float ambientOcclusionLevel = 0.0;
 const int noiseTextureResolution = 512;
 
 const bool shadowHardwareFiltering = true;
-const int shadowMapResolution      = 2048; // [1024 2048 4096]
+const int shadowMapResolution      = 2048; // [1024 1536 2048 3072 4096]
 const float shadowDistance         = 144.0; // [64.0 80.0 96.0 112.0 128.0 144.0 160.0 176.0 192.0 208.0 224.0 240.0 256.0 320.0 384.0 512.0 768.0 1024.0]
 const float shadowIntervalSize     = 2.0;
 const float sunPathRotation        = -40.0; // [-40.0 -35.0 -30.0 -25.0 -20.0 -15.0 -10.0 -5.0 0.0 5.0 10.0 15.0 20.0 25.0 30.0 35.0 40.0]
@@ -141,18 +141,14 @@ const float sunPathRotation        = -40.0; // [-40.0 -35.0 -30.0 -25.0 -20.0 -1
 
 //--// Indirect Lighting
 
-  #define INDIRECT_RENDER_SCALE 50
+  #define HBIL
+  #define HBIL_RENDER_SCALE 50
+  #define HBIL_RADIUS 8.0
+  #define HBIL_SLICES 1
+  #define HBIL_ACCUMULATION_LIMIT 200
+  #define HBIL_HORIZON_STEPS 16
 
-//#define SSPT // Uses screen-space path tracing for indirect lighting and artificial light. Provides natural bounced lighting and properly colored lighting from block light sources. This has a big performance cost on its own and requires expensive filtering to be usable. Due to its nature as a screen-space solution light from off-screen cannot contribute to SSPT, so when you look away from a light source like a torch its SSPT contribution will fade away. (although, the lightmap is still used so that light from off-screen is still accounted for as if SSPT were disabled)
-//#define SSPT_FILTER // Spatiotemporal variance guided filtering for SSPT. This has a big performance impact and may smudge SSPT shadows a little, but it's absolutely required for it to look acceptable
-
-  #define GTAO // Ground-truth based ambient occlusion (GTAO). Adds soft shadows in corners in ambient light. This option is ignored when SSPT is enabled, as SSPT naturally causes ambient occlusion
-  #define GTAO_RADIUS 0.5 // Determines how far the ambient occlusion can spread [0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0 1.1 1.2 1.3 1.4 1.5 1.6 1.7 1.8 1.9 2.0]
-  #define GTAO_SLICES 2 // Number of GTAO slices computed per frame. If you don't know what this is, don't change it! [1 2 3 4 5 6 7 8]
-  #define GTAO_HORIZON_STEPS 3 // Number of steps taken during the GTAO horizon search. If you don't know what this is, don't change it! [3 4 5 6 7 8]
-  #define GTAO_ACCUMULATION_LIMIT 16 // Maximum number of accumulated frames. A higher limit means less noise but more ghosting [0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33]
-
-  #define SH_SKYLIGHT // Uses spherical harmonics encoding for directional skylight in the Overworld, which provides a much more natural result. This works well with GTAO. This option is ignored when SSPT is enabled, since SSPT already provides a similar result. Small performance cost
+  #define SH_SKYLIGHT // Uses spherical harmonics encoding for directional skylight in the Overworld, which provides a far more natural result. Small performance cost
 
 //--// Light Sources
 

@@ -97,7 +97,7 @@ uniform vec3 moonDir;
 #include "/include/utility/encoding.glsl"
 #include "/include/utility/spaceConversion.glsl"
 
-//--// Program //-------------------------------------------------------------//
+//--// Functions //-----------------------------------------------------------//
 
 void main() {
 	ivec2 texel = ivec2(gl_FragCoord.xy);
@@ -120,12 +120,12 @@ void main() {
 
 	/* -- transformations -- */
 
-	vec3 positionScreen = vec3(coord, frontDepth);
-	vec3 positionView   = screenToViewSpace(positionScreen, true);
-	vec3 positionScene  = viewToSceneSpace(positionView);
+	vec3 screenPos = vec3(coord, frontDepth);
+	vec3 viewPos   = screenToViewSpace(screenPos, true);
+	vec3 scenePos  = viewToSceneSpace(viewPos);
 
-	float viewerDistance = length(positionView);
-	vec3 viewerDir = (gbufferModelViewInverse[3].xyz - positionScene) * rcp(viewerDistance);
+	float viewerDistance = length(viewPos);
+	vec3 viewerDir = (gbufferModelViewInverse[3].xyz - scenePos) * rcp(viewerDistance);
 
 	/* -- underwater effects -- */
 
@@ -151,7 +151,7 @@ void main() {
 		float LoV = dot(viewerDir, lightDir);
 		float sssDepth = lightingInfo.x * 32.0;
 		float skylight = lightingInfo.y;
-		float cloudShadow = getCloudShadows(colortex15, positionScene);
+		float cloudShadow = getCloudShadows(colortex15, scenePos);
 
 		mat2x3 waterVolume = getSimpleWaterVolume(
 			directIrradiance,

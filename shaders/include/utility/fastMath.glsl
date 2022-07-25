@@ -6,7 +6,7 @@
 // Max relative error: 3.9 * 10^-4
 // Max absolute error: 6.1 * 10^-4
 // Polynomial degree: 2
-float acosApprox(float x) {
+float fastAcos(float x) {
 	const float C0 = 1.57018;
 	const float C1 = -0.201877;
 	const float C2 = 0.0464619;
@@ -16,6 +16,7 @@ float acosApprox(float x) {
 
 	return x >= 0 ? res : pi - res; // Undo range reduction
 }
+vec2 fastAcos(vec2 v) { return vec2(fastAcos(v.x), fastAcos(v.y)); }
 
 float pow4(float x) { return sqr(sqr(x)); }
 float pow5(float x) { return pow4(x) * x; }

@@ -71,7 +71,7 @@ uniform vec2 taaOffset;
 #define TEMPORAL_REPROJECTION
 #include "/include/utility/spaceConversion.glsl"
 
-//--// Program //-------------------------------------------------------------//
+//--// Functions //-----------------------------------------------------------//
 
 /*
 const bool colortex3MipmapEnabled = true;
@@ -104,7 +104,7 @@ vec3 clipAabb(vec3 q, vec3 aabbMin, vec3 aabbMax, out bool clipped) {
     vec3 vClip = q - pClip;
     vec3 vUnit = vClip / eClip;
     vec3 aUnit = abs(vUnit);
-    float maUnit = max(aUnit.x, max(aUnit.y, aUnit.z));
+    float maUnit = maxOf(aUnit);
 
 	clipped = maUnit > 1.0;
     return clipped ? pClip + vClip / maUnit : q;

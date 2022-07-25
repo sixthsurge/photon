@@ -150,7 +150,7 @@ void getRainPuddles(
 	sampler2D noiseSampler,
 	float porosity,
 	vec2 lmCoord,
-	vec3 positionWorld,
+	vec3 worldPos,
 	vec3 geometryNormal,
 	inout vec3 normal,
 	inout vec3 albedo,
@@ -169,7 +169,7 @@ void getRainPuddles(
 
 	if (wetness < 0.0 || biomeMayRain < 0.0) return;
 
-	float puddle = texture(noiseSampler, positionWorld.xz * puddleFrequency).w;
+	float puddle = texture(noiseSampler, worldPos.xz * puddleFrequency).w;
 	      puddle = linearStep(0.45, 0.55, puddle) * wetness * biomeMayRain * max0(geometryNormal.y);
 
 	// prevent puddles from appearing indoors
@@ -185,12 +185,12 @@ void getRainPuddles(
 	roughness = min(roughness, mix(roughness, puddleRoughness, puddle));
 
 	const float h = 0.1;
-	float ripple0 = getRippleHeightmap(noiseSampler, positionWorld.xz);
-	float ripple1 = getRippleHeightmap(noiseSampler, positionWorld.xz + vec2(h, 0.0));
-	float ripple2 = getRippleHeightmap(noiseSampler, positionWorld.xz + vec2(0.0, h));
+	float ripple0 = getRippleHeightmap(noiseSampler, worldPos.xz);
+	float ripple1 = getRippleHeightmap(noiseSampler, worldPos.xz + vec2(h, 0.0));
+	float ripple2 = getRippleHeightmap(noiseSampler, worldPos.xz + vec2(0.0, h));
 
 	vec3 rippleNormal     = vec3(ripple1 - ripple0, ripple2 - ripple0, h);
-	     rippleNormal.xy *= 0.05 * smoothstep(0.0, 0.1, abs(dot(geometryNormal, normalize(positionWorld - cameraPosition))));
+	     rippleNormal.xy *= 0.05 * smoothstep(0.0, 0.1, abs(dot(geometryNormal, normalize(worldPos - cameraPosition))));
 	     rippleNormal     = normalize(rippleNormal);
 		 rippleNormal     = rippleNormal.xzy; // convert to world space
 

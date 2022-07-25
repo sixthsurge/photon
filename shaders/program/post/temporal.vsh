@@ -35,7 +35,7 @@ uniform vec2 viewTexelSize;
 
 #include "/include/utility/color.glsl"
 
-//--// Program //-------------------------------------------------------------//
+//--// Functions //-----------------------------------------------------------//
 
 #define getExposureFromEv100(ev100) exp2(-(ev100)) / 1.2
 #define getExposureFromLuminance(l) calibration / (l)

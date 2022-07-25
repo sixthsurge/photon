@@ -11,8 +11,8 @@ float getSphericalFog(float viewerDistance, float fogStartDistance, float fogDen
 	return exp2(-fogDensity * max0(viewerDistance - fogStartDistance));
 }
 
-float getBorderFog(vec3 positionScene, vec3 direction) {
-	float fog = cubicLength(positionScene.xz) / far;
+float getBorderFog(vec3 scenePos, vec3 direction) {
+	float fog = cubicLength(scenePos.xz) / far;
 	      fog = exp2(-8.0 * pow8(fog));
 	      fog = mix(fog, 1.0, 0.75 * dampen(linearStep(0.0, 0.2, direction.y)));
 
@@ -20,16 +20,16 @@ float getBorderFog(vec3 positionScene, vec3 direction) {
 }
 
 // fog effects shared by all dimensions
-vec3 applyCommonFog(vec3 radiance, vec3 positionScene, vec3 clearSky, float viewerDistance) {
+vec3 applyCommonFog(vec3 radiance, vec3 scenePos, vec3 clearSky, float viewerDistance) {
 	const vec3 lavaFogColor = 16.0 * pow(vec3(0.839, 0.373, 0.075), vec3(2.2)) * r709ToAp1;
 	const vec3 snowFogColor = 0.05 * pow(vec3(0.957, 0.988, 0.988), vec3(2.2)) * r709ToAp1;
 
-	positionScene -= gbufferModelViewInverse[3].xyz; // Account for view bobbing
-	vec3 direction = positionScene * rcp(viewerDistance);
+	scenePos -= gbufferModelViewInverse[3].xyz; // Account for view bobbing
+	vec3 direction = scenePos * rcp(viewerDistance);
 
 #ifdef BORDER_FOG
 	// border fog
-	float borderFog = getBorderFog(positionScene, direction);
+	float borderFog = getBorderFog(scenePos, direction);
 	radiance = mix(clearSky, radiance, borderFog);
 #endif
 
@@ -49,10 +49,10 @@ vec3 applyCommonFog(vec3 radiance, vec3 positionScene, vec3 clearSky, float view
 
 // fog effects specific to each dimension
 #if   defined WORLD_OVERWORLD
-vec3 applyFog(vec3 radiance, vec3 positionScene, vec3 clearSky) {
+vec3 applyFog(vec3 radiance, vec3 scenePos, vec3 clearSky) {
 	clearSky = mix(clearSky, caveFogColor, biomeCave); // fix border fog underground
 
-	float viewerDistance = length(positionScene);
+	float viewerDistance = length(scenePos);
 
 #ifdef CAVE_FOG
 	// cave fog
@@ -60,7 +60,7 @@ vec3 applyFog(vec3 radiance, vec3 positionScene, vec3 clearSky) {
 	radiance = mix(caveFogColor, radiance, caveFog);
 #endif
 
-	radiance = applyCommonFog(radiance, positionScene, clearSky, viewerDistance);
+	radiance = applyCommonFog(radiance, scenePos, clearSky, viewerDistance);
 
 	return radiance;
 }

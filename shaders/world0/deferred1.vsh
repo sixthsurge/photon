@@ -40,7 +40,7 @@ uniform vec3 lightDir;
 
 #include "/include/atmospherics/weather.glsl"
 
-//--// Program //-------------------------------------------------------------//
+//--// Functions //-----------------------------------------------------------//
 
 void main() {
 	coord = gl_MultiTexCoord0.xy;

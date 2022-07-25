@@ -10,8 +10,8 @@ layout (location = 1) out vec4 waterMask;
 
 in vec2 texCoord;
 in vec2 lmCoord;
-in vec3 positionView;
-in vec3 positionScene;
+in vec3 viewPos;
+in vec3 scenePos;
 in vec3 viewerDirTangent;
 
 flat in uint blockId;
@@ -131,7 +131,7 @@ uniform vec3 moonDir;
 #include "/include/utility/encoding.glsl"
 #include "/include/utility/spaceConversion.glsl"
 
-//--// Program //-------------------------------------------------------------//
+//--// Functions //-----------------------------------------------------------//
 
 const float lodBias = log2(renderScale);
 const float waterOpacity = 0.02;
@@ -173,16 +173,16 @@ void main() {
 		material.roughness += 0.3 * textureHighlight;
 #endif
 
-		vec3 positionWorld = positionScene + cameraPosition;
+		vec3 worldPos = scenePos + cameraPosition;
 
 		bool isStill = abs(tbnMatrix[2].y) > 0.99;
 		vec2 flowDir = isStill ? vec2(0.0) : normalize(tbnMatrix[2].xz);
 
 #ifdef WATER_PARALLAX
-		positionWorld.xz = waterParallax(normalize(viewerDirTangent), positionWorld.xz, flowDir);
+		worldPos.xz = waterParallax(normalize(viewerDirTangent), worldPos.xz, flowDir);
 #endif
 
-		normalTangent = getWaterNormal(tbnMatrix[2], positionWorld, flowDir);
+		normalTangent = getWaterNormal(tbnMatrix[2], worldPos, flowDir);
 	} else {
 		if (baseTex.a < 0.1) discard;
 
@@ -214,11 +214,11 @@ void main() {
 		}
 	}
 
-	float viewerDistance = length(positionView);
+	float viewerDistance = length(viewPos);
 
 	vec3 normal = tbnMatrix * normalTangent;
 	vec3 flatNormal = tbnMatrix[2];
-	vec3 viewerDir = (gbufferModelViewInverse[3].xyz - positionScene) * rcp(viewerDistance);
+	vec3 viewerDir = (gbufferModelViewInverse[3].xyz - scenePos) * rcp(viewerDistance);
 
 #if defined PROGRAM_GBUFFERS_TEXTURED
 	// no normal attribute
@@ -231,13 +231,12 @@ void main() {
 	float sssDepth;
 	fragColor.rgb = getSceneLighting(
 		material,
-		positionScene,
+		scenePos,
 		normal,
 		flatNormal,
-		normal,
 		viewerDir,
-		ambientIrradiance,
 		directIrradiance,
+		ambientIrradiance,
 		skyIrradiance,
 		lmCoord,
 		materialAo,
@@ -252,7 +251,7 @@ void main() {
 		material,
 		tbnMatrix,
 		vec3(coord, gl_FragCoord.z),
-		positionView,
+		viewPos,
 		normal,
 		viewerDir,
 		viewerDirTangent,
@@ -263,7 +262,7 @@ void main() {
 	/* -- fog -- */
 
 	vec3 clearSky = texelFetch(colortex6, ivec2(gl_FragCoord.xy), 0).rgb;
-	fragColor.rgb = applyFog(fragColor.rgb, positionScene, clearSky);
+	fragColor.rgb = applyFog(fragColor.rgb, scenePos, clearSky);
 
 	/* -- set water mask -- */
 

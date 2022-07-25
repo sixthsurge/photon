@@ -16,7 +16,7 @@ void decodeSpecularTex(vec4 specularTex, inout Material material) {
 
 	if (specularTex.g < 229.5 / 255.0) {
 		// dielectrics
-		material.f0 = vec3(specularTex.g);
+		material.f0 = max(material.f0, vec3(specularTex.g));
 		material.n  = f0ToIor(material.f0.x);
 
 		float hasPorosity = float(specularTex.b < 64.5 / 255.0);

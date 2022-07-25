@@ -59,7 +59,7 @@ uniform vec3 lightDir;
 #include "/include/utility/color.glsl"
 #include "/include/utility/dithering.glsl"
 
-//--// Program //-------------------------------------------------------------//
+//--// Functions //-----------------------------------------------------------//
 
 vec3 minOf(vec3 a, vec3 b, vec3 c, vec3 d, vec3 f) {
     return min(a, min(b, min(c, min(d, f))));

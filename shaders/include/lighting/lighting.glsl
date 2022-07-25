@@ -53,19 +53,23 @@ float getFakeBouncedLight(vec3 bentNormal, float sssDepth, float ao) {
 
 vec3 getSceneLighting(
 	Material material,
-	vec3 positionScene,
+	vec3 scenePos,
 	vec3 normal,
 	vec3 geometryNormal,
-	vec3 bentNormal,
 	vec3 viewerDir,
-	vec3 ambientIrradiance,
 	vec3 directIrradiance,
-	vec3 skylight,
+#if defined PROGRAM_DEFERRED_LIGHTING && defined HBIL
+	vec3 indirectIrradiance,
+#else
+	vec3 ambientIrradiance,
+	vec3 skyIrradiance,
+#endif
 	vec2 lmCoord,
 	float ao,
 	uint blockId,
 	out float sssDepth
 ) {
+	ao = 1.0;
 	vec3 radiance = material.emission * emissionIntensity;
 
 	// Sunlight/moonlight
@@ -74,12 +78,12 @@ vec3 getSceneLighting(
 	float NoL = dot(normal, lightDir) * step(0.0, dot(geometryNormal, lightDir));
 
 #if defined WORLD_OVERWORLD && defined CLOUD_SHADOWS
-	float cloudShadow = getCloudShadows(colortex15, positionScene);
+	float cloudShadow = getCloudShadows(colortex15, scenePos);
 #else
 	float cloudShadow = 1.0;
 #endif
 
-	vec3 visibility = NoL * calculateShadows(positionScene, geometryNormal, NoL, lmCoord.y, cloudShadow, blockId, sssDepth);
+	vec3 visibility = NoL * calculateShadows(scenePos, geometryNormal, NoL, lmCoord.y, cloudShadow, blockId, sssDepth);
 
 	if (maxOf(visibility) > eps || material.sssAmount > eps) {
 		float NoV = clamp01(dot(normal, viewerDir));
@@ -92,32 +96,36 @@ vec3 getSceneLighting(
 		vec3 specular = getSpecularHighlight(material, NoL, NoV, NoH, LoV, LoH);
 		vec3 subsurface = getSubsurfaceScattering(material.albedo, material.sssAmount, sssDepth, LoV);
 
-		radiance += directIrradiance * ((diffuse + specular) * visibility + subsurface) * getCloudShadows(colortex15, positionScene);
+		radiance += directIrradiance * ((diffuse + specular) * visibility + subsurface) * getCloudShadows(colortex15, scenePos);
 	}
 #endif
 
 	vec3 bsdf = material.albedo * rcpPi * float(!material.isMetal);
 
+#if defined PROGRAM_DEFERRED_LIGHTING && defined HBIL
+	// Indirect lighting already computed alongside HBIL
+	radiance += indirectIrradiance * ao * bsdf;
+#else
+
 	// Blocklight
 
 	vec3 blocklightColor = blackbody(BLOCKLIGHT_TEMPERATURE);
 	float blocklightFalloff = getBlocklightFalloff(lmCoord.x, ao);
-
 	radiance += blocklightIntensity * blocklightColor * blocklightFalloff * bsdf;
 
 	// Skylight
 
 	float skylightFalloff = getSkylightFalloff(lmCoord.y);
-
-	radiance += skylight * skylightFalloff * skylightBoost * bsdf;
+	radiance += skyIrradiance * skylightFalloff * skylightBoost * bsdf;
 
 #if defined WORLD_OVERWORLD && defined FAKE_BOUNCED_SUNLIGHT && SHADOW_QUALITY == SHADOW_QUALITY_FANCY
-	radiance += getFakeBouncedLight(bentNormal, sssDepth, ao) * directIrradiance * bsdf * (skylightFalloff * skylightFalloff * cloudShadow);
+	radiance += getFakeBouncedLight(normal, sssDepth, ao) * directIrradiance * bsdf * (skylightFalloff * skylightFalloff * cloudShadow);
 #endif
 
 	// Ambient light
 
 	radiance += ambientIrradiance * ao * bsdf;
+#endif
 
 	return radiance;
 }

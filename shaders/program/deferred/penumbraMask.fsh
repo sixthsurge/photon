@@ -83,16 +83,16 @@ void main() {
 
 	/* -- transformations -- */
 
-	vec3 positionView         = screenToViewSpace(vec3(coord, depth), true);
-	vec3 positionScene        = viewToSceneSpace(positionView);
-	vec3 positionShadowView   = transform(shadowModelView, positionScene);
-	vec3 positionShadowClip   = projectOrtho(shadowProjection, positionShadowView);
-	vec3 positionShadowScreen = distortShadowSpace(positionShadowClip) * 0.5 + 0.5;
+	vec3 viewPos         = screenToViewSpace(vec3(coord, depth), true);
+	vec3 scenePos        = viewToSceneSpace(viewPos);
+	vec3 shadowViewPos   = transform(shadowModelView, scenePos);
+	vec3 shadowClipPos   = projectOrtho(shadowProjection, shadowViewPos);
+	vec3 shadowScreenPos = distortShadowSpace(shadowClipPos) * 0.5 + 0.5;
 
 	/* -- blocker search -- */
 
 	float dither = texelFetch(noisetex, texel & 511, 0).b;
 	      dither = R1(frameCounter, dither);
 
-	penumbraMask.x = blockerSearch(shadowtex0, positionShadowScreen, positionShadowClip, dither, penumbraMask.y);
+	penumbraMask.x = blockerSearch(shadowtex0, shadowScreenPos, shadowClipPos, dither, penumbraMask.y);
 }

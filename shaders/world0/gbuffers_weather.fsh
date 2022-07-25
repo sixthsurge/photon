@@ -43,7 +43,7 @@ uniform vec2 viewTexelSize;
 #include "/include/utility/dithering.glsl"
 #include "/include/utility/encoding.glsl"
 
-//--// Program //-------------------------------------------------------------//
+//--// Functions //-----------------------------------------------------------//
 
 const float lodBias = log2(renderScale);
 const float rainId  = 253.0;

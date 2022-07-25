@@ -4,8 +4,8 @@
 
 out vec2 texCoord;
 out vec2 lmCoord;
-out vec3 positionView;
-out vec3 positionScene;
+out vec3 viewPos;
+out vec3 scenePos;
 out vec3 viewerDirTangent;
 
 flat out uint blockId;
@@ -52,7 +52,7 @@ uniform vec2 taaOffset;
 
 #include "/include/vertex/animation.glsl"
 
-//--// Program //-------------------------------------------------------------//
+//--// Functions //-----------------------------------------------------------//
 
 void main() {
 	texCoord = gl_MultiTexCoord0.xy;
@@ -64,17 +64,17 @@ void main() {
 	tbnMatrix[0] = mat3(gbufferModelViewInverse) * normalize(gl_NormalMatrix * at_tangent.xyz);
 	tbnMatrix[1] = cross(tbnMatrix[0], tbnMatrix[2]) * sign(at_tangent.w);
 
-	positionView  = transform(gl_ModelViewMatrix, gl_Vertex.xyz);
-	positionScene = transform(gbufferModelViewInverse, positionView);
+	viewPos  = transform(gl_ModelViewMatrix, gl_Vertex.xyz);
+	scenePos = transform(gbufferModelViewInverse, viewPos);
 
-	viewerDirTangent = normalize(gbufferModelViewInverse[3].xyz - positionScene) * tbnMatrix;
+	viewerDirTangent = normalize(gbufferModelViewInverse[3].xyz - scenePos) * tbnMatrix;
 
-	vec4 positionClip  = project(gl_ProjectionMatrix, positionView);
+	vec4 clipPos  = project(gl_ProjectionMatrix, viewPos);
 
 #ifdef TAA
-    positionClip.xy += taaOffset * positionClip.w;
-	positionClip.xy  = positionClip.xy * renderScale + positionClip.w * (renderScale - 1.0);
+    clipPos.xy += taaOffset * clipPos.w;
+	clipPos.xy  = clipPos.xy * renderScale + clipPos.w * (renderScale - 1.0);
 #endif
 
-	gl_Position = positionClip;
+	gl_Position = clipPos;
 }

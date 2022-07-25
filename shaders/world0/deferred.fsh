@@ -2,7 +2,7 @@
 
 /*
  * Program description:
- * Render sky from all directions into 256x128 sky capture for reflections, SSPT and SH skylight
+ * Render sky from all directions into 256x128 sky capture for reflections and directional skylight
  * Store lighting color palette and dynamic weather properties
  */
 
@@ -95,7 +95,7 @@ uniform vec3 moonDir;
 #include "/include/atmospherics/sky.glsl"
 #include "/include/atmospherics/skyProjection.glsl"
 
-//--// Program //-------------------------------------------------------------//
+//--// Functions //-----------------------------------------------------------//
 
 void main() {
 	ivec2 texel = ivec2(gl_FragCoord.xy);

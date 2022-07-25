@@ -29,8 +29,8 @@ float getWaterHeight(vec2 coord, vec2 flowDir) {
 	return height / amplitudeSum;
 }
 
-vec3 getWaterNormal(vec3 geometryNormal, vec3 positionWorld, vec2 flowDir) {
-	vec2 coord = positionWorld.xz - positionWorld.y;
+vec3 getWaterNormal(vec3 geometryNormal, vec3 worldPos, vec2 flowDir) {
+	vec2 coord = worldPos.xz - worldPos.y;
 
 	const float h = 0.1;
 	float wave0 = getWaterHeight(coord, flowDir);
@@ -38,7 +38,7 @@ vec3 getWaterNormal(vec3 geometryNormal, vec3 positionWorld, vec2 flowDir) {
 	float wave2 = getWaterHeight(coord + vec2(0.0, h), flowDir);
 
 	float normalInfluence  = 0.15 * smoothstep(0.0, 0.05, abs(geometryNormal.y));
-	      normalInfluence *= smoothstep(0.0, 0.1, abs(dot(geometryNormal, normalize(positionWorld - cameraPosition)))); // prevent noise when looking horizontal
+	      normalInfluence *= smoothstep(0.0, 0.1, abs(dot(geometryNormal, normalize(worldPos - cameraPosition)))); // prevent noise when looking horizontal
 
 	vec3 normal     = vec3(wave1 - wave0, wave2 - wave0, h);
 	     normal.xy *= normalInfluence;

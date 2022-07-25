@@ -10,8 +10,8 @@
 #include "/include/utility/spaceConversion.glsl"
 
 vec3 traceSpecularRay(
-	vec3 positionScreen,
-	vec3 positionView,
+	vec3 screenPos,
+	vec3 viewPos,
 	vec3 rayDir,
 	float dither,
 	float mipLevel,
@@ -22,14 +22,12 @@ vec3 traceSpecularRay(
 	vec3 hitPos;
 	bool hit = raytraceIntersection(
 		depthtex1,
-		positionScreen,
-		positionView,
+		screenPos,
+		viewPos,
 		rayDirView,
-		1.0,
 		dither,
 		mipLevel == 0.0 ? SSR_INTERSECTION_STEPS_SMOOTH : SSR_INTERSECTION_STEPS_ROUGH,
 		SSR_REFINEMENT_STEPS,
-		false,
 		hitPos
 	);
 
@@ -52,8 +50,8 @@ vec3 traceSpecularRay(
 vec3 getSpecularReflections(
 	Material material,
 	mat3 tbnMatrix,
-	vec3 positionScreen,
-	vec3 positionView,
+	vec3 screenPos,
+	vec3 viewPos,
 	vec3 normal,
 	vec3 viewerDir,
 	vec3 viewerDirTangent,
@@ -90,7 +88,7 @@ vec3 getSpecularReflections(
 			float NoL = dot(normal, rayDir);
 			if (NoL < eps) continue;
 
-			vec3 radiance = traceSpecularRay(positionScreen, positionView, rayDir, dither, mipLevel, skylightFalloff);
+			vec3 radiance = traceSpecularRay(screenPos, viewPos, rayDir, dither, mipLevel, skylightFalloff);
 
 			NoL       = max(1e-2, NoL);
 			float NoV = max(1e-2, dot(normal, viewerDir));
@@ -105,7 +103,9 @@ vec3 getSpecularReflections(
 			hash = R2Next(hash);
 		}
 
-		return reflection * albedoTint * rcp(float(SSR_RAY_COUNT));
+		reflection *= albedoTint * rcp(float(SSR_RAY_COUNT));
+		if (any(isnan(reflection))) reflection = vec3(0.0); // don't reflect NaNs
+		return reflection;
 	}
 #endif
 
@@ -118,11 +118,13 @@ vec3 getSpecularReflections(
 
 	if (NoL < eps) return vec3(0.0);
 
-	vec3 radiance = traceSpecularRay(positionScreen, positionView, rayDir, dither, 0.0, skylightFalloff);
+	vec3 radiance = traceSpecularRay(screenPos, viewPos, rayDir, dither, 0.0, skylightFalloff);
 
 	vec3 fresnel = material.isMetal ? fresnelSchlick(NoV, material.f0) : vec3(fresnelDielectric(NoV, material.n));
 
-	return radiance * albedoTint * fresnel;
+	vec3 reflection = radiance * albedoTint * fresnel;
+	if (any(isnan(reflection))) reflection = vec3(0.0); // don't reflect NaNs
+	return reflection;
 }
 
 #endif // INCLUDE_LIGHTING_REFLECTIONS

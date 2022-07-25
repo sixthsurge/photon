@@ -3,7 +3,7 @@
 //--// Outputs //-------------------------------------------------------------//
 
 out vec2 texCoord;
-out vec3 positionWorld;
+out vec3 worldPos;
 
 flat out uint blockId;
 flat out vec3 normal;
@@ -43,7 +43,7 @@ uniform float rainStrength;
 
 #include "/include/vertex/animation.glsl"
 
-//--// Program //-------------------------------------------------------------//
+//--// Functions //-----------------------------------------------------------//
 
 void main() {
 	texCoord = gl_MultiTexCoord0.xy;
@@ -57,19 +57,19 @@ void main() {
 	tbnMatrix[2] = normal;
 #endif
 
-	vec3 positionShadowView = transform(gl_ModelViewMatrix, gl_Vertex.xyz), positionShadowClip;
+	vec3 shadowViewPos = transform(gl_ModelViewMatrix, gl_Vertex.xyz), shadowClipPos;
 
-	vec3 positionScene = transform(shadowModelViewInverse, positionShadowView);
+	vec3 scenePos = transform(shadowModelViewInverse, shadowViewPos);
 
-	positionWorld  = positionScene + cameraPosition;
-	positionWorld += animateVertex(positionWorld, texCoord.y < mc_midTexCoord.y, rcp(240.0) * gl_MultiTexCoord1.y, blockId);
-	positionScene  = positionWorld - cameraPosition;
+	worldPos  = scenePos + cameraPosition;
+	worldPos += animateVertex(worldPos, texCoord.y < mc_midTexCoord.y, rcp(240.0) * gl_MultiTexCoord1.y, blockId);
+	scenePos  = worldPos - cameraPosition;
 
-	positionShadowView = transform(shadowModelView, positionScene);
-	positionShadowClip = projectOrtho(gl_ProjectionMatrix, positionShadowView);
+	shadowViewPos = transform(shadowModelView, scenePos);
+	shadowClipPos = projectOrtho(gl_ProjectionMatrix, shadowViewPos);
 
-	float distortionFactor = getShadowDistortionFactor(positionShadowClip.xy);
-	positionShadowClip = distortShadowSpace(positionShadowClip, distortionFactor);
+	float distortionFactor = getShadowDistortionFactor(shadowClipPos.xy);
+	shadowClipPos = distortShadowSpace(shadowClipPos, distortionFactor);
 
-	gl_Position = vec4(positionShadowClip, 1.0);
+	gl_Position = vec4(shadowClipPos, 1.0);
 }

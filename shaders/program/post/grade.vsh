@@ -21,7 +21,7 @@ uniform sampler2D colortex8; // Anti-aliased color and exposure
 #include "/include/fragment/aces/matrices.glsl"
 #include "/include/fragment/aces/utility.glsl"
 
-//--// Program //-------------------------------------------------------------//
+//--// Functions //-----------------------------------------------------------//
 
 mat3 getWhiteBalanceMatrix(const float whiteBalance) {
 	vec3 srcXyz = blackbody(whiteBalance) * ap1ToXyz;

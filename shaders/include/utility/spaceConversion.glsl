@@ -10,8 +10,8 @@ float reverseLinearDepth(float linearZ) {
 	return (far + near) / (far - near) + (2.0 * far * near) / (linearZ * (far - near));
 }
 
-vec3 screenToViewSpace(vec3 positionScreen, bool handleJitter) {
-	vec3 positionNdc = 2.0 * positionScreen - 1.0;
+vec3 screenToViewSpace(vec3 screenPos, bool handleJitter) {
+	vec3 positionNdc = 2.0 * screenPos - 1.0;
 
 #ifdef TAA
 	if (handleJitter) positionNdc.xy -= taaOffset;
@@ -20,8 +20,8 @@ vec3 screenToViewSpace(vec3 positionScreen, bool handleJitter) {
 	return projectAndDivide(gbufferProjectionInverse, positionNdc);
 }
 
-vec3 viewToScreenSpace(vec3 positionView, bool handleJitter) {
-	vec3 positionNdc = projectAndDivide(gbufferProjection, positionView);
+vec3 viewToScreenSpace(vec3 viewPos, bool handleJitter) {
+	vec3 positionNdc = projectAndDivide(gbufferProjection, viewPos);
 
 #ifdef TAA
 	if (handleJitter) positionNdc.xy += taaOffset;
@@ -30,12 +30,12 @@ vec3 viewToScreenSpace(vec3 positionView, bool handleJitter) {
 	return positionNdc * 0.5 + 0.5;
 }
 
-vec3 viewToSceneSpace(vec3 positionView) {
-	return transform(gbufferModelViewInverse, positionView);
+vec3 viewToSceneSpace(vec3 viewPos) {
+	return transform(gbufferModelViewInverse, viewPos);
 }
 
-vec3 sceneToViewSpace(vec3 positionScene) {
-	return transform(gbufferModelView, positionScene);
+vec3 sceneToViewSpace(vec3 scenePos) {
+	return transform(gbufferModelView, scenePos);
 }
 
 mat3 getTbnMatrix(vec3 normal) {
@@ -45,27 +45,33 @@ mat3 getTbnMatrix(vec3 normal) {
 }
 
 #if defined TEMPORAL_REPROJECTION
-vec3 reproject(vec3 positionScreen) {
-	vec3 pos = screenToViewSpace(positionScreen, false);
-	     pos = viewToSceneSpace(pos);
-
-	vec3 cameraOffset = linearizeDepth(positionScreen.z) < MC_HAND_DEPTH
+vec3 reprojectSceneSpace(vec3 scenePos, bool isHand) {
+	vec3 cameraOffset = isHand
 		? vec3(0.0)
 		: cameraPosition - previousCameraPosition;
 
-	vec3 previousPos = transform(gbufferPreviousModelView, pos + cameraOffset);
+	vec3 previousPos = transform(gbufferPreviousModelView, scenePos + cameraOffset);
 	     previousPos = projectAndDivide(gbufferPreviousProjection, previousPos);
 
 	return previousPos * 0.5 + 0.5;
 }
 
-vec3 reproject(vec3 positionScreen, sampler2D velocitySampler) {
-	vec3 velocity = texelFetch(velocitySampler, ivec2(positionScreen.xy * viewSize), 0).xyz;
+vec3 reproject(vec3 screenPos) {
+	vec3 pos = screenToViewSpace(screenPos, false);
+	     pos = viewToSceneSpace(pos);
+
+	bool isHand = screenPos.z < handDepth;
+
+	return reprojectSceneSpace(pos, isHand);
+}
+
+vec3 reproject(vec3 screenPos, sampler2D velocitySampler) {
+	vec3 velocity = texelFetch(velocitySampler, ivec2(screenPos.xy * viewSize), 0).xyz;
 
 	if (maxOf(abs(velocity)) < eps) {
-		return reproject(positionScreen);
+		return reproject(screenPos);
 	} else {
-		vec3 pos = screenToViewSpace(positionScreen, false);
+		vec3 pos = screenToViewSpace(screenPos, false);
 		     pos = pos - velocity;
 		     pos = viewToScreenSpace(pos, false);
 

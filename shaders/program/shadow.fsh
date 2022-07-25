@@ -7,7 +7,7 @@ layout (location = 0) out vec3 shadowcolor0Out;
 //--// Inputs //--------------------------------------------------------------//
 
 in vec2 texCoord;
-in vec3 positionWorld;
+in vec3 worldPos;
 
 flat in uint blockId;
 flat in vec3 normal;
@@ -81,10 +81,10 @@ float getWaterCaustics() {
 	bool isStill = tbnMatrix[2].y > 0.99;
 	vec2 flowDir = isStill ? vec2(0.0) : normalize(tbnMatrix[2].xz);
 
-	vec3 normal = tbnMatrix * getWaterNormal(normal, positionWorld, flowDir);
+	vec3 normal = tbnMatrix * getWaterNormal(normal, worldPos, flowDir);
 
-	vec3 oldPos = positionWorld;
-	vec3 newPos = positionWorld + refractSafe(lightDir, normal, airN / waterN) * distanceTraveled;
+	vec3 oldPos = worldPos;
+	vec3 newPos = worldPos + refractSafe(lightDir, normal, airN / waterN) * distanceTraveled;
 
 	float oldArea = lengthSquared(dFdx(oldPos)) * lengthSquared(dFdy(oldPos));
 	float newArea = lengthSquared(dFdx(newPos)) * lengthSquared(dFdy(newPos));

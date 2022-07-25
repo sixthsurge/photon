@@ -15,7 +15,7 @@ vec2 projectSky(vec3 direction) {
 	vec2 projectedDir = normalize(direction.xz);
 
 	float azimuthAngle = pi + atan(projectedDir.x, -projectedDir.y);
-	float altitudeAngle = horizonAngle - acosApprox(direction.y);
+	float altitudeAngle = horizonAngle - fastAcos(direction.y);
 
 	vec2 coord;
 	coord.x = azimuthAngle * (1.0 / tau);

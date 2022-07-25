@@ -28,7 +28,7 @@ uniform int renderStage;
 
 #include "/include/utility/color.glsl"
 
-//--// Program //-------------------------------------------------------------//
+//--// Functions //-----------------------------------------------------------//
 
 void main() {
 	vec2 adjustedCoord = texCoord;

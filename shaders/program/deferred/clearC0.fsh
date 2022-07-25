@@ -12,7 +12,7 @@ layout (location = 0) out vec4 colortex0Clear;
 
 in vec2 coord;
 
-//--// Program //-------------------------------------------------------------//
+//--// Functions //-----------------------------------------------------------//
 
 void main() {
 	colortex0Clear = vec4(0.0);

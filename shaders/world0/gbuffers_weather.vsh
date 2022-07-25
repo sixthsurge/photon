@@ -15,7 +15,7 @@ uniform vec3 cameraPosition;
 uniform mat4 gbufferModelView;
 uniform mat4 gbufferModelViewInverse;
 
-//--// Program //-------------------------------------------------------------//
+//--// Functions //-----------------------------------------------------------//
 
 const float rainTiltAmount = 0.2;
 

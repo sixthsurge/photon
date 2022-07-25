@@ -130,7 +130,7 @@ Material getMaterial(vec3 albedo, uint blockId) {
 		albedo,          // albedo
 		vec3(defaultF0), // f0
 		vec3(0.0),       // emission
-		0.8,             // roughness
+		1.0,             // roughness
 		defaultN,        // n
 		0.0,             // sssAmount
 		0.0,             // porosity

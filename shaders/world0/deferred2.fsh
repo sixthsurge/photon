@@ -113,7 +113,7 @@ uniform vec3 moonDir;
 #include "/include/utility/dithering.glsl"
 #include "/include/utility/spaceConversion.glsl"
 
-//--// Program //-------------------------------------------------------------//
+//--// Functions //-----------------------------------------------------------//
 
 vec4 minOf(vec4 a, vec4 b, vec4 c, vec4 d, vec4 f) {
     return min(a, min(b, min(c, min(d, f))));

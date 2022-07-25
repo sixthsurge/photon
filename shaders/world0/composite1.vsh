@@ -12,7 +12,7 @@ flat out vec3 skyIrradiance;
 
 uniform sampler2D colortex4; // Sky capture, lighting color palette,
 
-//--// Program //-------------------------------------------------------------//
+//--// Functions //-----------------------------------------------------------//
 
 void main() {
 	coord = gl_MultiTexCoord0.xy;

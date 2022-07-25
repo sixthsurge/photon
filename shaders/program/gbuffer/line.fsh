@@ -19,7 +19,7 @@ uniform vec2 viewTexelSize;
 
 #include "/include/utility/encoding.glsl"
 
-//--// Program //-------------------------------------------------------------//
+//--// Functions //-----------------------------------------------------------//
 
 void main() {
 #if TAA_UPSCALING_FACTOR > 1
@@ -33,7 +33,7 @@ void main() {
 	data[0].xyz = tint;
 	data[0].w   = 0.0;
 	data[1].xy  = encodeUnitVector(normal);
-	data[1].zw  = lmCoord;
+	data[1].zw  = vec2(0.0);
 
 	encoded.x = packUnorm4x8(data[0]);
 	encoded.y = packUnorm4x8(data[1]);

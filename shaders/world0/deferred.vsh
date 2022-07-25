@@ -68,7 +68,7 @@ uniform vec3 moonDir;
 #include "/include/atmospherics/palette.glsl"
 #include "/include/atmospherics/weather.glsl"
 
-//--// Program //-------------------------------------------------------------//
+//--// Functions //-----------------------------------------------------------//
 
 void main() {
 	coord = gl_MultiTexCoord0.xy;

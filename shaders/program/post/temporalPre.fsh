@@ -12,11 +12,12 @@
 layout (location = 0) out vec3 depthTaaInfo; // depth info for TAA - responsive AA flag and neighbourhood min/max depth
 layout (location = 1) out vec3 aabbMin;      // minimum bound for AABB clipping
 layout (location = 2) out vec3 aabbMax;      // maximum bound for AABB clipping
-layout (location = 3) out vec2 depthStore;   // front/back depth for next frame
+layout (location = 3) out vec4 temporalData; // current frame depth (front/back), light levels for next frame
 
 //--// Uniforms //------------------------------------------------------------//
 
-uniform sampler2D colortex3; // Scene color
+uniform usampler2D colortex1; // Scene data
+uniform sampler2D  colortex3; // Scene color
 
 uniform sampler2D depthtex0;
 uniform sampler2D depthtex1;
@@ -30,7 +31,7 @@ uniform float far;
 
 #include "/include/utility/color.glsl"
 
-//--// Program //-------------------------------------------------------------//
+//--// Functions //-----------------------------------------------------------//
 
 float linearizeDepth(float depth) {
 	// https://wiki.shaderlabs.org/wiki/Shader_tricks#Linearizing_depth
@@ -48,19 +49,23 @@ vec3 maxOf(vec3 a, vec3 b, vec3 c, vec3 d, vec3 f) {
 void main() {
 	ivec2 texel = ivec2(gl_FragCoord.xy);
 
+	float depth0    = texelFetch(depthtex0, texel, 0).x;
+	float depth1    = texelFetch(depthtex1, texel, 0).x;
+	uvec4 sceneData = texelFetch(colortex1, texel, 0);
+
     // Fetch 3x3 neighborhood
     // a b c
     // d e f
     // g h i
-    vec3 a = texelFetch(colortex3, texel + ivec2(-1, -1), 0).rgb;
-    vec3 b = texelFetch(colortex3, texel + ivec2( 0, -1), 0).rgb;
-    vec3 c = texelFetch(colortex3, texel + ivec2( 1, -1), 0).rgb;
+    vec3 a = texelFetch(colortex3, texel + ivec2(-1,  1), 0).rgb;
+    vec3 b = texelFetch(colortex3, texel + ivec2( 0,  1), 0).rgb;
+    vec3 c = texelFetch(colortex3, texel + ivec2( 1,  1), 0).rgb;
     vec3 d = texelFetch(colortex3, texel + ivec2(-1,  0), 0).rgb;
     vec3 e = texelFetch(colortex3, texel, 0).rgb;
     vec3 f = texelFetch(colortex3, texel + ivec2( 1,  0), 0).rgb;
-    vec3 g = texelFetch(colortex3, texel + ivec2(-1,  1), 0).rgb;
-    vec3 h = texelFetch(colortex3, texel + ivec2( 0,  1), 0).rgb;
-    vec3 i = texelFetch(colortex3, texel + ivec2( 1,  1), 0).rgb;
+    vec3 g = texelFetch(colortex3, texel + ivec2(-1, -1), 0).rgb;
+    vec3 h = texelFetch(colortex3, texel + ivec2( 0, -1), 0).rgb;
+    vec3 i = texelFetch(colortex3, texel + ivec2( 1, -1), 0).rgb;
 
 	// Convert to YCoCg
 	a = rgbToYcocg(a);
@@ -99,11 +104,8 @@ void main() {
 	aabbMax = min(aabbMax, mu + gamma * sigma);
 #endif
 
-	depthStore.x = texelFetch(depthtex0, texel, 0).x;
-	depthStore.y = texelFetch(depthtex1, texel, 0).x;
-
 	// More responsive AA behind translucents
-	depthTaaInfo.x = float(depthStore.x != depthStore.y);
+	depthTaaInfo.x = float(depth0 != depth1);
 
 	// Fetch depth values surrounding the current fragment
 	vec4 depthSamples;
@@ -112,13 +114,13 @@ void main() {
 	depthSamples.z = texelFetch(depthtex0, texel + ivec2(-1,  0), 0).x;
 	depthSamples.w = texelFetch(depthtex0, texel + ivec2( 0, -1), 0).x;
 
-	depthTaaInfo.y = min(depthStore.x, minOf(depthSamples));
-	depthTaaInfo.z = max(depthStore.x, maxOf(depthSamples));
-
-	// Storing reversed Z improves precision for a floating point buffer
-	depthStore = 1.0 - depthStore;
+	depthTaaInfo.y = min(depth0, minOf(depthSamples));
+	depthTaaInfo.z = max(depth0, maxOf(depthSamples));
 
 	// Storing linear depth improves precision for a fixed point buffer
 	depthTaaInfo.y = clamp01(linearizeDepth(depthTaaInfo.y) * rcp(far));
 	depthTaaInfo.z = clamp01(linearizeDepth(depthTaaInfo.z) * rcp(far));
+
+	temporalData.xy = 1.0 - vec2(depth0, depth1);     // reversed depth
+	temporalData.zw = unpackUnorm4x8(sceneData.y).zw; // light levels
 }

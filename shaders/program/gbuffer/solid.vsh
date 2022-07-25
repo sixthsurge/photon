@@ -54,7 +54,7 @@ uniform vec2 taaOffset;
 
 #include "/include/vertex/animation.glsl"
 
-//--// Program //-------------------------------------------------------------//
+//--// Functions //-----------------------------------------------------------//
 
 void main() {
 	texCoord = gl_MultiTexCoord0.xy;
@@ -75,23 +75,23 @@ void main() {
 #endif
 #endif
 
-	vec3 positionView = transform(gl_ModelViewMatrix, gl_Vertex.xyz);
+	vec3 viewPos = transform(gl_ModelViewMatrix, gl_Vertex.xyz);
 
 #ifdef PROGRAM_GBUFFERS_TERRAIN
 	bool isTopVertex = texCoord.y < mc_midTexCoord.y;
 
-	vec3 positionScene  = viewToSceneSpace(positionView);
-	     positionScene += animateVertex(positionScene + cameraPosition, isTopVertex, lmCoord.y, blockId);
+	vec3 scenePos  = viewToSceneSpace(viewPos);
+	     scenePos += animateVertex(scenePos + cameraPosition, isTopVertex, lmCoord.y, blockId);
 
-	positionView = sceneToViewSpace(positionScene);
+	viewPos = sceneToViewSpace(scenePos);
 #endif
 
-	vec4 positionClip = project(gl_ProjectionMatrix, positionView);
+	vec4 clipPos = project(gl_ProjectionMatrix, viewPos);
 
 #ifdef TAA
-    positionClip.xy += taaOffset * positionClip.w;
-	positionClip.xy  = positionClip.xy * renderScale + positionClip.w * (renderScale - 1.0);
+    clipPos.xy += taaOffset * clipPos.w;
+	clipPos.xy  = clipPos.xy * renderScale + clipPos.w * (renderScale - 1.0);
 #endif
 
-	gl_Position = positionClip;
+	gl_Position = clipPos;
 }

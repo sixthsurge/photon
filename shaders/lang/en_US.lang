@@ -23,7 +23,7 @@ screen.clouds                          = Clouds
 screen.fog                             = Fog
 screen.sky                             = Sky
 screen.weather                         = Weather
-screen.gtao                            = Ambient Occlusion
+screen.indirect                        = Indirect Lighting
 screen.lightSources                    = Light Sources
 screen.shadows                         = Shadows
 screen.camera                          = Camera
@@ -204,21 +204,6 @@ option.WEATHER_HUMIDITY_BIAS           = Humidity Bias
 option.WEATHER_WIND_STRENGTH_BIAS      = Wind Strength Bias
 
 #----# Lighting #----------------------------------------------------------------------------------#
-
-# SSPT
-
-option.SSPT                            = Enabled
-option.SSPT_SKYLIGHT                   = SSPT Skylight
-option.SSPT_FILTER                     = SSPT Filter
-
-# GTAO
-
-option.GTAO                            = Enabled
-option.GTAO_RADIUS                     = Radius
-option.GTAO_SLICES                     = Slices
-option.GTAO_HORIZON_STEPS              = Horizon Steps
-option.GTAO_ACCUMULATION_LIMIT         = Accumulation Limit
-option.SH_SKYLIGHT                     = SH Skylight
 
 # Light Sources
 

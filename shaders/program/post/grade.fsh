@@ -66,7 +66,7 @@ uniform vec2 windowTexelSize;
 #include "/include/utility/fastMath.glsl"
 #include "/include/utility/spaceConversion.glsl"
 
-//--// Program //-------------------------------------------------------------//
+//--// Functions //-----------------------------------------------------------//
 
 #define getExposureFromEv100(ev100) exp2(-(ev100)) / 1.2
 #define getExposureFromLuminance(l) calibration / (l)

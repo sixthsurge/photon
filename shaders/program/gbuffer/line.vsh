@@ -13,7 +13,7 @@ uniform vec2 viewTexelSize;
 
 uniform vec2 taaOffset;
 
-//--// Program //-------------------------------------------------------------//
+//--// Functions //-----------------------------------------------------------//
 
 void main() {
 	lmCoord = gl_MultiTexCoord1.xy * rcp(240.0);
@@ -45,18 +45,18 @@ void main() {
 
 	if (lineOffset.x < 0.0) lineOffset *= -1.0;
 
-	vec4 positionClip = (gl_VertexID & 1) == 0
+	vec4 clipPos = (gl_VertexID & 1) == 0
 		? vec4((ndc1 + vec3(lineOffset, 0.0)) * linePosStart.w, linePosStart.w)
 		: vec4((ndc1 - vec3(lineOffset, 0.0)) * linePosStart.w, linePosStart.w);
 #else
-	vec3 positionView = transform(gl_ModelViewMatrix, gl_Vertex.xyz);
-	vec4 positionClip = project(gl_ProjectionMatrix, positionView);
+	vec3 viewPos = transform(gl_ModelViewMatrix, gl_Vertex.xyz);
+	vec4 clipPos = project(gl_ProjectionMatrix, viewPos);
 #endif
 
 #ifdef TAA
-    positionClip.xy += taaOffset * positionClip.w;
-	positionClip.xy  = positionClip.xy * renderScale + positionClip.w * (renderScale - 1.0);
+    clipPos.xy += taaOffset * clipPos.w;
+	clipPos.xy  = clipPos.xy * renderScale + clipPos.w * (renderScale - 1.0);
 #endif
 
-	gl_Position = positionClip;
+	gl_Position = clipPos;
 }

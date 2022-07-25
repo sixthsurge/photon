@@ -1,7 +1,7 @@
 #if !defined INCLUDE_UTILITY_GEOMETRY
 #define INCLUDE_UTILITY_GEOMETRY
 
-// Sphere/AABB intersection functions are based on https://www.scratchapixel.com
+// Sphere/AABB intersection methods from https://www.scratchapixel.com
 
 // Returns +-1
 vec3 signNonZero(vec3 v) {
@@ -16,21 +16,24 @@ vec2 intersectBox(vec3 rayOrigin, vec3 rayDir, mat2x3 bounds) {
 	float tMin, tMax, tMinY, tMaxY, tMinZ, tMaxZ;
 
 	vec3  rcpRayDir  = rcp(rayDir);
-	ivec3 rayDirSign = ivec3(signNonZero(rayDir) * 0.5 + 0.5);
+	ivec3 rayDirSign = ivec3(0.5 - 0.5 * signNonZero(rayDir));
 
-	tMin =  (bounds[    rayDirSign.x].x - rayOrigin.x) * rcpRayDir.x;
-	tMax =  (bounds[1 - rayDirSign.x].x - rayOrigin.x) * rcpRayDir.x;
-	tMinY = (bounds[    rayDirSign.y].y - rayOrigin.y) * rcpRayDir.y;
-	tMaxY = (bounds[1 - rayDirSign.y].y - rayOrigin.y) * rcpRayDir.y;
-	tMinZ = (bounds[    rayDirSign.z].z - rayOrigin.z) * rcpRayDir.z;
-	tMaxZ = (bounds[1 - rayDirSign.z].z - rayOrigin.z) * rcpRayDir.z;
+	tMin = (bounds[    rayDirSign.x].x - rayOrigin.x) * rcpRayDir.x;
+	tMax = (bounds[1 - rayDirSign.x].x - rayOrigin.x) * rcpRayDir.x;
 
 	if ((tMin > tMaxY) || (tMinY > tMax))
 		return vec2(-1.0);
+
+	tMinY = (bounds[    rayDirSign.y].y - rayOrigin.y) * rcpRayDir.y;
+	tMaxY = (bounds[1 - rayDirSign.y].y - rayOrigin.y) * rcpRayDir.y;
+
 	if (tMinY > tMin)
 		tMin = tMinY;
 	if (tMaxY < tMax)
 		tMax = tMaxY;
+
+	tMinZ = (bounds[    rayDirSign.z].z - rayOrigin.z) * rcpRayDir.z;
+	tMaxZ = (bounds[1 - rayDirSign.z].z - rayOrigin.z) * rcpRayDir.z;
 
 	if ((tMin > tMaxZ) || (tMinZ > tMax))
 		return vec2(-1.0);
@@ -42,6 +45,7 @@ vec2 intersectBox(vec3 rayOrigin, vec3 rayDir, mat2x3 bounds) {
 	return vec2(tMin, tMax);
 }
 
+// from https://ebruneton.github.io/precomputed_atmospheric_scattering/
 vec2 intersectSphere(float mu, float r, float sphereRadius) {
 	float discriminant = r * r * (mu * mu - 1.0) + sqr(sphereRadius);
 

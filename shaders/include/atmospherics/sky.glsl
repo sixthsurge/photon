@@ -14,7 +14,7 @@ vec3 drawSun(vec3 rayDir) {
 
 	// Limb darkening model from http://www.physics.hmc.edu/faculty/esin/a101/limbdarkening.pdf
 	const vec3 alpha = vec3(0.429, 0.522, 0.614); // for AP1 primaries
-	float centerToEdge = max0(sunAngularRadius - acosApprox(nu));
+	float centerToEdge = max0(sunAngularRadius - fastAcos(nu));
 	vec3 limbDarkening = pow(vec3(1.0 - sqr(1.0 - centerToEdge)), 0.5 * alpha);
 
 	return 0.08 * step(0.0, centerToEdge) * sunRadiance * limbDarkening; // magically darkening the sun to prevent it from overloading bloom

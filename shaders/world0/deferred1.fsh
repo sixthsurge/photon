@@ -85,7 +85,7 @@ uniform vec3 moonDir;
 #include "/include/utility/random.glsl"
 #include "/include/utility/spaceConversion.glsl"
 
-//--// Program //-------------------------------------------------------------//
+//--// Functions //-----------------------------------------------------------//
 
 #if   CLOUDS_UPSCALING_FACTOR == 1
 	const vec2 cloudsRenderScale = vec2(1.0);
@@ -140,7 +140,7 @@ void main() {
 	ivec2 texel = ivec2(gl_FragCoord.xy);
 	ivec2 viewTexel = texel * ivec2(rcp(cloudsRenderScale)) + checkerboardOffsets[frameCounter % CLOUDS_UPSCALING_FACTOR];
 
-	if (clamp(viewTexel, ivec2(0), ivec2(viewSize) + 1) != viewTexel) discard;
+	if (clamp(viewTexel, ivec2(0), ivec2(viewSize) + 1) != viewTexel) { cloudData = vec4(0.0); return; }
 
 	// Get maximum depth from area covered by this fragment
 #if   CLOUDS_UPSCALING_FACTOR == 1
@@ -153,11 +153,11 @@ void main() {
 	float depth = depthMax4x4(depthtex1);
 #endif
 
-	vec3 positionScreen = vec3(viewTexel * viewTexelSize, depth);
-	vec3 positionView = screenToViewSpace(positionScreen, false);
+	vec3 screenPos = vec3(viewTexel * viewTexelSize, depth);
+	vec3 viewPos = screenToViewSpace(screenPos, false);
 
 	vec3 rayOrigin = vec3(0.0, CLOUDS_SCALE * (eyeAltitude - SEA_LEVEL) + planetRadius, 0.0) + CLOUDS_SCALE * gbufferModelViewInverse[3].xyz;
-	vec3 rayDir    = mat3(gbufferModelViewInverse) * normalize(positionView);
+	vec3 rayDir    = mat3(gbufferModelViewInverse) * normalize(viewPos);
 
 	vec3 cloudsLightDir = cloudsMoonlit ? moonDir : sunDir;
 
@@ -170,7 +170,7 @@ void main() {
 		cloudsLightDir,
 		dither,
 		(depth < 1.0)
-			? length(positionView) * CLOUDS_SCALE
+			? length(viewPos) * CLOUDS_SCALE
 			: -1.0,
 		false
 	);

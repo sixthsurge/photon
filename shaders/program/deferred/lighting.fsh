@@ -16,12 +16,7 @@ in vec2 coord;
 
 flat in vec3 ambientIrradiance;
 flat in vec3 directIrradiance;
-
-#ifdef SH_SKYLIGHT
-flat in vec3[9] skySh;
-#else
 flat in vec3 skyIrradiance;
-#endif
 
 //--// Uniforms //------------------------------------------------------------//
 
@@ -31,18 +26,11 @@ uniform sampler2D colortex0;  // Translucent overlays
 uniform usampler2D colortex1; // Scene data
 uniform sampler2D colortex3;  // Scene radiance
 uniform sampler2D colortex4;  // Sky capture
+uniform sampler2D colortex5;  // Indirect lighting
 uniform sampler2D colortex6;  // Clear sky
 uniform sampler2D colortex7;  // Shadow penumbra mask
 uniform sampler2D colortex8;  // Scene history
 uniform sampler2D colortex15; // Cloud shadow map
-
-#ifdef SSPT
-uniform sampler2D colortex5;  // SSPT
-#endif
-
-#ifdef GTAO
-uniform sampler2D colortex10; // GTAO
-#endif
 
 uniform sampler2D depthtex1;
 
@@ -140,13 +128,58 @@ uniform vec3 moonDir;
 #include "/include/lighting/reflections.glsl"
 
 #include "/include/utility/color.glsl"
+#include "/include/utility/fastMath.glsl"
 #include "/include/utility/encoding.glsl"
 #include "/include/utility/spaceConversion.glsl"
 #include "/include/utility/sphericalHarmonics.glsl"
 
-//--// Program //-------------------------------------------------------------//
+//--// Functions //-----------------------------------------------------------//
 
-const float indirectRenderScale = 0.01 * INDIRECT_RENDER_SCALE / renderScale;
+const float hbilRenderScale = 0.01 * HBIL_RENDER_SCALE;
+
+// Spatial upsampling for HBIL
+
+vec4 weighHbilSample(vec4 data, vec3 normal, float z0, float NoV, float weight) {
+	const float depthStrictness = 10.0;
+	const float depthTolerance  = 0.005;
+
+	bool isSky = data.x == 0.0;
+
+	if (!isSky) {
+		vec3 irradianceSample = decodeRgbe8(vec4(unpackUnorm2x8(data.x), unpackUnorm2x8(data.y)));
+		vec3 normalSample = decodeUnitVector(unpackUnorm2x8(data.w));
+
+		float z1 = data.z * far;
+
+		weight *= exp2(-max0(abs(z0 - z1) - depthTolerance) * depthStrictness * NoV);
+		weight *= pow16(abs(dot(normal, normalSample))) * 0.99 + 0.01;
+
+		return vec4(irradianceSample, 1.0) * weight;
+	} else {
+		return vec4(0.0);
+	}
+}
+
+vec3 upsampleHbil(vec3 normal, float linZ, float NoV) {
+	vec4 result = vec4(0.0);
+
+	vec2 pos = gl_FragCoord.xy * hbilRenderScale - 0.5;
+
+	ivec2 i = ivec2(pos);
+	vec2  f = fract(pos);
+
+	vec4 s0 = texelFetch(colortex5, i + ivec2(0, 0), 0);
+	vec4 s1 = texelFetch(colortex5, i + ivec2(1, 0), 0);
+	vec4 s2 = texelFetch(colortex5, i + ivec2(0, 1), 0);
+	vec4 s3 = texelFetch(colortex5, i + ivec2(1, 1), 0);
+
+	result += weighHbilSample(s0, normal, linZ, NoV, (1.0 - f.x) * (1.0 - f.y)); // bottom left
+	result += weighHbilSample(s1, normal, linZ, NoV, f.x - f.x * f.y);           // bottom right
+	result += weighHbilSample(s2, normal, linZ, NoV, f.y - f.x * f.y);           // top left
+	result += weighHbilSample(s3, normal, linZ, NoV, f.x * f.y);                 // top right
+
+	return (result.w == 0.0) ? vec3(0.0) : result.xyz / result.w;
+}
 
 void main() {
 	ivec2 texel = ivec2(gl_FragCoord.xy);
@@ -159,21 +192,17 @@ void main() {
 	radiance      = texelFetch(colortex3, texel, 0).rgb;
 	vec3 clearSky = texelFetch(colortex6, texel, 0).rgb;
 
-#ifdef GTAO
-	vec4 gtao = texture(colortex10, coord * indirectRenderScale);
-#endif
-
 	if (depth == 1.0) return;
 
 	/* -- transformations -- */
 
-	if (linearizeDepth(depth) < MC_HAND_DEPTH) depth += 0.38; // Hand lighting fix from Capt Tatsu
+	if (depth < handDepth) depth += 0.38; // Hand lighting fix from Capt Tatsu
 
-	vec3 positionView  = screenToViewSpace(vec3(coord, depth), true);
-	vec3 positionScene = viewToSceneSpace(positionView);
-	vec3 positionWorld = positionScene + cameraPosition;
+	vec3 viewPos  = screenToViewSpace(vec3(coord, depth), true);
+	vec3 scenePos = viewToSceneSpace(viewPos);
+	vec3 worldPos = scenePos + cameraPosition;
 
-	vec3 viewerDir = normalize(gbufferModelViewInverse[3].xyz - positionScene);
+	vec3 viewerDir = normalize(gbufferModelViewInverse[3].xyz - scenePos);
 
 	/* -- unpack gbuffer -- */
 
@@ -199,25 +228,12 @@ void main() {
 	albedo = overlayId == 1 ? 2.0 * albedo * overlays.rgb : albedo; // damage overlay
 	albedo = srgbToLinear(clamp01(albedo)) * r709ToAp1Unlit;
 
-	/* -- fetch ao/sspt -- */
+	/* -- fetch hbil -- */
 
-#ifdef GTAO
-	float ao = gtao.w;
-
-	vec3 bentNormal;
-	bentNormal.xy = gtao.xy * 2.0 - 1.0;
-	bentNormal.z  = sqrt(clamp01(1.0 - dot(bentNormal.xy, bentNormal.xy)));
-
-	bentNormal = mat3(gbufferModelViewInverse) * bentNormal;
-#else
-	float ao = 1.0;
-	vec3 bentNormal = normal;
-#endif
-
-#ifdef SH_SKYLIGHT
-	vec3 skylight = evaluateSphericalHarmonicsIrradiance(skySh, bentNormal, ao);
-#else
-	vec3 skylight = skyIrradiance * ao;
+#ifdef HBIL
+	float linZ = linearizeDepth(depth);
+	float NoV = abs(dot(normal, viewerDir));
+	vec3 indirectIrradiance = upsampleHbil(normal, linZ, NoV);
 #endif
 
 	/* -- get material -- */
@@ -235,7 +251,7 @@ void main() {
 		noisetex,
 		material.porosity,
 		lmCoord,
-		positionWorld,
+		worldPos,
 		geometryNormal,
 		normal,
 		material.albedo,
@@ -249,16 +265,19 @@ void main() {
 	float sssDepth;
 	radiance = getSceneLighting(
 		material,
-		positionScene,
+		scenePos,
 		normal,
 		geometryNormal,
-		bentNormal,
 		viewerDir,
-		ambientIrradiance,
 		directIrradiance,
-		skylight,
+#ifdef HBIL
+		indirectIrradiance,
+#else
+		ambientIrradiance,
+		skyIrradiance,
+#endif
 		lmCoord,
-		ao,
+		1.0,
 		blockId,
 		sssDepth
 	);
@@ -274,7 +293,7 @@ void main() {
 		material,
 		tbnMatrix,
 		vec3(coord, depth),
-		positionView,
+		viewPos,
 		normal,
 		viewerDir,
 		viewerDirTangent,
@@ -284,5 +303,5 @@ void main() {
 
 	/* -- fog -- */
 
-	radiance = applyFog(radiance, positionScene, clearSky);
+	radiance = applyFog(radiance, scenePos, clearSky);
 }
