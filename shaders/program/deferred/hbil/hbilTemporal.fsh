@@ -179,32 +179,31 @@ void main() {
 	const float smearAmount     = 0.25;
 	const float smearStrictness = 0.5;
 
-	bool smear;
-
 	vec3 previousScreenPos = reproject(screenPos, colortex2);
-	vec2 previousScreenPosClipped = clipAabb(previousScreenPos.xy, vec2(0.0), vec2(1.0), smear);
 
-	irradianceHistory = texture(colortex10, previousScreenPosClipped * hbilRenderScale);
-	if (any(isnan(irradianceHistory))) irradianceHistory = vec4(irradiance, 0.0);
+	if (clamp01(previousScreenPos.xy) == previousScreenPos.xy) {
+		irradianceHistory = texture(colortex10, previousScreenPos.xy * hbilRenderScale);
+		if (any(isnan(irradianceHistory))) irradianceHistory = vec4(irradiance, 0.0);
 
-	vec2 lightLevels = unpackUnorm4x8(texelFetch(colortex1, viewTexel, 0).y).zw;
-	vec2 previousLightLevels = texture(colortex13, previousScreenPos.xy).zw;
-	vec2 lightmapWeight = exp(-40.0 * max0(abs(lightLevels - previousLightLevels) - 0.01) * sqr(NoV));
+		vec2 lightLevels = unpackUnorm4x8(texelFetch(colortex1, viewTexel, 0).y).zw;
+		vec2 previousLightLevels = texture(colortex13, previousScreenPos.xy).zw;
+		vec2 lightmapWeight = exp(-40.0 * max0(abs(lightLevels - previousLightLevels) - 0.01) * sqr(NoV));
 
-	float z0 = linearizeDepth(previousScreenPos.z);
-	float z1 = texture(colortex14, previousScreenPos.xy).x;
-	float depthWeight = depthWeight(z0, z1, NoV);
+		float z0 = linearizeDepth(previousScreenPos.z);
+		float z1 = texture(colortex14, previousScreenPos.xy).x;
+		float depthWeight = depthWeight(z0, z1, NoV);
 
-	float smearDist = distance(previousScreenPos.xy, previousScreenPosClipped);
-	float smearWeight = smearAmount * exp2(-smearStrictness * smearDist);
+		float pixelAge  = min(irradianceHistory.w, float(HBIL_ACCUMULATION_LIMIT));
+		      pixelAge *= depthWeight * lightmapWeight.x * lightmapWeight.y;
+		      pixelAge *= float(!worldAgeChanged);
+		      pixelAge += 1.0;
 
-	float pixelAge  = min(irradianceHistory.w, float(HBIL_ACCUMULATION_LIMIT));
-	      pixelAge *= smear ? smearWeight : depthWeight * lightmapWeight.x * lightmapWeight.y;
-		  pixelAge *= float(!worldAgeChanged);
-	      pixelAge += 1.0;
-
-	irradianceHistory.xyz = mix(irradianceHistory.xyz, irradiance, rcp(pixelAge));
-	irradianceHistory.w   = pixelAge;
+		irradianceHistory.xyz = mix(irradianceHistory.xyz, irradiance, rcp(pixelAge));
+		irradianceHistory.w   = pixelAge;
+	} else {
+		irradianceHistory.xyz = irradiance;
+		irradianceHistory.w   = 0.0;
+	}
 
 	//--// Pack irradiance and gbuffer data
 

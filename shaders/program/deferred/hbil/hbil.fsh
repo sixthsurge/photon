@@ -111,7 +111,7 @@ vec4 horizonSearch(
 	float stepSize = maxRadius * (stepGrowth != 1.0 ? stepCoeff : rcp(float(stepCount)));
 
 	vec2 rayStep = (viewToScreenSpace(viewPos + viewSliceDir * stepSize, true) - screenPos).xy;
-	vec2 rayPos  = screenPos.xy;
+	vec2 rayPos  = screenPos.xy + maxOf(viewTexelSize) * normalize(rayStep);
 
 	vec4 irradiance = vec4(0.0);
 

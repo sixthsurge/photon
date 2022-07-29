@@ -90,6 +90,8 @@ uniform float wetness;
 
 //--// Custom uniforms
 
+uniform float eyeSkylight;
+
 uniform float biomeCave;
 uniform float biomeTemperature;
 uniform float biomeHumidity;
@@ -178,7 +180,7 @@ vec3 upsampleHbil(vec3 normal, float linZ, float NoV) {
 	result += weighHbilSample(s2, normal, linZ, NoV, f.y - f.x * f.y);           // top left
 	result += weighHbilSample(s3, normal, linZ, NoV, f.x * f.y);                 // top right
 
-	return (result.w == 0.0) ? vec3(0.0) : result.xyz / result.w;
+	return (result.w == 0.0) ? skyIrradiance * pow4(eyeSkylight) : result.xyz / result.w;
 }
 
 void main() {
