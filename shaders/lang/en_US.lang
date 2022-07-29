@@ -392,6 +392,7 @@ option.WATER_ABSORPTION_B              = §9Blue §fAbsorption
 
 #----# Misc #--------------------------------------------------------------------------------------#
 
+option.HIDE_WORLD_BORDER                = Hide World Border
 option.CAMERA_LOCAL_EXPOSURE_COMPARISON = Local Exposure Comparison
 
 # Debug View

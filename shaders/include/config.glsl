@@ -334,6 +334,8 @@ const float sunPathRotation        = -40.0; // [-40.0 -35.0 -30.0 -25.0 -20.0 -1
 
 //--// Misc //----------------------------------------------------------------//
 
+//#define HIDE_WORLD_BORDER // Prevents the world border from rendering, just for you Ulexer <3
+
 //--// Debug View
 
   #define DEBUG_VIEW_NONE 0

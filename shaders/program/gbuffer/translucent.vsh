@@ -22,6 +22,8 @@ attribute vec2 mc_midTexCoord;
 
 uniform sampler2D noisetex;
 
+uniform int renderStage;
+
 //--// Camera uniforms
 
 uniform float near;
@@ -66,6 +68,10 @@ void main() {
 
 #ifdef PROGRAM_GBUFFERS_TEXTURED_LIT
 	lmCoord = vec2(1.0);
+
+#ifdef HIDE_WORLD_BORDER
+	if (renderStage == MC_RENDER_STAGE_WORLD_BORDER) { gl_Position = vec4(-1.0); return; }
+#endif
 #endif
 
 	tbnMatrix[2] = mat3(gbufferModelViewInverse) * normalize(gl_NormalMatrix * gl_Normal);
