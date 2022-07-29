@@ -13,6 +13,7 @@ void decodeNormalTex(vec3 normalTex, out vec3 normal, out float ao) {
 
 void decodeSpecularTex(vec4 specularTex, inout Material material) {
 	material.roughness = sqr(1.0 - specularTex.r);
+	material.emission  = max(material.emission, material.albedo * specularTex.a * float(specularTex.a != 1.0));
 
 	if (specularTex.g < 229.5 / 255.0) {
 		// dielectrics
@@ -22,7 +23,6 @@ void decodeSpecularTex(vec4 specularTex, inout Material material) {
 		float hasPorosity = float(specularTex.b < 64.5 / 255.0);
 		material.porosity = specularTex.b * hasPorosity;
 		material.sssAmount = max(material.sssAmount, specularTex.b - specularTex.b * hasPorosity);
-		material.emission = max(material.emission, material.albedo * specularTex.a * float(specularTex.a != 1.0));
 	//} else if (specularTex.g < 237.5 / 255.0) {
 		// hardcoded metals
 	} else {
