@@ -77,7 +77,7 @@ void main() {
 	vec3 normalTex = texture(normals, texCoord, lodBias).xyz;
 #endif
 #ifdef MC_SPECULAR_MAP
-	vec4 specularTex = texture(specular, texCoord, lodBias);
+	vec4 specularTex = textureLod(specular, texCoord, 0);
 #endif
 
 	baseTex *= tint;

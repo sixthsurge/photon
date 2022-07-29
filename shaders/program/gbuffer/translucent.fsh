@@ -192,7 +192,7 @@ void main() {
 		material = getMaterial(albedo, blockId);
 
 #ifdef MC_SPECULAR_MAP
-		vec4 specularTex = texture(specular, texCoord, lodBias);
+		vec4 specularTex = textureLod(specular, texCoord, 0);
 		decodeSpecularTex(specularTex, material);
 #endif
 
