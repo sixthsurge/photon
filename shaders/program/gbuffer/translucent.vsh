@@ -60,6 +60,14 @@ void main() {
 	tint     = gl_Color;
 	blockId  = uint(max0(mc_Entity.x - 10000.0));
 
+#ifdef PROGRAM_GBUFFERS_CLOUDS
+	lmCoord = vec2(0.0, 1.0);
+#endif
+
+#ifdef PROGRAM_GBUFFERS_TEXTURED_LIT
+	lmCoord = vec2(1.0);
+#endif
+
 	tbnMatrix[2] = mat3(gbufferModelViewInverse) * normalize(gl_NormalMatrix * gl_Normal);
 	tbnMatrix[0] = mat3(gbufferModelViewInverse) * normalize(gl_NormalMatrix * at_tangent.xyz);
 	tbnMatrix[1] = cross(tbnMatrix[0], tbnMatrix[2]) * sign(at_tangent.w);
