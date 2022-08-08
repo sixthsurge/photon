@@ -220,7 +220,7 @@ void main() {
 	vec3 flatNormal = tbnMatrix[2];
 	vec3 viewerDir = (gbufferModelViewInverse[3].xyz - scenePos) * rcp(viewerDistance);
 
-#if defined PROGRAM_GBUFFERS_TEXTURED
+#if defined PROGRAM_GBUFFERS_TEXTURED || defined PROGRAM_GBUFFERS_TEXTURED_LIT
 	// no normal attribute
 	normal = vec3(0.0, 1.0, 0.0);
 	flatNormal = normal;
