@@ -153,7 +153,7 @@ void endText(inout vec3 fragColor) {
 	fragColor = mix(fragColor.rgb, text.result.rgb, text.result.a);
 }
 
-void printChar(uint char) {
+void printChar(uint character) {
 	ivec2 pos = text.fragPos - text.textPos - spaceSize * text.charPos * ivec2(1, -1) + ivec2(0, spaceSize.y);
 
 	uint index = uint(charWidth - pos.x + pos.y * charWidth + 1u);
@@ -164,7 +164,7 @@ void printChar(uint char) {
 
 	// Draw character
 	if (clamp(pos, ivec2(0), charSize - 1) == pos)
-		text.result = mix(text.result, text.fgCol, text.fgCol.a * float(char >> index & 1u));
+		text.result = mix(text.result, text.fgCol, text.fgCol.a * float(character >> index & 1u));
 
 	// Advance to next character
 	text.charPos.x++;

@@ -110,8 +110,8 @@ vec3 gradeOutput(vec3 rgb) {
 
 	const float orangeSatBoost = 0.05;
 	const float tealSatBoost   = 0.1;
-	const float greenSatBoost  = 0.0;
-	const float greenHueShift  = 0.0 / 360.0;
+	const float greenSatBoost  = -0.03;
+	const float greenHueShift  = 2.0 / 360.0;
 
 	vec3 hsl = rgbToHsl(rgb);
 
