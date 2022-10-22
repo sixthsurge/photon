@@ -1,5 +1,5 @@
-#if !defined INCLUDE_UTILITY_DITHERING
-#define INCLUDE_UTILITY_DITHERING
+#if !defined UTILITY_DITHERING_INCLUDED
+#define UTILITY_DITHERING_INCLUDED
 
 float bayer2(vec2 a) {
     a = floor(a);
@@ -34,4 +34,4 @@ vec3 dither8Bit(vec3 rgb, float pattern) {
 	return rgb + (pattern * mulAdd.x + mulAdd.y);
 }
 
-#endif // INCLUDE_UTILITY_DITHERING
+#endif // UTILITY_DITHERING_INCLUDED

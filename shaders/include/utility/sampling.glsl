@@ -1,5 +1,5 @@
-#if !defined INCLUDE_UTILITY_SAMPLING
-#define INCLUDE_UTILITY_SAMPLING
+#if !defined UTILITY_SAMPLING_INCLUDED
+#define UTILITY_SAMPLING_INCLUDED
 
 vec2 vogelDiskSample(int stepIndex, int stepCount, float rotation) {
 	const float goldenAngle = 2.4;
@@ -54,4 +54,4 @@ vec3 sampleGgxVndf(vec3 viewerDir, vec2 alpha, vec2 hash) {
 	return normal;
 }
 
-#endif // INCLUDE_UTILITY_SAMPLING
+#endif // UTILITY_SAMPLING_INCLUDED

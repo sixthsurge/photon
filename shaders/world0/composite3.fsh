@@ -1,3 +1,4 @@
-#version 410 compatibility
+#version 400 compatibility
 #define WORLD_OVERWORLD
-#include "/program/post/temporalPre.fsh"
+#define PROGRAM_COMPOSITE3
+#include "/program/post/temporal.fsh"

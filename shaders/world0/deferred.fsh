@@ -1,148 +1,81 @@
-#version 410 compatibility
+#version 400 compatibility
 
 /*
- * Program description:
- * Render sky from all directions into 256x128 sky capture for reflections and directional skylight
- * Store lighting color palette and dynamic weather properties
- */
+--------------------------------------------------------------------------------
+
+  Photon Shaders by SixthSurge
+
+  world0/deferred.fsh:
+  Render sky capture
+
+--------------------------------------------------------------------------------
+
+  Magic constants, please don't remove these!
+
+  const int colortex0Format = R11F_G11F_B10F; // Scene color (deferred3 -> temporal), bloom tiles (composite4 -> composite6), final color (composite7 -> final)
+  const int colortex1Format = RGBA16;         // Gbuffer 0 (solid -> composite1)
+  const int colortex2Format = RGBA16;         // Gbuffer 1 (solid -> composite1)
+  const int colortex3Format = RGBA8;          // Animated overlays/vanilla sky (solid -> deferred3), fog transmittance (composite -> composite1)
+  const int colortex4Format = R11F_G11F_B10F; // Sky capture (deferred -> composite1)
+  const int colortex5Format = RGBA16F;        // Scene history (always), clouds (deferred1 -> deferred3 +flip), fog scattering (composite -> composite1 +flip)
+  const int colortex6Format = RGBA16F;        // Ambient occlusion history (always), TAAU min color (composite2 -> composite3 +flip)
+  const int colortex7Format = RGBA16F;        // Clouds history (always), TAAU max color (composite2 -> composite3 +flip)
+
+  const bool colortex0Clear = false;
+  const bool colortex1Clear = false;
+  const bool colortex2Clear = false;
+  const bool colortex3Clear = true;
+  const bool colortex4Clear = false;
+  const bool colortex5Clear = false;
+  const bool colortex6Clear = false;
+  const bool colortex7Clear = false;
+
+  const vec4 colortex3ClearColor = vec4(0.0, 0.0, 0.0, 0.0);
+
+--------------------------------------------------------------------------------
+*/
 
 #include "/include/global.glsl"
 
-//--// Outputs //-------------------------------------------------------------//
+/* DRAWBUFFERS:4 */
+layout (location = 0) out vec3 fragColor;
 
-/* RENDERTARGETS: 4 */
-layout (location = 0) out vec3 radiance;
+in vec2 uv;
 
-//--// Inputs //--------------------------------------------------------------//
+flat in mat2x3 illuminance;
 
-in vec2 coord;
+uniform sampler3D depthtex0; // Atmosphere scattering LUT
 
-flat in vec3 weather;
-flat in vec3 cloudsDirectIrradiance;
-
-flat in vec3 ambientIrradiance;
-flat in vec3 directIrradiance;
-flat in vec3 skyIrradiance;
-
-//--// Uniforms //------------------------------------------------------------//
-
-uniform sampler2D noisetex;
-
-uniform sampler3D colortex2; // Atmosphere scattering LUT
-
-uniform sampler3D depthtex0; // 3D worley noise
-uniform sampler3D depthtex2; // 3D curl noise
-
-//--// Camera uniforms
-
-uniform float eyeAltitude;
-
-uniform vec3 cameraPosition;
-
-//--// Shadow uniforms
-
-uniform mat3 shadowModelView;
-
-//--// Time uniforms
-
-uniform int worldDay;
-uniform int worldTime;
-uniform int moonPhase;
-
-uniform int frameCounter;
-
-uniform float frameTimeCounter;
+#ifdef SHADOW
+uniform mat4 shadowModelViewInverse;
+#endif
 
 uniform float sunAngle;
 
-uniform float rainStrength;
-uniform float wetness;
-
-//--// Custom uniforms
-
-uniform bool cloudsMoonlit;
-
-uniform float worldAge;
-
-uniform float biomeCave;
-uniform float biomeTemperature;
-uniform float biomeHumidity;
-uniform float biomeMayRain;
-
-uniform float timeSunset;
-uniform float timeNoon;
-uniform float timeSunrise;
-uniform float timeMidnight;
-
-uniform float lightningFlash;
-uniform float moonPhaseBrightness;
+uniform int worldTime;
+uniform int frameCounter;
 
 uniform vec3 lightDir;
 uniform vec3 sunDir;
 uniform vec3 moonDir;
 
-//--// Includes //------------------------------------------------------------//
+uniform float biomeCave;
 
+uniform float timeSunrise;
+uniform float timeNoon;
+uniform float timeSunset;
+uniform float timeMidnight;
+
+#define ATMOSPHERE_SCATTERING_LUT depthtex0
 #define WORLD_OVERWORLD
-#define PROGRAM_SKY_CAPTURE
-#define ATMOSPHERE_SCATTERING_LUT colortex2
 
-#include "/block.properties"
-#include "/entity.properties"
-
-#include "/include/atmospherics/atmosphere.glsl"
-#include "/include/atmospherics/clouds.glsl"
-#include "/include/atmospherics/sky.glsl"
-#include "/include/atmospherics/skyProjection.glsl"
-
-//--// Functions //-----------------------------------------------------------//
+#include "/include/sky.glsl"
+#include "/include/skyProjection.glsl"
 
 void main() {
 	ivec2 texel = ivec2(gl_FragCoord.xy);
 
-	radiance = vec3(0.0);
+	vec3 rayDir = unprojectSky(uv);
 
-	if (texel.x == skyCaptureRes.x) {
-		switch (texel.y) {
-		case 0:
-			radiance = ambientIrradiance;
-			break;
-
-		case 1:
-			radiance = directIrradiance;
-			break;
-
-		case 2:
-			radiance = skyIrradiance;
-			break;
-		}
-	} else {
-		vec3 rayDir = unprojectSky(coord);
-
-		/* -- atmosphere -- */
-
-		vec3 atmosphereScattering = sunIrradiance * getAtmosphereScattering(rayDir, sunDir)
-		                          + moonIrradiance * getAtmosphereScattering(rayDir, moonDir) * moonPhaseBrightness;
-
-		vec3 atmosphereTransmittance = getAtmosphereTransmittance(rayDir.y, planetRadius);
-
-		radiance = radiance * atmosphereTransmittance + atmosphereScattering;
-
-		/* -- clouds -- */
-
-		vec3 rayOrigin = vec3(0.0, CLOUDS_SCALE * (eyeAltitude - SEA_LEVEL) + planetRadius, 0.0) + CLOUDS_SCALE;
-
-		vec3 cloudsLightDir = cloudsMoonlit ? moonDir : sunDir;
-
-		vec4 cloudData = renderClouds(rayOrigin, rayDir, cloudsLightDir, 0.5, -1.0, true);
-
-		const vec3 cloudsLightningFlash = vec3(10.0);
-
-		vec3 cloudsScattering = mat2x3(cloudsDirectIrradiance, skyIrradiance + cloudsLightningFlash * lightningFlash) * cloudData.xy;
-		     cloudsScattering = cloudsAerialPerspective(cloudsScattering, cloudData.rgb, rayDir, atmosphereScattering, cloudData.w);
-
-		#define cloudsTransmittance cloudData.z
-
-		radiance = radiance * cloudsTransmittance + cloudsScattering;
-	}
+	fragColor = renderSky(rayDir);
 }

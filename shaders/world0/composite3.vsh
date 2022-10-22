@@ -1,2 +1,4 @@
-#version 410 compatibility
-#include "/program/vertexSimple.vsh"
+#version 400 compatibility
+#define WORLD_OVERWORLD
+#define PROGRAM_COMPOSITE3
+#include "/program/post/temporal.vsh"

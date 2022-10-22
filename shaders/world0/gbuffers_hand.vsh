@@ -1,5 +1,4 @@
-#version 410 compatibility
-#define PROGRAM_GBUFFERS_ENTITIES
-#define PROGRAM_GBUFFERS_HAND
+#version 400 compatibility
 #define WORLD_OVERWORLD
+#define PROGRAM_HAND
 #include "/program/gbuffer/solid.vsh"

@@ -1,3 +1,4 @@
-#version 410 compatibility
+#version 400 compatibility
 #define WORLD_OVERWORLD
-#include "/program/post/bloom2.fsh"
+#define PROGRAM_COMPOSITE7
+#include "/program/post/bloom0.fsh"

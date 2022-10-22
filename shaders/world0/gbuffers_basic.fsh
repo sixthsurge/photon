@@ -1,4 +1,4 @@
-#version 410 compatibility
-#define PROGRAM_GBUFFERS_BASIC
+#version 400 compatibility
 #define WORLD_OVERWORLD
-#include "/program/gbuffer/line.fsh"
+#define PROGRAM_BASIC
+#include "/program/gbuffer/basic.fsh"

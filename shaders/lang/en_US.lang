@@ -1,241 +1,55 @@
-option.INFO                            = Photon
-value.INFO.0                           = §dby SixthSurge
-value.INFO.1                           = §bby SixthSurge
+# Profiles
 
-profile.fast                           = §bFast
-profile.fancy                          = §dFancy
+profile.low                            = §eLow
+profile.medium                         = §aMedium
+profile.high                           = §bHigh
+profile.ultra                          = §dUltra
 
-screen.atmos                           = Atmospherics
-screen.light                           = Light & Shadow
-screen.post                            = Post-Processing
-screen.terrain                         = Terrain
+# Screens
+
+screen.world                           = World
+screen.lighting                        = Lighting
+screen.sky                             = Sky
+screen.fog                             = Fog
+screen.materials                       = Materials
 screen.water                           = Water
+screen.post                            = Post-Processing
 screen.misc                            = Misc
 
-screen.atmos.comment                   = Options for atmospheric effects, including clouds, fog and the sky
-screen.light.comment                   = Options for lighting effects
-screen.post.comment                    = Options for post-processing effects, including camera effects, color grading and temporal upscaling
-screen.terrain.comment                 = Options for effects applied to terrain, including normal/specular mapping ("PBR") and waving blocks
-screen.water.comment                   = Options for water
-screen.misc.comment                    = Options that did not fit into the above categories, as well as debugging options
-
-screen.clouds                          = Clouds
-screen.fog                             = Fog
-screen.sky                             = Sky
-screen.weather                         = Weather
-screen.indirect                        = Indirect Lighting
-screen.lightSources                    = Light Sources
 screen.shadows                         = Shadows
-screen.camera                          = Camera
-screen.color                           = Color
-screen.imageQuality                    = Image Quality
-screen.bloom                           = Bloom
-screen.bloom.comment                   = Glowing effect around bright areas
 screen.colorGrading                    = Color Grading
-screen.colorGrading.comment            = Custom color grading
 screen.exposure                        = Exposure
-screen.temporal                        = Temporal AA
-screen.reflections                     = Reflections
-screen.wavingBlocks                    = Waving Blocks
-screen.waterWaves                      = Water Waves
-screen.waterFog                        = Water Fog
 
-screen.cloudsLayer0                    = Layer 0
-screen.cloudsLayer1                    = Layer 1
-screen.cloudsLayer2                    = Layer 2
-screen.cloudsLayer3                    = Layer 3
+screen.fogRlh                          = Rayleigh Coefficient
+screen.fogRlhNormal                    = Normal Color
+screen.fogRlhRain                      = Rain Color
+screen.fogRlhArid                      = Arid/Desert Color
+screen.fogRlhSnowy                     = Snowy Color
+screen.fogRlhTaiga                     = Taiga Color
+screen.fogRlhJungle                    = Jungle Color
+screen.fogRlhSwamp                     = Swamp Color
 
-screen.sunlightTint                    = Sunlight Tint
-screen.moonlightTint                   = Moonlight Tint
-screen.ambientLightTint                = Ambient Light Tint
+# World settings
 
-#----# Atmosphere #--------------------------------------------------------------------------------#
+# Lighting settings
 
-option.SEA_LEVEL                       = Sea Level
-option.WORLD_TIME_ANIMATION            = World Time Animation
-option.MOON_PHASE_AFFECTS_BRIGHTNESS   = Moon Phase Affects Brightness
+option.GTAO                            = Ambient Occlusion
 
-# Clouds
-
-option.CLOUDS_UPSCALING_FACTOR         = Temporal Upscaling
-
-value.CLOUDS_UPSCALING_FACTOR.1        = OFF
-value.CLOUDS_UPSCALING_FACTOR.2        = 2x
-value.CLOUDS_UPSCALING_FACTOR.4        = 4x
-value.CLOUDS_UPSCALING_FACTOR.8        = 8x
-value.CLOUDS_UPSCALING_FACTOR.9        = 9x
-value.CLOUDS_UPSCALING_FACTOR.16       = 16x
-
-option.CLOUDS_SCALE                    = Clouds Scale
-suffix.CLOUDS_SCALE                    = x
-
-# Layer 0
-
-option.CLOUDS_LAYER0                   = Enabled
-option.CLOUDS_LAYER0_SHADOW            = Casts Shadows
-option.CLOUDS_LAYER0_PRIMARY_STEPS     = Primary Steps
-option.CLOUDS_LAYER0_LIGHTING_STEPS    = Lighting Steps
-option.CLOUDS_LAYER0_ALTITUDE          = Altitude
-option.CLOUDS_LAYER0_THICKNESS         = Thickness
-option.CLOUDS_LAYER0_COVERAGE          = Coverage
-option.CLOUDS_LAYER0_FREQUENCY         = Frequency
-option.CLOUDS_LAYER0_DENSITY           = Density
-option.CLOUDS_LAYER0_STRATUS_AMOUNT    = Stratus Amount
-option.CLOUDS_LAYER0_CUMULUS_HUMILIS_AMOUNT = Cumulus Humilis Amount
-option.CLOUDS_LAYER0_WIND_SPEED        = Wind Speed
-option.CLOUDS_LAYER0_WIND_ANGLE        = Wind Angle
-option.CLOUDS_LAYER0_WEATHER_INFLUENCE = Weather Influence
-
-suffix.CLOUDS_LAYER0_ALTITUDE          = m
-suffix.CLOUDS_LAYER0_THICKNESS         = m
-suffix.CLOUDS_LAYER0_WIND_SPEED        = m/s
-suffix.CLOUDS_LAYER0_WIND_ANGLE        = °
-
-# Layer 1
-
-option.CLOUDS_LAYER1                   = Enabled
-option.CLOUDS_LAYER1_SHADOW            = Casts Shadows
-option.CLOUDS_LAYER1_PRIMARY_STEPS     = Primary Steps
-option.CLOUDS_LAYER1_LIGHTING_STEPS    = Lighting Steps
-option.CLOUDS_LAYER1_ALTITUDE          = Altitude
-option.CLOUDS_LAYER1_THICKNESS         = Thickness
-option.CLOUDS_LAYER1_COVERAGE          = Coverage
-option.CLOUDS_LAYER1_FREQUENCY         = Frequency
-option.CLOUDS_LAYER1_DENSITY           = Density
-option.CLOUDS_LAYER1_STRATUS_AMOUNT    = Stratus Amount
-option.CLOUDS_LAYER1_CUMULUS_HUMILIS_AMOUNT = Cumulus Humilis Amount
-option.CLOUDS_LAYER1_WIND_SPEED        = Wind Speed
-option.CLOUDS_LAYER1_WIND_ANGLE        = Wind Angle
-option.CLOUDS_LAYER1_WEATHER_INFLUENCE = Weather Influence
-
-suffix.CLOUDS_LAYER1_ALTITUDE          = m
-suffix.CLOUDS_LAYER1_THICKNESS         = m
-suffix.CLOUDS_LAYER1_WIND_SPEED        = m/s
-suffix.CLOUDS_LAYER1_WIND_ANGLE        = °
-
-# Layer 2
-
-option.CLOUDS_LAYER2                   = Enabled
-option.CLOUDS_LAYER2_MODE              = Layer Type
-option.CLOUDS_LAYER2_SHADOW            = Casts Shadows
-option.CLOUDS_LAYER2_PRIMARY_STEPS     = Primary Steps
-option.CLOUDS_LAYER2_LIGHTING_STEPS    = Lighting Steps
-option.CLOUDS_LAYER2_ALTITUDE          = Altitude
-option.CLOUDS_LAYER2_THICKNESS         = Thickness
-option.CLOUDS_LAYER2_COVERAGE          = Coverage
-option.CLOUDS_LAYER2_FREQUENCY         = Frequency
-option.CLOUDS_LAYER2_DENSITY           = Density
-option.CLOUDS_LAYER2_CIRRUS_AMOUNT     = Cirrus Amount (Planar)
-option.CLOUDS_LAYER2_CIRROCUMULUS_AMOUNT = Cirrocumulus Amount (Planar)
-option.CLOUDS_LAYER2_STRATUS_AMOUNT    = Stratus Amount (Vol.)
-option.CLOUDS_LAYER2_CUMULUS_HUMILIS_AMOUNT = Cumulus Humilis Amount (Vol.)
-option.CLOUDS_LAYER2_WIND_SPEED        = Wind Speed
-option.CLOUDS_LAYER2_WIND_ANGLE        = Wind Angle
-option.CLOUDS_LAYER2_WEATHER_INFLUENCE = Weather Influence
-
-value.CLOUDS_LAYER2_MODE.CLOUDS_MODE_VOLUMETRIC = Volumetric
-value.CLOUDS_LAYER2_MODE.CLOUDS_MODE_PLANAR = Planar
-
-suffix.CLOUDS_LAYER2_ALTITUDE          = m
-suffix.CLOUDS_LAYER2_THICKNESS         = m
-suffix.CLOUDS_LAYER2_WIND_SPEED        = m/s
-suffix.CLOUDS_LAYER2_WIND_ANGLE        = °
-
-# Layer 3
-
-option.CLOUDS_LAYER3                   = Enabled
-option.CLOUDS_LAYER3_MODE              = Layer Type
-option.CLOUDS_LAYER3_SHADOW            = Casts Shadows
-option.CLOUDS_LAYER3_PRIMARY_STEPS     = Primary Steps
-option.CLOUDS_LAYER3_LIGHTING_STEPS    = Lighting Steps
-option.CLOUDS_LAYER3_ALTITUDE          = Altitude
-option.CLOUDS_LAYER3_THICKNESS         = Thickness
-option.CLOUDS_LAYER3_COVERAGE          = Coverage
-option.CLOUDS_LAYER3_FREQUENCY         = Frequency
-option.CLOUDS_LAYER3_DENSITY           = Density
-option.CLOUDS_LAYER3_CIRRUS_AMOUNT     = Cirrus Amount (Planar)
-option.CLOUDS_LAYER3_CIRROCUMULUS_AMOUNT = Cirrocumulus Amount (Planar)
-option.CLOUDS_LAYER3_STRATUS_AMOUNT    = Stratus Amount (Vol.)
-option.CLOUDS_LAYER3_CUMULUS_HUMILIS_AMOUNT = Cumulus Humilis Amount (Vol.)
-option.CLOUDS_LAYER3_WIND_SPEED        = Wind Speed
-option.CLOUDS_LAYER3_WIND_ANGLE        = Wind Angle
-option.CLOUDS_LAYER3_WEATHER_INFLUENCE = Weather Influence
-
-value.CLOUDS_LAYER3_MODE.CLOUDS_MODE_VOLUMETRIC = Volumetric
-value.CLOUDS_LAYER3_MODE.CLOUDS_MODE_PLANAR = Planar
-
-suffix.CLOUDS_LAYER3_ALTITUDE          = m
-suffix.CLOUDS_LAYER3_THICKNESS         = m
-suffix.CLOUDS_LAYER3_WIND_SPEED        = m/s
-suffix.CLOUDS_LAYER3_WIND_ANGLE        = °
-
-# Sky
-
-option.SUN_ANGULAR_RADIUS              = Sun Angular Radius
-suffix.SUN_ANGULAR_RADIUS              = °
-
-option.MOON_ANGULAR_RADIUS             = Moon Angular Radius
-suffix.MOON_ANGULAR_RADIUS             = °
-
-option.VANILLA_SUN                     = Vanilla Sun
-option.VANILLA_MOON                    = Vanilla Moon
-
-option.HIDE_PLANET_SURFACE             = Hide Planet Surface
-
-option.STARS_COVERAGE                  = Stars Coverage
-option.STARS_INTENSITY                 = Stars Brightness
-
-# Fog
-
-option.BORDER_FOG                      = Border Fog
-option.CAVE_FOG                        = Cave Fog
-option.BLOOMY_FOG                      = Bloomy Fog
-option.BLOOMY_FOG_INTENSITY            = Bloomy Fog Strength
-
-# Weather
-
-option.DYNAMIC_WEATHER                 = Dynamic Weather
-option.LIGHTNING_FLASHES               = Lightning Flashes
-option.DESERT_SANDSTORM                = Desert Sandstorm
-
-option.WEATHER_VARIATION_SPEED         = Variation Speed
-option.WEATHER_TEMPERATURE_BIAS        = Temperature Bias
-option.WEATHER_HUMIDITY_BIAS           = Humidity Bias
-option.WEATHER_WIND_STRENGTH_BIAS      = Wind Strength Bias
-
-#----# Lighting #----------------------------------------------------------------------------------#
-
-# Light Sources
-
-option.SUNLIGHT_INTENSITY              = Sunlight Intensity
-
-option.SUNLIGHT_TINT_R                 = Red
-option.SUNLIGHT_TINT_G                 = Green
-option.SUNLIGHT_TINT_B                 = Blue
-
-option.MOONLIGHT_INTENSITY             = Moonlight Intensity
-
-option.MOONLIGHT_TINT_R                = Red
-option.MOONLIGHT_TINT_G                = Green
-option.MOONLIGHT_TINT_B                = Blue
-
-option.BLOCKLIGHT_INTENSITY            = Blocklight Intensity
-option.BLOCKLIGHT_TEMPERATURE          = Blocklight Color Temperature
-suffix.BLOCKLIGHT_TEMPERATURE          = K
-
-option.AMBIENT_LIGHT_INTENSITY         = Ambient Light Intensity
-option.AMBIENT_LIGHT_TINT_R            = Red
-option.AMBIENT_LIGHT_TINT_G            = Green
-option.AMBIENT_LIGHT_TINT_B            = Blue
-
-# Shadow Mapping
-
+option.SHADOW                          = Shadow Mapping
+option.SHADOW_PCF                      = Shadow Filtering
+option.SHADOW_COLOR                    = Colored Shadows
+option.SHADOW_VPS                      = Variable Penumbra Shadows
 option.shadowMapResolution             = Shadow Resolution
-suffix.shadowMapResolution             = ²
 option.shadowDistance                  = Shadow Distance
 option.sunPathRotation                 = Sun Path Rotation
+option.SHADOW_PENUMBRA_SCALE           = Shadow Softness
+option.ENTITY_SHADOWS                  = Entity Shadows
+option.BLOCK_ENTITY_SHADOWS            = Block Entity Shadows
+
+suffix.shadowMapResolution             = ²
 suffix.sunPathRotation                 = °
 
+value.shadowDistance.48.0              = 3 chunks
 value.shadowDistance.64.0              = 4 chunks
 value.shadowDistance.80.0              = 5 chunks
 value.shadowDistance.96.0              = 6 chunks
@@ -255,154 +69,104 @@ value.shadowDistance.512.0             = 32 chunks
 value.shadowDistance.768.0             = 48 chunks
 value.shadowDistance.1024.0            = 64 chunks
 
-option.SHADOW                          = Enabled
-option.SHADOW_QUALITY                  = Shadow Quality
-option.SHADOW_PENUMBRA_SCALE           = Shadow Softness
-option.SHADOW_COLOR                    = Colored Shadows
-option.CLOUD_SHADOWS                   = Cloud Shadows
-option.ENTITY_SHADOWS                  = Entity Shadows
-option.BLOCK_ENTITY_SHADOWS            = Block Entity Shadows
+# Sky settings
 
-value.SHADOW_QUALITY.SHADOW_QUALITY_FAST = §bFast
-value.SHADOW_QUALITY.SHADOW_QUALITY_FANCY = §dFancy
+# Fog settings
 
-#----# Post-Processing #---------------------------------------------------------------------------#
+option.FOG_RAYLEIGH_DENSITY            = Normal Density
+option.FOG_RAYLEIGH_R                  = §4Red
+option.FOG_RAYLEIGH_G                  = §2Green
+option.FOG_RAYLEIGH_B                  = §1Blue
+
+option.FOG_RAYLEIGH_DENSITY_RAIN       = Rain Density
+option.FOG_RAYLEIGH_R_RAIN             = §4Red
+option.FOG_RAYLEIGH_G_RAIN             = §2Green
+option.FOG_RAYLEIGH_B_RAIN             = §1Blue
+
+option.FOG_RAYLEIGH_DENSITY_ARID       = Arid/Desert Density
+option.FOG_RAYLEIGH_R_ARID             = §4Red
+option.FOG_RAYLEIGH_G_ARID             = §2Green
+option.FOG_RAYLEIGH_B_ARID             = §1Blue
+
+option.FOG_RAYLEIGH_DENSITY_SNOWY      = Snowy Density
+option.FOG_RAYLEIGH_R_SNOWY            = §4Red
+option.FOG_RAYLEIGH_G_SNOWY            = §2Green
+option.FOG_RAYLEIGH_B_SNOWY            = §1Blue
+
+option.FOG_RAYLEIGH_DENSITY_TAIGA      = Taiga Density
+option.FOG_RAYLEIGH_R_TAIGA            = §4Red
+option.FOG_RAYLEIGH_G_TAIGA            = §2Green
+option.FOG_RAYLEIGH_B_TAIGA            = §1Blue
+
+option.FOG_RAYLEIGH_DENSITY_JUNGLE     = Jungle Density
+option.FOG_RAYLEIGH_R_JUNGLE           = §4Red
+option.FOG_RAYLEIGH_G_JUNGLE           = §2Green
+option.FOG_RAYLEIGH_B_JUNGLE           = §1Blue
+
+option.FOG_RAYLEIGH_DENSITY_SWAMP      = Swamp Density
+option.FOG_RAYLEIGH_R_SWAMP            = §4Red
+option.FOG_RAYLEIGH_G_SWAMP            = §2Green
+option.FOG_RAYLEIGH_B_SWAMP            = §1Blue
+
+# Materials settings
+
+option.TEXTURE_FORMAT                  = Texture Format
+
+option.NORMAL_MAPPING                  = Normal Mapping
+option.SPECULAR_MAPPING                = Specular Mapping
+
+value.TEXTURE_FORMAT.TEXTURE_FORMAT_LAB = labPBR
+value.TEXTURE_FORMAT.TEXTURE_FORMAT_OLD = Old PBR
+
+# Water settings
+
+# Post-processing settings
+
+option.TAA                             = TAA
+option.FXAA                            = FXAA
+option.TAAU                            = TAA Upscaling
+option.TAAU_RENDER_SCALE               = TAAU Render Scale
+option.CAS                             = Image Sharpening
+option.CAS_INTENSITY                   = Image Sharpening Intensity
 
 option.tonemap                         = Tonemap Operator
 
-value.tonemap.tonemapAces              = Aces
-value.tonemap.tonemapAcesFit           = Aces Fit
+value.tonemap.academyFit               = Academy Fit
+value.tonemap.academyRrt               = Academy RRT
 value.tonemap.tonemapHejlBurgess       = Hejl-Burgess
+value.tonemap.tonemapUncharted2        = Uncharted 2
+value.tonemap.tonemapTech              = Tech
 value.tonemap.tonemapOzius             = Ozius
+value.tonemap.tonemapReinhard          = Reinhard
 value.tonemap.tonemapReinhardJodie     = Reinhard-Jodie
 
-# ACES
+option.AUTO_EXPOSURE                    = Exposure Method
+option.AUTO_EXPOSURE_BIAS               = Exposure Bias
+option.AUTO_EXPOSURE_MIN                = Minimum Exposure
+option.AUTO_EXPOSURE_MAX                = Maximum Exposure
+option.AUTO_EXPOSURE_RATE_DIM_TO_BRIGHT = Exposure Rate - Increasing
+option.AUTO_EXPOSURE_RATE_BRIGHT_TO_DIM = Exposure Rate - Decreasing
+option.MANUAL_EXPOSURE_VALUE            = Manual Exposure Value
+option.MANUAL_EXPOSURE_USE_SCREEN_BRIGHTNESS = Use Brightness Slider
+option.HISTOGRAM_BINS                   = Histogram Bins
+option.HISTOGRAM_TARGET                 = Histogram Target CDF Value
 
-option.RRT_GLOW_GAIN                   = RRT Glow Gain
-option.RRT_GLOW_MID                    = RRT Glow Mid
-option.RRT_RED_SCALE                   = RRT Red Scale
-option.RRT_RED_WIDTH                   = RRT Red Width
-option.RRT_SAT_FACTOR                  = RRT Saturation
-option.ODT_SAT_FACTOR                  = ODT Saturation
+value.AUTO_EXPOSURE.AUTO_EXPOSURE_SIMPLE    = Simple
+value.AUTO_EXPOSURE.AUTO_EXPOSURE_HISTOGRAM = Histogram
+value.AUTO_EXPOSURE.AUTO_EXPOSURE_OFF       = Manual
 
-# Bloom
+# Misc settings
 
-option.BLOOM                           = Enabled
-option.BLOOM_INTENSITY                 = Strength
-option.BLOOM_RADIUS                    = Radius
-option.BLOOM_TILES                     = Tiles
-
-option.BLOOM_UPSAMPLING_FILTER         = Bloom Upsampling Filter
-value.BLOOM_UPSAMPLING_FILTER.texture  = §bLinear
-value.BLOOM_UPSAMPLING_FILTER.textureBicubic = §dBicubic
-
-# Purkinje Shift
-
-option.PURKINJE_SHIFT_INTENSITY        = Purkinje Shift Intensity
-
-# Color Grading
-
-option.GRADE                           = Enabled
-option.GRADE_BRIGHTNESS                = Brightness
-option.GRADE_CONTRAST                  = Contrast
-option.GRADE_SATURATION                = Saturation
-option.GRADE_VIBRANCE                  = Vibrance
-option.GRADE_WHITE_BALANCE             = White Balance
-suffix.GRADE_WHITE_BALANCE             = K
-
-# Exposure
-
-option.CAMERA_EXPOSURE_MIN             = Minimum Exposure
-option.CAMERA_EXPOSURE_MAX             = Maximum Exposure
-option.CAMERA_EXPOSURE_BIAS            = Exposure Bias
-option.CAMERA_EXPOSURE_RATE_DIM_TO_BRIGHT = Brightening Rate
-option.CAMERA_EXPOSURE_RATE_BRIGHT_TO_DIM = Darkening Rate
-option.CAMERA_MANUAL_EXPOSURE          = Manual Exposure
-option.CAMERA_MANUAL_EXPOSURE_USE_SCREEN_BRIGHTNESS = Manual Exposure Uses Brightness Slider
-option.CAMERA_MANUAL_EXPOSURE_VALUE    = Manual Exposure Value
-
-option.HISTOGRAM_BINS                  = Histogram Bins
-option.HISTOGRAM_IGNORE_DIM            = Ignore Dim Range
-option.HISTOGRAM_IGNORE_BRIGHT         = Ignore Bright Range
-
-option.CAMERA_LOCAL_EXPOSURE           = Local Exposure
-
-# Image Sharpening
-
-option.CAS                             = Contrast-Adaptive Sharpening
-
-# Temporal AA
-
-option.TAA                             = Enabled
-option.TAA_UPSCALING_FACTOR            = Temporal Upscaling
-option.TAA_BLEND_WEIGHT                = Blend Weight
-option.TAA_SKIP_CLIPPING               = Skip Clipping
-option.TAA_VARIANCE_CLIPPING           = Variance Clipping
-option.TAA_CONFIDENCE_REJECTION        = Confidence Rejection
-option.TAA_OFFCENTER_REJECTION         = Offcenter Rejection
-option.TAA_FLICKER_REDUCTION           = Flicker Reduction
-
-value.TAA_UPSCALING_FACTOR.1           = OFF
-value.TAA_UPSCALING_FACTOR.2           = 2x
-value.TAA_UPSCALING_FACTOR.4           = 4x
-
-#----# Terrain #-----------------------------------------------------------------------------------#
-
-option.TEXTURE_FORMAT                  = Texture Format
-option.NORMAL_MAP                      = Normal Mapping
-option.SPECULAR_MAP                    = Specular Mapping
-option.RAIN_PUDDLES                    = Rain Puddles
-
-value.TEXTURE_FORMAT.TEXTURE_FORMAT_LAB = labPBR
-value.TEXTURE_FORMAT.TEXTURE_FORMAT_OLD = Old PBR / SEUS PBR
-
-# Reflections
-
-option.SSR                             = Enabled
-option.SSR_ROUGH                       = Roughness Support
-option.SSR_RAY_COUNT                   = Ray Count
-option.SSR_INTERSECTION_STEPS_SMOOTH   = Intersection Steps - Smooth
-option.SSR_INTERSECTION_STEPS_ROUGH    = Intersection Steps - Rough
-option.SSR_REFINEMENT_STEPS            = Refinement Steps
-option.SSR_ROUGHNESS_THRESHOLD         = Roughness Threshold
-
-# Waving Blocks
-
-option.WAVING_PLANTS                   = Waving Plants
-option.WAVING_LEAVES                   = Waving Leaves
-
-#----# Water #-------------------------------------------------------------------------------------#
-
-option.WATER_CAUSTICS                  = Caustics
-option.WATER_REFRACTION                = Refraction
-option.WATER_TEXTURE                   = Vanilla Water Texture
-
-# Water Waves
-
-option.WATER_PARALLAX                  = Water Parallax
-option.WATER_DISPLACEMENT              = Water Displacement
-
-# Water Fog
-
-option.WATER_DENSITY                   = Density
-option.WATER_SCATTERING_COEFF          = Scattering Coefficient
-option.WATER_ABSORPTION_R              = §cRed §fAbsorption
-option.WATER_ABSORPTION_G              = §aGreen §fAbsorption
-option.WATER_ABSORPTION_B              = §9Blue §fAbsorption
-
-#----# Misc #--------------------------------------------------------------------------------------#
-
-option.HIDE_WORLD_BORDER                = Hide World Border
-option.CAMERA_LOCAL_EXPOSURE_COMPARISON = Local Exposure Comparison
-
-# Debug View
+option.INFO                            = Photon Shaders
+value.INFO.0                           = §eby SixthSurge
+value.INFO.1                           = §aby SixthSurge
+value.INFO.2                           = §bby SixthSurge
+value.INFO.3                           = §dby SixthSurge
 
 option.DEBUG_VIEW                      = Debug View
+option.DEBUG_SAMPLER                   = Debug Sampler
 
 value.DEBUG_VIEW.DEBUG_VIEW_NONE       = OFF
 value.DEBUG_VIEW.DEBUG_VIEW_SAMPLER    = Sampler
 value.DEBUG_VIEW.DEBUG_VIEW_WEATHER    = Weather
 value.DEBUG_VIEW.DEBUG_VIEW_HISTOGRAM  = Histogram
-
-option.DEBUG_SAMPLER                   = Sampler To View
-option.DEBUG_SAMPLER_EXPOSURE          = Sampler Exposure

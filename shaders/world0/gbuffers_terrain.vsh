@@ -1,4 +1,4 @@
-#version 410 compatibility
-#define PROGRAM_GBUFFERS_TERRAIN
+#version 400 compatibility
 #define WORLD_OVERWORLD
+#define PROGRAM_TERRAIN
 #include "/program/gbuffer/solid.vsh"

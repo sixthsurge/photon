@@ -1,5 +1,5 @@
-#if !defined INCLUDE_UTILITY_CHECKERBOARD
-#define INCLUDE_UTILITY_CHECKERBOARD
+#if !defined UTILITY_CHECKERBOARD_INCLUDED
+#define UTILITY_CHECKERBOARD_INCLUDED
 
 const ivec2[2] checkerboardOffsets2x1 = ivec2[2](
 	ivec2(0, 0),
@@ -55,4 +55,4 @@ const ivec2[16] checkerboardOffsets4x4 = ivec2[16](
 	ivec2(2, 3)
 );
 
-#endif // INCLUDE_UTILITY_CHECKERBOARD
+#endif // UTILITY_CHECKERBOARD_INCLUDED

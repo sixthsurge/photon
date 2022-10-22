@@ -1,5 +1,5 @@
-#if !defined INCLUDE_UTILITY_BICUBIC
-#define INCLUDE_UTILITY_BICUBIC
+#if !defined UTILITY_BICUBIC_INCLUDED
+#define UTILITY_BICUBIC_INCLUDED
 
 // Source for bicubic filter: https://stackoverflow.com/questions/13501081/efficient-bicubic-filtering-code-in-glsl
 
@@ -109,7 +109,44 @@ vec4 textureCatmullRom(sampler2D sampler, vec2 coord) {
 
 // Approximation from Siggraph 2016 SMAA presentation
 // Ignores the corner texels, reducing the overhead from 9 to 5 bilinear samples
-vec3 textureCatmullRomFast(sampler2D sampler, vec2 coord, const float sharpness) {
+vec4 textureCatmullRomFast(sampler2D sampler, vec2 coord, const float sharpness) {
+	vec2 res = vec2(textureSize(sampler, 0));
+	vec2 texelSize = 1.0 / res;
+
+	vec2 position = res * coord;
+	vec2 centerPosition = floor(position - 0.5) + 0.5;
+	vec2 f = position - centerPosition;
+	vec2 f2 = f * f;
+	vec2 f3 = f * f2;
+
+	vec2 w0 =        -sharpness  * f3 +  2.0 * sharpness         * f2 - sharpness * f;
+	vec2 w1 =  (2.0 - sharpness) * f3 - (3.0 - sharpness)        * f2         + 1.0;
+	vec2 w2 = -(2.0 - sharpness) * f3 + (3.0 -  2.0 * sharpness) * f2 + sharpness * f;
+	vec2 w3 =         sharpness  * f3 -                sharpness * f2;
+
+	vec2 w12 = w1 + w2;
+	vec2 tc12 = texelSize * (centerPosition + w2 / w12);
+	vec4 centerColor = texture(sampler, vec2(tc12.x, tc12.y));
+
+	vec2 tc0 = texelSize * (centerPosition - 1.0);
+	vec2 tc3 = texelSize * (centerPosition + 2.0);
+
+	float l0 = w12.x * w0.y;
+	float l1 = w0.x  * w12.y;
+	float l2 = w12.x * w12.y;
+	float l3 = w3.x  * w12.y;
+	float l4 = w12.x * w3.y;
+
+	vec4 color = texture(sampler, vec2(tc12.x, tc0.y )) * l0
+	           + texture(sampler, vec2(tc0.x,  tc12.y)) * l1
+	           + centerColor                            * l2
+	           + texture(sampler, vec2(tc3.x,  tc12.y)) * l3
+	           + texture(sampler, vec2(tc12.x, tc3.y )) * l4;
+
+	return color / (l0 + l1 + l2 + l3 + l4);
+}
+
+vec3 textureCatmullRomFastRgb(sampler2D sampler, vec2 coord, const float sharpness) {
 	vec2 res = vec2(textureSize(sampler, 0));
 	vec2 texelSize = 1.0 / res;
 
@@ -140,4 +177,4 @@ vec3 textureCatmullRomFast(sampler2D sampler, vec2 coord, const float sharpness)
 	return color.rgb / color.a;
 }
 
-#endif // INCLUDE_UTILITY_BICUBIC
+#endif // UTILITY_BICUBIC_INCLUDED

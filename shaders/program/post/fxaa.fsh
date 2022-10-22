@@ -1,26 +1,24 @@
 /*
- * Program description:
- * FXAA v3.11 from http://blog.simonrodriguez.fr/articles/2016/07/implementing_fxaa.html
- */
+--------------------------------------------------------------------------------
+
+  Photon Shaders by SixthSurge
+
+  program/post/fxaa.fsh
+  FXAA v3.11 from http://blog.simonrodriguez.fr/articles/2016/07/implementing_fxaa.html
+
+--------------------------------------------------------------------------------
+*/
 
 #include "/include/global.glsl"
 
-//--// Outputs //-------------------------------------------------------------//
-
-/* RENDERTARGETS: 2 */
+/* DRAWBUFFERS:0 */
 layout (location = 0) out vec3 fragColor;
 
-//--// Inputs //--------------------------------------------------------------//
+in vec2 uv;
 
-in vec2 coord;
+uniform sampler2D colortex0; // LDR linear scene color
 
-//--// Uniforms //------------------------------------------------------------//
-
-uniform sampler2D colortex2; // LDR linear scene color
-
-uniform vec2 windowTexelSize;
-
-//--// Functions //-----------------------------------------------------------//
+uniform vec2 texelSize;
 
 const int maxIterations = 12;
 const float[12] quality = float[12](1.0, 1.0, 1.0, 1.0, 1.0, 1.5, 2.0, 2.0, 2.0, 2.0, 4.0, 8.0);
@@ -43,27 +41,23 @@ float maxOf(float a, float b, float c, float d, float e) {
 }
 
 void main() {
-#ifndef FXAA
-	#error "This program should be disabled if FXAA is disabled"
-#endif
-
 	ivec2 texel = ivec2(gl_FragCoord.xy);
 
-	//--// Detecting where to apply AA
+	// Detecting where to apply AA
 
 	// Fetch 3x3 neighborhood
 	// a b c
 	// d e f
 	// g h i
-	vec3 a = texelFetch(colortex2, texel + ivec2(-1,  1), 0).rgb;
-	vec3 b = texelFetch(colortex2, texel + ivec2( 0,  1), 0).rgb;
-	vec3 c = texelFetch(colortex2, texel + ivec2( 1,  1), 0).rgb;
-	vec3 d = texelFetch(colortex2, texel + ivec2(-1,  0), 0).rgb;
-	vec3 e = texelFetch(colortex2, texel, 0).rgb;
-	vec3 f = texelFetch(colortex2, texel + ivec2( 1,  0), 0).rgb;
-	vec3 g = texelFetch(colortex2, texel + ivec2(-1, -1), 0).rgb;
-	vec3 h = texelFetch(colortex2, texel + ivec2( 0, -1), 0).rgb;
-	vec3 i = texelFetch(colortex2, texel + ivec2( 1, -1), 0).rgb;
+	vec3 a = texelFetch(colortex0, texel + ivec2(-1,  1), 0).rgb;
+	vec3 b = texelFetch(colortex0, texel + ivec2( 0,  1), 0).rgb;
+	vec3 c = texelFetch(colortex0, texel + ivec2( 1,  1), 0).rgb;
+	vec3 d = texelFetch(colortex0, texel + ivec2(-1,  0), 0).rgb;
+	vec3 e = texelFetch(colortex0, texel, 0).rgb;
+	vec3 f = texelFetch(colortex0, texel + ivec2( 1,  0), 0).rgb;
+	vec3 g = texelFetch(colortex0, texel + ivec2(-1, -1), 0).rgb;
+	vec3 h = texelFetch(colortex0, texel + ivec2( 0, -1), 0).rgb;
+	vec3 i = texelFetch(colortex0, texel + ivec2( 1, -1), 0).rgb;
 
 	// Luma at the current fragment
 	float luma = getLuma(e);
@@ -84,7 +78,7 @@ void main() {
 	// If the luma variation is lower that a threshold (or if we are in a really dark area), we are not on an edge, don't perform any AA.
 	if (lumaRange < max(edgeThresholdMin, lumaMax * edgeThresholdMax)) { fragColor = e; return; }
 
-	//--// Estimating gradient and choosing edge direction
+	// Estimating gradient and choosing edge direction
 
 	// Get the lumas of the four remaining corners
 	float lumaUl = getLuma(a);
@@ -109,7 +103,7 @@ void main() {
 	// Is the local edge horizontal or vertical?
 	bool isHorizontal = edgeHorizontal >= edgeVertical;
 
-	//--// Choosing edge orientation
+	// Choosing edge orientation
 
 	// Select the two neighboring texels lumas in the opposite direction to the local edge
 	float luma1 = isHorizontal ? lumaD : lumaL;
@@ -126,7 +120,7 @@ void main() {
 	float gradientScaled = 0.25 * max(abs(gradient1), abs(gradient2));
 
 	// Choose the step size (one pixel) according to the edge direction
-	float stepLength = isHorizontal ? windowTexelSize.y : windowTexelSize.x;
+	float stepLength = isHorizontal ? texelSize.y : texelSize.x;
 
 	// Average luma in the correct direction
 	float lumaLocalAverage;
@@ -139,25 +133,25 @@ void main() {
 	}
 
 	// Shift UV in the correct direction by half a pixel
-	vec2 currentUv = coord;
+	vec2 currentUv = uv;
 	if (isHorizontal) {
 		currentUv.y += stepLength * 0.5;
 	} else {
 		currentUv.x += stepLength * 0.5;
 	}
 
-	//--// First iteration exploration
+	// First iteration exploration
 
 	// Compute offste (for each iteration step) in the right direction
-	vec2 offset = isHorizontal ? vec2(windowTexelSize.x, 0.0) : vec2(0.0, windowTexelSize.y);
+	vec2 offset = isHorizontal ? vec2(texelSize.x, 0.0) : vec2(0.0, texelSize.y);
 
 	// Compute UVs to explore on each side of the edge, orthogonally. "quality" allows us to step faster
 	vec2 uv1 = currentUv - offset;
 	vec2 uv2 = currentUv + offset;
 
 	// Read the lumas at both current extremities of the exploration segment, and compute the delta wrt the local average luma
-	float lumaEnd1 = getLuma(texture(colortex2, uv1).rgb);
-	float lumaEnd2 = getLuma(texture(colortex2, uv2).rgb);
+	float lumaEnd1 = getLuma(texture(colortex0, uv1).rgb);
+	float lumaEnd2 = getLuma(texture(colortex0, uv2).rgb);
 	lumaEnd1 -= lumaLocalAverage;
 	lumaEnd2 -= lumaLocalAverage;
 
@@ -170,19 +164,19 @@ void main() {
 	if (!reached1) uv1 -= offset;
 	if (!reached2) uv2 += offset;
 
-	//--// Iterating
+	// Iterating
 
 	// If both sides have not been reached, continue to explore
 	if (!reachedBoth) {
 		for (int i = 2; i < maxIterations; ++i) {
 			// If needed, read luma in 1st direction, compute delta
 			if (!reached1) {
-				lumaEnd1  = getLuma(texture(colortex2, uv1).rgb);
+				lumaEnd1  = getLuma(texture(colortex0, uv1).rgb);
 				lumaEnd1 -= lumaLocalAverage;
 			}
 			// If needed, read luma in the opposite direction, compute delta
 			if (!reached2) {
-				lumaEnd2  = getLuma(texture(colortex2, uv2).rgb);
+				lumaEnd2  = getLuma(texture(colortex0, uv2).rgb);
 				lumaEnd2 -= lumaLocalAverage;
 			}
 
@@ -200,11 +194,11 @@ void main() {
 		}
 	}
 
-	//--// Estimating offset
+	// Estimating offset
 
 	// Compute the distance to each extremity of the edge
-	float distance1 = isHorizontal ? (coord.x - uv1.x) : (coord.y - uv1.y);
-	float distance2 = isHorizontal ? (uv2.x - coord.x) : (uv2.y - coord.y);
+	float distance1 = isHorizontal ? (uv.x - uv1.x) : (uv.y - uv1.y);
+	float distance2 = isHorizontal ? (uv2.x - uv.x) : (uv2.y - uv.y);
 
 	// In which direction is the extremity of the edge closer?
 	bool isDirection1 = distance1 < distance2;
@@ -225,7 +219,7 @@ void main() {
 	// If the luma variation is incorrect, do not offset
 	float finalOffset = correctVariation ? pixelOffset : 0.0;
 
-	//--// Subpixel antialiasing
+	// Subpixel antialiasing
 
 	// Full weighted average of the luma over the 3x3 neighborhood
 	float lumaAverage = rcp(12.0) * (2.0 * (lumaHorizontal + lumaVertical) + lumaLeftCorners + lumaRightCorners);
@@ -238,18 +232,22 @@ void main() {
 	float subPixelOffsetFinal = subPixelOffset2 * subPixelOffset2 * subpixelQuality;
 
 	// Pick the biggest of the two offsets.
-	finalOffset = max(finalOffset,subPixelOffsetFinal);
+	finalOffset = max(finalOffset, subPixelOffsetFinal);
 
-	//--// Final read
+	// Final read
 
-	// Compute the final UV coordinates
-	vec2 finalUv = coord;
+	// Compute the final UV uvinates
+	vec2 finalUv = uv;
 	if (isHorizontal) {
 		finalUv.y += finalOffset * stepLength;
 	} else {
 		finalUv.x += finalOffset * stepLength;
 	}
 
-	// Return the color at the new UV coordinates
-	fragColor = texture(colortex2, finalUv).rgb;
+	// Return the color at the new UV uvinates
+	fragColor = texture(colortex0, finalUv).rgb;
 }
+
+#ifndef FXAA
+	#error "This program should be disabled if FXAA is disabled"
+#endif

@@ -1,135 +1,135 @@
+/*
+--------------------------------------------------------------------------------
+
+  Photon Shaders by SixthSurge
+
+  program/gbuffer/solid.fsh:
+  Handle terrain, entities, the hand, beacon beams and spider eyes
+
+--------------------------------------------------------------------------------
+*/
+
 #include "/include/global.glsl"
 
-//--// Outputs //-------------------------------------------------------------//
+/* DRAWBUFFERS:1 */
 
-/* RENDERTARGETS: 1 */
-layout (location = 0) out uvec4 encoded;
-
-#ifdef PROGRAM_GBUFFERS_ENTITIES
-/* RENDERTARGETS: 1,2 */
-layout (location = 1) out vec3 velocityOut;
+#ifdef NORMAL_MAPPING
+/* DRAWBUFFERS:12 */
 #endif
 
-//--// Inputs //--------------------------------------------------------------//
+#ifdef SPECULAR_MAPPING
+/* DRAWBUFFERS:12 */
+#endif
+
+layout (location = 0) out vec4 gbuffer0; // albedo, block ID, flat normal, light levels
+layout (location = 1) out vec4 gbuffer1; // detailed normal, specular map (optional)
 
 in vec2 texCoord;
 in vec2 lmCoord;
-in vec4 tint;
 
-flat in uint blockId;
-flat in mat3 tbnMatrix;
-
-#if defined PROGRAM_GBUFFERS_ENTITIES
-in vec3 velocity;
+#ifdef PROGRAM_TERRAIN
+in float vanillaAo;
 #endif
 
-//--// Uniforms //------------------------------------------------------------//
+flat in uint blockId;
+flat in vec4 tint;
+flat in mat3 tbnMatrix;
 
-#if MC_VERSION < 11700
-	#define gtexture gcolor
+#ifdef POM
+flat in vec2 atlasTileOffset;
+flat in vec2 atlasTileScale;
 #endif
 
 uniform sampler2D gtexture;
 
-#ifdef MC_NORMAL_MAP
+#ifdef NORMAL_MAPPING
 uniform sampler2D normals;
 #endif
 
-#ifdef MC_SPECULAR_MAP
+#ifdef SPECULAR_MAPPING
 uniform sampler2D specular;
 #endif
 
-#ifdef PROGRAM_GBUFFERS_ENTITIES
 uniform vec4 entityColor;
-uniform int entityId;
-#endif
-
-//--// Time uniforms
 
 uniform int frameCounter;
 
-//--// Custom uniforms
-
-uniform vec2 viewTexelSize;
-
-//--// Includes //------------------------------------------------------------//
-
-#include "/block.properties"
-#include "/entity.properties"
-
-#include "/include/fragment/textureFormat.glsl"
+uniform vec2 texelSize;
 
 #include "/include/utility/dithering.glsl"
 #include "/include/utility/encoding.glsl"
 
-//--// Functions //-----------------------------------------------------------//
+const float lodBias = log2(taauRenderScale);
 
-const float lodBias = log2(renderScale);
+#if   TEXTURE_FORMAT == TEXTURE_FORMAT_LAB
+void decodeNormalTexture(vec3 normalTex, out vec3 normal, out float ao) {
+	normal.xy = normalTex.xy * 2.0 - 1.0;
+	normal.z  = sqrt(clamp01(1.0 - dot(normal.xy, normal.xy)));
+	ao        = normalTex.z;
+}
+#elif TEXTURE_FORMAT == TEXTURE_FORMAT_OLD
+void decodeNormalTexture(vec3 normalTex, out vec3 normal, out float ao) {
+	normal  = normalTex * 2.0 - 1.0;
+	ao      = length(normal);
+	normal *= rcp(ao);
+}
+#endif
 
 void main() {
-#if TAA_UPSCALING_FACTOR > 1
-	vec2 coord = gl_FragCoord.xy * viewTexelSize;
-	if (clamp01(coord) != coord) discard;
+#if defined TAA && defined TAAU
+	vec2 screenPos = gl_FragCoord.xy * texelSize * rcp(taauRenderScale);
+	if (clamp01(screenPos) != screenPos) discard;
 #endif
 
-	vec4 baseTex = texture(gtexture, texCoord, lodBias);
-#ifdef MC_NORMAL_MAP
-	vec3 normalTex = texture(normals, texCoord, lodBias).xyz;
+	vec4 baseTex     = texture(gtexture, texCoord, lodBias) * tint;
+#ifdef NORMAL_MAPPING
+	vec3 normalTex   = texture(normals, texCoord, lodBias).xyz;
 #endif
-#ifdef MC_SPECULAR_MAP
-	vec4 specularTex = textureLod(specular, texCoord, 0);
+#ifdef SPECULAR_MAPPING
+	vec4 specularTex = texture(specular, texCoord, lodBias);
 #endif
 
-	baseTex *= tint;
-#ifdef PROGRAM_GBUFFERS_ENTITIES
-	if (baseTex.a < 0.1 && entityId != ENTITY_BOAT && entityId != ENTITY_LIGHTNING_BOLT) discard;
-#else
 	if (baseTex.a < 0.1) discard;
+
+#ifdef WHITE_WORLD
+	baseTex.rgb = vec3(1.0);
 #endif
 
-#if defined PROGRAM_GBUFFERS_ENTITIES
+#ifdef PROGRAM_TERRAIN
+	const float vanillaAoStrength = 0.65;
+	const float vanillaAoLift     = 1.0;
+	baseTex.rgb *= lift(vanillaAo, vanillaAoLift) * vanillaAoStrength + (1.0 - vanillaAoStrength);
+#endif
+
+#ifdef PROGRAM_ENTITIES
 	baseTex.rgb = mix(baseTex.rgb, entityColor.rgb, entityColor.a);
-	baseTex.rgb = mix(baseTex.rgb, vec3(1.0), float(entityId == ENTITY_LIGHTNING_BOLT));
 #endif
 
-#ifdef MC_NORMAL_MAP
+#ifdef NORMAL_MAPPING
 	vec3 normal; float ao;
-	decodeNormalTex(normalTex, normal, ao);
+	decodeNormalTexture(normalTex, normal, ao);
 
 	normal = tbnMatrix * normal;
 #endif
 
 	float dither = interleavedGradientNoise(gl_FragCoord.xy, frameCounter);
 
-	mat2x4 data;
-	data[0].xyz = baseTex.rgb;
-#if defined PROGRAM_GBUFFERS_ENTITIES
-	data[0].w   = float(entityId) * rcp(255.0);
-#else
-	data[0].w   = float(blockId) * rcp(255.0);
-#endif
-	data[1].xy  = encodeUnitVector(tbnMatrix[2]);
-	data[1].zw  = dither8Bit(lmCoord, dither);
+	gbuffer0.x  = packUnorm2x8(baseTex.rg);
+	gbuffer0.y  = packUnorm2x8(baseTex.b, float(blockId) * rcp(255.0));
+	gbuffer0.z  = packUnorm2x8(encodeUnitVector(tbnMatrix[2]));
+	gbuffer0.w  = packUnorm2x8(dither8Bit(lmCoord, dither));
 
-	encoded.x = packUnorm4x8(data[0]);
-	encoded.y = packUnorm4x8(data[1]);
-
-#ifdef MC_NORMAL_MAP
-	// Pack encoded normal in first 24 bits, material AO in next 7 and parallax shadow in final bit
-	vec4 normalData = vec4(encodeUnitVector(normal), ao, 1.0);
-	encoded.z = packUnormArb(normalData, uvec4(12, 12, 7, 1));
+#ifdef NORMAL_MAPPING
+	gbuffer1.xy = encodeUnitVector(normal);
 #endif
 
-#ifdef MC_SPECULAR_MAP
-	encoded.w = packUnorm4x8(specularTex);
-#endif
-
-#if defined PROGRAM_GBUFFERS_ENTITIES
-	velocityOut = velocity;
+#ifdef SPECULAR_MAPPING
+	gbuffer1.z  = packUnorm2x8(specularTex.xy);
+	gbuffer1.w  = packUnorm2x8(specularTex.zw);
 #endif
 
 #if defined PROGRAM_GBUFFERS_BEACONBEAM
 	// Discard the translucent edge part of the beam
 	if (baseTex.a < 0.99) discard;
 #endif
-}
+ }

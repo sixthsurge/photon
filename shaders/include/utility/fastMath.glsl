@@ -1,5 +1,5 @@
-#if !defined INCLUDE_UTILITY_FASTMATH
-#define INCLUDE_UTILITY_FASTMATH
+#if !defined UTILITY_FASTMATH_INCLUDED
+#define UTILITY_FASTMATH_INCLUDED
 
 // Faster alternative to acos
 // Source: https://seblagarde.wordpress.com/2014/12/01/inverse-trigonometric-functions-gpu-optimization-for-amd-gcn-architecture/#more-3316
@@ -32,7 +32,7 @@ float pow16(float x) {
 	return x;
 }
 
-float cube2(float x) {
+float pow32(float x) {
 	x *= x;
 	x *= x;
 	x *= x;
@@ -69,4 +69,4 @@ float pow1d5(float x) {
 float rcpLength(vec2 v) { return inversesqrt(dot(v, v)); }
 float rcpLength(vec3 v) { return inversesqrt(dot(v, v)); }
 
-#endif // INCLUDE_UTILITY_FASTMATH
+#endif // UTILITY_FASTMATH_INCLUDED

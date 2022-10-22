@@ -1,5 +1,5 @@
-#if !defined INCLUDE_UTILITY_SPHERICALHARMONICS
-#define INCLUDE_UTILITY_SPHERICALHARMONICS
+#if !defined UTILITY_SPHERICALHARMONICS_INCLUDED
+#define UTILITY_SPHERICALHARMONICS_INCLUDED
 
 float[4] getSphericalHarmonicsCoefficientsOrder1(vec3 direction) {
 	float x = direction.x;
@@ -105,4 +105,4 @@ vec3 evaluateSphericalHarmonicsIrradiance(vec3[9] sh, vec3 bentNormal, float vis
 	return evaluateConvolvedSphericalHarmonics(sh, kernel, bentNormal);
 }
 
-#endif // INCLUDE_UTILITY_SPHERICALHARMONICS
+#endif // UTILITY_SPHERICALHARMONICS_INCLUDED

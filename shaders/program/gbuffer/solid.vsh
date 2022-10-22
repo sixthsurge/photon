@@ -1,64 +1,51 @@
-#include "/include/global.glsl"
+/*
+--------------------------------------------------------------------------------
 
-//--// Outputs //-------------------------------------------------------------//
+  Photon Shaders by SixthSurge
+
+  program/gbuffer/solid.vsh:
+  Handle terrain, entities, the hand, beacon beams and spider eyes
+
+--------------------------------------------------------------------------------
+*/
+
+#include "/include/global.glsl"
 
 out vec2 texCoord;
 out vec2 lmCoord;
-out vec4 tint;
 
-flat out uint blockId;
-flat out mat3 tbnMatrix;
-
-#if defined PROGRAM_GBUFFERS_ENTITIES
-out vec3 velocity;
+#ifdef PROGRAM_TERRAIN
+out float vanillaAo;
 #endif
 
-//--// Inputs //--------------------------------------------------------------//
+flat out uint blockId;
+flat out vec4 tint;
+flat out mat3 tbnMatrix;
+
+#ifdef POM
+flat out vec2 atlasTileOffset;
+flat out vec2 atlasTileScale;
+#endif
 
 attribute vec4 at_tangent;
-attribute vec3 at_velocity;
 attribute vec3 mc_Entity;
 attribute vec2 mc_midTexCoord;
-
-//--// Uniforms //------------------------------------------------------------//
-
-uniform sampler2D noisetex;
-
-//--// Camera uniforms
-
-uniform float near;
-uniform float far;
-
-uniform vec3 cameraPosition;
 
 uniform mat4 gbufferModelView;
 uniform mat4 gbufferModelViewInverse;
 uniform mat4 gbufferProjection;
 uniform mat4 gbufferProjectionInverse;
 
-//--// Time uniforms
-
-uniform float frameTimeCounter;
-
-uniform float rainStrength;
-
-//--// Custom uniforms
+uniform float near;
+uniform float far;
 
 uniform vec2 taaOffset;
 
-//--// Includes //------------------------------------------------------------//
-
-#include "/block.properties"
-
 #include "/include/utility/spaceConversion.glsl"
-
-#include "/include/vertex/animation.glsl"
-
-//--// Functions //-----------------------------------------------------------//
 
 void main() {
 	texCoord = gl_MultiTexCoord0.xy;
-	lmCoord  = gl_MultiTexCoord1.xy * rcp(240.0);
+	lmCoord  = clamp01(gl_MultiTexCoord1.xy * rcp(240.0));
 	tint     = gl_Color;
 	blockId  = uint(max0(mc_Entity.x - 10000.0));
 
@@ -68,29 +55,19 @@ void main() {
 	tbnMatrix[1] = cross(tbnMatrix[0], tbnMatrix[2]) * sign(at_tangent.w);
 #endif
 
-#if defined PROGRAM_GBUFFERS_ENTITIES
-	velocity  = at_velocity;
-#if defined PROGRAM_GBUFFERS_HAND
-	velocity *= MC_HAND_DEPTH;
-#endif
+#ifdef PROGRAM_TERRAIN
+	vanillaAo = gl_Color.a < 0.1 ? 1.0 : gl_Color.a; // fixes models where vanilla ao breaks (eg lecterns)
+	tint.a = 1.0;
 #endif
 
 	vec3 viewPos = transform(gl_ModelViewMatrix, gl_Vertex.xyz);
-
-#ifdef PROGRAM_GBUFFERS_TERRAIN
-	bool isTopVertex = texCoord.y < mc_midTexCoord.y;
-
-	vec3 scenePos  = viewToSceneSpace(viewPos);
-	     scenePos += animateVertex(scenePos + cameraPosition, isTopVertex, lmCoord.y, blockId);
-
-	viewPos = sceneToViewSpace(scenePos);
-#endif
-
 	vec4 clipPos = project(gl_ProjectionMatrix, viewPos);
 
-#ifdef TAA
-    clipPos.xy += taaOffset * clipPos.w;
-	clipPos.xy  = clipPos.xy * renderScale + clipPos.w * (renderScale - 1.0);
+#if   defined TAA && defined TAAU
+	clipPos.xy  = clipPos.xy * taauRenderScale + clipPos.w * (taauRenderScale - 1.0);
+	clipPos.xy += taaOffset * clipPos.w;
+#elif defined TAA
+	clipPos.xy += taaOffset * clipPos.w * 0.75;
 #endif
 
 	gl_Position = clipPos;

@@ -1,9 +1,14 @@
-#if !defined INCLUDE_UTILITY_SPACECONVERSION
-#define INCLUDE_UTILITY_SPACECONVERSION
+#if !defined UTILITY_SPACECONVERSION_INCLUDED
+#define UTILITY_SPACECONVERSION_INCLUDED
 
+// https://wiki.shaderlabs.org/wiki/Shader_tricks#Linearizing_depth
 float linearizeDepth(float depth) {
-	// https://wiki.shaderlabs.org/wiki/Shader_tricks#Linearizing_depth
 	return (near * far) / (depth * (near - far) + far);
+}
+
+// Approximate linear depth function by DrDesten
+float linearizeDepthFast(float depth) {
+	return near / (1.0 - depth);
 }
 
 float reverseLinearDepth(float linearZ) {
@@ -14,7 +19,7 @@ vec3 screenToViewSpace(vec3 screenPos, bool handleJitter) {
 	vec3 positionNdc = 2.0 * screenPos - 1.0;
 
 #ifdef TAA
-	if (handleJitter) positionNdc.xy -= taaOffset;
+	if (handleJitter) positionNdc.xy -= taaOffset * rcp(taauRenderScale);
 #endif
 
 	return projectAndDivide(gbufferProjectionInverse, positionNdc);
@@ -24,7 +29,7 @@ vec3 viewToScreenSpace(vec3 viewPos, bool handleJitter) {
 	vec3 positionNdc = projectAndDivide(gbufferProjection, viewPos);
 
 #ifdef TAA
-	if (handleJitter) positionNdc.xy += taaOffset;
+	if (handleJitter) positionNdc.xy += taaOffset * rcp(taauRenderScale);
 #endif
 
 	return positionNdc * 0.5 + 0.5;
@@ -80,4 +85,4 @@ vec3 reproject(vec3 screenPos, sampler2D velocitySampler) {
 }
 #endif
 
-#endif // INCLUDE_UTILITY_SPACECONVERSION
+#endif // UTILITY_SPACECONVERSION_INCLUDED

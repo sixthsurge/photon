@@ -1,33 +1,39 @@
+/*
+--------------------------------------------------------------------------------
+
+  Photon Shaders by SixthSurge
+
+  program/gbuffer/solid.fsh:
+  Handle animated overlays (block breaking overlay and enchantment glint)
+
+--------------------------------------------------------------------------------
+*/
+
 #include "/include/global.glsl"
 
-//--// Outputs //-------------------------------------------------------------//
+/* DRAWBUFFERS:3 */
+layout (location = 0) out vec4 overlays;
 
-/* RENDERTARGETS: 0 */
-layout (location = 0) out vec4 fragColor;
-
-//--// Inputs //--------------------------------------------------------------//
-
-in vec2 texCoord;
-
-//--// Uniforms //------------------------------------------------------------//
-
-#if MC_VERSION < 11700
-	#define gtexture gcolor
-#endif
+in vec2 uv;
 
 uniform sampler2D gtexture;
 
-//--// Functions //-----------------------------------------------------------//
+const float lodBias = log2(taauRenderScale);
 
 void main() {
-	fragColor = texture(gtexture, texCoord, log2(renderScale));
-	if (fragColor.a < 0.1) discard;
+#if defined TAA && defined TAAU
+	vec2 screenPos = gl_FragCoord.xy * texelSize * rcp(taauRenderScale);
+	if (clamp01(screenPos) != screenPos) discard;
+#endif
 
-#if defined PROGRAM_GBUFFERS_ARMOR_GLINT
+	overlays = texture(gtexture, uv, lodBias);
+	if (overlays.a < 0.1) discard;
+
+#if   defined PROGRAM_ARMOR_GLINT
 	// alpha of 0 <=> enchantment glint
-	fragColor.a = 0.0;
-#elif defined PROGRAM_GBUFFERS_DAMAGEDBLOCK
-	// alpha of 1 <=> damage overlay
-	fragColor.a = 1.0;
+	overlays.a = 0.0;
+#elif defined PROGRAM_DAMAGEDBLOCK
+	// alpha of 1 <=> block breaking overlay
+	overlays.a = 1.0;
 #endif
 }

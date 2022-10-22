@@ -1,41 +1,35 @@
 /*
- * Program description:
- * Calculate global exposure using luminance histogram
- *
- * References:
- * http://www.alextardif.com/HistogramLuminance.html (Overview, histogram construction)
- * https://www.gamedev.net/forums/topic/670001-calculate-hdr-exposure-from-luminance-histogram/5241692/ (Histogram average)
- * https://github.com/zombye/spectrum/blob/master/shaders/program/temporal.glsl (GLSL implementation from Spectrum)
- */
+--------------------------------------------------------------------------------
+
+  Photon Shaders by SixthSurge
+
+  program/post/temporal.vsh:
+  Calculate auto exposure
+
+--------------------------------------------------------------------------------
+*/
 
 #include "/include/global.glsl"
 
-//--// Outputs //-------------------------------------------------------------//
+out vec2 uv;
 
-out vec2 coord;
-
-flat out float globalExposure;
+flat out float exposure;
 
 #if DEBUG_VIEW == DEBUG_VIEW_HISTOGRAM
 flat out vec4[HISTOGRAM_BINS / 4] histogramPdf;
 flat out float histogramSelectedBin;
 #endif
 
-//--// Uniforms //------------------------------------------------------------//
-
-uniform sampler2D colortex3; // Scene color
-uniform sampler2D colortex8; // Scene history
-
-uniform float frameTime;
+uniform sampler2D colortex0; // Scene color
+uniform sampler2D colortex5; // Scene history
 
 uniform vec2 viewSize;
-uniform vec2 viewTexelSize;
+uniform vec2 texelSize;
 
-//--// Includes //------------------------------------------------------------//
+uniform float frameTime;
+uniform float screenBrightness;
 
 #include "/include/utility/color.glsl"
-
-//--// Functions //-----------------------------------------------------------//
 
 #define getExposureFromEv100(ev100) exp2(-(ev100)) / 1.2
 #define getExposureFromLuminance(l) calibration / (l)
@@ -43,12 +37,18 @@ uniform vec2 viewTexelSize;
 
 const float K = 12.5; // Light-meter calibration constant
 const float sensitivity = 100.0; // ISO
-const float calibration = exp2(CAMERA_EXPOSURE_BIAS) * K / sensitivity / 1.2;
+const float calibration = exp2(AUTO_EXPOSURE_BIAS) * K / sensitivity / 1.2;
 
-const float minLuminance = getLuminanceFromExposure(getExposureFromEv100(CAMERA_EXPOSURE_MIN));
-const float maxLuminance = getLuminanceFromExposure(getExposureFromEv100(CAMERA_EXPOSURE_MAX));
+const float minLuminance = getLuminanceFromExposure(getExposureFromEv100(AUTO_EXPOSURE_MIN));
+const float maxLuminance = getLuminanceFromExposure(getExposureFromEv100(AUTO_EXPOSURE_MAX));
 const float minLogLuminance = log2(minLuminance);
 const float maxLogLuminance = log2(maxLuminance);
+
+#ifdef MANUAL_EXPOSURE_USE_SCREEN_BRIGHTNESS
+float manualExposureValue = mix(minLuminance, maxLuminance, screenBrightness);
+#else
+const float manualExposureValue = MANUAL_EXPOSURE_VALUE;
+#endif
 
 float getBinFromLuminance(float luminance) {
 	const float binCount = HISTOGRAM_BINS;
@@ -84,8 +84,8 @@ void buildHistogram(out float[HISTOGRAM_BINS] pdf) {
 		for (int x = 0; x < tiles.x; ++x) {
 			vec2 coord = vec2(x, y) * tileSize + (0.5 * tileSize);
 
-			vec3 rgb = textureLod(colortex3, coord, lod).rgb;
-			float luminance = dot(rgb, luminanceWeightsR709);
+			vec3 rgb = textureLod(colortex0, coord * taauRenderScale, lod).rgb;
+			float luminance = dot(rgb, luminanceWeightsAp1);
 
 			float bin = getBinFromLuminance(luminance);
 
@@ -105,59 +105,49 @@ void buildHistogram(out float[HISTOGRAM_BINS] pdf) {
 	for (int i = 0; i < HISTOGRAM_BINS; ++i) pdf[i] *= tileArea;
 }
 
-float calculateAverageLuminance(float[HISTOGRAM_BINS] pdf) {
-	float sum = 0.0;
-	for (int i = 0; i < HISTOGRAM_BINS; ++i) sum += pdf[i];
-
-	float minSum = sum * HISTOGRAM_IGNORE_DIM;
-	float maxSum = sum * (1.0 - HISTOGRAM_IGNORE_BRIGHT);
-
-	float l = 0.0, n = 0.0;
+float getMedianLuminance(float[HISTOGRAM_BINS] pdf) {
+	float cdf = 0.0;
 
 	for (int i = 0; i < HISTOGRAM_BINS; ++i) {
-		float binValue = pdf[i];
-
-		float minSub = min(binValue, minSum);
-		binValue -= minSub;
-		minSum -= minSub;
-		maxSum -= minSub;
-
-		// Remove outlier at upper end
-		binValue = min(binValue, maxSum);
-		maxSum -= binValue;
-
-		l += binValue * getLuminanceFromBin(i);
-		n += binValue;
+		cdf += pdf[i];
+		if (cdf > HISTOGRAM_TARGET) return getLuminanceFromBin(i);
 	}
 
-	return l / max(n, eps);
+	return 0.0; // ??
 }
 
 void main() {
-	coord = gl_MultiTexCoord0.xy;
+	uv = gl_MultiTexCoord0.xy;
 
-	//--// Auto exposure
+	// Auto exposure
 
-#ifdef CAMERA_MANUAL_EXPOSURE
-	globalExposure = getExposureFromEv100(CAMERA_MANUAL_EXPOSURE);
+#if AUTO_EXPOSURE == AUTO_EXPOSURE_OFF
+	exposure = getExposureFromEv100(manualExposureValue);
 #else
+	float previousExposure = texelFetch(colortex5, ivec2(0), 0).a;
+
+#if   AUTO_EXPOSURE == AUTO_EXPOSURE_SIMPLE
+	float lod = ceil(log2(maxOf(viewSize)));
+	vec3 rgb = textureLod(colortex0, vec2(0.5 * taauRenderScale), int(lod)).rgb;
+	float luminance = clamp(getLuminance(rgb), minLuminance, maxLuminance);
+#elif AUTO_EXPOSURE == AUTO_EXPOSURE_HISTOGRAM
 	float[HISTOGRAM_BINS] pdf;
 	buildHistogram(pdf);
 
-	float luminance = calculateAverageLuminance(pdf);
+	float luminance = getMedianLuminance(pdf);
+#endif
 
 	float targetExposure = getExposureFromLuminance(luminance);
-	float previousExposure = texelFetch(colortex8, ivec2(0), 0).a;
 
 	if (isnan(previousExposure) || isinf(previousExposure)) previousExposure = targetExposure;
 
-	float adjustmentRate = targetExposure < previousExposure ? CAMERA_EXPOSURE_RATE_DIM_TO_BRIGHT : CAMERA_EXPOSURE_RATE_BRIGHT_TO_DIM;
+	float adjustmentRate = targetExposure < previousExposure ? AUTO_EXPOSURE_RATE_DIM_TO_BRIGHT : AUTO_EXPOSURE_RATE_BRIGHT_TO_DIM;
 	float blendWeight = exp(-adjustmentRate * frameTime);
 
-	globalExposure = mix(targetExposure, previousExposure, blendWeight);
+	exposure = mix(targetExposure, previousExposure, blendWeight);
 #endif
 
-#if DEBUG_VIEW == DEBUG_VIEW_HISTOGRAM
+#if AUTO_EXPOSURE == AUTO_EXPOSURE_HISTOGRAM && DEBUG_VIEW == DEBUG_VIEW_HISTOGRAM
 	for (int i = 0; i < HISTOGRAM_BINS; ++i) histogramPdf[i >> 2][i & 3] = pdf[i];
 	histogramSelectedBin = getBinFromLuminance(luminance);
 #endif

@@ -1,4 +1,4 @@
-#version 410 compatibility
-#define PROGRAM_GBUFFERS_ARMOR_GLINT
+#version 400 compatibility
 #define WORLD_OVERWORLD
+#define PROGRAM_ARMOR_GLINT
 #include "/program/gbuffer/overlay.fsh"

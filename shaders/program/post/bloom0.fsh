@@ -1,42 +1,63 @@
 /*
- * Program description:
- * Resize image to 960x540 (fixed-size first bloom tile)
- */
+--------------------------------------------------------------------------------
+
+  Photon Shaders by SixthSurge
+
+  program/bloom0.fsh:
+  Downsample + horizontal blur
+
+--------------------------------------------------------------------------------
+*/
 
 #include "/include/global.glsl"
 
-//--// Outputs //-------------------------------------------------------------//
+/* DRAWBUFFERS:0 */
+layout (location = 0) out vec3 bloomTile;
 
-/* RENDERTARGETS: 15 */
-layout (location = 0) out vec3 bloom;
+in vec2 uv;
 
-//--// Inputs //--------------------------------------------------------------//
+uniform sampler2D colortex5; // Scene color
 
-in vec2 coord;
+uniform vec2 viewSize;
+uniform vec2 texelSize;
 
-//--// Uniforms //------------------------------------------------------------//
-
-uniform sampler2D colortex8; // Scene history
-
-//--// Includes //------------------------------------------------------------//
-
-#include "/include/utility/bicubic.glsl"
-
-//--// Functions //-----------------------------------------------------------//
+#include "/include/utility/color.glsl"
 
 /*
-const bool colortex8MipMapEnabled = true;
+const bool colortex5MipmapEnabled = true;
 */
 
+const vec4 binomialWeights7 = vec4(0.3125, 0.234375, 0.09375, 0.015625);
+
+vec3 bloomContrast(vec3 color) {
+	return color * sqr(getLuminance(color));
+}
+
 void main() {
+	float tileIndex = ceil(-log2(uv.x));
+	float tileScale = exp2(tileIndex);
+	float tileOffset = rcp(tileScale);
+
+	vec2 windowCoord = (uv - tileOffset) * tileScale;
+
+	if (clamp01(windowCoord) != windowCoord || tileIndex > float(BLOOM_TILES)) { bloomTile = vec3(0.0); return; };
+
+	vec2 padAmount = 3.0 * texelSize * tileScale;
+	windowCoord = linearStep(padAmount, 1.0 - padAmount, windowCoord);
+
+	float pixelSize = tileScale * texelSize.x;
+
+	bloomTile = vec3(0.0);
+
+	for (int x = -3; x <= 3; ++x) {
+		float weight = binomialWeights7[abs(x)];
+
+		vec2 sampleCoord = clamp01(windowCoord + vec2(x * pixelSize, 0.0));
+
+		bloomTile += bloomContrast(texture(colortex5, sampleCoord).rgb) * weight;
+	}
+}
+
 #ifndef BLOOM
 	#error "This program should be disabled if bloom is disabled"
 #endif
-
-	if (coord.y < 0.5) {
-		vec2 windowCoord = vec2(1.0, 2.0) * coord;
-
-		int lod = int(textureQueryLod(colortex8, windowCoord).x);
-		bloom = textureBicubicLod(colortex8, windowCoord, lod).rgb;
-	}
-}

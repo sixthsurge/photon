@@ -1,24 +1,45 @@
-#version 410 compatibility
+#version 400 compatibility
+
+/*
+--------------------------------------------------------------------------------
+
+  Photon Shaders by SixthSurge
+
+  world0/composite1.vsh:
+  Calculate lighting colors and fog coefficients
+
+--------------------------------------------------------------------------------
+*/
+
 #include "/include/global.glsl"
 
-//--// Outputs //-------------------------------------------------------------//
+out vec2 uv;
 
-out vec2 coord;
+flat out vec3 lightCol;
+flat out vec3 skyCol;
 
-flat out vec3 directIrradiance;
-flat out vec3 skyIrradiance;
+uniform float sunAngle;
 
-//--// Uniforms //------------------------------------------------------------//
+uniform int worldTime;
 
-uniform sampler2D colortex4; // Sky capture, lighting color palette,
+uniform vec3 lightDir;
+uniform vec3 sunDir;
+uniform vec3 moonDir;
 
-//--// Functions //-----------------------------------------------------------//
+uniform float timeSunrise;
+uniform float timeNoon;
+uniform float timeSunset;
+uniform float timeMidnight;
+
+#define WORLD_OVERWORLD
+#include "/include/palette.glsl"
 
 void main() {
-	coord = gl_MultiTexCoord0.xy;
+	uv = gl_MultiTexCoord0.xy;
 
-	directIrradiance = texelFetch(colortex4, ivec2(255, 1), 0).rgb;
-	skyIrradiance    = texelFetch(colortex4, ivec2(255, 2), 0).rgb;
+	lightCol = getLightColor();
+	skyCol = getSkyColor();
 
-	gl_Position = vec4(gl_Vertex.xy * 2.0 - 1.0, 0.0, 1.0);
+	vec2 vertexPos = gl_Vertex.xy * taauRenderScale;
+	gl_Position = vec4(vertexPos * 2.0 - 1.0, 0.0, 1.0);
 }
