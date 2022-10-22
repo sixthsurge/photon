@@ -10,7 +10,7 @@ vec3 getSunIlluminance() {
 	const vec3 userSunTintSqrt = vec3(SUN_R, SUN_G, SUN_B) * SUN_I;
 	const vec3 userSunTint = userSunTintSqrt * userSunTintSqrt;
 
-	vec3 illuminance = 9.0 * baseSunCol * userSunTint;
+	vec3 illuminance = 8.5 * baseSunCol * userSunTint;
 
 	// Magic brightness adjustment, pretty much pre-exposing for the light source to
 	// compensate for the lack of auto exposure by default

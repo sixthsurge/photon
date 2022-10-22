@@ -25,24 +25,31 @@ float getBorderFog(vec3 scenePos, vec3 worldDir) {
 
 #include "atmosphere.glsl"
 
-vec3 getBorderFogColor(vec3 worldDir) {
-	vec3 sky0 = illuminance[0] * atmosphereScattering(worldDir, sunDir)
-	          + illuminance[1] * atmosphereScattering(worldDir, moonDir);
+vec3 getBorderFogColor(vec3 worldDir, float fog) {
+	vec3 fogCol = illuminance[0] * atmosphereScattering(worldDir, sunDir)
+	            + illuminance[1] * atmosphereScattering(worldDir, moonDir);
 
 	worldDir.y = min(worldDir.y, -0.1);
 	worldDir = normalize(worldDir);
 
-	vec3 sky1 = illuminance[0] * atmosphereScattering(worldDir, sunDir)
-	          + illuminance[1] * atmosphereScattering(worldDir, moonDir);
+#ifdef BORDER_FOG_HIDE_SUNSET_GRADIENT
+	vec3 fogColSunset = illuminance[0] * atmosphereScattering(worldDir, sunDir)
+	                  + illuminance[1] * atmosphereScattering(worldDir, moonDir);
 
-	return mix(sky0, sky1, timeSunset + timeSunrise);
+	float sunsetFactor = sqr(pulse(float(worldTime), 13000.0, 800.0, 24000.0))  // dusk
+	                   + sqr(pulse(float(worldTime), 23000.0, 800.0, 24000.0)); // dawn
+
+	return mix(fogCol, fogColSunset, sunsetFactor);
+#else
+	return fogCol;
+#endif
 }
 
 void getSimpleFog(inout vec3 fragColor, vec3 scenePos, vec3 worldDir) {
 	// Border fog
 
 	float fog = getBorderFog(scenePos, worldDir);
-	fragColor = mix(getBorderFogColor(worldDir), fragColor, fog);
+	fragColor = mix(getBorderFogColor(worldDir, fog), fragColor, fog);
 }
 
 //----------------------------------------------------------------------------//
