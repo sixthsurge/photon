@@ -15,6 +15,8 @@ struct CloudLayer {
 	float radius;
 	float thickness;
 	float frequency;
+	float detailStrength;
+	float curlStrength;
 	vec2 coverage;     // min/max
 	vec4 cloudType;    // stratus min/max, cumulus humilis min/max
 	vec2 randomOffset;
@@ -70,7 +72,7 @@ float cloudVolumeDensity(CloudLayer layer, vec3 pos, float altitudeFraction, uin
 	if (density < eps) return 0.0;
 
 	// Curl noise used to warp the 3D noise into swirling shapes
-	vec3 curl = 0.181 * texture(depthtex2, 0.002 * pos).xyz * smoothstep(0.4, 1.0, 1.0 - altitudeFraction);
+	vec3 curl = 0.181 * layer.curlStrength * texture(depthtex2, 0.002 * pos).xyz * smoothstep(0.4, 1.0, 1.0 - altitudeFraction);
 
 	// 3D worley noise for detail
 	const uint detailIterations = 2;
@@ -82,7 +84,7 @@ float cloudVolumeDensity(CloudLayer layer, vec3 pos, float altitudeFraction, uin
 		pos.xz += 1.2 * layer.wind;
 
 		float worley3D = texture(depthtex0, pos * detailFrequency + curl).x;
-		density -= sqr(worley3D) * detailAmplitude * dampen(clamp01(1.0 - density));
+		density -= sqr(worley3D) * detailAmplitude * layer.detailStrength * dampen(clamp01(1.0 - density));
 
 		detailAmplitude *= detailFade;
 		detailFrequency *= 6.0;
@@ -315,6 +317,8 @@ float cloudPlaneDensity(CloudLayer layer, vec2 coord, float altitudeFraction) {
 	          + 0.25 * curl2D(0.00004 * coord)
 			  + 0.125 * curl2D(0.00008 * coord);
 
+	curl *= layer.curlStrength;
+
 	float density = 0.0;
 	float heightShaping = 1.0 - abs(1.0 - 2.0 * altitudeFraction);
 
@@ -325,7 +329,7 @@ float cloudPlaneDensity(CloudLayer layer, vec2 coord, float altitudeFraction) {
 		              + 0.3 * texture(noisetex, 0.000008 * coord + 0.008 * curl).x;
 		      cirrus = linearStep(0.7 - layer.coverage.x, 1.0, cirrus);
 
-		float detailAmplitude = 0.2;
+		float detailAmplitude = 0.2 * layer.detailStrength;
 		float detailFrequency = 0.00002;
 		float curlStrength    = 0.1;
 
@@ -354,8 +358,8 @@ float cloudPlaneDensity(CloudLayer layer, vec2 coord, float altitudeFraction) {
 		      cirrocumulus = linearStep(1.0 - coverage, 1.0, cirrocumulus);
 
 		// detail
-		cirrocumulus -= 0.2 * texture(noisetex, coord * 0.00005 + 0.1 * curl).y;
-		cirrocumulus -= 0.1 * texture(noisetex, coord * 0.00010 + 0.4  * curl).y;
+		cirrocumulus -= 0.2 * texture(noisetex, coord * 0.00005 + 0.1 * curl).y * layer.detailStrength;
+		cirrocumulus -= 0.1 * texture(noisetex, coord * 0.00010 + 0.4  * curl).y * layer.detailStrength;
 
 		density += cube(max0(cirrocumulus)) * dampen(heightShaping);
 	}
@@ -517,15 +521,17 @@ vec4 renderClouds(
 	CloudLayer layer;
 
 #ifdef CLOUDS_LAYER0 // layer 0 (cumulus, cumulus humilis, stratocumulus, stratus)
-	layer.radius       = CLOUDS_LAYER0_ALTITUDE + planetRadius;
-	layer.thickness    = CLOUDS_LAYER0_THICKNESS;
-	layer.frequency    = CLOUDS_LAYER0_FREQUENCY;
-	layer.sigmaT       = cloudsLayer0Density(weather);
-	layer.sigmaS       = cloudsScatteringAlbedo * layer.sigmaT;
-	layer.coverage     = cloudsLayer0Coverage(weather);
-	layer.cloudType    = cloudsLayer0CloudType(weather);
-	layer.randomOffset = vec2(0.0);
-	layer.wind         = polar(CLOUDS_LAYER0_WIND_SPEED * cloudsTime, CLOUDS_LAYER0_WIND_ANGLE * degree);
+	layer.radius         = CLOUDS_LAYER0_ALTITUDE + planetRadius;
+	layer.thickness      = CLOUDS_LAYER0_THICKNESS;
+	layer.frequency      = CLOUDS_LAYER0_FREQUENCY;
+	layer.sigmaT         = cloudsLayer0Density(weather);
+	layer.sigmaS         = cloudsScatteringAlbedo * layer.sigmaT;
+	layer.coverage       = cloudsLayer0Coverage(weather);
+	layer.cloudType      = cloudsLayer0CloudType(weather);
+	layer.randomOffset   = vec2(0.0);
+	layer.wind           = polar(CLOUDS_LAYER0_WIND_SPEED * cloudsTime, CLOUDS_LAYER0_WIND_ANGLE * degree);
+	layer.detailStrength = CLOUDS_LAYER0_WISPINESS;
+	layer.curlStrength   = CLOUDS_LAYER0_SWIRLINESS;
 
 	result = renderCloudVolume(
 		layer,
@@ -544,15 +550,17 @@ vec4 renderClouds(
 #endif
 
 #ifdef CLOUDS_LAYER1 // layer 1 (altocumulus, altostratus)
-	layer.radius       = CLOUDS_LAYER1_ALTITUDE + planetRadius;
-	layer.thickness    = CLOUDS_LAYER1_THICKNESS;
-	layer.frequency    = CLOUDS_LAYER1_FREQUENCY;
-	layer.sigmaT       = CLOUDS_LAYER1_DENSITY * 0.1;
-	layer.sigmaS       = cloudsScatteringAlbedo * layer.sigmaT;
-	layer.coverage     = cloudsLayer1Coverage(weather);
-	layer.cloudType    = vec4(vec2(CLOUDS_LAYER1_STRATUS_AMOUNT), vec2(CLOUDS_LAYER1_CUMULUS_HUMILIS_AMOUNT));
-	layer.randomOffset = vec2(631210.0, 814172.0);
-	layer.wind         = polar(CLOUDS_LAYER1_WIND_SPEED * cloudsTime, CLOUDS_LAYER1_WIND_ANGLE * degree);
+	layer.radius         = CLOUDS_LAYER1_ALTITUDE + planetRadius;
+	layer.thickness      = CLOUDS_LAYER1_THICKNESS;
+	layer.frequency      = CLOUDS_LAYER1_FREQUENCY;
+	layer.sigmaT         = CLOUDS_LAYER1_DENSITY * 0.1;
+	layer.sigmaS         = cloudsScatteringAlbedo * layer.sigmaT;
+	layer.coverage       = cloudsLayer1Coverage(weather);
+	layer.cloudType      = vec4(vec2(CLOUDS_LAYER1_STRATUS_AMOUNT), vec2(CLOUDS_LAYER1_CUMULUS_HUMILIS_AMOUNT));
+	layer.randomOffset   = vec2(631210.0, 814172.0);
+	layer.wind           = polar(CLOUDS_LAYER1_WIND_SPEED * cloudsTime, CLOUDS_LAYER1_WIND_ANGLE * degree);
+	layer.detailStrength = CLOUDS_LAYER1_WISPINESS;
+	layer.curlStrength   = CLOUDS_LAYER1_SWIRLINESS;
 
 	resultTemp = renderCloudVolume(
 		layer,
@@ -580,14 +588,16 @@ vec4 renderClouds(
 	float cirrocumulusCoverage = cloudsCirrocumulusCoverage(weather);
 
 #ifdef CLOUDS_LAYER2 // layer 2 (cirrocumulus)
-	layer.radius       = CLOUDS_LAYER2_ALTITUDE + planetRadius;
-	layer.thickness    = CLOUDS_LAYER2_THICKNESS;
-	layer.frequency    = CLOUDS_LAYER2_FREQUENCY;
-	layer.sigmaT       = CLOUDS_LAYER2_DENSITY * 0.1;
-	layer.sigmaS       = CLOUDS_LAYER2_DENSITY * 0.1;
-	layer.cloudType    = vec4(vec2(CLOUDS_LAYER2_STRATUS_AMOUNT), vec2(CLOUDS_LAYER2_CUMULUS_HUMILIS_AMOUNT));
-	layer.randomOffset = vec2(-659843.0, 234920.0);
-	layer.wind         = polar(CLOUDS_LAYER2_WIND_SPEED * cloudsTime, CLOUDS_LAYER2_WIND_ANGLE * degree);
+	layer.radius         = CLOUDS_LAYER2_ALTITUDE + planetRadius;
+	layer.thickness      = CLOUDS_LAYER2_THICKNESS;
+	layer.frequency      = CLOUDS_LAYER2_FREQUENCY;
+	layer.sigmaT         = CLOUDS_LAYER2_DENSITY * 0.1;
+	layer.sigmaS         = CLOUDS_LAYER2_DENSITY * 0.1;
+	layer.cloudType      = vec4(vec2(CLOUDS_LAYER2_STRATUS_AMOUNT), vec2(CLOUDS_LAYER2_CUMULUS_HUMILIS_AMOUNT));
+	layer.randomOffset   = vec2(-659843.0, 234920.0);
+	layer.wind           = polar(CLOUDS_LAYER2_WIND_SPEED * cloudsTime, CLOUDS_LAYER2_WIND_ANGLE * degree);
+	layer.detailStrength = CLOUDS_LAYER2_WISPINESS;
+	layer.curlStrength   = CLOUDS_LAYER2_SWIRLINESS;
 
 #if CLOUDS_LAYER2_MODE == CLOUDS_MODE_PLANAR
 	layer.coverage.x = CLOUDS_LAYER2_COVERAGE * CLOUDS_LAYER2_CIRRUS_AMOUNT * mix(1.0, cirrusCoverage, CLOUDS_LAYER2_WEATHER_INFLUENCE);
@@ -629,15 +639,18 @@ vec4 renderClouds(
 #endif
 
 #ifdef CLOUDS_LAYER3 // layer 3 (cirrus)
-	layer.radius       = CLOUDS_LAYER3_ALTITUDE + planetRadius;
-	layer.thickness    = CLOUDS_LAYER3_THICKNESS;
-	layer.frequency    = CLOUDS_LAYER3_FREQUENCY;
-	layer.sigmaT       = CLOUDS_LAYER3_DENSITY * 0.1;
-	layer.sigmaS       = CLOUDS_LAYER3_DENSITY * 0.1;
-	layer.cloudType    = vec4(vec2(CLOUDS_LAYER3_STRATUS_AMOUNT), vec2(CLOUDS_LAYER3_CUMULUS_HUMILIS_AMOUNT));
-	layer.coverage     = vec2(CLOUDS_LAYER3_COVERAGE);
-	layer.randomOffset = vec2(-979530.0, -122390.0);
-	layer.wind         = polar(CLOUDS_LAYER3_WIND_SPEED * cloudsTime, CLOUDS_LAYER3_WIND_ANGLE * degree);
+	layer.radius         = CLOUDS_LAYER3_ALTITUDE + planetRadius;
+	layer.thickness      = CLOUDS_LAYER3_THICKNESS;
+	layer.frequency      = CLOUDS_LAYER3_FREQUENCY;
+	layer.sigmaT         = CLOUDS_LAYER3_DENSITY * 0.1;
+	layer.sigmaS         = CLOUDS_LAYER3_DENSITY * 0.1;
+	layer.cloudType      = vec4(vec2(CLOUDS_LAYER3_STRATUS_AMOUNT), vec2(CLOUDS_LAYER3_CUMULUS_HUMILIS_AMOUNT));
+	layer.coverage       = vec2(CLOUDS_LAYER3_COVERAGE);
+	layer.randomOffset   = vec2(-979530.0, -122390.0);
+	layer.wind           = polar(CLOUDS_LAYER3_WIND_SPEED * cloudsTime, CLOUDS_LAYER3_WIND_ANGLE * degree);
+	layer.detailStrength = CLOUDS_LAYER2_WISPINESS;
+	layer.curlStrength   = CLOUDS_LAYER2_SWIRLINESS;
+
 
 #if CLOUDS_LAYER3_MODE == CLOUDS_MODE_PLANAR
 	layer.coverage.x = CLOUDS_LAYER3_COVERAGE * CLOUDS_LAYER3_CIRRUS_AMOUNT * mix(1.0, cirrusCoverage, CLOUDS_LAYER3_WEATHER_INFLUENCE);
@@ -732,15 +745,17 @@ float getCloudShadows(vec3 rayOrigin, vec3 rayDir) {
 	CloudLayer layer;
 
 #if defined CLOUDS_LAYER0 && defined CLOUDS_LAYER0_SHADOW // layer 0 (cumulus, cumulus humilis, stratocumulus, stratus)
-	layer.radius       = CLOUDS_LAYER0_ALTITUDE + planetRadius;
-	layer.thickness    = CLOUDS_LAYER0_THICKNESS;
-	layer.frequency    = CLOUDS_LAYER0_FREQUENCY;
-	layer.sigmaT       = cloudsLayer0Density(weather);
-	layer.sigmaS       = 0.0;
-	layer.coverage     = cloudsLayer0Coverage(weather);
-	layer.cloudType    = cloudsLayer0CloudType(weather);
-	layer.randomOffset = vec2(0.0);
-	layer.wind         = polar(CLOUDS_LAYER0_WIND_SPEED * cloudsTime, CLOUDS_LAYER0_WIND_ANGLE * degree);
+	layer.radius         = CLOUDS_LAYER0_ALTITUDE + planetRadius;
+	layer.thickness      = CLOUDS_LAYER0_THICKNESS;
+	layer.frequency      = CLOUDS_LAYER0_FREQUENCY;
+	layer.sigmaT         = cloudsLayer0Density(weather);
+	layer.sigmaS         = 0.0;
+	layer.coverage       = cloudsLayer0Coverage(weather);
+	layer.cloudType      = cloudsLayer0CloudType(weather);
+	layer.randomOffset   = vec2(0.0);
+	layer.wind           = polar(CLOUDS_LAYER0_WIND_SPEED * cloudsTime, CLOUDS_LAYER0_WIND_ANGLE * degree);
+	layer.detailStrength = CLOUDS_LAYER0_WISPINESS;
+	layer.curlStrength   = CLOUDS_LAYER0_SWIRLINESS;
 
 	result = cloudVolumeShadow(layer, rayOrigin, rayDir);
 
@@ -748,15 +763,17 @@ float getCloudShadows(vec3 rayOrigin, vec3 rayDir) {
 #endif
 
 #if defined CLOUDS_LAYER1 && defined CLOUDS_LAYER1_SHADOW // layer 1 (altocumulus, altostratus)
-	layer.radius       = CLOUDS_LAYER1_ALTITUDE + planetRadius;
-	layer.thickness    = CLOUDS_LAYER1_THICKNESS;
-	layer.frequency    = CLOUDS_LAYER1_FREQUENCY;
-	layer.sigmaT       = CLOUDS_LAYER1_DENSITY * 0.1;
-	layer.sigmaS       = 0.0;
-	layer.coverage     = cloudsLayer1Coverage(weather);
-	layer.cloudType    = vec4(vec2(CLOUDS_LAYER1_STRATUS_AMOUNT), vec2(CLOUDS_LAYER1_CUMULUS_HUMILIS_AMOUNT));
-	layer.randomOffset = vec2(631210.0, 814172.0);
-	layer.wind         = polar(CLOUDS_LAYER1_WIND_SPEED * cloudsTime, CLOUDS_LAYER1_WIND_ANGLE * degree);
+	layer.radius         = CLOUDS_LAYER1_ALTITUDE + planetRadius;
+	layer.thickness      = CLOUDS_LAYER1_THICKNESS;
+	layer.frequency      = CLOUDS_LAYER1_FREQUENCY;
+	layer.sigmaT         = CLOUDS_LAYER1_DENSITY * 0.1;
+	layer.sigmaS         = 0.0;
+	layer.coverage       = cloudsLayer1Coverage(weather);
+	layer.cloudType      = vec4(vec2(CLOUDS_LAYER1_STRATUS_AMOUNT), vec2(CLOUDS_LAYER1_CUMULUS_HUMILIS_AMOUNT));
+	layer.randomOffset   = vec2(631210.0, 814172.0);
+	layer.wind           = polar(CLOUDS_LAYER1_WIND_SPEED * cloudsTime, CLOUDS_LAYER1_WIND_ANGLE * degree);
+	layer.detailStrength = CLOUDS_LAYER1_WISPINESS;
+	layer.curlStrength   = CLOUDS_LAYER1_SWIRLINESS;
 
 	result *= cloudVolumeShadow(layer, rayOrigin, rayDir);
 
@@ -777,6 +794,8 @@ float getCloudShadows(vec3 rayOrigin, vec3 rayDir) {
 	layer.cloudType    = vec4(vec2(CLOUDS_LAYER2_STRATUS_AMOUNT), vec2(CLOUDS_LAYER2_CUMULUS_HUMILIS_AMOUNT));
 	layer.randomOffset = vec2(-659843.0, 234920.0);
 	layer.wind         = polar(CLOUDS_LAYER2_WIND_SPEED * cloudsTime, CLOUDS_LAYER2_WIND_ANGLE * degree);
+	layer.detailStrength = CLOUDS_LAYER2_WISPINESS;
+	layer.curlStrength   = CLOUDS_LAYER2_SWIRLINESS;
 
 #if CLOUDS_LAYER2_MODE == CLOUDS_MODE_PLANAR
 	layer.coverage.x = CLOUDS_LAYER2_COVERAGE * CLOUDS_LAYER2_CIRRUS_AMOUNT * mix(1.0, cirrusCoverage, CLOUDS_LAYER2_WEATHER_INFLUENCE);
@@ -784,7 +803,7 @@ float getCloudShadows(vec3 rayOrigin, vec3 rayDir) {
 
 	result *= cloudPlaneShadow(layer, rayOrigin, rayDir);
 #else
-	layer.coverage = vec2(CLOUDS_LAYER2_COVERAGE) * mix(1.0, cirrocumulusCoverage, CLOUDS_LAYER2_WEATHER_INFLUENCE);
+	layer.coverage       = vec2(CLOUDS_LAYER2_COVERAGE) * mix(1.0, cirrocumulusCoverage, CLOUDS_LAYER2_WEATHER_INFLUENCE);
 
 	result *= cloudVolumeShadow(layer, rayOrigin, rayDir);
 #endif
@@ -802,6 +821,8 @@ float getCloudShadows(vec3 rayOrigin, vec3 rayDir) {
 	layer.coverage     = vec2(CLOUDS_LAYER3_COVERAGE);
 	layer.randomOffset = vec2(-979530.0, -122390.0);
 	layer.wind         = polar(CLOUDS_LAYER3_WIND_SPEED * cloudsTime, CLOUDS_LAYER3_WIND_ANGLE * degree);
+	layer.detailStrength = CLOUDS_LAYER3_WISPINESS;
+	layer.curlStrength   = CLOUDS_LAYER3_SWIRLINESS;
 
 #if CLOUDS_LAYER3_MODE == CLOUDS_MODE_PLANAR
 	layer.coverage.x = CLOUDS_LAYER3_COVERAGE * CLOUDS_LAYER3_CIRRUS_AMOUNT * mix(1.0, cirrusCoverage, CLOUDS_LAYER3_WEATHER_INFLUENCE);
@@ -809,7 +830,7 @@ float getCloudShadows(vec3 rayOrigin, vec3 rayDir) {
 
 	result *= cloudPlaneShadow(layer, rayOrigin, rayDir);
 #else
-	layer.coverage = vec2(CLOUDS_LAYER3_COVERAGE) * mix(1.0, cirrocumulusCoverage, CLOUDS_LAYER3_WEATHER_INFLUENCE);
+	layer.coverage       = vec2(CLOUDS_LAYER3_COVERAGE) * mix(1.0, cirrocumulusCoverage, CLOUDS_LAYER3_WEATHER_INFLUENCE);
 
 	result *= cloudVolumeShadow(layer, rayOrigin, rayDir);
 #endif
