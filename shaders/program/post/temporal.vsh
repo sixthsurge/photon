@@ -31,7 +31,7 @@ uniform float screenBrightness;
 
 #include "/include/utility/color.glsl"
 
-#define getExposureFromEv100(ev100) exp2(-(ev100)) / 1.2
+#define getExposureFromEv100(ev100) exp2(-(ev100))
 #define getExposureFromLuminance(l) calibration / (l)
 #define getLuminanceFromExposure(e) calibration / (e)
 

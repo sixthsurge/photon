@@ -289,12 +289,10 @@ void main() {
 	result = texelFetch(colortex0, texel, 0);
 #endif
 
-#if AUTO_EXPOSURE != AUTO_EXPOSURE_OFF
 	// Store exposure in the alpha component of the bottom left texel of the history buffer
 	if (texel == ivec2(0)) result.a = exposure;
 
 #if AUTO_EXPOSURE == AUTO_EXPOSURE_HISTOGRAM && DEBUG_VIEW == DEBUG_VIEW_HISTOGRAM
 	drawHistogram(texel);
-#endif
 #endif
 }

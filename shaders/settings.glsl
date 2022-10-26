@@ -20,7 +20,7 @@ const float sunPathRotation         = -25.0; // [-50.0 -45.0 -40.0 -35.0 -30.0 -
 
 // ---- world ---- //
 
-  #define SEA_LEVEL 63.0
+  #define SEA_LEVEL 5.0
 
 // ---- lighting ---- //
 
@@ -170,10 +170,10 @@ const float sunPathRotation         = -25.0; // [-50.0 -45.0 -40.0 -35.0 -30.0 -
   #define AUTO_EXPOSURE_SIMPLE 1
   #define AUTO_EXPOSURE_HISTOGRAM 2
 
-  #define AUTO_EXPOSURE AUTO_EXPOSURE_OFF // [AUTO_EXPOSURE_OFF AUTO_EXPOSURE_SIMPLE AUTO_EXPOSURE_HISTOGRAM]
-  #define AUTO_EXPOSURE_BIAS 0.0 // [-2.0 -1.5 -1.0 -0.5 0.0 0.5 1.0 1.5 2.0]
-  #define AUTO_EXPOSURE_MIN 0.0 // [-6.0 -5.0 -4.0 -3.0 -2.0 -1.0 0.0 1.0 2.0 3.0 4.0 5.0 6.0 7.0 8.0 9.0 10.0 11.0 12.0 13.0 14.0 15.0 16.0 17.0]
-  #define AUTO_EXPOSURE_MAX 1.0 // [-6.0 -5.0 -4.0 -3.0 -2.0 -1.0 0.0 1.0 2.0 3.0 4.0 5.0 6.0 7.0 8.0 9.0 10.0 11.0 12.0 13.0 14.0 15.0 16.0 17.0]
+  #define AUTO_EXPOSURE AUTO_EXPOSURE_SIMPLE // [AUTO_EXPOSURE_OFF AUTO_EXPOSURE_SIMPLE AUTO_EXPOSURE_HISTOGRAM]
+  #define AUTO_EXPOSURE_BIAS 0.0 // [-2.0 -1.9 -1.8 -1.7 -1.6 -1.5 -1.4 -1.3 -1.2 -1.1 -1.0 -0.9 -0.8 -0.7 -0.6 -0.5 -0.4 -0.3 -0.2 -0.1 0.0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0 1.1 1.2 1.3 1.4 1.5 1.6 1.7 1.8 1.9 2.0]
+  #define AUTO_EXPOSURE_MIN -1.0 // [-2.0 -1.9 -1.8 -1.7 -1.6 -1.5 -1.4 -1.3 -1.2 -1.1 -1.0 -0.9 -0.8 -0.7 -0.6 -0.5 -0.4 -0.3 -0.2 -0.1 0.0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0 1.1 1.2 1.3 1.4 1.5 1.6 1.7 1.8 1.9 2.0]
+  #define AUTO_EXPOSURE_MAX 0.0 // [-2.0 -1.9 -1.8 -1.7 -1.6 -1.5 -1.4 -1.3 -1.2 -1.1 -1.0 -0.9 -0.8 -0.7 -0.6 -0.5 -0.4 -0.3 -0.2 -0.1 0.0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0 1.1 1.2 1.3 1.4 1.5 1.6 1.7 1.8 1.9 2.0]
   #define AUTO_EXPOSURE_RATE_DIM_TO_BRIGHT 2.0 // [0.5 1.0 1.5 2.0 2.5 3.0 3.5 4.0 4.5 5.0 5.5 6.0]
   #define AUTO_EXPOSURE_RATE_BRIGHT_TO_DIM 1.0 // [0.5 1.0 1.5 2.0 2.5 3.0 3.5 4.0 4.5 5.0 5.5 6.0]
 

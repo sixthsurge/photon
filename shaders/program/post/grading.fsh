@@ -227,10 +227,14 @@ void main() {
 
 	fragColor = texelFetch(colortex5, texel, 0).rgb;
 
+	float exposure = texelFetch(colortex5, ivec2(0), 0).a;
+
 #ifdef BLOOM
 	vec3 fogBloom;
 	vec3 bloom = getBloom(fogBloom);
 #endif
+
+	fragColor *= exposure;
 
 #ifdef VIGNETTE
 	fragColor *= vignette(uv);
