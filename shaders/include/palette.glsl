@@ -5,34 +5,43 @@
 #if   defined WORLD_OVERWORLD
 
 #include "atmosphere.glsl"
+#include "utility/color.glsl"
 
-vec3 getSunIlluminance() {
-	const vec3 userSunTintSqrt = vec3(SUN_R, SUN_G, SUN_B) * SUN_I;
-	const vec3 userSunTint = userSunTintSqrt * userSunTintSqrt;
+// Magic brightness adjustments, pre-exposing for the light source to compensate
+// for the lack of auto exposure by default
+float getSunBrightness() {
+	const float baseSunBrightness = 8.4;
+	const float userSunBrightness = SUN_I;
 
-	vec3 illuminance = 8.5 * baseSunCol * userSunTint;
-
-	// Magic brightness adjustment, pretty much pre-exposing for the light source to
-	// compensate for the lack of auto exposure by default
 	float blueHour = cube(pulse(float(worldTime), 13200.0, 800.0, 24000.0))  // dusk
 	               + cube(pulse(float(worldTime), 22800.0, 800.0, 24000.0)); // dawn
 
-	illuminance *= 1.0 + 44.0 * blueHour;
+	float blueHourMul = 1.0 + 44.0 * blueHour;
 
-	// Nice purpley tint during the blue hour
-	const vec3 purpleTint = vec3(1.0, 0.85, 0.95);
-	illuminance *= (1.0 - blueHour) + blueHour * purpleTint;
-
-	return illuminance;
+	return baseSunBrightness * userSunBrightness * blueHourMul;
+}
+float getMoonBrightness() {
+	return 0.0;
 }
 
-vec3 getMoonIlluminance() {
-	return vec3(0.05);
+vec3 getSunTint() {
+	const vec3 userSunTint = toRec2020(vec3(SUN_R, SUN_G, SUN_B));
+
+	float blueHour = cube(pulse(float(worldTime), 13200.0, 800.0, 24000.0))  // dusk
+	               + cube(pulse(float(worldTime), 22800.0, 800.0, 24000.0)); // dawn
+
+	const vec3 purple = vec3(1.0, 0.85, 0.95);
+	vec3 blueHourTint = (1.0 - blueHour) + blueHour * purple;
+
+	return blueHourTint * userSunTint;
+}
+vec3 getMoonTint() {
+	return vec3(1.0);
 }
 
 vec3 getLightColor() {
-	vec3 lightCol  = mix(getSunIlluminance(), getMoonIlluminance(), step(0.5, sunAngle));
-	     lightCol *= atmosphereTransmittance(airViewerPos, lightDir);
+	vec3 lightCol  = mix(getSunBrightness() * getSunTint(), getMoonBrightness() * getMoonTint(), step(0.5, sunAngle));
+	     lightCol *= atmosphereSunColor(lightDir.y, planetRadius);
 	     lightCol *= clamp01(rcp(0.02) * lightDir.y); // fade away during day/night transition
 
 	return lightCol;

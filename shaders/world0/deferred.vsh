@@ -27,8 +27,8 @@ uniform float timeMidnight;
 void main() {
 	uv = gl_MultiTexCoord0.xy;
 
-	illuminance[0] = getSunIlluminance();
-	illuminance[1] = getMoonIlluminance();
+	illuminance[0] = getSunBrightness() * getSunTint();
+	illuminance[1] = getMoonBrightness() * getMoonTint();
 
 	gl_Position = vec4(gl_Vertex.xy * 2.0 - 1.0, 0.0, 1.0);
 }

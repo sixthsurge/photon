@@ -21,6 +21,8 @@ flat out mat2x3 illuminance;
 
 uniform sampler2D colortex4; // Sky capture
 
+uniform sampler2D depthtex2; // Atmospheric sun color LUT
+
 uniform float sunAngle;
 
 uniform int worldTime;
@@ -36,6 +38,7 @@ uniform float timeNoon;
 uniform float timeSunset;
 uniform float timeMidnight;
 
+#define ATMOSPHERE_SUN_COLOR_LUT depthtex2
 #define WORLD_OVERWORLD
 
 #include "/include/utility/random.glsl"
@@ -48,8 +51,8 @@ uniform float timeMidnight;
 void main() {
 	uv = gl_MultiTexCoord0.xy;
 
-	illuminance[0] = getSunIlluminance();
-	illuminance[1] = getMoonIlluminance();
+	illuminance[0] = getSunBrightness() * getSunTint();
+	illuminance[1] = getMoonBrightness() * getMoonTint();
 
 	lightCol = getLightColor();
 
