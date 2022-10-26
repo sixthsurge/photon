@@ -25,6 +25,8 @@ float getBorderFog(vec3 scenePos, vec3 worldDir) {
 
 #include "atmosphere.glsl"
 
+const vec3 caveFogCol = toRec2020(vec3(1.0)) * 0.0;
+
 vec3 getBorderFogColor(vec3 worldDir, float fog) {
 	vec3 fogCol = illuminance[0] * atmosphereScattering(worldDir, sunDir)
 	            + illuminance[1] * atmosphereScattering(worldDir, moonDir);
@@ -39,10 +41,10 @@ vec3 getBorderFogColor(vec3 worldDir, float fog) {
 	float sunsetFactor = sqr(pulse(float(worldTime), 13000.0, 800.0, 24000.0))  // dusk
 	                   + sqr(pulse(float(worldTime), 23000.0, 800.0, 24000.0)); // dawn
 
-	return mix(fogCol, fogColSunset, sunsetFactor);
-#else
-	return fogCol;
+	fogCol = mix(fogCol, fogColSunset, sunsetFactor);
 #endif
+
+	return mix(fogCol, caveFogCol, biomeCave);
 }
 
 void getSimpleFog(inout vec3 fragColor, vec3 scenePos, vec3 worldDir) {

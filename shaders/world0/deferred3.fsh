@@ -61,10 +61,11 @@ uniform vec3 previousCameraPosition;
 uniform float near;
 uniform float far;
 
+uniform int worldTime;
 uniform float sunAngle;
 
-uniform int worldTime;
 uniform int frameCounter;
+uniform float frameTimeCounter;
 
 uniform vec3 lightDir;
 uniform vec3 sunDir;
@@ -84,8 +85,6 @@ uniform float timeMidnight;
 #define ATMOSPHERE_SCATTERING_LUT depthtex0
 #define TEMPORAL_REPROJECTION
 #define WORLD_OVERWORLD
-
-#include "/include/aces/matrices.glsl"
 
 #include "/include/utility/color.glsl"
 #include "/include/utility/encoding.glsl"

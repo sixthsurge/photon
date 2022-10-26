@@ -1,6 +1,6 @@
 // Settings
 
-#include "/settings.glsl"
+#include "/include/config.glsl"
 
 #if MC_VERSION < 11700
 	#define gtexture gcolor

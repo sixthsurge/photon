@@ -10,43 +10,59 @@
 
 // Stars based on https://www.shadertoy.com/view/Md2SR3
 
-vec3 unstableStarField(vec2 coord) {
-	const float threshold = 1.0 - 0.01 * STARS_COVERAGE;
+vec3 unstableStarField(vec2 coord, float starThreshold) {
 	const float minTemp = 3500.0;
 	const float maxTemp = 9500.0;
 
-	vec2 noise = hash2(coord);
+	vec4 noise = hash4(coord);
 
-	float star = linearStep(threshold, 1.0, noise.x);
+	float star = linearStep(starThreshold, 1.0, noise.x);
 	      star = pow4(star) * STARS_INTENSITY;
 
 	float temp = mix(minTemp, maxTemp, noise.y);
 	vec3 color = blackbody(temp);
+
+	const float twinkleSpeed = 2.0;
+	float twinkleAmount = noise.z;
+	float twinkleOffset = tau * noise.w;
+	star *= 1.0 - twinkleAmount * cos(frameTimeCounter * twinkleSpeed + twinkleOffset);
 
 	return star * color;
 }
 
 // Stabilizes the star field by sampling at the four neighboring integer coordinates and
 // interpolating
-vec3 stableStarField(vec2 coord) {
+vec3 stableStarField(vec2 coord, float starThreshold) {
 	coord = abs(coord) + 33.3 * step(0.0, coord);
 	vec2 i, f = modf(coord, i);
 
 	f.x = cubicSmooth(f.x);
 	f.y = cubicSmooth(f.y);
 
-	return unstableStarField(i + vec2(0.0, 0.0)) * (1.0 - f.x) * (1.0 - f.y)
-	     + unstableStarField(i + vec2(1.0, 0.0)) * f.x * (1.0 - f.y)
-	     + unstableStarField(i + vec2(0.0, 1.0)) * f.y * (1.0 - f.x)
-	     + unstableStarField(i + vec2(1.0, 1.0)) * f.x * f.y;
+	return unstableStarField(i + vec2(0.0, 0.0), starThreshold) * (1.0 - f.x) * (1.0 - f.y)
+	     + unstableStarField(i + vec2(1.0, 0.0), starThreshold) * f.x * (1.0 - f.y)
+	     + unstableStarField(i + vec2(0.0, 1.0), starThreshold) * f.y * (1.0 - f.x)
+	     + unstableStarField(i + vec2(1.0, 1.0), starThreshold) * f.x * f.y;
 }
 
 vec3 drawStars(vec3 rayDir) {
+#ifdef SHADOW
+	// Trick to make stars rotate with sun and moon
+	mat3 rot = (sunAngle < 0.5)
+		? mat3(shadowModelViewInverse)
+		: mat3(-shadowModelViewInverse[0].xyz, shadowModelViewInverse[1].xyz, -shadowModelViewInverse[2].xyz);
+
+	rayDir *= rot;
+#endif
+
+	// Adjust star threshold so that brightest stars appear first
+	float starThreshold = 1.0 - 0.008 * STARS_COVERAGE * smoothstep(-0.05, 0.1, -sunDir.y);
+
 	// Project ray direction onto the plane
 	vec2 coord  = rayDir.xy * rcp(abs(rayDir.z) + length(rayDir.xy)) + 41.21 * sign(rayDir.z);
 	     coord *= 600.0;
 
-	return stableStarField(coord) * (1.0 - timeNoon);
+	return stableStarField(coord, starThreshold);
 }
 
 vec3 renderSky(vec3 rayDir) {

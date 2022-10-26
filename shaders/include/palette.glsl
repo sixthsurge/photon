@@ -21,7 +21,10 @@ float getSunBrightness() {
 	return baseSunBrightness * userSunBrightness * blueHourMul;
 }
 float getMoonBrightness() {
-	return 0.0;
+	const float baseMoonBrightness = 0.3;
+	const float userMoonBrightness = MOON_I;
+
+	return baseMoonBrightness * userMoonBrightness;
 }
 
 vec3 getSunTint() {
@@ -66,7 +69,9 @@ vec3 getSkyColor() {
 }
 
 float getSkylightBoost() {
-	return 1.0;
+	float nightSkylightBoost = 4.0 * (1.0 - smoothstep(-0.1, -0.05, sunDir.y));
+
+	return 1.0 + nightSkylightBoost;
 }
 
 //----------------------------------------------------------------------------//

@@ -214,7 +214,7 @@ vec3 tonemapReinhardJodie(vec3 rgb) {
 
 float vignette(vec2 uv) {
     const float vignetteSize = 16.0;
-    const float vignetteIntensity = 0.1 * VIGNETTE_INTENSITY;
+    const float vignetteIntensity = 0.08 * VIGNETTE_INTENSITY;
 
     float vignette = vignetteSize * (uv.x * uv.y - uv.x) * (uv.x * uv.y - uv.y);
           vignette = pow(vignette, vignetteIntensity + 0.15 * biomeCave + 0.3 * blindness);

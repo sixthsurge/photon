@@ -50,10 +50,11 @@ uniform sampler3D depthtex0; // Atmosphere scattering LUT
 uniform mat4 shadowModelViewInverse;
 #endif
 
+uniform int worldTime;
 uniform float sunAngle;
 
-uniform int worldTime;
 uniform int frameCounter;
+uniform float frameTimeCounter;
 
 uniform vec3 lightDir;
 uniform vec3 sunDir;

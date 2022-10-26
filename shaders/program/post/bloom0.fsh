@@ -29,10 +29,6 @@ const bool colortex5MipmapEnabled = true;
 
 const vec4 binomialWeights7 = vec4(0.3125, 0.234375, 0.09375, 0.015625);
 
-vec3 bloomContrast(vec3 color) {
-	return color * sqr(getLuminance(color));
-}
-
 void main() {
 	float tileIndex = ceil(-log2(uv.x));
 	float tileScale = exp2(tileIndex);
@@ -54,7 +50,7 @@ void main() {
 
 		vec2 sampleCoord = clamp01(windowCoord + vec2(x * pixelSize, 0.0));
 
-		bloomTile += bloomContrast(texture(colortex5, sampleCoord).rgb) * weight;
+		bloomTile += texture(colortex5, sampleCoord).rgb * weight;
 	}
 }
 

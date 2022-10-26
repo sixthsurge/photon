@@ -142,7 +142,7 @@ vec3 atmosphereScatteringUv(float nu, float mu, float muS) {
 
 vec3 atmosphereScattering(float nu, float mu, float muS) {
 #ifndef SKY_GROUND
-	float horizonMu = mix(-0.01, 0.02, smoothstep(-0.05, 0.2, muS));
+	float horizonMu = mix(-0.01, 0.03, smoothstep(-0.05, 0.2, muS));
 	mu = max(mu, horizonMu);
 #endif
 
