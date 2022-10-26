@@ -87,6 +87,7 @@ option.CLOUDS_LAYER0_CUMULUS_HUMILIS_AMOUNT = Cumulus Humilis Amount
 option.CLOUDS_LAYER0_WIND_SPEED        = Wind Speed
 option.CLOUDS_LAYER0_WIND_ANGLE        = Wind Angle
 option.CLOUDS_LAYER0_WEATHER_INFLUENCE = Weather Influence
+option.CLOUDS_LAYER0_LOCAL_COVERAGE_VARIATION = Local Coverage Variation
 
 suffix.CLOUDS_LAYER0_ALTITUDE          = m
 suffix.CLOUDS_LAYER0_THICKNESS         = m
@@ -111,6 +112,7 @@ option.CLOUDS_LAYER1_CUMULUS_HUMILIS_AMOUNT = Cumulus Humilis Amount
 option.CLOUDS_LAYER1_WIND_SPEED        = Wind Speed
 option.CLOUDS_LAYER1_WIND_ANGLE        = Wind Angle
 option.CLOUDS_LAYER1_WEATHER_INFLUENCE = Weather Influence
+option.CLOUDS_LAYER1_LOCAL_COVERAGE_VARIATION = Local Coverage Variation
 
 suffix.CLOUDS_LAYER1_ALTITUDE          = m
 suffix.CLOUDS_LAYER1_THICKNESS         = m

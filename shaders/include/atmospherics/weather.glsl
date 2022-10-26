@@ -56,7 +56,7 @@ vec3 getWeather() {
 // higher humidity -> higher coverage
 // very high temperature -> lower coverage
 vec2 cloudsLayer0Coverage(vec3 weather) {
-	const vec2 localVariation = vec2(-0.2, 0.16);
+	const vec2 localVariation = vec2(-0.2, 0.16) * CLOUDS_LAYER0_LOCAL_COVERAGE_VARIATION;
 
 	float temperatureWeight = 1.0 + 0.4 * (1.0 - linearStep(0.0, 0.21, weather.x));
 	float humidityWeight    = 0.2 + 0.8 * sqrt(max0(weather.y));
@@ -92,7 +92,7 @@ float cloudsLayer0Density(vec3 weather) {
 // high humidity -> high coverage
 // medium-high temperature -> high coverage
 vec2 cloudsLayer1Coverage(vec3 weather) {
-	const vec2 localVariation = vec2(-0.08, 0.08);
+	const vec2 localVariation = vec2(-0.08, 0.08) * CLOUDS_LAYER1_LOCAL_COVERAGE_VARIATION;
 
 	float temperatureWeight = 0.4 + 0.6 * linearStep(0.4, 0.63, weather.x) * (1.0 - 0.25 * linearStep(0.81, 1.0, weather.x));
 	float humidityWeight    = linearStep(0.4, 0.6, weather.y);
