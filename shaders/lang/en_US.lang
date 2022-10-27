@@ -140,6 +140,7 @@ option.CLOUDS_LAYER2_CUMULUS_HUMILIS_AMOUNT = Cumulus Humilis Amount (Vol.)
 option.CLOUDS_LAYER2_WIND_SPEED        = Wind Speed
 option.CLOUDS_LAYER2_WIND_ANGLE        = Wind Angle
 option.CLOUDS_LAYER2_WEATHER_INFLUENCE = Weather Influence
+option.CLOUDS_LAYER2_LOCAL_COVERAGE_VARIATION = Local Coverage Variation
 
 value.CLOUDS_LAYER2_MODE.CLOUDS_MODE_VOLUMETRIC = Volumetric
 value.CLOUDS_LAYER2_MODE.CLOUDS_MODE_PLANAR = Planar

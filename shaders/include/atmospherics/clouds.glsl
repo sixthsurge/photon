@@ -615,7 +615,8 @@ vec4 renderClouds(
 		CLOUDS_LAYER2_LIGHTING_STEPS
 	);
 #else
-	layer.coverage = vec2(CLOUDS_LAYER2_COVERAGE) * mix(1.0, cirrocumulusCoverage, CLOUDS_LAYER2_WEATHER_INFLUENCE);
+	layer.coverage  = vec2(CLOUDS_LAYER2_COVERAGE) * mix(1.0, cirrocumulusCoverage, CLOUDS_LAYER2_WEATHER_INFLUENCE);
+	layer.coverage += vec2(-0.2, 0.2) * CLOUDS_LAYER2_LOCAL_COVERAGE_VARIATION;
 
 	resultTemp = renderCloudVolume(
 		layer,
@@ -803,7 +804,9 @@ float getCloudShadows(vec3 rayOrigin, vec3 rayDir) {
 
 	result *= cloudPlaneShadow(layer, rayOrigin, rayDir);
 #else
-	layer.coverage       = vec2(CLOUDS_LAYER2_COVERAGE) * mix(1.0, cirrocumulusCoverage, CLOUDS_LAYER2_WEATHER_INFLUENCE);
+	layer.coverage  = vec2(CLOUDS_LAYER2_COVERAGE) * mix(1.0, cirrocumulusCoverage, CLOUDS_LAYER2_WEATHER_INFLUENCE);
+	layer.coverage += vec2(-0.2, 0.2) * CLOUDS_LAYER2_LOCAL_COVERAGE_VARIATION;
+	layer.coverage  = clamp01(layer.coverage);
 
 	result *= cloudVolumeShadow(layer, rayOrigin, rayDir);
 #endif
