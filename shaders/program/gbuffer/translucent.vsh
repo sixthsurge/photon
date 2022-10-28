@@ -58,17 +58,11 @@ uniform vec2 taaOffset;
 
 void main() {
 	texCoord = gl_MultiTexCoord0.xy;
-	lmCoord  = gl_MultiTexCoord1.xy * rcp(240.0);
+	lmCoord  = clamp01(gl_MultiTexCoord1.xy * rcp(240.0));
 	tint     = gl_Color;
 	blockId  = uint(max0(mc_Entity.x - 10000.0));
 
-#ifdef PROGRAM_GBUFFERS_CLOUDS
-	lmCoord = vec2(0.0, 1.0);
-#endif
-
 #ifdef PROGRAM_GBUFFERS_TEXTURED_LIT
-	lmCoord = vec2(1.0);
-
 #ifdef HIDE_WORLD_BORDER
 	if (renderStage == MC_RENDER_STAGE_WORLD_BORDER) { gl_Position = vec4(-1.0); return; }
 #endif
