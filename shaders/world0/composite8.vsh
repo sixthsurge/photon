@@ -1,2 +1,4 @@
 #version 400 compatibility
-#include "/program/vertexSimple.vsh"
+#define WORLD_OVERWORLD
+#define BLOOM_TILE_INDEX 3
+#include "/program/post/bloom/downsample.vsh"

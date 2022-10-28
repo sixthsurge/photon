@@ -1,15 +1,17 @@
 #if !defined MATERIAL_INCLUDED
 #define MATERIAL_INCLUDED
 
+#include "utility/color.glsl"
+
 struct Material {
 	vec3 albedo;
-	vec3 emission;
 	vec3 f0;
 	vec3 f82; // hardcoded metals only
 	float roughness;
 	float refractiveIndex;
 	float sssAmount;
 	float porosity;
+	float emission;
 	bool isMetal;
 	bool isHardcodedMetal;
 };
@@ -40,25 +42,25 @@ void decodeSpecularTexture() {
 }
 #endif
 
-Material getMaterial(vec3 albedoSrgb, uint blockId, inout vec2 lmCoord) {
-	vec3 hsl = rgbToHsl(albedoSrgb);
-
+Material getMaterial(vec3 albedoSrgb, uint blockId, vec3 fractWorldPos, inout vec2 lmCoord) {
 	// Create material with default values
 
 	Material material;
 	material.albedo           = srgbToLinear(albedoSrgb) * rec709_to_rec2020;
-	material.emission         = vec3(0.0);
 	material.f0               = vec3(0.04);
 	material.f82              = vec3(0.0);
 	material.roughness        = 1.0;
 	material.refractiveIndex  = (1.0 + sqrt(0.04)) / (1.0 - sqrt(0.04));
 	material.sssAmount        = 0.0;
 	material.porosity         = 0.0;
+	material.emission         = 0.0;
 	material.isMetal          = false;
 	material.isHardcodedMetal = false;
 
 	// Hardcoded materials for specific blocks
 	// Using binary split search to minimise branches per fragment (TODO: measure impact)
+
+	vec3 hsl = rgbToHsl(albedoSrgb);
 
 	if (blockId < 16u) { // 0-16
 		if (blockId < 8u) { // 0-8
@@ -69,45 +71,66 @@ Material getMaterial(vec3 albedoSrgb, uint blockId, inout vec2 lmCoord) {
 					}
 				} else { // 2-4
 					if (blockId == 2u) {
-
+						// Bright full emissives
+						material.emission = 1.00 * (0.1 + 0.9 * sqr(hsl.z));
+						lmCoord.x *= 0.8;
 					} else {
-						material.sssAmount = 0.5;
+						// Medium full emissives
+						material.emission = 0.70 * (0.1 + 0.9 * sqr(hsl.z));
+						lmCoord.x *= 0.8;
 					}
 				}
 			} else { // 4-8
 				if (blockId < 6u) { // 4-6
 					if (blockId == 4u) {
-						material.sssAmount = 1.0;
+						// Dim full emissives
+						material.emission = 0.30 * (0.1 + 0.9 * cube(hsl.z));
+						lmCoord.x *= 0.95;
 					} else {
-
+						// Partial emissives (brightest parts glow)
+						material.emission = step(0.48, 0.2 * hsl.y + 0.5 * hsl.z);
+						lmCoord.x *= 0.88;
 					}
 				} else { // 6-8
 					if (blockId == 6u) {
-
+						// Ground torches and other partial emissives
+						material.emission = 0.3 * cube(linearStep(0.2, 0.4, fractWorldPos.y));
 					} else {
-
+						// Wall torches
+						material.emission = 0.3 * cube(linearStep(0.35, 0.6, fractWorldPos.y));
 					}
+
+					material.emission  = max(material.emission, step(0.5, 0.2 * hsl.y + 0.55 * hsl.z));
+					material.emission *= lmCoord.x;
+					lmCoord.x *= 0.75;
 				}
 			}
 		} else { // 8-16
 			if (blockId < 12u) { // 8-12
-				if (blockId < 10u) { // 8-10
+				if (blockId < 10u) { // 8-10, Torches
 					if (blockId == 8u) {
-
+						// Jack o' Lantern + nether mushrooms
+						material.emission = 0.80 * step(0.73, 0.1 * hsl.y + 0.7 * hsl.z);
+						lmCoord *= 0.9;
 					} else {
-
+						// Beacon
+						material.emission = step(0.2, hsl.z) * step(maxOf(abs(fractWorldPos - 0.5)), 0.4);
+						lmCoord *= 0.9;
 					}
 				} else { // 10-12
 					if (blockId == 10u) {
-
+						// End portal frame
+						material.emission = 0.33 * isolateHue(hsl, 120.0, 50.0);
 					} else {
-
+						// Really bright full emissives
+						material.emission = 2.0;
 					}
 				}
 			} else { // 12-16
 				if (blockId < 14u) { // 12-14
 					if (blockId == 12u) {
-
+						// Really dim full emissives
+						material.emission = 0.05 * sqr(hsl.z);
 					} else {
 
 					}
@@ -125,23 +148,29 @@ Material getMaterial(vec3 albedoSrgb, uint blockId, inout vec2 lmCoord) {
 			if (blockId < 20u) { // 16-20
 				if (blockId < 18u) { // 16-18
 					if (blockId == 16u) {
-
+						// Small plants
+						material.sssAmount = 0.5;
 					} else {
-
+						// Tall plants (lower half)
+						material.sssAmount = 0.5;
 					}
 				} else { // 18-20
 					if (blockId == 18u) {
-
+						// Tall plants (upper half)
+						material.sssAmount = 0.5;
 					} else {
-
+						// Leaves
+						material.sssAmount = 1.0;
 					}
 				}
 			} else { // 20-24
 				if (blockId < 24u) { // 20-22
 					if (blockId == 20u) {
-
+						// Weak SSS
+						material.sssAmount = 0.3;
 					} else {
-
+						// Strong SSS
+						material.sssAmount = 0.7;
 					}
 				} else { // 22-24
 					if (blockId == 22u) {

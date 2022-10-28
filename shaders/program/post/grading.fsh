@@ -22,6 +22,8 @@ uniform sampler2D colortex5; // Scene color
 
 uniform float blindness;
 uniform float biomeCave;
+uniform float timeNoon;
+uniform float eyeSkylight;
 
 uniform vec2 texelSize;
 
@@ -32,45 +34,30 @@ uniform vec2 texelSize;
 
 // Bloom
 
-vec3 getBloom(out vec3 fogBloom) {
+vec3 getBloom() {
+	const int tileCount = 6;
+	const float radius  = 1.0;
+
 	vec3 tileSum = vec3(0.0);
 
 	float weight = 1.0;
 	float weightSum = 0.0;
 
-#if defined BLOOMY_FOG || defined BLOOMY_RAIN
-	const float fogBloomRadius = 1.5;
+	for (int i = 0; i < tileCount; ++i) {
+		float a = exp2(float(-i));
 
-	fogBloom = vec3(0.0); // large-scale bloom for bloomy fog
-	float fogBloomWeight = 1.0;
-	float fogBloomWeightSum = 0.0;
-#endif
+		float tileSize   = 0.5 * a;
+		float tileOffset = 1.0 - a;
 
-	for (int i = 1; i < BLOOM_TILES; ++i) {
-		float tileSize = exp2(-i);
+		vec2 tileCoord = uv * tileSize + tileOffset;
 
-		vec2 padAmount = 6.0 * texelSize * rcp(tileSize);
-
-		vec2 tileCoord = mix(padAmount, 1.0 - padAmount, uv) * tileSize + tileSize;
-
-		vec3 tile = BLOOM_UPSAMPLING_FILTER(colortex0, tileCoord).rgb;
+		vec3 tile = textureBicubic(colortex0, tileCoord).rgb;
 
 		tileSum += tile * weight;
 		weightSum += weight;
 
-		weight *= BLOOM_RADIUS;
-
-#if defined BLOOMY_FOG || defined BLOOMY_RAIN
-		fogBloom += tile * fogBloomWeight;
-
-		fogBloomWeightSum += fogBloomWeight;
-		fogBloomWeight *= fogBloomRadius;
-#endif
+		weight *= radius;
 	}
-
-#if defined BLOOMY_FOG || defined BLOOMY_RAIN
-	fogBloom *= rcp(fogBloomWeightSum);
-#endif
 
 	return tileSum / weightSum;
 }
@@ -108,10 +95,10 @@ vec3 gradeOutput(vec3 rgb) {
 
 	// HSL color grading inspired by Tech's color grading setup in Lux Shaders
 
-	const float orangeSatBoost = 0.05;
-	const float tealSatBoost   = 0.1;
-	const float greenSatBoost  = 0.0;
-	const float greenHueShift  = 4.0 / 360.0;
+	const float orangeSatBoost = GRADE_ORANGE_SAT_BOOST;
+	const float tealSatBoost   = GRADE_TEAL_SAT_BOOST;
+	const float greenSatBoost  = GRADE_GREEN_SAT_BOOST;
+	const float greenHueShift  = GRADE_GREEN_HUE_SHIFT / 360.0;
 
 	vec3 hsl = rgbToHsl(rgb);
 
@@ -231,8 +218,10 @@ void main() {
 	float exposure = texelFetch(colortex5, ivec2(0), 0).a;
 
 #ifdef BLOOM
-	vec3 fogBloom;
-	vec3 bloom = getBloom(fogBloom);
+	vec3 bloom = getBloom();
+	float bloomIntensity = 0.1 * BLOOM_INTENSITY;
+
+	fragColor = mix(fragColor, bloom, bloomIntensity);
 #endif
 
 	fragColor *= exposure;

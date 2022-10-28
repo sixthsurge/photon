@@ -10,10 +10,12 @@
 //----------------------------------------------------------------------------//
 #if   defined WORLD_OVERWORLD
 
-const float sssIntensity       = 3.0;
-const float sssDensity         = 12.0;
-const float metalDiffuseAmount = 0.25; // Scales diffuse lighting on metals, ideally this would be zero but purely specular metals don't play well with SSR
-const vec3  blocklightColor    = toRec2020(vec3(BLOCKLIGHT_R, BLOCKLIGHT_G, BLOCKLIGHT_B)) * BLOCKLIGHT_I;
+const float blocklightIntensity = 12.0;
+const float emissionIntensity   = 32.0;
+const float sssIntensity        = 3.0;
+const float sssDensity          = 12.0;
+const float metalDiffuseAmount  = 0.25; // Scales diffuse lighting on metals, ideally this would be zero but purely specular metals don't play well with SSR
+const vec3  blocklightColor     = toRec2020(vec3(BLOCKLIGHT_R, BLOCKLIGHT_G, BLOCKLIGHT_B)) * BLOCKLIGHT_I;
 
 vec3 getSubsurfaceScattering(vec3 albedo, float sssAmount, float sssDepth, float LoV) {
 	if (sssAmount < eps) return vec3(0.0);
@@ -70,7 +72,9 @@ vec3 getSceneLighting(
 	float blocklightFalloff  = clamp01(pow16(lmCoord.x) + 0.15 * pow5(lmCoord.x) + 0.1 * sqr(lmCoord.x) + 0.025 * dampen(lmCoord.x));
 	      blocklightFalloff *= mix(ao, 1.0, blocklightFalloff);
 
-	illuminance += 8.0 * blocklightScale * blocklightFalloff * blocklightColor;
+	illuminance += blocklightIntensity * blocklightScale * blocklightFalloff * blocklightColor;
+
+	illuminance += emissionIntensity * blocklightScale * material.albedo * material.emission;
 
 	// Cave lighting
 

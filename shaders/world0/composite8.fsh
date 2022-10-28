@@ -1,4 +1,4 @@
 #version 400 compatibility
 #define WORLD_OVERWORLD
-#define PROGRAM_COMPOSITE7
-#include "/program/post/bloom1.fsh"
+#define BLOOM_TILE_INDEX 3
+#include "/program/post/bloom/downsample.fsh"

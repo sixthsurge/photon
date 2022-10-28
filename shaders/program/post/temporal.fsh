@@ -11,8 +11,9 @@
 
 #include "/include/global.glsl"
 
-/* DRAWBUFFERS:5 */
-layout (location = 0) out vec4 result;
+/* DRAWBUFFERS:05 */
+layout (location = 0) out vec3 bloomInput;
+layout (location = 1) out vec4 result;
 
 in vec2 uv;
 
@@ -295,4 +296,6 @@ void main() {
 #if AUTO_EXPOSURE == AUTO_EXPOSURE_HISTOGRAM && DEBUG_VIEW == DEBUG_VIEW_HISTOGRAM
 	drawHistogram(texel);
 #endif
+
+	bloomInput = result.rgb;
 }

@@ -122,6 +122,8 @@ value.TEXTURE_FORMAT.TEXTURE_FORMAT_OLD = Old PBR
 
 # Post-processing settings
 
+option.BLOOM                           = Bloom
+option.BLOOM_INTENSITY                 = Bloom Intensity
 option.TAA                             = TAA
 option.FXAA                            = FXAA
 option.TAAU                            = TAA Upscaling
@@ -130,8 +132,6 @@ option.CAS                             = Image Sharpening
 option.CAS_INTENSITY                   = Image Sharpening Intensity
 option.VIGNETTE                        = Vignette
 option.VIGNETTE_INTENSITY              = Vignette Intensity
-option.PURKINJE_SHIFT                  = Purkinje Shift
-option.PURKINJE_SHIFT_INTENSITY        = Purkinje Shift Intensity
 
 option.tonemap                         = Tonemap Operator
 
@@ -143,6 +143,21 @@ value.tonemap.tonemapTech              = Tech
 value.tonemap.tonemapOzius             = Ozius
 value.tonemap.tonemapReinhard          = Reinhard
 value.tonemap.tonemapReinhardJodie     = Reinhard-Jodie
+
+# Color Grading
+
+option.GRADE_BRIGHTNESS                 = Brightness
+option.GRADE_CONTRAST                   = Contrast
+option.GRADE_SATURATION                 = Overall Saturation
+option.GRADE_ORANGE_SAT_BOOST           = Orange Saturation Boost
+option.GRADE_TEAL_SAT_BOOST             = Teal Saturation Boost
+option.GRADE_GREEN_SAT_BOOST            = Green Saturation Boost
+option.GRADE_GREEN_HUE_SHIFT            = Green Hue Shift
+suffix.GRADE_GREEN_HUE_SHIFT            = °
+option.PURKINJE_SHIFT                  = Purkinje Shift
+option.PURKINJE_SHIFT_INTENSITY        = Purkinje Shift Intensity
+
+# Exposure
 
 option.AUTO_EXPOSURE                    = Exposure Method
 option.AUTO_EXPOSURE_BIAS               = Exposure Bias

@@ -114,6 +114,7 @@ void main() {
 
 	vec3 viewPos = screenToViewSpace(vec3(uv, depth), true);
 	vec3 scenePos = viewToSceneSpace(viewPos);
+	vec3 worldPos = scenePos + cameraPosition;
 	vec3 worldDir = normalize(scenePos - gbufferModelViewInverse[3].xyz);
 
 	if (isSky(depth)) { // Sky
@@ -147,7 +148,7 @@ void main() {
 
 		albedo = overlays.a < 0.5 ? albedo + overlays.rgb : 2.0 * albedo * overlays.rgb;
 
-		Material material = getMaterial(albedo, blockId, lmCoord);
+		Material material = getMaterial(albedo, blockId, fract(worldPos), lmCoord);
 
 #ifdef NORMAL_MAPPING
 		vec3 normal = decodeUnitVector(gbuffer1.xy);
