@@ -13,7 +13,7 @@
 
 #include "/include/global.glsl"
 
-/* DRAWBUFFERS:53 */
+/* DRAWBUFFERS:56 */
 layout (location = 0) out vec3 fogScattering;
 layout (location = 1) out vec3 fogTransmittance;
 

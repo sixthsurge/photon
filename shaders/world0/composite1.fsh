@@ -6,7 +6,7 @@
   Photon Shaders by SixthSurge
 
   world0/composite1.fsh:
-
+  Shade translucent layer, apply specular and fog
 
 --------------------------------------------------------------------------------
 */
@@ -18,14 +18,20 @@ layout (location = 0) out vec3 fragColor;
 
 in vec2 uv;
 
+uniform sampler2D colortex0; // Scene color
+uniform sampler2D colortex1; // Gbuffer 0
+uniform sampler2D colortex2; // Gbuffer 1
+uniform sampler2D colortex3; // Translucent color
+uniform sampler2D colortex4; // Sky capture
+uniform sampler2D colortex5; // Volumetric fog scattering
+uniform sampler2D colortex6; // Volumetric fog transmittance
+
 uniform sampler2D depthtex0;
 uniform sampler2D depthtex1;
 
-uniform sampler2D colortex0; // main color
-uniform sampler2D colortex1; // gbuffer 0
-uniform sampler2D colortex2; // gbuffer 1
-uniform sampler2D colortex3; // volumetric fog transmittance
-uniform sampler2D colortex5; // volumetric fog scattering
+#ifdef SHADOW
+uniform sampler2DShadow shadowtex1;
+#endif
 
 uniform mat4 gbufferModelView;
 uniform mat4 gbufferModelViewInverse;
@@ -35,12 +41,10 @@ uniform mat4 gbufferProjectionInverse;
 uniform mat4 gbufferPreviousModelView;
 uniform mat4 gbufferPreviousProjection;
 
-#ifdef SHADOW
 uniform mat4 shadowModelView;
 uniform mat4 shadowModelViewInverse;
 uniform mat4 shadowProjection;
 uniform mat4 shadowProjectionInverse;
-#endif
 
 uniform vec3 cameraPosition;
 uniform vec3 previousCameraPosition;
@@ -75,6 +79,20 @@ uniform float timeMidnight;
 #include "/include/utility/fastMath.glsl"
 #include "/include/utility/spaceConversion.glsl"
 
+// from https://iquilezles.org/www/articles/texture/texture.htm
+vec4 textureSmooth(sampler2D sampler, vec2 coord) {
+	vec2 res = vec2(textureSize(sampler, 0));
+
+	coord = coord * res + 0.5;
+
+	vec2 i, f = modf(coord, i);
+	f = f * f * f * (f * (f * 6.0 - 15.0) + 10.0);
+	coord = i + f;
+
+	coord = (coord - 0.5) / res;
+	return texture(sampler, coord);
+}
+
 // from http://www.diva-portal.org/smash/get/diva2:24136/FULLTEXT01.pdf
 vec3 purkinjeShift(vec3 rgb, float purkinjeIntensity) {
 	if (purkinjeIntensity == 0.0) return rgb;
@@ -94,15 +112,36 @@ vec3 purkinjeShift(vec3 rgb, float purkinjeIntensity) {
 void main() {
 	ivec2 texel = ivec2(gl_FragCoord.xy);
 
-	float depth   = texelFetch(depthtex1, texel, 0).x;
+	// Texture fetches
+
 	fragColor     = texelFetch(colortex0, texel, 0).rgb;
+
+	float depth0  = texelFetch(depthtex0, texel, 0).x;
+	float depth1  = texelFetch(depthtex1, texel, 0).x;
 	vec4 gbuffer0 = texelFetch(colortex1, texel, 0);
 #if defined NORMAL_MAPPING || defined SPECULAR_MAPPING
 	vec4 gbuffer1 = texelFetch(colortex2, texel, 0);
 #endif
+	vec4 transCol = texelFetch(colortex3, texel, 0);
 
-	bool hand = isHand(depth);
-	depth += 0.38 * float(hand); // Hand lighting fix from Capt Tatsu
+	vec3 fogScattering    = textureSmooth(colortex5, 0.5 * uv).rgb;
+	vec3 fogTransmittance = textureSmooth(colortex6, 0.5 * uv).rgb;
+
+	// Transformations
+
+	depth0 += 0.38 * float(isHand(depth0)); // Hand lighting fix from Capt Tatsu
+
+	vec3 screenPos = vec3(uv, depth0);
+	vec3 viewPos   = screenToViewSpace(screenPos, true);
+	vec3 scenePos  = viewToSceneSpace(viewPos);
+	vec3 worldPos  = scenePos + cameraPosition;
+
+	vec3 worldDir; float viewDistance;
+	lengthNormalize(scenePos - gbufferModelViewInverse[3].xyz, worldDir, viewDistance);
+
+	vec3 viewBackPos = screenToViewSpace(vec3(uv, depth1), true);
+
+	// Unpack gbuffer data
 
 	mat4x2 data = mat4x2(
 		unpackUnorm2x8(gbuffer0.x),
@@ -111,23 +150,26 @@ void main() {
 		unpackUnorm2x8(gbuffer0.w)
 	);
 
-	vec3 albedo      = vec3(data[0], data[1].x);
-	uint blockId     = uint(255.0 * data[1].y);
-	vec3 flatNormal  = decodeUnitVector(data[2]);
-	vec2 lightLevels = data[3];
+	vec3 albedo     = vec3(data[0], data[1].x);
+	uint blockId    = uint(255.0 * data[1].y);
+	vec3 flatNormal = decodeUnitVector(data[2]);
+	vec2 lmCoord    = data[3];
 
-	vec3 fogScattering = texture(colortex5, 0.5 * uv).rgb;
-	vec3 fogTransmittance = texture(colortex3, 0.5 * uv).rgb;
+	fragColor = mix(fragColor, transCol.rgb, transCol.a);
+
+	// Apply volumetric fog
 
 	fragColor = fragColor * fogTransmittance + fogScattering;
 
 	// Purkinje shift
 
-	lightLevels = isSky(depth) ? vec2(0.0, 1.0) : lightLevels;
+#ifdef PURKINJE_SHIFT
+	lmCoord = isSky(depth0) ? vec2(0.0, 1.0) : lmCoord;
 
-	float purkinjeIntensity  = 0.1 * PURKINJE_SHIFT_INTENSITY;
-	      purkinjeIntensity *= 1.0 - smoothstep(-0.14, -0.08, sunDir.y) * sqrt(lightLevels.y);
-	      purkinjeIntensity *= clamp01(1.0 - 1.5 * lightLevels.x);
+	float purkinjeIntensity  = 0.025 * PURKINJE_SHIFT_INTENSITY;
+	      purkinjeIntensity *= 1.0 - smoothstep(-0.14, -0.08, sunDir.y) * sqrt(lmCoord.y);
+	      purkinjeIntensity *= clamp01(1.0 - lmCoord.x);
 
 	fragColor = purkinjeShift(fragColor, purkinjeIntensity);
+#endif
 }

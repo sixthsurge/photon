@@ -13,8 +13,9 @@
 
 #include "/include/global.glsl"
 
-/* DRAWBUFFERS:0 */
+/* DRAWBUFFERS:03 */
 layout (location = 0) out vec3 fragColor;
+layout (location = 3) out vec4 colortex3Clear; // Clear colortex3 so that translucents can write to it
 
 in vec2 uv;
 
@@ -48,12 +49,10 @@ uniform mat4 gbufferProjectionInverse;
 uniform mat4 gbufferPreviousModelView;
 uniform mat4 gbufferPreviousProjection;
 
-#ifdef SHADOW
 uniform mat4 shadowModelView;
 uniform mat4 shadowModelViewInverse;
 uniform mat4 shadowProjection;
 uniform mat4 shadowProjectionInverse;
-#endif
 
 uniform vec3 cameraPosition;
 uniform vec3 previousCameraPosition;
@@ -100,6 +99,8 @@ uniform float timeMidnight;
 void main() {
 	ivec2 texel = ivec2(gl_FragCoord.xy);
 
+	// Texture fetches
+
 	float depth   = texelFetch(depthtex1, texel, 0).x;
 	vec4 gbuffer0 = texelFetch(colortex1, texel, 0);
 #if defined NORMAL_MAPPING || defined SPECULAR_MAPPING
@@ -107,26 +108,30 @@ void main() {
 #endif
 	vec4 overlays = texelFetch(colortex3, texel, 0);
 
-	bool hand = isHand(depth);
-	depth += 0.38 * float(hand); // Hand lighting fix from Capt Tatsu
+	// Transformations
+
+	depth += 0.38 * float(isHand(depth)); // Hand lighting fix from Capt Tatsu
 
 	vec3 viewPos = screenToViewSpace(vec3(uv, depth), true);
 	vec3 scenePos = viewToSceneSpace(viewPos);
 	vec3 worldDir = normalize(scenePos - gbufferModelViewInverse[3].xyz);
 
-	if (isSky(depth)) {
+	if (isSky(depth)) { // Sky
 		fragColor = renderSky(worldDir);
-	} else {
+	} else { // Terrain
+		// Sample half-res lighting data many operations before using it (latency hiding)
+
 		vec2 halfResPos = gl_FragCoord.xy * (0.5 / taauRenderScale) - 0.5;
 
 		ivec2 i = ivec2(halfResPos);
 		vec2  f = fract(halfResPos);
 
-		// Read half-res lighting data (ao, bent normal) a while before using it (latency hiding)
 		vec4 halfRes00 = texelFetch(colortex6, i + ivec2(0, 0), 0);
 		vec4 halfRes10 = texelFetch(colortex6, i + ivec2(1, 0), 0);
 		vec4 halfRes01 = texelFetch(colortex6, i + ivec2(0, 1), 0);
 		vec4 halfRes11 = texelFetch(colortex6, i + ivec2(1, 1), 0);
+
+		// Unpack gbuffer data
 
 		mat4x2 data = mat4x2(
 			unpackUnorm2x8(gbuffer0.x),
@@ -135,14 +140,14 @@ void main() {
 			unpackUnorm2x8(gbuffer0.w)
 		);
 
-		vec3 albedo      = vec3(data[0], data[1].x);
-		uint blockId     = uint(255.0 * data[1].y);
-		vec3 flatNormal  = decodeUnitVector(data[2]);
-		vec2 lightLevels = data[3];
+		vec3 albedo     = vec3(data[0], data[1].x);
+		uint blockId    = uint(255.0 * data[1].y);
+		vec3 flatNormal = decodeUnitVector(data[2]);
+		vec2 lmCoord    = data[3];
 
 		albedo = overlays.a < 0.5 ? albedo + overlays.rgb : 2.0 * albedo * overlays.rgb;
 
-		Material material = getMaterial(albedo, blockId, lightLevels);
+		Material material = getMaterial(albedo, blockId, lmCoord);
 
 #ifdef NORMAL_MAPPING
 		vec3 normal = decodeUnitVector(gbuffer1.xy);
@@ -191,15 +196,17 @@ void main() {
 		#define bentNormal normal
 #endif
 
+		// Terrain diffuse lighting
+
 		float sssDepth;
-		vec3 shadows = calculateShadows(scenePos, flatNormal, lightLevels.y, material.sssAmount, sssDepth);
+		vec3 shadows = calculateShadows(scenePos, flatNormal, lmCoord.y, material.sssAmount, sssDepth);
 
 		fragColor = getSceneLighting(
 			material,
 			normal,
 			bentNormal,
 			shadows,
-			lightLevels,
+			lmCoord,
 			ao,
 			sssDepth,
 			NoL,
@@ -208,8 +215,10 @@ void main() {
 			LoV
 		);
 
-		fragColor += getSpecularHighlight(material, NoL, NoV, NoH, LoV, LoH) * lightCol * shadows;
+		fragColor += getSpecularHighlight(material, NoL, NoV, NoH, LoV, LoH) * lightCol * shadows * ao;
 
 		getSimpleFog(fragColor, scenePos, worldDir);
 	}
+
+	colortex3Clear = vec4(0.0);
 }

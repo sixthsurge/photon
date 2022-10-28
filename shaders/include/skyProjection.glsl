@@ -5,7 +5,7 @@
 
 // Sky capture projection from https://sebh.github.io/publications/egsr2020.pdf
 
-const ivec2 skyCaptureRes = ivec2(255, 128);
+const ivec2 skyCaptureRes = ivec2(192, 108);
 
 vec2 projectSky(vec3 direction) {
 	vec2 projectedDir = normalize(direction.xz);

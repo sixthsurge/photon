@@ -17,6 +17,9 @@ const vec3 airViewerPos = vec3(0.0, 6371e3, 0.0); // Position of the viewer in p
 
 const vec3 baseSunCol = vec3(1.051, 0.985, 0.940); // Color of sunlight in space, obtained from AM0 solar irradiance spectrum from https://www.nrel.gov/grid/solar-resource/spectra-astm-e490.html using the CIE (2006) 2-deg LMS cone fundamentals
 
+const float sunAngularRadius  = SUN_ANGULAR_RADIUS * degree;
+const float moonAngularRadius = MOON_ANGULAR_RADIUS * degree;
+
 const ivec2 transmittanceRes = ivec2(/* mu */ 256, /* r */ 64);
 const ivec3 scatteringRes    = ivec3(/* nu */ 16, /* mu */ 64, /* muS */ 32);
 
@@ -87,6 +90,10 @@ vec3 atmosphereScatteringUv(float nu, float mu, float muS) {
 	float uNu = (nuMin == nuMax) ? nuMin : (nu - nuMin) / (nuMax - nuMin);
 	      uNu = getUvFromUnitRange(uNu, scatteringRes.x);
 
+	// Stretch the sky near the horizon upwards (to make it easier to admire the sunset without zooming in)
+
+	if (mu > 0.0) mu *= sqrt(sqrt(mu));
+
 	// Mapping for mu
 
 	const float r = planetRadius; // distance to the planet centre
@@ -142,7 +149,7 @@ vec3 atmosphereScatteringUv(float nu, float mu, float muS) {
 
 vec3 atmosphereScattering(float nu, float mu, float muS) {
 #ifndef SKY_GROUND
-	float horizonMu = mix(-0.01, 0.03, smoothstep(-0.05, 0.2, muS));
+	float horizonMu = mix(-0.01, 0.03, smoothstep(-0.05, 0.1, muS));
 	mu = max(mu, horizonMu);
 #endif
 

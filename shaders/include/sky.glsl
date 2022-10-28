@@ -4,9 +4,23 @@
 //----------------------------------------------------------------------------//
 #if   defined WORLD_OVERWORLD
 
-#include "utility/random.glsl"
 #include "atmosphere.glsl"
 #include "palette.glsl"
+#include "utility/fastMath.glsl"
+#include "utility/random.glsl"
+
+const float sunLuminance = 120.0; // luminance of sun disk
+
+vec3 drawSun(vec3 rayDir) {
+	float nu = dot(rayDir, sunDir);
+
+	// Limb darkening model from http://www.physics.hmc.edu/faculty/esin/a101/limbdarkening.pdf
+	const vec3 alpha = vec3(0.429, 0.522, 0.614);
+	float centerToEdge = max0(sunAngularRadius - fastAcos(nu));
+	vec3 limbDarkening = pow(vec3(1.0 - sqr(1.0 - centerToEdge)), 0.5 * alpha);
+
+	return baseSunCol * sunLuminance * step(0.0, centerToEdge) * limbDarkening; // magically darkening the sun to prevent it from overloading bloom
+}
 
 // Stars based on https://www.shadertoy.com/view/Md2SR3
 
@@ -66,16 +80,29 @@ vec3 drawStars(vec3 rayDir) {
 }
 
 vec3 renderSky(vec3 rayDir) {
+	vec3 sky = vec3(0.0);
+
+	// Sun, moon and stars
+
+#ifdef VANILLA_SUN
+#else
+	sky += drawSun(rayDir);
+#endif
+
+#ifdef VANILLA_MOON
+#else
+	sky += drawMoon(rayDir);
+#endif
+
+#ifdef STARS
+	sky += drawStars(rayDir);
+#endif
+
 	// Sky gradient
 
-	vec3 sky = illuminance[0] * atmosphereScattering(rayDir, sunDir)
-	         + illuminance[1] * atmosphereScattering(rayDir, moonDir);
-
-	sky += 1.0 * drawStars(rayDir) * atmosphereTransmittance(airViewerPos, rayDir);
-
-	// Stars
-
-	// Sun and moon
+	sky *= atmosphereTransmittance(airViewerPos, rayDir);
+	sky += illuminance[0] * atmosphereScattering(rayDir, sunDir);
+	sky += illuminance[1] * atmosphereScattering(rayDir, moonDir);
 
 	// Clouds
 

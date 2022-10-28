@@ -40,16 +40,18 @@ void decodeSpecularTexture() {
 }
 #endif
 
-Material getMaterial(vec3 albedoSrgb, uint blockId, inout vec2 lightLevels) {
+Material getMaterial(vec3 albedoSrgb, uint blockId, inout vec2 lmCoord) {
+	vec3 hsl = rgbToHsl(albedoSrgb);
+
 	// Create material with default values
 
 	Material material;
 	material.albedo           = srgbToLinear(albedoSrgb) * rec709_to_rec2020;
 	material.emission         = vec3(0.0);
-	material.f0               = vec3(0.0);
+	material.f0               = vec3(0.04);
 	material.f82              = vec3(0.0);
 	material.roughness        = 1.0;
-	material.refractiveIndex  = 1.0;
+	material.refractiveIndex  = (1.0 + sqrt(0.04)) / (1.0 - sqrt(0.04));
 	material.sssAmount        = 0.0;
 	material.porosity         = 0.0;
 	material.isMetal          = false;
@@ -57,8 +59,6 @@ Material getMaterial(vec3 albedoSrgb, uint blockId, inout vec2 lightLevels) {
 
 	// Hardcoded materials for specific blocks
 	// Using binary split search to minimise branches per fragment (TODO: measure impact)
-
-	vec3 hsl = rgbToHsl(albedoSrgb);
 
 	if (blockId < 16u) { // 0-16
 		if (blockId < 8u) { // 0-8

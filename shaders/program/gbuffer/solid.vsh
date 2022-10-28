@@ -14,10 +14,6 @@
 out vec2 texCoord;
 out vec2 lmCoord;
 
-#ifdef PROGRAM_TERRAIN
-out float vanillaAo;
-#endif
-
 flat out uint blockId;
 flat out vec4 tint;
 flat out mat3 tbnMatrix;
@@ -25,6 +21,10 @@ flat out mat3 tbnMatrix;
 #ifdef POM
 flat out vec2 atlasTileOffset;
 flat out vec2 atlasTileScale;
+#endif
+
+#ifdef PROGRAM_TERRAIN
+out float vanillaAo;
 #endif
 
 attribute vec4 at_tangent;

@@ -110,8 +110,8 @@ vec3 gradeOutput(vec3 rgb) {
 
 	const float orangeSatBoost = 0.05;
 	const float tealSatBoost   = 0.1;
-	const float greenSatBoost  = -0.03;
-	const float greenHueShift  = 2.0 / 360.0;
+	const float greenSatBoost  = 0.0;
+	const float greenHueShift  = 4.0 / 360.0;
 
 	vec3 hsl = rgbToHsl(rgb);
 
@@ -165,6 +165,7 @@ vec3 academyFit(vec3 rgb) {
 
 // Filmic tonemapping operator made by Jim Hejl and Richard Burgess
 vec3 tonemapHejlBurgess(vec3 rgb) {
+	rgb = max0(rgb - 0.004);
 	rgb = (rgb * (6.2 * rgb + 0.5)) / (rgb * (6.2 * rgb + 1.7) + 0.06);
 	return srgbToLinear(rgb); // Revert built-in sRGB conversion
 }

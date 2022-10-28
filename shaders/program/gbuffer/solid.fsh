@@ -27,10 +27,6 @@ layout (location = 1) out vec4 gbuffer1; // detailed normal, specular map (optio
 in vec2 texCoord;
 in vec2 lmCoord;
 
-#ifdef PROGRAM_TERRAIN
-in float vanillaAo;
-#endif
-
 flat in uint blockId;
 flat in vec4 tint;
 flat in mat3 tbnMatrix;
@@ -38,6 +34,10 @@ flat in mat3 tbnMatrix;
 #ifdef POM
 flat in vec2 atlasTileOffset;
 flat in vec2 atlasTileScale;
+#endif
+
+#ifdef PROGRAM_TERRAIN
+in float vanillaAo;
 #endif
 
 uniform sampler2D gtexture;
@@ -77,8 +77,8 @@ void decodeNormalTexture(vec3 normalTex, out vec3 normal, out float ao) {
 
 void main() {
 #if defined TAA && defined TAAU
-	vec2 screenPos = gl_FragCoord.xy * texelSize * rcp(taauRenderScale);
-	if (clamp01(screenPos) != screenPos) discard;
+	vec2 uv = gl_FragCoord.xy * texelSize * rcp(taauRenderScale);
+	if (clamp01(uv) != uv) discard;
 #endif
 
 	vec4 baseTex     = texture(gtexture, texCoord, lodBias) * tint;

@@ -38,8 +38,8 @@ vec3 getBorderFogColor(vec3 worldDir, float fog) {
 	vec3 fogColSunset = illuminance[0] * atmosphereScattering(worldDir, sunDir)
 	                  + illuminance[1] * atmosphereScattering(worldDir, moonDir);
 
-	float sunsetFactor = sqr(pulse(float(worldTime), 13000.0, 800.0, 24000.0))  // dusk
-	                   + sqr(pulse(float(worldTime), 23000.0, 800.0, 24000.0)); // dawn
+	float sunsetFactor = pulse(float(worldTime), 13000.0, 800.0, 24000.0)  // dusk
+	                   + pulse(float(worldTime), 23000.0, 800.0, 24000.0); // dawn
 
 	fogCol = mix(fogCol, fogColSunset, sunsetFactor);
 #endif

@@ -69,4 +69,12 @@ float pow1d5(float x) {
 float rcpLength(vec2 v) { return inversesqrt(dot(v, v)); }
 float rcpLength(vec3 v) { return inversesqrt(dot(v, v)); }
 
+// Computes the length of a vector and normalizes it using one inversesqrt
+void lengthNormalize(vec3 v, out vec3 normalized, out float len) {
+	float lenSq = lengthSquared(v);
+	float rcpLen = inversesqrt(lenSq);
+	len = lenSq * rcpLen;
+	normalized = rcpLen * v;
+}
+
 #endif // UTILITY_FASTMATH_INCLUDED

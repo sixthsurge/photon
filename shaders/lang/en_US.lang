@@ -128,6 +128,10 @@ option.TAAU                            = TAA Upscaling
 option.TAAU_RENDER_SCALE               = TAAU Render Scale
 option.CAS                             = Image Sharpening
 option.CAS_INTENSITY                   = Image Sharpening Intensity
+option.VIGNETTE                        = Vignette
+option.VIGNETTE_INTENSITY              = Vignette Intensity
+option.PURKINJE_SHIFT                  = Purkinje Shift
+option.PURKINJE_SHIFT_INTENSITY        = Purkinje Shift Intensity
 
 option.tonemap                         = Tonemap Operator
 

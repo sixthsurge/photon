@@ -11,7 +11,7 @@
 
 #include "/include/global.glsl"
 
-flat out vec2 lightLevels;
+flat out vec2 lmCoord;
 flat out vec3 tint;
 
 uniform vec2 taaOffset;
@@ -19,8 +19,8 @@ uniform vec2 viewSize;
 uniform vec2 texelSize;
 
 void main() {
-	lightLevels = clamp01(gl_MultiTexCoord1.xy * rcp(240.0));
-	tint        = gl_Color.rgb;
+	lmCoord = clamp01(gl_MultiTexCoord1.xy * rcp(240.0));
+	tint    = gl_Color.rgb;
 
 #if defined PROGRAM_LINE
 	// Ripped from vanilla 1.17's rendertype_lines.vsh

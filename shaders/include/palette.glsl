@@ -10,11 +10,11 @@
 // Magic brightness adjustments, pre-exposing for the light source to compensate
 // for the lack of auto exposure by default
 float getSunBrightness() {
-	const float baseSunBrightness = 8.4;
+	const float baseSunBrightness = 8.5;
 	const float userSunBrightness = SUN_I;
 
-	float blueHour = cube(pulse(float(worldTime), 13200.0, 800.0, 24000.0))  // dusk
-	               + cube(pulse(float(worldTime), 22800.0, 800.0, 24000.0)); // dawn
+	float blueHour = cube(pulse(float(worldTime), 13200.0, 900.0, 24000.0))  // dusk
+	               + cube(pulse(float(worldTime), 22800.0, 900.0, 24000.0)); // dawn
 
 	float blueHourMul = 1.0 + 33.0 * blueHour;
 
@@ -69,7 +69,7 @@ vec3 getSkyColor() {
 }
 
 float getSkylightBoost() {
-	float nightSkylightBoost = 4.0 * (1.0 - smoothstep(-0.1, -0.05, sunDir.y));
+	float nightSkylightBoost = 4.0 * (1.0 - smoothstep(-0.2, -0.1, sunDir.y));
 
 	return 1.0 + nightSkylightBoost;
 }

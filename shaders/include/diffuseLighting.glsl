@@ -32,7 +32,7 @@ vec3 getSceneLighting(
 	vec3 normal,
 	vec3 bentNormal,
 	vec3 shadows,
-	vec2 lightLevels,
+	vec2 lmCoord,
 	float ao,
 	float sssDepth,
 	float NoL,
@@ -45,7 +45,7 @@ vec3 getSceneLighting(
 	// Sunlight/moonlight
 
 	vec3 diffuse = diffuseHammon(material.albedo, material.roughness, material.refractiveIndex, material.f0.x, NoL, NoV, NoH, LoV) * (1.0 - 0.5 * material.sssAmount) * pi;
-	vec3 bounced = 0.066 * (1.0 - shadows * max0(NoL)) * (1.0 - 0.33 * max0(normal.y)) * pow1d5(ao) * pow4(lightLevels.y);
+	vec3 bounced = 0.07 * (1.0 - shadows * max0(NoL)) * (1.0 - 0.33 * max0(normal.y)) * pow1d5(ao) * pow4(lmCoord.y);
 	vec3 sss = vec3(0.0);
 
 	illuminance += lightCol * (max0(NoL) * diffuse * shadows * ao + bounced + sss);
@@ -59,20 +59,22 @@ vec3 getSceneLighting(
 #else
 #endif
 
-	float skylightFalloff = sqr(lightLevels.y);
+	float skylightFalloff = sqr(lmCoord.y);
 
 	illuminance += skylight * skylightFalloff;
 
 	// Blocklight
 
-	float blocklightScale = 1.0 - 0.5 * timeNoon * lightLevels.y;
+	float blocklightScale = 1.0 - 0.5 * timeNoon * lmCoord.y;
 
-	float blocklightFalloff  = clamp01(pow16(lightLevels.x) + 0.3 * pow5(lightLevels.x) + 0.09 * sqr(lightLevels.x) + 0.01 * dampen(lightLevels.x));
+	float blocklightFalloff  = clamp01(pow16(lmCoord.x) + 0.15 * pow5(lmCoord.x) + 0.1 * sqr(lmCoord.x) + 0.025 * dampen(lmCoord.x));
 	      blocklightFalloff *= mix(ao, 1.0, blocklightFalloff);
 
-	illuminance += 10.0 * blocklightScale * blocklightFalloff * blocklightColor;
+	illuminance += 8.0 * blocklightScale * blocklightFalloff * blocklightColor;
 
 	// Cave lighting
+
+	illuminance += CAVE_LIGHTING_I * ao * (1.0 - skylightFalloff);
 
 	return illuminance * material.albedo * rcpPi * mix(1.0, metalDiffuseAmount, float(material.isMetal));
 }
