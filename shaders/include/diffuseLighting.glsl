@@ -10,7 +10,7 @@
 //----------------------------------------------------------------------------//
 #if   defined WORLD_OVERWORLD
 
-const float blocklightIntensity = 12.0;
+const float blocklightIntensity = 5.0;
 const float emissionIntensity   = 32.0;
 const float sssIntensity        = 3.0;
 const float sssDensity          = 12.0;
@@ -69,7 +69,7 @@ vec3 getSceneLighting(
 
 	float blocklightScale = 1.0 - 0.5 * timeNoon * lmCoord.y;
 
-	float blocklightFalloff  = clamp01(pow16(lmCoord.x) + 0.15 * pow5(lmCoord.x) + 0.1 * sqr(lmCoord.x) + 0.025 * dampen(lmCoord.x));
+	float blocklightFalloff  = clamp01(1.2 * pow12(lmCoord.x) + 0.2 * pow5(lmCoord.x) + 0.1 * sqr(lmCoord.x) + 0.07 * lmCoord.x);
 	      blocklightFalloff *= mix(ao, 1.0, blocklightFalloff);
 
 	illuminance += blocklightIntensity * blocklightScale * blocklightFalloff * blocklightColor;

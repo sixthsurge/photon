@@ -50,5 +50,6 @@ const mat3 ap1_to_rec709  = ap1_to_xyz * d60_to_d65 * xyz_to_rec709;
 // Used for quantities that are multiplied by an illuminant, like the diffuse albedo. These take
 // the white point of the light source
 const mat3 rec709_to_ap1_unlit = rec709_to_xyz * xyz_to_ap1;
+const mat3 rec2020_to_ap1_unlit = rec2020_to_xyz * xyz_to_ap1;
 
 #endif // ACES_MATRICES_INCLUDED

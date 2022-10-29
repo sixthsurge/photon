@@ -25,9 +25,11 @@ flat in mat2x3 fogCoeff[2];
 
 uniform sampler2D noisetex;
 
-uniform sampler3D colortex3; // 3D worley noise
+uniform sampler2D colortex1; // Gbuffer data
 
 uniform sampler2D depthtex1;
+
+uniform sampler3D colortex3; // 3D worley noise
 
 #ifdef SHADOW
 uniform sampler2D shadowtex0;
@@ -72,6 +74,7 @@ uniform float eyeSkylight;
 
 #define WORLD_OVERWORLD
 
+#include "/include/utility/encoding.glsl"
 #include "/include/utility/random.glsl"
 #include "/include/utility/spaceConversion.glsl"
 
@@ -108,7 +111,7 @@ vec2 fogDensity(vec3 worldPos) {
 	return density;
 }
 
-mat2x3 raymarchFog(vec3 worldStartPos, vec3 worldEndPos, bool isSky, float dither) {
+mat2x3 raymarchFog(vec3 worldStartPos, vec3 worldEndPos, bool isSky, float skylight, float dither) {
 	vec3 worldDir = worldEndPos - worldStartPos;
 
 	float lengthSq = lengthSquared(worldDir);
@@ -195,6 +198,12 @@ mat2x3 raymarchFog(vec3 worldStartPos, vec3 worldEndPos, bool isSky, float dithe
 	lightSky[0] *= fogCoeff[0][0] * eyeSkylight;
 	lightSky[1] *= fogCoeff[0][1] * eyeSkylight;
 
+	if (!isSky) {
+		// Skylight falloff
+		lightSky[0] *= skylight;
+		lightSky[1] *= skylight;
+	}
+
 	float LoV = dot(worldDir, lightDir);
 	float miePhase = 0.7 * henyeyGreensteinPhase(LoV, 0.5) + 0.3 * henyeyGreensteinPhase(LoV, -0.2);
 
@@ -224,7 +233,10 @@ void main() {
 	ivec2 fogTexel  = ivec2(gl_FragCoord.xy);
 	ivec2 viewTexel = ivec2(gl_FragCoord.xy * rcp(FOG_RENDER_SCALE));
 
-	float depth = texelFetch(depthtex1, viewTexel, 0).x;
+	float depth   = texelFetch(depthtex1, viewTexel, 0).x;
+	vec4 gbuffer0 = texelFetch(colortex1, viewTexel, 0);
+
+	float skylight = unpackUnorm2x8(gbuffer0.w).y;
 
 	vec3 viewPos  = screenToViewSpace(vec3(uv, depth), true);
 	vec3 scenePos = viewToSceneSpace(viewPos);
@@ -239,7 +251,7 @@ void main() {
 			vec3 worldStartPos = gbufferModelViewInverse[3].xyz + cameraPosition;
 			vec3 worldEndPos   = worldPos;
 
-			mat2x3 fog = raymarchFog(worldStartPos, worldEndPos, depth == 1.0, dither);
+			mat2x3 fog = raymarchFog(worldStartPos, worldEndPos, depth == 1.0, skylight, dither);
 
 			fogScattering    = fog[0];
 			fogTransmittance = fog[1];

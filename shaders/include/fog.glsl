@@ -50,8 +50,10 @@ vec3 getBorderFogColor(vec3 worldDir, float fog) {
 void getSimpleFog(inout vec3 fragColor, vec3 scenePos, vec3 worldDir) {
 	// Border fog
 
+#ifdef BORDER_FOG
 	float fog = getBorderFog(scenePos, worldDir);
 	fragColor = mix(getBorderFogColor(worldDir, fog), fragColor, fog);
+#endif
 }
 
 //----------------------------------------------------------------------------//

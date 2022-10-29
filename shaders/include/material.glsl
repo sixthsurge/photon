@@ -1,6 +1,7 @@
 #if !defined MATERIAL_INCLUDED
 #define MATERIAL_INCLUDED
 
+#include "aces/matrices.glsl"
 #include "utility/color.glsl"
 
 struct Material {
@@ -47,10 +48,10 @@ Material getMaterial(vec3 albedoSrgb, uint blockId, vec3 fractWorldPos, inout ve
 
 	Material material;
 	material.albedo           = srgbToLinear(albedoSrgb) * rec709_to_rec2020;
-	material.f0               = vec3(0.04);
+	material.f0               = vec3(0.0);
 	material.f82              = vec3(0.0);
 	material.roughness        = 1.0;
-	material.refractiveIndex  = (1.0 + sqrt(0.04)) / (1.0 - sqrt(0.04));
+	material.refractiveIndex  = 1.0;
 	material.sssAmount        = 0.0;
 	material.porosity         = 0.0;
 	material.emission         = 0.0;
@@ -71,27 +72,36 @@ Material getMaterial(vec3 albedoSrgb, uint blockId, vec3 fractWorldPos, inout ve
 					}
 				} else { // 2-4
 					if (blockId == 2u) {
+						#ifdef HARDCODED_EMISSION
 						// Bright full emissives
 						material.emission = 1.00 * (0.1 + 0.9 * sqr(hsl.z));
 						lmCoord.x *= 0.8;
+						#endif
 					} else {
+						#ifdef HARDCODED_EMISSION
 						// Medium full emissives
-						material.emission = 0.70 * (0.1 + 0.9 * sqr(hsl.z));
+						material.emission = 0.66 * (0.1 + 0.9 * sqr(hsl.z));
 						lmCoord.x *= 0.8;
+						#endif
 					}
 				}
 			} else { // 4-8
 				if (blockId < 6u) { // 4-6
 					if (blockId == 4u) {
+						#ifdef HARDCODED_EMISSION
 						// Dim full emissives
-						material.emission = 0.30 * (0.1 + 0.9 * cube(hsl.z));
+						material.emission = 0.33 * (0.1 + 0.9 * cube(hsl.z));
 						lmCoord.x *= 0.95;
+						#endif
 					} else {
+						#ifdef HARDCODED_EMISSION
 						// Partial emissives (brightest parts glow)
-						material.emission = step(0.48, 0.2 * hsl.y + 0.5 * hsl.z);
+						material.emission = 0.8 * step(0.495, 0.2 * hsl.y + 0.5 * hsl.z);
 						lmCoord.x *= 0.88;
+						#endif
 					}
-				} else { // 6-8
+				} else { // 6-8, Torches
+					#ifdef HARDCODED_EMISSION
 					if (blockId == 6u) {
 						// Ground torches and other partial emissives
 						material.emission = 0.3 * cube(linearStep(0.2, 0.4, fractWorldPos.y));
@@ -99,44 +109,64 @@ Material getMaterial(vec3 albedoSrgb, uint blockId, vec3 fractWorldPos, inout ve
 						// Wall torches
 						material.emission = 0.3 * cube(linearStep(0.35, 0.6, fractWorldPos.y));
 					}
-
 					material.emission  = max(material.emission, step(0.5, 0.2 * hsl.y + 0.55 * hsl.z));
 					material.emission *= lmCoord.x;
 					lmCoord.x *= 0.75;
+					#endif
 				}
 			}
 		} else { // 8-16
 			if (blockId < 12u) { // 8-12
-				if (blockId < 10u) { // 8-10, Torches
+				if (blockId < 10u) { // 8-10
 					if (blockId == 8u) {
-						// Jack o' Lantern + nether mushrooms
-						material.emission = 0.80 * step(0.73, 0.1 * hsl.y + 0.7 * hsl.z);
-						lmCoord *= 0.9;
+						#ifdef HARDCODED_EMISSION
+						// Lava
+						material.emission = 2.00 * (0.2 + 0.8 * isolateHue(hsl, 30.0, 15.0));
+						lmCoord.x *= 0.3;
+						#endif
 					} else {
-						// Beacon
-						material.emission = step(0.2, hsl.z) * step(maxOf(abs(fractWorldPos - 0.5)), 0.4);
-						lmCoord *= 0.9;
+						#ifdef HARDCODED_EMISSION
+						// Redstone components
+						vec3 ap1 = material.albedo * rec2020_to_ap1_unlit;
+						float l = 0.5 * (minOf(ap1) + maxOf(ap1));
+						float redness = ap1.r * rcp(ap1.g + ap1.b);
+						material.emission = 0.33 * step(0.45, redness * l);
+						#endif
 					}
 				} else { // 10-12
 					if (blockId == 10u) {
-						// End portal frame
-						material.emission = 0.33 * isolateHue(hsl, 120.0, 50.0);
+						#ifdef HARDCODED_EMISSION
+						// Jack o' Lantern + nether mushrooms
+						material.emission = 0.80 * step(0.73, 0.1 * hsl.y + 0.7 * hsl.z);
+						lmCoord *= 0.9;
+						#endif
 					} else {
-						// Really bright full emissives
-						material.emission = 2.0;
+						#ifdef HARDCODED_EMISSION
+						// Beacon
+						material.emission = step(0.2, hsl.z) * step(maxOf(abs(fractWorldPos - 0.5)), 0.4);
+						lmCoord *= 0.9;
+						#endif
 					}
 				}
 			} else { // 12-16
 				if (blockId < 14u) { // 12-14
 					if (blockId == 12u) {
-						// Really dim full emissives
-						material.emission = 0.05 * sqr(hsl.z);
+						#ifdef HARDCODED_EMISSION
+						// End portal frame
+						material.emission = 0.33 * isolateHue(hsl, 120.0, 50.0);
+						#endif
 					} else {
-
+						#ifdef HARDCODED_EMISSION
+						// Sculk
+						material.emission = 0.2 * isolateHue(hsl, 200.0, 40.0) * smoothstep(0.5, 0.7, hsl.z);
+						#endif
 					}
 				} else { // 14-16
 					if (blockId == 14u) {
-
+						#ifdef HARDCODED_EMISSION
+						// Pink glow
+						material.emission = 2.0 * isolateHue(hsl, 310.0, 50.0);
+						#endif
 					} else {
 
 					}
@@ -167,10 +197,10 @@ Material getMaterial(vec3 albedoSrgb, uint blockId, vec3 fractWorldPos, inout ve
 				if (blockId < 24u) { // 20-22
 					if (blockId == 20u) {
 						// Weak SSS
-						material.sssAmount = 0.3;
+						material.sssAmount = 0.2;
 					} else {
 						// Strong SSS
-						material.sssAmount = 0.7;
+						material.sssAmount = 0.6;
 					}
 				} else { // 22-24
 					if (blockId == 22u) {

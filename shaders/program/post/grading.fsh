@@ -34,7 +34,7 @@ uniform vec2 texelSize;
 
 // Bloom
 
-vec3 getBloom() {
+vec3 getBloom(out vec3 fogBloom) {
 	const int tileCount = 6;
 	const float radius  = 1.0;
 
@@ -43,13 +43,21 @@ vec3 getBloom() {
 	float weight = 1.0;
 	float weightSum = 0.0;
 
+#if defined BLOOMY_FOG || defined BLOOMY_RAIN
+	const float fogBloomRadius = 1.5;
+
+	fogBloom = vec3(0.0); // large-scale bloom for bloomy fog
+	float fogBloomWeight = 1.0;
+	float fogBloomWeightSum = 0.0;
+#endif
+
 	for (int i = 0; i < tileCount; ++i) {
 		float a = exp2(float(-i));
 
-		float tileSize   = 0.5 * a;
-		float tileOffset = 1.0 - a;
+		float tileScale = 0.5 * a;
+		vec2 tileOffset = vec2(1.0 - a, float(i & 1) * (1.0 - 0.5 * a));
 
-		vec2 tileCoord = uv * tileSize + tileOffset;
+		vec2 tileCoord = uv * tileScale + tileOffset;
 
 		vec3 tile = textureBicubic(colortex0, tileCoord).rgb;
 
@@ -57,7 +65,18 @@ vec3 getBloom() {
 		weightSum += weight;
 
 		weight *= radius;
+
+#if defined BLOOMY_FOG || defined BLOOMY_RAIN
+		fogBloom += tile * fogBloomWeight;
+
+		fogBloomWeightSum += fogBloomWeight;
+		fogBloomWeight *= fogBloomRadius;
+#endif
 	}
+
+#if defined BLOOMY_FOG || defined BLOOMY_RAIN
+	fogBloom /= fogBloomWeightSum;
+#endif
 
 	return tileSum / weightSum;
 }
@@ -151,8 +170,9 @@ vec3 academyFit(vec3 rgb) {
 }
 
 // Filmic tonemapping operator made by Jim Hejl and Richard Burgess
+// Modified by Tech to not lose color information below 0.004
 vec3 tonemapHejlBurgess(vec3 rgb) {
-	rgb = max0(rgb - 0.004);
+	rgb = rgb * min(vec3(1.0), 1.0 - 0.8 * exp(rcp(-0.004) * rgb));
 	rgb = (rgb * (6.2 * rgb + 0.5)) / (rgb * (6.2 * rgb + 1.7) + 0.06);
 	return srgbToLinear(rgb); // Revert built-in sRGB conversion
 }
@@ -205,7 +225,7 @@ float vignette(vec2 uv) {
     const float vignetteIntensity = 0.08 * VIGNETTE_INTENSITY;
 
     float vignette = vignetteSize * (uv.x * uv.y - uv.x) * (uv.x * uv.y - uv.y);
-          vignette = pow(vignette, vignetteIntensity + 0.15 * biomeCave + 0.3 * blindness);
+          vignette = pow(vignette, vignetteIntensity + 0.1 * biomeCave + 0.3 * blindness);
 
     return vignette;
 }
@@ -218,10 +238,16 @@ void main() {
 	float exposure = texelFetch(colortex5, ivec2(0), 0).a;
 
 #ifdef BLOOM
-	vec3 bloom = getBloom();
+	vec3 fogBloom;
+	vec3 bloom = getBloom(fogBloom);
 	float bloomIntensity = 0.1 * BLOOM_INTENSITY;
 
 	fragColor = mix(fragColor, bloom, bloomIntensity);
+
+#ifdef BLOOMY_FOG
+	float fogTransmittance = texelFetch(colortex3, texel, 0).x;
+	fragColor = mix(fogBloom, fragColor, pow(fogTransmittance, BLOOMY_FOG_INTENSITY));
+#endif
 #endif
 
 	fragColor *= exposure;

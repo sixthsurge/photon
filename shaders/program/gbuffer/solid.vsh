@@ -41,6 +41,19 @@ uniform float far;
 
 uniform vec2 taaOffset;
 
+#ifdef PROGRAM_ENTITIES
+uniform int entityId;
+#endif
+
+#ifdef PROGRAM_BLOCK
+uniform int blockEntityId;
+#endif
+
+#ifdef PROGRAM_HAND
+uniform int heldItemId;
+uniform int heldItemId2;
+#endif
+
 #include "/include/utility/spaceConversion.glsl"
 
 void main() {
@@ -48,6 +61,14 @@ void main() {
 	lmCoord  = clamp01(gl_MultiTexCoord1.xy * rcp(240.0));
 	tint     = gl_Color;
 	blockId  = uint(max0(mc_Entity.x - 10000.0));
+
+#if defined PROGRAM_ENTITIES
+	blockId = uint(max(entityId - 10000, 0));
+#endif
+
+#if defined PROGRAM_BLOCK
+	blockId = uint(max(blockEntityId - 10000, 0));
+#endif
 
 	tbnMatrix[2] = mat3(gbufferModelViewInverse) * normalize(gl_NormalMatrix * gl_Normal);
 #ifdef MC_NORMAL_MAP
@@ -58,6 +79,11 @@ void main() {
 #ifdef PROGRAM_TERRAIN
 	vanillaAo = gl_Color.a < 0.1 ? 1.0 : gl_Color.a; // fixes models where vanilla ao breaks (eg lecterns)
 	tint.a = 1.0;
+#endif
+
+#ifdef PROGRAM_SPIDEREYES
+	blockId = 2; // full emissive
+	lmCoord.x = 1.0;
 #endif
 
 	vec3 viewPos = transform(gl_ModelViewMatrix, gl_Vertex.xyz);

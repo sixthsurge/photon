@@ -20,6 +20,12 @@ uniform sampler2D colortex0;
 
 uniform vec2 viewSize;
 
+#define bloomTileScale(i) 0.5 * exp2(-(i))
+#define bloomTileOffset(i) vec2(            \
+	1.0 - exp2(-(i)),                       \
+	float((i) & 1) * (1.0 - 0.5 * exp2(-(i))) \
+)
+
 const float[5] binomialWeights9 = float[5](
    0.2734375,
    0.21875,
@@ -33,17 +39,17 @@ void main() {
 
 	// Calculate the bounds of the tile containing the fragment
 
-	float tileIndex = floor(-log2(1.0 - uv.x));
+	int tileIndex = int(-log2(1.0 - uv.x));
 
-	float tileSize   = 0.5 * exp2(-tileIndex);
-	float tileOffset = 1.0 - exp2(-tileIndex);
+	float tileScale = bloomTileScale(tileIndex);
+	vec2 tileOffset = bloomTileOffset(tileIndex);
 
 	ivec2 boundsMin = ivec2(viewSize * tileOffset);
-	ivec2 boundsMax = ivec2(viewSize * (tileOffset + tileSize));
+	ivec2 boundsMax = ivec2(viewSize * (tileOffset + tileScale));
 
 	// Discard fragments that aren't part of a bloom tile
 
-	if (clamp(texel.y, boundsMin.y, boundsMax.y) != texel.y) discard;
+	if (clamp(texel.y, boundsMin.y, boundsMax.y) != texel.y || tileIndex > 5) discard;
 
 	// Horizontal 9-tap gaussian blur
 

@@ -29,12 +29,23 @@ uniform sampler2D colortex0;
 
 uniform vec2 texelSize;
 
-const float srcTileSize   = 0.5 * exp2(-(BLOOM_TILE_INDEX - 1.0));
-const float srcTileOffset = 1.0 - exp2(-max0(BLOOM_TILE_INDEX - 1.0));
+#define bloomTileScale(i) 0.5 * exp2(-(i))
+#define bloomTileOffset(i) vec2(            \
+	1.0 - exp2(-(i)),                       \
+	float((i) & 1) * (1.0 - 0.5 * exp2(-(i))) \
+)
+
+#if BLOOM_TILE_INDEX == 0
+const float srcTileScale = 1.0;
+const vec2 srcTileOffset = vec2(0.0);
+#else
+const float srcTileScale = bloomTileScale(BLOOM_TILE_INDEX - 1);
+const vec2 srcTileOffset = bloomTileOffset(BLOOM_TILE_INDEX - 1);
+#endif
 
 void main() {
-	vec2 padAmount = 2.0 * texelSize * rcp(srcTileSize);
-	vec2 uvSrc = clamp(uv, padAmount, 1.0 - padAmount) * srcTileSize + srcTileOffset;
+	vec2 padAmount = 3.0 * texelSize * rcp(srcTileScale);
+	vec2 uvSrc = clamp(uv, padAmount, 1.0 - padAmount) * srcTileScale + srcTileOffset;
 
 	// 6x6 downsampling filter made from overlapping 4x4 box kernels
 	// As described in "Next Generation Post-Processing in Call of Duty Advanced Warfare"

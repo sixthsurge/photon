@@ -60,7 +60,7 @@ vec3 diffuseHammon(
 	float fresnelNV = fresnelDielectric(max(NoV, 1e-2), n).x;
 	float energyConservationFactor = 1.0 - (4.0 * sqrt(f0) + 5.0 * f0 * f0) * (1.0 / 9.0);
 
-	float singleRough = max0(facing) * (-0.2 * facing + 0.45) * (1.0 / NoH + 2.0);
+	float singleRough = sqrt(max0(facing)) * (-0.2 * facing + 0.45) * (1.0 / NoH + 2.0);
 	float singleSmooth = (1.0 - fresnelNL) * (1.0 - fresnelNV) / energyConservationFactor;
 
 	float single = mix(singleSmooth, singleRough, roughness) * rcpPi;

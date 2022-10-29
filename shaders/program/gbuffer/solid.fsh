@@ -115,7 +115,7 @@ void main() {
 	float dither = interleavedGradientNoise(gl_FragCoord.xy, frameCounter);
 
 	gbuffer0.x  = packUnorm2x8(baseTex.rg);
-	gbuffer0.y  = packUnorm2x8(baseTex.b, float(blockId) * rcp(255.0));
+	gbuffer0.y  = packUnorm2x8(baseTex.b, clamp01(float(blockId) * rcp(255.0)));
 	gbuffer0.z  = packUnorm2x8(encodeUnitVector(tbnMatrix[2]));
 	gbuffer0.w  = packUnorm2x8(dither8Bit(lmCoord, dither));
 
