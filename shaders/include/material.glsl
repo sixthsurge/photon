@@ -43,7 +43,7 @@ void decodeSpecularTexture() {
 }
 #endif
 
-Material getMaterial(vec3 albedoSrgb, uint blockId, vec3 fractWorldPos, inout vec2 lmCoord) {
+Material getMaterial(vec3 albedoSrgb, uint blockId, vec3 blockPos, inout vec2 lmCoord) {
 	// Create material with default values
 
 	Material material;
@@ -104,10 +104,10 @@ Material getMaterial(vec3 albedoSrgb, uint blockId, vec3 fractWorldPos, inout ve
 					#ifdef HARDCODED_EMISSION
 					if (blockId == 6u) {
 						// Ground torches and other partial emissives
-						material.emission = 0.3 * cube(linearStep(0.2, 0.4, fractWorldPos.y));
+						material.emission = 0.3 * cube(linearStep(0.2, 0.4, blockPos.y));
 					} else {
 						// Wall torches
-						material.emission = 0.3 * cube(linearStep(0.35, 0.6, fractWorldPos.y));
+						material.emission = 0.3 * cube(linearStep(0.35, 0.6, blockPos.y));
 					}
 					material.emission  = max(material.emission, step(0.5, 0.2 * hsl.y + 0.55 * hsl.z));
 					material.emission *= lmCoord.x;
@@ -143,7 +143,7 @@ Material getMaterial(vec3 albedoSrgb, uint blockId, vec3 fractWorldPos, inout ve
 					} else {
 						#ifdef HARDCODED_EMISSION
 						// Beacon
-						material.emission = step(0.2, hsl.z) * step(maxOf(abs(fractWorldPos - 0.5)), 0.4);
+						material.emission = step(0.2, hsl.z) * step(maxOf(abs(blockPos - 0.5)), 0.4);
 						lmCoord *= 0.9;
 						#endif
 					}
@@ -178,33 +178,54 @@ Material getMaterial(vec3 albedoSrgb, uint blockId, vec3 fractWorldPos, inout ve
 			if (blockId < 20u) { // 16-20
 				if (blockId < 18u) { // 16-18
 					if (blockId == 16u) {
+						#ifdef HARDCODED_SSS
 						// Small plants
 						material.sssAmount = 0.5;
+						#endif
 					} else {
+						#ifdef HARDCODED_SSS
 						// Tall plants (lower half)
 						material.sssAmount = 0.5;
+						#endif
 					}
 				} else { // 18-20
 					if (blockId == 18u) {
+						#ifdef HARDCODED_SSS
 						// Tall plants (upper half)
 						material.sssAmount = 0.5;
+						#endif
 					} else {
+						#ifdef HARDCODED_SSS
 						// Leaves
 						material.sssAmount = 1.0;
+						#endif
 					}
 				}
 			} else { // 20-24
 				if (blockId < 24u) { // 20-22
 					if (blockId == 20u) {
+						// Stained glass
+						#ifdef HARDCODED_SPECULAR
+						material.f0              = vec3(0.04);
+						material.refractiveIndex = (1.0 + sqrt(0.04)) / (1.0 - sqrt(0.04));
+						material.roughness       = 0.1;
+						#endif
+
+						#ifdef HARDCODED_SSS
+						material.sssAmount = 0.5;
+						#endif
+					} else {
+						#ifdef HARDCODED_SSS
 						// Weak SSS
 						material.sssAmount = 0.2;
-					} else {
-						// Strong SSS
-						material.sssAmount = 0.6;
+						#endif
 					}
 				} else { // 22-24
 					if (blockId == 22u) {
-
+						#ifdef HARDCODED_SSS
+						// Strong SSS
+						material.sssAmount = 0.6;
+						#endif
 					} else {
 
 					}

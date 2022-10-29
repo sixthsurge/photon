@@ -218,7 +218,7 @@ float chapmanFunctionApprox(float x, float cosTheta) {
 }
 
 vec3 atmosphereTransmittance(float mu, float r) {
-	if (intersectSphere(mu, r, planetRadius).x >= 0.0) return vec3(0.0);
+	if (intersectSphere(mu, max(r, planetRadius + 10.0), planetRadius).x >= 0.0) return vec3(0.0);
 
 	// Rayleigh and mie density at r
 	const vec2 rcpScaleHeights = rcp(airScaleHeights);

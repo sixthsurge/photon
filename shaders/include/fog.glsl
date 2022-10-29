@@ -27,6 +27,7 @@ float getBorderFog(vec3 scenePos, vec3 worldDir) {
 
 const vec3 caveFogCol = toRec2020(vec3(1.0)) * 0.0;
 
+#if defined PROGRAM_DEFERRED3
 vec3 getBorderFogColor(vec3 worldDir, float fog) {
 	vec3 fogCol = illuminance[0] * atmosphereScattering(worldDir, sunDir)
 	            + illuminance[1] * atmosphereScattering(worldDir, moonDir);
@@ -46,11 +47,12 @@ vec3 getBorderFogColor(vec3 worldDir, float fog) {
 
 	return mix(fogCol, caveFogCol, biomeCave);
 }
+#endif
 
 void getSimpleFog(inout vec3 fragColor, vec3 scenePos, vec3 worldDir) {
 	// Border fog
 
-#ifdef BORDER_FOG
+#if defined BORDER_FOG && defined PROGRAM_DEFERRED3
 	float fog = getBorderFog(scenePos, worldDir);
 	fragColor = mix(getBorderFogColor(worldDir, fog), fragColor, fog);
 #endif

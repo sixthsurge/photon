@@ -19,6 +19,9 @@ layout (location = 1) out float bloomyFog;
 
 in vec2 uv;
 
+flat in vec3 lightCol;
+flat in vec3 skyCol;
+
 uniform sampler2D colortex0; // Scene color
 uniform sampler2D colortex1; // Gbuffer 0
 uniform sampler2D colortex2; // Gbuffer 1
@@ -31,6 +34,7 @@ uniform sampler2D depthtex0;
 uniform sampler2D depthtex1;
 
 #ifdef SHADOW
+uniform sampler2D shadowtex0;
 uniform sampler2DShadow shadowtex1;
 #endif
 
@@ -75,10 +79,23 @@ uniform float timeNoon;
 uniform float timeSunset;
 uniform float timeMidnight;
 
+#define PROGRAM_COMPOSITE1
+#define WORLD_OVERWORLD
+
+#ifdef SHADOW_COLOR
+	#undef SHADOW_COLOR
+#endif
+
 #include "/include/utility/color.glsl"
 #include "/include/utility/encoding.glsl"
 #include "/include/utility/fastMath.glsl"
 #include "/include/utility/spaceConversion.glsl"
+
+#include "/include/diffuseLighting.glsl"
+#include "/include/fog.glsl"
+#include "/include/material.glsl"
+#include "/include/shadows.glsl"
+#include "/include/specularLighting.glsl"
 
 // from https://iquilezles.org/www/articles/texture/texture.htm
 vec4 textureSmooth(sampler2D sampler, vec2 coord) {
@@ -125,7 +142,7 @@ void main() {
 #if defined NORMAL_MAPPING || defined SPECULAR_MAPPING
 	vec4 gbuffer1 = texelFetch(colortex2, texel, 0);
 #endif
-	vec4 transCol = texelFetch(colortex3, texel, 0);
+	vec4 blendCol = texelFetch(colortex3, texel, 0);
 
 	vec2 fogUv = clamp(uv * FOG_RENDER_SCALE, vec2(0.0), floor(viewSize * FOG_RENDER_SCALE - 1.0) * texelSize);
 
@@ -160,7 +177,68 @@ void main() {
 	vec3 flatNormal = decodeUnitVector(data[2]);
 	vec2 lmCoord    = data[3];
 
-	fragColor = mix(fragColor, transCol.rgb, transCol.a);
+	Material material;
+
+	// Shade translucent layer
+
+	bool isTranslucent  = depth0 != depth1;
+	bool isWater        = blockId == 1;
+	bool isRainParticle = blockId == 253;
+	bool isSnowParticle = blockId == 254;
+
+	if (isTranslucent) {
+		material = getMaterial(blendCol.rgb, blockId, fract(worldPos), lmCoord);
+
+#ifdef NORMAL_MAPPING
+		vec3 normal = decodeUnitVector(gbuffer1.xy);
+#else
+		#define normal flatNormal
+#endif
+
+#ifdef SPECULAR_MAPPING
+		vec4 specularTex = vec4(unpackUnorm2x8(gbuffer1.z), unpackUnorm2x8(gbuffer1.w));
+		//decodeSpecularTexture(specularTex, material);
+#endif
+
+		float NoL = dot(normal, lightDir);
+		float NoV = clamp01(dot(normal, -worldDir));
+		float LoV = dot(lightDir, -worldDir);
+		float halfwayNorm = inversesqrt(2.0 * LoV + 2.0);
+		float NoH = (NoL + NoV) * halfwayNorm;
+		float LoH = LoV * halfwayNorm + halfwayNorm;
+
+		float sssDepth;
+		vec3 shadows = calculateShadows(scenePos, flatNormal, lmCoord.y, material.sssAmount, sssDepth);
+
+		vec3 translucentCol = getSceneLighting(
+			material,
+			normal,
+			normal,
+			shadows,
+			lmCoord,
+			1.0,
+			sssDepth,
+			NoL,
+			NoV,
+			NoH,
+			LoV
+		);
+
+		translucentCol += getSpecularHighlight(material, NoL, NoV, NoH, LoV, LoH) * lightCol * shadows;
+
+		getSimpleFog(translucentCol, scenePos, worldDir);
+
+		blendCol.a *= getBorderFog(scenePos, worldDir);
+
+		// Blend with background
+
+		vec3 tint = material.albedo;
+		float alpha = blendCol.a;
+
+		fragColor *= (1.0 - alpha) + tint * alpha;
+		fragColor *= 1.0 - alpha;
+		fragColor += translucentCol;
+	}
 
 	// Apply volumetric fog
 

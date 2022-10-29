@@ -89,7 +89,11 @@ void main() {
 	vec4 specularTex = texture(specular, texCoord, lodBias);
 #endif
 
+#if defined PROGRAM_ENTITIES
+	if (baseTex.a < 0.1 && blockId != 101) discard; // Save transparent quad in boats, which masks out water
+#else
 	if (baseTex.a < 0.1) discard;
+#endif
 
 #ifdef WHITE_WORLD
 	baseTex.rgb = vec3(1.0);

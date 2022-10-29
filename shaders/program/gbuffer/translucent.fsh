@@ -21,7 +21,7 @@
 /* DRAWBUFFERS:312 */
 #endif
 
-layout (location = 0) out vec4 baseColor;
+layout (location = 0) out vec4 blendCol;
 layout (location = 1) out vec4 gbuffer0; // albedo, block ID, flat normal, light levels
 layout (location = 2) out vec4 gbuffer1; // detailed normal, specular map (optional)
 
@@ -76,7 +76,7 @@ void main() {
 	if (clamp01(uv) != uv) discard;
 #endif
 
-	baseColor        = texture(gtexture, texCoord, lodBias) * tint;
+	blendCol         = texture(gtexture, texCoord, lodBias) * tint;
 #ifdef NORMAL_MAPPING
 	vec3 normalTex   = texture(normals, texCoord, lodBias).xyz;
 #endif
@@ -84,7 +84,7 @@ void main() {
 	vec4 specularTex = texture(specular, texCoord, lodBias);
 #endif
 
-	if (baseColor.a < 0.1) discard;
+	if (blendCol.a < 0.1) discard;
 
 #ifdef NORMAL_MAPPING
 	vec3 normal; float ao;
@@ -95,8 +95,8 @@ void main() {
 
 	float dither = interleavedGradientNoise(gl_FragCoord.xy, frameCounter);
 
-	gbuffer0.x  = packUnorm2x8(baseColor.rg);
-	gbuffer0.y  = packUnorm2x8(baseColor.b, float(blockId) * rcp(255.0));
+	gbuffer0.x  = packUnorm2x8(blendCol.rg);
+	gbuffer0.y  = packUnorm2x8(blendCol.b, float(blockId) * rcp(255.0));
 	gbuffer0.z  = packUnorm2x8(encodeUnitVector(tbnMatrix[2]));
 	gbuffer0.w  = packUnorm2x8(dither8Bit(lmCoord, dither));
 
@@ -111,7 +111,6 @@ void main() {
 
 #ifdef PROGRAM_TEXTURED
 	// Kill the little rain splash particles
-	if (baseColor.r < 0.29 && baseColor.g < 0.45 && baseColor.b > 0.75) discard;
+	if (blendCol.r < 0.29 && blendCol.g < 0.45 && blendCol.b > 0.75) discard;
 #endif
-
  }

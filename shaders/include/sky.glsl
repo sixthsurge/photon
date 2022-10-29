@@ -9,7 +9,8 @@
 #include "utility/fastMath.glsl"
 #include "utility/random.glsl"
 
-const float sunLuminance = 30.0; // luminance of sun disk
+const float sunLuminance  = 40.0; // luminance of sun disk
+const float moonLuminance = 2.0; // luminance of sun disk
 
 vec3 drawSun(vec3 rayDir) {
 	float nu = dot(rayDir, sunDir);
@@ -84,18 +85,32 @@ vec3 renderSky(vec3 rayDir) {
 
 	// Sun, moon and stars
 
+#if defined PROGRAM_DEFERRED3
+	vec4 vanillaSky = texelFetch(colortex3, ivec2(gl_FragCoord.xy), 0);
+	vec3 vanillaSkyColor = srgbToLinear(vanillaSky.rgb) * rec709_to_rec2020;
+	uint vanillaSkyId = uint(255.0 * vanillaSky.a);
+
 #ifdef VANILLA_SUN
+	if (vanillaSkyId == 2) {
+		const vec3 brightnessScale = baseSunCol * sunLuminance;
+		sky += vanillaSkyColor * brightnessScale;
+	}
 #else
 	sky += drawSun(rayDir);
 #endif
 
 #ifdef VANILLA_MOON
+	if (vanillaSkyId == 3) {
+		const vec3 brightnessScale = baseSunCol * moonLuminance;
+		sky += vanillaSkyColor * brightnessScale;
+	}
 #else
 	sky += drawMoon(rayDir);
 #endif
 
 #ifdef STARS
 	sky += drawStars(rayDir);
+#endif
 #endif
 
 	// Sky gradient

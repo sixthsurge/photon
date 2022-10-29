@@ -82,6 +82,7 @@ uniform float timeSunset;
 uniform float timeMidnight;
 
 #define ATMOSPHERE_SCATTERING_LUT depthtex0
+#define PROGRAM_DEFERRED3
 #define TEMPORAL_REPROJECTION
 #define WORLD_OVERWORLD
 
@@ -146,7 +147,9 @@ void main() {
 		vec3 flatNormal = decodeUnitVector(data[2]);
 		vec2 lmCoord    = data[3];
 
-		albedo = overlays.a < 0.5 ? albedo + overlays.rgb : 2.0 * albedo * overlays.rgb;
+		uint overlayId = uint(255.0 * overlays.a);
+		albedo = overlayId == 0u ? albedo + overlays.rgb : albedo; // enchantment glint
+		albedo = overlayId == 1u ? 2.0 * albedo * overlays.rgb : albedo; // damage overlay
 
 		Material material = getMaterial(albedo, blockId, fract(worldPos), lmCoord);
 

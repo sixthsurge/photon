@@ -35,4 +35,12 @@ float kleinNishinaPhase(float nu, float e) {
 	return e / (tau * (e - e * nu + 1.0) * log(2.0 * e + 1.0));
 }
 
+// A phase function specifically designed for leaves. kD is the diffuse reflection, and smaller
+// values returns a brighter phase value. Thanks to Jessie for sharing this in the #snippets channel
+// of the shaderLABS discord server
+float bilambertianPlatePhase(float nu, float kD) {
+	float phase = 2.0 * (-pi * nu * kD + sqrt(clamp01(1.0 - sqr(nu))) + nu * fastAcos(-nu));
+	return phase * rcp(3.0 * pi * pi);
+}
+
 #endif // PHASEFUNCTIONS_INCLUDED

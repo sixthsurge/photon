@@ -1,32 +1,33 @@
 #if !defined DIFFUSELIGHTING_INCLUDED
 #define DIFFUSELIGHTING_INCLUDED
 
-#include "utility/fastMath.glsl"
-#include "utility/sphericalHarmonics.glsl"
 #include "bsdf.glsl"
 #include "material.glsl"
 #include "palette.glsl"
+#include "phaseFunctions.glsl"
+#include "utility/fastMath.glsl"
+#include "utility/sphericalHarmonics.glsl"
 
 //----------------------------------------------------------------------------//
 #if   defined WORLD_OVERWORLD
 
 const float blocklightIntensity = 5.0;
 const float emissionIntensity   = 32.0;
-const float sssIntensity        = 3.0;
-const float sssDensity          = 12.0;
+const float sssIntensity        = 5.0;
+const float sssDensity          = 32.0;
 const float metalDiffuseAmount  = 0.25; // Scales diffuse lighting on metals, ideally this would be zero but purely specular metals don't play well with SSR
 const vec3  blocklightColor     = toRec2020(vec3(BLOCKLIGHT_R, BLOCKLIGHT_G, BLOCKLIGHT_B)) * BLOCKLIGHT_I;
 
 vec3 getSubsurfaceScattering(vec3 albedo, float sssAmount, float sssDepth, float LoV) {
 	if (sssAmount < eps) return vec3(0.0);
 
-	vec3 coeff = normalizeSafe(albedo) * sqrt(sqrt(length(albedo)));
-	     coeff = (clamp01(coeff) * sssDensity - sssDensity) / sssAmount;
+	vec3 coeff = albedo * inversesqrt(getLuminance(albedo) + eps);
+	     coeff = clamp01(0.75 * coeff);
+	     coeff = (1.0 - coeff) * sssDensity / sssAmount;
 
-	vec3 sss1 = exp(3.0 * coeff * sssDepth) * henyeyGreensteinPhase(-LoV, 0.4);
-	vec3 sss2 = exp(0.0 * coeff * sssDepth) * (0.6 * henyeyGreensteinPhase(-LoV, 0.33) + 0.4 * henyeyGreensteinPhase(-LoV, -0.2));
+	float phase = bilambertianPlatePhase(-LoV, 0.3);
 
-	return albedo * sssIntensity * sssAmount * (sss2);
+	return pi * phase * exp2(-coeff * sssDepth) * sssIntensity * sqrt(sssAmount);
 }
 
 vec3 getSceneLighting(
@@ -47,18 +48,17 @@ vec3 getSceneLighting(
 	// Sunlight/moonlight
 
 	vec3 diffuse = diffuseHammon(material.albedo, material.roughness, material.refractiveIndex, material.f0.x, NoL, NoV, NoH, LoV) * (1.0 - 0.5 * material.sssAmount) * pi;
-	vec3 bounced = 0.07 * (1.0 - shadows * max0(NoL)) * (1.0 - 0.33 * max0(normal.y)) * pow1d5(ao) * pow4(lmCoord.y);
-	vec3 sss = vec3(0.0);
+	vec3 bounced = 0.066 * (1.0 - shadows * max0(NoL)) * (1.0 - 0.33 * max0(normal.y)) * pow1d5(ao + eps) * pow4(lmCoord.y);
+	vec3 sss = getSubsurfaceScattering(material.albedo, material.sssAmount, sssDepth, LoV);
 
 	illuminance += lightCol * (max0(NoL) * diffuse * shadows * ao + bounced + sss);
 
-	illuminance += lightCol * exp((clamp01(material.albedo * inversesqrt(getLuminance(material.albedo)))- 1.0) * 32.0 * sssDepth) * 0.75 * sqrt(material.sssAmount);
-
 	// Skylight
 
-#ifdef SH_SKYLIGHT
+#if defined SH_SKYLIGHT && defined PROGRAM_DEFERRED3
 	vec3 skylight = evaluateSphericalHarmonicsIrradiance(skySh, bentNormal, ao);
 #else
+	vec3 skylight = skyCol * ao;
 #endif
 
 	float skylightFalloff = sqr(lmCoord.y);
@@ -80,7 +80,7 @@ vec3 getSceneLighting(
 
 	illuminance += CAVE_LIGHTING_I * ao * (1.0 - skylightFalloff);
 
-	return illuminance * material.albedo * rcpPi * mix(1.0, metalDiffuseAmount, float(material.isMetal));
+	return max0(illuminance) * material.albedo * rcpPi * mix(1.0, metalDiffuseAmount, float(material.isMetal));
 }
 
 //----------------------------------------------------------------------------//

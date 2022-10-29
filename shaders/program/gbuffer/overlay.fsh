@@ -31,9 +31,9 @@ void main() {
 
 #if   defined PROGRAM_ARMOR_GLINT
 	// alpha of 0 <=> enchantment glint
-	overlays.a = 0.0;
+	overlays.a = 0.0 / 255.0;
 #elif defined PROGRAM_DAMAGEDBLOCK
 	// alpha of 1 <=> block breaking overlay
-	overlays.a = 1.0;
+	overlays.a = 1.0 / 255.0;
 #endif
 }
