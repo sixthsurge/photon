@@ -10,7 +10,7 @@
 // Magic brightness adjustments, pre-exposing for the light source to compensate
 // for the lack of auto exposure by default
 float getSunBrightness() {
-	const float baseSunBrightness = 8.33;
+	const float baseSunBrightness = 8.0;
 	const float userSunBrightness = SUN_I;
 
 	float blueHour = cube(pulse(float(worldTime), 13200.0, 900.0, 24000.0))  // dusk
@@ -21,7 +21,7 @@ float getSunBrightness() {
 	return baseSunBrightness * userSunBrightness * blueHourMul;
 }
 float getMoonBrightness() {
-	const float baseMoonBrightness = 0.3;
+	const float baseMoonBrightness = 0.5;
 	const float userMoonBrightness = MOON_I;
 
 	return baseMoonBrightness * userMoonBrightness;

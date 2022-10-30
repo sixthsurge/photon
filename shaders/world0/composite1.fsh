@@ -162,8 +162,8 @@ void main() {
 	vec3 scenePos  = viewToSceneSpace(viewPos);
 	vec3 worldPos  = scenePos + cameraPosition;
 
-	vec3 worldDir; float viewDistance;
-	lengthNormalize(scenePos - gbufferModelViewInverse[3].xyz, worldDir, viewDistance);
+	vec3 worldDir; float viewDist;
+	lengthNormalize(scenePos - gbufferModelViewInverse[3].xyz, worldDir, viewDist);
 
 	vec3 viewBackPos = screenToViewSpace(vec3(uv, depth1), true);
 
@@ -217,6 +217,7 @@ void main() {
 		vec3 translucentColor = getSceneLighting(
 			material,
 			normal,
+			flatNormal,
 			normal,
 			shadows,
 			lmCoord,
@@ -237,10 +238,8 @@ void main() {
 		blendColor.a *= borderFog;
 
 		// Blend with background
-
 		vec3 tint = material.albedo;
 		float alpha = blendColor.a;
-
 		fragColor *= (1.0 - alpha) + tint * alpha;
 		fragColor *= 1.0 - alpha;
 		fragColor += translucentColor * borderFog;
@@ -250,10 +249,6 @@ void main() {
 
 #ifdef VOLUMETRIC_FOG
 	fragColor = fragColor * fogTransmittance + fogScattering;
-
-#ifdef BLOOMY_FOG
-	bloomyFog = clamp01(dot(fogTransmittance, vec3(0.33)));
-#endif
 #endif
 
 	// Purkinje shift
@@ -267,4 +262,19 @@ void main() {
 
 	fragColor = purkinjeShift(fragColor, purkinjeIntensity);
 #endif
+
+	// Calculate bloomy fog
+
+#ifdef BLOOMY_FOG
+	#ifdef VOLUMETRIC_FOG
+	bloomyFog = clamp01(dot(fogTransmittance, vec3(0.33)));
+	#else
+	bloomyFog = 1.0;
+	#endif
+
+	#ifdef CAVE_FOG
+	bloomyFog *= getSphericalFog(viewDist, 0.0, 0.005 * biomeCave);
+	#endif
+#endif
+
 }

@@ -11,9 +11,9 @@
 //----------------------------------------------------------------------------//
 #if   defined WORLD_OVERWORLD
 
-const float blocklightIntensity = 5.0;
-const float emissionIntensity   = 32.0;
-const float sssIntensity        = 5.0;
+const float blocklightIntensity = 10.0;
+const float emissionIntensity   = 40.0;
+const float sssIntensity        = 4.0;
 const float sssDensity          = 32.0;
 const float metalDiffuseAmount  = 0.25; // Scales diffuse lighting on metals, ideally this would be zero but purely specular metals don't play well with SSR
 const vec3  blocklightColor     = toRec2020(vec3(BLOCKLIGHT_R, BLOCKLIGHT_G, BLOCKLIGHT_B)) * BLOCKLIGHT_I;
@@ -27,12 +27,13 @@ vec3 getSubsurfaceScattering(vec3 albedo, float sssAmount, float sssDepth, float
 
 	float phase = bilambertianPlatePhase(-LoV, 0.3);
 
-	return pi * phase * exp2(-coeff * sssDepth) * sssIntensity * sqrt(sssAmount);
+	return pi * phase * exp2(-coeff * sssDepth) * sssIntensity * dampen(sssAmount);
 }
 
 vec3 getSceneLighting(
 	Material material,
 	vec3 normal,
+	vec3 flatNormal,
 	vec3 bentNormal,
 	vec3 shadows,
 	vec2 lmCoord,
@@ -67,18 +68,22 @@ vec3 getSceneLighting(
 
 	// Blocklight
 
+	// Random directional shading for blocklight and cave lighting - makes it easier to tell faces apart
+	float directionalShading = (0.9 + 0.1 * normal.x) * (0.75 + 0.25 * abs(flatNormal.y));
+
+	// Reduce blocklight intensity in daylight
 	float blocklightScale = 1.0 - 0.5 * timeNoon * lmCoord.y;
 
 	float blocklightFalloff  = clamp01(1.2 * pow12(lmCoord.x) + 0.2 * pow5(lmCoord.x) + 0.1 * sqr(lmCoord.x) + 0.07 * lmCoord.x);
 	      blocklightFalloff *= mix(ao, 1.0, blocklightFalloff);
 
-	illuminance += blocklightIntensity * blocklightScale * blocklightFalloff * blocklightColor;
+	illuminance += blocklightIntensity * blocklightScale * blocklightFalloff * blocklightColor * directionalShading;
 
 	illuminance += emissionIntensity * blocklightScale * material.albedo * material.emission;
 
 	// Cave lighting
 
-	illuminance += CAVE_LIGHTING_I * ao * (1.0 - skylightFalloff);
+	illuminance += CAVE_LIGHTING_I * ao * directionalShading * (1.0 - skylightFalloff);
 
 	return max0(illuminance) * material.albedo * rcpPi * mix(1.0, metalDiffuseAmount, float(material.isMetal));
 }

@@ -10,12 +10,18 @@ attribute vec4 at_tangent;
 attribute vec3 mc_Entity;
 attribute vec2 mc_midTexCoord;
 
+uniform sampler2D noisetex;
+
 uniform mat4 shadowModelView;
 uniform mat4 shadowModelViewInverse;
 
 uniform vec3 cameraPosition;
 
+uniform float frameTimeCounter;
+uniform float rainStrength;
+
 #include "/include/shadowDistortion.glsl"
+#include "/include/windAnimation.glsl"
 
 void main() {
 	uv      = gl_MultiTexCoord0.xy;
@@ -27,6 +33,13 @@ void main() {
 	tbnMatrix[1] = cross(tbnMatrix[0], tbnMatrix[2]) * sign(at_tangent.w);
 
 	vec3 shadowViewPos = transform(gl_ModelViewMatrix, gl_Vertex.xyz);
+
+	// Wind animation
+	vec3 scenePos = transform(shadowModelViewInverse, shadowViewPos);
+	bool isTopVertex = uv.y < mc_midTexCoord.y;
+	scenePos += animateVertex(scenePos + cameraPosition, isTopVertex, clamp01(rcp(240.0) * gl_MultiTexCoord1.y), blockId);
+	shadowViewPos = transform(shadowModelView, scenePos);
+
 	vec3 shadowClipPos = projectOrtho(gl_ProjectionMatrix, shadowViewPos);
 	     shadowClipPos = distortShadowSpace(shadowClipPos);
 

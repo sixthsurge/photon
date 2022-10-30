@@ -93,14 +93,16 @@ void decodeNormalTexture(vec3 normalTex, out vec3 normal, out float ao) {
 uniform sampler2D noisetex;
 
 #ifdef PROGRAM_BLOCK
-vec3 parallaxEndPortal() {
-	const int   layerCount = 8;   // number of layers
-	const float depthScale = 0.3; // distance between layers
-	const float depthFade  = 0.5;
-	const float threshold  = 0.99;
+vec3 drawEndPortal() {
+	const int   layerCount = 8;    // Number of layers
+	const float depthScale = 0.3;  // Apparent distance between layers
+	const float depthFade  = 0.5;  // How quickly the layers fade to black
+	const float threshold  = 0.99; // Threshold for the "stars". Lower values mean more stars appear
 	const vec3  color0     = pow(vec3(0.80, 0.90, 0.99), vec3(2.2));
 	const vec3  color1     = pow(vec3(0.20, 0.90, 0.75), vec3(2.2));
 	const vec3  color2     = pow(vec3(0.20, 0.70, 0.90), vec3(2.2));
+
+	// Transformations
 
 	vec3 screenPos = vec3(gl_FragCoord.xy * texelSize * rcp(taauRenderScale), gl_FragCoord.z);
 	vec3 viewPos = screenToViewSpace(screenPos, true);
@@ -108,6 +110,8 @@ vec3 parallaxEndPortal() {
 
 	vec3 worldPos = scenePos + cameraPosition;
 	vec3 worldDir = normalize(scenePos - gbufferModelViewInverse[3].xyz);
+
+	// Get tangent-space position/direction without TBN matrix
 
 	vec2 tangentPos, tangentDir;
 	if (abs(tbnMatrix[2].x) > 0.5) {
@@ -121,7 +125,7 @@ vec3 parallaxEndPortal() {
 		tangentDir = worldDir.xy;
 	}
 
-	vec3 portalColor = vec3(0.0);
+	vec3 result = vec3(0.0);
 
 	for (int i = 0; i < layerCount; ++i) {
 		// Random layer offset
@@ -131,25 +135,30 @@ vec3 parallaxEndPortal() {
 		float angle = i * goldenAngle;
 		vec2 drift = 0.02 * vec2(cos(angle), sin(angle)) * frameTimeCounter * R1(i);
 
-		// Snap tangentPos to 16x16 grid
+		// Snap tangentPos to a grid and calculate a seed for the RNG
 		ivec2 gridPos = ivec2((tangentPos + drift) * 32.0 + layerOffset);
 		uint seed = uint(80000 * gridPos.y + gridPos.x);
 
+		// 3 random numbers for this grid cell
 		vec3 random = randNextVec3(seed);
 
+		// Stomp all values below threshold to zero
 		float intensity = cube(linearStep(threshold, 1.0, random.x));
 
+		// Blend between the 3 colors
 		vec3 color = mix(color0, color1, random.y);
 		     color = mix(color, color2, random.z);
 
+		// Fade away with depth
 		float fade = exp2(-depthFade * float(i));
 
-		portalColor += color * intensity * exp2(3.0 * (1.0 - fade) * (color - 1.0)) * fade;
+		result += color * intensity * exp2(-3.0 * (1.0 - fade) * (1.0 - color)) * fade;
 
+		// Step along the view ray
 		tangentPos += tangentDir * depthScale * gbufferProjection[1][1] * rcp(1.37);
 	}
 
-	return sqrt(portalColor);
+	return sqrt(result); // Approximate linear -> sRGB conversion
 }
 #endif
 
@@ -189,7 +198,7 @@ void main() {
 
 #ifdef PROGRAM_BLOCK
 	// Parallax end portal
-	if (blockId == 250) baseTex.rgb = parallaxEndPortal();
+	if (blockId == 250) baseTex.rgb = drawEndPortal();
 #endif
 
 #ifdef NORMAL_MAPPING

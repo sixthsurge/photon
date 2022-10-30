@@ -31,13 +31,20 @@ attribute vec4 at_tangent;
 attribute vec3 mc_Entity;
 attribute vec2 mc_midTexCoord;
 
+uniform sampler2D noisetex;
+
 uniform mat4 gbufferModelView;
 uniform mat4 gbufferModelViewInverse;
 uniform mat4 gbufferProjection;
 uniform mat4 gbufferProjectionInverse;
 
+uniform vec3 cameraPosition;
+
 uniform float near;
 uniform float far;
+
+uniform float frameTimeCounter;
+uniform float rainStrength;
 
 uniform vec2 taaOffset;
 
@@ -55,6 +62,8 @@ uniform int heldItemId2;
 #endif
 
 #include "/include/utility/spaceConversion.glsl"
+
+#include "/include/windAnimation.glsl"
 
 void main() {
 	texCoord = gl_MultiTexCoord0.xy;
@@ -87,6 +96,12 @@ void main() {
 #endif
 
 	vec3 viewPos = transform(gl_ModelViewMatrix, gl_Vertex.xyz);
+#if defined PROGRAM_TERRAIN
+	bool isTopVertex = texCoord.y < mc_midTexCoord.y;
+	vec3 scenePos = viewToSceneSpace(viewPos);
+	scenePos += animateVertex(scenePos + cameraPosition, isTopVertex, lmCoord.y, blockId);
+    viewPos = sceneToViewSpace(scenePos);
+#endif
 	vec4 clipPos = project(gl_ProjectionMatrix, viewPos);
 
 #if   defined TAA && defined TAAU

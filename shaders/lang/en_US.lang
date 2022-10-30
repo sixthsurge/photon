@@ -31,6 +31,9 @@ screen.fogRlhSwamp                     = Swamp Color
 
 # World settings
 
+option.WAVING_PLANTS                   = Waving Plants
+option.WAVING_LEAVES                   = Waving Leaves
+
 # Lighting settings
 
 option.GTAO                            = Ambient Occlusion
@@ -179,7 +182,7 @@ option.HISTOGRAM_TARGET                 = Histogram Target CDF Value
 
 value.AUTO_EXPOSURE.AUTO_EXPOSURE_SIMPLE    = Simple
 value.AUTO_EXPOSURE.AUTO_EXPOSURE_HISTOGRAM = Histogram
-value.AUTO_EXPOSURE.AUTO_EXPOSURE_OFF       = Manual
+value.AUTO_EXPOSURE.AUTO_EXPOSURE_OFF       = Off
 
 # Misc settings
 

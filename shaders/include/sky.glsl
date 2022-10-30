@@ -10,7 +10,7 @@
 #include "utility/random.glsl"
 
 const float sunLuminance  = 10.0; // luminance of sun disk
-const float moonLuminance = 2.0; // luminance of sun disk
+const float moonLuminance = 4.0; // luminance of sun disk
 
 vec3 drawSun(vec3 rayDir) {
 	float nu = dot(rayDir, sunDir);

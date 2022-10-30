@@ -26,18 +26,18 @@ vec3 animateVertex(vec3 worldPos, bool isTopVertex, float skylight, uint blockId
 
 	switch (blockId) {
 #ifdef WAVING_PLANTS
-	case BLOCK_SMALL_PLANT:
+	case 16:
 		return getWindOffset(worldPos, windSpeed, windStrength, false) * float(isTopVertex);
 
-	case BLOCK_TALL_PLANT_LOWER:
+	case 17:
 		return getWindOffset(worldPos, windSpeed, windStrength, false) * float(isTopVertex);
 
-	case BLOCK_TALL_PLANT_UPPER:
+	case 18:
 		return getWindOffset(worldPos, windSpeed, windStrength, isTopVertex);
 #endif
 
 #ifdef WAVING_LEAVES
-	case BLOCK_LEAVES:
+	case 19:
 		return getWindOffset(worldPos, windSpeed, windStrength * 0.5, false);
 #endif
 

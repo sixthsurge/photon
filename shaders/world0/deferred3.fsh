@@ -211,6 +211,7 @@ void main() {
 		fragColor = getSceneLighting(
 			material,
 			normal,
+			flatNormal,
 			bentNormal,
 			shadows,
 			lmCoord,
