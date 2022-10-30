@@ -169,6 +169,25 @@ vec3 academyFit(vec3 rgb) {
 	return rgb * ap1_to_rec2020;
 }
 
+// Timothy Lottes 2016, "Advanced Techniques and Optimization of HDR Color Pipelines"
+// https://gpuopen.com/wp-content/uploads/2016/03/GdcVdrLottes.pdf
+vec3 tonemapLottes(vec3 rgb) {
+	const vec3 a = vec3(1.5);
+	const vec3 d = vec3(0.89);
+	const vec3 hdrMax = vec3(4.0);
+	const vec3 midIn = vec3(0.25);
+	const vec3 midOut = vec3(0.337);
+
+	const vec3 b =
+		(-pow(midIn, a) + pow(hdrMax, a) * midOut) /
+		((pow(hdrMax, a * d) - pow(midIn, a * d)) * midOut);
+	const vec3 c =
+		(pow(hdrMax, a * d) * pow(midIn, a) - pow(hdrMax, a) * pow(midIn, a * d) * midOut) /
+		((pow(hdrMax, a * d) - pow(midIn, a * d)) * midOut);
+
+	return pow(rgb, a) / (pow(rgb, a * d) * b + c);
+}
+
 // Filmic tonemapping operator made by Jim Hejl and Richard Burgess
 // Modified by Tech to not lose color information below 0.004
 vec3 tonemapHejlBurgess(vec3 rgb) {

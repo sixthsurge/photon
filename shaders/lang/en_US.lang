@@ -137,6 +137,7 @@ option.tonemap                         = Tonemap Operator
 
 value.tonemap.academyFit               = Academy Fit
 value.tonemap.academyRrt               = Academy RRT
+value.tonemap.tonemapLottes            = Lottes
 value.tonemap.tonemapHejlBurgess       = Hejl-Burgess
 value.tonemap.tonemapUncharted2        = Uncharted 2
 value.tonemap.tonemapTech              = Tech
