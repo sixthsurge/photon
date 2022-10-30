@@ -124,6 +124,10 @@ value.TEXTURE_FORMAT.TEXTURE_FORMAT_OLD = Old PBR
 
 option.BLOOM                           = Bloom
 option.BLOOM_INTENSITY                 = Bloom Intensity
+option.DOF                             = Depth of Field
+option.DOF_INTENSITY                   = DoF Intensity
+option.DOF_SAMPLES                     = DoF Samples
+option.DOF_FOCUS                       = DoF Focus
 option.TAA                             = TAA
 option.FXAA                            = FXAA
 option.TAAU                            = TAA Upscaling
@@ -132,6 +136,8 @@ option.CAS                             = Image Sharpening
 option.CAS_INTENSITY                   = Image Sharpening Intensity
 option.VIGNETTE                        = Vignette
 option.VIGNETTE_INTENSITY              = Vignette Intensity
+
+value.DOF_FOCUS.-1.0                   = Automatic
 
 option.tonemap                         = Tonemap Operator
 
