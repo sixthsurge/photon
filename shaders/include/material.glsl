@@ -217,7 +217,7 @@ Material getMaterial(vec3 albedoSrgb, uint blockId, vec3 blockPos, inout vec2 lm
 					} else {
 						#ifdef HARDCODED_SSS
 						// Weak SSS
-						material.sssAmount = 0.2;
+						material.sssAmount = 0.1;
 						#endif
 					}
 				} else { // 22-24

@@ -19,8 +19,8 @@ layout (location = 1) out vec3 fogTransmittance;
 
 in vec2 uv;
 
-flat in vec3 lightCol;
-flat in vec3 skyCol;
+flat in vec3 lightColor;
+flat in vec3 skyColor;
 flat in mat2x3 fogCoeff[2];
 
 uniform sampler2D noisetex;
@@ -55,7 +55,6 @@ uniform float near;
 uniform float far;
 
 uniform float eyeAltitude;
-
 uniform float blindness;
 
 uniform int isEyeInWater;
@@ -209,21 +208,23 @@ mat2x3 raymarchFog(vec3 worldStartPos, vec3 worldEndPos, bool isSky, float skyli
 
 	/*
 	// Single scattering
-	vec3 scattering  = lightCol * (lightSun * vec2(isotropicPhase, miePhase));
-	     scattering += skyCol * (lightSky * vec2(isotropicPhase));
+	vec3 scattering  = lightColor * (lightSun * vec2(isotropicPhase, miePhase));
+	     scattering += skyColor * (lightSky * vec2(isotropicPhase));
 	/*/
 	// Multiple scattering
 	vec3 scattering = vec3(0.0);
 	float scatterAmount = 1.0;
 
 	for (int i = 0; i < 4; ++i) {
-		scattering += scatterAmount * (lightSun * vec2(isotropicPhase, miePhase)) * lightCol;
-		scattering += scatterAmount * (lightSky * vec2(isotropicPhase)) * skyCol;
+		scattering += scatterAmount * (lightSun * vec2(isotropicPhase, miePhase)) * lightColor;
+		scattering += scatterAmount * (lightSky * vec2(isotropicPhase)) * skyColor;
 
 		scatterAmount *= 0.5;
 		miePhase = mix(miePhase, isotropicPhase, 0.3);
 	}
 	//*/
+
+	scattering *= 1.0 - blindness;
 
 	return mat2x3(scattering, transmittance);
 }

@@ -43,15 +43,15 @@ vec3 getMoonTint() {
 }
 
 vec3 getLightColor() {
-	vec3 lightCol  = mix(getSunBrightness() * getSunTint(), getMoonBrightness() * getMoonTint(), step(0.5, sunAngle));
-	     lightCol *= atmosphereSunColor(lightDir.y, planetRadius);
-	     lightCol *= clamp01(rcp(0.02) * lightDir.y); // fade away during day/night transition
+	vec3 lightColor  = mix(getSunBrightness() * getSunTint(), getMoonBrightness() * getMoonTint(), step(0.5, sunAngle));
+	     lightColor *= atmosphereSunColor(lightDir.y, planetRadius);
+	     lightColor *= clamp01(rcp(0.02) * lightDir.y); // fade away during day/night transition
 
-	return lightCol;
+	return lightColor;
 }
 
 vec3 getSkyColor() {
-	vec3 skyCol = vec3(0.41, 0.50, 0.73) * timeSunrise
+	vec3 skyColor = vec3(0.41, 0.50, 0.73) * timeSunrise
 	            + vec3(0.69, 0.87, 1.67) * timeNoon
 				+ vec3(0.48, 0.55, 0.75) * timeSunset
 				+ vec3(0.00, 0.00, 0.00) * timeMidnight;
@@ -62,10 +62,10 @@ vec3 getSkyColor() {
 	float blueHour = pulse(float(worldTime), 13000.0, 500.0, 24000.0)  // dusk
 	               + pulse(float(worldTime), 23000.0, 500.0, 24000.0); // dawn
 
-	skyCol = mix(skyCol, vec3(0.26, 0.28, 0.33), lateSunset);
-	skyCol = mix(skyCol, vec3(0.44, 0.45, 0.70), blueHour);
+	skyColor = mix(skyColor, vec3(0.26, 0.28, 0.33), lateSunset);
+	skyColor = mix(skyColor, vec3(0.44, 0.45, 0.70), blueHour);
 
-	return skyCol;
+	return skyColor;
 }
 
 float getSkylightBoost() {

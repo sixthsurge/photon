@@ -19,7 +19,7 @@ layout (location = 3) out vec4 colortex3Clear; // Clear colortex3 so that transl
 
 in vec2 uv;
 
-flat in vec3 lightCol;
+flat in vec3 lightColor;
 flat in vec3 skySh[9];
 flat in mat2x3 illuminance;
 
@@ -65,6 +65,9 @@ uniform float sunAngle;
 
 uniform int frameCounter;
 uniform float frameTimeCounter;
+
+uniform int isEyeInWater;
+uniform float blindness;
 
 uniform vec3 lightDir;
 uniform vec3 sunDir;
@@ -219,10 +222,10 @@ void main() {
 			LoV
 		);
 
-		fragColor += getSpecularHighlight(material, NoL, NoV, NoH, LoV, LoH) * lightCol * shadows * ao;
-
-		getSimpleFog(fragColor, scenePos, worldDir);
+		fragColor += getSpecularHighlight(material, NoL, NoV, NoH, LoV, LoH) * lightColor * shadows * ao;
 	}
+
+	applyFog(fragColor, scenePos, worldDir, depth == 1.0);
 
 	colortex3Clear = vec4(0.0);
 }

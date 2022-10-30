@@ -19,13 +19,13 @@ layout (location = 1) out float bloomyFog;
 
 in vec2 uv;
 
-flat in vec3 lightCol;
-flat in vec3 skyCol;
+flat in vec3 lightColor;
+flat in vec3 skyColor;
 
 uniform sampler2D colortex0; // Scene color
 uniform sampler2D colortex1; // Gbuffer 0
 uniform sampler2D colortex2; // Gbuffer 1
-uniform sampler2D colortex3; // Translucent color
+uniform sampler2D colortex3; // Blended color
 uniform sampler2D colortex4; // Sky capture
 uniform sampler2D colortex5; // Volumetric fog scattering
 uniform sampler2D colortex6; // Volumetric fog transmittance
@@ -61,6 +61,9 @@ uniform float sunAngle;
 
 uniform int worldTime;
 uniform int frameCounter;
+
+uniform int isEyeInWater;
+uniform float blindness;
 
 uniform vec3 lightDir;
 uniform vec3 sunDir;
@@ -134,15 +137,16 @@ void main() {
 
 	// Texture fetches
 
-	fragColor     = texelFetch(colortex0, texel, 0).rgb;
 
-	float depth0  = texelFetch(depthtex0, texel, 0).x;
-	float depth1  = texelFetch(depthtex1, texel, 0).x;
-	vec4 gbuffer0 = texelFetch(colortex1, texel, 0);
+	float depth0    = texelFetch(depthtex0, texel, 0).x;
+	float depth1    = texelFetch(depthtex1, texel, 0).x;
+
+	fragColor       = texelFetch(colortex0, texel, 0).rgb;
+	vec4 gbuffer0   = texelFetch(colortex1, texel, 0);
 #if defined NORMAL_MAPPING || defined SPECULAR_MAPPING
-	vec4 gbuffer1 = texelFetch(colortex2, texel, 0);
+	vec4 gbuffer1   = texelFetch(colortex2, texel, 0);
 #endif
-	vec4 blendCol = texelFetch(colortex3, texel, 0);
+	vec4 blendColor = texelFetch(colortex3, texel, 0);
 
 	vec2 fogUv = clamp(uv * FOG_RENDER_SCALE, vec2(0.0), floor(viewSize * FOG_RENDER_SCALE - 1.0) * texelSize);
 
@@ -187,7 +191,7 @@ void main() {
 	bool isSnowParticle = blockId == 254;
 
 	if (isTranslucent) {
-		material = getMaterial(blendCol.rgb, blockId, fract(worldPos), lmCoord);
+		material = getMaterial(blendColor.rgb, blockId, fract(worldPos), lmCoord);
 
 #ifdef NORMAL_MAPPING
 		vec3 normal = decodeUnitVector(gbuffer1.xy);
@@ -210,7 +214,7 @@ void main() {
 		float sssDepth;
 		vec3 shadows = calculateShadows(scenePos, flatNormal, lmCoord.y, material.sssAmount, sssDepth);
 
-		vec3 translucentCol = getSceneLighting(
+		vec3 translucentColor = getSceneLighting(
 			material,
 			normal,
 			normal,
@@ -224,20 +228,22 @@ void main() {
 			LoV
 		);
 
-		translucentCol += getSpecularHighlight(material, NoL, NoV, NoH, LoV, LoH) * lightCol * shadows;
+		translucentColor += getSpecularHighlight(material, NoL, NoV, NoH, LoV, LoH) * lightColor * shadows;
 
-		getSimpleFog(translucentCol, scenePos, worldDir);
+		applyFog(translucentColor, scenePos, worldDir, false);
 
-		blendCol.a *= getBorderFog(scenePos, worldDir);
+		// Handle border fog by attenuating the alpha component
+		float borderFog = getBorderFog(scenePos, worldDir);
+		blendColor.a *= borderFog;
 
 		// Blend with background
 
 		vec3 tint = material.albedo;
-		float alpha = blendCol.a;
+		float alpha = blendColor.a;
 
 		fragColor *= (1.0 - alpha) + tint * alpha;
 		fragColor *= 1.0 - alpha;
-		fragColor += translucentCol;
+		fragColor += translucentColor * borderFog;
 	}
 
 	// Apply volumetric fog

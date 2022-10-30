@@ -15,7 +15,7 @@
 
 out vec2 uv;
 
-flat out vec3 lightCol;
+flat out vec3 lightColor;
 flat out vec3 skySh[9];
 flat out mat2x3 illuminance;
 
@@ -54,7 +54,7 @@ void main() {
 	illuminance[0] = getSunBrightness() * getSunTint();
 	illuminance[1] = getMoonBrightness() * getMoonTint();
 
-	lightCol = getLightColor();
+	lightColor = getLightColor();
 
 #ifdef SH_SKYLIGHT
 	float skylightBoost = getSkylightBoost();

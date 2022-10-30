@@ -51,14 +51,14 @@ vec3 getSceneLighting(
 	vec3 bounced = 0.066 * (1.0 - shadows * max0(NoL)) * (1.0 - 0.33 * max0(normal.y)) * pow1d5(ao + eps) * pow4(lmCoord.y);
 	vec3 sss = getSubsurfaceScattering(material.albedo, material.sssAmount, sssDepth, LoV);
 
-	illuminance += lightCol * (max0(NoL) * diffuse * shadows * ao + bounced + sss);
+	illuminance += lightColor * (max0(NoL) * diffuse * shadows * ao + bounced + sss);
 
 	// Skylight
 
 #if defined SH_SKYLIGHT && defined PROGRAM_DEFERRED3
 	vec3 skylight = evaluateSphericalHarmonicsIrradiance(skySh, bentNormal, ao);
 #else
-	vec3 skylight = skyCol * ao;
+	vec3 skylight = skyColor * ao;
 #endif
 
 	float skylightFalloff = sqr(lmCoord.y);

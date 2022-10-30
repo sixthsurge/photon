@@ -15,8 +15,8 @@
 
 out vec2 uv;
 
-flat out vec3 lightCol;
-flat out vec3 skyCol;
+flat out vec3 lightColor;
+flat out vec3 skyColor;
 flat out mat2x3 fogCoeff[2];
 
 uniform sampler2D depthtex2; // Atmospheric sun color LUT
@@ -54,8 +54,8 @@ uniform float timeMidnight;
 void main() {
 	uv = gl_MultiTexCoord0.xy;
 
-	lightCol = getLightColor();
-	skyCol = getSkyColor();
+	lightColor = getLightColor();
+	skyColor = getSkyColor();
 
 	mat2x3 rayleighCoeff = fogRayleighCoeff(), mieCoeff = fogMieCoeff();
 	fogCoeff[0] = mat2x3(rayleighCoeff[0], mieCoeff[0]);
