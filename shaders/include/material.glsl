@@ -264,6 +264,8 @@ Material getMaterial(vec3 albedoSrgb, uint blockId, vec3 blockPos, inout vec2 lm
 		}
 	}
 
+	material.emission += float(blockId == 250); // End portal
+
 	return material;
 }
 

@@ -50,14 +50,29 @@ uniform sampler2D normals;
 uniform sampler2D specular;
 #endif
 
+uniform mat4 gbufferModelView;
+uniform mat4 gbufferModelViewInverse;
+uniform mat4 gbufferProjection;
+uniform mat4 gbufferProjectionInverse;
+
+uniform vec3 cameraPosition;
+
+uniform float near;
+uniform float far;
+
 uniform vec4 entityColor;
 
 uniform int frameCounter;
+uniform float frameTimeCounter;
 
+uniform vec2 viewSize;
 uniform vec2 texelSize;
+uniform vec2 taaOffset;
 
 #include "/include/utility/dithering.glsl"
 #include "/include/utility/encoding.glsl"
+#include "/include/utility/random.glsl"
+#include "/include/utility/spaceConversion.glsl"
 
 const float lodBias = log2(taauRenderScale);
 
@@ -72,6 +87,69 @@ void decodeNormalTexture(vec3 normalTex, out vec3 normal, out float ao) {
 	normal  = normalTex * 2.0 - 1.0;
 	ao      = length(normal);
 	normal *= rcp(ao);
+}
+#endif
+
+uniform sampler2D noisetex;
+
+#ifdef PROGRAM_BLOCK
+vec3 parallaxEndPortal() {
+	const int   layerCount = 8;   // number of layers
+	const float depthScale = 0.3; // distance between layers
+	const float depthFade  = 0.5;
+	const float threshold  = 0.99;
+	const vec3  color0     = pow(vec3(0.80, 0.90, 0.99), vec3(2.2));
+	const vec3  color1     = pow(vec3(0.20, 0.90, 0.75), vec3(2.2));
+	const vec3  color2     = pow(vec3(0.20, 0.70, 0.90), vec3(2.2));
+
+	vec3 screenPos = vec3(gl_FragCoord.xy * texelSize * rcp(taauRenderScale), gl_FragCoord.z);
+	vec3 viewPos = screenToViewSpace(screenPos, true);
+	vec3 scenePos = viewToSceneSpace(viewPos);
+
+	vec3 worldPos = scenePos + cameraPosition;
+	vec3 worldDir = normalize(scenePos - gbufferModelViewInverse[3].xyz);
+
+	vec2 tangentPos, tangentDir;
+	if (tbnMatrix[2].x > 0.5) {
+		tangentPos = worldPos.yz;
+		tangentDir = worldDir.yz;
+	} else if (tbnMatrix[2].y > 0.5) {
+		tangentPos = worldPos.xz;
+		tangentDir = worldDir.xz;
+	} else {
+		tangentPos = worldPos.xy;
+		tangentDir = worldDir.xy;
+	}
+
+	vec3 portalColor = vec3(0.0);
+
+	for (int i = 0; i < layerCount; ++i) {
+		// Random layer offset
+		vec2 layerOffset = R2(i) * 512.0;
+
+		// Make layers drift over time
+		float angle = i * goldenAngle;
+		vec2 drift = 0.02 * vec2(cos(angle), sin(angle)) * frameTimeCounter * R1(i);
+
+		// Snap tangentPos to 16x16 grid
+		ivec2 gridPos = ivec2((tangentPos + drift) * 32.0 + layerOffset);
+		uint seed = uint(80000 * gridPos.y + gridPos.x);
+
+		vec3 random = randNextVec3(seed);
+
+		float intensity = cube(linearStep(threshold, 1.0, random.x));
+
+		vec3 color = mix(color0, color1, random.y);
+		     color = mix(color, color2, random.z);
+
+		float fade = exp2(-depthFade * float(i));
+
+		portalColor += color * intensity * exp2(3.0 * (1.0 - fade) * (color - 1.0)) * fade;
+
+		tangentPos += tangentDir * depthScale * gbufferProjection[1][1] * rcp(1.37);
+	}
+
+	return sqrt(portalColor);
 }
 #endif
 
@@ -107,6 +185,11 @@ void main() {
 
 #ifdef PROGRAM_ENTITIES
 	baseTex.rgb = mix(baseTex.rgb, entityColor.rgb, entityColor.a);
+#endif
+
+#ifdef PROGRAM_BLOCK
+	// Parallax end portal
+	if (blockId == 250) baseTex.rgb = parallaxEndPortal();
 #endif
 
 #ifdef NORMAL_MAPPING
