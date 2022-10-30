@@ -110,10 +110,10 @@ vec3 parallaxEndPortal() {
 	vec3 worldDir = normalize(scenePos - gbufferModelViewInverse[3].xyz);
 
 	vec2 tangentPos, tangentDir;
-	if (tbnMatrix[2].x > 0.5) {
+	if (abs(tbnMatrix[2].x) > 0.5) {
 		tangentPos = worldPos.yz;
 		tangentDir = worldDir.yz;
-	} else if (tbnMatrix[2].y > 0.5) {
+	} else if (abs(tbnMatrix[2].y) > 0.5) {
 		tangentPos = worldPos.xz;
 		tangentDir = worldDir.xz;
 	} else {
