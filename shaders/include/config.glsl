@@ -75,7 +75,7 @@ const float sunPathRotation         = -25.0; // [-50.0 -45.0 -40.0 -35.0 -30.0 -
 
   #define SUN_ANGULAR_RADIUS 2.0 // [0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0 1.1 1.2 1.3 1.4 1.5 1.6 1.7 1.8 1.9 2.0 2.1 2.2 2.3 2.4 2.5 2.6 2.7 2.8 2.9 3.0]
   #define MOON_ANGULAR_RADIUS 3.0 // [0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0 1.1 1.2 1.3 1.4 1.5 1.6 1.7 1.8 1.9 2.0 2.1 2.2 2.3 2.4 2.5 2.6 2.7 2.8 2.9 3.0]
-  #define VANILLA_SUN
+//#define VANILLA_SUN
   #define VANILLA_MOON
 
 // Stars
@@ -230,6 +230,10 @@ const float sunPathRotation         = -25.0; // [-50.0 -45.0 -40.0 -35.0 -30.0 -
   #define DEBUG_VIEW DEBUG_VIEW_NONE // [DEBUG_VIEW_NONE DEBUG_VIEW_SAMPLER DEBUG_VIEW_HISTOGRAM]
   #define DEBUG_SAMPLER colortex1 // [colortex1 colortex2 colortex3 colortex4 colortex5 colortex6 colortex7 colortex8 colortex9 colortex10 colortex11 colortex12 colortex13 colortex14 colortex15 depthtex0 depthtex1 depthtex2 shadowtex0 shadowtex1 shadowcolor0 shadowcolor1]
   #define DEBUG_VIEW DEBUG_VIEW_NONE // [DEBUG_VIEW_NONE DEBUG_VIEW_SAMPLER DEBUG_VIEW_HISTOGRAM DEBUG_VIEW_BIOMES]
+
+//#define TONEMAP_COMPARISON
+  #define tonemapLeft tonemapLottes // [academyFit academyRrt tonemapLottes tonemapHejlBurgess tonemapTech tonemapUncharted2 tonemapOzius tonemapReinhard tonemapReinhardJodie]
+  #define tonemapRight tonemapLottes // [academyFit academyRrt tonemapLottes tonemapHejlBurgess tonemapTech tonemapUncharted2 tonemapOzius tonemapReinhard tonemapReinhardJodie]
 
 // The settings parser only detects boolean options which are used with
 // #ifdef; it doesn't look for #if defined or other settings usages (e.g

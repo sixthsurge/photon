@@ -9,7 +9,7 @@
 #include "utility/fastMath.glsl"
 #include "utility/random.glsl"
 
-const float sunLuminance  = 40.0; // luminance of sun disk
+const float sunLuminance  = 10.0; // luminance of sun disk
 const float moonLuminance = 2.0; // luminance of sun disk
 
 vec3 drawSun(vec3 rayDir) {
@@ -20,7 +20,7 @@ vec3 drawSun(vec3 rayDir) {
 	float centerToEdge = max0(sunAngularRadius - fastAcos(nu));
 	vec3 limbDarkening = pow(vec3(1.0 - sqr(1.0 - centerToEdge)), 0.5 * alpha);
 
-	return baseSunCol * sunLuminance * step(0.0, centerToEdge) * limbDarkening; // magically darkening the sun to prevent it from overloading bloom
+	return baseSunCol * sunLuminance * step(0.0, centerToEdge) * limbDarkening * illuminance[0];
 }
 
 // Stars based on https://www.shadertoy.com/view/Md2SR3
@@ -93,7 +93,7 @@ vec3 renderSky(vec3 rayDir) {
 #ifdef VANILLA_SUN
 	if (vanillaSkyId == 2) {
 		const vec3 brightnessScale = baseSunCol * sunLuminance;
-		sky += vanillaSkyColor * brightnessScale;
+		sky += vanillaSkyColor * brightnessScale * illuminance[0];
 	}
 #else
 	sky += drawSun(rayDir);

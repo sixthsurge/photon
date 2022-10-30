@@ -173,8 +173,8 @@ vec3 academyFit(vec3 rgb) {
 // https://gpuopen.com/wp-content/uploads/2016/03/GdcVdrLottes.pdf
 vec3 tonemapLottes(vec3 rgb) {
 	const vec3 a = vec3(1.5);
-	const vec3 d = vec3(0.89);
-	const vec3 hdrMax = vec3(4.0);
+	const vec3 d = vec3(0.93);
+	const vec3 hdrMax = vec3(8.0);
 	const vec3 midIn = vec3(0.25);
 	const vec3 midOut = vec3(0.337);
 
@@ -276,6 +276,13 @@ void main() {
 #endif
 
 	fragColor = gradeInput(fragColor);
-	fragColor = clamp01(tonemap(fragColor) * rec2020_to_rec709);
+
+#ifdef TONEMAP_COMPARISON
+	fragColor = uv.x < 0.5 ? tonemapLeft(fragColor) : tonemapRight(fragColor);
+#else
+	fragColor = tonemap(fragColor);
+#endif
+
+	fragColor = clamp01(fragColor * rec2020_to_rec709);
 	fragColor = gradeOutput(fragColor);
 }

@@ -185,8 +185,31 @@ value.INFO.3                           = §dby SixthSurge
 
 option.DEBUG_VIEW                      = Debug View
 option.DEBUG_SAMPLER                   = Debug Sampler
+option.TONEMAP_COMPARISON              = Tonemap Comparison
+option.tonemapLeft                     = Left Tonemap
+option.tonemapRight                    = Right Tonemap
 
 value.DEBUG_VIEW.DEBUG_VIEW_NONE       = OFF
 value.DEBUG_VIEW.DEBUG_VIEW_SAMPLER    = Sampler
 value.DEBUG_VIEW.DEBUG_VIEW_WEATHER    = Weather
 value.DEBUG_VIEW.DEBUG_VIEW_HISTOGRAM  = Histogram
+
+value.tonemapLeft.academyFit           = Academy Fit
+value.tonemapLeft.academyRrt           = Academy RRT
+value.tonemapLeft.tonemapLottes        = Lottes
+value.tonemapLeft.tonemapHejlBurgess   = Hejl-Burgess
+value.tonemapLeft.tonemapUncharted2    = Uncharted 2
+value.tonemapLeft.tonemapTech          = Tech
+value.tonemapLeft.tonemapOzius         = Ozius
+value.tonemapLeft.tonemapReinhard      = Reinhard
+value.tonemapLeft.tonemapReinhardJodie = Reinhard-Jodie
+
+value.tonemapRight.academyFit           = Academy Fit
+value.tonemapRight.academyRrt           = Academy RRT
+value.tonemapRight.tonemapLottes        = Lottes
+value.tonemapRight.tonemapHejlBurgess   = Hejl-Burgess
+value.tonemapRight.tonemapUncharted2    = Uncharted 2
+value.tonemapRight.tonemapTech          = Tech
+value.tonemapRight.tonemapOzius         = Ozius
+value.tonemapRight.tonemapReinhard      = Reinhard
+value.tonemapRight.tonemapReinhardJodie = Reinhard-Jodie
