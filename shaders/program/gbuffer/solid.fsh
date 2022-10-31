@@ -96,10 +96,10 @@ uniform sampler2D noisetex;
 #ifdef PROGRAM_BLOCK
 vec3 drawEndPortal() {
 	const int   layerCount = 8;       // Number of layers
-	const float depthScale = 0.3;     // Apparent distance between layers
+	const float depthScale = 0.33;    // Apparent distance between layers
 	const float depthFade  = 0.5;     // How quickly the layers fade to black
 	const float threshold  = 0.99;    // Threshold for the "stars". Lower values mean more stars appear
-	const float twinkleSpeed = 0.5;   // How fast the stars appear to twinkle
+	const float twinkleSpeed = 0.2;   // How fast the stars appear to twinkle
 	const float twinkleAmount = 0.04; // How many twinkling stars appear
 	const vec3  color0     = pow(vec3(0.80, 0.90, 0.99), vec3(2.2));
 	const vec3  color1     = pow(vec3(0.75, 0.40, 0.93), vec3(2.2));
