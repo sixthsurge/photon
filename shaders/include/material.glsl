@@ -90,7 +90,7 @@ Material getMaterial(vec3 albedoSrgb, uint blockId, vec3 blockPos, inout vec2 lm
 					if (blockId == 4u) {
 						#ifdef HARDCODED_EMISSION
 						// Dim full emissives
-						material.emission = 0.33 * (0.1 + 0.9 * cube(hsl.z));
+						material.emission = 0.2 * (0.1 + 0.9 * pow4(hsl.z));
 						lmCoord.x *= 0.95;
 						#endif
 					} else {

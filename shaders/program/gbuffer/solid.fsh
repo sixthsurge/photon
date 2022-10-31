@@ -71,6 +71,7 @@ uniform vec2 taaOffset;
 
 #include "/include/utility/dithering.glsl"
 #include "/include/utility/encoding.glsl"
+#include "/include/utility/fastMath.glsl"
 #include "/include/utility/random.glsl"
 #include "/include/utility/spaceConversion.glsl"
 
@@ -94,12 +95,14 @@ uniform sampler2D noisetex;
 
 #ifdef PROGRAM_BLOCK
 vec3 drawEndPortal() {
-	const int   layerCount = 8;    // Number of layers
-	const float depthScale = 0.3;  // Apparent distance between layers
-	const float depthFade  = 0.5;  // How quickly the layers fade to black
-	const float threshold  = 0.99; // Threshold for the "stars". Lower values mean more stars appear
+	const int   layerCount = 8;       // Number of layers
+	const float depthScale = 0.3;     // Apparent distance between layers
+	const float depthFade  = 0.5;     // How quickly the layers fade to black
+	const float threshold  = 0.99;    // Threshold for the "stars". Lower values mean more stars appear
+	const float twinkleSpeed = 0.5;   // How fast the stars appear to twinkle
+	const float twinkleAmount = 0.04; // How many twinkling stars appear
 	const vec3  color0     = pow(vec3(0.80, 0.90, 0.99), vec3(2.2));
-	const vec3  color1     = pow(vec3(0.20, 0.90, 0.75), vec3(2.2));
+	const vec3  color1     = pow(vec3(0.75, 0.40, 0.93), vec3(2.2));
 	const vec3  color2     = pow(vec3(0.20, 0.70, 0.90), vec3(2.2));
 
 	// Transformations
@@ -133,17 +136,21 @@ vec3 drawEndPortal() {
 
 		// Make layers drift over time
 		float angle = i * goldenAngle;
-		vec2 drift = 0.02 * vec2(cos(angle), sin(angle)) * frameTimeCounter * R1(i);
+		vec2 drift = 0.033 * vec2(cos(angle), sin(angle)) * frameTimeCounter * R1(i);
 
 		// Snap tangentPos to a grid and calculate a seed for the RNG
 		ivec2 gridPos = ivec2((tangentPos + drift) * 32.0 + layerOffset);
 		uint seed = uint(80000 * gridPos.y + gridPos.x);
 
-		// 3 random numbers for this grid cell
-		vec3 random = randNextVec3(seed);
+		// 4 random numbers for this grid cell
+		vec4 random = randNextVec4(seed);
+
+		// Twinkling animation
+		float twinkleOffset = tau * random.w;
+		random.x *= 1.0 - twinkleAmount * cos(frameTimeCounter * twinkleSpeed + twinkleOffset);
 
 		// Stomp all values below threshold to zero
-		float intensity = cube(linearStep(threshold, 1.0, random.x));
+		float intensity = pow8(linearStep(threshold, 1.0, random.x));
 
 		// Blend between the 3 colors
 		vec3 color = mix(color0, color1, random.y);
@@ -156,6 +163,8 @@ vec3 drawEndPortal() {
 
 		// Step along the view ray
 		tangentPos += tangentDir * depthScale * gbufferProjection[1][1] * rcp(1.37);
+
+		if (random.x > threshold) break;
 	}
 
 	return sqrt(result); // Approximate linear -> sRGB conversion
@@ -187,7 +196,7 @@ void main() {
 #endif
 
 #ifdef PROGRAM_TERRAIN
-	const float vanillaAoStrength = 1.0;
+	const float vanillaAoStrength = 0.8;
 	const float vanillaAoLift     = 0.8;
 	baseTex.rgb *= lift(vanillaAo, vanillaAoLift) * vanillaAoStrength + (1.0 - vanillaAoStrength);
 #endif

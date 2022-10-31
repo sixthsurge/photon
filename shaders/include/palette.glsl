@@ -16,7 +16,7 @@ float getSunBrightness() {
 	float blueHour = cube(pulse(float(worldTime), 13200.0, 900.0, 24000.0))  // dusk
 	               + cube(pulse(float(worldTime), 22800.0, 900.0, 24000.0)); // dawn
 
-	float blueHourMul = 1.0 + 33.0 * blueHour;
+	float blueHourMul = 1.0 + 40.0 * blueHour;
 
 	return baseSunBrightness * userSunBrightness * blueHourMul;
 }
