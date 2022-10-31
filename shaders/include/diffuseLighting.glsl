@@ -13,7 +13,7 @@
 
 const float blocklightIntensity = 8.0;
 const float emissionIntensity   = 32.0;
-const float sssIntensity        = 4.0;
+const float sssIntensity        = 1.0;
 const float sssDensity          = 32.0;
 const float metalDiffuseAmount  = 0.25; // Scales diffuse lighting on metals, ideally this would be zero but purely specular metals don't play well with SSR
 const vec3  blocklightColor     = toRec2020(vec3(BLOCKLIGHT_R, BLOCKLIGHT_G, BLOCKLIGHT_B)) * BLOCKLIGHT_I;
@@ -25,9 +25,7 @@ vec3 getSubsurfaceScattering(vec3 albedo, float sssAmount, float sssDepth, float
 	     coeff = clamp01(0.75 * coeff);
 	     coeff = (1.0 - coeff) * sssDensity / sssAmount;
 
-	float phase = bilambertianPlatePhase(-LoV, 0.3);
-
-	return pi * phase * exp2(-coeff * sssDepth) * sssIntensity * dampen(sssAmount);
+	return exp2(-coeff * sssDepth) * sssIntensity * dampen(sssAmount);
 }
 
 vec3 getSceneLighting(
@@ -48,7 +46,7 @@ vec3 getSceneLighting(
 
 	// Sunlight/moonlight
 
-	vec3 bounced = 0.06 * (1.0 - shadows * max0(NoL)) * (1.0 - 0.33 * max0(normal.y)) * pow1d5(ao + eps) * pow4(lmCoord.y);
+	vec3 bounced = 0.08 * (1.0 - shadows * max0(NoL)) * (1.0 - 0.33 * max0(normal.y)) * pow1d5(ao + eps) * pow4(lmCoord.y);
 	vec3 sss = getSubsurfaceScattering(material.albedo, material.sssAmount, sssDepth, LoV);
 
 	illuminance += lightColor * (max0(NoL) * shadows * ao * (1.0 - 0.5 * material.sssAmount) + bounced + sss);

@@ -53,6 +53,8 @@ vec3 getSpecularHighlight(
 	float LoV,
 	float LoH
 ) {
+	const float specularMaxValue = 4.0; // Maximum value imposed on specular highlight to prevent it from overloading bloom
+
 #if   defined WORLD_OVERWORLD
 	float lightRadius = (sunAngle < 0.5) ? (0.57 * degree) : (1.0 * degree);
 #endif
@@ -77,6 +79,6 @@ vec3 getSpecularHighlight(
 	float d = distributionGgx(NoHSq, alphaSq);
 	float v = v2SmithGgx(max(NoL, 1e-2), max(NoV, 1e-2), alphaSq);
 
-	return (NoL * d * v) * fresnel * albedoTint;
+	return min((NoL * d * v) * fresnel * albedoTint, vec3(specularMaxValue));
 }
 #endif // SPECULARLIGHTING_INCLUDED

@@ -113,10 +113,12 @@ option.FOG_RAYLEIGH_B_SWAMP            = §1Blue
 
 # Materials settings
 
-option.TEXTURE_FORMAT                  = Texture Format
-
 option.NORMAL_MAPPING                  = Normal Mapping
 option.SPECULAR_MAPPING                = Specular Mapping
+option.TEXTURE_FORMAT                  = Texture Format
+option.HARDCODED_SPECULAR              = Hardcoded Specular
+option.HARDCODED_EMISSION              = Hardcoded Emission
+option.HARDCODED_SSS                   = Hardcoded SSS
 
 value.TEXTURE_FORMAT.TEXTURE_FORMAT_LAB = labPBR
 value.TEXTURE_FORMAT.TEXTURE_FORMAT_OLD = Old PBR

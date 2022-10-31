@@ -164,7 +164,7 @@ void main() {
 
 #ifdef SPECULAR_MAPPING
 		vec4 specularTex = vec4(unpackUnorm2x8(gbuffer1.z), unpackUnorm2x8(gbuffer1.w));
-		//decodeSpecularTexture(specularTex, material);
+		decodeSpecularTexture(specularTex, material);
 #endif
 
 		float NoL = dot(normal, lightDir);

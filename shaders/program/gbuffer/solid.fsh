@@ -99,13 +99,11 @@ vec3 drawEndPortal() {
 	const float depthScale = 0.33;    // Apparent distance between layers
 	const float depthFade  = 0.5;     // How quickly the layers fade to black
 	const float threshold  = 0.99;    // Threshold for the "stars". Lower values mean more stars appear
-	const float twinkleSpeed = 0.2;   // How fast the stars appear to twinkle
+	const float twinkleSpeed = 0.4;   // How fast the stars appear to twinkle
 	const float twinkleAmount = 0.04; // How many twinkling stars appear
 	const vec3  color0     = pow(vec3(0.80, 0.90, 0.99), vec3(2.2));
 	const vec3  color1     = pow(vec3(0.75, 0.40, 0.93), vec3(2.2));
 	const vec3  color2     = pow(vec3(0.20, 0.70, 0.90), vec3(2.2));
-
-	// Transformations
 
 	vec3 screenPos = vec3(gl_FragCoord.xy * texelSize * rcp(taauRenderScale), gl_FragCoord.z);
 	vec3 viewPos = screenToViewSpace(screenPos, true);

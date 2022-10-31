@@ -17,8 +17,17 @@ struct Material {
 	bool isHardcodedMetal;
 };
 
+float f0ToIor(float f0) {
+	float sqrtF0 = sqrt(f0) * 0.99999;
+	return (1.0 + sqrtF0) / (1.0 - sqrtF0);
+}
+vec3 f0ToIor(vec3 f0) {
+	vec3 sqrtF0 = sqrt(f0) * 0.999999;
+	return (1.0 + sqrtF0) / (1.0 - sqrtF0);
+}
+
 #if TEXTURE_FORMAT == TEXTURE_FORMAT_LAB
-void decodeSpecularTexture() {
+void decodeSpecularTexture(vec4 specularTex, inout Material material) {
 	// f0 and f82 values for hardcoded metals from Jessie LC (https://github.com/Jessie-LC)
 	const vec3[] metalF0 = vec3[](
 		vec3(0.78, 0.77, 0.74), // Iron
@@ -40,6 +49,38 @@ void decodeSpecularTexture() {
 		vec3(0.89, 0.87, 0.81),
 		vec3(1.00, 1.00, 0.95)
 	);
+
+	material.roughness = sqr(1.0 - specularTex.r);
+	material.emission  = max(material.emission, specularTex.a * float(specularTex.a != 1.0));
+
+	if (specularTex.g < 229.5 / 255.0) {
+		// Dielectrics
+		material.f0 = vec3(specularTex.g);
+		material.refractiveIndex = f0ToIor(material.f0.x);
+
+		float hasSss = step(64.5 / 255.0, specularTex.b);
+		material.sssAmount = max(material.sssAmount, specularTex.b * hasSss);
+		material.porosity = specularTex.b - specularTex.b * hasSss;
+	} else if (specularTex.g < 237.5 / 255.0) {
+		// Hardcoded metals
+		uint metalId = clamp(uint(255.0 * specularTex.g) - 230u, 0u, 7u);
+
+		material.f0 = metalF0[metalId];
+		material.f82 = metalF82[metalId];
+		material.isMetal = true;
+		material.isHardcodedMetal = true;
+	} else {
+		// Albedo metal
+		material.f0 = material.albedo;
+		material.isMetal = true;
+	}
+}
+#elif TEXTURE_FORMAT == TEXTURE_FORMAT_OLD
+void decodeSpecularTexture(vec4 specularTex, inout Material material) {
+	material.roughness = sqr(1.0 - specularTex.r);
+	material.isMetal   = specularTex.g > 0.5;
+	material.f0        = material.isMetal ? material.albedo : material.f0;
+	material.emission  = max(material.emission, specularTex.b);
 }
 #endif
 

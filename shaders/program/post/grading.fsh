@@ -180,10 +180,10 @@ vec3 academyFit(vec3 rgb) {
 // https://gpuopen.com/wp-content/uploads/2016/03/GdcVdrLottes.pdf
 vec3 tonemapLottes(vec3 rgb) {
 	const vec3 a = vec3(1.5);
-	const vec3 d = vec3(0.95);
+	const vec3 d = vec3(0.94);
 	const vec3 hdrMax = vec3(8.0);
-	const vec3 midIn = vec3(0.25);
-	const vec3 midOut = vec3(0.337);
+	const vec3 midIn = vec3(0.26);
+	const vec3 midOut = vec3(0.33);
 
 	const vec3 b =
 		(-pow(midIn, a) + pow(hdrMax, a) * midOut) /
