@@ -11,7 +11,7 @@
 //----------------------------------------------------------------------------//
 #if   defined WORLD_OVERWORLD
 
-const float blocklightIntensity = 10.0;
+const float blocklightIntensity = 11.0;
 const float emissionIntensity   = 40.0;
 const float sssIntensity        = 4.0;
 const float sssDensity          = 32.0;
@@ -48,11 +48,10 @@ vec3 getSceneLighting(
 
 	// Sunlight/moonlight
 
-	vec3 diffuse = diffuseHammon(material.albedo, material.roughness, material.refractiveIndex, material.f0.x, NoL, NoV, NoH, LoV) * (1.0 - 0.5 * material.sssAmount) * pi;
-	vec3 bounced = 0.066 * (1.0 - shadows * max0(NoL)) * (1.0 - 0.33 * max0(normal.y)) * pow1d5(ao + eps) * pow4(lmCoord.y);
+	vec3 bounced = 0.05 * (1.0 - shadows * max0(NoL)) * (1.0 - 0.33 * max0(normal.y)) * pow1d5(ao + eps) * pow4(lmCoord.y);
 	vec3 sss = getSubsurfaceScattering(material.albedo, material.sssAmount, sssDepth, LoV);
 
-	illuminance += lightColor * (max0(NoL) * diffuse * shadows * ao + bounced + sss);
+	illuminance += lightColor * (max0(NoL) * shadows * ao * (1.0 - 0.5 * material.sssAmount) + bounced + sss);
 
 	// Skylight
 

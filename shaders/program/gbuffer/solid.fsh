@@ -187,8 +187,8 @@ void main() {
 #endif
 
 #ifdef PROGRAM_TERRAIN
-	const float vanillaAoStrength = 0.65;
-	const float vanillaAoLift     = 1.0;
+	const float vanillaAoStrength = 1.0;
+	const float vanillaAoLift     = 0.8;
 	baseTex.rgb *= lift(vanillaAo, vanillaAoLift) * vanillaAoStrength + (1.0 - vanillaAoStrength);
 #endif
 

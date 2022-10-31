@@ -206,7 +206,7 @@ void main() {
 		// Terrain diffuse lighting
 
 		float sssDepth;
-		vec3 shadows = calculateShadows(scenePos, flatNormal, lmCoord.y, material.sssAmount, sssDepth);
+		vec3 shadows = calculateShadows(scenePos, flatNormal, lmCoord.y, 1.0, sssDepth);
 
 		fragColor = getSceneLighting(
 			material,

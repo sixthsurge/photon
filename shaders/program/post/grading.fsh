@@ -83,6 +83,11 @@ vec3 getBloom(out vec3 fogBloom) {
 
 // Color grading
 
+vec3 gain(vec3 x, float k) {
+    vec3 a = 0.5 * pow(2.0 * mix(x, 1.0 - x, step(0.5, x)), vec3(k));
+    return mix(a, 1.0 - a, step(0.5, x));
+}
+
 vec3 brightnessSaturationContrast(vec3 rgb, const float brightness, const float saturation, const float contrast) {
 	// Brightness
 	rgb *= brightness;
@@ -136,6 +141,8 @@ vec3 gradeOutput(vec3 rgb) {
 
 	rgb = hslToRgb(hsl);
 
+	rgb = gain(rgb, 1.05);
+
 	return sqr(rgb);
 }
 
@@ -173,7 +180,7 @@ vec3 academyFit(vec3 rgb) {
 // https://gpuopen.com/wp-content/uploads/2016/03/GdcVdrLottes.pdf
 vec3 tonemapLottes(vec3 rgb) {
 	const vec3 a = vec3(1.5);
-	const vec3 d = vec3(0.93);
+	const vec3 d = vec3(0.95);
 	const vec3 hdrMax = vec3(8.0);
 	const vec3 midIn = vec3(0.25);
 	const vec3 midOut = vec3(0.337);
