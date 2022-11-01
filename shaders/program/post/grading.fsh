@@ -183,7 +183,7 @@ vec3 tonemapLottes(vec3 rgb) {
 	const vec3 d = vec3(0.94);
 	const vec3 hdrMax = vec3(8.0);
 	const vec3 midIn = vec3(0.26);
-	const vec3 midOut = vec3(0.325);
+	const vec3 midOut = vec3(0.33);
 
 	const vec3 b =
 		(-pow(midIn, a) + pow(hdrMax, a) * midOut) /

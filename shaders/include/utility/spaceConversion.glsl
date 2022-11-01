@@ -19,7 +19,13 @@ vec3 screenToViewSpace(vec3 screenPos, bool handleJitter) {
 	vec3 positionNdc = 2.0 * screenPos - 1.0;
 
 #ifdef TAA
-	if (handleJitter) positionNdc.xy -= taaOffset * rcp(taauRenderScale);
+#ifdef TAAU
+	vec2 jitterOffset = taaOffset * rcp(taauRenderScale);
+#else
+	vec2 jitterOffset = taaOffset * 0.75;
+#endif
+
+	if (handleJitter) positionNdc.xy -= jitterOffset;
 #endif
 
 	return projectAndDivide(gbufferProjectionInverse, positionNdc);
@@ -29,7 +35,13 @@ vec3 viewToScreenSpace(vec3 viewPos, bool handleJitter) {
 	vec3 positionNdc = projectAndDivide(gbufferProjection, viewPos);
 
 #ifdef TAA
-	if (handleJitter) positionNdc.xy += taaOffset * rcp(taauRenderScale);
+#ifdef TAAU
+	vec2 jitterOffset = taaOffset * rcp(taauRenderScale);
+#else
+	vec2 jitterOffset = taaOffset * 0.75;
+#endif
+
+	if (handleJitter) positionNdc.xy += jitterOffset;
 #endif
 
 	return positionNdc * 0.5 + 0.5;

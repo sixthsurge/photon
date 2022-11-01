@@ -145,14 +145,14 @@ Material getMaterial(vec3 albedoSrgb, uint blockId, vec3 blockPos, inout vec2 lm
 					#ifdef HARDCODED_EMISSION
 					if (blockId == 6u) {
 						// Ground torches and other partial emissives
-						material.emission = 0.3 * cube(linearStep(0.2, 0.4, blockPos.y));
+						material.emission = 0.33 * cube(linearStep(0.2, 0.4, blockPos.y));
 					} else {
 						// Wall torches
-						material.emission = 0.3 * cube(linearStep(0.35, 0.6, blockPos.y));
+						material.emission = 0.33 * cube(linearStep(0.35, 0.6, blockPos.y));
 					}
 					material.emission  = max(material.emission, step(0.5, 0.2 * hsl.y + 0.55 * hsl.z));
 					material.emission *= lmCoord.x;
-					lmCoord.x *= 0.75;
+					lmCoord.x *= 0.8;
 					#endif
 				}
 			}

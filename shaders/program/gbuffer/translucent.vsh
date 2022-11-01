@@ -62,7 +62,7 @@ void main() {
 	clipPos.xy  = clipPos.xy * taauRenderScale + clipPos.w * (taauRenderScale - 1.0);
 	clipPos.xy += taaOffset * clipPos.w;
 #elif defined TAA
-	clipPos.xy += taaOffset * clipPos.w * 0.75;
+	clipPos.xy += taaOffset * clipPos.w * 0.66;
 #endif
 
 	gl_Position = clipPos;

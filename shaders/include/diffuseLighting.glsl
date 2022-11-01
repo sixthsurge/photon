@@ -13,7 +13,7 @@
 
 const float blocklightIntensity = 8.0;
 const float emissionIntensity   = 32.0;
-const float sssIntensity        = 1.0;
+const float sssIntensity        = 0.85;
 const float sssDensity          = 32.0;
 const float metalDiffuseAmount  = 0.25; // Scales diffuse lighting on metals, ideally this would be zero but purely specular metals don't play well with SSR
 const vec3  blocklightColor     = toRec2020(vec3(BLOCKLIGHT_R, BLOCKLIGHT_G, BLOCKLIGHT_B)) * BLOCKLIGHT_I;
@@ -48,11 +48,11 @@ vec3 getSceneLighting(
 
 	// Sunlight/moonlight
 
-	float diffuse = sqrt(max0(NoL)) * (1.0 - 0.5 * material.sssAmount);
-	vec3 bounced = 0.08 * (1.0 - shadows * max0(NoL)) * (1.0 - 0.33 * max0(normal.y)) * pow1d5(ao + eps) * pow4(lmCoord.y);
+	float diffuse = lift(max0(NoL), 1.4) * (1.0 - 0.5 * material.sssAmount) * directionalShading;
+	vec3 bounced = 0.05 * (1.0 - shadows * max0(NoL)) * (1.0 - 0.33 * max0(normal.y)) * pow1d5(ao + eps) * pow4(lmCoord.y);
 	vec3 sss = getSubsurfaceScattering(material.albedo, material.sssAmount, sssDepth, LoV);
 
-	lighting += lightColor * (diffuse * shadows * ao * directionalShading + bounced + sss);
+	lighting += lightColor * (diffuse * shadows * ao + bounced + sss);
 
 	// Skylight
 
@@ -71,8 +71,8 @@ vec3 getSceneLighting(
 	// Reduce blocklight intensity in daylight
 	float blocklightScale = 1.0 - 0.5 * timeNoon * lmCoord.y;
 
-	float blocklightFalloff  = clamp01(1.2 * pow12(lmCoord.x) + 0.2 * pow5(lmCoord.x) + 0.1 * sqr(lmCoord.x) + 0.07 * lmCoord.x);
-	      blocklightFalloff *= mix(ao, 1.0, blocklightFalloff);
+	float blocklightFalloff  = clamp01(pow12(lmCoord.x) + 0.27 * pow5(lmCoord.x) + 0.18 * sqr(lmCoord.x) + 0.08 * lmCoord.x);
+	      blocklightFalloff *= mix(ao, 1.0, blocklightFalloff) * directionalShading;
 
 	lighting += blocklightIntensity * blocklightScale * blocklightFalloff * blocklightColor;
 
