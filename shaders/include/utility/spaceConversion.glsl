@@ -50,8 +50,8 @@ mat3 getTbnMatrix(vec3 normal) {
 }
 
 #if defined TEMPORAL_REPROJECTION
-vec3 reprojectSceneSpace(vec3 scenePos, bool isHand) {
-	vec3 cameraOffset = isHand
+vec3 reprojectSceneSpace(vec3 scenePos, bool hand) {
+	vec3 cameraOffset = hand
 		? vec3(0.0)
 		: cameraPosition - previousCameraPosition;
 
@@ -65,9 +65,9 @@ vec3 reproject(vec3 screenPos) {
 	vec3 pos = screenToViewSpace(screenPos, false);
 	     pos = viewToSceneSpace(pos);
 
-	bool isHand = screenPos.z < handDepth;
+	bool hand = screenPos.z < handDepth;
 
-	return reprojectSceneSpace(pos, isHand);
+	return reprojectSceneSpace(pos, hand);
 }
 
 vec3 reproject(vec3 screenPos, sampler2D velocitySampler) {

@@ -24,7 +24,7 @@ float getBorderFog(vec3 scenePos, vec3 worldDir) {
 	return fog;
 }
 
-void applyCommonFog(inout vec3 fragColor, vec3 scenePos, vec3 worldDir, float viewDist, bool isSky) {
+void applyCommonFog(inout vec3 fragColor, vec3 scenePos, vec3 worldDir, float viewDist, bool sky) {
 	const vec3 lavaColor         = toRec2020(vec3(0.839, 0.373, 0.075)) * 2.0;
 	const vec3 powderedSnowColor = toRec2020(vec3(0.957, 0.988, 0.988)) * 0.8;
 
@@ -72,13 +72,13 @@ vec3 getBorderFogColor(vec3 worldDir, float fog) {
 }
 #endif
 
-void applyFog(inout vec3 fragColor, vec3 scenePos, vec3 worldDir, bool isSky) {
+void applyFog(inout vec3 fragColor, vec3 scenePos, vec3 worldDir, bool sky) {
 	float viewDist = length(scenePos - gbufferModelView[3].xyz);
 
 	// Border fog
 
 #if defined BORDER_FOG && defined PROGRAM_DEFERRED3
-	if (!isSky) {
+	if (!sky) {
 		float fog = getBorderFog(scenePos, worldDir);
 		fragColor = mix(getBorderFogColor(worldDir, fog), fragColor, fog);
 	}
@@ -87,11 +87,11 @@ void applyFog(inout vec3 fragColor, vec3 scenePos, vec3 worldDir, bool isSky) {
 	// Cave fog
 
 #ifdef CAVE_FOG
-	float fog = getSphericalFog(viewDist, 0.0, 0.0033 * biomeCave * float(!isSky));
+	float fog = getSphericalFog(viewDist, 0.0, 0.0033 * biomeCave * float(!sky));
 	fragColor = mix(caveFogColor, fragColor, fog);
 #endif
 
-	applyCommonFog(fragColor, scenePos, worldDir, viewDist, isSky);
+	applyCommonFog(fragColor, scenePos, worldDir, viewDist, sky);
 }
 
 //----------------------------------------------------------------------------//

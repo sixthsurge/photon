@@ -21,7 +21,7 @@ uniform sampler2D colortex0;
 void main() {
 	int tileIndex = int(-log2(1.0 - uv.x));
 
-	if ((tileIndex & 1) == 0) {
+	if ((tileIndex & 1) == 1) {
 		bloomTiles = texelFetch(colortex0, ivec2(gl_FragCoord.xy), 0).rgb;
 	} else {
 		discard;

@@ -1,3 +1,3 @@
 #version 400 compatibility
 #define WORLD_OVERWORLD
-#include "/program/post/fxaa.fsh"
+#include "/program/post/grading.fsh"

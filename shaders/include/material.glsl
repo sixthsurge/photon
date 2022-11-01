@@ -206,7 +206,7 @@ Material getMaterial(vec3 albedoSrgb, uint blockId, vec3 blockPos, inout vec2 lm
 					if (blockId == 14u) {
 						#ifdef HARDCODED_EMISSION
 						// Pink glow
-						material.emission = 2.0 * isolateHue(hsl, 310.0, 50.0);
+						material.emission = 4.0 * isolateHue(hsl, 310.0, 50.0);
 						#endif
 					} else {
 

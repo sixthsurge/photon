@@ -16,9 +16,9 @@ float getSunBrightness() {
 	float blueHour = cube(pulse(float(worldTime), 13200.0, 900.0, 24000.0))  // dusk
 	               + cube(pulse(float(worldTime), 22800.0, 900.0, 24000.0)); // dawn
 
-	float blueHourMul = 1.0 + 40.0 * blueHour;
+	float daytimeMul = 1.0 + 0.5 * (timeSunset + timeSunrise) + 40.0 * blueHour;
 
-	return baseSunBrightness * userSunBrightness * blueHourMul;
+	return baseSunBrightness * userSunBrightness * daytimeMul;
 }
 float getMoonBrightness() {
 	const float baseMoonBrightness = 0.5;

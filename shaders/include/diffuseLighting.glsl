@@ -42,14 +42,17 @@ vec3 getSceneLighting(
 	float NoH,
 	float LoV
 ) {
-	vec3 illuminance = vec3(0.0);
+	vec3 lighting = vec3(0.0);
+
+	float directionalShading = (0.9 + 0.1 * normal.x) * (0.8 + 0.2 * abs(flatNormal.y)); // Arbitrary directional shading to make faces easier to distinguish
 
 	// Sunlight/moonlight
 
+	float diffuse = sqrt(max0(NoL)) * (1.0 - 0.5 * material.sssAmount);
 	vec3 bounced = 0.08 * (1.0 - shadows * max0(NoL)) * (1.0 - 0.33 * max0(normal.y)) * pow1d5(ao + eps) * pow4(lmCoord.y);
 	vec3 sss = getSubsurfaceScattering(material.albedo, material.sssAmount, sssDepth, LoV);
 
-	illuminance += lightColor * (max0(NoL) * shadows * ao * (1.0 - 0.5 * material.sssAmount) + bounced + sss);
+	lighting += lightColor * (diffuse * shadows * ao * directionalShading + bounced + sss);
 
 	// Skylight
 
@@ -61,7 +64,7 @@ vec3 getSceneLighting(
 
 	float skylightFalloff = sqr(lmCoord.y);
 
-	illuminance += skylight * skylightFalloff;
+	lighting += skylight * skylightFalloff;
 
 	// Blocklight
 
@@ -71,16 +74,15 @@ vec3 getSceneLighting(
 	float blocklightFalloff  = clamp01(1.2 * pow12(lmCoord.x) + 0.2 * pow5(lmCoord.x) + 0.1 * sqr(lmCoord.x) + 0.07 * lmCoord.x);
 	      blocklightFalloff *= mix(ao, 1.0, blocklightFalloff);
 
-	illuminance += blocklightIntensity * blocklightScale * blocklightFalloff * blocklightColor;
+	lighting += blocklightIntensity * blocklightScale * blocklightFalloff * blocklightColor;
 
-	illuminance += emissionIntensity * blocklightScale * material.albedo * material.emission;
+	lighting += emissionIntensity * blocklightScale * material.albedo * material.emission;
 
 	// Cave lighting
 
-	float directionalShading = (0.9 + 0.1 * normal.x) * (0.75 + 0.25 * abs(flatNormal.y));
-	illuminance += CAVE_LIGHTING_I * ao * directionalShading * (1.0 - skylightFalloff);
+	lighting += CAVE_LIGHTING_I * ao * directionalShading * (1.0 - skylightFalloff);
 
-	return max0(illuminance) * material.albedo * rcpPi * mix(1.0, metalDiffuseAmount, float(material.isMetal));
+	return max0(lighting) * material.albedo * rcpPi * mix(1.0, metalDiffuseAmount, float(material.isMetal));
 }
 
 //----------------------------------------------------------------------------//
