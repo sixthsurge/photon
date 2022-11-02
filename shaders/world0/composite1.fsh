@@ -233,9 +233,13 @@ void main() {
 
 		applyFog(translucentColor, scenePos, worldDir, false);
 
+#ifdef BORDER_FOG
 		// Handle border fog by attenuating the alpha component
 		float borderFog = getBorderFog(scenePos, worldDir);
 		blendColor.a *= borderFog;
+#else
+		const float borderFog = 1.0;
+#endif
 
 		// Blend with background
 		vec3 tint = material.albedo;

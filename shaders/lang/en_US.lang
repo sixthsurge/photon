@@ -21,6 +21,7 @@ screen.colorGrading                    = Color Grading
 screen.exposure                        = Exposure
 
 screen.fogRlh                          = Rayleigh Coefficient
+screen.fogMie                          = Mie Coefficient
 screen.fogRlhNormal                    = Normal Color
 screen.fogRlhRain                      = Rain Color
 screen.fogRlhArid                      = Arid/Desert Color
@@ -33,6 +34,7 @@ screen.fogRlhSwamp                     = Swamp Color
 
 option.WAVING_PLANTS                   = Waving Plants
 option.WAVING_LEAVES                   = Waving Leaves
+option.SEA_LEVEL                       = Sea Level
 
 # Lighting settings
 
@@ -74,7 +76,25 @@ value.shadowDistance.1024.0            = 64 chunks
 
 # Sky settings
 
+option.VANILLA_SUN                     = Vanilla Sun
+option.VANILLA_MOON                    = Vanilla Moon
+option.SUN_ANGULAR_RADIUS              = Sun Angular Radius
+option.MOON_ANGULAR_RADIUS             = Moon Angular Radius
+option.SKY_GROUND                      = Sky Ground
+option.STARS                           = Stars
+option.STARS_INTENSITY                 = Stars Intensity
+option.STARS_COVERAGE                  = Stars Coverage
+
 # Fog settings
+
+option.BORDER_FOG                      = Border Fog
+option.CAVE_FOG                        = Cave Fog
+option.BLOOMY_FOG                      = Bloomy Fog
+option.BLOOMY_FOG_INTENSITY            = Bloomy Fog Intensity
+option.VOLUMETRIC_FOG                  = Volumetric Fog
+option.FOG_RENDER_SCALE                = Vol. Fog Render Scale
+option.FOG_CLOUDY_NOISE                = Cloudy Noise
+option.FOG_COLORED_LIGHT_SHAFTS        = Colored Light Shafts
 
 option.FOG_RAYLEIGH_DENSITY            = Normal Density
 option.FOG_RAYLEIGH_R                  = §4Red
@@ -110,6 +130,13 @@ option.FOG_RAYLEIGH_DENSITY_SWAMP      = Swamp Density
 option.FOG_RAYLEIGH_R_SWAMP            = §4Red
 option.FOG_RAYLEIGH_G_SWAMP            = §2Green
 option.FOG_RAYLEIGH_B_SWAMP            = §1Blue
+
+option.FOG_MIE_DENSITY_MORNING         = Morning Density
+option.FOG_MIE_DENSITY_NOON            = Noon Density
+option.FOG_MIE_DENSITY_EVENING         = Evening Density
+option.FOG_MIE_DENSITY_MIDNIGHT        = Midnight Density
+option.FOG_MIE_DENSITY_RAIN            = Rain Density
+option.FOG_MIE_DENSITY_BLUE_HOUR       = Dawn/Dusk Density
 
 # Materials settings
 

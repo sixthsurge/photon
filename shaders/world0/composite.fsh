@@ -167,9 +167,19 @@ mat2x3 raymarchFog(vec3 worldStartPos, vec3 worldEndPos, bool sky, float skyligh
 		vec3 shadowScreenPos = distortShadowSpace(shadowPos) * 0.5 + 0.5;
 
 #ifdef SHADOW
-	#ifdef FOG_COLOR
+	 	ivec2 shadowTexel = ivec2(shadowScreenPos.xy * shadowMapResolution * MC_SHADOW_QUALITY);
+
+	#ifdef FOG_COLORED_LIGHT_SHAFTS
+		float depth0 = texelFetch(shadowtex0, shadowTexel, 0).x;
+		float depth1 = texelFetch(shadowtex1, shadowTexel, 0).x;
+		vec3  color = texelFetch(shadowcolor0, shadowTexel, 0).rgb;
+		float colorWeight = step(depth0, shadowScreenPos.z) * step(eps, maxOf(color));
+
+		color = color * colorWeight + (1.0 - colorWeight);
+
+		vec3 shadow = step(shadowScreenPos.z, depth1) * color;
 	#else
-		float depth1 = texelFetch(shadowtex1, ivec2(shadowScreenPos.xy * shadowMapResolution * MC_SHADOW_QUALITY), 0).x;
+		float depth1 = texelFetch(shadowtex1, shadowTexel, 0).x;
 		float shadow = step(float(clamp01(shadowScreenPos) == shadowScreenPos) * shadowScreenPos.z, depth1);
 	#endif
 #else
