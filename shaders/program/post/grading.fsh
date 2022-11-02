@@ -108,7 +108,11 @@ vec3 brightnessSaturationContrast(vec3 rgb, const float brightness, const float 
 // Color grading applied before tone mapping
 // rgb := color in acescg [0, inf]
 vec3 gradeInput(vec3 rgb) {
-	return brightnessSaturationContrast(rgb, GRADE_BRIGHTNESS, GRADE_SATURATION, GRADE_CONTRAST);
+	const float brightness = 1.07 * GRADE_BRIGHTNESS;
+	const float saturation = 1.00 * GRADE_SATURATION;
+	const float contrast   = 1.05 * GRADE_CONTRAST;
+
+	return brightnessSaturationContrast(rgb, brightness, saturation, contrast);
 }
 
 // Color grading applied after tone mapping

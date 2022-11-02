@@ -110,7 +110,7 @@ vec2 fogDensity(vec3 worldPos) {
 	return density;
 }
 
-mat2x3 raymarchFog(vec3 worldStartPos, vec3 worldEndPos, bool isSky, float skylight, float dither) {
+mat2x3 raymarchFog(vec3 worldStartPos, vec3 worldEndPos, bool sky, float skylight, float dither) {
 	vec3 worldDir = worldEndPos - worldStartPos;
 
 	float lengthSq = lengthSquared(worldDir);
@@ -144,7 +144,7 @@ mat2x3 raymarchFog(vec3 worldStartPos, vec3 worldEndPos, bool isSky, float skyli
 
 	if (distanceToVolumeEnd < 0.0) return mat2x3(vec3(0.0), vec3(1.0));
 
-	rayLength = isSky ? distanceToVolumeEnd : rayLength;
+	rayLength = sky ? distanceToVolumeEnd : rayLength;
 	rayLength = clamp(rayLength - distanceToVolumeStart, 0.0, far);
 
 	uint stepCount = uint(float(fogMinStepCount) + fogStepCountGrowth * rayLength);
@@ -197,7 +197,7 @@ mat2x3 raymarchFog(vec3 worldStartPos, vec3 worldEndPos, bool isSky, float skyli
 	lightSky[0] *= fogCoeff[0][0] * eyeSkylight;
 	lightSky[1] *= fogCoeff[0][1] * eyeSkylight;
 
-	if (!isSky) {
+	if (!sky) {
 		// Skylight falloff
 		lightSky[0] *= skylight;
 		lightSky[1] *= skylight;
