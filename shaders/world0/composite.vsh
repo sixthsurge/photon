@@ -19,8 +19,6 @@ flat out vec3 lightColor;
 flat out vec3 skyColor;
 flat out mat2x3 fogCoeff[2];
 
-uniform sampler2D depthtex2; // Atmospheric sun color LUT
-
 uniform float sunAngle;
 
 uniform int worldTime;
@@ -46,7 +44,6 @@ uniform float timeNoon;
 uniform float timeSunset;
 uniform float timeMidnight;
 
-#define ATMOSPHERE_SUN_COLOR_LUT depthtex2
 #define WORLD_OVERWORLD
 #include "/include/palette.glsl"
 #include "/include/weather.glsl"

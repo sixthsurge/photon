@@ -16,7 +16,7 @@
 out vec2 uv;
 
 flat out vec3 lightColor;
-flat out vec3 skyColor;
+flat out mat3 skyColors;
 
 uniform float sunAngle;
 
@@ -38,7 +38,10 @@ void main() {
 	uv = gl_MultiTexCoord0.xy;
 
 	lightColor = getLightColor();
-	skyColor = getSkyColor();
+
+	skyColors[0] = getSkyColor();
+	skyColors[1] = skyColors[0];
+	skyColors[2] = skyColors[0];
 
 	vec2 vertexPos = gl_Vertex.xy * taauRenderScale;
 	gl_Position = vec4(vertexPos * 2.0 - 1.0, 0.0, 1.0);

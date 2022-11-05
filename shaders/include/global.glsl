@@ -9,6 +9,7 @@
 // Common constants
 
 const float eps         = 1e-6;
+const float e           = exp(1.0);
 const float pi          = acos(-1.0);
 const float tau         = 2.0 * pi;
 const float halfPi      = 0.5 * pi;

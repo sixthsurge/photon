@@ -242,7 +242,7 @@ mat2x3 raymarchFog(vec3 worldStartPos, vec3 worldEndPos, bool sky, float skyligh
 
 void main() {
 	ivec2 fogTexel  = ivec2(gl_FragCoord.xy);
-	ivec2 viewTexel = ivec2(gl_FragCoord.xy * rcp(FOG_RENDER_SCALE));
+	ivec2 viewTexel = ivec2(gl_FragCoord.xy * taauRenderScale * rcp(FOG_RENDER_SCALE));
 
 	float depth   = texelFetch(depthtex1, viewTexel, 0).x;
 	vec4 gbuffer0 = texelFetch(colortex1, viewTexel, 0);

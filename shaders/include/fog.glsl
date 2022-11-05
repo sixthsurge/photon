@@ -16,10 +16,12 @@ float getSphericalFog(float viewDist, float fogStartDistance, float fogDensity) 
 float getBorderFog(vec3 scenePos, vec3 worldDir) {
 #if defined WORLD_OVERWORLD
 	float density = 1.0 - 0.2 * smoothstep(0.0, 0.25, worldDir.y);
+#else
+	float density = 1.0;
 #endif
 
 	float fog = cubicLength(scenePos.xz) / far;
-	      fog = exp2(-8.0 * pow8(fog * density));
+	      fog = exp2(-12.0 * pow8(fog * density));
 
 	return fog;
 }

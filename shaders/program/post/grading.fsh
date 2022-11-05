@@ -20,6 +20,7 @@ uniform sampler2D colortex0; // Bloom tiles
 uniform sampler2D colortex3; // Fog transmittance
 uniform sampler2D colortex5; // Scene color
 
+uniform float aspectRatio;
 uniform float blindness;
 uniform float biomeCave;
 uniform float timeNoon;
@@ -88,13 +89,15 @@ vec3 gain(vec3 x, float k) {
     return mix(a, 1.0 - a, step(0.5, x));
 }
 
-vec3 brightnessSaturationContrast(vec3 rgb, const float brightness, const float saturation, const float contrast) {
+// Color grading applied before tone mapping
+// rgb := color in acescg [0, inf]
+vec3 gradeInput(vec3 rgb) {
+	const float brightness = 1.08 * GRADE_BRIGHTNESS;
+	const float contrast   = 1.05 * GRADE_CONTRAST;
+	const float saturation = 1.02 * GRADE_SATURATION;
+
 	// Brightness
 	rgb *= brightness;
-
-	// Saturation
-	float lum = getLuminance(rgb);
-	rgb = mix(vec3(lum), rgb, saturation);
 
 	// Contrast
 	const float logMidpoint = 0.18;
@@ -102,13 +105,22 @@ vec3 brightnessSaturationContrast(vec3 rgb, const float brightness, const float 
 	rgb = contrast * (rgb - logMidpoint) + logMidpoint;
 	rgb = max0(exp2(rgb) - eps);
 
-	return rgb;
-}
+	// Saturation
+	float lum = getLuminance(rgb, luminanceWeightsRec2020);
+	rgb = max0(mix(vec3(lum), rgb, saturation));
 
-// Color grading applied before tone mapping
-// rgb := color in acescg [0, inf]
-vec3 gradeInput(vec3 rgb) {
-	return brightnessSaturationContrast(rgb, GRADE_BRIGHTNESS, GRADE_SATURATION, GRADE_CONTRAST);
+#if GRADE_WHITE_BALANCE != 6500
+	// White balance (slow)
+	vec3 srcXyz = blackbody(float(GRADE_WHITE_BALANCE)) * rec2020_to_xyz;
+	vec3 dstXyz = blackbody(                    6500.0) * rec2020_to_xyz;
+	mat3 cat = getChromaticAdaptationMatrix(srcXyz, dstXyz);
+
+	rgb = rgb * rec2020_to_xyz;
+	rgb = rgb * cat;
+	rgb = rgb * xyz_to_rec2020;
+#endif
+
+	return rgb;
 }
 
 // Color grading applied after tone mapping
@@ -179,11 +191,19 @@ vec3 academyFit(vec3 rgb) {
 // Timothy Lottes 2016, "Advanced Techniques and Optimization of HDR Color Pipelines"
 // https://gpuopen.com/wp-content/uploads/2016/03/GdcVdrLottes.pdf
 vec3 tonemapLottes(vec3 rgb) {
-	const vec3 a = vec3(1.5);
-	const vec3 d = vec3(0.94);
-	const vec3 hdrMax = vec3(8.0);
-	const vec3 midIn = vec3(0.26);
-	const vec3 midOut = vec3(0.33);
+	//*
+	const vec3 a = vec3(1.33);      // Contrast
+	const vec3 d = vec3(0.97);      // Shoulder contrast
+	const vec3 hdrMax = vec3(8.0);  // White point
+	const vec3 midIn = vec3(0.26);  // Fixed midpoint x
+	const vec3 midOut = vec3(0.33); // Fixed midput y
+	/*/
+	const vec3 a = vec3(1.5);       // Contrast
+	const vec3 d = vec3(0.94);      // Shoulder contrast
+	const vec3 hdrMax = vec3(8.0);  // White point
+	const vec3 midIn = vec3(0.26);  // Fixed midpoint x
+	const vec3 midOut = vec3(0.33); // Fixed midput y
+	//*/
 
 	const vec3 b =
 		(-pow(midIn, a) + pow(hdrMax, a) * midOut) /
@@ -271,7 +291,7 @@ void main() {
 	fragColor = mix(fragColor, bloom, bloomIntensity);
 
 #ifdef BLOOMY_FOG
-	float fogTransmittance = texelFetch(colortex3, texel, 0).x;
+	float fogTransmittance = texture(colortex3, uv * taauRenderScale).x;
 	fragColor = mix(fogBloom, fragColor, pow(fogTransmittance, BLOOMY_FOG_INTENSITY));
 #endif
 #endif
@@ -292,4 +312,15 @@ void main() {
 
 	fragColor = clamp01(fragColor * rec2020_to_rec709);
 	fragColor = gradeOutput(fragColor);
+
+#if 0 // Tonemap plot
+	const float scale = 2.0;
+	vec2 uvScaled = uv * scale * vec2(1.0, 1.0 / aspectRatio);
+	float x = uvScaled.x;
+	float y = tonemap(vec3(x)).x;
+
+	if (abs(uvScaled.x - 1.0) < 0.001 * scale) fragColor = vec3(1.0, 0.0, 0.0);
+	if (abs(uvScaled.y - 1.0) < 0.001 * scale) fragColor = vec3(1.0, 0.0, 0.0);
+	if (abs(uvScaled.y - y) < 0.001 * scale) fragColor = vec3(1.0);
+#endif
 }

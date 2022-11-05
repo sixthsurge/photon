@@ -61,7 +61,7 @@ void main() {
 
 	for (int i = 0; i < DOF_SAMPLES; ++i) {
 		vec2 offset = vogelDiskSample(i, DOF_SAMPLES, theta);
-		fragColor += textureLod(colortex0, uv + offset * CoC, 0).rgb;
+		fragColor += textureLod(colortex0, (uv + offset * CoC) * taauRenderScale, 0).rgb;
 	}
 
 	fragColor *= rcp(DOF_SAMPLES);

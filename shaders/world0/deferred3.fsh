@@ -20,8 +20,13 @@ layout (location = 3) out vec4 colortex3Clear; // Clear colortex3 so that transl
 in vec2 uv;
 
 flat in vec3 lightColor;
+#ifdef SH_SKYLIGHT
 flat in vec3 skySh[9];
-flat in mat2x3 illuminance;
+#else
+flat in mat3 skyColors;
+#endif
+
+flat in mat2x3 illuminance; // Sun/moon illuminance
 
 uniform sampler2D noisetex;
 

@@ -18,6 +18,8 @@ in vec2 texCoord;
 
 uniform sampler2D gtexture;
 
+uniform vec2 texelSize;
+
 const float lodBias = log2(taauRenderScale);
 
 void main() {

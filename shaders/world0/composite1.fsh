@@ -20,7 +20,7 @@ layout (location = 1) out float bloomyFog;
 in vec2 uv;
 
 flat in vec3 lightColor;
-flat in vec3 skyColor;
+flat in mat3 skyColors;
 
 uniform sampler2D colortex0; // Scene color
 uniform sampler2D colortex1; // Gbuffer 0
@@ -89,6 +89,10 @@ uniform float timeMidnight;
 	#undef SHADOW_COLOR
 #endif
 
+#ifdef SH_SKYLIGHT
+	#undef SH_SKYLIGHT
+#endif
+
 #include "/include/utility/color.glsl"
 #include "/include/utility/encoding.glsl"
 #include "/include/utility/fastMath.glsl"
@@ -116,7 +120,7 @@ vec4 textureSmooth(sampler2D sampler, vec2 coord) {
 
 // from http://www.diva-portal.org/smash/get/diva2:24136/FULLTEXT01.pdf
 vec3 purkinjeShift(vec3 rgb, float purkinjeIntensity) {
-	const vec3 purkinjeTint = vec3(0.5, 0.7, 1.0) * rec709_to_rec2020;
+	const vec3 purkinjeTint = vec3(0.43, 0.64, 1.0);
 	const vec3 rodResponse = vec3(7.15e-5, 4.81e-1, 3.28e-1) * rec709_to_rec2020;
 
 	if (purkinjeIntensity == 0.0) return rgb;
@@ -136,7 +140,6 @@ void main() {
 	ivec2 texel = ivec2(gl_FragCoord.xy);
 
 	// Texture fetches
-
 
 	float depth0    = texelFetch(depthtex0, texel, 0).x;
 	float depth1    = texelFetch(depthtex1, texel, 0).x;
@@ -260,8 +263,8 @@ void main() {
 #ifdef PURKINJE_SHIFT
 	lmCoord = isSky(depth0) ? vec2(0.0, 1.0) : lmCoord;
 
-	float purkinjeIntensity  = 0.025 * PURKINJE_SHIFT_INTENSITY;
-	      purkinjeIntensity *= 1.0 - smoothstep(-0.14, -0.08, sunDir.y) * sqrt(lmCoord.y);
+	float purkinjeIntensity  = 0.066 * PURKINJE_SHIFT_INTENSITY;
+	      purkinjeIntensity *= 1.0 - smoothstep(-0.12, -0.06, sunDir.y) * sqrt(lmCoord.y);
 	      purkinjeIntensity *= clamp01(1.0 - lmCoord.x);
 
 	fragColor = purkinjeShift(fragColor, purkinjeIntensity);

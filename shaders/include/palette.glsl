@@ -13,10 +13,10 @@ float getSunBrightness() {
 	const float baseSunBrightness = 8.0;
 	const float userSunBrightness = SUN_I;
 
-	float blueHour = cube(pulse(float(worldTime), 13200.0, 900.0, 24000.0))  // dusk
-	               + cube(pulse(float(worldTime), 22800.0, 900.0, 24000.0)); // dawn
+	float blueHour = cube(pulse(float(worldTime), 13200.0, 840.0, 24000.0))  // dusk
+	               + cube(pulse(float(worldTime), 22800.0, 840.0, 24000.0)); // dawn
 
-	float daytimeMul = 1.0 + 0.7 * (timeSunset + timeSunrise) + 32.0 * blueHour;
+	float daytimeMul = 1.0 + 0.5 * (timeSunset + timeSunrise) + 32.0 * blueHour;
 
 	return baseSunBrightness * userSunBrightness * daytimeMul;
 }
@@ -33,10 +33,13 @@ vec3 getSunTint() {
 	float blueHour = cube(pulse(float(worldTime), 13200.0, 800.0, 24000.0))  // dusk
 	               + cube(pulse(float(worldTime), 22800.0, 800.0, 24000.0)); // dawn
 
-	const vec3 purple = vec3(1.0, 0.85, 0.95);
-	vec3 blueHourTint = (1.0 - blueHour) + blueHour * purple;
+	vec3 morningEveningTint = vec3(1.0, 0.84, 0.93) * 1.2;
+	     morningEveningTint = mix(vec3(1.0), morningEveningTint, sqr(pulse(sunDir.y, 0.17, 0.20)));
 
-	return blueHourTint * userSunTint;
+	vec3 blueHourTint = vec3(1.0, 0.85, 0.95);
+	     blueHourTint = mix(vec3(1.0), blueHourTint, blueHour);
+
+	return morningEveningTint * blueHourTint * userSunTint;
 }
 vec3 getMoonTint() {
 	return vec3(1.0);
@@ -46,6 +49,7 @@ vec3 getLightColor() {
 	vec3 lightColor  = mix(getSunBrightness() * getSunTint(), getMoonBrightness() * getMoonTint(), step(0.5, sunAngle));
 	     lightColor *= atmosphereSunColor(lightDir.y, planetRadius);
 	     lightColor *= clamp01(rcp(0.02) * lightDir.y); // fade away during day/night transition
+		 lightColor *= 1.0 - 0.33 * pulse(abs(lightDir.y), 0.15, 0.11);
 
 	return lightColor;
 }

@@ -30,6 +30,12 @@ screen.fogRlhTaiga                     = Taiga Color
 screen.fogRlhJungle                    = Jungle Color
 screen.fogRlhSwamp                     = Swamp Color
 
+option.INFO                            = Photon Shaders
+value.INFO.0                           = §eby SixthSurge
+value.INFO.1                           = §aby SixthSurge
+value.INFO.2                           = §bby SixthSurge
+value.INFO.3                           = §dby SixthSurge
+
 # World settings
 
 option.WAVING_PLANTS                   = Waving Plants
@@ -39,6 +45,10 @@ option.SEA_LEVEL                       = Sea Level
 # Lighting settings
 
 option.GTAO                            = Ambient Occlusion
+option.SH_SKYLIGHT                     = SH Skylight
+
+value.GTAO.true                        = GTAO and Vanilla
+value.GTAO.false                       = Vanilla AO Only
 
 option.SHADOW                          = Shadow Mapping
 option.SHADOW_PCF                      = Shadow Filtering
@@ -187,12 +197,15 @@ value.tonemap.tonemapReinhardJodie     = Reinhard-Jodie
 
 option.GRADE_BRIGHTNESS                 = Brightness
 option.GRADE_CONTRAST                   = Contrast
-option.GRADE_SATURATION                 = Overall Saturation
+option.GRADE_SATURATION                 = Saturation
+option.GRADE_WHITE_BALANCE              = White Balance
 option.GRADE_ORANGE_SAT_BOOST           = Orange Saturation Boost
 option.GRADE_TEAL_SAT_BOOST             = Teal Saturation Boost
 option.GRADE_GREEN_SAT_BOOST            = Green Saturation Boost
 option.GRADE_GREEN_HUE_SHIFT            = Green Hue Shift
+suffix.GRADE_WHITE_BALANCE              = K
 suffix.GRADE_GREEN_HUE_SHIFT            = °
+
 option.PURKINJE_SHIFT                  = Purkinje Shift
 option.PURKINJE_SHIFT_INTENSITY        = Purkinje Shift Intensity
 
@@ -215,14 +228,9 @@ value.AUTO_EXPOSURE.AUTO_EXPOSURE_OFF       = Off
 
 # Misc settings
 
-option.INFO                            = Photon Shaders
-value.INFO.0                           = §eby SixthSurge
-value.INFO.1                           = §aby SixthSurge
-value.INFO.2                           = §bby SixthSurge
-value.INFO.3                           = §dby SixthSurge
-
 option.DEBUG_VIEW                      = Debug View
 option.DEBUG_SAMPLER                   = Debug Sampler
+option.WHITE_WORLD                     = White World
 option.TONEMAP_COMPARISON              = Tonemap Comparison
 option.tonemapLeft                     = Left Tonemap
 option.tonemapRight                    = Right Tonemap

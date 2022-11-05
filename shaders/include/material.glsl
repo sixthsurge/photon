@@ -85,6 +85,8 @@ void decodeSpecularTexture(vec4 specularTex, inout Material material) {
 #endif
 
 Material getMaterial(vec3 albedoSrgb, uint blockId, vec3 blockPos, inout vec2 lmCoord) {
+	vec3 hsl = rgbToHsl(albedoSrgb);
+
 	// Create material with default values
 
 	Material material;
@@ -101,8 +103,6 @@ Material getMaterial(vec3 albedoSrgb, uint blockId, vec3 blockPos, inout vec2 lm
 
 	// Hardcoded materials for specific blocks
 	// Using binary split search to minimise branches per fragment (TODO: measure impact)
-
-	vec3 hsl = rgbToHsl(albedoSrgb);
 
 	if (blockId < 16u) { // 0-16
 		if (blockId < 8u) { // 0-8
@@ -221,19 +221,19 @@ Material getMaterial(vec3 albedoSrgb, uint blockId, vec3 blockPos, inout vec2 lm
 					if (blockId == 16u) {
 						#ifdef HARDCODED_SSS
 						// Small plants
-						material.sssAmount = 0.5;
+						material.sssAmount = 1.0;
 						#endif
 					} else {
 						#ifdef HARDCODED_SSS
 						// Tall plants (lower half)
-						material.sssAmount = 0.5;
+						material.sssAmount = 1.0;
 						#endif
 					}
 				} else { // 18-20
 					if (blockId == 18u) {
 						#ifdef HARDCODED_SSS
 						// Tall plants (upper half)
-						material.sssAmount = 0.5;
+						material.sssAmount = 1.0;
 						#endif
 					} else {
 						#ifdef HARDCODED_SSS
