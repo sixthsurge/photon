@@ -92,7 +92,7 @@ vec3 gain(vec3 x, float k) {
 // Color grading applied before tone mapping
 // rgb := color in acescg [0, inf]
 vec3 gradeInput(vec3 rgb) {
-	const float brightness = 1.08 * GRADE_BRIGHTNESS;
+	const float brightness = 1.07 * GRADE_BRIGHTNESS;
 	const float contrast   = 1.05 * GRADE_CONTRAST;
 	const float saturation = 1.02 * GRADE_SATURATION;
 
@@ -191,19 +191,11 @@ vec3 academyFit(vec3 rgb) {
 // Timothy Lottes 2016, "Advanced Techniques and Optimization of HDR Color Pipelines"
 // https://gpuopen.com/wp-content/uploads/2016/03/GdcVdrLottes.pdf
 vec3 tonemapLottes(vec3 rgb) {
-	//*
-	const vec3 a = vec3(1.33);      // Contrast
-	const vec3 d = vec3(0.97);      // Shoulder contrast
+	const vec3 a      = vec3(1.33); // Contrast
+	const vec3 d      = vec3(0.98); // Shoulder contrast
 	const vec3 hdrMax = vec3(8.0);  // White point
-	const vec3 midIn = vec3(0.26);  // Fixed midpoint x
+	const vec3 midIn  = vec3(0.26); // Fixed midpoint x
 	const vec3 midOut = vec3(0.33); // Fixed midput y
-	/*/
-	const vec3 a = vec3(1.5);       // Contrast
-	const vec3 d = vec3(0.94);      // Shoulder contrast
-	const vec3 hdrMax = vec3(8.0);  // White point
-	const vec3 midIn = vec3(0.26);  // Fixed midpoint x
-	const vec3 midOut = vec3(0.33); // Fixed midput y
-	//*/
 
 	const vec3 b =
 		(-pow(midIn, a) + pow(hdrMax, a) * midOut) /

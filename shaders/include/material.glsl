@@ -6,25 +6,16 @@
 
 struct Material {
 	vec3 albedo;
+	vec3 emission;
 	vec3 f0;
 	vec3 f82; // hardcoded metals only
 	float roughness;
-	float refractiveIndex;
 	float sssAmount;
+	float sheenAmount; // SSS "sheen" for tall grass
 	float porosity;
-	float emission;
 	bool isMetal;
 	bool isHardcodedMetal;
 };
-
-float f0ToIor(float f0) {
-	float sqrtF0 = sqrt(f0) * 0.99999;
-	return (1.0 + sqrtF0) / (1.0 - sqrtF0);
-}
-vec3 f0ToIor(vec3 f0) {
-	vec3 sqrtF0 = sqrt(f0) * 0.999999;
-	return (1.0 + sqrtF0) / (1.0 - sqrtF0);
-}
 
 #if TEXTURE_FORMAT == TEXTURE_FORMAT_LAB
 void decodeSpecularTexture(vec4 specularTex, inout Material material) {
@@ -51,12 +42,11 @@ void decodeSpecularTexture(vec4 specularTex, inout Material material) {
 	);
 
 	material.roughness = sqr(1.0 - specularTex.r);
-	material.emission  = max(material.emission, specularTex.a * float(specularTex.a != 1.0));
+	material.emission  = max(material.emission, material.albedo * specularTex.a * float(specularTex.a != 1.0));
 
 	if (specularTex.g < 229.5 / 255.0) {
 		// Dielectrics
 		material.f0 = vec3(specularTex.g);
-		material.refractiveIndex = f0ToIor(material.f0.x);
 
 		float hasSss = step(64.5 / 255.0, specularTex.b);
 		material.sssAmount = max(material.sssAmount, specularTex.b * hasSss);
@@ -80,29 +70,30 @@ void decodeSpecularTexture(vec4 specularTex, inout Material material) {
 	material.roughness = sqr(1.0 - specularTex.r);
 	material.isMetal   = specularTex.g > 0.5;
 	material.f0        = material.isMetal ? material.albedo : material.f0;
-	material.emission  = max(material.emission, specularTex.b);
+	material.emission  = max(material.emission, material.albedo * specularTex.b);
 }
 #endif
 
 Material getMaterial(vec3 albedoSrgb, uint blockId, vec3 blockPos, inout vec2 lmCoord) {
-	vec3 hsl = rgbToHsl(albedoSrgb);
-
 	// Create material with default values
 
 	Material material;
 	material.albedo           = srgbToLinear(albedoSrgb) * rec709_to_rec2020;
+	material.emission         = vec3(0.0);
 	material.f0               = vec3(0.0);
 	material.f82              = vec3(0.0);
 	material.roughness        = 1.0;
-	material.refractiveIndex  = 1.0;
 	material.sssAmount        = 0.0;
+	material.sheenAmount      = 0.0;
 	material.porosity         = 0.0;
-	material.emission         = 0.0;
 	material.isMetal          = false;
 	material.isHardcodedMetal = false;
 
 	// Hardcoded materials for specific blocks
 	// Using binary split search to minimise branches per fragment (TODO: measure impact)
+
+	vec3 hsl = rgbToHsl(albedoSrgb);
+	vec3 albedoSqrt = sqrt(material.albedo);
 
 	if (blockId < 16u) { // 0-16
 		if (blockId < 8u) { // 0-8
@@ -115,13 +106,13 @@ Material getMaterial(vec3 albedoSrgb, uint blockId, vec3 blockPos, inout vec2 lm
 					if (blockId == 2u) {
 						#ifdef HARDCODED_EMISSION
 						// Bright full emissives
-						material.emission = 1.00 * (0.1 + 0.9 * sqr(hsl.z));
+						material.emission = 1.00 * albedoSqrt * (0.1 + 0.9 * cube(hsl.z));
 						lmCoord.x *= 0.8;
 						#endif
 					} else {
 						#ifdef HARDCODED_EMISSION
 						// Medium full emissives
-						material.emission = 0.66 * (0.1 + 0.9 * sqr(hsl.z));
+						material.emission = 0.66 * albedoSqrt * (0.1 + 0.9 * cube(hsl.z));
 						lmCoord.x *= 0.8;
 						#endif
 					}
@@ -131,13 +122,13 @@ Material getMaterial(vec3 albedoSrgb, uint blockId, vec3 blockPos, inout vec2 lm
 					if (blockId == 4u) {
 						#ifdef HARDCODED_EMISSION
 						// Dim full emissives
-						material.emission = 0.2 * (0.1 + 0.9 * pow4(hsl.z));
+						material.emission = 0.2 * albedoSqrt * (0.1 + 0.9 * pow4(hsl.z));
 						lmCoord.x *= 0.95;
 						#endif
 					} else {
 						#ifdef HARDCODED_EMISSION
 						// Partial emissives (brightest parts glow)
-						material.emission = 0.8 * step(0.495, 0.2 * hsl.y + 0.5 * hsl.z);
+						material.emission = 0.8 * albedoSqrt * step(0.495, 0.2 * hsl.y + 0.5 * hsl.z);
 						lmCoord.x *= 0.88;
 						#endif
 					}
@@ -145,12 +136,12 @@ Material getMaterial(vec3 albedoSrgb, uint blockId, vec3 blockPos, inout vec2 lm
 					#ifdef HARDCODED_EMISSION
 					if (blockId == 6u) {
 						// Ground torches and other partial emissives
-						material.emission = 0.33 * cube(linearStep(0.2, 0.4, blockPos.y));
+						material.emission = vec3(0.15) * sqrt(albedoSqrt) * cube(linearStep(0.16, 0.4, blockPos.y));
 					} else {
 						// Wall torches
-						material.emission = 0.33 * cube(linearStep(0.35, 0.6, blockPos.y));
+						material.emission = vec3(0.15) * sqrt(albedoSqrt) * cube(linearStep(0.31, 0.6, blockPos.y));
 					}
-					material.emission  = max(material.emission, step(0.5, 0.2 * hsl.y + 0.55 * hsl.z));
+					material.emission  = max(material.emission, 0.85 * albedoSqrt * step(0.5, 0.2 * hsl.y + 0.55 * hsl.z));
 					material.emission *= lmCoord.x;
 					lmCoord.x *= 0.8;
 					#endif
@@ -162,7 +153,7 @@ Material getMaterial(vec3 albedoSrgb, uint blockId, vec3 blockPos, inout vec2 lm
 					if (blockId == 8u) {
 						#ifdef HARDCODED_EMISSION
 						// Lava
-						material.emission = 2.00 * (0.2 + 0.8 * isolateHue(hsl, 30.0, 15.0));
+						material.emission = 2.00 * albedoSqrt * (0.2 + 0.8 * isolateHue(hsl, 30.0, 15.0));
 						lmCoord.x *= 0.3;
 						#endif
 					} else {
@@ -171,20 +162,20 @@ Material getMaterial(vec3 albedoSrgb, uint blockId, vec3 blockPos, inout vec2 lm
 						vec3 ap1 = material.albedo * rec2020_to_ap1_unlit;
 						float l = 0.5 * (minOf(ap1) + maxOf(ap1));
 						float redness = ap1.r * rcp(ap1.g + ap1.b);
-						material.emission = 0.33 * step(0.45, redness * l);
+						material.emission = 0.33 * material.albedo * step(0.45, redness * l);
 						#endif
 					}
 				} else { // 10-12
 					if (blockId == 10u) {
 						#ifdef HARDCODED_EMISSION
 						// Jack o' Lantern + nether mushrooms
-						material.emission = 0.80 * step(0.73, 0.1 * hsl.y + 0.7 * hsl.z);
-						lmCoord *= 0.9;
+						material.emission = 0.80 * albedoSqrt * step(0.73, 0.1 * hsl.y + 0.7 * hsl.z);
+						lmCoord *= 0.85;
 						#endif
 					} else {
 						#ifdef HARDCODED_EMISSION
 						// Beacon
-						material.emission = step(0.2, hsl.z) * step(maxOf(abs(blockPos - 0.5)), 0.4);
+						material.emission = step(0.2, hsl.z) * albedoSqrt * step(maxOf(abs(blockPos - 0.5)), 0.4);
 						lmCoord *= 0.9;
 						#endif
 					}
@@ -194,19 +185,19 @@ Material getMaterial(vec3 albedoSrgb, uint blockId, vec3 blockPos, inout vec2 lm
 					if (blockId == 12u) {
 						#ifdef HARDCODED_EMISSION
 						// End portal frame
-						material.emission = 0.33 * isolateHue(hsl, 120.0, 50.0);
+						material.emission = 0.33 * material.albedo * isolateHue(hsl, 120.0, 50.0);
 						#endif
 					} else {
 						#ifdef HARDCODED_EMISSION
 						// Sculk
-						material.emission = 0.2 * isolateHue(hsl, 200.0, 40.0) * smoothstep(0.5, 0.7, hsl.z);
+						material.emission = 0.2 * material.albedo * isolateHue(hsl, 200.0, 40.0) * smoothstep(0.5, 0.7, hsl.z);
 						#endif
 					}
 				} else { // 14-16
 					if (blockId == 14u) {
 						#ifdef HARDCODED_EMISSION
 						// Pink glow
-						material.emission = 4.0 * isolateHue(hsl, 310.0, 50.0);
+						material.emission = vec3(1.0) * isolateHue(hsl, 310.0, 50.0);
 						#endif
 					} else {
 
@@ -222,11 +213,13 @@ Material getMaterial(vec3 albedoSrgb, uint blockId, vec3 blockPos, inout vec2 lm
 						#ifdef HARDCODED_SSS
 						// Small plants
 						material.sssAmount = 1.0;
+						material.sheenAmount = 1.0;
 						#endif
 					} else {
 						#ifdef HARDCODED_SSS
 						// Tall plants (lower half)
 						material.sssAmount = 1.0;
+						material.sheenAmount = 1.0;
 						#endif
 					}
 				} else { // 18-20
@@ -234,10 +227,17 @@ Material getMaterial(vec3 albedoSrgb, uint blockId, vec3 blockPos, inout vec2 lm
 						#ifdef HARDCODED_SSS
 						// Tall plants (upper half)
 						material.sssAmount = 1.0;
+						material.sheenAmount = 1.0;
 						#endif
 					} else {
-						#ifdef HARDCODED_SSS
 						// Leaves
+						#ifdef HARDCODED_SPECULAR
+						float smoothness = 0.33 * smoothstep(0.16, 0.5, hsl.z);
+						material.roughness = sqr(1.0 - smoothness);
+						material.f0 = vec3(0.02);
+						#endif
+
+						#ifdef HARDCODED_SSS
 						material.sssAmount = 1.0;
 						#endif
 					}
@@ -247,9 +247,8 @@ Material getMaterial(vec3 albedoSrgb, uint blockId, vec3 blockPos, inout vec2 lm
 					if (blockId == 20u) {
 						// Stained glass
 						#ifdef HARDCODED_SPECULAR
-						material.f0              = vec3(0.04);
-						material.refractiveIndex = (1.0 + sqrt(0.04)) / (1.0 - sqrt(0.04));
-						material.roughness       = 0.1;
+						material.f0         = vec3(0.04);
+						material.roughness  = 0.1;
 						#endif
 
 						#ifdef HARDCODED_SSS
@@ -276,21 +275,34 @@ Material getMaterial(vec3 albedoSrgb, uint blockId, vec3 blockPos, inout vec2 lm
 			if (blockId < 28u) { // 24-28
 				if (blockId < 26u) { // 24-26
 					if (blockId == 24u) {
-
+						// Grass block, stone
+						#ifdef HARDCODED_SPECULAR
+						float smoothness = 0.33 * smoothstep(0.2, 0.6, hsl.z);
+						material.roughness = sqr(1.0 - smoothness);
+						material.f0 = vec3(0.02);
+						#endif
 					} else {
-
 					}
 				} else { // 26-28
 					if (blockId == 26u) {
-
+						// Sand
+						float smoothness = 0.8 * linearStep(0.81, 0.96, hsl.z);
+						material.roughness = sqr(1.0 - smoothness);
+						material.f0 = vec3(0.02);
 					} else {
-
+						// Red sand
+						float smoothness = 0.4 * linearStep(0.61, 0.85, hsl.z);
+						material.roughness = sqr(1.0 - smoothness);
+						material.f0 = vec3(0.02);
 					}
 				}
 			} else { // 28-32
 				if (blockId < 30) { // 28-30
 					if (blockId == 28u) {
-
+						// Oak, jungle and acacia planks, granite and diorite
+						float smoothness = 0.5 * linearStep(0.4, 0.8, hsl.z);
+						material.roughness = sqr(1.0 - smoothness);
+						material.f0 = vec3(0.02);
 					} else {
 
 					}

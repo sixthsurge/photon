@@ -3,6 +3,11 @@
 
 #include "/include/utility/fastMath.glsl"
 
+float f0ToIor(float f0) {
+	float sqrtF0 = sqrt(f0) * 0.99999;
+	return (1.0 + sqrtF0) / (1.0 - sqrtF0);
+}
+
 // https://www.gdcvault.com/play/1024478/PBR-Diffuse-Lighting-for-GGX
 float distributionGgx(float NoHSq, float alphaSq) {
 	return alphaSq / (pi * sqr(1.0 - NoHSq + NoHSq * alphaSq));
@@ -23,7 +28,8 @@ vec3 fresnelSchlick(float cosTheta, vec3 f0) {
 	return f + f0 * (1.0 - f);
 }
 
-vec3 fresnelDielectric(float cosTheta, float n) {
+vec3 fresnelDielectric(float cosTheta, float f0) {
+	float n = f0ToIor(f0);
 	float gSq = sqr(n) + sqr(cosTheta) - 1.0;
 
 	if (gSq < 0.0) return vec3(1.0); // Imaginary g => TIR
@@ -45,7 +51,6 @@ vec3 fresnelLazanyi2019(float cosTheta, vec3 f0, vec3 f82) {
 vec3 diffuseHammon(
 	vec3 albedo,
 	float roughness,
-	float n,
 	float f0,
 	float NoL,
 	float NoV,
@@ -56,8 +61,8 @@ vec3 diffuseHammon(
 
 	float facing = 0.5 * LoV + 0.5;
 
-	float fresnelNL = fresnelDielectric(max(NoL, 1e-2), n).x;
-	float fresnelNV = fresnelDielectric(max(NoV, 1e-2), n).x;
+	float fresnelNL = fresnelDielectric(max(NoL, 1e-2), f0).x;
+	float fresnelNV = fresnelDielectric(max(NoV, 1e-2), f0).x;
 	float energyConservationFactor = 1.0 - (4.0 * sqrt(f0) + 5.0 * f0 * f0) * (1.0 / 9.0);
 
 	float singleRough = max0(facing) * (-0.2 * facing + 0.45) * (1.0 / NoH + 2.0);

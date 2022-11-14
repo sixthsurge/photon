@@ -117,13 +117,13 @@ vec3 drawEndPortal() {
 	vec2 tangentPos, tangentDir;
 	if (abs(tbnMatrix[2].x) > 0.5) {
 		tangentPos = worldPos.yz;
-		tangentDir = worldDir.yz;
+		tangentDir = worldDir.yz / abs(worldDir.x + eps);
 	} else if (abs(tbnMatrix[2].y) > 0.5) {
 		tangentPos = worldPos.xz;
-		tangentDir = worldDir.xz;
+		tangentDir = worldDir.xz / abs(worldDir.y + eps);
 	} else {
 		tangentPos = worldPos.xy;
-		tangentDir = worldDir.xy;
+		tangentDir = worldDir.xy / abs(worldDir.z + eps);
 	}
 
 	vec3 result = vec3(0.0);
@@ -165,7 +165,11 @@ vec3 drawEndPortal() {
 		if (random.x > threshold) break;
 	}
 
-	return sqrt(result); // Approximate linear -> sRGB conversion
+	result *= 0.8;
+	result  = sqrt(result);
+	result *= sqrt(result);
+
+	return result;
 }
 #endif
 

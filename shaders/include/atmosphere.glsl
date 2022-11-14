@@ -175,9 +175,34 @@ vec3 atmosphereScattering(vec3 rayDir, vec3 lightDir) {
 
 	return atmosphereScattering(nu, mu, muS);
 }
+
+vec3 atmosphereScatteringBorderFog(vec3 rayDir, vec3 lightDir) { // For border fog,
+	float nu = dot(rayDir, lightDir);
+	float mu = rayDir.y;
+	float muS = lightDir.y;
+
+#ifndef SKY_GROUND
+	float horizonMu = mix(-0.01, 0.03, smoothstep(-0.05, 0.1, muS));
+	mu = max(mu, horizonMu);
 #endif
 
-#if defined ATMOSPHERE_TRANSMITTANCE_LUT || defined ATMOSPHERE_SUN_COLOR_LUT
+	vec3 uv = atmosphereScatteringUv(nu, mu, muS);
+
+	vec3 scattering;
+
+	// Rayleigh + multiple scattering
+	uv.x *= 0.5;
+	scattering  = texture(ATMOSPHERE_SCATTERING_LUT, uv).rgb;
+
+	// Single mie scattering
+	uv.x += 0.5;
+	scattering += texture(ATMOSPHERE_SCATTERING_LUT, uv).rgb * min(kleinNishinaPhase(nu, airMieEnergyParameter), 1.0);
+
+	return scattering;
+}
+#endif
+
+#if defined ATMOSPHERE_TRANSMITTANCE_LUT || defined ATMOSPHERE_IRRADIANCE_LUT
 vec2 atmosphereTransmittanceUv(float mu, float r) {
 	// Distance to the atmosphere outer limit for a horizontal ray at ground level
 	const float H = sqrt(max(atmosphereOuterRadiusSq - atmosphereInnerRadiusSq, 0));
@@ -244,12 +269,12 @@ vec3 atmosphereTransmittance(vec3 rayOrigin, vec3 rayDir) {
 	return atmosphereTransmittance(mu, r);
 }
 
-#if defined ATMOSPHERE_SUN_COLOR_LUT
+#if defined ATMOSPHERE_IRRADIANCE_LUT
 vec3 atmosphereSunColor(float mu, float r) {
 	if (intersectSphere(mu, r, planetRadius).x >= 0.0) return vec3(0.0);
 
 	vec2 uv = atmosphereTransmittanceUv(mu, r);
-	return texture(ATMOSPHERE_SUN_COLOR_LUT, uv).rgb;
+	return texture(ATMOSPHERE_IRRADIANCE_LUT, uv).rgb;
 }
 #else
 vec3 atmosphereSunColor(float mu, float r) {

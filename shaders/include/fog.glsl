@@ -54,20 +54,20 @@ const vec3 caveFogColor = vec3(0.033);
 
 #if defined PROGRAM_DEFERRED3
 vec3 getBorderFogColor(vec3 worldDir, float fog) {
-	vec3 fogColor = illuminance[0] * atmosphereScattering(worldDir, sunDir)
-	              + illuminance[1] * atmosphereScattering(worldDir, moonDir);
+	vec3 fogColor = illuminance[0] * atmosphereScatteringBorderFog(worldDir, sunDir)
+	              + illuminance[1] * atmosphereScatteringBorderFog(worldDir, moonDir);
 
+#ifdef BORDER_FOG_HIDE_SUNSET_GRADIENT
 	worldDir.y = min(worldDir.y, -0.1);
 	worldDir = normalize(worldDir);
 
-#ifdef BORDER_FOG_HIDE_SUNSET_GRADIENT
-	vec3 fogColorSunset = illuminance[0] * atmosphereScattering(worldDir, sunDir)
-	                    + illuminance[1] * atmosphereScattering(worldDir, moonDir);
+	vec3 fogColorSunset = illuminance[0] * atmosphereScatteringBorderFog(worldDir, sunDir)
+	                    + illuminance[1] * atmosphereScatteringBorderFog(worldDir, moonDir);
 
 	float sunsetFactor = pulse(float(worldTime), 13000.0, 800.0, 24000.0)  // dusk
 	                   + pulse(float(worldTime), 23000.0, 800.0, 24000.0); // dawn
 
-	fogColor = mix(fogColor, fogColorSunset, sunsetFactor);
+	fogColor = mix(fogColor, fogColorSunset, sqr(sunsetFactor));
 #endif
 
 	return mix(fogColor, caveFogColor, biomeCave);

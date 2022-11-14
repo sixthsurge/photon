@@ -73,7 +73,8 @@ vec3 getSkyColor() {
 }
 
 float getSkylightBoost() {
-	float nightSkylightBoost = 4.0 * (1.0 - smoothstep(-0.2, -0.1, sunDir.y));
+	float nightSkylightBoost = 6.0 * (1.0 - smoothstep(-0.16, 0.0, sunDir.y))
+	                         - 4.0 * dampen(pulse(float(worldTime), 18000.0, 6000.0));
 
 	return 1.0 + nightSkylightBoost;
 }

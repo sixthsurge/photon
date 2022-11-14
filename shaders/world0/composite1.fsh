@@ -264,7 +264,8 @@ void main() {
 	lmCoord = isSky(depth0) ? vec2(0.0, 1.0) : lmCoord;
 
 	float purkinjeIntensity  = 0.066 * PURKINJE_SHIFT_INTENSITY;
-	      purkinjeIntensity *= 1.0 - smoothstep(-0.12, -0.06, sunDir.y) * sqrt(lmCoord.y);
+	      purkinjeIntensity *= 1.0 - smoothstep(-0.12, -0.06, sunDir.y);
+		  purkinjeIntensity *= 0.1 + 0.9 * lmCoord.y;
 	      purkinjeIntensity *= clamp01(1.0 - lmCoord.x);
 
 	fragColor = purkinjeShift(fragColor, purkinjeIntensity);
@@ -280,7 +281,7 @@ void main() {
 	#endif
 
 	#ifdef CAVE_FOG
-	bloomyFog *= getSphericalFog(viewDist, 0.0, 0.005 * biomeCave);
+	bloomyFog *= getSphericalFog(viewDist, 0.0, 0.005 * biomeCave * float(depth0 != 1.0));
 	#endif
 #endif
 

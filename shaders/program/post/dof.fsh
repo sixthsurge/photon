@@ -3,7 +3,7 @@
 
   Photon Shaders by SixthSurge
 
-  program/post/fxaa.fsh
+  program/post/dof.fsh
   Calculate depth of field
 
 --------------------------------------------------------------------------------

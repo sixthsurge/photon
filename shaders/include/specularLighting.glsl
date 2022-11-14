@@ -65,7 +65,7 @@ vec3 getSpecularHighlight(
 	} else if (material.isMetal) {
 		fresnel = fresnelSchlick(LoH, material.albedo);
 	} else {
-		fresnel = fresnelDielectric(LoH, material.refractiveIndex);
+		fresnel = fresnelDielectric(LoH, material.f0.x);
 	}
 
 	if (NoL <= eps) return vec3(0.0);
