@@ -4,6 +4,18 @@
 
 <p align = "center">A high performance shader pack for Minecraft: Java Edition with a "natural" visual style</p>
 
+<div align = "center">
+	<a href="http://www.youtube.com/watch?feature=player_embedded&v=2yW1ZKGWwJk" target="_blank"><img src="http://img.youtube.com/vi/2yW1ZKGWwJk/0.jpg" width="640" height="256" border="0" /></a>
+	<p> Excellent timelapse video by TheFinkie
+	<br><br>
+	<a href="http://www.youtube.com/watch?feature=player_embedded&v=yy4ucw9wX-8" target="_blank"><img src="http://img.youtube.com/vi/yy4ucw9wX-8/0.jpg" width="640" height="360" border="0" /></a>
+	<p> Another awesome showcase video by iambeen
+</div>
+
+## Notice
+
+I'm currently working on a new version of Photon with a more stylised visual direction and an emphasis on being comfortable to use for actual survival gameplay. You can try it on the [rework](https://github.com/sixthsurge/photon/tree/rework) branch.
+
 ## Compatibility
 
 ### GPU vendors
