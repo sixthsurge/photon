@@ -3,7 +3,7 @@
 
   Photon Shaders by SixthSurge
 
-  program/post/grading.fsh:
+  program/post/grade.fsh:
   Apply bloom, color grading and tone mapping then convert to rec. 709
 
 --------------------------------------------------------------------------------
@@ -92,7 +92,7 @@ vec3 gain(vec3 x, float k) {
 // Color grading applied before tone mapping
 // rgb := color in acescg [0, inf]
 vec3 gradeInput(vec3 rgb) {
-	const float brightness = 1.07 * GRADE_BRIGHTNESS;
+	const float brightness = 1.00 * GRADE_BRIGHTNESS;
 	const float contrast   = 1.05 * GRADE_CONTRAST;
 	const float saturation = 1.02 * GRADE_SATURATION;
 

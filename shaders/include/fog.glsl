@@ -33,7 +33,7 @@ void applyCommonFog(inout vec3 fragColor, vec3 scenePos, vec3 worldDir, float vi
 	float fog;
 
 	// Blindness fog
-	fog = getSphericalFog(viewDist, 2.0, 4.0 * blindness);
+	fog = getSphericalFog(viewDist, 2.0, blindness);
 	fragColor *= fog;
 
 	// Lava fog
@@ -54,15 +54,15 @@ const vec3 caveFogColor = vec3(0.033);
 
 #if defined PROGRAM_DEFERRED3
 vec3 getBorderFogColor(vec3 worldDir, float fog) {
-	vec3 fogColor = illuminance[0] * atmosphereScatteringBorderFog(worldDir, sunDir)
-	              + illuminance[1] * atmosphereScatteringBorderFog(worldDir, moonDir);
+	vec3 fogColor = sunColor * atmosphereScatteringBorderFog(worldDir, sunDir)
+	              + moonColor * atmosphereScatteringBorderFog(worldDir, moonDir);
 
 #ifdef BORDER_FOG_HIDE_SUNSET_GRADIENT
 	worldDir.y = min(worldDir.y, -0.1);
 	worldDir = normalize(worldDir);
 
-	vec3 fogColorSunset = illuminance[0] * atmosphereScatteringBorderFog(worldDir, sunDir)
-	                    + illuminance[1] * atmosphereScatteringBorderFog(worldDir, moonDir);
+	vec3 fogColorSunset = sunColor * atmosphereScatteringBorderFog(worldDir, sunDir)
+	                    + moonColor * atmosphereScatteringBorderFog(worldDir, moonDir);
 
 	float sunsetFactor = pulse(float(worldTime), 13000.0, 800.0, 24000.0)  // dusk
 	                   + pulse(float(worldTime), 23000.0, 800.0, 24000.0); // dawn

@@ -43,7 +43,7 @@ vec3 maxOf(vec3 a, vec3 b, vec3 c, vec3 d, vec3 f) {
 // https://github.com/GPUOpen-Effects/FidelityFX-CAS
 vec3 textureCas(sampler2D sampler, ivec2 texel, const float sharpness) {
 #ifndef CAS
-	return texelFetch(sampler, texel, 0).rgb;
+	return linearToSrgb(texelFetch(sampler, texel, 0).rgb);
 #endif
 
 	// Fetch 3x3 neighborhood
@@ -59,6 +59,17 @@ vec3 textureCas(sampler2D sampler, ivec2 texel, const float sharpness) {
 	vec3 g = texelFetch(sampler, texel + ivec2(-1,  1), 0).rgb;
 	vec3 h = texelFetch(sampler, texel + ivec2( 0,  1), 0).rgb;
 	vec3 i = texelFetch(sampler, texel + ivec2( 1,  1), 0).rgb;
+
+    // Convert to sRGB before performing CAS
+    a = linearToSrgb(a);
+    b = linearToSrgb(b);
+    c = linearToSrgb(c);
+    d = linearToSrgb(d);
+    e = linearToSrgb(e);
+    f = linearToSrgb(f);
+    g = linearToSrgb(g);
+    h = linearToSrgb(h);
+    i = linearToSrgb(i);
 
 	// Soft min and max. These are 2x bigger (factored out the extra multiply)
 	vec3 minColor  = minOf(d, e, f, b, h);
@@ -87,9 +98,9 @@ void main() {
 		fragColor = textureCas(colortex0, texel, CAS_INTENSITY * 2.0 - 1.0);
 	} else {
 		fragColor = textureCatmullRomFastRgb(colortex0, uv, 0.6);
+	    fragColor = linearToSrgb(fragColor);
 	}
 
-	fragColor = linearToSrgb(fragColor);
 	fragColor = dither8Bit(fragColor, bayer16(vec2(texel)));
 
 #if   DEBUG_VIEW == DEBUG_VIEW_SAMPLER

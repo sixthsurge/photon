@@ -18,7 +18,7 @@ float cloudsPhaseMulti(float cosTheta, vec3 g) { // Multiple scattering phase fu
 float clouds3DShape(vec3 pos) {
 	float altitudeFraction = (length(pos) - cloudVolumeRadius) * rcp(cloudVolumeThickness);
 
-	pos.xz += cameraPosition.xz * CLOUDS3D_SCALE;
+	pos.xz += cameraPosition.xz;
 
 	// 2D noise for base shape and coverage
 	vec2 noise2D;
@@ -69,7 +69,7 @@ vec3 clouds3DScattering(
 	float cosTheta,
 	float scatteringCoeff,
 	float extinctionCoeff,
-	float stepT,
+	float stepTransmittance,
 	float lightTransmittance,
 	float skyTransmittance,
 	float groundTransmittance,
@@ -77,7 +77,7 @@ vec3 clouds3DScattering(
 ) {
 	vec2 scattering = vec2(0.0);
 
-	float scatteringIntegral = (1.0 - stepT) / extinctionCoeff;
+	float scatteringIntegral = (1.0 - stepTransmittance) / extinctionCoeff;
 
 	float phase = cloudsPhaseSingle(cosTheta);
 	vec3 phaseG = lift(vec3(0.6, 0.9, 0.3), lightTransmittance - 1.0);
@@ -123,7 +123,7 @@ vec4 draw3DClouds() {
 
 	float altitude = length(rayOrigin);
 	bool planetIntersected = intersectSphere(rayOrigin, rayDir, min(altitude - 10.0, planetRadius)).y >= 0.0;
-	bool terrainIntersected = distanceToTerrain >= 0.0 && altitude < cloudVolumeRadius && distanceToTerrain * CLOUDS_SCALE < dists.y;
+	bool terrainIntersected = distanceToTerrain >= 0.0 && altitude < cloudVolumeRadius && distanceToTerrain < dists.y;
 
 	if (dists.y < 0.0                         // volume not intersected
 	 || planetIntersected && r < layer.radius // planet blocking clouds

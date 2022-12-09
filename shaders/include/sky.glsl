@@ -9,7 +9,7 @@
 #include "utility/fastMath.glsl"
 #include "utility/random.glsl"
 
-const float sunLuminance  = 16.0; // luminance of sun disk
+const float sunLuminance  = 40.0; // luminance of sun disk
 const float moonLuminance = 5.0; // luminance of sun disk
 
 vec3 drawSun(vec3 rayDir) {
@@ -20,7 +20,7 @@ vec3 drawSun(vec3 rayDir) {
 	float centerToEdge = max0(sunAngularRadius - fastAcos(nu));
 	vec3 limbDarkening = pow(vec3(1.0 - sqr(1.0 - centerToEdge)), 0.5 * alpha);
 
-	return baseSunCol * sunLuminance * step(0.0, centerToEdge) * limbDarkening * illuminance[0];
+	return baseSunCol * sunLuminance * step(0.0, centerToEdge) * limbDarkening * sunColor;
 }
 
 // Stars based on https://www.shadertoy.com/view/Md2SR3
@@ -71,7 +71,7 @@ vec3 drawStars(vec3 rayDir) {
 #endif
 
 	// Adjust star threshold so that brightest stars appear first
-	float starThreshold = 1.0 - 0.008 * STARS_COVERAGE * smoothstep(-0.05, 0.1, -sunDir.y);
+	float starThreshold = 1.0 - 0.008 * STARS_COVERAGE * smoothstep(-0.2, 0.05, -sunDir.y);
 
 	// Project ray direction onto the plane
 	vec2 coord  = rayDir.xy * rcp(abs(rayDir.z) + length(rayDir.xy)) + 41.21 * sign(rayDir.z);
@@ -93,7 +93,7 @@ vec3 renderSky(vec3 rayDir) {
 #ifdef VANILLA_SUN
 	if (vanillaSkyId == 2) {
 		const vec3 brightnessScale = baseSunCol * sunLuminance;
-		sky += vanillaSkyColor * brightnessScale * illuminance[0];
+		sky += vanillaSkyColor * brightnessScale * sunColor;
 	}
 #else
 	sky += drawSun(rayDir);
@@ -116,8 +116,8 @@ vec3 renderSky(vec3 rayDir) {
 	// Sky gradient
 
 	sky *= atmosphereTransmittance(airViewerPos, rayDir);
-	sky += illuminance[0] * atmosphereScattering(rayDir, sunDir);
-	sky += illuminance[1] * atmosphereScattering(rayDir, moonDir);
+	sky += sunColor * atmosphereScattering(rayDir, sunDir);
+	sky += moonColor * atmosphereScattering(rayDir, moonDir);
 
 	// Clouds
 

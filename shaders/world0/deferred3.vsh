@@ -16,13 +16,13 @@
 out vec2 uv;
 
 flat out vec3 lightColor;
+flat out vec3 sunColor;
+flat out vec3 moonColor;
 #ifdef SH_SKYLIGHT
 flat out vec3 skySh[9];
 #else
 flat out mat3 skyColors;
 #endif
-
-flat out mat2x3 illuminance; // Sun/moon illuminance
 
 uniform sampler2D colortex4; // Sky capture
 
@@ -57,8 +57,8 @@ uniform float timeMidnight;
 void main() {
 	uv = gl_MultiTexCoord0.xy;
 
-	illuminance[0] = getSunBrightness() * getSunTint();
-	illuminance[1] = getMoonBrightness() * getMoonTint();
+	sunColor = getSunBrightness() * getSunTint();
+	moonColor = getMoonBrightness() * getMoonTint();
 
 	lightColor = getLightColor();
 
@@ -86,12 +86,12 @@ void main() {
 	vec3 dir1 = normalize(vec3(sunDir.xz + 0.1, 0.066).xzy);  // Sun-facing horizon
 	vec3 dir2 = normalize(vec3(moonDir.xz + 0.1, 0.066).xzy); // Opposite horizon
 
-	skyColors[0] = illuminance[0] * atmosphereScattering(dir0, sunDir)
-	             + illuminance[1] * atmosphereScattering(dir0, moonDir);
-	skyColors[1] = illuminance[0] * atmosphereScattering(dir1, sunDir)
-	             + illuminance[1] * atmosphereScattering(dir1, moonDir);
-	skyColors[2] = illuminance[0] * atmosphereScattering(dir2, sunDir)
-	             + illuminance[1] * atmosphereScattering(dir2, moonDir);
+	skyColors[0] = sunColor * atmosphereScattering(dir0, sunDir)
+	             + moonColor * atmosphereScattering(dir0, moonDir);
+	skyColors[1] = sunColor * atmosphereScattering(dir1, sunDir)
+	             + moonColor * atmosphereScattering(dir1, moonDir);
+	skyColors[2] = sunColor * atmosphereScattering(dir2, sunDir)
+	             + moonColor * atmosphereScattering(dir2, moonDir);
 
 	skyColors[0] *= skylightBoost;
 	skyColors[1] *= skylightBoost;

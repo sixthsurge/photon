@@ -16,7 +16,7 @@ layout (location = 0) out vec3 fragColor;
 
 in vec2 uv;
 
-uniform sampler2D colortex0; // LDR linear scene color
+uniform sampler2D colortex0;
 
 uniform vec2 texelSize;
 

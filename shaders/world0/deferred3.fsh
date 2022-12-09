@@ -20,13 +20,13 @@ layout (location = 3) out vec4 colortex3Clear; // Clear colortex3 so that transl
 in vec2 uv;
 
 flat in vec3 lightColor;
+flat in vec3 sunColor;
+flat in vec3 moonColor;
 #ifdef SH_SKYLIGHT
 flat in vec3 skySh[9];
 #else
 flat in mat3 skyColors;
 #endif
-
-flat in mat2x3 illuminance; // Sun/moon illuminance
 
 uniform sampler2D noisetex;
 
@@ -73,6 +73,7 @@ uniform float frameTimeCounter;
 
 uniform int isEyeInWater;
 uniform float blindness;
+uniform float nightVision;
 
 uniform vec3 lightDir;
 uniform vec3 sunDir;

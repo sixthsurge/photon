@@ -15,7 +15,7 @@
   const int colortex0Format = R11F_G11F_B10F; // Scene color (deferred3 -> temporal), bloom tiles (composite4 -> composite6), final color (composite7 -> final)
   const int colortex1Format = RGBA16;         // Gbuffer 0 (solid -> composite1)
   const int colortex2Format = RGBA16;         // Gbuffer 1 (solid -> composite1)
-  const int colortex3Format = RGBA8;          // Animated overlays/vanilla sky (solid -> deferred3), translucent color (translucent -> composite1)
+  const int colortex3Format = RGBA8;          // Animated overlays/vanilla sky (solid -> deferred3), translucent color (translucent -> composite1), final color (composite7 -> final)
   const int colortex4Format = R11F_G11F_B10F; // Sky capture (deferred -> composite1)
   const int colortex5Format = RGBA16F;        // Scene history (always), clouds (deferred1 -> deferred3 +flip), fog scattering (composite -> composite1 +flip)
   const int colortex6Format = RGBA16F;        // Ambient occlusion history (always), fog transmittance (composite -> composite1), TAAU min color (composite2 -> composite3 +flip)
@@ -42,7 +42,8 @@ layout (location = 0) out vec3 fragColor;
 
 in vec2 uv;
 
-flat in mat2x3 illuminance;
+flat in vec3 sunColor;
+flat in vec3 moonColor;
 
 uniform sampler3D depthtex0; // Atmosphere scattering LUT
 

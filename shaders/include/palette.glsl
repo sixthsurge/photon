@@ -33,8 +33,8 @@ vec3 getSunTint() {
 	float blueHour = cube(pulse(float(worldTime), 13200.0, 800.0, 24000.0))  // dusk
 	               + cube(pulse(float(worldTime), 22800.0, 800.0, 24000.0)); // dawn
 
-	vec3 morningEveningTint = vec3(1.0, 0.84, 0.93) * 1.2;
-	     morningEveningTint = mix(vec3(1.0), morningEveningTint, sqr(pulse(sunDir.y, 0.17, 0.20)));
+	vec3 morningEveningTint = vec3(1.05, 0.84, 0.93) * 1.2;
+	     morningEveningTint = mix(vec3(1.0), morningEveningTint, sqr(pulse(sunDir.y, 0.17, 0.40)));
 
 	vec3 blueHourTint = vec3(1.0, 0.85, 0.95);
 	     blueHourTint = mix(vec3(1.0), blueHourTint, blueHour);
@@ -49,7 +49,8 @@ vec3 getLightColor() {
 	vec3 lightColor  = mix(getSunBrightness() * getSunTint(), getMoonBrightness() * getMoonTint(), step(0.5, sunAngle));
 	     lightColor *= atmosphereSunColor(lightDir.y, planetRadius);
 	     lightColor *= clamp01(rcp(0.02) * lightDir.y); // fade away during day/night transition
-		 lightColor *= 1.0 - 0.33 * pulse(abs(lightDir.y), 0.15, 0.11);
+		 lightColor *= 1.0 - 0.25 * pulse(abs(lightDir.y), 0.15, 0.11);
+         lightColor *= vec3(0.98, 0.99, 1.0);
 
 	return lightColor;
 }
@@ -73,8 +74,8 @@ vec3 getSkyColor() {
 }
 
 float getSkylightBoost() {
-	float nightSkylightBoost = 6.0 * (1.0 - smoothstep(-0.16, 0.0, sunDir.y))
-	                         - 4.0 * dampen(pulse(float(worldTime), 18000.0, 6000.0));
+	float nightSkylightBoost = 4.0 * (1.0 - smoothstep(-0.16, 0.0, sunDir.y))
+	                         - 3.0 * dampen(pulse(float(worldTime), 18000.0, 6000.0));
 
 	return 1.0 + nightSkylightBoost;
 }

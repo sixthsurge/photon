@@ -128,18 +128,19 @@ Material getMaterial(vec3 albedoSrgb, uint blockId, vec3 blockPos, inout vec2 lm
 					} else {
 						#ifdef HARDCODED_EMISSION
 						// Partial emissives (brightest parts glow)
-						material.emission = 0.8 * albedoSqrt * step(0.495, 0.2 * hsl.y + 0.5 * hsl.z);
+						float blue = isolateHue(hsl, 200.0, 30.0);
+						material.emission = 0.8 * albedoSqrt * step(0.495 - 0.1 * blue, 0.2 * hsl.y + 0.5 * hsl.z);
 						lmCoord.x *= 0.88;
 						#endif
 					}
 				} else { // 6-8, Torches
 					#ifdef HARDCODED_EMISSION
 					if (blockId == 6u) {
-						// Ground torches and other partial emissives
-						material.emission = vec3(0.15) * sqrt(albedoSqrt) * cube(linearStep(0.16, 0.4, blockPos.y));
+						// Ground torches
+						material.emission = 0.2 * sqrt(albedoSqrt) * cube(linearStep(0.16, 0.4, blockPos.y));
 					} else {
 						// Wall torches
-						material.emission = vec3(0.15) * sqrt(albedoSqrt) * cube(linearStep(0.31, 0.6, blockPos.y));
+						material.emission = 0.2 * sqrt(albedoSqrt) * cube(linearStep(0.31, 0.6, blockPos.y));
 					}
 					material.emission  = max(material.emission, 0.85 * albedoSqrt * step(0.5, 0.2 * hsl.y + 0.55 * hsl.z));
 					material.emission *= lmCoord.x;
@@ -170,13 +171,13 @@ Material getMaterial(vec3 albedoSrgb, uint blockId, vec3 blockPos, inout vec2 lm
 						#ifdef HARDCODED_EMISSION
 						// Jack o' Lantern + nether mushrooms
 						material.emission = 0.80 * albedoSqrt * step(0.73, 0.1 * hsl.y + 0.7 * hsl.z);
-						lmCoord *= 0.85;
+						lmCoord.x *= 0.85;
 						#endif
 					} else {
 						#ifdef HARDCODED_EMISSION
 						// Beacon
 						material.emission = step(0.2, hsl.z) * albedoSqrt * step(maxOf(abs(blockPos - 0.5)), 0.4);
-						lmCoord *= 0.9;
+						lmCoord.x *= 0.9;
 						#endif
 					}
 				}
@@ -200,7 +201,11 @@ Material getMaterial(vec3 albedoSrgb, uint blockId, vec3 blockPos, inout vec2 lm
 						material.emission = vec3(1.0) * isolateHue(hsl, 310.0, 50.0);
 						#endif
 					} else {
-
+						#ifdef HARDCODED_EMISSION
+						// Candles
+						material.emission = vec3(0.2) * pow4(clamp01(blockPos.y * 2.0));
+						lmCoord.x *= 0.9;
+						#endif
 					}
 				}
 			}
@@ -212,13 +217,13 @@ Material getMaterial(vec3 albedoSrgb, uint blockId, vec3 blockPos, inout vec2 lm
 					if (blockId == 16u) {
 						#ifdef HARDCODED_SSS
 						// Small plants
-						material.sssAmount = 1.0;
+						material.sssAmount = 0.5;
 						material.sheenAmount = 1.0;
 						#endif
 					} else {
 						#ifdef HARDCODED_SSS
 						// Tall plants (lower half)
-						material.sssAmount = 1.0;
+						material.sssAmount = 0.5;
 						material.sheenAmount = 1.0;
 						#endif
 					}
@@ -226,7 +231,7 @@ Material getMaterial(vec3 albedoSrgb, uint blockId, vec3 blockPos, inout vec2 lm
 					if (blockId == 18u) {
 						#ifdef HARDCODED_SSS
 						// Tall plants (upper half)
-						material.sssAmount = 1.0;
+						material.sssAmount = 0.5;
 						material.sheenAmount = 1.0;
 						#endif
 					} else {
@@ -304,7 +309,10 @@ Material getMaterial(vec3 albedoSrgb, uint blockId, vec3 blockPos, inout vec2 lm
 						material.roughness = sqr(1.0 - smoothness);
 						material.f0 = vec3(0.02);
 					} else {
-
+						// Obsidian, nether brick
+						float smoothness = 0.5 * linearStep(0.05, 0.4, hsl.z);
+						material.roughness = sqr(1.0 - smoothness);
+						material.f0 = vec3(0.02);
 					}
 				} else { // 30-32
 					if (blockId == 30u) {

@@ -4,7 +4,8 @@
 
 out vec2 uv;
 
-flat out mat2x3 illuminance;
+flat out vec3 sunColor;
+flat out vec3 moonColor;
 
 uniform float sunAngle;
 
@@ -27,8 +28,8 @@ uniform float timeMidnight;
 void main() {
 	uv = gl_MultiTexCoord0.xy;
 
-	illuminance[0] = getSunBrightness() * getSunTint();
-	illuminance[1] = getMoonBrightness() * getMoonTint();
+	sunColor = getSunBrightness() * getSunTint();
+	moonColor = getMoonBrightness() * getMoonTint();
 
 	gl_Position = vec4(gl_Vertex.xy * 2.0 - 1.0, 0.0, 1.0);
 }
