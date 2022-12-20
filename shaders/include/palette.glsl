@@ -10,7 +10,7 @@
 // Magic brightness adjustments, pre-exposing for the light source to compensate
 // for the lack of auto exposure by default
 float getSunBrightness() {
-	const float baseSunBrightness = 8.0;
+	const float baseSunBrightness = 7.0;
 	const float userSunBrightness = SUN_I;
 
 	float blueHour = cube(pulse(float(worldTime), 13200.0, 840.0, 24000.0))  // dusk
@@ -50,7 +50,7 @@ vec3 getLightColor() {
 	     lightColor *= atmosphereSunColor(lightDir.y, planetRadius);
 	     lightColor *= clamp01(rcp(0.02) * lightDir.y); // fade away during day/night transition
 		 lightColor *= 1.0 - 0.25 * pulse(abs(lightDir.y), 0.15, 0.11);
-         lightColor *= vec3(0.98, 0.99, 1.0);
+         lightColor *= vec3(0.97, 0.97, 1.0);
 
 	return lightColor;
 }

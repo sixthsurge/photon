@@ -137,10 +137,10 @@ Material getMaterial(vec3 albedoSrgb, uint blockId, vec3 blockPos, inout vec2 lm
 					#ifdef HARDCODED_EMISSION
 					if (blockId == 6u) {
 						// Ground torches
-						material.emission = 0.2 * sqrt(albedoSqrt) * cube(linearStep(0.16, 0.4, blockPos.y));
+						material.emission = 0.33 * sqrt(albedoSqrt) * cube(linearStep(0.12, 0.45, blockPos.y));
 					} else {
 						// Wall torches
-						material.emission = 0.2 * sqrt(albedoSqrt) * cube(linearStep(0.31, 0.6, blockPos.y));
+						material.emission = 0.33 * sqrt(albedoSqrt) * cube(linearStep(0.35, 0.6, blockPos.y));
 					}
 					material.emission  = max(material.emission, 0.85 * albedoSqrt * step(0.5, 0.2 * hsl.y + 0.55 * hsl.z));
 					material.emission *= lmCoord.x;
