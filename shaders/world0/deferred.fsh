@@ -12,12 +12,12 @@
 
   Magic constants, please don't remove these!
 
-  const int colortex0Format = R11F_G11F_B10F; // Scene color (deferred3 -> temporal), bloom tiles (composite4 -> composite6), final color (composite7 -> final)
+  const int colortex0Format = R11F_G11F_B10F; // Scene color (deferred3 -> temporal), bloom tiles (composite5 -> composite14), final color (composite14 -> final)
   const int colortex1Format = RGBA16;         // Gbuffer 0 (solid -> composite1)
   const int colortex2Format = RGBA16;         // Gbuffer 1 (solid -> composite1)
-  const int colortex3Format = RGBA8;          // Animated overlays/vanilla sky (solid -> deferred3), translucent color (translucent -> composite1), final color (composite7 -> final)
+  const int colortex3Format = RGBA8;          // Animated overlays/vanilla sky (solid -> deferred3), blended translucent color (translucent -> composite1)
   const int colortex4Format = R11F_G11F_B10F; // Sky capture (deferred -> composite1)
-  const int colortex5Format = RGBA16F;        // Scene history (always), clouds (deferred1 -> deferred3 +flip), fog scattering (composite -> composite1 +flip)
+  const int colortex5Format = RGBA16F;        // scene_color history (always), clouds (deferred1 -> deferred3 +flip), fog scattering (composite -> composite1 +flip)
   const int colortex6Format = RGBA16F;        // Ambient occlusion history (always), fog transmittance (composite -> composite1), TAAU min color (composite2 -> composite3 +flip)
   const int colortex7Format = RGBA16F;        // Clouds history (always), TAAU max color (composite2 -> composite3 +flip)
 
@@ -38,12 +38,12 @@
 #include "/include/global.glsl"
 
 /* DRAWBUFFERS:4 */
-layout (location = 0) out vec3 fragColor;
+layout (location = 0) out vec3 scene_color;
 
 in vec2 uv;
 
-flat in vec3 sunColor;
-flat in vec3 moonColor;
+flat in vec3 sun_color;
+flat in vec3 moon_color;
 
 uniform sampler3D depthtex0; // Atmosphere scattering LUT
 
@@ -57,28 +57,28 @@ uniform float sunAngle;
 uniform int frameCounter;
 uniform float frameTimeCounter;
 
-uniform vec3 lightDir;
-uniform vec3 sunDir;
-uniform vec3 moonDir;
+uniform vec3 light_dir;
+uniform vec3 sun_dir;
+uniform vec3 moon_dir;
 
-uniform float biomeCave;
+uniform float biome_cave;
 
-uniform float timeSunrise;
-uniform float timeNoon;
-uniform float timeSunset;
-uniform float timeMidnight;
+uniform float time_sunrise;
+uniform float time_noon;
+uniform float time_sunset;
+uniform float time_midnight;
 
 #define ATMOSPHERE_SCATTERING_LUT depthtex0
 #define PROGRAM_DEFERRED
 #define WORLD_OVERWORLD
 
 #include "/include/sky.glsl"
-#include "/include/skyProjection.glsl"
+#include "/include/sky_projection.glsl"
 
 void main() {
 	ivec2 texel = ivec2(gl_FragCoord.xy);
 
-	vec3 rayDir = unprojectSky(uv);
+	vec3 ray_dir = unproject_sky(uv);
 
-	fragColor = renderSky(rayDir);
+	scene_color = draw_sky(ray_dir);
 }

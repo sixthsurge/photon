@@ -15,9 +15,9 @@
 
 out vec2 uv;
 
-flat out vec3 lightColor;
-flat out vec3 skyColor;
-flat out mat2x3 fogCoeff[2];
+flat out vec3 light_color;
+flat out vec3 skylight_color;
+flat out mat2x3 air_fog_coeff[2];
 
 uniform float sunAngle;
 
@@ -25,24 +25,24 @@ uniform int worldTime;
 
 uniform float rainStrength;
 
-uniform vec3 lightDir;
-uniform vec3 sunDir;
-uniform vec3 moonDir;
+uniform vec3 light_dir;
+uniform vec3 sun_dir;
+uniform vec3 moon_dir;
 
-uniform float biomeTemperate;
-uniform float biomeArid;
-uniform float biomeSnowy;
-uniform float biomeTaiga;
-uniform float biomeJungle;
-uniform float biomeSwamp;
-uniform float biomeMayRain;
-uniform float biomeTemperature;
-uniform float biomeHumidity;
+uniform float biome_temperate;
+uniform float biome_arid;
+uniform float biome_snowy;
+uniform float biome_taiga;
+uniform float biome_jungle;
+uniform float biome_swamp;
+uniform float biome_may_rain;
+uniform float biome_temperature;
+uniform float biome_humidity;
 
-uniform float timeSunrise;
-uniform float timeNoon;
-uniform float timeSunset;
-uniform float timeMidnight;
+uniform float time_sunrise;
+uniform float time_noon;
+uniform float time_sunset;
+uniform float time_midnight;
 
 #define WORLD_OVERWORLD
 #include "/include/palette.glsl"
@@ -51,13 +51,13 @@ uniform float timeMidnight;
 void main() {
 	uv = gl_MultiTexCoord0.xy;
 
-	lightColor = getLightColor();
-	skyColor = getSkyColor();
+	light_color    = get_light_color();
+	skylight_color = get_skylight_color();
 
-	mat2x3 rayleighCoeff = fogRayleighCoeff(), mieCoeff = fogMieCoeff();
-	fogCoeff[0] = mat2x3(rayleighCoeff[0], mieCoeff[0]);
-	fogCoeff[1] = mat2x3(rayleighCoeff[1], mieCoeff[1]);
+	mat2x3 rayleigh_coeff = air_fog_rayleigh_coeff(), mie_coeff = air_fog_mie_coeff();
+	air_fog_coeff[0] = mat2x3(rayleigh_coeff[0], mie_coeff[0]);
+	air_fog_coeff[1] = mat2x3(rayleigh_coeff[1], mie_coeff[1]);
 
-	vec2 vertexPos = gl_Vertex.xy * FOG_RENDER_SCALE;
-	gl_Position = vec4(vertexPos * 2.0 - 1.0, 0.0, 1.0);
+	vec2 vertex_pos = gl_Vertex.xy * VL_RENDER_SCALE;
+	gl_Position = vec4(vertex_pos * 2.0 - 1.0, 0.0, 1.0);
 }

@@ -1,13 +1,13 @@
 #include "/include/global.glsl"
 
 /* DRAWBUFFERS:0 */
-layout (location = 0) out vec3 shadowcolor0Out;
+layout (location = 0) out vec3 shadowcolor0_out;
 
 in vec2 uv;
 
-flat in uint blockId;
+flat in uint object_id;
 flat in vec3 tint;
-flat in mat3 tbnMatrix;
+flat in mat3 tbn;
 
 uniform sampler2D tex;
 
@@ -17,15 +17,15 @@ uniform sampler2D tex;
 
 void main() {
 #ifdef SHADOW_COLOR
-	if (blockId == 2) { // Water
-		shadowcolor0Out = vec3(1.0);
+	if (object_id == 2) { // Water
+		shadowcolor0_out = vec3(1.0);
 	} else {
-		vec4 baseTex = textureLod(tex, uv, 0);
-		if (baseTex.a < 0.1) discard;
+		vec4 base_color = textureLod(tex, uv, 0);
+		if (base_color.a < 0.1) discard;
 
-		shadowcolor0Out  = mix(vec3(1.0), baseTex.rgb * tint, baseTex.a);
-		shadowcolor0Out  = 0.25 * srgbToLinear(shadowcolor0Out) * rec709_to_rec2020;
-		shadowcolor0Out *= step(baseTex.a, 1.0 - rcp(255.0));
+		shadowcolor0_out  = mix(vec3(1.0), base_color.rgb * tint, base_color.a);
+		shadowcolor0_out  = 0.25 * srgb_transfer_function_inverse(shadowcolor0_out) * rec709_to_rec2020;
+		shadowcolor0_out *= step(base_color.a, 1.0 - rcp(255.0));
 	}
 #else
 	if (texture(tex, uv).a < 0.1) discard;

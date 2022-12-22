@@ -8,21 +8,21 @@
 
 // Common constants
 
-const float eps         = 1e-6;
-const float e           = exp(1.0);
-const float pi          = acos(-1.0);
-const float tau         = 2.0 * pi;
-const float halfPi      = 0.5 * pi;
-const float rcpPi       = 1.0 / pi;
-const float degree      = tau / 360.0; // Size of one degree in radians, useful because radians() is not a constant expression on all platforms
-const float goldenRatio = 0.5 + 0.5 * sqrt(5.0);
-const float goldenAngle = tau / goldenRatio / goldenRatio;
-const float handDepth   = 0.56;
+const float eps          = 1e-6;
+const float e            = exp(1.0);
+const float pi           = acos(-1.0);
+const float tau          = 2.0 * pi;
+const float half_pi      = 0.5 * pi;
+const float rcp_pi       = 1.0 / pi;
+const float degree       = tau / 360.0; // Size of one degree in radians, useful because radians() is not a constant expression on all platforms
+const float golden_ratio = 0.5 + 0.5 * sqrt(5.0);
+const float golden_angle = tau / golden_ratio / golden_ratio;
+const float hand_depth   = 0.56;
 
 #ifdef TAAU
-const float taauRenderScale = TAAU_RENDER_SCALE;
+const float taau_render_scale = TAAU_RENDER_SCALE;
 #else
-const float taauRenderScale = 1.0;
+const float taau_render_scale = 1.0;
 #endif
 
 // Helper functions
@@ -32,8 +32,8 @@ const float taauRenderScale = 1.0;
 #define max0(x) max(x, 0.0)
 #define min1(x) min(x, 1.0)
 
-#define isSky(depth)  ((depth) == 1.0)
-#define isHand(depth) ((depth) < 0.56)
+#define is_sky(depth)  ((depth) == 1.0)
+#define is_hand(depth) ((depth) < 0.56)
 
 float sqr(float x) { return x * x; }
 vec2  sqr(vec2  v) { return v * v; }
@@ -42,26 +42,26 @@ vec4  sqr(vec4  v) { return v * v; }
 
 float cube(float x) { return x * x * x; }
 
-float maxOf(vec2 v) { return max(v.x, v.y); }
-float maxOf(vec3 v) { return max(v.x, max(v.y, v.z)); }
-float maxOf(vec4 v) { return max(v.x, max(v.y, max(v.z, v.w))); }
-float minOf(vec2 v) { return min(v.x, v.y); }
-float minOf(vec3 v) { return min(v.x, min(v.y, v.z)); }
-float minOf(vec4 v) { return min(v.x, min(v.y, min(v.z, v.w))); }
+float max_of(vec2 v) { return max(v.x, v.y); }
+float max_of(vec3 v) { return max(v.x, max(v.y, v.z)); }
+float max_of(vec4 v) { return max(v.x, max(v.y, max(v.z, v.w))); }
+float min_of(vec2 v) { return min(v.x, v.y); }
+float min_of(vec3 v) { return min(v.x, min(v.y, v.z)); }
+float min_of(vec4 v) { return min(v.x, min(v.y, min(v.z, v.w))); }
 
-float lengthSquared(vec2 v) { return dot(v, v); }
-float lengthSquared(vec3 v) { return dot(v, v); }
+float length_squared(vec2 v) { return dot(v, v); }
+float length_squared(vec3 v) { return dot(v, v); }
 
-vec2 normalizeSafe(vec2 v) { return v == vec2(0.0) ? v : normalize(v); }
-vec3 normalizeSafe(vec3 v) { return v == vec3(0.0) ? v : normalize(v); }
+vec2 normalize_safe(vec2 v) { return v == vec2(0.0) ? v : normalize(v); }
+vec3 normalize_safe(vec3 v) { return v == vec3(0.0) ? v : normalize(v); }
 
 // Remapping functions
 
-float linearStep(float edge0, float edge1, float x) {
+float linear_step(float edge0, float edge1, float x) {
 	return clamp01((x - edge0) / (edge1 - edge0));
 }
 
-vec2 linearStep(vec2 edge0, vec2 edge1, vec2 x) {
+vec2 linear_step(vec2 edge0, vec2 edge1, vec2 x) {
 	return clamp01((x - edge0) / (edge1 - edge0));
 }
 
@@ -76,8 +76,8 @@ float dampen(float x) {
 // amount := lifting amount [-1.0, inf]
 //
 // amount = 0 -> identity
-// amount < 0 -> increase signal strength (power > 1)
-// amount > 0 -> reduce signal strength (power < 1)
+// amount < 0 -> increase signal contrast (power > 1)
+// amount > 0 -> reduce signal contrast (power < 1)
 float lift(float x, float amount) {
 	return (x + x * amount) / (1.0 + x * amount);
 }
@@ -87,22 +87,22 @@ vec3 lift(vec3 x, float amount) {
 
 // Smoothing function used by smoothstep
 // Zero derivative at zero and one
-float cubicSmooth(float x) {
+float cubic_smooth(float x) {
 	return sqr(x) * (3.0 - 2.0 * x);
 }
 
 // Similar to the above, but even smoother with a zero second derivative at zero and one
-float quinticSmooth(float x) {
+float quintic_smooth(float x) {
     return cube(x) * (x * (x * 6.0 - 15.0) + 10.0);
 }
 
 // Converts between the unit range [0, 1] and texture coordinates on [0.5/res, 1 - 0.5/res]. This
 // prevents extrapolation at texture edges (used for atmosphere lookup tables)
-float getUvFromUnitRange(float values, const int res) {
+float get_uv_from_unit_range(float values, const int res) {
 	return values * (1.0 - 1.0 / float(res)) + (0.5 / float(res));
 }
 
-float getUnitRangeFromUv(float uv, const int res) {
+float get_unit_range_from_uv(float uv, const int res) {
 	return (uv - 0.5 / float(res)) / (1.0 - 1.0 / float(res));
 }
 
@@ -110,7 +110,7 @@ float getUnitRangeFromUv(float uv, const int res) {
 
 // Applies a smooth minimum value to a signal, where n is the new minimum value and m is the
 // threshold after which x remains unchanged
-float almostIdentity(float x, float m, float n) {
+float almost_identity(float x, float m, float n) {
 	if(x > m) return x;
 
 	float a = 2.0 * n - m;
@@ -120,8 +120,8 @@ float almostIdentity(float x, float m, float n) {
 	return (a * t + b) * t * t + n;
 }
 
-// Equivalent to almostIdentity with n = 0 and m = 1
-float almostUnitIdentity(float x) {
+// Equivalent to almost_identity with n = 0 and m = 1
+float almost_unit_identity(float x) {
 	return x * x * (2.0 - x);
 }
 
@@ -129,7 +129,7 @@ float almostUnitIdentity(float x) {
 // smoothstep
 float pulse(float x, float center, float width) {
     x = abs(x - center) / width;
-    return x > 1.0 ? 0.0 : 1.0 - cubicSmooth(x);
+    return x > 1.0 ? 0.0 : 1.0 - cubic_smooth(x);
 }
 
 float pulse(float x, float center, float width, const float period) {
@@ -147,7 +147,7 @@ float impulse(float x, float peak) {
 
 // Euclidian distance is defined as sqrt(a^2 + b^2 + ...). This function instead does
 // cbrt(|a|^3 + |b|^3 + ...). This results in smaller distances along the diagonal axes
-float cubicLength(vec2 v) {
+float cubic_length(vec2 v) {
 	return pow(cube(abs(v.x)) + cube(abs(v.y)), rcp(3.0));
 }
 
@@ -165,11 +165,11 @@ vec4 project(mat4 m, vec3 pos) {
     return vec4(m[0].x, m[1].y, m[2].zw) * pos.xyzz + m[3];
 }
 
-vec3 projectAndDivide(mat4 m, vec3 pos) {
+vec3 project_and_divide(mat4 m, vec3 pos) {
     vec4 homogenous = project(m, pos);
     return homogenous.xyz / homogenous.w;
 }
 
-vec3 projectOrtho(mat4 m, vec3 pos) {
+vec3 project_ortho(mat4 m, vec3 pos) {
     return diagonal(m).xyz * pos + m[3].xyz;
 }

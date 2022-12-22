@@ -14,21 +14,21 @@
 /* DRAWBUFFERS:3 */
 layout (location = 0) out vec4 overlays;
 
-in vec2 texCoord;
+in vec2 uv;
 
 uniform sampler2D gtexture;
 
-uniform vec2 texelSize;
+uniform vec2 view_pixel_size;
 
-const float lodBias = log2(taauRenderScale);
+const float lod_bias = log2(taau_render_scale);
 
 void main() {
 #if defined TAA && defined TAAU
-	vec2 uv = gl_FragCoord.xy * texelSize * rcp(taauRenderScale);
+	vec2 uv = gl_FragCoord.xy * view_pixel_size * rcp(taau_render_scale);
 	if (clamp01(uv) != uv) discard;
 #endif
 
-	overlays = texture(gtexture, texCoord, lodBias);
+	overlays = texture(gtexture, uv, lod_bias);
 	if (overlays.a < 0.1) discard;
 
 #if   defined PROGRAM_ARMOR_GLINT

@@ -11,20 +11,20 @@
 
 #include "/include/global.glsl"
 
-out vec2 texCoord;
-out vec2 lmCoord;
+out vec2 uv;
+out vec2 light_access;
 
-flat out uint blockId;
+flat out uint object_id;
 flat out vec4 tint;
-flat out mat3 tbnMatrix;
+flat out mat3 tbn;
 
 #ifdef POM
-flat out vec2 atlasTileOffset;
-flat out vec2 atlasTileScale;
+flat out vec2 atlas_tile_offset;
+flat out vec2 atlas_tile_scale;
 #endif
 
 #ifdef PROGRAM_TERRAIN
-out float vanillaAo;
+out float vertex_ao;
 #endif
 
 attribute vec4 at_tangent;
@@ -46,7 +46,7 @@ uniform float far;
 uniform float frameTimeCounter;
 uniform float rainStrength;
 
-uniform vec2 taaOffset;
+uniform vec2 taa_offset;
 
 #ifdef PROGRAM_ENTITIES
 uniform int entityId;
@@ -61,55 +61,55 @@ uniform int heldItemId;
 uniform int heldItemId2;
 #endif
 
-#include "/include/utility/spaceConversion.glsl"
+#include "/include/utility/space_conversion.glsl"
 
-#include "/include/windAnimation.glsl"
+#include "/include/wind_animation.glsl"
 
 void main() {
-	texCoord = gl_MultiTexCoord0.xy;
-	lmCoord  = clamp01(gl_MultiTexCoord1.xy * rcp(240.0));
-	tint     = gl_Color;
-	blockId  = uint(max0(mc_Entity.x - 10000.0));
+	uv           = gl_MultiTexCoord0.xy;
+	light_access = clamp01(gl_MultiTexCoord1.xy * rcp(240.0));
+	tint         = gl_Color;
+	object_id    = uint(max0(mc_Entity.x - 10000.0));
 
 #if defined PROGRAM_ENTITIES
-	blockId = uint(max(entityId - 10000, 0));
+	object_id = uint(max(entityId - 10000, 0));
 #endif
 
 #if defined PROGRAM_BLOCK
-	blockId = uint(max(blockEntityId - 10000, 0));
+	object_id = uint(max(blockEntityId - 10000, 0));
 #endif
 
-	tbnMatrix[2] = mat3(gbufferModelViewInverse) * normalize(gl_NormalMatrix * gl_Normal);
+	tbn[2] = mat3(gbufferModelViewInverse) * normalize(gl_NormalMatrix * gl_Normal);
 #ifdef NORMAL_MAPPING
-	tbnMatrix[0] = mat3(gbufferModelViewInverse) * normalize(gl_NormalMatrix * at_tangent.xyz);
-	tbnMatrix[1] = cross(tbnMatrix[0], tbnMatrix[2]) * sign(at_tangent.w);
+	tbn[0] = mat3(gbufferModelViewInverse) * normalize(gl_NormalMatrix * at_tangent.xyz);
+	tbn[1] = cross(tbn[0], tbn[2]) * sign(at_tangent.w);
 #endif
 
 #ifdef PROGRAM_TERRAIN
-	vanillaAo = gl_Color.a < 0.1 ? 1.0 : gl_Color.a; // fixes models where vanilla ao breaks (eg lecterns)
+	vertex_ao = gl_Color.a < 0.1 ? 1.0 : gl_Color.a; // fixes models where vanilla ao breaks (eg lecterns)
 	tint.a = 1.0;
 #endif
 
 #ifdef PROGRAM_SPIDEREYES
-	blockId = 2; // full emissive
-	lmCoord.x = 1.0;
+	object_id = 2; // full emissive
+	light_access.x = 1.0;
 #endif
 
-	vec3 viewPos = transform(gl_ModelViewMatrix, gl_Vertex.xyz);
+	vec3 view_pos = transform(gl_ModelViewMatrix, gl_Vertex.xyz);
 #if defined PROGRAM_TERRAIN
-	bool isTopVertex = texCoord.y < mc_midTexCoord.y;
-	vec3 scenePos = viewToSceneSpace(viewPos);
-	scenePos += animateVertex(scenePos + cameraPosition, isTopVertex, lmCoord.y, blockId);
-    viewPos = sceneToViewSpace(scenePos);
+	bool is_top_vertex = uv.y < mc_midTexCoord.y;
+	vec3 scene_pos = view_to_scene_space(view_pos);
+	scene_pos += animate_vertex(scene_pos + cameraPosition, is_top_vertex, light_access.y, object_id);
+    view_pos = scene_to_view_space(scene_pos);
 #endif
-	vec4 clipPos = project(gl_ProjectionMatrix, viewPos);
+	vec4 clip_pos = project(gl_ProjectionMatrix, view_pos);
 
 #if   defined TAA && defined TAAU
-	clipPos.xy  = clipPos.xy * taauRenderScale + clipPos.w * (taauRenderScale - 1.0);
-	clipPos.xy += taaOffset * clipPos.w;
+	clip_pos.xy  = clip_pos.xy * taau_render_scale + clip_pos.w * (taau_render_scale - 1.0);
+	clip_pos.xy += taa_offset * clip_pos.w;
 #elif defined TAA
-	clipPos.xy += taaOffset * clipPos.w * 0.66;
+	clip_pos.xy += taa_offset * clip_pos.w * 0.66;
 #endif
 
-	gl_Position = clipPos;
+	gl_Position = clip_pos;
 }

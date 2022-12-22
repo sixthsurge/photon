@@ -3,7 +3,7 @@
 
   Photon Shaders by SixthSurge
 
-  program/post/temporalPre.fsh:
+  program/post/temporal_pre.fsh:
   Calculate neighborhood limits for TAAU
 
 --------------------------------------------------------------------------------
@@ -12,8 +12,8 @@
 #include "/include/global.glsl"
 
 /* DRAWBUFFERS:67 */
-layout (location = 0) out vec3 minColor;
-layout (location = 1) out vec3 maxColor;
+layout (location = 0) out vec3 min_color;
+layout (location = 1) out vec3 max_color;
 
 in vec2 uv;
 
@@ -21,11 +21,11 @@ uniform sampler2D colortex0;
 
 #include "/include/utility/color.glsl"
 
-vec3 minOf(vec3 a, vec3 b, vec3 c, vec3 d, vec3 f) {
+vec3 min_of(vec3 a, vec3 b, vec3 c, vec3 d, vec3 f) {
     return min(a, min(b, min(c, min(d, f))));
 }
 
-vec3 maxOf(vec3 a, vec3 b, vec3 c, vec3 d, vec3 f) {
+vec3 max_of(vec3 a, vec3 b, vec3 c, vec3 d, vec3 f) {
     return max(a, max(b, max(c, max(d, f))));
 }
 
@@ -47,27 +47,27 @@ void main() {
 	vec3 i = texelFetch(colortex0, texel + ivec2( 1, -1), 0).rgb;
 
 	// Convert to YCoCg
-	a = rgbToYcocg(a);
-	b = rgbToYcocg(b);
-	c = rgbToYcocg(c);
-	d = rgbToYcocg(d);
-	e = rgbToYcocg(e);
-	f = rgbToYcocg(f);
-	g = rgbToYcocg(g);
-	h = rgbToYcocg(h);
-	i = rgbToYcocg(i);
+	a = rgb_to_ycocg(a);
+	b = rgb_to_ycocg(b);
+	c = rgb_to_ycocg(c);
+	d = rgb_to_ycocg(d);
+	e = rgb_to_ycocg(e);
+	f = rgb_to_ycocg(f);
+	g = rgb_to_ycocg(g);
+	h = rgb_to_ycocg(h);
+	i = rgb_to_ycocg(i);
 
 	// Soft minimum and maximum ("Hybrid Reconstruction Antialiasing")
 	//        b         a b c
 	// (min d e f + min d e f) / 2
 	//        h         g h i
-	minColor  = minOf(b, d, e, f, h);
-	minColor += minOf(minColor, a, c, g, i);
-	minColor *= 0.5;
+	min_color  = min_of(b, d, e, f, h);
+	min_color += min_of(min_color, a, c, g, i);
+	min_color *= 0.5;
 
-	maxColor  = maxOf(b, d, e, f, h);
-	maxColor += maxOf(maxColor, a, c, g, i);
-	maxColor *= 0.5;
+	max_color  = max_of(b, d, e, f, h);
+	max_color += max_of(max_color, a, c, g, i);
+	max_color *= 0.5;
 }
 
 #ifndef TAAU

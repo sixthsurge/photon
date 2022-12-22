@@ -15,21 +15,21 @@
 
 out vec2 uv;
 
-flat out vec3 lightColor;
-flat out mat3 skyColors;
+flat out vec3 light_color;
+flat out mat3 sky_samples;
 
 uniform float sunAngle;
 
 uniform int worldTime;
 
-uniform vec3 lightDir;
-uniform vec3 sunDir;
-uniform vec3 moonDir;
+uniform vec3 light_dir;
+uniform vec3 sun_dir;
+uniform vec3 moon_dir;
 
-uniform float timeSunrise;
-uniform float timeNoon;
-uniform float timeSunset;
-uniform float timeMidnight;
+uniform float time_sunrise;
+uniform float time_noon;
+uniform float time_sunset;
+uniform float time_midnight;
 
 #define WORLD_OVERWORLD
 #include "/include/palette.glsl"
@@ -37,12 +37,12 @@ uniform float timeMidnight;
 void main() {
 	uv = gl_MultiTexCoord0.xy;
 
-	lightColor = getLightColor();
+	light_color = get_light_color();
 
-	skyColors[0] = getSkyColor();
-	skyColors[1] = skyColors[0];
-	skyColors[2] = skyColors[0];
+	sky_samples[0] = get_skylight_color();
+	sky_samples[1] = sky_samples[0];
+	sky_samples[2] = sky_samples[0];
 
-	vec2 vertexPos = gl_Vertex.xy * taauRenderScale;
-	gl_Position = vec4(vertexPos * 2.0 - 1.0, 0.0, 1.0);
+	vec2 vertex_pos = gl_Vertex.xy * taau_render_scale;
+	gl_Position = vec4(vertex_pos * 2.0 - 1.0, 0.0, 1.0);
 }

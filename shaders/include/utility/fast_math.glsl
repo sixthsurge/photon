@@ -1,12 +1,12 @@
-#if !defined UTILITY_FASTMATH_INCLUDED
-#define UTILITY_FASTMATH_INCLUDED
+#if !defined UTILITY_FAST_MATH_INCLUDED
+#define UTILITY_FAST_MATH_INCLUDED
 
 // Faster alternative to acos
 // Source: https://seblagarde.wordpress.com/2014/12/01/inverse-trigonometric-functions-gpu-optimization-for-amd-gcn-architecture/#more-3316
 // Max relative error: 3.9 * 10^-4
 // Max absolute error: 6.1 * 10^-4
 // Polynomial degree: 2
-float fastAcos(float x) {
+float fast_acos(float x) {
 	const float C0 = 1.57018;
 	const float C1 = -0.201877;
 	const float C2 = 0.0464619;
@@ -16,7 +16,7 @@ float fastAcos(float x) {
 
 	return x >= 0 ? res : pi - res; // Undo range reduction
 }
-vec2 fastAcos(vec2 v) { return vec2(fastAcos(v.x), fastAcos(v.y)); }
+vec2 fast_acos(vec2 v) { return vec2(fast_acos(v.x), fast_acos(v.y)); }
 
 float pow4(float x) { return sqr(sqr(x)); }
 float pow5(float x) { return pow4(x) * x; }
@@ -70,15 +70,15 @@ float pow1d5(float x) {
 	return x * sqrt(x);
 }
 
-float rcpLength(vec2 v) { return inversesqrt(dot(v, v)); }
-float rcpLength(vec3 v) { return inversesqrt(dot(v, v)); }
+float rcp_length(vec2 v) { return inversesqrt(dot(v, v)); }
+float rcp_length(vec3 v) { return inversesqrt(dot(v, v)); }
 
 // Computes the length of a vector and normalizes it using one inversesqrt
-void lengthNormalize(vec3 v, out vec3 normalized, out float len) {
-	float lenSq = lengthSquared(v);
-	float rcpLen = inversesqrt(lenSq);
-	len = lenSq * rcpLen;
-	normalized = rcpLen * v;
+void length_normalize(vec3 v, out vec3 normalized, out float len) {
+	float len_sq = length_squared(v);
+	float rcp_len = inversesqrt(len_sq);
+	len = len_sq * rcp_len;
+	normalized = rcp_len * v;
 }
 
-#endif // UTILITY_FASTMATH_INCLUDED
+#endif // UTILITY_FAST_MATH_INCLUDED

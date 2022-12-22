@@ -16,78 +16,78 @@ out vec2 uv;
 flat out float exposure;
 
 #if DEBUG_VIEW == DEBUG_VIEW_HISTOGRAM
-flat out vec4[HISTOGRAM_BINS / 4] histogramPdf;
-flat out float histogramSelectedBin;
+flat out vec4[HISTOGRAM_BINS / 4] histogram_pdf;
+flat out float histogram_selected_bin;
 #endif
 
 uniform sampler2D colortex0; // Scene color
-uniform sampler2D colortex5; // Scene history
+uniform sampler2D colortex5; // scene_color history
 
-uniform vec2 viewSize;
-uniform vec2 texelSize;
+uniform vec2 view_res;
+uniform vec2 view_pixel_size;
 
 uniform float frameTime;
 uniform float screenBrightness;
 
 #include "/include/utility/color.glsl"
 
-#define getExposureFromEv100(ev100) exp2(-(ev100))
-#define getExposureFromLuminance(l) calibration / (l)
-#define getLuminanceFromExposure(e) calibration / (e)
+#define get_exposure_from_ev_100(ev100) exp2(-(ev100))
+#define get_exposure_from_luminance(l) calibration / (l)
+#define get_luminance_from_exposure(e) calibration / (e)
 
 const float K = 12.5; // Light-meter calibration constant
 const float sensitivity = 100.0; // ISO
 const float calibration = exp2(AUTO_EXPOSURE_BIAS) * K / sensitivity / 1.2;
 
-const float minLuminance = getLuminanceFromExposure(getExposureFromEv100(AUTO_EXPOSURE_MIN));
-const float maxLuminance = getLuminanceFromExposure(getExposureFromEv100(AUTO_EXPOSURE_MAX));
-const float minLogLuminance = log2(minLuminance);
-const float maxLogLuminance = log2(maxLuminance);
+const float min_luminance = get_luminance_from_exposure(get_exposure_from_ev_100(AUTO_EXPOSURE_MIN));
+const float max_luminance = get_luminance_from_exposure(get_exposure_from_ev_100(AUTO_EXPOSURE_MAX));
+const float min_log_luminance = log2(min_luminance);
+const float max_log_luminance = log2(max_luminance);
 
 #ifdef MANUAL_EXPOSURE_USE_SCREEN_BRIGHTNESS
-float manualExposureValue = mix(minLuminance, maxLuminance, screenBrightness);
+float manual_exposure_value = mix(min_luminance, max_luminance, screenBrightness);
 #else
-const float manualExposureValue = MANUAL_EXPOSURE_VALUE;
+const float manual_exposure_value = MANUAL_EXPOSURE_VALUE;
 #endif
 
-float getBinFromLuminance(float luminance) {
-	const float binCount = HISTOGRAM_BINS;
-	const float rcpLogLuminanceRange = 1.0 / (maxLogLuminance - minLogLuminance);
-	const float scaledMinLogLuminance = minLogLuminance * rcpLogLuminanceRange;
+float get_bin_from_luminance(float luminance) {
+	const float bin_count = HISTOGRAM_BINS;
+	const float rcp_log_luminance_range = 1.0 / (max_log_luminance - min_log_luminance);
+	const float scaled_min_log_luminance = min_log_luminance * rcp_log_luminance_range;
 
-	if (luminance <= minLuminance) return 0.0; // Avoid taking log of 0
+	if (luminance <= min_luminance) return 0.0; // Avoid taking log of 0
 
-	float logLuminance = clamp01(log2(luminance) * rcpLogLuminanceRange - scaledMinLogLuminance);
+	float log_luminance = clamp01(log2(luminance) * rcp_log_luminance_range - scaled_min_log_luminance);
 
-	return min(binCount * logLuminance, binCount - 1.0);
+	return min(bin_count * log_luminance, bin_count - 1.0);
 }
 
-float getLuminanceFromBin(int bin) {
-	const float logLuminanceRange = maxLogLuminance - minLogLuminance;
+float get_luminance_from_bin(int bin) {
+	const float log_luminance_range = max_log_luminance - min_log_luminance;
 
-	float logLuminance = bin * rcp(float(HISTOGRAM_BINS));
+	float log_luminance = bin * rcp(float(HISTOGRAM_BINS));
 
-	return exp2(logLuminance * logLuminanceRange + minLogLuminance);
+	return exp2(log_luminance * log_luminance_range + min_log_luminance);
 }
 
-void buildHistogram(out float[HISTOGRAM_BINS] pdf) {
+void build_histogram(out float[HISTOGRAM_BINS] pdf) {
 	// Initialize PDF to 0
 	for (int i = 0; i < HISTOGRAM_BINS; ++i) pdf[i] = 0.0;
 
 	const ivec2 tiles = ivec2(32, 18);
-	const vec2 tileSize = rcp(vec2(tiles));
+	const vec2 tile_size = rcp(vec2(tiles));
 
-	float lod = ceil(log2(maxOf(viewSize * tileSize)));
+	float lod = ceil(log2(max_of(view_res * tile_size)));
 
 	// Sample into histogram
 	for (int y = 0; y < tiles.y; ++y) {
 		for (int x = 0; x < tiles.x; ++x) {
-			vec2 coord = vec2(x, y) * tileSize + (0.5 * tileSize);
+			vec2 coord = vec2(x, y) * tile_size + (0.5 * tile_size);
 
-			vec3 rgb = textureLod(colortex0, coord * taauRenderScale, lod).rgb;
-			float luminance = dot(rgb, luminanceWeightsAp1);
+			vec3 rgb = textureLod(colortex0, coord * taau_render_scale, lod).rgb;
+			float luminance = dot(rgb, luminance_weights_ap1);
 
-			float bin = getBinFromLuminance(luminance);
+			float bin = get_bin_from_luminance(luminance);
 
 			uint bin0 = uint(bin);
 			uint bin1 = bin0 + 1;
@@ -101,16 +101,16 @@ void buildHistogram(out float[HISTOGRAM_BINS] pdf) {
 	}
 
 	// Normalize PDF
-	float tileArea = tileSize.x * tileSize.y;
-	for (int i = 0; i < HISTOGRAM_BINS; ++i) pdf[i] *= tileArea;
+	float tile_area = tile_size.x * tile_size.y;
+	for (int i = 0; i < HISTOGRAM_BINS; ++i) pdf[i] *= tile_area;
 }
 
-float getMedianLuminance(float[HISTOGRAM_BINS] pdf) {
+float get_median_luminance(float[HISTOGRAM_BINS] pdf) {
 	float cdf = 0.0;
 
 	for (int i = 0; i < HISTOGRAM_BINS; ++i) {
 		cdf += pdf[i];
-		if (cdf > HISTOGRAM_TARGET) return getLuminanceFromBin(i);
+		if (cdf > HISTOGRAM_TARGET) return get_luminance_from_bin(i);
 	}
 
 	return 0.0; // ??
@@ -122,34 +122,34 @@ void main() {
 	// Auto exposure
 
 #if AUTO_EXPOSURE == AUTO_EXPOSURE_OFF
-	exposure = getExposureFromEv100(manualExposureValue);
+	exposure = get_exposure_from_ev_100(manual_exposure_value);
 #else
-	float previousExposure = texelFetch(colortex5, ivec2(0), 0).a;
+	float previous_exposure = texelFetch(colortex5, ivec2(0), 0).a;
 
 #if   AUTO_EXPOSURE == AUTO_EXPOSURE_SIMPLE
-	float lod = ceil(log2(maxOf(viewSize)));
-	vec3 rgb = textureLod(colortex0, vec2(0.5 * taauRenderScale), int(lod)).rgb;
-	float luminance = clamp(getLuminance(rgb), minLuminance, maxLuminance);
+	float lod = ceil(log2(max_of(view_res)));
+	vec3 rgb = textureLod(colortex0, vec2(0.5 * taau_render_scale), int(lod)).rgb;
+	float luminance = clamp(dot(rgb, luminance_weights), min_luminance, max_luminance);
 #elif AUTO_EXPOSURE == AUTO_EXPOSURE_HISTOGRAM
 	float[HISTOGRAM_BINS] pdf;
-	buildHistogram(pdf);
+	build_histogram(pdf);
 
-	float luminance = getMedianLuminance(pdf);
+	float luminance = get_median_luminance(pdf);
 #endif
 
-	float targetExposure = getExposureFromLuminance(luminance);
+	float target_exposure = get_exposure_from_luminance(luminance);
 
-	if (isnan(previousExposure) || isinf(previousExposure)) previousExposure = targetExposure;
+	if (isnan(previous_exposure) || isinf(previous_exposure)) previous_exposure = target_exposure;
 
-	float adjustmentRate = targetExposure < previousExposure ? AUTO_EXPOSURE_RATE_DIM_TO_BRIGHT : AUTO_EXPOSURE_RATE_BRIGHT_TO_DIM;
-	float blendWeight = exp(-adjustmentRate * frameTime);
+	float adjustment_rate = target_exposure < previous_exposure ? AUTO_EXPOSURE_RATE_DIM_TO_BRIGHT : AUTO_EXPOSURE_RATE_BRIGHT_TO_DIM;
+	float blend_weight = exp(-adjustment_rate * frameTime);
 
-	exposure = mix(targetExposure, previousExposure, blendWeight);
+	exposure = mix(target_exposure, previous_exposure, blend_weight);
 #endif
 
 #if AUTO_EXPOSURE == AUTO_EXPOSURE_HISTOGRAM && DEBUG_VIEW == DEBUG_VIEW_HISTOGRAM
-	for (int i = 0; i < HISTOGRAM_BINS; ++i) histogramPdf[i >> 2][i & 3] = pdf[i];
-	histogramSelectedBin = getBinFromLuminance(luminance);
+	for (int i = 0; i < HISTOGRAM_BINS; ++i) histogram_pdf[i >> 2][i & 3] = pdf[i];
+	histogram_selected_bin = get_bin_from_luminance(luminance);
 #endif
 
 	gl_Position = vec4(gl_Vertex.xy * 2.0 - 1.0, 0.0, 1.0);

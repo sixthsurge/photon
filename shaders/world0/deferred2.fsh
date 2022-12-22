@@ -46,11 +46,11 @@ uniform float far;
 
 uniform int frameCounter;
 
-uniform vec3 lightDir;
+uniform vec3 light_dir;
 
-uniform vec2 viewSize;
-uniform vec2 texelSize;
-uniform vec2 taaOffset;
+uniform vec2 view_res;
+uniform vec2 view_pixel_size;
+uniform vec2 taa_offset;
 
 #define TEMPORAL_REPROJECTION
 #define WORLD_OVERWORLD
@@ -58,16 +58,14 @@ uniform vec2 taaOffset;
 #include "/include/utility/bicubic.glsl"
 #include "/include/utility/dithering.glsl"
 #include "/include/utility/encoding.glsl"
-#include "/include/utility/fastMath.glsl"
+#include "/include/utility/fast_math.glsl"
 #include "/include/utility/random.glsl"
-#include "/include/utility/spaceConversion.glsl"
+#include "/include/utility/space_conversion.glsl"
 
-#include "/include/gtao.glsl"
-
-const float gtaoRenderScale = 0.5;
+const float gtao_render_scale = 0.5;
 
 // from https://iquilezles.org/www/articles/texture/texture.htm
-vec4 textureSmooth(sampler2D sampler, vec2 coord) {
+vec4 smooth_filter(sampler2D sampler, vec2 coord) {
 	vec2 res = vec2(textureSize(sampler, 0));
 
 	coord = coord * res + 0.5;
@@ -80,85 +78,182 @@ vec4 textureSmooth(sampler2D sampler, vec2 coord) {
 	return texture(sampler, coord);
 }
 
+// ---------------------
+//   ambient occlusion
+// ---------------------
+
+#define GTAO_SLICES        2
+#define GTAO_HORIZON_STEPS 3
+#define GTAO_RADIUS        2.0
+#define GTAO_FALLOFF_START 0.75
+
+float integrate_arc(vec2 h, float n, float cos_n) {
+	vec2 tmp = cos_n + 2.0 * h * sin(n) - cos(2.0 * h - n);
+	return 0.25 * (tmp.x + tmp.y);
+}
+
+float calculate_maximum_horizon_angle(
+	vec3 view_slice_dir,
+	vec3 viewer_dir,
+	vec3 screen_pos,
+	vec3 view_pos,
+	float dither
+) {
+	const float step_size = GTAO_RADIUS * rcp(float(GTAO_HORIZON_STEPS));
+
+	float max_cos_theta = -1.0;
+
+	vec2 ray_step = (view_to_screen_space(view_pos + view_slice_dir * step_size, true) - screen_pos).xy;
+	vec2 ray_pos = screen_pos.xy + ray_step * (dither + max_of(view_pixel_size) * rcp_length(ray_step));
+
+	for (int i = 0; i < GTAO_HORIZON_STEPS; ++i, ray_pos += ray_step) {
+		float depth = texelFetch(depthtex1, ivec2(clamp01(ray_pos) * view_res * taau_render_scale - 0.5), 0).x;
+
+		if (is_sky(depth) || is_hand(depth) || depth == screen_pos.z) continue;
+
+		vec3 offset = screen_to_view_space(vec3(ray_pos, depth), true) - view_pos;
+
+		float len_sq = length_squared(offset);
+		float norm = inversesqrt(len_sq);
+
+		float distance_falloff = linear_step(GTAO_FALLOFF_START * GTAO_RADIUS, GTAO_RADIUS, len_sq * norm);
+
+		float cos_theta = dot(viewer_dir, offset) * norm;
+		      cos_theta = mix(cos_theta, -1.0, distance_falloff);
+
+		max_cos_theta = max(cos_theta, max_cos_theta);
+	}
+
+	return fast_acos(clamp(max_cos_theta, -1.0, 1.0));
+}
+
+vec4 gtao(vec3 screen_pos, vec3 view_pos, vec3 view_normal, vec2 dither) {
+	float ao = 0.0;
+	vec3 bent_normal = vec3(0.0);
+
+	// Construct local working space
+	vec3 viewer_dir   = normalize(-view_pos);
+	vec3 viewer_right = normalize(cross(vec3(0.0, 1.0, 0.0), viewer_dir));
+	vec3 viewer_up    = cross(viewer_dir, viewer_right);
+	mat3 local_to_view = mat3(viewer_right, viewer_up, viewer_dir);
+
+	for (int i = 0; i < GTAO_SLICES; ++i) {
+		float slice_angle = (i + dither.x) * (pi / float(GTAO_SLICES));
+
+		vec3 slice_dir = vec3(cos(slice_angle), sin(slice_angle), 0.0);
+		vec3 view_slice_dir = local_to_view * slice_dir;
+
+		vec3 ortho_dir = slice_dir - dot(slice_dir, viewer_dir) * viewer_dir;
+		vec3 axis = cross(slice_dir, viewer_dir);
+		vec3 projected_normal = view_normal - axis * dot(view_normal, axis);
+
+		float len_sq = dot(projected_normal, projected_normal);
+		float norm = inversesqrt(len_sq);
+
+		float sgn_gamma = sign(dot(ortho_dir, projected_normal));
+		float cos_gamma = clamp01(dot(projected_normal, viewer_dir) * norm);
+		float gamma = sgn_gamma * fast_acos(cos_gamma);
+
+		vec2 max_horizon_angles;
+		max_horizon_angles.x = calculate_maximum_horizon_angle(-view_slice_dir, viewer_dir, screen_pos, view_pos, dither.y);
+		max_horizon_angles.y = calculate_maximum_horizon_angle( view_slice_dir, viewer_dir, screen_pos, view_pos, dither.y);
+
+		max_horizon_angles = gamma + clamp(vec2(-1.0, 1.0) * max_horizon_angles - gamma, -half_pi, half_pi);
+		ao += integrate_arc(max_horizon_angles, gamma, cos_gamma) * len_sq * norm;
+
+		float bent_angle = dot(max_horizon_angles, vec2(0.5));
+		bent_normal += viewer_dir * cos(bent_angle) + ortho_dir * sin(bent_angle);
+	}
+
+	const float albedo = 0.2; // albedo of surroundings (for multibounce approx)
+
+	ao *= rcp(float(GTAO_SLICES));
+	ao /= albedo * ao + (1.0 - albedo);
+
+	bent_normal = normalize(normalize(bent_normal) - 0.5 * viewer_dir);
+
+	return vec4(bent_normal, ao);
+}
+
 void main() {
-	ivec2 texel     = ivec2(gl_FragCoord.xy);
-	ivec2 viewTexel = ivec2(gl_FragCoord.xy * (taauRenderScale / gtaoRenderScale));
+	ivec2 texel      = ivec2(gl_FragCoord.xy);
+	ivec2 view_texel = ivec2(gl_FragCoord.xy * (taau_render_scale / gtao_render_scale));
 
-	float depth = texelFetch(depthtex1, viewTexel, 0).x;
+	float depth = texelFetch(depthtex1, view_texel, 0).x;
 
-#ifdef NORMAL_MAPPING
-	vec4 gbuffer1 = texelFetch(colortex2, viewTexel, 0);
+#ifndef NORMAL_MAPPING
+	vec4 gbuffer_data = texelFetch(colortex1, view_texel, 0);
 #else
-	vec4 gbuffer0 = texelFetch(colortex1, viewTexel, 0);
+	vec4 gbuffer_data = texelFetch(colortex2, view_texel, 0);
 #endif
 
 	vec2 dither = vec2(texelFetch(noisetex, texel & 511, 0).b, texelFetch(noisetex, (texel + 249) & 511, 0).b);
 
-	if (isSky(depth)) { ao = vec4(1.0); return; }
+	if (is_sky(depth)) { ao = vec4(1.0); return; }
 
-	depth += 0.38 * float(isHand(depth)); // Hand lighting fix from Capt Tatsu
+	depth += 0.38 * float(is_hand(depth)); // Hand lighting fix from Capt Tatsu
 
-	vec3 screenPos = vec3(uv, depth);
-	vec3 viewPos = screenToViewSpace(screenPos, true);
-	vec3 scenePos = viewToSceneSpace(viewPos);
+	vec3 screen_pos = vec3(uv, depth);
+	vec3 view_pos = screen_to_view_space(screen_pos, true);
+	vec3 scene_pos = view_to_scene_space(view_pos);
 
 #ifdef NORMAL_MAPPING
-	vec3 worldNormal = decodeUnitVector(gbuffer1.xy);
+	vec3 world_normal = decode_unit_vector(gbuffer_data.xy);
 #else
-	vec3 worldNormal = decodeUnitVector(unpackUnorm2x8(gbuffer0.z));
+	vec3 world_normal = decode_unit_vector(unpack_unorm_2x8(gbuffer_data.z));
 #endif
 
-	vec3 viewNormal = mat3(gbufferModelView) * worldNormal;
+	vec3 view_normal = mat3(gbufferModelView) * world_normal;
 
-	dither = R2(frameCounter, dither);
+	dither = r2(frameCounter, dither);
 
 #ifdef GTAO
-	ao = calculateGtao(screenPos, viewPos, viewNormal, dither);
+	ao = gtao(screen_pos, view_pos, view_normal, dither);
 #else
 	ao = vec4(1.0);
 #endif
 
 	// Temporal accumulation
 
-	const float maxAccumulatedFrames       = 10.0;
-	const float depthRejectionStrength     = 16.0;
-	const float offcenterRejectionStrength = 0.25;
+	const float max_accumulated_frames       = 10.0;
+	const float depth_rejection_strength     = 16.0;
+	const float offcenter_rejection_strength = 0.25;
 
-	vec3 previousScreenPos = reproject(screenPos);
+	vec3 previous_screen_pos = reproject(screen_pos);
 
-	vec4 historyAo = textureCatmullRomFast(colortex6, previousScreenPos.xy * gtaoRenderScale, 0.65);
-	     historyAo = (clamp01(previousScreenPos.xy) == previousScreenPos.xy) ? historyAo : ao;
-		 historyAo = max0(historyAo);
+	vec4 history_ao = catmull_rom_filter_fast(colortex6, previous_screen_pos.xy * gtao_render_scale, 0.65);
+	     history_ao = (clamp01(previous_screen_pos.xy) == previous_screen_pos.xy) ? history_ao : ao;
+		 history_ao = max0(history_ao);
 
 	// TEMP -- Will use pixel age from colortex7
-	float pixelAge = texture(colortex5, previousScreenPos.xy).a;
-	      pixelAge = min(pixelAge, maxAccumulatedFrames);
+	float pixel_age = texture(colortex5, previous_screen_pos.xy).a;
+	      pixel_age = min(pixel_age, max_accumulated_frames);
 
 	// Offcenter rejection from Jessie, which is originally by Zombye
 	// Reduces blur in motion
-	vec2 pixelOffset = 1.0 - abs(2.0 * fract(viewSize * gtaoRenderScale * previousScreenPos.xy) - 1.0);
-	float offcenterRejection = sqrt(pixelOffset.x * pixelOffset.y) * offcenterRejectionStrength + (1.0 - offcenterRejectionStrength);
+	vec2 pixel_offset = 1.0 - abs(2.0 * fract(view_res * gtao_render_scale * previous_screen_pos.xy) - 1.0);
+	float offcenter_rejection = sqrt(pixel_offset.x * pixel_offset.y) * offcenter_rejection_strength + (1.0 - offcenter_rejection_strength);
 
 	// Depth rejection
-	float viewNorm = rcpLength(viewPos);
-	float NoV = abs(dot(viewNormal, viewPos)) * viewNorm; // NoV / sqrt(length(viewPos))
-	float z0 = linearizeDepthFast(depth);
-	float z1 = linearizeDepthFast(1.0 - historyAo.z);
-	float depthWeight = exp2(-abs(z0 - z1) * depthRejectionStrength * NoV * viewNorm);
+	float view_norm = rcp_length(view_pos);
+	float NoV = abs(dot(view_normal, view_pos)) * view_norm; // NoV / sqrt(length(view_pos))
+	float z0 = linearize_depth_fast(depth);
+	float z1 = linearize_depth_fast(1.0 - history_ao.z);
+	float depth_weight = exp2(-abs(z0 - z1) * depth_rejection_strength * NoV * view_norm);
 
-	pixelAge *= depthWeight * offcenterRejection * float(historyAo.z != 1.0);
+	pixel_age *= depth_weight * offcenter_rejection * float(history_ao.z != 1.0);
 
-	float historyWeight = pixelAge / (pixelAge + 1.0);
+	float history_weight = pixel_age / (pixel_age + 1.0);
 
 	// Reconstruct bent normal Z
-	historyAo.xy = historyAo.xy * 2.0 - 1.0;
-	historyAo.z  = sqrt(max0(1.0 - dot(historyAo.xy, historyAo.xy)));
+	history_ao.xy = history_ao.xy * 2.0 - 1.0;
+	history_ao.z  = sqrt(max0(1.0 - dot(history_ao.xy, history_ao.xy)));
 
 	// Blend with history
-	ao = mix(ao, historyAo, historyWeight);
+	ao = mix(ao, history_ao, history_weight);
 
 	// Re-normalize bent normal
-	ao.xy *= rcpLength(ao.xyz);
+	ao.xy *= rcp_length(ao.xyz);
 	ao.xy  = ao.xy * 0.5 + 0.5;
 
 	// Store reversed depth for next frame (using reversed depth improves precision for fp buffers)

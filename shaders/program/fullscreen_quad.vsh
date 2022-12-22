@@ -3,7 +3,7 @@
 
   Photon Shaders by SixthSurge
 
-  program/vertexSimple.vsh:
+  program/fullscreen_quad.vsh:
   Simple vertex shader for fullscreen passes
 
 --------------------------------------------------------------------------------
@@ -17,10 +17,10 @@ void main() {
 	uv = gl_MultiTexCoord0.xy;
 
 #if defined PROGRAM_SCALE
-	vec2 vertexPos = gl_Vertex.xy * PROGRAM_SCALE;
+	vec2 vertex_pos = gl_Vertex.xy * PROGRAM_SCALE;
 #else
-	vec2 vertexPos = gl_Vertex.xy;
+	vec2 vertex_pos = gl_Vertex.xy;
 #endif
 
-	gl_Position = vec4(vertexPos * 2.0 - 1.0, 0.0, 1.0);
+	gl_Position = vec4(vertex_pos * 2.0 - 1.0, 0.0, 1.0);
 }

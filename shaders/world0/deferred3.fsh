@@ -14,18 +14,19 @@
 #include "/include/global.glsl"
 
 /* DRAWBUFFERS:03 */
-layout (location = 0) out vec3 fragColor;
-layout (location = 3) out vec4 colortex3Clear; // Clear colortex3 so that translucents can write to it
+layout (location = 0) out vec3 scene_color;
+layout (location = 3) out vec4 colortex3_clear; // Clear colortex3 so that translucents can write to it
 
 in vec2 uv;
 
-flat in vec3 lightColor;
-flat in vec3 sunColor;
-flat in vec3 moonColor;
+flat in vec3 light_color;
+flat in vec3 sun_color;
+flat in vec3 moon_color;
+
 #ifdef SH_SKYLIGHT
-flat in vec3 skySh[9];
+flat in vec3 sky_sh[9];
 #else
-flat in mat3 skyColors;
+flat in mat3 sky_samples;
 #endif
 
 uniform sampler2D noisetex;
@@ -75,20 +76,20 @@ uniform int isEyeInWater;
 uniform float blindness;
 uniform float nightVision;
 
-uniform vec3 lightDir;
-uniform vec3 sunDir;
-uniform vec3 moonDir;
+uniform vec3 light_dir;
+uniform vec3 sun_dir;
+uniform vec3 moon_dir;
 
-uniform vec2 viewSize;
-uniform vec2 texelSize;
-uniform vec2 taaOffset;
+uniform vec2 view_res;
+uniform vec2 view_pixel_size;
+uniform vec2 taa_offset;
 
-uniform float biomeCave;
+uniform float biome_cave;
 
-uniform float timeSunrise;
-uniform float timeNoon;
-uniform float timeSunset;
-uniform float timeMidnight;
+uniform float time_sunrise;
+uniform float time_noon;
+uniform float time_sunset;
+uniform float time_midnight;
 
 #define ATMOSPHERE_SCATTERING_LUT depthtex0
 #define PROGRAM_DEFERRED3
@@ -97,14 +98,14 @@ uniform float timeMidnight;
 
 #include "/include/utility/color.glsl"
 #include "/include/utility/encoding.glsl"
-#include "/include/utility/spaceConversion.glsl"
+#include "/include/utility/space_conversion.glsl"
 
-#include "/include/diffuseLighting.glsl"
+#include "/include/diffuse_lighting.glsl"
 #include "/include/fog.glsl"
 #include "/include/material.glsl"
-#include "/include/shadows.glsl"
+#include "/include/shadow_mapping.glsl"
 #include "/include/sky.glsl"
-#include "/include/specularLighting.glsl"
+#include "/include/specular_lighting.glsl"
 
 void main() {
 	ivec2 texel = ivec2(gl_FragCoord.xy);
@@ -112,87 +113,87 @@ void main() {
 	// Texture fetches
 
 	float depth   = texelFetch(depthtex1, texel, 0).x;
-	vec4 gbuffer0 = texelFetch(colortex1, texel, 0);
+	vec4 gbuffer_data_0 = texelFetch(colortex1, texel, 0);
 #if defined NORMAL_MAPPING || defined SPECULAR_MAPPING
-	vec4 gbuffer1 = texelFetch(colortex2, texel, 0);
+	vec4 gbuffer_data_1 = texelFetch(colortex2, texel, 0);
 #endif
 	vec4 overlays = texelFetch(colortex3, texel, 0);
 
 	// Transformations
 
-	depth += 0.38 * float(isHand(depth)); // Hand lighting fix from Capt Tatsu
+	depth += 0.38 * float(is_hand(depth)); // Hand lighting fix from Capt Tatsu
 
-	vec3 viewPos = screenToViewSpace(vec3(uv, depth), true);
-	vec3 scenePos = viewToSceneSpace(viewPos);
-	vec3 worldPos = scenePos + cameraPosition;
-	vec3 worldDir = normalize(scenePos - gbufferModelViewInverse[3].xyz);
+	vec3 view_pos = screen_to_view_space(vec3(uv, depth), true);
+	vec3 scene_pos = view_to_scene_space(view_pos);
+	vec3 world_pos = scene_pos + cameraPosition;
+	vec3 world_dir = normalize(scene_pos - gbufferModelViewInverse[3].xyz);
 
-	if (isSky(depth)) { // Sky
-		fragColor = renderSky(worldDir);
+	if (is_sky(depth)) { // Sky
+		scene_color = draw_sky(world_dir);
 	} else { // Terrain
 		// Sample half-res lighting data many operations before using it (latency hiding)
 
-		vec2 halfResPos = gl_FragCoord.xy * (0.5 / taauRenderScale) - 0.5;
+		vec2 half_res_pos = gl_FragCoord.xy * (0.5 / taau_render_scale) - 0.5;
 
-		ivec2 i = ivec2(halfResPos);
-		vec2  f = fract(halfResPos);
+		ivec2 i = ivec2(half_res_pos);
+		vec2  f = fract(half_res_pos);
 
-		vec4 halfRes00 = texelFetch(colortex6, i + ivec2(0, 0), 0);
-		vec4 halfRes10 = texelFetch(colortex6, i + ivec2(1, 0), 0);
-		vec4 halfRes01 = texelFetch(colortex6, i + ivec2(0, 1), 0);
-		vec4 halfRes11 = texelFetch(colortex6, i + ivec2(1, 1), 0);
+		vec4 half_res_00 = texelFetch(colortex6, i + ivec2(0, 0), 0);
+		vec4 half_res_10 = texelFetch(colortex6, i + ivec2(1, 0), 0);
+		vec4 half_res_01 = texelFetch(colortex6, i + ivec2(0, 1), 0);
+		vec4 half_res_11 = texelFetch(colortex6, i + ivec2(1, 1), 0);
 
 		// Unpack gbuffer data
 
 		mat4x2 data = mat4x2(
-			unpackUnorm2x8(gbuffer0.x),
-			unpackUnorm2x8(gbuffer0.y),
-			unpackUnorm2x8(gbuffer0.z),
-			unpackUnorm2x8(gbuffer0.w)
+			unpack_unorm_2x8(gbuffer_data_0.x),
+			unpack_unorm_2x8(gbuffer_data_0.y),
+			unpack_unorm_2x8(gbuffer_data_0.z),
+			unpack_unorm_2x8(gbuffer_data_0.w)
 		);
 
-		vec3 albedo     = vec3(data[0], data[1].x);
-		uint blockId    = uint(255.0 * data[1].y);
-		vec3 flatNormal = decodeUnitVector(data[2]);
-		vec2 lmCoord    = data[3];
+		vec3 albedo       = vec3(data[0], data[1].x);
+		uint object_id    = uint(255.0 * data[1].y);
+		vec3 flat_normal  = decode_unit_vector(data[2]);
+		vec2 light_access = data[3];
 
-		uint overlayId = uint(255.0 * overlays.a);
-		albedo = overlayId == 0u ? albedo + overlays.rgb : albedo; // enchantment glint
-		albedo = overlayId == 1u ? 2.0 * albedo * overlays.rgb : albedo; // damage overlay
+		uint overlay_id = uint(255.0 * overlays.a);
+		albedo = overlay_id == 0u ? albedo + overlays.rgb : albedo; // enchantment glint
+		albedo = overlay_id == 1u ? 2.0 * albedo * overlays.rgb : albedo; // damage overlay
 
-		Material material = getMaterial(albedo, blockId, fract(worldPos), lmCoord);
+		Material material = material_from(albedo, object_id, world_pos, light_access);
 
 #ifdef NORMAL_MAPPING
-		vec3 normal = decodeUnitVector(gbuffer1.xy);
+		vec3 normal = decode_unit_vector(gbuffer_data_1.xy);
 #else
-		#define normal flatNormal
+		#define normal flat_normal
 #endif
 
 #ifdef SPECULAR_MAPPING
-		vec4 specularTex = vec4(unpackUnorm2x8(gbuffer1.z), unpackUnorm2x8(gbuffer1.w));
-		decodeSpecularTexture(specularTex, material);
+		vec4 specular_map = vec4(unpack_unorm_2x8(gbuffer_data_1.z), unpack_unorm_2x8(gbuffer_data_1.w));
+		decode_specular_map(specular_map, material);
 #endif
 
-		float NoL = dot(normal, lightDir);
-		float NoV = clamp01(dot(normal, -worldDir));
-		float LoV = dot(lightDir, -worldDir);
-		float halfwayNorm = inversesqrt(2.0 * LoV + 2.0);
-		float NoH = (NoL + NoV) * halfwayNorm;
-		float LoH = LoV * halfwayNorm + halfwayNorm;
+		float NoL = dot(normal, light_dir);
+		float NoV = clamp01(dot(normal, -world_dir));
+		float LoV = dot(light_dir, -world_dir);
+		float halfway_norm = inversesqrt(2.0 * LoV + 2.0);
+		float NoH = (NoL + NoV) * halfway_norm;
+		float LoH = LoV * halfway_norm + halfway_norm;
 
 #ifdef GTAO
 		// Depth-aware upscaling for GTAO
 
-		float linZ = linearizeDepthFast(depth);
+		float lin_z = linearize_depth_fast(depth);
 
-		#define depthWeight(reversedDepth) exp2(-10.0 * abs(linearizeDepthFast(1.0 - reversedDepth) - linZ))
+		#define depth_weight(reversed_depth) exp2(-10.0 * abs(linearize_depth_fast(1.0 - reversed_depth) - lin_z))
 
-		vec4 gtao = vec4(halfRes00.xyw, 1.0) * depthWeight(halfRes00.z) * (1.0 - f.x) * (1.0 - f.y)
-		          + vec4(halfRes10.xyw, 1.0) * depthWeight(halfRes10.z) * (f.x - f.x * f.y)
-		          + vec4(halfRes01.xyw, 1.0) * depthWeight(halfRes01.z) * (f.y - f.x * f.y)
-		          + vec4(halfRes11.xyw, 1.0) * depthWeight(halfRes11.z) * (f.x * f.y);
+		vec4 gtao = vec4(half_res_00.xyw, 1.0) * depth_weight(half_res_00.z) * (1.0 - f.x) * (1.0 - f.y)
+		          + vec4(half_res_10.xyw, 1.0) * depth_weight(half_res_10.z) * (f.x - f.x * f.y)
+		          + vec4(half_res_01.xyw, 1.0) * depth_weight(half_res_01.z) * (f.y - f.x * f.y)
+		          + vec4(half_res_11.xyw, 1.0) * depth_weight(half_res_11.z) * (f.x * f.y);
 
-		#undef depthWeight
+		#undef depth_weight
 
 		gtao = (gtao.w == 0.0) ? vec4(0.0) : gtao / gtao.w;
 
@@ -200,39 +201,39 @@ void main() {
 
 		float ao = gtao.z;
 
-		vec3 bentNormal;
-		bentNormal.xy = gtao.xy * 2.0 - 1.0;
-		bentNormal.z = sqrt(max0(1.0 - dot(bentNormal.xy, bentNormal.xy)));
-		bentNormal = mat3(gbufferModelViewInverse) * bentNormal;
+		vec3 bent_normal;
+		bent_normal.xy = gtao.xy * 2.0 - 1.0;
+		bent_normal.z = sqrt(max0(1.0 - dot(bent_normal.xy, bent_normal.xy)));
+		bent_normal = mat3(gbufferModelViewInverse) * bent_normal;
 #else
 		#define ao 1.0
-		#define bentNormal normal
+		#define bent_normal normal
 #endif
 
 		// Terrain diffuse lighting
 
-		float sssDepth;
-		vec3 shadows = calculateShadows(scenePos, flatNormal, lmCoord.y, 1.0, sssDepth);
+		float sss_depth;
+		vec3 shadows = calculate_shadows(scene_pos, flat_normal, light_access.y, 1.0, sss_depth);
 
-		fragColor = getSceneLighting(
+		scene_color = get_diffuse_lighting(
 			material,
 			normal,
-			flatNormal,
-			bentNormal,
+			flat_normal,
+			bent_normal,
 			shadows,
-			lmCoord,
+			light_access,
 			ao,
-			sssDepth,
+			sss_depth,
 			NoL,
 			NoV,
 			NoH,
 			LoV
 		);
 
-		fragColor += getSpecularHighlight(material, NoL, NoV, NoH, LoV, LoH) * lightColor * shadows * ao;
+		scene_color += get_specular_highlight(material, NoL, NoV, NoH, LoV, LoH) * light_color * shadows * ao;
 	}
 
-	applyFog(fragColor, scenePos, worldDir, depth == 1.0);
+	apply_fog(scene_color, scene_pos, world_dir, depth == 1.0);
 
-	colortex3Clear = vec4(0.0);
+	colortex3_clear = vec4(0.0);
 }

@@ -21,20 +21,20 @@
 /* DRAWBUFFERS:312 */
 #endif
 
-layout (location = 0) out vec4 blendCol;
-layout (location = 1) out vec4 gbuffer0; // albedo, block ID, flat normal, light levels
-layout (location = 2) out vec4 gbuffer1; // detailed normal, specular map (optional)
+layout (location = 0) out vec4 base_color;
+layout (location = 1) out vec4 gbuffer_data_0; // albedo, block ID, flat normal, light levels
+layout (location = 2) out vec4 gbuffer_data_1; // detailed normal, specular map (optional)
 
-in vec2 texCoord;
-in vec2 lmCoord;
+in vec2 uv;
+in vec2 light_access;
 
-flat in uint blockId;
+flat in uint object_id;
 flat in vec4 tint;
-flat in mat3 tbnMatrix;
+flat in mat3 tbn;
 
 #ifdef POM
-flat in vec2 atlasTileOffset;
-flat in vec2 atlasTileScale;
+flat in vec2 atlas_tile_offset;
+flat in vec2 atlas_tile_scale;
 #endif
 
 uniform sampler2D gtexture;
@@ -49,22 +49,22 @@ uniform sampler2D specular;
 
 uniform int frameCounter;
 
-uniform vec2 texelSize;
+uniform vec2 view_pixel_size;
 
 #include "/include/utility/dithering.glsl"
 #include "/include/utility/encoding.glsl"
 
-const float lodBias = log2(taauRenderScale);
+const float lod_bias = log2(taau_render_scale);
 
 #if   TEXTURE_FORMAT == TEXTURE_FORMAT_LAB
-void decodeNormalTexture(vec3 normalTex, out vec3 normal, out float ao) {
-	normal.xy = normalTex.xy * 2.0 - 1.0;
+void decode_normal_map(vec3 normal_map, out vec3 normal, out float ao) {
+	normal.xy = normal_map.xy * 2.0 - 1.0;
 	normal.z  = sqrt(clamp01(1.0 - dot(normal.xy, normal.xy)));
-	ao        = normalTex.z;
+	ao        = normal_map.z;
 }
 #elif TEXTURE_FORMAT == TEXTURE_FORMAT_OLD
-void decodeNormalTexture(vec3 normalTex, out vec3 normal, out float ao) {
-	normal  = normalTex * 2.0 - 1.0;
+void decode_normal_map(vec3 normal_map, out vec3 normal, out float ao) {
+	normal  = normal_map * 2.0 - 1.0;
 	ao      = length(normal);
 	normal *= rcp(ao);
 }
@@ -72,45 +72,45 @@ void decodeNormalTexture(vec3 normalTex, out vec3 normal, out float ao) {
 
 void main() {
 #if defined TAA && defined TAAU
-	vec2 uv = gl_FragCoord.xy * texelSize * rcp(taauRenderScale);
+	vec2 uv = gl_FragCoord.xy * view_pixel_size * rcp(taau_render_scale);
 	if (clamp01(uv) != uv) discard;
 #endif
 
-	blendCol         = texture(gtexture, texCoord, lodBias) * tint;
+	base_color         = texture(gtexture, uv, lod_bias) * tint;
 #ifdef NORMAL_MAPPING
-	vec3 normalTex   = texture(normals, texCoord, lodBias).xyz;
+	vec3 normal_map   = texture(normals, uv, lod_bias).xyz;
 #endif
 #ifdef SPECULAR_MAPPING
-	vec4 specularTex = texture(specular, texCoord, lodBias);
+	vec4 specular_map = texture(specular, uv, lod_bias);
 #endif
 
-	if (blendCol.a < 0.1) discard;
+	if (base_color.a < 0.1) discard;
 
 #ifdef NORMAL_MAPPING
 	vec3 normal; float ao;
-	decodeNormalTexture(normalTex, normal, ao);
+	decode_normal_map(normal_map, normal, ao);
 
-	normal = tbnMatrix * normal;
+	normal = tbn * normal;
 #endif
 
-	float dither = interleavedGradientNoise(gl_FragCoord.xy, frameCounter);
+	float dither = interleaved_gradient_noise(gl_FragCoord.xy, frameCounter);
 
-	gbuffer0.x  = packUnorm2x8(blendCol.rg);
-	gbuffer0.y  = packUnorm2x8(blendCol.b, float(blockId) * rcp(255.0));
-	gbuffer0.z  = packUnorm2x8(encodeUnitVector(tbnMatrix[2]));
-	gbuffer0.w  = packUnorm2x8(dither8Bit(lmCoord, dither));
+	gbuffer_data_0.x  = pack_unorm_2x8(base_color.rg);
+	gbuffer_data_0.y  = pack_unorm_2x8(base_color.b, float(object_id) * rcp(255.0));
+	gbuffer_data_0.z  = pack_unorm_2x8(encode_unit_vector(tbn[2]));
+	gbuffer_data_0.w  = pack_unorm_2x8(dither_8bit(light_access, dither));
 
 #ifdef NORMAL_MAPPING
-	gbuffer1.xy = encodeUnitVector(normal);
+	gbuffer_data_1.xy = encode_unit_vector(normal);
 #endif
 
 #ifdef SPECULAR_MAPPING
-	gbuffer1.z  = packUnorm2x8(specularTex.xy);
-	gbuffer1.w  = packUnorm2x8(specularTex.zw);
+	gbuffer_data_1.z  = pack_unorm_2x8(specular_map.xy);
+	gbuffer_data_1.w  = pack_unorm_2x8(specular_map.zw);
 #endif
 
 #ifdef PROGRAM_TEXTURED
 	// Kill the little rain splash particles
-	if (blendCol.r < 0.29 && blendCol.g < 0.45 && blendCol.b > 0.75) discard;
+	if (base_color.r < 0.29 && base_color.g < 0.45 && base_color.b > 0.75) discard;
 #endif
  }

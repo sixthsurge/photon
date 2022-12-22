@@ -2,9 +2,9 @@
 
 out vec2 uv;
 
-flat out uint blockId;
+flat out uint object_id;
 flat out vec3 tint;
-flat out mat3 tbnMatrix;
+flat out mat3 tbn;
 
 attribute vec4 at_tangent;
 attribute vec3 mc_Entity;
@@ -20,28 +20,28 @@ uniform vec3 cameraPosition;
 uniform float frameTimeCounter;
 uniform float rainStrength;
 
-#include "/include/shadowDistortion.glsl"
-#include "/include/windAnimation.glsl"
+#include "/include/shadow_distortion.glsl"
+#include "/include/wind_animation.glsl"
 
 void main() {
 	uv      = gl_MultiTexCoord0.xy;
-	blockId = uint(mc_Entity.x - 10000.0);
+	object_id = uint(mc_Entity.x - 10000.0);
 	tint    = gl_Color.rgb;
 
-	tbnMatrix[0] = mat3(shadowModelViewInverse) * normalize(gl_NormalMatrix * at_tangent.xyz);
-	tbnMatrix[2] = mat3(shadowModelViewInverse) * normalize(gl_NormalMatrix * gl_Normal);
-	tbnMatrix[1] = cross(tbnMatrix[0], tbnMatrix[2]) * sign(at_tangent.w);
+	tbn[0] = mat3(shadowModelViewInverse) * normalize(gl_NormalMatrix * at_tangent.xyz);
+	tbn[2] = mat3(shadowModelViewInverse) * normalize(gl_NormalMatrix * gl_Normal);
+	tbn[1] = cross(tbn[0], tbn[2]) * sign(at_tangent.w);
 
-	vec3 shadowViewPos = transform(gl_ModelViewMatrix, gl_Vertex.xyz);
+	vec3 shadow_view_pos = transform(gl_ModelViewMatrix, gl_Vertex.xyz);
 
 	// Wind animation
-	vec3 scenePos = transform(shadowModelViewInverse, shadowViewPos);
-	bool isTopVertex = uv.y < mc_midTexCoord.y;
-	scenePos += animateVertex(scenePos + cameraPosition, isTopVertex, clamp01(rcp(240.0) * gl_MultiTexCoord1.y), blockId);
-	shadowViewPos = transform(shadowModelView, scenePos);
+	vec3 scene_pos = transform(shadowModelViewInverse, shadow_view_pos);
+	bool is_top_vertex = uv.y < mc_midTexCoord.y;
+	scene_pos += animate_vertex(scene_pos + cameraPosition, is_top_vertex, clamp01(rcp(240.0) * gl_MultiTexCoord1.y), object_id);
+	shadow_view_pos = transform(shadowModelView, scene_pos);
 
-	vec3 shadowClipPos = projectOrtho(gl_ProjectionMatrix, shadowViewPos);
-	     shadowClipPos = distortShadowSpace(shadowClipPos);
+	vec3 shadow_clip_pos = project_ortho(gl_ProjectionMatrix, shadow_view_pos);
+	     shadow_clip_pos = distort_shadow_space(shadow_clip_pos);
 
-	gl_Position = vec4(shadowClipPos, 1.0);
+	gl_Position = vec4(shadow_clip_pos, 1.0);
 }

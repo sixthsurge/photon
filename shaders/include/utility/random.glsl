@@ -7,38 +7,38 @@ const float phi1 = 1.6180339887; // Golden ratio, solution to x^2 = x + 1
 const float phi2 = 1.3247179572; // Plastic constant, solution to x^3 = x + 1
 const float phi3 = 1.2207440846; // Solution to x^4 = x + 1
 
-float R1(int n, float seed) {
+float r1(int n, float seed) {
     const float alpha = 1.0 / phi1;
 	return fract(seed + n * alpha);
 }
-float R1(int n) {
-	return R1(n, 0.5);
+float r1(int n) {
+	return r1(n, 0.5);
 }
-float R1Next(float u) {
+float r1_next(float u) {
     const float alpha = 1.0 / phi1;
 	return fract(u + alpha);
 }
 
-vec2 R2(int n, vec2 seed) {
+vec2 r2(int n, vec2 seed) {
     const vec2 alpha = 1.0 / vec2(phi2, phi2 * phi2);
 	return fract(seed + n * alpha);
 }
-vec2 R2(int n) {
-	return R2(n, vec2(0.5));
+vec2 r2(int n) {
+	return r2(n, vec2(0.5));
 }
-vec2 R2Next(vec2 u) {
+vec2 r2_next(vec2 u) {
     const vec2 alpha = 1.0 / vec2(phi2, phi2 * phi2);
     return fract(u + alpha);
 }
 
-vec3 R3(int n, vec3 seed) {
+vec3 r3(int n, vec3 seed) {
     const vec3 alpha = 1.0 / vec3(phi3, phi3 * phi3, phi3 * phi3 * phi3);
 	return fract(seed + n * alpha);
 }
-vec3 R3(int n) {
-	return R3(n, vec3(0.5));
+vec3 r3(int n) {
+	return r3(n, vec3(0.5));
 }
-vec3 R3Next(vec3 u) {
+vec3 r3_next(vec3 u) {
     const vec3 alpha = 1.0 / vec3(phi3, phi3 * phi3, phi3 * phi3 * phi3);
 	return fract(u + alpha);
 }
@@ -56,7 +56,7 @@ uint lowbias32(uint x) {
     return x;
 }
 
-uint lowbias32Inverse(uint x) {
+uint lowbias32_inverse(uint x) {
     x ^= x >> 16;
     x *= 0x43021123u;
     x ^= x >> 15 ^ x >> 30;
@@ -65,18 +65,18 @@ uint lowbias32Inverse(uint x) {
     return x;
 }
 
-float randNextFloat(inout uint state) {
+float rand_next_float(inout uint state) {
     state = lowbias32(state);
     return float(state) / float(0xffffffffu);
 }
 
-vec2 randNextVec2(inout uint state) { return vec2(randNextFloat(state), randNextFloat(state)); }
-vec3 randNextVec3(inout uint state) { return vec3(randNextFloat(state), randNextFloat(state), randNextFloat(state)); }
-vec4 randNextVec4(inout uint state) { return vec4(randNextFloat(state), randNextFloat(state), randNextFloat(state), randNextFloat(state)); }
+vec2 rand_next_vec2(inout uint state) { return vec2(rand_next_float(state), rand_next_float(state)); }
+vec3 rand_next_vec3(inout uint state) { return vec3(rand_next_float(state), rand_next_float(state), rand_next_float(state)); }
+vec4 rand_next_vec4(inout uint state) { return vec4(rand_next_float(state), rand_next_float(state), rand_next_float(state), rand_next_float(state)); }
 
 //----------------------------------------------------------------------------//
 
-// https://www.shadertoy.com/view/4djSRW
+// https://www.shadertoy.com/view/4dj_s_r_w
 // Uncomment when needed
 
 //*

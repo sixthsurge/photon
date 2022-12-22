@@ -11,7 +11,7 @@
 
 #include "/include/global.glsl"
 
-out vec3 fragColor;
+out vec3 scene_color;
 
 in vec2 uv;
 
@@ -26,24 +26,24 @@ uniform float viewHeight;
 #include "/include/utility/bicubic.glsl"
 #include "/include/utility/color.glsl"
 #include "/include/utility/dithering.glsl"
-#include "/include/utility/textRendering.glsl"
+#include "/include/utility/text_rendering.glsl"
 
-const int debugTextScale = 2;
-ivec2 debugTextPosition = ivec2(0, int(viewHeight) / debugTextScale);
+const int debug_text_scale = 2;
+ivec2 debug_text_position = ivec2(0, int(viewHeight) / debug_text_scale);
 
-vec3 minOf(vec3 a, vec3 b, vec3 c, vec3 d, vec3 f) {
+vec3 min_of(vec3 a, vec3 b, vec3 c, vec3 d, vec3 f) {
 	return min(a, min(b, min(c, min(d, f))));
 }
 
-vec3 maxOf(vec3 a, vec3 b, vec3 c, vec3 d, vec3 f) {
+vec3 max_of(vec3 a, vec3 b, vec3 c, vec3 d, vec3 f) {
 	return max(a, max(b, max(c, max(d, f))));
 }
 
 // FidelityFX contrast-adaptive sharpening filter
 // https://github.com/GPUOpen-Effects/FidelityFX-CAS
-vec3 textureCas(sampler2D sampler, ivec2 texel, const float sharpness) {
+vec3 cas_filter(sampler2D sampler, ivec2 texel, const float sharpness) {
 #ifndef CAS
-	return linearToSrgb(texelFetch(sampler, texel, 0).rgb);
+	return display_transfer_function(texelFetch(sampler, texel, 0).rgb);
 #endif
 
 	// Fetch 3x3 neighborhood
@@ -61,25 +61,25 @@ vec3 textureCas(sampler2D sampler, ivec2 texel, const float sharpness) {
 	vec3 i = texelFetch(sampler, texel + ivec2( 1,  1), 0).rgb;
 
     // Convert to sRGB before performing CAS
-    a = linearToSrgb(a);
-    b = linearToSrgb(b);
-    c = linearToSrgb(c);
-    d = linearToSrgb(d);
-    e = linearToSrgb(e);
-    f = linearToSrgb(f);
-    g = linearToSrgb(g);
-    h = linearToSrgb(h);
-    i = linearToSrgb(i);
+    a = display_transfer_function(a);
+    b = display_transfer_function(b);
+    c = display_transfer_function(c);
+    d = display_transfer_function(d);
+    e = display_transfer_function(e);
+    f = display_transfer_function(f);
+    g = display_transfer_function(g);
+    h = display_transfer_function(h);
+    i = display_transfer_function(i);
 
 	// Soft min and max. These are 2x bigger (factored out the extra multiply)
-	vec3 minColor  = minOf(d, e, f, b, h);
-	     minColor += minOf(minColor, a, c, g, i);
+	vec3 min_color  = min_of(d, e, f, b, h);
+	     min_color += min_of(min_color, a, c, g, i);
 
-	vec3 maxColor  = maxOf(d, e, f, b, h);
-	     maxColor += maxOf(maxColor, a, c, g, i);
+	vec3 max_color  = max_of(d, e, f, b, h);
+	     max_color += max_of(max_color, a, c, g, i);
 
 	// Smooth minimum distance to the signal limit divided by smooth max
-	vec3 w  = clamp01(min(minColor, 2.0 - maxColor) / maxColor);
+	vec3 w  = clamp01(min(min_color, 2.0 - max_color) / max_color);
 	     w  = 1.0 - sqr(1.0 - w); // Shaping amount of sharpening
 	     w *= -1.0 / mix(8.0, 5.0, sharpness);
 
@@ -87,26 +87,26 @@ vec3 textureCas(sampler2D sampler, ivec2 texel, const float sharpness) {
 	// 0 w 0
 	// w 1 w
 	// 0 w 0
-	vec3 weightSum = 1.0 + 4.0 * w;
-	return clamp01((b + d + f + h) * w + e) / weightSum;
+	vec3 weight_sum = 1.0 + 4.0 * w;
+	return clamp01((b + d + f + h) * w + e) / weight_sum;
 }
 
 void main() {
     ivec2 texel = ivec2(gl_FragCoord.xy);
 
 	if (abs(MC_RENDER_QUALITY - 1.0) < 0.01) {
-		fragColor = textureCas(colortex0, texel, CAS_INTENSITY * 2.0 - 1.0);
+		scene_color = cas_filter(colortex0, texel, CAS_INTENSITY * 2.0 - 1.0);
 	} else {
-		fragColor = textureCatmullRomFastRgb(colortex0, uv, 0.6);
-	    fragColor = linearToSrgb(fragColor);
+		scene_color = catmull_rom_filter_fast_rgb(colortex0, uv, 0.6);
+	    scene_color = display_transfer_function(scene_color);
 	}
 
-	fragColor = dither8Bit(fragColor, bayer16(vec2(texel)));
+	scene_color = dither_8bit(scene_color, bayer16(vec2(texel)));
 
 #if   DEBUG_VIEW == DEBUG_VIEW_SAMPLER
 	if (clamp(texel, ivec2(0), ivec2(textureSize(DEBUG_SAMPLER, 0))) == texel) {
-		fragColor = texelFetch(DEBUG_SAMPLER, texel, 0).rgb;
-		fragColor = linearToSrgb(fragColor);
+		scene_color = texelFetch(DEBUG_SAMPLER, texel, 0).rgb;
+		scene_color = display_transfer_function(scene_color);
 	}
 #endif
 }

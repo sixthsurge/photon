@@ -17,18 +17,18 @@ screen.post                            = Post-Processing
 screen.misc                            = Misc
 
 screen.shadows                         = Shadows
-screen.colorGrading                    = Color Grading
+screen.color_grading                   = Color Grading
 screen.exposure                        = Exposure
 
-screen.fogRlh                          = Rayleigh Coefficient
-screen.fogMie                          = Mie Coefficient
-screen.fogRlhNormal                    = Normal Color
-screen.fogRlhRain                      = Rain Color
-screen.fogRlhArid                      = Arid/Desert Color
-screen.fogRlhSnowy                     = Snowy Color
-screen.fogRlhTaiga                     = Taiga Color
-screen.fogRlhJungle                    = Jungle Color
-screen.fogRlhSwamp                     = Swamp Color
+screen.fog_rlh                         = Rayleigh Coefficient
+screen.fog_mie                         = Mie Coefficient
+screen.fog_rlh_normal                  = Normal Color
+screen.fog_rlh_rain                    = Rain Color
+screen.fog_rlh_arid                    = Arid/Desert Color
+screen.fog_rlh_snowy                   = Snowy Color
+screen.fog_rlh_taiga                   = Taiga Color
+screen.fog_rlh_jungle                  = Jungle Color
+screen.fog_rlh_swamp                   = Swamp Color
 
 option.INFO                            = Photon Shaders
 value.INFO.0                           = §eby SixthSurge
@@ -44,11 +44,9 @@ option.SEA_LEVEL                       = Sea Level
 
 # Lighting settings
 
-option.GTAO                            = Ambient Occlusion
+option.GTAO                            = Shader AO
+option.VANILLA_AO                      = Vanilla AO
 option.SH_SKYLIGHT                     = SH Skylight
-
-value.GTAO.true                        = GTAO and Vanilla
-value.GTAO.false                       = Vanilla AO Only
 
 option.SHADOW                          = Shadow Mapping
 option.SHADOW_PCF                      = Shadow Filtering
@@ -101,52 +99,52 @@ option.BORDER_FOG                      = Border Fog
 option.CAVE_FOG                        = Cave Fog
 option.BLOOMY_FOG                      = Bloomy Fog
 option.BLOOMY_FOG_INTENSITY            = Bloomy Fog Intensity
-option.VOLUMETRIC_FOG                  = Volumetric Fog
-option.FOG_RENDER_SCALE                = Vol. Fog Render Scale
-option.FOG_CLOUDY_NOISE                = Cloudy Noise
-option.FOG_COLORED_LIGHT_SHAFTS        = Colored Light Shafts
+option.VL                              = Volumetric Lighting
+option.VL_RENDER_SCALE                 = VL Render Scale
+option.AIR_FOG_CLOUDY_NOISE            = Cloudy Fog
+option.AIR_FOG_COLORED_LIGHT_SHAFTS    = Colored Light Shafts
 
-option.FOG_RAYLEIGH_DENSITY            = Normal Density
-option.FOG_RAYLEIGH_R                  = §4Red
-option.FOG_RAYLEIGH_G                  = §2Green
-option.FOG_RAYLEIGH_B                  = §1Blue
+option.AIR_FOG_RAYLEIGH_DENSITY        = Normal Density
+option.AIR_FOG_RAYLEIGH_R              = §4Red
+option.AIR_FOG_RAYLEIGH_G              = §2Green
+option.AIR_FOG_RAYLEIGH_B              = §1Blue
 
-option.FOG_RAYLEIGH_DENSITY_RAIN       = Rain Density
-option.FOG_RAYLEIGH_R_RAIN             = §4Red
-option.FOG_RAYLEIGH_G_RAIN             = §2Green
-option.FOG_RAYLEIGH_B_RAIN             = §1Blue
+option.AIR_FOG_RAYLEIGH_DENSITY_RAIN   = Rain Density
+option.AIR_FOG_RAYLEIGH_R_RAIN         = §4Red
+option.AIR_FOG_RAYLEIGH_G_RAIN         = §2Green
+option.AIR_FOG_RAYLEIGH_B_RAIN         = §1Blue
 
-option.FOG_RAYLEIGH_DENSITY_ARID       = Arid/Desert Density
-option.FOG_RAYLEIGH_R_ARID             = §4Red
-option.FOG_RAYLEIGH_G_ARID             = §2Green
-option.FOG_RAYLEIGH_B_ARID             = §1Blue
+option.AIR_FOG_RAYLEIGH_DENSITY_ARID   = Arid/Desert Density
+option.AIR_FOG_RAYLEIGH_R_ARID         = §4Red
+option.AIR_FOG_RAYLEIGH_G_ARID         = §2Green
+option.AIR_FOG_RAYLEIGH_B_ARID         = §1Blue
 
-option.FOG_RAYLEIGH_DENSITY_SNOWY      = Snowy Density
-option.FOG_RAYLEIGH_R_SNOWY            = §4Red
-option.FOG_RAYLEIGH_G_SNOWY            = §2Green
-option.FOG_RAYLEIGH_B_SNOWY            = §1Blue
+option.AIR_FOG_RAYLEIGH_DENSITY_SNOWY  = Snowy Density
+option.AIR_FOG_RAYLEIGH_R_SNOWY        = §4Red
+option.AIR_FOG_RAYLEIGH_G_SNOWY        = §2Green
+option.AIR_FOG_RAYLEIGH_B_SNOWY        = §1Blue
 
-option.FOG_RAYLEIGH_DENSITY_TAIGA      = Taiga Density
-option.FOG_RAYLEIGH_R_TAIGA            = §4Red
-option.FOG_RAYLEIGH_G_TAIGA            = §2Green
-option.FOG_RAYLEIGH_B_TAIGA            = §1Blue
+option.AIR_FOG_RAYLEIGH_DENSITY_TAIGA  = Taiga Density
+option.AIR_FOG_RAYLEIGH_R_TAIGA        = §4Red
+option.AIR_FOG_RAYLEIGH_G_TAIGA        = §2Green
+option.AIR_FOG_RAYLEIGH_B_TAIGA        = §1Blue
 
-option.FOG_RAYLEIGH_DENSITY_JUNGLE     = Jungle Density
-option.FOG_RAYLEIGH_R_JUNGLE           = §4Red
-option.FOG_RAYLEIGH_G_JUNGLE           = §2Green
-option.FOG_RAYLEIGH_B_JUNGLE           = §1Blue
+option.AIR_FOG_RAYLEIGH_DENSITY_JUNGLE = Jungle Density
+option.AIR_FOG_RAYLEIGH_R_JUNGLE       = §4Red
+option.AIR_FOG_RAYLEIGH_G_JUNGLE       = §2Green
+option.AIR_FOG_RAYLEIGH_B_JUNGLE       = §1Blue
 
-option.FOG_RAYLEIGH_DENSITY_SWAMP      = Swamp Density
-option.FOG_RAYLEIGH_R_SWAMP            = §4Red
-option.FOG_RAYLEIGH_G_SWAMP            = §2Green
-option.FOG_RAYLEIGH_B_SWAMP            = §1Blue
+option.AIR_FOG_RAYLEIGH_DENSITY_SWAMP  = Swamp Density
+option.AIR_FOG_RAYLEIGH_R_SWAMP        = §4Red
+option.AIR_FOG_RAYLEIGH_G_SWAMP        = §2Green
+option.AIR_FOG_RAYLEIGH_B_SWAMP        = §1Blue
 
-option.FOG_MIE_DENSITY_MORNING         = Morning Density
-option.FOG_MIE_DENSITY_NOON            = Noon Density
-option.FOG_MIE_DENSITY_EVENING         = Evening Density
-option.FOG_MIE_DENSITY_MIDNIGHT        = Midnight Density
-option.FOG_MIE_DENSITY_RAIN            = Rain Density
-option.FOG_MIE_DENSITY_BLUE_HOUR       = Dawn/Dusk Density
+option.AIR_FOG_MIE_DENSITY_MORNING     = Morning Density
+option.AIR_FOG_MIE_DENSITY_NOON        = Noon Density
+option.AIR_FOG_MIE_DENSITY_EVENING     = Evening Density
+option.AIR_FOG_MIE_DENSITY_MIDNIGHT    = Midnight Density
+option.AIR_FOG_MIE_DENSITY_RAIN        = Rain Density
+option.AIR_FOG_MIE_DENSITY_BLUE_HOUR   = Dawn/Dusk Density
 
 # Materials settings
 
@@ -183,44 +181,44 @@ value.DOF_FOCUS.-1.0                   = Automatic
 
 option.tonemap                         = Tonemap Operator
 
-value.tonemap.academyFit               = Academy Fit
-value.tonemap.academyRrt               = Academy RRT
-value.tonemap.tonemapLottes            = Lottes
-value.tonemap.tonemapHejlBurgess       = Hejl-Burgess
-value.tonemap.tonemapUncharted2        = Uncharted 2
-value.tonemap.tonemapTech              = Tech
-value.tonemap.tonemapOzius             = Ozius
-value.tonemap.tonemapReinhard          = Reinhard
-value.tonemap.tonemapReinhardJodie     = Reinhard-Jodie
+value.tonemap.academy_fit              = Academy Fit
+value.tonemap.academy_rrt              = Academy RRT
+value.tonemap.tonemap_lottes           = Lottes
+value.tonemap.tonemap_hejl_burgess     = Hejl-Burgess
+value.tonemap.tonemap_uncharted_2      = Uncharted 2
+value.tonemap.tonemap_tech             = Tech
+value.tonemap.tonemap_ozius            = Ozius
+value.tonemap.tonemap_reinhard         = Reinhard
+value.tonemap.tonemap_reinhard_jodie   = Reinhard-Jodie
 
 # Color Grading
 
-option.GRADE_BRIGHTNESS                 = Brightness
-option.GRADE_CONTRAST                   = Contrast
-option.GRADE_SATURATION                 = Saturation
-option.GRADE_WHITE_BALANCE              = White Balance
-option.GRADE_ORANGE_SAT_BOOST           = Orange Saturation Boost
-option.GRADE_TEAL_SAT_BOOST             = Teal Saturation Boost
-option.GRADE_GREEN_SAT_BOOST            = Green Saturation Boost
-option.GRADE_GREEN_HUE_SHIFT            = Green Hue Shift
-suffix.GRADE_WHITE_BALANCE              = K
-suffix.GRADE_GREEN_HUE_SHIFT            = °
+option.GRADE_BRIGHTNESS                = Brightness
+option.GRADE_CONTRAST                  = Contrast
+option.GRADE_SATURATION                = Saturation
+option.GRADE_WHITE_BALANCE             = White Balance
+option.GRADE_ORANGE_SAT_BOOST          = Orange Saturation Boost
+option.GRADE_TEAL_SAT_BOOST            = Teal Saturation Boost
+option.GRADE_GREEN_SAT_BOOST           = Green Saturation Boost
+option.GRADE_GREEN_HUE_SHIFT           = Green Hue Shift
+suffix.GRADE_WHITE_BALANCE             = K
+suffix.GRADE_GREEN_HUE_SHIFT           = °
 
 option.PURKINJE_SHIFT                  = Purkinje Shift
 option.PURKINJE_SHIFT_INTENSITY        = Purkinje Shift Intensity
 
 # Exposure
 
-option.AUTO_EXPOSURE                    = Exposure Method
-option.AUTO_EXPOSURE_BIAS               = Exposure Bias
-option.AUTO_EXPOSURE_MIN                = Minimum Exposure
-option.AUTO_EXPOSURE_MAX                = Maximum Exposure
-option.AUTO_EXPOSURE_RATE_DIM_TO_BRIGHT = Exposure Rate - Increasing
-option.AUTO_EXPOSURE_RATE_BRIGHT_TO_DIM = Exposure Rate - Decreasing
-option.MANUAL_EXPOSURE_VALUE            = Manual Exposure Value
+option.AUTO_EXPOSURE                         = Auto Exposure
+option.AUTO_EXPOSURE_BIAS                    = Exposure Bias
+option.AUTO_EXPOSURE_MIN                     = Minimum Exposure
+option.AUTO_EXPOSURE_MAX                     = Maximum Exposure
+option.AUTO_EXPOSURE_RATE_DIM_TO_BRIGHT      = Exposure Rate - Increasing
+option.AUTO_EXPOSURE_RATE_BRIGHT_TO_DIM      = Exposure Rate - Decreasing
+option.MANUAL_EXPOSURE_VALUE                 = Manual Exposure Value
 option.MANUAL_EXPOSURE_USE_SCREEN_BRIGHTNESS = Use Brightness Slider
-option.HISTOGRAM_BINS                   = Histogram Bins
-option.HISTOGRAM_TARGET                 = Histogram Target CDF Value
+option.HISTOGRAM_BINS                        = Histogram Bins
+option.HISTOGRAM_TARGET                      = Histogram Target CDF Value
 
 value.AUTO_EXPOSURE.AUTO_EXPOSURE_SIMPLE    = Simple
 value.AUTO_EXPOSURE.AUTO_EXPOSURE_HISTOGRAM = Histogram
@@ -232,30 +230,30 @@ option.DEBUG_VIEW                      = Debug View
 option.DEBUG_SAMPLER                   = Debug Sampler
 option.WHITE_WORLD                     = White World
 option.TONEMAP_COMPARISON              = Tonemap Comparison
-option.tonemapLeft                     = Left Tonemap
-option.tonemapRight                    = Right Tonemap
+option.tonemap_left                    = Left Tonemap
+option.tonemap_right                   = Right Tonemap
 
 value.DEBUG_VIEW.DEBUG_VIEW_NONE       = OFF
 value.DEBUG_VIEW.DEBUG_VIEW_SAMPLER    = Sampler
 value.DEBUG_VIEW.DEBUG_VIEW_WEATHER    = Weather
 value.DEBUG_VIEW.DEBUG_VIEW_HISTOGRAM  = Histogram
 
-value.tonemapLeft.academyFit           = Academy Fit
-value.tonemapLeft.academyRrt           = Academy RRT
-value.tonemapLeft.tonemapLottes        = Lottes
-value.tonemapLeft.tonemapHejlBurgess   = Hejl-Burgess
-value.tonemapLeft.tonemapUncharted2    = Uncharted 2
-value.tonemapLeft.tonemapTech          = Tech
-value.tonemapLeft.tonemapOzius         = Ozius
-value.tonemapLeft.tonemapReinhard      = Reinhard
-value.tonemapLeft.tonemapReinhardJodie = Reinhard-Jodie
+value.tonemap_left.academy_fit            = Academy Fit
+value.tonemap_left.academy_rrt            = Academy RRT
+value.tonemap_left.tonemap_lottes         = Lottes
+value.tonemap_left.tonemap_hejl_burgess   = Hejl-Burgess
+value.tonemap_left.tonemap_uncharted_2    = Uncharted 2
+value.tonemap_left.tonemap_tech           = Tech
+value.tonemap_left.tonemap_ozius          = Ozius
+value.tonemap_left.tonemap_reinhard       = Reinhard
+value.tonemap_left.tonemap_reinhard_jodie = Reinhard-Jodie
 
-value.tonemapRight.academyFit           = Academy Fit
-value.tonemapRight.academyRrt           = Academy RRT
-value.tonemapRight.tonemapLottes        = Lottes
-value.tonemapRight.tonemapHejlBurgess   = Hejl-Burgess
-value.tonemapRight.tonemapUncharted2    = Uncharted 2
-value.tonemapRight.tonemapTech          = Tech
-value.tonemapRight.tonemapOzius         = Ozius
-value.tonemapRight.tonemapReinhard      = Reinhard
-value.tonemapRight.tonemapReinhardJodie = Reinhard-Jodie
+value.tonemap_right.academy_fit            = Academy Fit
+value.tonemap_right.academy_rrt            = Academy RRT
+value.tonemap_right.tonemap_lottes         = Lottes
+value.tonemap_right.tonemap_hejl_burgess   = Hejl-Burgess
+value.tonemap_right.tonemap_uncharted_2    = Uncharted 2
+value.tonemap_right.tonemap_tech           = Tech
+value.tonemap_right.tonemap_ozius          = Ozius
+value.tonemap_right.tonemap_reinhard       = Reinhard
+value.tonemap_right.tonemap_reinhard_jodie = Reinhard-Jodie

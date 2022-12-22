@@ -12,39 +12,39 @@
 
 // Constants
 
-const float rrtGlowGain  = 0.1;   // default: 0.05
-const float rrtGlowMid   = 0.08;  // default: 0.08
+const float rrt_glow_gain   = 0.1;   // default: 0.05
+const float rrt_glow_mid    = 0.08;  // default: 0.08
 
-const float rrtRedScale  = 1.0;   // default: 0.82
-const float rrtRedPivot  = 0.03;  // default: 0.03
-const float rrtRedHue    = 0.0;   // default: 0.0
-const float rrtRedWidth  = 135.0; // default: 135.0
+const float rrt_red_scale   = 1.0;   // default: 0.82
+const float rrt_red_pivot   = 0.03;  // default: 0.03
+const float rrt_red_hue     = 0.0;   // default: 0.0
+const float rrt_red_width   = 135.0; // default: 135.0
 
-const float rrtSatFactor = 0.96;  // default: 0.96
-const float odtSatFactor = 1.0;   // default: 0.93
+const float rrt_sat_factor  = 0.96;  // default: 0.96
+const float odt_sat_factor  = 1.0;   // default: 0.93
 
-const float rrtGammaCurve = 0.96;
+const float rrt_gamma_curve = 0.96;
 
-const float cinemaWhite  = 48.0;  // default: 48.0
-const float cinemaBlack  = 0.02;  // default: 10^log_10(0.02)
+const float cinema_white    = 48.0;  // default: 48.0
+const float cinema_black    = 0.02;  // default: 10^log_10(0.02)
 
 // "Glow module" functions
 
-float glowFwd(float ycIn, float glowGainIn, const float glowMid) {
-	float glowGainOut;
+float glow_fwd(float yc_in, float glow_gain_in, const float glow_mid) {
+	float glow_gain_out;
 
-	if (ycIn <= 2.0 / 3.0 * glowMid)
-		glowGainOut = glowGainIn;
-	else if (ycIn >= 2.0 * glowMid)
-		glowGainOut = 0.0;
+	if (yc_in <= 2.0 / 3.0 * glow_mid)
+		glow_gain_out = glow_gain_in;
+	else if (yc_in >= 2.0 * glow_mid)
+		glow_gain_out = 0.0;
 	else
-		glowGainOut = glowGainIn * (glowMid / ycIn - 0.5);
+		glow_gain_out = glow_gain_in * (glow_mid / yc_in - 0.5);
 
-	return glowGainOut;
+	return glow_gain_out;
 }
 
 // Sigmoid function in the range 0 to 1 spanning -2 to +2
-float sigmoidShaper(float x) {
+float sigmoid_shaper(float x) {
 	float t = max0(1.0 - abs(0.5 * x));
 	float y = 1.0 + sign(x) * (1.0 - t * t);
 
@@ -53,7 +53,7 @@ float sigmoidShaper(float x) {
 
 // "Red modifier" functions
 
-float cubicBasisShaper(float x, const float width) {
+float cubic_basis_shaper(float x, const float width) {
 	const mat4 M = mat4(
 		vec4(-1.0,  3.0, -3.0,  1.0) / 6.0,
 		vec4( 3.0, -6.0,  3.0,  0.0) / 6.0,
@@ -69,9 +69,9 @@ float cubicBasisShaper(float x, const float width) {
 		 0.5  * width
 	);
 
-	float knotCoord = (x - knots[0]) * 4.0 / width;
-	uint i = 3 - uint(clamp(knotCoord, 0.0, 3.0));
-	float f = fract(knotCoord);
+	float knot_coord = (x - knots[0]) * 4.0 / width;
+	uint i = 3 - uint(clamp(knot_coord, 0.0, 3.0));
+	float f = fract(knot_coord);
 
 	if (x < knots[0] || x > knots[4] || i > 3) return 0.0;
 
@@ -83,52 +83,52 @@ float cubicBasisShaper(float x, const float width) {
 	return 1.5 * y;
 }
 
-float cubicBasisShaperFit(float x, const float width) {
+float cubic_basis_shaper_fit(float x, const float width) {
 	float radius = 0.5 * width;
 	return abs(x) < radius
-		? sqr(cubicSmooth(1.0 - abs(x) / radius))
+		? sqr(cubic_smooth(1.0 - abs(x) / radius))
 		: 0.0;
 }
 
-float centerHue(float hue, float centerH) {
-	float hueCentered = hue - centerH;
+float center_hue(float hue, float center_h) {
+	float hue_centered = hue - center_h;
 
-	if (hueCentered < -180.0) {
-		return hueCentered + 360.0;
-	} else if (hueCentered > 180.0) {
-		return hueCentered - 360.0;
+	if (hue_centered < -180.0) {
+		return hue_centered + 360.0;
+	} else if (hue_centered > 180.0) {
+		return hue_centered - 360.0;
 	} else {
-		return hueCentered;
+		return hue_centered;
 	}
 }
 
-vec3 rrtSweeteners(vec3 aces) {
+vec3 rrt_sweeteners(vec3 aces) {
 	// Glow module
-	float saturation = rgbToSaturation(aces);
-	float ycIn = rgbToYc(aces);
-	float s = sigmoidShaper(5.0 * saturation - 2.0);
-	float addedGlow = 1.0 + glowFwd(ycIn, rrtGlowGain * s, rrtGlowMid);
+	float saturation = rgb_to_saturation(aces);
+	float yc_in = rgb_to_yc(aces);
+	float s = sigmoid_shaper(5.0 * saturation - 2.0);
+	float added_glow = 1.0 + glow_fwd(yc_in, rrt_glow_gain * s, rrt_glow_mid);
 
-	aces *= addedGlow;
+	aces *= added_glow;
 
 	// Red modifier
-	float hue = rgbToHue(aces);
-	float centeredHue = centerHue(hue, rrtRedHue);
-	float hueWeight = cubicBasisShaperFit(centeredHue, rrtRedWidth);
+	float hue = rgb_to_hue(aces);
+	float centered_hue = center_hue(hue, rrt_red_hue);
+	float hue_weight = cubic_basis_shaper_fit(centered_hue, rrt_red_width);
 
-	aces.r = aces.r + hueWeight * saturation * (rrtRedPivot - aces.r) * (1.0 - rrtRedScale);
+	aces.r = aces.r + hue_weight * saturation * (rrt_red_pivot - aces.r) * (1.0 - rrt_red_scale);
 
 	// ACES to RGB rendering space
-	vec3 rgbPre = max0(aces) * ap0_to_ap1;
+	vec3 rgb_pre = max0(aces) * ap0_to_ap1;
 
 	// Global desaturation
-	float luminance = getLuminance(rgbPre, luminanceWeightsAp1);
-	rgbPre = mix(vec3(luminance), rgbPre, rrtSatFactor);
+	float luminance = dot(rgb_pre, luminance_weights_ap1);
+	rgb_pre = mix(vec3(luminance), rgb_pre, rrt_sat_factor);
 
 	// Added gamma adjustment before the RRT
-	rgbPre = pow(rgbPre, vec3(rrtGammaCurve));
+	rgb_pre = pow(rgb_pre, vec3(rrt_gamma_curve));
 
-	return rgbPre;
+	return rgb_pre;
 }
 
 /*
@@ -137,30 +137,30 @@ vec3 rrtSweeteners(vec3 aces) {
  * Modifications:
  * Changed input and output color space to ACEScg to avoid 2 unnecessary mat3 transformations
  */
-vec3 acesRrt(vec3 aces) {
+vec3 aces_rrt(vec3 aces) {
 	// Apply RRT sweeteners
-	vec3 rgbPre = rrtSweeteners(aces);
+	vec3 rgb_pre = rrt_sweeteners(aces);
 
 	// Apply the tonescale independently in rendering-space RGB
-	vec3 rgbPost;
-	rgbPost.r = segmentedSplineC5Fwd(rgbPre.r);
-	rgbPost.g = segmentedSplineC5Fwd(rgbPre.g);
-	rgbPost.b = segmentedSplineC5Fwd(rgbPre.b);
+	vec3 rgb_post;
+	rgb_post.r = segmented_spline_c5_fwd(rgb_pre.r);
+	rgb_post.g = segmented_spline_c5_fwd(rgb_pre.g);
+	rgb_post.b = segmented_spline_c5_fwd(rgb_pre.b);
 
-	return rgbPost;
+	return rgb_post;
 }
 
 // Gamma adjustment to compensate for dim surround
-vec3 darkSurroundToDimSurround(vec3 linearCV) {
-	const float dimSurroundGamma = 0.9811; // default: 0.9811
+vec3 dark_surround_to_dim_surround(vec3 linear_c_v) {
+	const float dim_surround_gamma = 0.9811; // default: 0.9811
 
-	vec3 XYZ = linearCV * ap1_to_xyz;
-	vec3 xyY = XYZ_to_xyY(XYZ);
+	vec3 XYZ = linear_c_v * ap1_to_xyz;
+	vec3 xy_y = XYZ_to_xy_y(XYZ);
 
-	xyY.z = max0(xyY.z);
-	xyY.z = pow(xyY.z, dimSurroundGamma);
+	xy_y.z = max0(xy_y.z);
+	xy_y.z = pow(xy_y.z, dim_surround_gamma);
 
-	return xyY_to_XYZ(xyY) * xyz_to_ap1;
+	return xy_y_to_XYZ(xy_y) * xyz_to_ap1;
 }
 
 /*
@@ -173,33 +173,33 @@ vec3 darkSurroundToDimSurround(vec3 linearCV) {
  *
  * Modifications:
  * Changed input and output color spaces to ACEScg to avoid 3 unnecessary mat3 transformations
- * The sRGB transfer function is applied later in the pipeline
+ * The s_r_g_b transfer function is applied later in the pipeline
  */
-vec3 acesOdt(vec3 rgbPre) {
+vec3 aces_odt(vec3 rgb_pre) {
 	// Apply the tonescale independently in rendering-space RGB
-	vec3 rgbPost;
-	rgbPost.r = segmentedSplineC9Fwd(rgbPre.r);
-	rgbPost.g = segmentedSplineC9Fwd(rgbPre.g);
-	rgbPost.b = segmentedSplineC9Fwd(rgbPre.b);
+	vec3 rgb_post;
+	rgb_post.r = segmented_spline_c9_fwd(rgb_pre.r);
+	rgb_post.g = segmented_spline_c9_fwd(rgb_pre.g);
+	rgb_post.b = segmented_spline_c9_fwd(rgb_pre.b);
 
 	// Scale luminance to linear code value
-	vec3 linearCV = yToLinCV(rgbPost, cinemaWhite, cinemaBlack);
+	vec3 linear_c_v = y_to_lin_c_v(rgb_post, cinema_white, cinema_black);
 
 	// Apply gamma adjustment to compensate for dim surround
-	linearCV = darkSurroundToDimSurround(linearCV);
+	linear_c_v = dark_surround_to_dim_surround(linear_c_v);
 
 	// Apply desaturation to compensate for luminance difference
-	float luminance = getLuminance(linearCV, luminanceWeightsAp1);
-	linearCV = mix(vec3(luminance), linearCV, odtSatFactor);
+	float luminance = dot(linear_c_v, luminance_weights_ap1);
+	linear_c_v = mix(vec3(luminance), linear_c_v, odt_sat_factor);
 
-	return linearCV;
+	return linear_c_v;
 }
 
 /*
  * RRT + ODT fit by Stephen Hill
  * https://github.com/TheRealMJP/BakingLab/blob/master/BakingLab/ACES.hlsl
  */
-vec3 rrtAndOdtFit(vec3 rgb) {
+vec3 rrt_and_odt_fit(vec3 rgb) {
 	vec3 a = rgb * (rgb + 0.0245786) - 0.000090537;
 	vec3 b = rgb * (0.983729 * rgb + 0.4329510) + 0.238081;
 

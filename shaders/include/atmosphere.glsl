@@ -4,53 +4,53 @@
 #include "/include/aces/matrices.glsl"
 
 #include "/include/utility/color.glsl"
-#include "/include/utility/fastMath.glsl"
+#include "/include/utility/fast_math.glsl"
 #include "/include/utility/geometry.glsl"
 
-#include "/include/phaseFunctions.glsl"
+#include "/include/phase_functions.glsl"
 
 // These have to be macros so that they can be used by constant expressions
-#define coneAngleToSolidAngle(theta) (tau * (1.0 - cos(theta)))
-#define solidAngleToConeAngle(theta) acos(1.0 - (theta) / tau)
+#define cone_angle_to_solid_angle(theta) (tau * (1.0 - cos(theta)))
+#define solid_angle_to_cone_angle(theta) acos(1.0 - (theta) / tau)
 
-const vec3 airViewerPos = vec3(0.0, 6371e3, 0.0); // Position of the viewer in planet-space
+const vec3 air_viewer_pos = vec3(0.0, 6371e3, 0.0); // Position of the viewer in planet-space
 
-const vec3 baseSunCol = vec3(1.051, 0.985, 0.940); // Color of sunlight in space, obtained from AM0 solar irradiance spectrum from https://www.nrel.gov/grid/solar-resource/spectra-astm-e490.html using the CIE (2006) 2-deg LMS cone fundamentals
+const vec3 sunlight_color = vec3(1.051, 0.985, 0.940); // Color of sunlight in space, obtained from AM0 solar irradiance spectrum from https://www.nrel.gov/grid/solar-resource/spectra-astm-e490.html using the CIE (2006) 2-deg LMS cone fundamentals
 
-const float sunAngularRadius  = SUN_ANGULAR_RADIUS * degree;
-const float moonAngularRadius = MOON_ANGULAR_RADIUS * degree;
+const float sun_angular_radius  = SUN_ANGULAR_RADIUS * degree;
+const float moon_angular_radius = MOON_ANGULAR_RADIUS * degree;
 
-const ivec2 transmittanceRes = ivec2(/* mu */ 256, /* r */ 64);
-const ivec3 scatteringRes    = ivec3(/* nu */ 16, /* mu */ 64, /* muS */ 32);
+const ivec2 transmittance_res = ivec2(/* mu */ 256, /* r */ 64);
+const ivec3 scattering_res    = ivec3(/* nu */ 16, /* mu */ 64, /* mu_s */ 32);
 
-const float minMuS = -0.35;
+const float min_mu_s = -0.35;
 
 // Atmosphere boundaries
 
-const float planetRadius = 6371e3; // m
+const float planet_radius = 6371e3; // m
 
-const float atmosphereInnerRadius = planetRadius - 1e3; // m
-const float atmosphereOuterRadius = planetRadius + 110e3; // m
+const float atmosphere_inner_radius = planet_radius - 1e3; // m
+const float atmosphere_outer_radius = planet_radius + 110e3; // m
 
-const float planetRadiusSq = planetRadius * planetRadius;
-const float atmosphereThickness = atmosphereOuterRadius - atmosphereInnerRadius;
-const float atmosphereInnerRadiusSq = atmosphereInnerRadius * atmosphereInnerRadius;
-const float atmosphereOuterRadiusSq = atmosphereOuterRadius * atmosphereOuterRadius;
+const float planet_radius_sq = planet_radius * planet_radius;
+const float atmosphere_thickness = atmosphere_outer_radius - atmosphere_inner_radius;
+const float atmosphere_inner_radius_sq = atmosphere_inner_radius * atmosphere_inner_radius;
+const float atmosphere_outer_radius_sq = atmosphere_outer_radius * atmosphere_outer_radius;
 
 // Atmosphere coefficients
 
-const float airMieAlbedo = 0.9;
-const float airMieEnergyParameter = 3000.0; // Energy parameter for Klein-Nishina phase function
+const float air_mie_albedo = 0.9;
+const float air_mie_energy_parameter = 3000.0; // Energy parameter for Klein-Nishina phase function
 
-const vec2 airScaleHeights = vec2(8.4e3, 1.25e3); // m
+const vec2 air_scale_heights = vec2(8.4e3, 1.25e3); // m
 
 // Coefficients for Rec. 709 primaries transformed to Rec. 2020
-const vec3 airRayleighCoefficient = vec3(8.059375432e-06, 1.671209429e-05, 4.080133294e-05) * rec709_to_rec2020;
-const vec3 airMieCoefficient      = vec3(1.666442358e-06, 1.812685127e-06, 1.958927896e-06) * rec709_to_rec2020;
-const vec3 airOzoneCoefficient    = vec3(8.304280072e-07, 1.314911970e-06, 5.440679729e-08) * rec709_to_rec2020;
+const vec3 air_rayleigh_coefficient = vec3(8.059375432e-06, 1.671209429e-05, 4.080133294e-05) * rec709_to_rec2020;
+const vec3 air_mie_coefficient      = vec3(1.666442358e-06, 1.812685127e-06, 1.958927896e-06) * rec709_to_rec2020;
+const vec3 air_ozone_coefficient    = vec3(8.304280072e-07, 1.314911970e-06, 5.440679729e-08) * rec709_to_rec2020;
 
-const mat2x3 airScatteringCoefficients = mat2x3(airRayleighCoefficient, airMieAlbedo * airMieCoefficient);
-const mat3x3 airExtinctionCoefficients = mat3x3(airRayleighCoefficient, airMieCoefficient, airOzoneCoefficient);
+const mat2x3 air_scattering_coefficients = mat2x3(air_rayleigh_coefficient, air_mie_albedo * air_mie_coefficient);
+const mat3x3 air_extinction_coefficients = mat3x3(air_rayleigh_coefficient, air_mie_coefficient, air_ozone_coefficient);
 
 /*
  * Mapping functions from Eric Bruneton's 2020 atmosphere implementation
@@ -58,37 +58,37 @@ const mat3x3 airExtinctionCoefficients = mat3x3(airRayleighCoefficient, airMieCo
  *
  * nu: cos view-light angle
  * mu: cos view-zenith angle
- * muS: cos light-zenith angle
+ * mu_s: cos light-zenith angle
  * r: distance to planet centre
  */
 
-vec3 atmosphereDensity(float r) {
-	const vec2 rcpScaleHeights = rcp(airScaleHeights);
-	const vec2 scaledPlanetRadius = planetRadius * rcpScaleHeights;
+vec3 atmosphere_density(float r) {
+	const vec2 rcp_scale_heights = rcp(air_scale_heights);
+	const vec2 scaled_planet_radius = planet_radius * rcp_scale_heights;
 
-	vec2 rayleighMie = exp(r * -rcpScaleHeights + scaledPlanetRadius);
+	vec2 rayleigh_mie = exp(r * -rcp_scale_heights + scaled_planet_radius);
 
 	// Ozone density distribution from Jessie - https://www.desmos.com/calculator/b66xr8madc
-	float altitudeKm = r * 1e-3 - (planetRadius * 1e-3);
-	float o1 = 12.5 * exp(rcp(  8.0) * ( 0.0 - altitudeKm));
-	float o2 = 30.0 * exp(rcp( 80.0) * (18.0 - altitudeKm) * (altitudeKm - 18.0));
-	float o3 = 75.0 * exp(rcp( 50.0) * (23.5 - altitudeKm) * (altitudeKm - 23.5));
-	float o4 = 50.0 * exp(rcp(150.0) * (30.0 - altitudeKm) * (altitudeKm - 30.0));
+	float altitude_km = r * 1e-3 - (planet_radius * 1e-3);
+	float o1 = 12.5 * exp(rcp(  8.0) * ( 0.0 - altitude_km));
+	float o2 = 30.0 * exp(rcp( 80.0) * (18.0 - altitude_km) * (altitude_km - 18.0));
+	float o3 = 75.0 * exp(rcp( 50.0) * (23.5 - altitude_km) * (altitude_km - 23.5));
+	float o4 = 50.0 * exp(rcp(150.0) * (30.0 - altitude_km) * (altitude_km - 30.0));
 	float ozone = 7.428e-3 * (o1 + o2 + o3 + o4);
 
-	return vec3(rayleighMie, ozone);
+	return vec3(rayleigh_mie, ozone);
 }
 
 #if defined ATMOSPHERE_SCATTERING_LUT
-vec3 atmosphereScatteringUv(float nu, float mu, float muS) {
+vec3 atmosphere_scattering_uv(float nu, float mu, float mu_s) {
 	// Improved mapping for nu from Spectrum by Zombye
 
-	float halfRangeNu = sqrt((1.0 - mu * mu) * (1.0 - muS * muS));
-	float nuMin = mu * muS - halfRangeNu;
-	float nuMax = mu * muS + halfRangeNu;
+	float half_range_nu = sqrt((1.0 - mu * mu) * (1.0 - mu_s * mu_s));
+	float nu_min = mu * mu_s - half_range_nu;
+	float nu_max = mu * mu_s + half_range_nu;
 
-	float uNu = (nuMin == nuMax) ? nuMin : (nu - nuMin) / (nuMax - nuMin);
-	      uNu = getUvFromUnitRange(uNu, scatteringRes.x);
+	float u_nu = (nu_min == nu_max) ? nu_min : (nu - nu_min) / (nu_max - nu_min);
+	      u_nu = get_uv_from_unit_range(u_nu, scattering_res.x);
 
 	// Stretch the sky near the horizon upwards (to make it easier to admire the sunset without zooming in)
 
@@ -96,64 +96,64 @@ vec3 atmosphereScatteringUv(float nu, float mu, float muS) {
 
 	// Mapping for mu
 
-	const float r = planetRadius; // distance to the planet centre
-	const float H = sqrt(atmosphereOuterRadiusSq - atmosphereInnerRadiusSq); // distance to the atmosphere upper limit for a horizontal ray at ground level
-	const float rho = sqrt(max0(planetRadius * planetRadius - atmosphereInnerRadiusSq)); // distance to the horizon
+	const float r = planet_radius; // distance to the planet centre
+	const float H = sqrt(atmosphere_outer_radius_sq - atmosphere_inner_radius_sq); // distance to the atmosphere upper limit for a horizontal ray at ground level
+	const float rho = sqrt(max0(planet_radius * planet_radius - atmosphere_inner_radius_sq)); // distance to the horizon
 
 	// Discriminant of the quadratic equation for the intersections of the ray (r, mu) with the
 	// ground
 	float rmu = r * mu;
-	float discriminant = rmu * rmu - r * r + atmosphereInnerRadiusSq;
+	float discriminant = rmu * rmu - r * r + atmosphere_inner_radius_sq;
 
-	float uMu;
+	float u_mu;
 	if (mu < 0.0 && discriminant >= 0.0) { // Ray (r, mu) intersects ground
 		// Distance to the ground for the ray (r, mu) and its minimum and maximum values over all mu
 		float d = -rmu - sqrt(max0(discriminant));
-		float dMin = r - atmosphereInnerRadius;
-		float dMax = rho;
+		float d_min = r - atmosphere_inner_radius;
+		float d_max = rho;
 
-		uMu = dMax == dMin ? 0.0 : (d - dMin) / (dMax - dMin);
-		uMu = getUvFromUnitRange(uMu, scatteringRes.y / 2);
-		uMu = 0.5 - 0.5 * uMu;
+		u_mu = d_max == d_min ? 0.0 : (d - d_min) / (d_max - d_min);
+		u_mu = get_uv_from_unit_range(u_mu, scattering_res.y / 2);
+		u_mu = 0.5 - 0.5 * u_mu;
 	} else {
 		// Distance to exit the atmosphere outer limit for the ray (r, mu) and its minimum and
 		// maximum values over all mu
 		float d = -rmu + sqrt(discriminant + H * H);
-		float dMin = atmosphereOuterRadius - r;
-		float dMax = rho + H;
+		float d_min = atmosphere_outer_radius - r;
+		float d_max = rho + H;
 
-		uMu = (d - dMin) / (dMax - dMin);
-		uMu = getUvFromUnitRange(uMu, scatteringRes.y / 2);
-		uMu = 0.5 + 0.5 * uMu;
+		u_mu = (d - d_min) / (d_max - d_min);
+		u_mu = get_uv_from_unit_range(u_mu, scattering_res.y / 2);
+		u_mu = 0.5 + 0.5 * u_mu;
 	}
 
-	// Mapping for muS
+	// Mapping for mu_s
 
-	// Distance to the atmosphere outer limit for the ray (atmosphereInnerRadius, muS)
-	float d = intersectSphere(muS, atmosphereInnerRadius, atmosphereOuterRadius).y;
-	float dMin = atmosphereThickness;
-	float dMax = H;
-	float a = (d - dMin) / (dMax - dMin);
+	// Distance to the atmosphere outer limit for the ray (atmosphere_inner_radius, mu_s)
+	float d = intersect_sphere(mu_s, atmosphere_inner_radius, atmosphere_outer_radius).y;
+	float d_min = atmosphere_thickness;
+	float d_max = H;
+	float a = (d - d_min) / (d_max - d_min);
 
-	// Distance to the atmosphere upper limit for the ray (atmosphereInnerRadius, minMuS)
-	float D = intersectSphere(minMuS, atmosphereInnerRadius, atmosphereOuterRadius).y;
-	float A = (D - dMin) / (dMax - dMin);
+	// Distance to the atmosphere upper limit for the ray (atmosphere_inner_radius, min_mu_s)
+	float D = intersect_sphere(min_mu_s, atmosphere_inner_radius, atmosphere_outer_radius).y;
+	float A = (D - d_min) / (d_max - d_min);
 
-	// An ad-hoc function equal to 0 for muS = minMuS (because then d = D and thus a = A, equal
-	// to 1 for muS = 1 (because then d = dMin and thus a = 0), and with a large slope around
-	// muS = 0, to get more texture samples near the horizon
-	float uMuS = getUvFromUnitRange(max0(1.0 - a / A) / (1.0 + a), scatteringRes.z);
+	// An ad-hoc function equal to 0 for mu_s = min_mu_s (because then d = D and thus a = A, equal
+	// to 1 for mu_s = 1 (because then d = d_min and thus a = 0), and with a large slope around
+	// mu_s = 0, to get more texture samples near the horizon
+	float u_mu_s = get_uv_from_unit_range(max0(1.0 - a / A) / (1.0 + a), scattering_res.z);
 
-	return vec3(uNu, uMu, uMuS);
+	return vec3(u_nu, u_mu, u_mu_s);
 }
 
-vec3 atmosphereScattering(float nu, float mu, float muS) {
+vec3 atmosphere_scattering(float nu, float mu, float mu_s) {
 #ifndef SKY_GROUND
-	float horizonMu = mix(-0.01, 0.03, smoothstep(-0.05, 0.1, muS));
-	mu = max(mu, horizonMu);
+	float horizon_mu = mix(-0.01, 0.03, smoothstep(-0.05, 0.1, mu_s));
+	mu = max(mu, horizon_mu);
 #endif
 
-	vec3 uv = atmosphereScatteringUv(nu, mu, muS);
+	vec3 uv = atmosphere_scattering_uv(nu, mu, mu_s);
 
 	vec3 scattering;
 
@@ -163,30 +163,30 @@ vec3 atmosphereScattering(float nu, float mu, float muS) {
 
 	// Single mie scattering
 	uv.x += 0.5;
-	scattering += texture(ATMOSPHERE_SCATTERING_LUT, uv).rgb * kleinNishinaPhase(nu, airMieEnergyParameter);
+	scattering += texture(ATMOSPHERE_SCATTERING_LUT, uv).rgb * klein_nishina_phase(nu, air_mie_energy_parameter);
 
 	return scattering;
 }
 
-vec3 atmosphereScattering(vec3 rayDir, vec3 lightDir) {
-	float nu = dot(rayDir, lightDir);
-	float mu = rayDir.y;
-	float muS = lightDir.y;
+vec3 atmosphere_scattering(vec3 ray_dir, vec3 light_dir) {
+	float nu = dot(ray_dir, light_dir);
+	float mu = ray_dir.y;
+	float mu_s = light_dir.y;
 
-	return atmosphereScattering(nu, mu, muS);
+	return atmosphere_scattering(nu, mu, mu_s);
 }
 
-vec3 atmosphereScatteringBorderFog(vec3 rayDir, vec3 lightDir) { // For border fog,
-	float nu = dot(rayDir, lightDir);
-	float mu = rayDir.y;
-	float muS = lightDir.y;
+vec3 atmosphere_scattering_border_fog(vec3 ray_dir, vec3 light_dir) { // For border fog,
+	float nu = dot(ray_dir, light_dir);
+	float mu = ray_dir.y;
+	float mu_s = light_dir.y;
 
 #ifndef SKY_GROUND
-	float horizonMu = mix(-0.01, 0.03, smoothstep(-0.05, 0.1, muS));
-	mu = max(mu, horizonMu);
+	float horizon_mu = mix(-0.01, 0.03, smoothstep(-0.05, 0.1, mu_s));
+	mu = max(mu, horizon_mu);
 #endif
 
-	vec3 uv = atmosphereScatteringUv(nu, mu, muS);
+	vec3 uv = atmosphere_scattering_uv(nu, mu, mu_s);
 
 	vec3 scattering;
 
@@ -196,90 +196,77 @@ vec3 atmosphereScatteringBorderFog(vec3 rayDir, vec3 lightDir) { // For border f
 
 	// Single mie scattering
 	uv.x += 0.5;
-	scattering += texture(ATMOSPHERE_SCATTERING_LUT, uv).rgb * min(kleinNishinaPhase(nu, airMieEnergyParameter), 1.0);
+	scattering += texture(ATMOSPHERE_SCATTERING_LUT, uv).rgb * min(klein_nishina_phase(nu, air_mie_energy_parameter), 1.0);
 
 	return scattering;
 }
 #endif
 
 #if defined ATMOSPHERE_TRANSMITTANCE_LUT || defined ATMOSPHERE_IRRADIANCE_LUT
-vec2 atmosphereTransmittanceUv(float mu, float r) {
+vec2 atmosphere_transmittance_uv(float mu, float r) {
 	// Distance to the atmosphere outer limit for a horizontal ray at ground level
-	const float H = sqrt(max(atmosphereOuterRadiusSq - atmosphereInnerRadiusSq, 0));
+	const float H = sqrt(max(atmosphere_outer_radius_sq - atmosphere_inner_radius_sq, 0));
 
 	// Distance to the horizon
-	float rho = sqrt(max0(r * r - atmosphereInnerRadiusSq));
+	float rho = sqrt(max0(r * r - atmosphere_inner_radius_sq));
 
 	// Distance to the atmosphere upper limit and its minimum and maximum values over all mu
-	float d = intersectSphere(mu, r, atmosphereOuterRadius).y;
-	float dMin = atmosphereOuterRadius - r;
-	float dMax = rho + H;
+	float d = intersect_sphere(mu, r, atmosphere_outer_radius).y;
+	float d_min = atmosphere_outer_radius - r;
+	float d_max = rho + H;
 
-	float uMu = getUvFromUnitRange((d - dMin) / (dMax - dMin), transmittanceRes.x);
-	float uR  = getUvFromUnitRange(rho / H, transmittanceRes.y);
+	float u_mu = get_uv_from_unit_range((d - d_min) / (d_max - d_min), transmittance_res.x);
+	float u_r  = get_uv_from_unit_range(rho / H, transmittance_res.y);
 
-	return vec2(uMu, uR);
+	return vec2(u_mu, u_r);
 }
 #endif
 
 #if defined ATMOSPHERE_TRANSMITTANCE_LUT
-vec3 atmosphereTransmittance(float mu, float r) {
-	if (intersectSphere(mu, r, planetRadius).x >= 0.0) return vec3(0.0);
+vec3 atmosphere_transmittance(float mu, float r) {
+	if (intersect_sphere(mu, r, planet_radius).x >= 0.0) return vec3(0.0);
 
-	vec2 uv = atmosphereTransmittanceUv(mu, r);
+	vec2 uv = atmosphere_transmittance_uv(mu, r);
 	return texture(ATMOSPHERE_TRANSMITTANCE_LUT, uv).rgb;
 }
 #else
 // Source: http://www.thetenthplanet.de/archives/4519
-float chapmanFunctionApprox(float x, float cosTheta) {
-	float c = sqrt(halfPi * x);
+float chapman_function_approx(float x, float cos_theta) {
+	float c = sqrt(half_pi * x);
 
-	if (cosTheta >= 0.0) { // => theta <= 90 deg
-		return c / ((c - 1.0) * cosTheta + 1.0);
+	if (cos_theta >= 0.0) { // => theta <= 90 deg
+		return c / ((c - 1.0) * cos_theta + 1.0);
 	} else {
-		float sinTheta = sqrt(clamp01(1.0 - sqr(cosTheta)));
-		return c / ((c - 1.0) * cosTheta - 1.0) + 2.0 * c * exp(x - x * sinTheta) * sqrt(sinTheta);
+		float sin_theta = sqrt(clamp01(1.0 - sqr(cos_theta)));
+		return c / ((c - 1.0) * cos_theta - 1.0) + 2.0 * c * exp(x - x * sin_theta) * sqrt(sin_theta);
 	}
 }
 
-vec3 atmosphereTransmittance(float mu, float r) {
-	if (intersectSphere(mu, max(r, planetRadius + 10.0), planetRadius).x >= 0.0) return vec3(0.0);
+vec3 atmosphere_transmittance(float mu, float r) {
+	if (intersect_sphere(mu, max(r, planet_radius + 10.0), planet_radius).x >= 0.0) return vec3(0.0);
 
 	// Rayleigh and mie density at r
-	const vec2 rcpScaleHeights = rcp(airScaleHeights);
-	const vec2 scaledPlanetRadius = planetRadius * rcpScaleHeights;
-	vec2 density = exp(r * -rcpScaleHeights + scaledPlanetRadius);
+	const vec2 rcp_scale_heights = rcp(air_scale_heights);
+	const vec2 scaled_planet_radius = planet_radius * rcp_scale_heights;
+	vec2 density = exp(r * -rcp_scale_heights + scaled_planet_radius);
 
 	// Estimate airmass along ray using chapman function approximation
-	vec2 airmass = airScaleHeights * density;
-	airmass.x *= chapmanFunctionApprox(r * rcpScaleHeights.x, mu);
-	airmass.y *= chapmanFunctionApprox(r * rcpScaleHeights.y, mu);
+	vec2 airmass = air_scale_heights * density;
+	airmass.x *= chapman_function_approx(r * rcp_scale_heights.x, mu);
+	airmass.y *= chapman_function_approx(r * rcp_scale_heights.y, mu);
 
 	// Approximate ozone density as rayleigh density
-	return clamp01(exp(-airExtinctionCoefficients * airmass.xyx));
+	return clamp01(exp(-air_extinction_coefficients * airmass.xyx));
 }
 #endif
 
-vec3 atmosphereTransmittance(vec3 rayOrigin, vec3 rayDir) {
-	float rSq = dot(rayOrigin, rayOrigin);
-	float rcpR = inversesqrt(rSq);
-	float mu = dot(rayOrigin, rayDir) * rcpR;
-	float r = rSq * rcpR;
+vec3 atmosphere_transmittance(vec3 ray_origin, vec3 ray_dir) {
+	float r_sq = dot(ray_origin, ray_origin);
+	float rcp_r = inversesqrt(r_sq);
+	float mu = dot(ray_origin, ray_dir) * rcp_r;
+	float r = r_sq * rcp_r;
 
-	return atmosphereTransmittance(mu, r);
+	return atmosphere_transmittance(mu, r);
 }
-
-#if defined ATMOSPHERE_IRRADIANCE_LUT
-vec3 atmosphereSunColor(float mu, float r) {
-	if (intersectSphere(mu, r, planetRadius).x >= 0.0) return vec3(0.0);
-
-	vec2 uv = atmosphereTransmittanceUv(mu, r);
-	return texture(ATMOSPHERE_IRRADIANCE_LUT, uv).rgb;
-}
-#else
-vec3 atmosphereSunColor(float mu, float r) {
-	return baseSunCol * atmosphereTransmittance(mu, r);
-}
-#endif
 
 #endif // ATMOSPHERE_INCLUDED
