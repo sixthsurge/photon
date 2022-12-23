@@ -14,7 +14,7 @@
 #include "/include/global.glsl"
 
 /* DRAWBUFFERS:6 */
-layout (location = 0) out vec4 ao;
+layout (location = 0) out vec3 ao;
 
 in vec2 uv;
 
@@ -23,7 +23,7 @@ uniform sampler2D noisetex;
 uniform sampler2D colortex1; // Gbuffer 0
 uniform sampler2D colortex2; // Gbuffer 1
 uniform sampler2D colortex6; // Ambient occlusion history
-uniform sampler2D colortex7; // Clouds history, pixel age
+uniform sampler2D colortex7; // Clouds history
 
 // TEMPORARY
 uniform sampler2D colortex5; // Scene history
@@ -127,9 +127,9 @@ float calculate_maximum_horizon_angle(
 	return fast_acos(clamp(max_cos_theta, -1.0, 1.0));
 }
 
-vec4 gtao(vec3 screen_pos, vec3 view_pos, vec3 view_normal, vec2 dither) {
+float ambient_occlusion(vec3 screen_pos, vec3 view_pos, vec3 view_normal, vec2 dither) {
 	float ao = 0.0;
-	vec3 bent_normal = vec3(0.0);
+	// vec3 bent_normal = vec3(0.0);
 
 	// Construct local working space
 	vec3 viewer_dir   = normalize(-view_pos);
@@ -161,8 +161,8 @@ vec4 gtao(vec3 screen_pos, vec3 view_pos, vec3 view_normal, vec2 dither) {
 		max_horizon_angles = gamma + clamp(vec2(-1.0, 1.0) * max_horizon_angles - gamma, -half_pi, half_pi);
 		ao += integrate_arc(max_horizon_angles, gamma, cos_gamma) * len_sq * norm;
 
-		float bent_angle = dot(max_horizon_angles, vec2(0.5));
-		bent_normal += viewer_dir * cos(bent_angle) + ortho_dir * sin(bent_angle);
+		// float bent_angle = dot(max_horizon_angles, vec2(0.5));
+		// bent_normal += viewer_dir * cos(bent_angle) + ortho_dir * sin(bent_angle);
 	}
 
 	const float albedo = 0.2; // albedo of surroundings (for multibounce approx)
@@ -170,9 +170,9 @@ vec4 gtao(vec3 screen_pos, vec3 view_pos, vec3 view_normal, vec2 dither) {
 	ao *= rcp(float(GTAO_SLICES));
 	ao /= albedo * ao + (1.0 - albedo);
 
-	bent_normal = normalize(normalize(bent_normal) - 0.5 * viewer_dir);
+	// bent_normal = normalize(normalize(bent_normal) - 0.5 * viewer_dir);
 
-	return vec4(bent_normal, ao);
+	return ao;
 }
 
 void main() {
@@ -189,7 +189,7 @@ void main() {
 
 	vec2 dither = vec2(texelFetch(noisetex, texel & 511, 0).b, texelFetch(noisetex, (texel + 249) & 511, 0).b);
 
-	if (is_sky(depth)) { ao = vec4(1.0); return; }
+	if (is_sky(depth)) { ao = vec3(1.0); return; }
 
 	depth += 0.38 * float(is_hand(depth)); // Hand lighting fix from Capt Tatsu
 
@@ -208,9 +208,9 @@ void main() {
 	dither = r2(frameCounter, dither);
 
 #ifdef GTAO
-	ao = gtao(screen_pos, view_pos, view_normal, dither);
+	ao.x = ambient_occlusion(screen_pos, view_pos, view_normal, dither);
 #else
-	ao = vec4(1.0);
+	ao.x = 1.0;;
 #endif
 
 	// Temporal accumulation
@@ -221,12 +221,11 @@ void main() {
 
 	vec3 previous_screen_pos = reproject(screen_pos);
 
-	vec4 history_ao = catmull_rom_filter_fast(colortex6, previous_screen_pos.xy * gtao_render_scale, 0.65);
-	     history_ao = (clamp01(previous_screen_pos.xy) == previous_screen_pos.xy) ? history_ao : ao;
+	vec3 history_ao = catmull_rom_filter_fast_rgb(colortex6, previous_screen_pos.xy * gtao_render_scale, 0.65);
+	     history_ao = (clamp01(previous_screen_pos.xy) == previous_screen_pos.xy) ? history_ao : vec3(ao.x, vec2(0.0));
 		 history_ao = max0(history_ao);
 
-	// TEMP -- Will use pixel age from colortex7
-	float pixel_age = texture(colortex5, previous_screen_pos.xy).a;
+	float pixel_age = history_ao.y;
 	      pixel_age = min(pixel_age, max_accumulated_frames);
 
 	// Offcenter rejection from Jessie, which is originally by Zombye
@@ -245,17 +244,7 @@ void main() {
 
 	float history_weight = pixel_age / (pixel_age + 1.0);
 
-	// Reconstruct bent normal Z
-	history_ao.xy = history_ao.xy * 2.0 - 1.0;
-	history_ao.z  = sqrt(max0(1.0 - dot(history_ao.xy, history_ao.xy)));
-
-	// Blend with history
-	ao = mix(ao, history_ao, history_weight);
-
-	// Re-normalize bent normal
-	ao.xy *= rcp_length(ao.xyz);
-	ao.xy  = ao.xy * 0.5 + 0.5;
-
-	// Store reversed depth for next frame (using reversed depth improves precision for fp buffers)
-	ao.z = 1.0 - depth;
+	ao.x = mix(ao.x, history_ao.x, history_weight);
+	ao.y = pixel_age + 1.0;
+	ao.z = 1.0 - depth; // Storing reversed depth improves precision for fp buffers
 }

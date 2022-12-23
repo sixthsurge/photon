@@ -222,7 +222,6 @@ void main() {
 			material,
 			normal,
 			flat_normal,
-			normal,
 			shadows,
 			light_access,
 			1.0,

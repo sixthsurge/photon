@@ -38,7 +38,6 @@ vec3 get_diffuse_lighting(
 	Material material,
 	vec3 normal,
 	vec3 flat_normal,
-	vec3 bent_normal,
 	vec3 shadows,
 	vec2 light_access,
 	float ao,
@@ -61,16 +60,16 @@ vec3 get_diffuse_lighting(
 	// Skylight
 
 #ifdef SH_SKYLIGHT
-	vec3 skylight = sh_evaluate_irradiance(sky_sh, bent_normal, ao);
+	vec3 skylight = sh_evaluate_irradiance(sky_sh, normal, ao);
 #else
-	vec3 horizon_color = mix(sky_samples[1], sky_samples[2], dot(bent_normal.xz, moon_dir.xz) * 0.5 + 0.5);
-	     horizon_color = mix(horizon_color, mix(sky_samples[1], sky_samples[2], step(sun_dir.y, 0.5)), abs(bent_normal.y) * (time_noon + time_midnight));
+	vec3 horizon_color = mix(sky_samples[1], sky_samples[2], dot(normal.xz, moon_dir.xz) * 0.5 + 0.5);
+	     horizon_color = mix(horizon_color, mix(sky_samples[1], sky_samples[2], step(sun_dir.y, 0.5)), abs(normal.y) * (time_noon + time_midnight));
 
 	float horizon_weight = 0.166 * (time_noon + time_midnight) + 0.03 * (time_sunrise + time_sunset);
 
 	vec3 skylight  = mix(sky_samples[0] * 1.3, horizon_color, horizon_weight);
-	     skylight  = mix(horizon_color * 0.2, skylight, clamp01(abs(bent_normal.y)) * 0.3 + 0.7);
-	     skylight *= 1.0 - 0.75 * clamp01(-bent_normal.y);
+	     skylight  = mix(horizon_color * 0.2, skylight, clamp01(abs(normal.y)) * 0.3 + 0.7);
+	     skylight *= 1.0 - 0.75 * clamp01(-normal.y);
 	     skylight *= 1.0 + 0.33 * clamp01(flat_normal.y) * (1.0 - shadows.x) * (time_noon + time_midnight);
 	     skylight *= ao * pi;
 #endif

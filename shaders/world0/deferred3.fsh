@@ -138,10 +138,10 @@ void main() {
 		ivec2 i = ivec2(half_res_pos);
 		vec2  f = fract(half_res_pos);
 
-		vec4 half_res_00 = texelFetch(colortex6, i + ivec2(0, 0), 0);
-		vec4 half_res_10 = texelFetch(colortex6, i + ivec2(1, 0), 0);
-		vec4 half_res_01 = texelFetch(colortex6, i + ivec2(0, 1), 0);
-		vec4 half_res_11 = texelFetch(colortex6, i + ivec2(1, 1), 0);
+		vec3 half_res_00 = texelFetch(colortex6, i + ivec2(0, 0), 0).xyz;
+		vec3 half_res_10 = texelFetch(colortex6, i + ivec2(1, 0), 0).xyz;
+		vec3 half_res_01 = texelFetch(colortex6, i + ivec2(0, 1), 0).xyz;
+		vec3 half_res_11 = texelFetch(colortex6, i + ivec2(1, 1), 0).xyz;
 
 		// Unpack gbuffer data
 
@@ -188,26 +188,18 @@ void main() {
 
 		#define depth_weight(reversed_depth) exp2(-10.0 * abs(linearize_depth_fast(1.0 - reversed_depth) - lin_z))
 
-		vec4 gtao = vec4(half_res_00.xyw, 1.0) * depth_weight(half_res_00.z) * (1.0 - f.x) * (1.0 - f.y)
-		          + vec4(half_res_10.xyw, 1.0) * depth_weight(half_res_10.z) * (f.x - f.x * f.y)
-		          + vec4(half_res_01.xyw, 1.0) * depth_weight(half_res_01.z) * (f.y - f.x * f.y)
-		          + vec4(half_res_11.xyw, 1.0) * depth_weight(half_res_11.z) * (f.x * f.y);
+		vec4 gtao = vec4(half_res_00, 1.0) * depth_weight(half_res_00.z) * (1.0 - f.x) * (1.0 - f.y)
+		          + vec4(half_res_10, 1.0) * depth_weight(half_res_10.z) * (f.x - f.x * f.y)
+		          + vec4(half_res_01, 1.0) * depth_weight(half_res_01.z) * (f.y - f.x * f.y)
+		          + vec4(half_res_11, 1.0) * depth_weight(half_res_11.z) * (f.x * f.y);
 
 		#undef depth_weight
 
 		gtao = (gtao.w == 0.0) ? vec4(0.0) : gtao / gtao.w;
 
-		// Reconstruct bent normal
-
-		float ao = gtao.z;
-
-		vec3 bent_normal;
-		bent_normal.xy = gtao.xy * 2.0 - 1.0;
-		bent_normal.z = sqrt(max0(1.0 - dot(bent_normal.xy, bent_normal.xy)));
-		bent_normal = mat3(gbufferModelViewInverse) * bent_normal;
+		float ao = gtao.x;
 #else
 		#define ao 1.0
-		#define bent_normal normal
 #endif
 
 		// Terrain diffuse lighting
@@ -219,7 +211,6 @@ void main() {
 			material,
 			normal,
 			flat_normal,
-			bent_normal,
 			shadows,
 			light_access,
 			ao,
