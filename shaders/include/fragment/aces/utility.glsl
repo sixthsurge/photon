@@ -1,8 +1,10 @@
 #if !defined INCLUDE_FRAGMENT_ACES_UTILITY
 #define INCLUDE_FRAGMENT_ACES_UTILITY
 
-#include "/include/utility/color.glsl" // for luminance weights
-#include "/include/utility/fastMath.glsl" // for half-precision helper functions
+// for luminance weights
+#include "/include/utility/color.glsl"
+// for half-precision helper functions
+#include "/include/utility/fastMath.glsl"
 
 mat3 getChromaticAdaptationMatrix(vec3 srcXyz, vec3 dstXyz) {
 	const mat3 bradfordConeResponse = mat3(
