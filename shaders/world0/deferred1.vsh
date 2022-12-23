@@ -15,10 +15,12 @@
 
 out vec2 uv;
 
-flat out vec3 light_color;
+flat out vec3 base_light_color;
 flat out vec3 sky_color;
+flat out vec3 sun_color;
+flat out vec3 moon_color;
 
-uniform sampler3D depthtex0; // Atmospheric scattering LUT
+uniform sampler3D shadowcolor1; // Atmospheric scattering LUT
 
 uniform float sunAngle;
 
@@ -37,16 +39,18 @@ uniform float time_midnight;
 
 uniform bool clouds_moonlit;
 
-#define ATMOSPHERE_SCATTERING_LUT depthtex0
+#define ATMOSPHERE_SCATTERING_LUT shadowcolor1
 #define WORLD_OVERWORLD
 
 #include "/include/atmosphere.glsl"
 #include "/include/palette.glsl"
 
 void main() {
-	vec3 sun_color = get_sunlight_scale() * get_sunlight_tint();
-	vec3 moon_color = get_moonlight_scale() * get_moonlight_tint();
-	light_color = mix(sun_color, moon_color, float(clouds_moonlit));
+	uv = gl_MultiTexCoord0.xy;
+
+	sun_color = get_sunlight_scale() * get_sunlight_tint();
+	moon_color = get_moonlight_scale() * get_moonlight_tint();
+	base_light_color = mix(sun_color, moon_color, float(clouds_moonlit));
 
 	const vec3 sky_dir = normalize(vec3(0.0, 1.0, -0.8)); // don't point direcly upwards to avoid the sun halo when the sun path rotation is 0
 	sky_color = atmosphere_scattering(sky_dir, sun_dir) * sun_color + atmosphere_scattering(sky_dir, moon_dir) * moon_color;

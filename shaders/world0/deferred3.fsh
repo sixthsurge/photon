@@ -36,7 +36,7 @@ uniform sampler2D colortex2; // Gbuffer 1
 uniform sampler2D colortex3; // Animated overlays/vanilla sky
 uniform sampler2D colortex6; // Ambient occlusion
 
-uniform sampler3D depthtex0; // Atmosphere scattering LUT
+uniform sampler3D shadowcolor1; // Atmosphere scattering LUT
 uniform sampler2D depthtex1;
 
 #ifdef SHADOW
@@ -91,7 +91,7 @@ uniform float time_noon;
 uniform float time_sunset;
 uniform float time_midnight;
 
-#define ATMOSPHERE_SCATTERING_LUT depthtex0
+#define ATMOSPHERE_SCATTERING_LUT shadowcolor1
 #define PROGRAM_DEFERRED3
 #define TEMPORAL_REPROJECTION
 #define WORLD_OVERWORLD

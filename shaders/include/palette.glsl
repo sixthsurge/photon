@@ -54,7 +54,7 @@ vec3 get_light_color() {
 	return light_color;
 }
 
-vec3 get_skylight_color() {
+vec3 get_sky_color() {
 	vec3 sky_color = vec3(0.41, 0.50, 0.73) * time_sunrise
 	               + vec3(0.69, 0.87, 1.67) * time_noon
 				   + vec3(0.48, 0.55, 0.75) * time_sunset

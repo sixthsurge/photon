@@ -16,7 +16,7 @@
 out vec2 uv;
 
 flat out vec3 light_color;
-flat out vec3 skylight_color;
+flat out vec3 sky_color;
 flat out mat2x3 air_fog_coeff[2];
 
 uniform float sunAngle;
@@ -52,7 +52,7 @@ void main() {
 	uv = gl_MultiTexCoord0.xy;
 
 	light_color    = get_light_color();
-	skylight_color = get_skylight_color();
+	sky_color = get_sky_color();
 
 	mat2x3 rayleigh_coeff = air_fog_rayleigh_coeff(), mie_coeff = air_fog_mie_coeff();
 	air_fog_coeff[0] = mat2x3(rayleigh_coeff[0], mie_coeff[0]);

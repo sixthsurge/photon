@@ -45,7 +45,7 @@ in vec2 uv;
 flat in vec3 sun_color;
 flat in vec3 moon_color;
 
-uniform sampler3D depthtex0; // Atmosphere scattering LUT
+uniform sampler3D shadowcolor1; // Atmosphere scattering LUT
 
 #ifdef SHADOW
 uniform mat4 shadowModelViewInverse;
@@ -68,7 +68,7 @@ uniform float time_noon;
 uniform float time_sunset;
 uniform float time_midnight;
 
-#define ATMOSPHERE_SCATTERING_LUT depthtex0
+#define ATMOSPHERE_SCATTERING_LUT shadowcolor1
 #define PROGRAM_DEFERRED
 #define WORLD_OVERWORLD
 

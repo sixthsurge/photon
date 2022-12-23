@@ -20,7 +20,7 @@ layout (location = 1) out vec3 fog_transimttance;
 in vec2 uv;
 
 flat in vec3 light_color;
-flat in vec3 skylight_color;
+flat in vec3 sky_color;
 flat in mat2x3 air_fog_coeff[2];
 
 uniform sampler2D noisetex;
@@ -218,7 +218,7 @@ mat2x3 raymarch_air_fog(vec3 world_start_pos, vec3 world_end_pos, bool sky, floa
 	/*
 	// Single scattering
 	vec3 scattering  = light_color * (light_sun * vec2(isotropic_phase, mie_phase));
-	     scattering += skylight_color * (light_sky * vec2(isotropic_phase));
+	     scattering += sky_color * (light_sky * vec2(isotropic_phase));
 	/*/
 	// Multiple scattering
 	vec3 scattering = vec3(0.0);
@@ -226,7 +226,7 @@ mat2x3 raymarch_air_fog(vec3 world_start_pos, vec3 world_end_pos, bool sky, floa
 
 	for (int i = 0; i < 4; ++i) {
 		scattering += scatter_amount * (light_sun * vec2(isotropic_phase, mie_phase)) * light_color;
-		scattering += scatter_amount * (light_sky * vec2(isotropic_phase)) * skylight_color;
+		scattering += scatter_amount * (light_sky * vec2(isotropic_phase)) * sky_color;
 
 		scatter_amount *= 0.5;
 		mie_phase = mix(mie_phase, isotropic_phase, 0.3);

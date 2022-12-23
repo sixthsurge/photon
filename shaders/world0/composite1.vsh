@@ -39,7 +39,7 @@ void main() {
 
 	light_color = get_light_color();
 
-	sky_samples[0] = get_skylight_color();
+	sky_samples[0] = get_sky_color();
 	sky_samples[1] = sky_samples[0];
 	sky_samples[2] = sky_samples[0];
 

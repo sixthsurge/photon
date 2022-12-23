@@ -269,10 +269,16 @@ float vignette(vec2 uv) {
     return vignette;
 }
 
+uniform sampler2D colortex8;
+
 void main() {
 	ivec2 texel = ivec2(gl_FragCoord.xy);
 
 	scene_color = texelFetch(colortex5, texel, 0).rgb;
+
+	vec4 clouds = texture(colortex8, uv);
+	scene_color *= clouds.a;
+	scene_color += clouds.rgb;
 
 	float exposure = texelFetch(colortex5, ivec2(0), 0).a;
 

@@ -120,7 +120,7 @@ vec2 hash2(vec2 p) {
 }
 //*/
 
-/*
+//*
 vec2 hash2(vec3 p3) {
 	p3 = fract(p3 * vec3(.1031, .1030, .0973));
     p3 += dot(p3, p3.yzx+33.33);

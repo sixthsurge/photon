@@ -26,7 +26,7 @@ flat out mat3 sky_samples;
 
 uniform sampler2D colortex4; // Sky capture
 
-uniform sampler3D depthtex0; // Atmospheric scattering LUT
+uniform sampler3D shadowcolor1; // Atmospheric scattering LUT
 
 uniform float sunAngle;
 
@@ -43,7 +43,7 @@ uniform float time_noon;
 uniform float time_sunset;
 uniform float time_midnight;
 
-#define ATMOSPHERE_SCATTERING_LUT depthtex0
+#define ATMOSPHERE_SCATTERING_LUT shadowcolor1
 #define WORLD_OVERWORLD
 
 #include "/include/utility/random.glsl"
