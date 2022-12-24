@@ -17,8 +17,8 @@
   const int colortex2Format = RGBA16;         // Gbuffer 1 (solid -> composite1)
   const int colortex3Format = RGBA8;          // Animated overlays/vanilla sky (solid -> deferred3), blended translucent color (translucent -> composite1)
   const int colortex4Format = R11F_G11F_B10F; // Sky capture (deferred -> composite1)
-  const int colortex5Format = RGBA16F;        // scene_color history (always), clouds (deferred1 -> deferred3 +flip), fog scattering (composite -> composite1 +flip)
-  const int colortex6Format = RGBA16F;        // Ambient occlusion history (always), fog transmittance (composite -> composite1), TAAU min color (composite2 -> composite3 +flip)
+  const int colortex5Format = RGBA16F;        // Scene history (always), low-res clouds (deferred1 -> deferred2 +flip), fog scattering (composite -> composite1 +flip)
+  const int colortex6Format = RGB16F;         // Ambient occlusion history (always), fog transmittance (composite -> composite1), TAAU min color (composite2 -> composite3 +flip)
   const int colortex7Format = RGBA16F;        // Clouds history (always), TAAU max color (composite2 -> composite3 +flip)
 
   const bool colortex0Clear = false;
@@ -45,7 +45,7 @@ in vec2 uv;
 flat in vec3 sun_color;
 flat in vec3 moon_color;
 
-uniform sampler3D shadowcolor1; // Atmosphere scattering LUT
+uniform sampler3D depthtex0; // Atmosphere scattering LUT
 
 #ifdef SHADOW
 uniform mat4 shadowModelViewInverse;
@@ -68,7 +68,7 @@ uniform float time_noon;
 uniform float time_sunset;
 uniform float time_midnight;
 
-#define ATMOSPHERE_SCATTERING_LUT shadowcolor1
+#define ATMOSPHERE_SCATTERING_LUT depthtex0
 #define PROGRAM_DEFERRED
 #define WORLD_OVERWORLD
 

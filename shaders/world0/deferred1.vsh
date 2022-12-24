@@ -20,7 +20,7 @@ flat out vec3 sky_color;
 flat out vec3 sun_color;
 flat out vec3 moon_color;
 
-uniform sampler3D shadowcolor1; // Atmospheric scattering LUT
+uniform sampler3D depthtex0; // Atmospheric scattering LUT
 
 uniform float sunAngle;
 
@@ -39,7 +39,7 @@ uniform float time_midnight;
 
 uniform bool clouds_moonlit;
 
-#define ATMOSPHERE_SCATTERING_LUT shadowcolor1
+#define ATMOSPHERE_SCATTERING_LUT depthtex0
 #define WORLD_OVERWORLD
 
 #include "/include/atmosphere.glsl"
@@ -56,6 +56,10 @@ void main() {
 	sky_color = atmosphere_scattering(sky_dir, sun_dir) * sun_color + atmosphere_scattering(sky_dir, moon_dir) * moon_color;
 	sky_color = tau * mix(sky_color, vec3(sky_color.b) * sqrt(2.0), rcp_pi);
 
-	vec2 vertex_pos = gl_Vertex.xy * CLOUDS_RENDER_SCALE;
+	vec2 vertex_pos  = gl_Vertex.xy;
+#ifdef CLOUDS_TEMPORAL_UPSCALING
+	     vertex_pos *= 0.25;
+#endif
+
 	gl_Position = vec4(vertex_pos * 2.0 - 1.0, 0.0, 1.0);
 }

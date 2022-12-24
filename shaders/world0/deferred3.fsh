@@ -35,8 +35,9 @@ uniform sampler2D colortex1; // Gbuffer 0
 uniform sampler2D colortex2; // Gbuffer 1
 uniform sampler2D colortex3; // Animated overlays/vanilla sky
 uniform sampler2D colortex6; // Ambient occlusion
+uniform sampler2D colortex7; // Clouds history
 
-uniform sampler3D shadowcolor1; // Atmosphere scattering LUT
+uniform sampler3D depthtex0; // Atmosphere scattering LUT
 uniform sampler2D depthtex1;
 
 #ifdef SHADOW
@@ -52,16 +53,12 @@ uniform mat4 gbufferModelViewInverse;
 uniform mat4 gbufferProjection;
 uniform mat4 gbufferProjectionInverse;
 
-uniform mat4 gbufferPreviousModelView;
-uniform mat4 gbufferPreviousProjection;
-
 uniform mat4 shadowModelView;
 uniform mat4 shadowModelViewInverse;
 uniform mat4 shadowProjection;
 uniform mat4 shadowProjectionInverse;
 
 uniform vec3 cameraPosition;
-uniform vec3 previousCameraPosition;
 
 uniform float near;
 uniform float far;
@@ -91,11 +88,11 @@ uniform float time_noon;
 uniform float time_sunset;
 uniform float time_midnight;
 
-#define ATMOSPHERE_SCATTERING_LUT shadowcolor1
+#define ATMOSPHERE_SCATTERING_LUT depthtex0
 #define PROGRAM_DEFERRED3
-#define TEMPORAL_REPROJECTION
 #define WORLD_OVERWORLD
 
+#include "/include/utility/bicubic.glsl"
 #include "/include/utility/color.glsl"
 #include "/include/utility/encoding.glsl"
 #include "/include/utility/space_conversion.glsl"
@@ -107,12 +104,26 @@ uniform float time_midnight;
 #include "/include/sky.glsl"
 #include "/include/specular_lighting.glsl"
 
+// from https://iquilezles.org/www/articles/texture/texture.htm
+vec4 smooth_filter(sampler2D sampler, vec2 coord) {
+	vec2 res = vec2(textureSize(sampler, 0));
+
+	coord = coord * res + 0.5;
+
+	vec2 i, f = modf(coord, i);
+	f = f * f * f * (f * (f * 6.0 - 15.0) + 10.0);
+	coord = i + f;
+
+	coord = (coord - 0.5) / res;
+	return texture(sampler, coord);
+}
+
 void main() {
 	ivec2 texel = ivec2(gl_FragCoord.xy);
 
 	// Texture fetches
 
-	float depth   = texelFetch(depthtex1, texel, 0).x;
+	float depth         = texelFetch(depthtex1, texel, 0).x;
 	vec4 gbuffer_data_0 = texelFetch(colortex1, texel, 0);
 #if defined NORMAL_MAPPING || defined SPECULAR_MAPPING
 	vec4 gbuffer_data_1 = texelFetch(colortex2, texel, 0);
@@ -130,6 +141,11 @@ void main() {
 
 	if (is_sky(depth)) { // Sky
 		scene_color = draw_sky(world_dir);
+
+		// Apply clouds
+		vec4 clouds = catmull_rom_filter(colortex7, 0.5 * uv);
+		scene_color *= clouds.a;
+		scene_color += clouds.rgb;
 	} else { // Terrain
 		// Sample half-res lighting data many operations before using it (latency hiding)
 

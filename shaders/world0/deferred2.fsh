@@ -6,15 +6,16 @@
   Photon Shaders by SixthSurge
 
   world0/deferred2.fsh:
-  Calculate ambient occlusion
+  Calculate ambient occlusion, temporal upscaling for clouds
 
 --------------------------------------------------------------------------------
 */
 
 #include "/include/global.glsl"
 
-/* DRAWBUFFERS:6 */
+/* DRAWBUFFERS:67 */
 layout (location = 0) out vec3 ao;
+layout (location = 1) out vec4 clouds;
 
 in vec2 uv;
 
@@ -51,11 +52,15 @@ uniform vec3 light_dir;
 uniform vec2 view_res;
 uniform vec2 view_pixel_size;
 uniform vec2 taa_offset;
+uniform vec2 clouds_offset;
+
+uniform bool world_age_changed;
 
 #define TEMPORAL_REPROJECTION
 #define WORLD_OVERWORLD
 
 #include "/include/utility/bicubic.glsl"
+#include "/include/utility/checkerboard.glsl"
 #include "/include/utility/dithering.glsl"
 #include "/include/utility/encoding.glsl"
 #include "/include/utility/fast_math.glsl"
@@ -175,6 +180,55 @@ float ambient_occlusion(vec3 screen_pos, vec3 view_pos, vec3 view_normal, vec2 d
 	return ao;
 }
 
+// --------------------
+//   clouds upscaling
+// --------------------
+
+#define CLOUDS_ACCUMULATION_LIMIT 0.9
+#define CLOUDS_OFFCENTER_REJECTION 0.5
+
+vec4 upscale_clouds(vec2 previous_uv) {
+	vec3 ao_history = texture(colortex6, previous_uv * gtao_render_scale).xyz;
+
+	ivec2 dst_texel = ivec2(gl_FragCoord.xy);
+	ivec2 src_texel = clamp(dst_texel / 2, ivec2(0), ivec2(view_res) / 4 - 1);
+
+	vec2 previous_uv_clamped = clamp(previous_uv, vec2(0.0), 1.0 - 2.0 * view_pixel_size);
+
+	bool disocclusion = clamp01(previous_uv) != previous_uv;
+	     disocclusion = disocclusion || ao_history.z > eps;
+	     disocclusion = disocclusion || world_age_changed;
+
+	vec4 current = texelFetch(colortex5, src_texel, 0);
+	vec4 history = catmull_rom_filter(colortex7, previous_uv_clamped * gtao_render_scale);
+	     history = max0(history); // kill any NaNs
+
+	if (disocclusion) history = current;
+
+	float pixel_age  = max0(ao_history.y);
+	      pixel_age -= pixel_age * float(disocclusion);
+
+	float history_weight = min(pixel_age / (pixel_age + 1.0), CLOUDS_ACCUMULATION_LIMIT);
+
+	// Checkerboard upscaling
+	ivec2 offset0 = dst_texel % ivec2(2);
+	ivec2 offset1 = checkerboard_offsets_2x2[frameCounter % 4];
+	if (offset0 != offset1) current = history;
+
+	// Velocity rejection
+	vec2 velocity = 0.5 * view_res * (uv - previous_uv);
+	history_weight *= exp(-length(velocity)) * 0.7 + 0.3;
+
+	// Offcenter rejection from Jessie, which is originally by Zombye
+	// Reduces blur in motion
+	vec2 pixel_offset = 1.0 - abs(2.0 * fract(view_res * gtao_render_scale * previous_uv) - 1.0);
+	history_weight *= sqrt(pixel_offset.x * pixel_offset.y) * CLOUDS_OFFCENTER_REJECTION + (1.0 - CLOUDS_OFFCENTER_REJECTION);
+
+	ao.y = min(pixel_age + 1.0, 256);
+
+	return mix(current, history, history_weight);
+}
+
 void main() {
 	ivec2 texel      = ivec2(gl_FragCoord.xy);
 	ivec2 view_texel = ivec2(gl_FragCoord.xy * (taau_render_scale / gtao_render_scale));
@@ -189,62 +243,69 @@ void main() {
 
 	vec2 dither = vec2(texelFetch(noisetex, texel & 511, 0).b, texelFetch(noisetex, (texel + 249) & 511, 0).b);
 
-	if (is_sky(depth)) { ao = vec3(1.0); return; }
-
 	depth += 0.38 * float(is_hand(depth)); // Hand lighting fix from Capt Tatsu
 
 	vec3 screen_pos = vec3(uv, depth);
 	vec3 view_pos = screen_to_view_space(screen_pos, true);
 	vec3 scene_pos = view_to_scene_space(view_pos);
 
-#ifdef NORMAL_MAPPING
-	vec3 world_normal = decode_unit_vector(gbuffer_data.xy);
-#else
-	vec3 world_normal = decode_unit_vector(unpack_unorm_2x8(gbuffer_data.z));
-#endif
-
-	vec3 view_normal = mat3(gbufferModelView) * world_normal;
-
-	dither = r2(frameCounter, dither);
-
-#ifdef GTAO
-	ao.x = ambient_occlusion(screen_pos, view_pos, view_normal, dither);
-#else
-	ao.x = 1.0;;
-#endif
-
-	// Temporal accumulation
-
-	const float max_accumulated_frames       = 10.0;
-	const float depth_rejection_strength     = 16.0;
-	const float offcenter_rejection_strength = 0.25;
-
 	vec3 previous_screen_pos = reproject(screen_pos);
 
-	vec3 history_ao = catmull_rom_filter_fast_rgb(colortex6, previous_screen_pos.xy * gtao_render_scale, 0.65);
-	     history_ao = (clamp01(previous_screen_pos.xy) == previous_screen_pos.xy) ? history_ao : vec3(ao.x, vec2(0.0));
-		 history_ao = max0(history_ao);
+	if (depth == 1.0) {
+		ao = vec3(1.0, 0.0, 0.0);
+		clouds = upscale_clouds(previous_screen_pos.xy);
+	} else {
+		clouds = vec4(0.0, 0.0, 0.0, 1.0);
 
-	float pixel_age = history_ao.y;
-	      pixel_age = min(pixel_age, max_accumulated_frames);
+		// GTAO
 
-	// Offcenter rejection from Jessie, which is originally by Zombye
-	// Reduces blur in motion
-	vec2 pixel_offset = 1.0 - abs(2.0 * fract(view_res * gtao_render_scale * previous_screen_pos.xy) - 1.0);
-	float offcenter_rejection = sqrt(pixel_offset.x * pixel_offset.y) * offcenter_rejection_strength + (1.0 - offcenter_rejection_strength);
+	#ifdef NORMAL_MAPPING
+		vec3 world_normal = decode_unit_vector(gbuffer_data.xy);
+	#else
+		vec3 world_normal = decode_unit_vector(unpack_unorm_2x8(gbuffer_data.z));
+	#endif
 
-	// Depth rejection
-	float view_norm = rcp_length(view_pos);
-	float NoV = abs(dot(view_normal, view_pos)) * view_norm; // NoV / sqrt(length(view_pos))
-	float z0 = linearize_depth_fast(depth);
-	float z1 = linearize_depth_fast(1.0 - history_ao.z);
-	float depth_weight = exp2(-abs(z0 - z1) * depth_rejection_strength * NoV * view_norm);
+		vec3 view_normal = mat3(gbufferModelView) * world_normal;
 
-	pixel_age *= depth_weight * offcenter_rejection * float(history_ao.z != 1.0);
+		dither = r2(frameCounter, dither);
 
-	float history_weight = pixel_age / (pixel_age + 1.0);
+	#ifdef GTAO
+		ao.x = ambient_occlusion(screen_pos, view_pos, view_normal, dither);
+	#else
+		ao.x = 1.0;
+	#endif
 
-	ao.x = mix(ao.x, history_ao.x, history_weight);
-	ao.y = pixel_age + 1.0;
-	ao.z = 1.0 - depth; // Storing reversed depth improves precision for fp buffers
+		// Temporal accumulation
+
+		const float max_accumulated_frames       = 10.0;
+		const float depth_rejection_strength     = 16.0;
+		const float offcenter_rejection_strength = 0.25;
+
+		vec3 history_ao = catmull_rom_filter_fast_rgb(colortex6, previous_screen_pos.xy * gtao_render_scale, 0.65);
+		     history_ao = (clamp01(previous_screen_pos.xy) == previous_screen_pos.xy) ? history_ao : vec3(ao.x, vec2(0.0));
+		     history_ao = max0(history_ao);
+
+		float pixel_age = history_ao.y;
+		      pixel_age = min(pixel_age, max_accumulated_frames);
+
+		// Offcenter rejection from Jessie, which is originally by Zombye
+		// Reduces blur in motion
+		vec2 pixel_offset = 1.0 - abs(2.0 * fract(view_res * gtao_render_scale * previous_screen_pos.xy) - 1.0);
+		float offcenter_rejection = sqrt(pixel_offset.x * pixel_offset.y) * offcenter_rejection_strength + (1.0 - offcenter_rejection_strength);
+
+		// Depth rejection
+		float view_norm = rcp_length(view_pos);
+		float NoV = abs(dot(view_normal, view_pos)) * view_norm; // NoV / sqrt(length(view_pos))
+		float z0 = linearize_depth_fast(depth);
+		float z1 = linearize_depth_fast(1.0 - history_ao.z);
+		float depth_weight = exp2(-abs(z0 - z1) * depth_rejection_strength * NoV * view_norm);
+
+		pixel_age *= depth_weight * offcenter_rejection * float(history_ao.z != 1.0);
+
+		float history_weight = pixel_age / (pixel_age + 1.0);
+
+		ao.x = mix(ao.x, history_ao.x, history_weight);
+		ao.y = pixel_age + 1.0;
+		ao.z = 1.0 - depth; // Storing reversed depth improves precision for fp buffers
+	}
 }

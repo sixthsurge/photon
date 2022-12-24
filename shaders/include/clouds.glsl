@@ -20,7 +20,6 @@ float clouds_phase_multi(float cos_theta, vec3 g) { // Multiple scattering phase
 }
 
 float clouds_powder_effect(float density, float cos_theta) {
-	// 100% magic numbers :)
 	float powder = pi * density / (density + 0.15);
 	      powder = mix(powder, 1.0, 0.75 * sqr(cos_theta * 0.5 + 0.5));
 
@@ -93,12 +92,18 @@ float clouds_density_cu(vec3 pos) {
 	density -= smoothstep(cloud_gradient.w, 1.0, altitude_fraction) * 0.6;
 
 	// curl noise used to warp the 3D noise into swirling shapes
+	vec3 curl = 0.181 * texture(colortex7, 0.002 * pos).xyz * smoothstep(0.4, 1.0, 1.0 - altitude_fraction);
 
 	// 3D worley noise for detail
-	density -= 0.25 * texture(depthtex0, pos * 0.001).x;
-	density -= 0.125 * texture(depthtex0, pos * 0.005).x;
-	density -= 0.0625 * texture(depthtex0, pos * 0.01).x;
-	density = max0(density);
+	float worley_0 = texture(colortex6, pos * 0.00125 + curl).x;
+	float worley_1 = texture(colortex6, pos * 0.005 + curl * 3.0).x;
+
+	float detail_fade = 0.6 - 0.35 * smoothstep(0.05, 0.5, altitude_fraction);
+
+	density -= 0.4 * sqr(worley_0) * dampen(clamp01(1.0 - density));
+	density -= 0.4 * sqr(worley_1) * dampen(clamp01(1.0 - density)) * detail_fade;
+
+	if (density < eps) return 0.0;
 
 	// adjust density so that the clouds are wispy at the bottom and hard at the top
 	density  = 1.0 - pow(1.0 - density, 3.0 + 5.0 * altitude_fraction);
@@ -115,7 +120,7 @@ float clouds_optical_depth_cu(
 ) {
 	const float step_growth = 2.0;
 
-	float step_length = 0.33 * clouds_thickness_cu / float(step_count); // m
+	float step_length = 0.1 * clouds_thickness_cu / float(step_count); // m
 
 	vec3 ray_pos = ray_origin;
 	vec4 ray_step = vec4(ray_dir, 1.0) * step_length;
@@ -156,7 +161,7 @@ vec2 clouds_scattering_cu(
 		scattering.x += scatter_amount * exp(-extinct_amount * ground_optical_depth) * isotropic_phase * bounced_light;
 		scattering.y += scatter_amount * exp(-extinct_amount *    sky_optical_depth) * isotropic_phase;
 
-		scatter_amount *= 0.55 * powder_effect;
+		scatter_amount *= 0.55 * mix(lift(clouds_scattering_coeff_cu / 0.08, 0.33), 1.0, cos_theta * 0.5 + 0.5) * powder_effect;
 		extinct_amount *= 0.4;
 		phase_g *= 0.8;
 
@@ -175,7 +180,7 @@ vec4 draw_clouds_cu(vec3 ray_dir, vec3 clear_sky, float dither) {
 
 	const uint  primary_steps_horizon = 40;
 	const uint  primary_steps_zenith  = 20;
-	const uint  lighting_steps        = 4;
+	const uint  lighting_steps        = 6;
 	const uint  ambient_steps         = 2;
 	const float max_ray_length        = 2e4;
 	const float min_transmittance     = 0.075;
@@ -257,7 +262,7 @@ vec4 draw_clouds_cu(vec3 ray_dir, vec3 clear_sky, float dither) {
 	}
 
 	// get main light color for this layer
-	vec3 light_color = atmosphere_transmittance(ray_origin, clouds_light_dir) * base_light_color;
+	vec3 light_color = atmosphere_transmittance(ray_origin, clouds_light_dir) * base_light_color * sunlight_color;
 
 	// remap the transmittance so that min_transmittance is 0
 	float clouds_transmittance = linear_step(min_transmittance, 1.0, transmittance);
