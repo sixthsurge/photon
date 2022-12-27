@@ -6,7 +6,7 @@
   Photon Shaders by SixthSurge
 
   world0/deferred1.fsh:
-  Render clouds at 1/16th resolution
+  Render clouds
 
 --------------------------------------------------------------------------------
 */
@@ -18,10 +18,6 @@ layout (location = 0) out vec4 clouds;
 
 in vec2 uv;
 
-/*
-const int colortex8Format = RGBA16F;
-*/
-
 flat in vec3 base_light_color;
 flat in vec3 sky_color;
 flat in vec3 sun_color;
@@ -31,7 +27,7 @@ uniform sampler2D depthtex1;
 
 uniform sampler2D noisetex;
 
-uniform sampler3D depthtex0; // Atmospheric scattering LUT
+uniform sampler3D depthtex0; // atmospheric scattering LUT
 
 uniform sampler3D colortex6; // 3D worley noise
 uniform sampler3D colortex7; // 3D curl noise
@@ -90,6 +86,18 @@ uniform vec2 clouds_coverage_ci;
 #include "/include/atmosphere.glsl"
 #include "/include/clouds.glsl"
 
+#if   CLOUDS_TEMPORAL_UPSCALING == 1
+	#define checkerboard_offsets ivec2[1](ivec2(0))
+#elif CLOUDS_TEMPORAL_USPCALING == 2
+	#define checkerboard_offsets checkerboard_offsets_2x2
+#elif CLOUDS_TEMPORAL_UPSCALING == 3
+	#define checkerboard_offsets checkerboard_offsets_3x3
+#elif CLOUDS_TEMPORAL_UPSCALING == 4
+	#define checkerboard_offsets checkerboard_offsets_4x4
+#endif
+
+const int checkerboard_area = CLOUDS_TEMPORAL_UPSCALING * CLOUDS_TEMPORAL_UPSCALING;
+
 float depth_max_4x4(sampler2D depth_sampler) {
 	vec4 depth_samples_0 = textureGather(depth_sampler, uv * taau_render_scale + vec2( 2.0 * view_pixel_size.x,  2.0 * view_pixel_size.y));
 	vec4 depth_samples_1 = textureGather(depth_sampler, uv * taau_render_scale + vec2(-2.0 * view_pixel_size.x,  2.0 * view_pixel_size.y));
@@ -104,11 +112,11 @@ float depth_max_4x4(sampler2D depth_sampler) {
 
 void main() {
 	ivec2 texel = ivec2(gl_FragCoord.xy);
-	ivec2 checkerboard_pos = texel * 2 + checkerboard_offsets_2x2[frameCounter % 4];
+	ivec2 checkerboard_pos = CLOUDS_TEMPORAL_UPSCALING * texel + checkerboard_offsets[frameCounter % checkerboard_area];
 
-	vec2 new_uv = vec2(checkerboard_pos) * 2.0 / vec2(view_res);
+	vec2 new_uv = vec2(checkerboard_pos) / vec2(view_res);
 
-	// skip rendering clouds if they are occluded by terrain
+	// Skip rendering clouds if they are occluded by terrain
 	float depth_max = depth_max_4x4(depthtex1);
 	if (depth_max < 1.0) { clouds = vec4(0.0, 0.0, 0.0, 1.0); return; }
 
@@ -119,9 +127,7 @@ void main() {
 	               + atmosphere_scattering(ray_dir, moon_dir) * moon_color;
 
 	float dither = texelFetch(noisetex, ivec2(checkerboard_pos & 511), 0).b;
-	      dither = r1(frameCounter / 4, dither);
+	      dither = r1(frameCounter / checkerboard_area, dither);
 
 	clouds = draw_clouds_cu(ray_dir, clear_sky, dither);
-
-	if (any(isnan(clouds))) clouds = vec4(1.0, 0.0, 0.0, 1.0);
 }

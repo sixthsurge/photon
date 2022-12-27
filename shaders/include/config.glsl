@@ -77,7 +77,7 @@ const float sunPathRotation         = -35.0; // [-40.0 -39.0 -38.0 -37.0 -36.0 -
 
 // Clouds
 
-  #define CLOUDS_TEMPORAL_UPSCALING
+  #define CLOUDS_TEMPORAL_UPSCALING 4 // [1 2 3 4]
 
   #define CLOUDS_CUMULUS_ALTITUDE 1200.0
   #define CLOUDS_CUMULUS_THICKNESS 1.0

@@ -12,14 +12,14 @@
 
   Magic constants, please don't remove these!
 
-  const int colortex0Format = R11F_G11F_B10F; // Scene color (deferred3 -> temporal), bloom tiles (composite5 -> composite14), final color (composite14 -> final)
-  const int colortex1Format = RGBA16;         // Gbuffer 0 (solid -> composite1)
-  const int colortex2Format = RGBA16;         // Gbuffer 1 (solid -> composite1)
-  const int colortex3Format = RGBA8;          // Animated overlays/vanilla sky (solid -> deferred3), blended translucent color (translucent -> composite1)
-  const int colortex4Format = R11F_G11F_B10F; // Sky capture (deferred -> composite1)
-  const int colortex5Format = RGBA16F;        // Scene history (always), low-res clouds (deferred1 -> deferred2 +flip), fog scattering (composite -> composite1 +flip)
-  const int colortex6Format = RGB16F;         // Ambient occlusion history (always), fog transmittance (composite -> composite1), TAAU min color (composite2 -> composite3 +flip)
-  const int colortex7Format = RGBA16F;        // Clouds history (always), TAAU max color (composite2 -> composite3 +flip)
+  const int colortex0Format = R11F_G11F_B10F; // scene color (deferred3 -> temporal), bloom tiles (composite5 -> composite14), final color (composite14 -> final)
+  const int colortex1Format = RGBA16;         // gbuffer data 0 (solid -> composite1)
+  const int colortex2Format = RGBA16;         // gbuffer data 1 (solid -> composite1)
+  const int colortex3Format = RGBA8;          // animated overlays/vanilla sky (solid -> deferred3), blended translucent color (translucent -> composite1)
+  const int colortex4Format = R11F_G11F_B10F; // sky capture (deferred -> composite1)
+  const int colortex5Format = RGBA16F;        // scene history (always), low-res clouds (deferred1 -> deferred2 +flip), fog scattering (composite -> composite1 +flip)
+  const int colortex6Format = RGBA16F;        // ambient occlusion history & clouds pixel age (always), fog transmittance (composite -> composite1), TAAU min color (composite2 -> composite3 +flip)
+  const int colortex7Format = RGBA16F;        // clouds history (always), TAAU max color (composite2 -> composite3 +flip)
 
   const bool colortex0Clear = false;
   const bool colortex1Clear = false;
@@ -45,7 +45,7 @@ in vec2 uv;
 flat in vec3 sun_color;
 flat in vec3 moon_color;
 
-uniform sampler3D depthtex0; // Atmosphere scattering LUT
+uniform sampler3D depthtex0; // atmosphere scattering LUT
 
 #ifdef SHADOW
 uniform mat4 shadowModelViewInverse;
@@ -80,5 +80,5 @@ void main() {
 
 	vec3 ray_dir = unproject_sky(uv);
 
-	scene_color = draw_sky(ray_dir);
+	scene_color = draw_sky(ray_dir, vec4(vec3(0.0), 1.0));
 }

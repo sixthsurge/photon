@@ -80,7 +80,7 @@ vec3 draw_stars(vec3 ray_dir) {
 	return stable_star_field(coord, star_threshold);
 }
 
-vec3 draw_sky(vec3 ray_dir) {
+vec3 draw_sky(vec3 ray_dir, vec4 clouds) {
 	vec3 sky = vec3(0.0);
 
 	// Sun, moon and stars
@@ -120,6 +120,9 @@ vec3 draw_sky(vec3 ray_dir) {
 	sky += moon_color * atmosphere_scattering(ray_dir, moon_dir);
 
 	// Clouds
+
+	sky *= clouds.a;   // transmittance
+	sky += clouds.rgb; // scattering
 
 	// Fade lower part of sky into cave fog color when underground so that the sky isn't visible
 	// beyond the render distance

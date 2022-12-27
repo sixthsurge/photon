@@ -15,7 +15,7 @@
 
 /* DRAWBUFFERS:03 */
 layout (location = 0) out vec3 scene_color;
-layout (location = 3) out vec4 colortex3_clear; // Clear colortex3 so that translucents can write to it
+layout (location = 1) out vec4 colortex3_clear;
 
 in vec2 uv;
 
@@ -31,13 +31,13 @@ flat in mat3 sky_samples;
 
 uniform sampler2D noisetex;
 
-uniform sampler2D colortex1; // Gbuffer 0
-uniform sampler2D colortex2; // Gbuffer 1
-uniform sampler2D colortex3; // Animated overlays/vanilla sky
-uniform sampler2D colortex6; // Ambient occlusion
-uniform sampler2D colortex7; // Clouds history
+uniform sampler2D colortex1; // gbuffer 0
+uniform sampler2D colortex2; // gbuffer 1
+uniform sampler2D colortex3; // animated overlays/vanilla sky
+uniform sampler2D colortex6; // ambient occlusion
+uniform sampler2D colortex7; // clouds
 
-uniform sampler3D depthtex0; // Atmosphere scattering LUT
+uniform sampler3D depthtex0; // atmosphere scattering LUT
 uniform sampler2D depthtex1;
 
 #ifdef SHADOW
@@ -104,20 +104,6 @@ uniform float time_midnight;
 #include "/include/sky.glsl"
 #include "/include/specular_lighting.glsl"
 
-// from https://iquilezles.org/www/articles/texture/texture.htm
-vec4 smooth_filter(sampler2D sampler, vec2 coord) {
-	vec2 res = vec2(textureSize(sampler, 0));
-
-	coord = coord * res + 0.5;
-
-	vec2 i, f = modf(coord, i);
-	f = f * f * f * (f * (f * 6.0 - 15.0) + 10.0);
-	coord = i + f;
-
-	coord = (coord - 0.5) / res;
-	return texture(sampler, coord);
-}
-
 void main() {
 	ivec2 texel = ivec2(gl_FragCoord.xy);
 
@@ -128,7 +114,8 @@ void main() {
 #if defined NORMAL_MAPPING || defined SPECULAR_MAPPING
 	vec4 gbuffer_data_1 = texelFetch(colortex2, texel, 0);
 #endif
-	vec4 overlays = texelFetch(colortex3, texel, 0);
+	vec4 overlays       = texelFetch(colortex3, texel, 0);
+	vec4 clouds         = texelFetch(colortex7, texel, 0);
 
 	// Transformations
 
@@ -140,12 +127,7 @@ void main() {
 	vec3 world_dir = normalize(scene_pos - gbufferModelViewInverse[3].xyz);
 
 	if (is_sky(depth)) { // Sky
-		scene_color = draw_sky(world_dir);
-
-		// Apply clouds
-		vec4 clouds = catmull_rom_filter(colortex7, 0.5 * uv);
-		scene_color *= clouds.a;
-		scene_color += clouds.rgb;
+		scene_color = draw_sky(world_dir, clouds);
 	} else { // Terrain
 		// Sample half-res lighting data many operations before using it (latency hiding)
 
@@ -242,5 +224,6 @@ void main() {
 
 	apply_fog(scene_color, scene_pos, world_dir, depth == 1.0);
 
+	// Clear colortex3 so that translucents can write to it
 	colortex3_clear = vec4(0.0);
 }
