@@ -203,8 +203,7 @@ vec4 upscale_clouds() {
 	vec2 previous_uv = reproject(vec3(uv, 1.0)).xy;
 
 	vec4 current = texelFetch(colortex5, src_texel, 0);
-	vec4 history = smooth_filter(colortex7, previous_uv);
-	     history = max0(history);
+	vec4 history = max0(smooth_filter(colortex7, previous_uv));
 
 	float history_depth = min_of(textureGather(colortex6, previous_uv * gtao_render_scale, 2));
 
@@ -214,7 +213,7 @@ vec4 upscale_clouds() {
 
 	if (disocclusion) history = current;
 
-	float pixel_age = texture(colortex6, previous_uv).w * float(!disocclusion);
+	float pixel_age = max0(texture(colortex6, previous_uv).w) * float(!disocclusion);
 
 	// Reduce history weight when player is moving quickly
 	float movement_rejection = exp(-16.0 * length(cameraPosition - previousCameraPosition));
@@ -223,7 +222,7 @@ vec4 upscale_clouds() {
 	float history_weight = 1.0 - rcp(max(pixel_age - checkerboard_area, 1.0));
 
 	// Soft history sample using bicubic resampling
-	vec4 history_soft = bicubic_filter(colortex7, previous_uv);
+	vec4 history_soft = max0(bicubic_filter(colortex7, previous_uv));
 	     history_soft = mix(history_soft, history, history_weight * 0.4 + 0.6);
 
 	// Checkerboard upscaling
