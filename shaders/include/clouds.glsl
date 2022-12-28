@@ -9,8 +9,8 @@
 #include "/include/utility/sampling.glsl"
 
 float clouds_phase_single(float cos_theta) { // Single scattering phase function
-	return 0.7 * klein_nishina_phase(cos_theta, 2600.0)    // forwards lobe
-	     + 0.3 * henyey_greenstein_phase(cos_theta, -0.2); // backwards lobe
+	return 0.8 * klein_nishina_phase(cos_theta, 2600.0)    // forwards lobe
+	     + 0.2 * henyey_greenstein_phase(cos_theta, -0.2); // backwards lobe
 }
 
 float clouds_phase_multi(float cos_theta, vec3 g) { // Multiple scattering phase function
@@ -21,7 +21,7 @@ float clouds_phase_multi(float cos_theta, vec3 g) { // Multiple scattering phase
 
 float clouds_powder_effect(float density, float cos_theta) {
 	float powder = pi * density / (density + 0.15);
-	      powder = mix(powder, 1.0, 0.75 * sqr(cos_theta * 0.5 + 0.5));
+	      powder = mix(powder, 1.0, 0.8 * sqr(cos_theta * 0.5 + 0.5));
 
 	return powder;
 }
@@ -56,23 +56,26 @@ vec3 clouds_aerial_perspective(
 
   1st layer: cumulus/stratocumulus clouds
 
-  altitude: 400-1000m
+  altitude: 1200-2400m
   description: low-level, cauliflower-shaped clouds with a cotton-like appearance
   abbreviation: Cu
 
 --------------------------------------------------------------------------------
 */
 
-const float clouds_radius_cu           = planet_radius + CLOUDS_CUMULUS_ALTITUDE;
-const float clouds_thickness_cu        = CLOUDS_CUMULUS_ALTITUDE * CLOUDS_CUMULUS_THICKNESS;
-const float clouds_scattering_coeff_cu = 0.1;
-const float clouds_extinction_coeff_cu = 0.1;
+const float clouds_radius_cu     = planet_radius + CLOUDS_CUMULUS_ALTITUDE;
+const float clouds_thickness_cu  = CLOUDS_CUMULUS_ALTITUDE * CLOUDS_CUMULUS_THICKNESS;
+float clouds_extinction_coeff_cu = mix(0.05, 0.1, smoothstep(0.0, 0.33, abs(sun_dir.y)));
+float clouds_scattering_coeff_cu = clouds_extinction_coeff_cu * mix(1.00, 0.66, rainStrength);
 
 float clouds_density_cu(vec3 pos) {
+	const float wind_angle = CLOUDS_CUMULUS_WIND_ANGLE * degree;
+	const vec2 wind_velocity = CLOUDS_CUMULUS_WIND_SPEED * vec2(cos(wind_angle), sin(wind_angle));
+
 	float altitude_fraction = (length(pos) - clouds_radius_cu) * rcp(clouds_thickness_cu);
 	if (clamp01(altitude_fraction) != altitude_fraction) return 0.0; // outside of cloud volume
 
-	pos.xz += cameraPosition.xz;
+	pos.xz += cameraPosition.xz + wind_velocity * world_age;
 
 	// 2D noise for base shape and coverage
 	vec2 noise;
@@ -84,7 +87,7 @@ float clouds_density_cu(vec3 pos) {
 	density = linear_step(1.0 - density, 1.0, noise.y);
 
 	// attenuate and erode density over altitude
-	altitude_fraction *= 0.75;
+	altitude_fraction *= 0.8;
 	const vec4 cloud_gradient = vec4(0.2, 0.2, 0.85, 0.2);
 	density *= smoothstep(0.0, cloud_gradient.x, altitude_fraction);
 	density *= smoothstep(0.0, cloud_gradient.y, 1.0 - altitude_fraction);
@@ -95,13 +98,15 @@ float clouds_density_cu(vec3 pos) {
 	vec3 curl = 0.181 * texture(colortex7, 0.002 * pos).xyz * smoothstep(0.4, 1.0, 1.0 - altitude_fraction);
 
 	// 3D worley noise for detail
-	float worley_0 = texture(colortex6, pos * 0.00125 + curl).x;
+	pos.xz += 0.2 * wind_velocity * world_age;
+	float worley_0 = texture(colortex6, pos * 0.001 + curl).x;
+	pos.xz += 0.2 * wind_velocity * world_age;
 	float worley_1 = texture(colortex6, pos * 0.005 + curl * 3.0).x;
 
 	float detail_fade = 0.6 - 0.35 * smoothstep(0.05, 0.5, altitude_fraction);
 
-	density -= 0.4 * sqr(worley_0) * dampen(clamp01(1.0 - density));
-	density -= 0.4 * sqr(worley_1) * dampen(clamp01(1.0 - density)) * detail_fade;
+	density -= 0.33 * sqr(worley_0) * dampen(clamp01(1.0 - density));
+	density -= 0.38 * sqr(worley_1) * dampen(clamp01(1.0 - density)) * detail_fade;
 
 	if (density < eps) return 0.0;
 
@@ -161,7 +166,7 @@ vec2 clouds_scattering_cu(
 		scattering.x += scatter_amount * exp(-extinct_amount * ground_optical_depth) * isotropic_phase * bounced_light;
 		scattering.y += scatter_amount * exp(-extinct_amount *    sky_optical_depth) * isotropic_phase;
 
-		scatter_amount *= 0.55 * mix(lift(clouds_scattering_coeff_cu / 0.08, 0.33), 1.0, cos_theta * 0.5 + 0.5) * powder_effect;
+		scatter_amount *= 0.55 * mix(lift(clamp01(clouds_scattering_coeff_cu / 0.1), 0.33), 1.0, cos_theta * 0.5 + 0.5) * powder_effect;
 		extinct_amount *= 0.4;
 		phase_g *= 0.8;
 
@@ -178,24 +183,24 @@ vec4 draw_clouds_cu(vec3 ray_dir, vec3 clear_sky, float dither) {
 	//   Raymarching Setup
 	// ---------------------
 
-	const uint  primary_steps_horizon = 40;
-	const uint  primary_steps_zenith  = 20;
-	const uint  lighting_steps        = 6;
-	const uint  ambient_steps         = 2;
+	const uint  primary_steps_horizon = CLOUDS_CUMULUS_PRIMARY_STEPS_H;
+	const uint  primary_steps_zenith  = CLOUDS_CUMULUS_PRIMARY_STEPS_Z;
+	const uint  lighting_steps        = CLOUDS_CUMULUS_LIGHTING_STEPS;
+	const uint  ambient_steps         = CLOUDS_CUMULUS_AMBIENT_STEPS;
 	const float max_ray_length        = 2e4;
 	const float min_transmittance     = 0.075;
 	const float planet_albedo         = 0.4;
 	const vec3  sky_dir               = vec3(0.0, 1.0, 0.0);
 
-	uint primary_steps = uint(mix(primary_steps_horizon, primary_steps_zenith, dampen(abs(ray_dir.y))));
+	uint primary_steps = uint(mix(primary_steps_horizon, primary_steps_zenith, abs(ray_dir.y)));
 
-	vec3 ray_origin = air_viewer_pos + vec3(0.0, eyeAltitude, 0.0);
+	vec3 air_viewer_pos = vec3(0.0, planet_radius + eyeAltitude, 0.0);
 
-	vec2 dists = intersect_spherical_shell(ray_origin, ray_dir, clouds_radius_cu, clouds_radius_cu + clouds_thickness_cu);
-	bool planet_intersected = intersect_sphere(ray_origin, ray_dir, min(length(ray_origin) - 10.0, planet_radius)).y >= 0.0;
+	vec2 dists = intersect_spherical_shell(air_viewer_pos, ray_dir, clouds_radius_cu, clouds_radius_cu + clouds_thickness_cu);
+	bool planet_intersected = intersect_sphere(air_viewer_pos, ray_dir, min(length(air_viewer_pos) - 10.0, planet_radius)).y >= 0.0;
 
 	if (dists.y < 0.0
-	 || planet_intersected && length(ray_origin) < clouds_radius_cu
+	 || planet_intersected && length(air_viewer_pos) < clouds_radius_cu
 	) { return vec4(0.0, 0.0, 0.0, 1.0); }
 
 	float ray_length = min(dists.y - dists.x, max_ray_length);
@@ -203,7 +208,7 @@ vec4 draw_clouds_cu(vec3 ray_dir, vec3 clear_sky, float dither) {
 
 	vec3 ray_step = ray_dir * step_length;
 
-	ray_origin += ray_dir * (dists.x + step_length * dither);
+	vec3 ray_origin = air_viewer_pos + ray_dir * (dists.x + step_length * dither);
 
 	vec2 scattering = vec2(0.0); // x: direct light, y: skylight
 	float transmittance = 1.0;

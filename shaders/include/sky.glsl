@@ -115,7 +115,7 @@ vec3 draw_sky(vec3 ray_dir, vec4 clouds) {
 
 	// Sky gradient
 
-	sky *= atmosphere_transmittance(air_viewer_pos, ray_dir);
+	sky *= atmosphere_transmittance(ray_dir.y, planet_radius);
 	sky += sun_color * atmosphere_scattering(ray_dir, sun_dir);
 	sky += moon_color * atmosphere_scattering(ray_dir, moon_dir);
 

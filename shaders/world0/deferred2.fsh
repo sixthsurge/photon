@@ -3,7 +3,7 @@
 /*
 --------------------------------------------------------------------------------
 
-  Photon Shaders by SixthSurge
+  Photon Shader by SixthSurge
 
   world0/deferred2.fsh:
   Calculate ambient occlusion and
@@ -198,42 +198,45 @@ vec4 upscale_clouds() {
 	const int checkerboard_area = CLOUDS_TEMPORAL_UPSCALING * CLOUDS_TEMPORAL_UPSCALING;
 
 	ivec2 dst_texel = ivec2(gl_FragCoord.xy);
-	ivec2 src_texel = dst_texel / CLOUDS_TEMPORAL_UPSCALING;
+	ivec2 src_texel = clamp(dst_texel / CLOUDS_TEMPORAL_UPSCALING, ivec2(0), ivec2(view_res) / CLOUDS_TEMPORAL_UPSCALING - 1);
 
 	vec2 previous_uv = reproject(vec3(uv, 1.0)).xy;
 
 	vec4 current = texelFetch(colortex5, src_texel, 0);
-	vec4 history = texture(colortex7, previous_uv);
+	vec4 history = smooth_filter(colortex7, previous_uv);
 
 	float history_depth = min_of(textureGather(colortex6, previous_uv * gtao_render_scale, 2));
 
 	bool disocclusion = clamp01(previous_uv) != previous_uv;
 	     disocclusion = disocclusion || world_age_changed;
 		 disocclusion = disocclusion || history_depth > eps;
-	     disocclusion = disocclusion || length(cameraPosition - previousCameraPosition) > 100.0;
 
 	if (disocclusion) history = current;
 
 	float pixel_age = texture(colortex6, previous_uv).w * float(!disocclusion);
+
+	// Reduce history weight when player is moving quickly
+	float movement_rejection = exp(-16.0 * length(cameraPosition - previousCameraPosition));
+	pixel_age *= movement_rejection * 0.13 + 0.87;
+
 	float history_weight = 1.0 - rcp(max(pixel_age - checkerboard_area, 1.0));
 
-	// Soft history sample by jittering the sample position
-	previous_uv += (1.0 - history_weight) * 0.6 * taa_offset;
-	vec4 history_soft = texture(colortex7, previous_uv);
+	// Soft history sample using bicubic resampling
+	vec4 history_soft = bicubic_filter(colortex7, previous_uv);
+	     history_soft = mix(history_soft, history, history_weight * 0.4 + 0.6);
 
 	// Checkerboard upscaling
 	ivec2 offset_0 = dst_texel % CLOUDS_TEMPORAL_UPSCALING;
 	ivec2 offset_1 = checkerboard_offsets[frameCounter % checkerboard_area];
 	if (offset_0 != offset_1 && !disocclusion) current = history_soft;
 
-	// Offcenter rejection (reduces blur when looking around)
+	// Offcenter rejection
 	vec2 pixel_center_offset = 1.0 - abs(fract(previous_uv * view_res) * 2.0 - 1.0);
 	float offcenter_rejection = sqrt(pixel_center_offset.x * pixel_center_offset.y);
 	history_weight *= offcenter_rejection;
 
 	// Store pixel age for next frame
-	pixel_age += offcenter_rejection;
-	ao.w = min(pixel_age, CLOUDS_ACCUMULATION_LIMIT);
+	ao.w = min(++pixel_age, CLOUDS_ACCUMULATION_LIMIT);
 
 	return mix(current, history, history_weight);
 }

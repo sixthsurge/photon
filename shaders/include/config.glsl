@@ -79,11 +79,17 @@ const float sunPathRotation         = -35.0; // [-40.0 -39.0 -38.0 -37.0 -36.0 -
 
   #define CLOUDS_TEMPORAL_UPSCALING 4 // [1 2 3 4]
 
+  #define CLOUDS_CUMULUS_PRIMARY_STEPS_H 40
+  #define CLOUDS_CUMULUS_PRIMARY_STEPS_Z 20
+  #define CLOUDS_CUMULUS_LIGHTING_STEPS 6
+  #define CLOUDS_CUMULUS_AMBIENT_STEPS 2
   #define CLOUDS_CUMULUS_ALTITUDE 1200.0
-  #define CLOUDS_CUMULUS_THICKNESS 1.0
+  #define CLOUDS_CUMULUS_THICKNESS 1.00
   #define CLOUDS_CUMULUS_DENSITY 1.00
   #define CLOUDS_CUMULUS_COVERAGE 1.00
   #define CLOUDS_CUMULUS_SIZE 1.00
+  #define CLOUDS_CUMULUS_WIND_SPEED 5.0 // [0.0 1.0 2.0 3.0 4.0 5.0 6.0 7.0 8.0 9.0 10.0 11.0 12.0 13.0 14.0 15.0 16.0 17.0 18.0 19.0 20.0 21.0 22.0 23.0 24.0 25.0 26.0 27.0 28.0 29.0 30.0 31.0 32.0 33.0 34.0 35.0 36.0 37.0 38.0 39.0 40.0 41.0 42.0 43.0 44.0 45.0 46.0 47.0 48.0 49.0 50.0 51.0 52.0 53.0 54.0 55.0 56.0 57.0 58.0 59.0 60.0 61.0 62.0 63.0 64.0 65.0 66.0 67.0 68.0 69.0 70.0 71.0 72.0 73.0 74.0 75.0 76.0 77.0 78.0 79.0 80.0 81.0 82.0 83.0 84.0 85.0 86.0 87.0 88.0 89.0 90.0 91.0 92.0 93.0 94.0 95.0 96.0 97.0 98.0 99.0 100.0]
+  #define CLOUDS_CUMULUS_WIND_ANGLE 30.0 // [0.0 10.0 20.0 30.0 40.0 50.0 60.0 70.0 80.0 90.0 100.0 110.0 120.0 130.0 140.0 150.0 160.0 170.0 180.0 190.0 200.0 210.0 220.0 230.0 240.0 250.0 260.0 270.0 280.0 290.0 300.0 310.0 320.0 330.0 340.0 350.0]
 
 // Sun and Moon
 
@@ -108,7 +114,7 @@ const float sunPathRotation         = -35.0; // [-40.0 -39.0 -38.0 -37.0 -36.0 -
   #define AIR_FOG_CLOUDY_NOISE                    // Subtle cloudy shapes in the fog, best visible in the morning. Requires volumetric fog!
 //#define AIR_FOG_COLORED_LIGHT_SHAFTS            // Light shafts passing through translucent objects are tinted by their color
   #define AIR_FOG_RAYLEIGH_FALLOFF_START     30.0 // Altitude above sea level at which the rayleigh fog begins to decrease
-  #define AIR_FOG_RAYLEIGH_FALLOFF_HALF_LIFE 15.0 // Altitude above the Rayleigh Falloff Start where the rayleigh fog density is halved
+  #define AIR_FOG_RAYLEIGH_FALLOFF_HALF_LIFE 30.0 // Altitude above the Rayleigh Falloff Start where the rayleigh fog density is halved
   #define AIR_FOG_MIE_FALLOFF_START          5.0  // Altitude above sea level at which the mie fog begins to decrease
   #define AIR_FOG_MIE_FALLOFF_HALF_LIFE      5.0  // Altitude above the Mie Falloff Start where the mie fog density is halved
 

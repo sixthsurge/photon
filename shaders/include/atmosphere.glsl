@@ -13,8 +13,6 @@
 #define cone_angle_to_solid_angle(theta) (tau * (1.0 - cos(theta)))
 #define solid_angle_to_cone_angle(theta) acos(1.0 - (theta) / tau)
 
-const vec3 air_viewer_pos = vec3(0.0, 6371e3, 0.0); // Position of the viewer in planet-space
-
 const vec3 sunlight_color = vec3(1.051, 0.985, 0.940); // Color of sunlight in space, obtained from AM0 solar irradiance spectrum from https://www.nrel.gov/grid/solar-resource/spectra-astm-e490.html using the CIE (2006) 2-deg LMS cone fundamentals
 
 const float sun_angular_radius  = SUN_ANGULAR_RADIUS * degree;

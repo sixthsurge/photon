@@ -1,7 +1,7 @@
 /*
 --------------------------------------------------------------------------------
 
-  Photon Shaders by SixthSurge
+  Photon Shader by SixthSurge
 
   program/post/temporal.fsh:
   Perform TAA, store auto exposure value for later
@@ -67,7 +67,7 @@ uniform vec2 taa_offset;
 /*
 (needed by vertex stage for auto exposure)
 const bool colortex0MipmapEnabled = true;
-*/
+ */
 
 vec3 min_of(vec3 a, vec3 b, vec3 c, vec3 d, vec3 f) {
     return min(a, min(b, min(c, min(d, f))));

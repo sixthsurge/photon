@@ -3,7 +3,7 @@
 /*
 --------------------------------------------------------------------------------
 
-  Photon Shaders by SixthSurge
+  Photon Shader by SixthSurge
 
   world0/deferred3.fsh:
   Shade terrain and entities, draw sky
@@ -104,6 +104,10 @@ uniform float time_midnight;
 #include "/include/sky.glsl"
 #include "/include/specular_lighting.glsl"
 
+/*
+const bool colortex7MipmapEnabled = true;
+ */
+
 void main() {
 	ivec2 texel = ivec2(gl_FragCoord.xy);
 
@@ -115,7 +119,6 @@ void main() {
 	vec4 gbuffer_data_1 = texelFetch(colortex2, texel, 0);
 #endif
 	vec4 overlays       = texelFetch(colortex3, texel, 0);
-	vec4 clouds         = texelFetch(colortex7, texel, 0);
 
 	// Transformations
 
@@ -127,6 +130,15 @@ void main() {
 	vec3 world_dir = normalize(scene_pos - gbufferModelViewInverse[3].xyz);
 
 	if (is_sky(depth)) { // Sky
+		float pixel_age = texelFetch(colortex6, texel, 0).w;
+
+		// Soften clouds for new pixels
+		int lod = int(max0(3.0 - 0.5 * pixel_age));
+		vec4 clouds_soft = bicubic_filter_lod(colortex7, uv, lod);
+
+		vec4 clouds = texelFetch(colortex7, texel, 0);
+		     clouds = mix(clouds_soft, clouds, smoothstep(0.0, 7.0, pixel_age));
+
 		scene_color = draw_sky(world_dir, clouds);
 	} else { // Terrain
 		// Sample half-res lighting data many operations before using it (latency hiding)

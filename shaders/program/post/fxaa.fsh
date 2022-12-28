@@ -1,7 +1,7 @@
 /*
 --------------------------------------------------------------------------------
 
-  Photon Shaders by SixthSurge
+  Photon Shader by SixthSurge
 
   program/post/fxaa.fsh
   FXAA v3.11 from http://blog.simonrodriguez.fr/articles/2016/07/implementing_fxaa.html

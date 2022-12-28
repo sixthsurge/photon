@@ -3,7 +3,7 @@
 /*
 --------------------------------------------------------------------------------
 
-  Photon Shaders by SixthSurge
+  Photon Shader by SixthSurge
 
   world0/deferred1.fsh:
   Render clouds
@@ -22,6 +22,11 @@ flat in vec3 base_light_color;
 flat in vec3 sky_color;
 flat in vec3 sun_color;
 flat in vec3 moon_color;
+
+flat in vec2 clouds_coverage_cu;
+flat in vec2 clouds_coverage_ac;
+flat in vec2 clouds_coverage_cc;
+flat in vec2 clouds_coverage_ci;
 
 uniform sampler2D depthtex1;
 
@@ -59,6 +64,7 @@ uniform float frameTimeCounter;
 
 uniform int isEyeInWater;
 uniform float eyeAltitude;
+uniform float rainStrength;
 
 uniform vec3 sun_dir;
 uniform vec3 moon_dir;
@@ -67,15 +73,11 @@ uniform vec2 view_res;
 uniform vec2 view_pixel_size;
 uniform vec2 taa_offset;
 
+uniform float world_age;
+
 uniform float biome_cave;
 
-uniform vec2 clouds_offset;
 uniform vec3 clouds_light_dir;
-
-uniform vec2 clouds_coverage_cu;
-uniform vec2 clouds_coverage_ac;
-uniform vec2 clouds_coverage_cc;
-uniform vec2 clouds_coverage_ci;
 
 #define ATMOSPHERE_SCATTERING_LUT depthtex0
 
@@ -123,8 +125,8 @@ void main() {
 	vec3 view_pos = screen_to_view_space(vec3(new_uv, 1.0), false);
 	vec3 ray_dir = mat3(gbufferModelViewInverse) * normalize(view_pos);
 
-	vec3 clear_sky = atmosphere_scattering(ray_dir, sun_dir) * sun_color
-	               + atmosphere_scattering(ray_dir, moon_dir) * moon_color;
+	vec3 clear_sky = atmosphere_scattering_border_fog(ray_dir, sun_dir) * sun_color
+	               + atmosphere_scattering_border_fog(ray_dir, moon_dir) * moon_color;
 
 	float dither = texelFetch(noisetex, ivec2(checkerboard_pos & 511), 0).b;
 	      dither = r1(frameCounter / checkerboard_area, dither);

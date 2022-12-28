@@ -5,6 +5,20 @@
 
 // clouds
 
+void clouds_coverage_variation(
+	uint clouds_day,
+	out vec2 clouds_coverage_cu,
+	out vec2 clouds_coverage_ac,
+	out vec2 clouds_coverage_cc,
+	out vec2 clouds_coverage_ci
+) {
+	switch (clouds_day) {
+	case 0u:
+		clouds_coverage_cu = vec2(0.44, 0.48);
+		break;
+	}
+}
+
 // air fog
 
 mat2x3 air_fog_rayleigh_coeff() {
