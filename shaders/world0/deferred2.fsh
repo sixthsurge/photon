@@ -204,6 +204,7 @@ vec4 upscale_clouds() {
 
 	vec4 current = texelFetch(colortex5, src_texel, 0);
 	vec4 history = smooth_filter(colortex7, previous_uv);
+	     history = max0(history);
 
 	float history_depth = min_of(textureGather(colortex6, previous_uv * gtao_render_scale, 2));
 
