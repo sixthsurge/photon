@@ -80,6 +80,7 @@ uniform float biome_cave;
 uniform vec3 clouds_light_dir;
 
 #define ATMOSPHERE_SCATTERING_LUT depthtex0
+#define MIE_PHASE_CLAMP
 
 #include "/include/utility/checkerboard.glsl"
 #include "/include/utility/random.glsl"
@@ -116,7 +117,7 @@ void main() {
 	ivec2 texel = ivec2(gl_FragCoord.xy);
 	ivec2 checkerboard_pos = CLOUDS_TEMPORAL_UPSCALING * texel + checkerboard_offsets[frameCounter % checkerboard_area];
 
-	vec2 new_uv = vec2(checkerboard_pos) / vec2(view_res);
+	vec2 new_uv = vec2(checkerboard_pos) / vec2(view_res) * rcp(float(taau_render_scale));
 
 	// Skip rendering clouds if they are occluded by terrain
 	float depth_max = depth_max_4x4(depthtex1);
@@ -125,8 +126,8 @@ void main() {
 	vec3 view_pos = screen_to_view_space(vec3(new_uv, 1.0), false);
 	vec3 ray_dir = mat3(gbufferModelViewInverse) * normalize(view_pos);
 
-	vec3 clear_sky = atmosphere_scattering_border_fog(ray_dir, sun_dir) * sun_color
-	               + atmosphere_scattering_border_fog(ray_dir, moon_dir) * moon_color;
+	vec3 clear_sky = atmosphere_scattering(ray_dir, sun_dir) * sun_color
+	               + atmosphere_scattering(ray_dir, moon_dir) * moon_color;
 
 	float dither = texelFetch(noisetex, ivec2(checkerboard_pos & 511), 0).b;
 	      dither = r1(frameCounter / checkerboard_area, dither);

@@ -25,8 +25,8 @@ const vec3 normal = vec3(0.0, 1.0, 0.0);
 
 void main() {
 #if defined TAA && defined TAAU
-	vec2 uv = gl_FragCoord.xy * view_pixel_size * rcp(taau_render_scale);
-	if (clamp01(uv) != uv) discard;
+	vec2 coord = gl_FragCoord.xy * view_pixel_size * rcp(taau_render_scale);
+	if (clamp01(coord) != coord) discard;
 #endif
 
 	gbuffer_data.x = pack_unorm_2x8(tint.rg);

@@ -57,10 +57,10 @@ uniform float time_midnight;
 void main() {
 	uv = gl_MultiTexCoord0.xy;
 
+	light_color = get_light_color();
+
 	sun_color = get_sunlight_scale() * get_sunlight_tint();
 	moon_color = get_moonlight_scale() * get_moonlight_tint();
-
-	light_color = get_light_color();
 
 	float skylight_boost = get_skylight_boost();
 
@@ -86,12 +86,12 @@ void main() {
 	vec3 dir1 = normalize(vec3(sun_dir.xz + 0.1, 0.066).xzy);  // Sun-facing horizon
 	vec3 dir2 = normalize(vec3(moon_dir.xz + 0.1, 0.066).xzy); // Opposite horizon
 
-	sky_samples[0] = sun_color * atmosphere_scattering(dir0, sun_dir)
-	             + moon_color * atmosphere_scattering(dir0, moon_dir);
-	sky_samples[1] = sun_color * atmosphere_scattering(dir1, sun_dir)
-	             + moon_color * atmosphere_scattering(dir1, moon_dir);
-	sky_samples[2] = sun_color * atmosphere_scattering(dir2, sun_dir)
-	             + moon_color * atmosphere_scattering(dir2, moon_dir);
+	sky_samples[0] = sun_color  * atmosphere_scattering(dir0, sun_dir)
+	               + moon_color * atmosphere_scattering(dir0, moon_dir);
+	sky_samples[1] = sun_color  * atmosphere_scattering(dir1, sun_dir)
+	               + moon_color * atmosphere_scattering(dir1, moon_dir);
+	sky_samples[2] = sun_color  * atmosphere_scattering(dir2, sun_dir)
+	               + moon_color * atmosphere_scattering(dir2, moon_dir);
 
 	sky_samples[0] *= skylight_boost;
 	sky_samples[1] *= skylight_boost;

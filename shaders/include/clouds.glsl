@@ -65,53 +65,61 @@ vec3 clouds_aerial_perspective(
 
 const float clouds_radius_cu     = planet_radius + CLOUDS_CUMULUS_ALTITUDE;
 const float clouds_thickness_cu  = CLOUDS_CUMULUS_ALTITUDE * CLOUDS_CUMULUS_THICKNESS;
-float clouds_extinction_coeff_cu = mix(0.05, 0.1, smoothstep(0.0, 0.33, abs(sun_dir.y)));
+const float clouds_top_radius_cu = clouds_radius_cu + clouds_thickness_cu;
+float clouds_extinction_coeff_cu = mix(0.05, 0.1, smoothstep(0.0, 0.3, abs(sun_dir.y)));
 float clouds_scattering_coeff_cu = clouds_extinction_coeff_cu * mix(1.00, 0.66, rainStrength);
+
+// altitude_fraction := 0 at the bottom of the cloud layer and 1 at the top
+float altitude_shaping_cu(float density, float altitude_fraction) {
+	// Carve egg shape
+	density -= smoothstep(0.2, 1.0, altitude_fraction) * 0.6;
+
+	// Reduce density at the bottom of the cloud
+	density *= smoothstep(0.0, 0.2, altitude_fraction);
+
+	return density;
+}
 
 float clouds_density_cu(vec3 pos) {
 	const float wind_angle = CLOUDS_CUMULUS_WIND_ANGLE * degree;
 	const vec2 wind_velocity = CLOUDS_CUMULUS_WIND_SPEED * vec2(cos(wind_angle), sin(wind_angle));
 
-	float altitude_fraction = (length(pos) - clouds_radius_cu) * rcp(clouds_thickness_cu);
-	if (clamp01(altitude_fraction) != altitude_fraction) return 0.0; // outside of cloud volume
+	float r = length(pos);
+	if (r < clouds_radius_cu || r > clouds_top_radius_cu) return 0.0;
+
+	float altitude_fraction = 0.8 * (r - clouds_radius_cu) * rcp(clouds_thickness_cu);
 
 	pos.xz += cameraPosition.xz + wind_velocity * world_age;
 
 	// 2D noise for base shape and coverage
-	vec2 noise;
-	noise.x = texture(noisetex, 0.000002 * pos.xz * rcp(CLOUDS_CUMULUS_SIZE)).r; // cloud coverage
-	noise.y = texture(noisetex, 0.000027 * pos.xz).a; // cloud shape
+	vec2 noise = vec2(
+		texture(noisetex, 0.000002 * pos.xz * rcp(CLOUDS_CUMULUS_SIZE)).x, // cloud coverage
+		texture(noisetex, 0.000027 * pos.xz * rcp(CLOUDS_CUMULUS_SIZE)).w  // cloud shape
+	);
 
-	float density;
-	density = clamp01(mix(clouds_coverage_cu.x, clouds_coverage_cu.y, noise.x));
-	density = linear_step(1.0 - density, 1.0, noise.y);
-
-	// attenuate and erode density over altitude
-	altitude_fraction *= 0.8;
-	const vec4 cloud_gradient = vec4(0.2, 0.2, 0.85, 0.2);
-	density *= smoothstep(0.0, cloud_gradient.x, altitude_fraction);
-	density *= smoothstep(0.0, cloud_gradient.y, 1.0 - altitude_fraction);
-	density -= smoothstep(cloud_gradient.z, 1.0, 1.0 - altitude_fraction) * 0.1;
-	density -= smoothstep(cloud_gradient.w, 1.0, altitude_fraction) * 0.6;
-
-	// curl noise used to warp the 3D noise into swirling shapes
-	vec3 curl = 0.181 * texture(colortex7, 0.002 * pos).xyz * smoothstep(0.4, 1.0, 1.0 - altitude_fraction);
-
-	// 3D worley noise for detail
-	pos.xz += 0.2 * wind_velocity * world_age;
-	float worley_0 = texture(colortex6, pos * 0.001 + curl).x;
-	pos.xz += 0.2 * wind_velocity * world_age;
-	float worley_1 = texture(colortex6, pos * 0.005 + curl * 3.0).x;
-
-	float detail_fade = 0.6 - 0.35 * smoothstep(0.05, 0.5, altitude_fraction);
-
-	density -= 0.33 * sqr(worley_0) * dampen(clamp01(1.0 - density));
-	density -= 0.38 * sqr(worley_1) * dampen(clamp01(1.0 - density)) * detail_fade;
+	float density = mix(clouds_coverage_cu.x, clouds_coverage_cu.y, noise.x);
+	      density = linear_step(1.0 - density, 1.0, noise.y);
+	      density = altitude_shaping_cu(density, altitude_fraction);
 
 	if (density < eps) return 0.0;
 
-	// adjust density so that the clouds are wispy at the bottom and hard at the top
-	density  = 1.0 - pow(1.0 - density, 3.0 + 5.0 * altitude_fraction);
+	// Curl noise used to warp the 3D noise into swirling shapes
+	vec3 curl = 0.181 * texture(colortex7, 0.002 * pos).xyz * smoothstep(0.4, 1.0, 1.0 - altitude_fraction);
+	vec3 wind = vec3(wind_velocity * world_age, 0.0).xzy;
+
+	// 3D worley noise for detail
+	float worley_0 = texture(colortex6, (pos + 0.2 * wind) * 0.001 + curl * 1.0).x;
+	float worley_1 = texture(colortex6, (pos + 0.4 * wind) * 0.005 + curl * 3.0).x;
+
+	float detail_fade = 0.20 * smoothstep(0.85, 1.0, 1.0 - altitude_fraction)
+	                  - 0.35 * smoothstep(0.05, 0.5, altitude_fraction) + 0.6;
+
+	density -= 0.33 * sqr(worley_0) * dampen(clamp01(1.0 - density));
+	density -= 0.40 * sqr(worley_1) * dampen(clamp01(1.0 - density)) * detail_fade;
+
+	// Adjust density so that the clouds are wispy at the bottom and hard at the top
+	density  = max0(density);
+	density  = 1.0 - pow(1.0 - density, mix(3.0, 8.0, altitude_fraction));
 	density *= 0.1 + 0.9 * smoothstep(0.2, 0.7, altitude_fraction);
 
 	return density;
@@ -154,7 +162,7 @@ vec2 clouds_scattering_cu(
 	float scatter_amount = clouds_scattering_coeff_cu;
 	float extinct_amount = clouds_extinction_coeff_cu;
 
-	float scattering_integral = (1.0 - step_transmittance) / clouds_extinction_coeff_cu;
+	float scattering_integral_times_density = (1.0 - step_transmittance) / clouds_extinction_coeff_cu;
 
 	float powder_effect = clouds_powder_effect(density, cos_theta);
 
@@ -175,7 +183,7 @@ vec2 clouds_scattering_cu(
 		phase = clouds_phase_multi(cos_theta, phase_g);
 	}
 
-	return scattering * scattering_integral;
+	return scattering * scattering_integral_times_density;
 }
 
 vec4 draw_clouds_cu(vec3 ray_dir, vec3 clear_sky, float dither) {
@@ -196,7 +204,7 @@ vec4 draw_clouds_cu(vec3 ray_dir, vec3 clear_sky, float dither) {
 
 	vec3 air_viewer_pos = vec3(0.0, planet_radius + eyeAltitude, 0.0);
 
-	vec2 dists = intersect_spherical_shell(air_viewer_pos, ray_dir, clouds_radius_cu, clouds_radius_cu + clouds_thickness_cu);
+	vec2 dists = intersect_spherical_shell(air_viewer_pos, ray_dir, clouds_radius_cu, clouds_top_radius_cu);
 	bool planet_intersected = intersect_sphere(air_viewer_pos, ray_dir, min(length(air_viewer_pos) - 10.0, planet_radius)).y >= 0.0;
 
 	if (dists.y < 0.0
@@ -236,7 +244,7 @@ vec4 draw_clouds_cu(vec3 ray_dir, vec3 clear_sky, float dither) {
 
 		// fade away in the distance to hide the cutoff
 		float distance_to_sample = distance(ray_origin, ray_pos);
-		float distance_fade = smoothstep(0.95, 1.0, (distance_to_sample - dists.x) * rcp(max_ray_length));
+		float distance_fade = smoothstep(0.95, 1.0, distance_to_sample * rcp(max_ray_length));
 
 		density *= 1.0 - distance_fade;
 

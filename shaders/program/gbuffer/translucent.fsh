@@ -72,26 +72,40 @@ void decode_normal_map(vec3 normal_map, out vec3 normal, out float ao) {
 
 void main() {
 #if defined TAA && defined TAAU
-	vec2 uv = gl_FragCoord.xy * view_pixel_size * rcp(taau_render_scale);
-	if (clamp01(uv) != uv) discard;
+	vec2 coord = gl_FragCoord.xy * view_pixel_size * rcp(taau_render_scale);
+	if (clamp01(coord) != coord) discard;
 #endif
 
-	base_color         = texture(gtexture, uv, lod_bias) * tint;
+	bool is_water = object_id == 1;
+	if (is_water) { // Water
+		base_color = vec4(0.0);
+	} else {
+		base_color        = texture(gtexture, uv, lod_bias) * tint;
 #ifdef NORMAL_MAPPING
-	vec3 normal_map   = texture(normals, uv, lod_bias).xyz;
+		vec3 normal_map   = texture(normals, uv, lod_bias).xyz;
 #endif
 #ifdef SPECULAR_MAPPING
-	vec4 specular_map = texture(specular, uv, lod_bias);
+		vec4 specular_map = texture(specular, uv, lod_bias);
 #endif
 
-	if (base_color.a < 0.1) discard;
+		if (base_color.a < 0.1) discard;
 
 #ifdef NORMAL_MAPPING
-	vec3 normal; float ao;
-	decode_normal_map(normal_map, normal, ao);
+		vec3 normal; float ao;
+		decode_normal_map(normal_map, normal, ao);
 
-	normal = tbn * normal;
+		normal = tbn * normal;
 #endif
+
+#ifdef NORMAL_MAPPING
+		gbuffer_data_1.xy = encode_unit_vector(normal);
+#endif
+
+#ifdef SPECULAR_MAPPING
+		gbuffer_data_1.z  = pack_unorm_2x8(specular_map.xy);
+		gbuffer_data_1.w  = pack_unorm_2x8(specular_map.zw);
+#endif
+	}
 
 	float dither = interleaved_gradient_noise(gl_FragCoord.xy, frameCounter);
 
@@ -99,15 +113,6 @@ void main() {
 	gbuffer_data_0.y  = pack_unorm_2x8(base_color.b, float(object_id) * rcp(255.0));
 	gbuffer_data_0.z  = pack_unorm_2x8(encode_unit_vector(tbn[2]));
 	gbuffer_data_0.w  = pack_unorm_2x8(dither_8bit(light_access, dither));
-
-#ifdef NORMAL_MAPPING
-	gbuffer_data_1.xy = encode_unit_vector(normal);
-#endif
-
-#ifdef SPECULAR_MAPPING
-	gbuffer_data_1.z  = pack_unorm_2x8(specular_map.xy);
-	gbuffer_data_1.w  = pack_unorm_2x8(specular_map.zw);
-#endif
 
 #ifdef PROGRAM_TEXTURED
 	// Kill the little rain splash particles

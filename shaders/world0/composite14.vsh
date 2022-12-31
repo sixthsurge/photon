@@ -1,2 +1,2 @@
 #version 400 compatibility
-#include "/program/fullscreen_quad.vsh"
+#include "/program/vertex_simple.vsh"

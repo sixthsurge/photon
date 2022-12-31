@@ -6,7 +6,7 @@
   Photon Shader by SixthSurge
 
   world0/composite1.fsh:
-  Shade translucent layer, apply specular and fog
+  Shade translucent layer, apply SSR and VL
 
 --------------------------------------------------------------------------------
 */
@@ -20,15 +20,21 @@ layout (location = 1) out float bloomy_fog;
 in vec2 uv;
 
 flat in vec3 light_color;
+flat in vec3 sun_color;
+flat in vec3 moon_color;
+flat in vec3 water_fog_color;
 flat in mat3 sky_samples;
+
+uniform sampler2D noisetex;
 
 uniform sampler2D colortex0; // Scene color
 uniform sampler2D colortex1; // Gbuffer 0
 uniform sampler2D colortex2; // Gbuffer 1
 uniform sampler2D colortex3; // Blended color
 uniform sampler2D colortex4; // Sky capture
-uniform sampler2D colortex5; // Volumetric fog scattering
-uniform sampler2D colortex6; // Volumetric fog transmittance
+uniform sampler2D colortex5; // Scene history
+uniform sampler2D colortex6; // Volumetric fog scattering
+uniform sampler2D colortex7; // Volumetric fog transmittance
 
 uniform sampler2D depthtex0;
 uniform sampler2D depthtex1;
@@ -57,6 +63,7 @@ uniform vec3 previousCameraPosition;
 uniform float near;
 uniform float far;
 
+uniform float frameTimeCounter;
 uniform float sunAngle;
 
 uniform int worldTime;
@@ -84,6 +91,7 @@ uniform float time_sunset;
 uniform float time_midnight;
 
 #define PROGRAM_COMPOSITE1
+#define TEMPORAL_REPROJECTION
 #define WORLD_OVERWORLD
 
 #ifdef SHADOW_COLOR
@@ -104,8 +112,13 @@ uniform float time_midnight;
 #include "/include/material.glsl"
 #include "/include/shadow_mapping.glsl"
 #include "/include/specular_lighting.glsl"
+#include "/include/water_fog.glsl"
 
-// from https://iquilezles.org/www/articles/texture/texture.htm
+/*
+const bool colortex5MipmapEnabled = true;
+ */
+
+// https://iquilezles.org/www/articles/texture/texture.htm
 vec4 smooth_filter(sampler2D sampler, vec2 coord) {
 	vec2 res = vec2(textureSize(sampler, 0));
 
@@ -119,9 +132,9 @@ vec4 smooth_filter(sampler2D sampler, vec2 coord) {
 	return texture(sampler, coord);
 }
 
-// from http://www.diva-portal.org/smash/get/diva2:24136/FULLTEXT01.pdf
+// http://www.diva-portal.org/smash/get/diva2:24136/FULLTEXT01.pdf
 vec3 purkinje_shift(vec3 rgb, float purkinje_intensity) {
-	const vec3 purkinje_tint = vec3(0.5, 0.7, 1.0) * rec709_to_rec2020;
+	const vec3 purkinje_tint = vec3(0.57, 0.71, 1.0);
 	const vec3 rod_response = vec3(7.15e-5, 4.81e-1, 3.28e-1) * rec709_to_rec2020;
 
 	if (purkinje_intensity == 0.0) return rgb;
@@ -142,24 +155,22 @@ void main() {
 
 	// Texture fetches
 
-	float depth0    = texelFetch(depthtex0, texel, 0).x;
-	float depth1    = texelFetch(depthtex1, texel, 0).x;
-
-	scene_color       = texelFetch(colortex0, texel, 0).rgb;
-	vec4 gbuffer_data_0   = texelFetch(colortex1, texel, 0);
+	float depth0        = texelFetch(depthtex0, texel, 0).x;
+	float depth1        = texelFetch(depthtex1, texel, 0).x;
+	vec4 gbuffer_data_0 = texelFetch(colortex1, texel, 0);
 #if defined NORMAL_MAPPING || defined SPECULAR_MAPPING
-	vec4 gbuffer_data_1   = texelFetch(colortex2, texel, 0);
+	vec4 gbuffer_data_1 = texelFetch(colortex2, texel, 0);
 #endif
-	vec4 blend_color = texelFetch(colortex3, texel, 0);
+	vec4 blend_color    = texelFetch(colortex3, texel, 0);
 
 	vec2 fog_uv = clamp(uv * VL_RENDER_SCALE, vec2(0.0), floor(view_res * VL_RENDER_SCALE - 1.0) * view_pixel_size);
 
-	vec3 fog_scattering    = smooth_filter(colortex5, fog_uv).rgb;
-	vec3 fog_transmittance = smooth_filter(colortex6, fog_uv).rgb;
+	vec3 fog_scattering    = smooth_filter(colortex6, fog_uv).rgb;
+	vec3 fog_transmittance = smooth_filter(colortex7, fog_uv).rgb;
 
 	// Transformations
 
-	depth0 += 0.38 * float(is_hand(depth0)); // Hand lighting fix from Capt Tatsu
+	depth0 += 0.38 * float(depth0 < hand_depth); // Hand lighting fix from Capt Tatsu
 
 	vec3 screen_pos = vec3(uv, depth0);
 	vec3 view_pos   = screen_to_view_space(screen_pos, true);
@@ -169,9 +180,9 @@ void main() {
 	vec3 world_dir; float view_dist;
 	length_normalize(scene_pos - gbufferModelViewInverse[3].xyz, world_dir, view_dist);
 
-	vec3 view_back_pos = screen_to_view_space(vec3(uv, depth1), true);
-
 	// Unpack gbuffer data
+
+	bool is_translucent = depth0 != depth1;
 
 	mat4x2 data = mat4x2(
 		unpack_unorm_2x8(gbuffer_data_0.x),
@@ -180,40 +191,85 @@ void main() {
 		unpack_unorm_2x8(gbuffer_data_0.w)
 	);
 
-	vec3 albedo       = vec3(data[0], data[1].x);
+	vec3 albedo       = is_translucent ? blend_color.rgb : vec3(data[0], data[1].x);
 	uint object_id    = uint(255.0 * data[1].y);
 	vec3 flat_normal  = decode_unit_vector(data[2]);
 	vec2 light_access = data[3];
 
 	Material material;
+	vec3 normal = flat_normal;
 
-	// Shade translucent layer
+	mat3 tbn = get_tbn_matrix(flat_normal);
 
-	bool is_translucent = depth0 != depth1;
+	// Get material
+
 	bool is_water = object_id == 1;
 	bool is_rain_particle = object_id == 253;
 	bool is_snow_particle = object_id == 254;
 
-	if (is_translucent) {
-		material = material_from(blend_color.rgb, object_id, world_pos, light_access);
+	if (is_water) {
+		material.albedo             = srgb_eotf_inv(albedo) * rec709_to_rec2020;
+		material.emission           = vec3(0.0);
+		material.f0                 = vec3(0.02);
+		material.roughness          = 0.002;
+		material.sss_amount         = 1.0;
+		material.sheen_amount       = 0.0;
+		material.porosity           = 0.0;
+		material.is_metal           = false;
+		material.is_hardcoded_metal = false;
+		material.has_reflections    = true;
+	} else {
+		material = material_from(albedo, object_id, world_pos, light_access);
 
 #ifdef NORMAL_MAPPING
-		vec3 normal = decode_unit_vector(gbuffer_data_1.xy);
-#else
-		#define normal flat_normal
+		normal = decode_unit_vector(gbuffer_data_1.xy);
 #endif
 
 #ifdef SPECULAR_MAPPING
 		vec4 specular_map = vec4(unpack_unorm_2x8(gbuffer_data_1.z), unpack_unorm_2x8(gbuffer_data_1.w));
-		decode_specular_map(specular_map, material);
+
+#if defined POM && defined POM_SHADOW
+		// Specular map alpha > 0.5 => inside parallax shadow
+		bool parallax_shadow = specular_map.a > 0.5;
+		specular_map.a -= 0.5 * float(parallax_shadow);
+		specular_map.a *= 2.0;
 #endif
 
-		float NoL = dot(normal, light_dir);
-		float NoV = clamp01(dot(normal, -world_dir));
-		float LoV = dot(light_dir, -world_dir);
-		float halfway_norm = inversesqrt(2.0 * LoV + 2.0);
-		float NoH = (NoL + NoV) * halfway_norm;
-		float LoH = LoV * halfway_norm + halfway_norm;
+		decode_specular_map(specular_map, material);
+#endif
+	}
+
+	// Refraction
+
+#if REFRACTION == REFRACTION_OFF
+	scene_color = texelFetch(colortex0, texel, 0).rgb;
+#else
+	vec2 refracted_uv = uv;
+
+#if REFRACTION == REFRACTION_WATER_ONLY
+	if (is_water) {
+#elif REFRACTION == REFRACTION_ALL
+	if (is_translucent) {
+#endif
+		vec3 tangent_normal = normal * tbn;
+		refracted_uv = uv + 0.5 * tangent_normal.xy * rcp(view_dist);
+	}
+
+	scene_color = texture(colortex0, refracted_uv * taau_render_scale).rgb;
+	depth1      = texture(depthtex1, refracted_uv * taau_render_scale).x;
+
+	vec3 view_back_pos = screen_to_view_space(vec3(refracted_uv, depth1), true);
+#endif
+
+	// Shade translucent layer
+
+	if (is_translucent) {
+		float nol = dot(normal, light_dir);
+		float nov = clamp01(dot(normal, -world_dir));
+		float lov = dot(light_dir, -world_dir);
+		float halfway_norm = inversesqrt(2.0 * lov + 2.0);
+		float noh = (nol + nov) * halfway_norm;
+		float loh = lov * halfway_norm + halfway_norm;
 
 		float sss_depth;
 		vec3 shadows = calculate_shadows(scene_pos, flat_normal, light_access.y, material.sss_amount, sss_depth);
@@ -224,32 +280,59 @@ void main() {
 			flat_normal,
 			shadows,
 			light_access,
-			1.0,
+			material.sss_amount,
 			sss_depth,
-			NoL,
-			NoV,
-			NoH,
-			LoV
+			nol,
+			nov,
+			noh,
+			lov
 		);
 
-		translucent_color += get_specular_highlight(material, NoL, NoV, NoH, LoV, LoH) * light_color * shadows;
-
-		apply_fog(translucent_color, scene_pos, world_dir, false);
-
-#ifdef BORDER_FOG
-		// Handle border fog by attenuating the alpha component
-		float border_fog = border_fog(scene_pos, world_dir);
-		blend_color.a *= border_fog;
-#else
-		const float border_fog = 1.0;
-#endif
+		translucent_color += get_specular_highlight(material, nol, nov, noh, lov, loh) * light_color * shadows;
 
 		// Blend with background
-		vec3 tint = material.albedo;
-		float alpha = blend_color.a;
-		scene_color *= (1.0 - alpha) + tint * alpha;
-		scene_color *= 1.0 - alpha;
-		scene_color += translucent_color * border_fog;
+
+		if (is_water) {
+			float dist = (isEyeInWater == 1) ? 0.0 : distance(view_pos, view_back_pos);
+			float lov = dot(world_dir, light_dir);
+			float water_n = isEyeInWater == 1 ? air_n / water_n : water_n / air_n;
+
+			mat2x3 water_fog = get_simple_water_fog(dist, lov, sss_depth, light_access.y);
+
+			scene_color *= water_fog[1];
+			scene_color += water_fog[0];
+			scene_color *= 1.0 - fresnel_dielectric_n(nov, water_n);
+		} else {
+			vec3 tint = material.albedo;
+			float alpha = blend_color.a;
+			scene_color *= (1.0 - alpha) + tint * alpha;
+			scene_color *= 1.0 - alpha;
+		}
+
+		scene_color += translucent_color;
+	}
+
+	// Specular reflections
+
+#ifdef SSR
+	if (material.has_reflections && depth0 < 1.0) {
+		scene_color += get_specular_reflections(
+			material,
+			tbn,
+			screen_pos,
+			view_pos,
+			normal,
+			world_dir,
+			world_dir * tbn,
+			light_access.y
+		);
+	}
+#endif
+
+	// Apply fog to translucents
+
+	if (is_translucent) {
+		apply_fog(scene_color, scene_pos, world_dir, false);
 	}
 
 	// Apply volumetric lighting
@@ -261,9 +344,9 @@ void main() {
 	// Purkinje shift
 
 #ifdef PURKINJE_SHIFT
-	light_access = is_sky(depth0) ? vec2(0.0, 1.0) : light_access;
+	light_access = (depth0 == 1.0) ? vec2(0.0, 1.0) : light_access;
 
-	float purkinje_intensity  = 0.025 * PURKINJE_SHIFT_INTENSITY;
+	float purkinje_intensity  = 0.066 * PURKINJE_SHIFT_INTENSITY;
 	      purkinje_intensity *= 1.0 - smoothstep(-0.12, -0.06, sun_dir.y) * light_access.y;
 		  purkinje_intensity *= 0.1 + 0.9 * light_access.y;
 	      purkinje_intensity *= clamp01(1.0 - light_access.x);
@@ -271,7 +354,7 @@ void main() {
 	scene_color = purkinje_shift(scene_color, purkinje_intensity);
 #endif
 
-	// Calculate bloomy fog
+	// Calculate bloomy fog amount
 
 #ifdef BLOOMY_FOG
 	#ifdef VL

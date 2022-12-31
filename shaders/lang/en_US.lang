@@ -16,6 +16,8 @@ screen.water                           = Water
 screen.post                            = Post-Processing
 screen.misc                            = Misc
 
+screen.rp_settings                     = Resource Pack Settings
+screen.reflections                     = Reflections
 screen.shadows                         = Shadows
 screen.color_grading                   = Color Grading
 screen.exposure                        = Exposure
@@ -150,13 +152,30 @@ option.AIR_FOG_MIE_DENSITY_BLUE_HOUR   = Dawn/Dusk Density
 
 option.NORMAL_MAPPING                  = Normal Mapping
 option.SPECULAR_MAPPING                = Specular Mapping
+option.POM                             = Parallax Occlusion Mapping
 option.TEXTURE_FORMAT                  = Texture Format
 option.HARDCODED_SPECULAR              = Hardcoded Specular
 option.HARDCODED_EMISSION              = Hardcoded Emission
 option.HARDCODED_SSS                   = Hardcoded SSS
+option.RAIN_PUDDLES                    = Rain Puddles
+option.REFRACTION                      = Refraction
+option.EMISSION_STRENGTH               = Emission Strength
+option.POM_DEPTH                       = Parallax Depth
+option.POM_SAMPLES                     = Parallax Samples
+option.POM_SHADOW                      = POM Self-Shadowing
+option.POM_SHADOW_SAMPLES              = POM Self-Shadow Samples
+option.POM_SLOPE_NORMALS               = POM Slope Normals
+option.POM_DISTANCE                    = POM Distance
+
+suffix.POM_DEPTH                       = m
+suffix.POM_DISTANCE                    = m
 
 value.TEXTURE_FORMAT.TEXTURE_FORMAT_LAB = labPBR
 value.TEXTURE_FORMAT.TEXTURE_FORMAT_OLD = Old PBR
+
+value.REFRACTION.REFRACTION_OFF        = §cOff
+value.REFRACTION.REFRACTION_WATER_ONLY = Water Only
+value.REFRACTION.REFRACTION_ALL        = §aAll
 
 # Water settings
 

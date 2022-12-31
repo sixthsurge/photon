@@ -93,15 +93,15 @@ vec3 gain(vec3 x, float k) {
 // Color grading applied before tone mapping
 // rgb := color in acescg [0, inf]
 vec3 grade_input(vec3 rgb) {
-	const float brightness = 1.02 * GRADE_BRIGHTNESS;
+	const float brightness = 1.05 * GRADE_BRIGHTNESS;
 	const float contrast   = 1.05 * GRADE_CONTRAST;
-	const float saturation = 1.00 * GRADE_SATURATION;
+	const float saturation = 1.02 * GRADE_SATURATION;
 
 	// Brightness
 	rgb *= brightness;
 
 	// Contrast
-	const float log_midpoint = 0.18;
+	const float log_midpoint = log2(0.18);
 	rgb = log2(rgb + eps);
 	rgb = contrast * (rgb - log_midpoint) + log_midpoint;
 	rgb = max0(exp2(rgb) - eps);
@@ -213,7 +213,7 @@ vec3 tonemap_lottes(vec3 rgb) {
 vec3 tonemap_hejl_burgess(vec3 rgb) {
 	rgb = rgb * min(vec3(1.0), 1.0 - 0.8 * exp(rcp(-0.004) * rgb));
 	rgb = (rgb * (6.2 * rgb + 0.5)) / (rgb * (6.2 * rgb + 1.7) + 0.06);
-	return srgb_transfer_function_inverse(rgb); // Revert built-in s_r_g_b conversion
+	return srgb_eotf_inv(rgb); // Revert built-in s_r_g_b conversion
 }
 
 // Filmic tonemapping operator made by John Hable for Uncharted 2

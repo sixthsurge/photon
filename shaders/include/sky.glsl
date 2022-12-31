@@ -20,7 +20,7 @@ vec3 draw_sun(vec3 ray_dir) {
 	float center_to_edge = max0(sun_angular_radius - fast_acos(nu));
 	vec3 limb_darkening = pow(vec3(1.0 - sqr(1.0 - center_to_edge)), 0.5 * alpha);
 
-	return sunlight_color * sun_luminance * step(0.0, center_to_edge) * limb_darkening * sun_color;
+	return sun_luminance * sun_color * step(0.0, center_to_edge) * limb_darkening;
 }
 
 // Stars based on https://www.shadertoy.com/view/Md2SR3

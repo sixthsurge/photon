@@ -12,10 +12,10 @@
 float get_sunlight_scale() {
 	const float base_scale = 7.0 * SUN_I;
 
-	float blue_hour = cube(pulse(float(worldTime), 13200.0, 840.0, 24000.0))  // dusk
-	                + cube(pulse(float(worldTime), 22800.0, 840.0, 24000.0)); // dawn
+	float blue_hour = cube(pulse(float(worldTime), 13200.0, 830.0, 24000.0))  // dusk
+	                + cube(pulse(float(worldTime), 22800.0, 830.0, 24000.0)); // dawn
 
-	float daytime_mul = 1.0 + 0.5 * (time_sunset + time_sunrise) + 32.0 * blue_hour;
+	float daytime_mul = 1.0 + 0.5 * (time_sunset + time_sunrise) + 40.0 * blue_hour;
 
 	return base_scale * daytime_mul;
 }
@@ -29,7 +29,7 @@ vec3 get_sunlight_tint() {
 	vec3 morning_evening_tint = vec3(1.05, 0.84, 0.93) * 1.2;
 	     morning_evening_tint = mix(vec3(1.0), morning_evening_tint, sqr(pulse(sun_dir.y, 0.17, 0.40)));
 
-	vec3 blue_hour_tint = vec3(1.0, 0.9, 0.95);
+	vec3 blue_hour_tint = vec3(1.0, 0.85, 0.95);
 	     blue_hour_tint = mix(vec3(1.0), blue_hour_tint, blue_hour);
 
 	return base_tint * morning_evening_tint * blue_hour_tint;
@@ -57,8 +57,7 @@ vec3 get_light_color() {
 vec3 get_sky_color() {
 	vec3 sky_color = vec3(0.41, 0.50, 0.73) * time_sunrise
 	               + vec3(0.69, 0.87, 1.67) * time_noon
-				   + vec3(0.48, 0.55, 0.75) * time_sunset
-				   + vec3(0.00, 0.00, 0.00) * time_midnight;
+				   + vec3(0.48, 0.55, 0.75) * time_sunset;
 
 	float late_sunset = pulse(float(worldTime), 12500.0, 500.0, 24000.0)
 	                  + pulse(float(worldTime), 23500.0, 500.0, 24000.0);
@@ -68,6 +67,7 @@ vec3 get_sky_color() {
 
 	sky_color = mix(sky_color, vec3(0.26, 0.28, 0.33), late_sunset);
 	sky_color = mix(sky_color, vec3(0.44, 0.45, 0.70), blue_hour);
+	sky_color = mix(vec3(0.0), sky_color, linear_step(-0.07, 0.0, sun_dir.y));
 
 	return sky_color;
 }

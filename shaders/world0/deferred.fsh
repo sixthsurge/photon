@@ -17,9 +17,9 @@
   const int colortex2Format = RGBA16;         // gbuffer data 1 (solid -> composite1)
   const int colortex3Format = RGBA8;          // animated overlays/vanilla sky (solid -> deferred3), blended translucent color (translucent -> composite1)
   const int colortex4Format = R11F_G11F_B10F; // sky capture (deferred -> composite1)
-  const int colortex5Format = RGBA16F;        // scene history (always), low-res clouds (deferred1 -> deferred2 +flip), fog scattering (composite -> composite1 +flip)
-  const int colortex6Format = RGBA16F;        // ambient occlusion history & clouds pixel age (always), fog transmittance (composite -> composite1), TAAU min color (composite2 -> composite3 +flip)
-  const int colortex7Format = RGBA16F;        // clouds history (always), TAAU max color (composite2 -> composite3 +flip)
+  const int colortex5Format = RGBA16F;        // scene history (always), low-res clouds (deferred1 -> deferred2 +flip),
+  const int colortex6Format = RGBA16F;        // ambient occlusion history & clouds pixel age (always), fog scattering (composite -> composite1 +flip), TAAU min color (composite2 -> composite3 +flip)
+  const int colortex7Format = RGBA16F;        // clouds history (always), fog transmittance (composite -> composite1), TAAU max color (composite2 -> composite3 +flip)
 
   const bool colortex0Clear = false;
   const bool colortex1Clear = false;
@@ -69,6 +69,7 @@ uniform float time_sunset;
 uniform float time_midnight;
 
 #define ATMOSPHERE_SCATTERING_LUT depthtex0
+#define MIE_PHASE_CLAMP
 #define PROGRAM_DEFERRED
 #define WORLD_OVERWORLD
 

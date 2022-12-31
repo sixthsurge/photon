@@ -32,6 +32,8 @@ flat in vec4 tint;
 flat in mat3 tbn;
 
 #ifdef POM
+in vec2 atlas_tile_coord;
+in vec3 tangent_pos;
 flat in vec2 atlas_tile_offset;
 flat in vec2 atlas_tile_scale;
 #endif
@@ -42,7 +44,7 @@ in float vertex_ao;
 
 uniform sampler2D gtexture;
 
-#ifdef NORMAL_MAPPING
+#if defined NORMAL_MAPPING || defined POM
 uniform sampler2D normals;
 #endif
 
@@ -62,6 +64,8 @@ uniform float far;
 
 uniform vec4 entityColor;
 
+uniform ivec2 atlasSize;
+
 uniform int frameCounter;
 uniform float frameTimeCounter;
 
@@ -69,13 +73,23 @@ uniform vec2 view_res;
 uniform vec2 view_pixel_size;
 uniform vec2 taa_offset;
 
+uniform vec3 light_dir;
+
 #include "/include/utility/dithering.glsl"
 #include "/include/utility/encoding.glsl"
 #include "/include/utility/fast_math.glsl"
 #include "/include/utility/random.glsl"
 #include "/include/utility/space_conversion.glsl"
 
+#include "/include/parallax.glsl"
+
 const float lod_bias = log2(taau_render_scale);
+
+#if defined PROGRAM_TERRAIN && defined POM
+	#define read_tex(x) textureGrad(x, parallax_uv, uv_gradient[0], uv_gradient[1])
+#else
+	#define read_tex(x) texture(x, uv, lod_bias)
+#endif
 
 #if   TEXTURE_FORMAT == TEXTURE_FORMAT_LAB
 void decode_normal_map(vec3 normal_map, out vec3 normal, out float ao) {
@@ -90,8 +104,6 @@ void decode_normal_map(vec3 normal_map, out vec3 normal, out float ao) {
 	normal *= rcp(ao);
 }
 #endif
-
-uniform sampler2D noisetex;
 
 #ifdef PROGRAM_BLOCK
 vec3 draw_end_portal() {
@@ -175,16 +187,34 @@ vec3 draw_end_portal() {
 
 void main() {
 #if defined TAA && defined TAAU
-	vec2 uv = gl_FragCoord.xy * view_pixel_size * rcp(taau_render_scale);
-	if (clamp01(uv) != uv) discard;
+	vec2 coord = gl_FragCoord.xy * view_pixel_size * rcp(taau_render_scale);
+	if (clamp01(coord) != coord) discard;
 #endif
 
-	vec4 base_color   = texture(gtexture, uv, lod_bias) * tint;
+	bool parallax_shadow = false;
+	float dither = interleaved_gradient_noise(gl_FragCoord.xy, frameCounter);
+
+#if defined PROGRAM_TERRAIN && defined POM
+	float view_distance = length(tangent_pos);
+
+	vec3 tangent_dir = -normalize(tangent_pos);
+	mat2 uv_gradient = mat2(dFdx(uv), dFdy(uv));
+
+	float pom_depth;
+	vec3 shadow_trace_pos;
+
+	vec2 parallax_uv = get_parallax_uv(tangent_dir, uv_gradient, view_distance, dither, shadow_trace_pos, pom_depth);
+#ifdef POM_SHADOW
+	parallax_shadow = get_parallax_shadow(shadow_trace_pos, uv_gradient, view_distance, dither);
+#endif
+#endif
+
+	vec4 base_color   = read_tex(gtexture) * tint;
 #ifdef NORMAL_MAPPING
-	vec3 normal_map   = texture(normals, uv, lod_bias).xyz;
+	vec3 normal_map   = read_tex(normals).xyz;
 #endif
 #ifdef SPECULAR_MAPPING
-	vec4 specular_map = texture(specular, uv, lod_bias);
+	vec4 specular_map = read_tex(specular);
 #endif
 
 #if defined PROGRAM_ENTITIES
@@ -197,9 +227,9 @@ void main() {
 	base_color.rgb = vec3(1.0);
 #endif
 
-#if defined PROGRAM_TERRAIN && defined VANILLA_AO
+#if defined PROGRAM_TERRAIN
 	const float vertex_ao_strength = 0.9;
-	const float vertex_ao_lift     = 0.7;
+	const float vertex_ao_lift     = 0.5;
 	base_color.rgb *= lift(vertex_ao, vertex_ao_lift) * vertex_ao_strength + (1.0 - vertex_ao_strength);
 #endif
 
@@ -216,10 +246,11 @@ void main() {
 	vec3 normal; float ao;
 	decode_normal_map(normal_map, normal, ao);
 
-	normal = tbn * normal;
+#if defined PROGRAM_TERRAIN && defined POM && defined POM_SLOPE_NORMALS
 #endif
 
-	float dither = interleaved_gradient_noise(gl_FragCoord.xy, frameCounter);
+	normal = tbn * normal;
+#endif
 
 	gbuffer_data_0.x  = pack_unorm_2x8(base_color.rg);
 	gbuffer_data_0.y  = pack_unorm_2x8(base_color.b, clamp01(float(object_id) * rcp(255.0)));
@@ -231,6 +262,13 @@ void main() {
 #endif
 
 #ifdef SPECULAR_MAPPING
+#if defined POM && defined POM_SHADOW
+	// Pack parallax shadow in alpha component of specular map
+	// Specular map alpha >= 0.5 => parallax shadow
+	specular_map.a *= step(specular_map.a, 0.999);
+	specular_map.a  = clamp01(specular_map.a * 0.5 + 0.5 * float(parallax_shadow));
+#endif
+
 	gbuffer_data_1.z  = pack_unorm_2x8(specular_map.xy);
 	gbuffer_data_1.w  = pack_unorm_2x8(specular_map.zw);
 #endif

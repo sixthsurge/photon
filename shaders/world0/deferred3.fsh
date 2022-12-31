@@ -34,6 +34,7 @@ uniform sampler2D noisetex;
 uniform sampler2D colortex1; // gbuffer 0
 uniform sampler2D colortex2; // gbuffer 1
 uniform sampler2D colortex3; // animated overlays/vanilla sky
+uniform sampler2D colortex4; // sky capture
 uniform sampler2D colortex6; // ambient occlusion
 uniform sampler2D colortex7; // clouds
 
@@ -122,22 +123,20 @@ void main() {
 
 	// Transformations
 
-	depth += 0.38 * float(is_hand(depth)); // Hand lighting fix from Capt Tatsu
+	depth += 0.38 * float(depth < hand_depth); // Hand lighting fix from Capt Tatsu
 
 	vec3 view_pos = screen_to_view_space(vec3(uv, depth), true);
 	vec3 scene_pos = view_to_scene_space(view_pos);
 	vec3 world_pos = scene_pos + cameraPosition;
 	vec3 world_dir = normalize(scene_pos - gbufferModelViewInverse[3].xyz);
 
-	if (is_sky(depth)) { // Sky
+	if (depth == 1.0) { // Sky
 		float pixel_age = texelFetch(colortex6, texel, 0).w;
+		vec4 clouds = bicubic_filter(colortex7, uv * taau_render_scale);
 
 		// Soften clouds for new pixels
-		int lod = int(max0(3.0 - 0.5 * pixel_age));
-		vec4 clouds_soft = bicubic_filter_lod(colortex7, uv, lod);
-
-		vec4 clouds = texelFetch(colortex7, texel, 0);
-		     clouds = mix(clouds_soft, clouds, smoothstep(0.0, 7.0, pixel_age));
+		int ld = int(max0(3.0 - 0.25 * pixel_age));
+		clouds = mix(bicubic_filter_lod(colortex7, uv * taau_render_scale, ld), clouds, smoothstep(0.0, 30.0, pixel_age));
 
 		scene_color = draw_sky(world_dir, clouds);
 	} else { // Terrain
@@ -181,15 +180,22 @@ void main() {
 
 #ifdef SPECULAR_MAPPING
 		vec4 specular_map = vec4(unpack_unorm_2x8(gbuffer_data_1.z), unpack_unorm_2x8(gbuffer_data_1.w));
+
+#if defined POM && defined POM_SHADOW
+		// Specular map alpha >= 0.5 => parallax shadow
+		bool parallax_shadow = specular_map.a >= 0.5;
+		specular_map.a = fract(specular_map.a * 2.0);
+#endif
+
 		decode_specular_map(specular_map, material);
 #endif
 
-		float NoL = dot(normal, light_dir);
-		float NoV = clamp01(dot(normal, -world_dir));
-		float LoV = dot(light_dir, -world_dir);
-		float halfway_norm = inversesqrt(2.0 * LoV + 2.0);
-		float NoH = (NoL + NoV) * halfway_norm;
-		float LoH = LoV * halfway_norm + halfway_norm;
+		float nol = dot(normal, light_dir);
+		float nov = clamp01(dot(normal, -world_dir));
+		float lov = dot(light_dir, -world_dir);
+		float halfway_norm = inversesqrt(2.0 * lov + 2.0);
+		float noh = (nol + nov) * halfway_norm;
+		float loh = lov * halfway_norm + halfway_norm;
 
 #ifdef GTAO
 		// Depth-aware upscaling for GTAO
@@ -215,7 +221,11 @@ void main() {
 		// Terrain diffuse lighting
 
 		float sss_depth;
-		vec3 shadows = calculate_shadows(scene_pos, flat_normal, light_access.y, 1.0, sss_depth);
+		vec3 shadows = calculate_shadows(scene_pos, flat_normal, light_access.y, material.sss_amount, sss_depth);
+
+#if defined POM && defined POM_SHADOW
+		shadows *= float(!parallax_shadow);
+#endif
 
 		scene_color = get_diffuse_lighting(
 			material,
@@ -225,13 +235,13 @@ void main() {
 			light_access,
 			ao,
 			sss_depth,
-			NoL,
-			NoV,
-			NoH,
-			LoV
+			nol,
+			nov,
+			noh,
+			lov
 		);
 
-		scene_color += get_specular_highlight(material, NoL, NoV, NoH, LoV, LoH) * light_color * shadows * ao;
+		scene_color += get_specular_highlight(material, nol, nov, noh, lov, loh) * light_color * shadows * ao;
 	}
 
 	apply_fog(scene_color, scene_pos, world_dir, depth == 1.0);

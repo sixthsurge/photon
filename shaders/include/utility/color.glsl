@@ -54,13 +54,13 @@ const mat3 rec2020_to_rec709 = rec2020_to_xyz * xyz_to_rec709;
 //   Transfer functions (gamma)
 // ------------------------------
 
-#define display_transfer_function srgb_transfer_function
-#define display_transfer_function_inverse srgb_transfer_function_inverse
+#define display_eotf srgb_eotf
+#define display_eotf_inv srgb_eotf_inv
 
-vec3 srgb_transfer_function(vec3 linear) { // linear -> sRGB
+vec3 srgb_eotf(vec3 linear) { // linear -> sRGB
     return 1.14374 * (-0.126893 * linear + sqrt(linear)); // from Jodie in #snippets
 }
-vec3 srgb_transfer_function_inverse(vec3 srgb) { // sRGB -> linear
+vec3 srgb_eotf_inv(vec3 srgb) { // sRGB -> linear
 	return srgb * (srgb * (srgb * 0.305306011 + 0.682171111) + 0.012522878); // https://chilliant.blogspot.com/2012/08/srgb-approximations-for-hlsl.html
 }
 

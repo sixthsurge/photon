@@ -43,7 +43,7 @@ void main() {
 
 	float depth = texelFetch(depthtex0, texel, 0).x;
 
-	if (is_hand(depth)) {
+	if (depth < hand_depth) {
 		scene_color = texelFetch(colortex0, texel, 0).rgb;
 		return;
 	};

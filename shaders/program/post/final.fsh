@@ -43,7 +43,7 @@ vec3 max_of(vec3 a, vec3 b, vec3 c, vec3 d, vec3 f) {
 // https://github.com/GPUOpen-Effects/FidelityFX-CAS
 vec3 cas_filter(sampler2D sampler, ivec2 texel, const float sharpness) {
 #ifndef CAS
-	return display_transfer_function(texelFetch(sampler, texel, 0).rgb);
+	return display_eotf(texelFetch(sampler, texel, 0).rgb);
 #endif
 
 	// Fetch 3x3 neighborhood
@@ -61,15 +61,15 @@ vec3 cas_filter(sampler2D sampler, ivec2 texel, const float sharpness) {
 	vec3 i = texelFetch(sampler, texel + ivec2( 1,  1), 0).rgb;
 
     // Convert to sRGB before performing CAS
-    a = display_transfer_function(a);
-    b = display_transfer_function(b);
-    c = display_transfer_function(c);
-    d = display_transfer_function(d);
-    e = display_transfer_function(e);
-    f = display_transfer_function(f);
-    g = display_transfer_function(g);
-    h = display_transfer_function(h);
-    i = display_transfer_function(i);
+    a = display_eotf(a);
+    b = display_eotf(b);
+    c = display_eotf(c);
+    d = display_eotf(d);
+    e = display_eotf(e);
+    f = display_eotf(f);
+    g = display_eotf(g);
+    h = display_eotf(h);
+    i = display_eotf(i);
 
 	// Soft min and max. These are 2x bigger (factored out the extra multiply)
 	vec3 min_color  = min_of(d, e, f, b, h);
@@ -98,7 +98,7 @@ void main() {
 		scene_color = cas_filter(colortex0, texel, CAS_INTENSITY * 2.0 - 1.0);
 	} else {
 		scene_color = catmull_rom_filter_fast_rgb(colortex0, uv, 0.6);
-	    scene_color = display_transfer_function(scene_color);
+	    scene_color = display_eotf(scene_color);
 	}
 
 	scene_color = dither_8bit(scene_color, bayer16(vec2(texel)));
@@ -106,7 +106,7 @@ void main() {
 #if   DEBUG_VIEW == DEBUG_VIEW_SAMPLER
 	if (clamp(texel, ivec2(0), ivec2(textureSize(DEBUG_SAMPLER, 0))) == texel) {
 		scene_color = texelFetch(DEBUG_SAMPLER, texel, 0).rgb;
-		scene_color = display_transfer_function(scene_color);
+		scene_color = display_eotf(scene_color);
 	}
 #endif
 }

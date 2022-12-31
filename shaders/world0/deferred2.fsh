@@ -6,7 +6,7 @@
   Photon Shader by SixthSurge
 
   world0/deferred2.fsh:
-  Calculate ambient occlusion and
+  Calculate ambient occlusion, cloud temporal upscaling
 
 --------------------------------------------------------------------------------
 */
@@ -112,7 +112,7 @@ float calculate_maximum_horizon_angle(
 	for (int i = 0; i < GTAO_HORIZON_STEPS; ++i, ray_pos += ray_step) {
 		float depth = texelFetch(depthtex1, ivec2(clamp01(ray_pos) * view_res * taau_render_scale - 0.5), 0).x;
 
-		if (is_sky(depth) || is_hand(depth) || depth == screen_pos.z) continue;
+		if (depth == 1.0 || depth < hand_depth || depth == screen_pos.z) continue;
 
 		vec3 offset = screen_to_view_space(vec3(ray_pos, depth), true) - view_pos;
 
@@ -198,32 +198,34 @@ vec4 upscale_clouds() {
 	const int checkerboard_area = CLOUDS_TEMPORAL_UPSCALING * CLOUDS_TEMPORAL_UPSCALING;
 
 	ivec2 dst_texel = ivec2(gl_FragCoord.xy);
-	ivec2 src_texel = clamp(dst_texel / CLOUDS_TEMPORAL_UPSCALING, ivec2(0), ivec2(view_res) / CLOUDS_TEMPORAL_UPSCALING - 1);
+	ivec2 src_texel = clamp(dst_texel / CLOUDS_TEMPORAL_UPSCALING, ivec2(0), ivec2(view_res * taau_render_scale) / CLOUDS_TEMPORAL_UPSCALING - 1);
 
 	vec2 previous_uv = reproject(vec3(uv, 1.0)).xy;
 
 	vec4 current = texelFetch(colortex5, src_texel, 0);
-	vec4 history = max0(smooth_filter(colortex7, previous_uv));
+	vec4 history = catmull_rom_filter(colortex7, previous_uv * taau_render_scale);
 
 	float history_depth = min_of(textureGather(colortex6, previous_uv * gtao_render_scale, 2));
 
 	bool disocclusion = clamp01(previous_uv) != previous_uv;
+		 disocclusion = disocclusion || any(isnan(history));
 	     disocclusion = disocclusion || world_age_changed;
 		 disocclusion = disocclusion || history_depth > eps;
 
 	if (disocclusion) history = current;
 
-	float pixel_age = max0(texture(colortex6, previous_uv).w) * float(!disocclusion);
+	float pixel_age = max0(texture(colortex6, previous_uv * taau_render_scale).w) * float(!disocclusion);
 
 	// Reduce history weight when player is moving quickly
 	float movement_rejection = exp(-16.0 * length(cameraPosition - previousCameraPosition));
-	pixel_age *= movement_rejection * 0.13 + 0.87;
+	pixel_age *= movement_rejection * 0.07 + 0.93;
 
-	float history_weight = 1.0 - rcp(max(pixel_age - checkerboard_area, 1.0));
+	float history_weight  = 1.0 - rcp(max(pixel_age - checkerboard_area, 1.0));
+	      history_weight *= mix(1.0, movement_rejection, history_weight);
 
 	// Soft history sample using bicubic resampling
-	vec4 history_soft = max0(bicubic_filter(colortex7, previous_uv));
-	     history_soft = mix(history_soft, history, history_weight * 0.4 + 0.6);
+	vec4 history_soft = max0(bicubic_filter(colortex7, previous_uv * taau_render_scale));
+	     history_soft = mix(history_soft, history, history_weight * 0.5 + 0.5);
 
 	// Checkerboard upscaling
 	ivec2 offset_0 = dst_texel % CLOUDS_TEMPORAL_UPSCALING;
@@ -233,6 +235,8 @@ vec4 upscale_clouds() {
 	// Offcenter rejection
 	vec2 pixel_center_offset = 1.0 - abs(fract(previous_uv * view_res) * 2.0 - 1.0);
 	float offcenter_rejection = sqrt(pixel_center_offset.x * pixel_center_offset.y);
+          offcenter_rejection = mix(1.0, offcenter_rejection, history_weight);
+
 	history_weight *= offcenter_rejection;
 
 	// Store pixel age for next frame
@@ -259,9 +263,9 @@ void main() {
 
 	vec2 dither = vec2(texelFetch(noisetex, texel & 511, 0).b, texelFetch(noisetex, (texel + 249) & 511, 0).b);
 
-	depth += 0.38 * float(is_hand(depth)); // Hand lighting fix from Capt Tatsu
+	depth += 0.38 * float(depth < hand_depth); // Hand lighting fix from Capt Tatsu
 
-	vec3 screen_pos = vec3(uv / gtao_render_scale, depth);
+	vec3 screen_pos = vec3(uv * (taau_render_scale / gtao_render_scale), depth);
 	vec3 view_pos = screen_to_view_space(screen_pos, true);
 	vec3 scene_pos = view_to_scene_space(view_pos);
 
@@ -307,10 +311,10 @@ void main() {
 
 	// Depth rejection
 	float view_norm = rcp_length(view_pos);
-	float NoV = abs(dot(view_normal, view_pos)) * view_norm; // NoV / sqrt(length(view_pos))
+	float nov = abs(dot(view_normal, view_pos)) * view_norm; // nov / sqrt(length(view_pos))
 	float z0 = linearize_depth_fast(depth);
 	float z1 = linearize_depth_fast(1.0 - history_ao.z);
-	float depth_weight = exp2(-abs(z0 - z1) * depth_rejection_strength * NoV * view_norm);
+	float depth_weight = exp2(-abs(z0 - z1) * depth_rejection_strength * nov * view_norm);
 
 	pixel_age *= depth_weight * offcenter_rejection * float(history_ao.z != 1.0);
 

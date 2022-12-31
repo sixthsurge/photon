@@ -18,13 +18,15 @@ flat out uint object_id;
 flat out vec4 tint;
 flat out mat3 tbn;
 
+#ifdef PROGRAM_TERRAIN
+out float vertex_ao;
+
 #ifdef POM
+out vec2 atlas_tile_coord;
+out vec3 tangent_pos;
 flat out vec2 atlas_tile_offset;
 flat out vec2 atlas_tile_scale;
 #endif
-
-#ifdef PROGRAM_TERRAIN
-out float vertex_ao;
 #endif
 
 attribute vec4 at_tangent;
@@ -69,25 +71,30 @@ void main() {
 	uv           = gl_MultiTexCoord0.xy;
 	light_access = clamp01(gl_MultiTexCoord1.xy * rcp(240.0));
 	tint         = gl_Color;
-	object_id    = uint(max0(mc_Entity.x - 10000.0));
 
-#if defined PROGRAM_ENTITIES
-	object_id = uint(max(entityId - 10000, 0));
-#endif
-
-#if defined PROGRAM_BLOCK
-	object_id = uint(max(blockEntityId - 10000, 0));
-#endif
-
-	tbn[2] = mat3(gbufferModelViewInverse) * normalize(gl_NormalMatrix * gl_Normal);
-#ifdef NORMAL_MAPPING
 	tbn[0] = mat3(gbufferModelViewInverse) * normalize(gl_NormalMatrix * at_tangent.xyz);
+	tbn[2] = mat3(gbufferModelViewInverse) * normalize(gl_NormalMatrix * gl_Normal);
 	tbn[1] = cross(tbn[0], tbn[2]) * sign(at_tangent.w);
+
+#if   defined PROGRAM_TERRAIN
+	object_id = uint(max0(mc_Entity.x - 10000.0));
+#elif defined PROGRAM_ENTITIES
+	object_id = uint(max(entityId - 10000, 0));
+#elif defined PROGRAM_BLOCK
+	object_id = uint(max(blockEntityId - 10000, 0));
 #endif
 
 #ifdef PROGRAM_TERRAIN
 	vertex_ao = gl_Color.a < 0.1 ? 1.0 : gl_Color.a; // fixes models where vanilla ao breaks (eg lecterns)
 	tint.a = 1.0;
+
+	#ifdef POM
+	// from fayer3
+	vec2 uv_minus_mid = uv - mc_midTexCoord;
+	atlas_tile_offset = min(uv, mc_midTexCoord - uv_minus_mid);
+	atlas_tile_scale = abs(uv_minus_mid) * 2.0;
+	atlas_tile_coord = sign(uv_minus_mid) * 0.5 + 0.5;
+	#endif
 #endif
 
 #ifdef PROGRAM_SPIDEREYES
@@ -101,7 +108,12 @@ void main() {
 	vec3 scene_pos = view_to_scene_space(view_pos);
 	scene_pos += animate_vertex(scene_pos + cameraPosition, is_top_vertex, light_access.y, object_id);
     view_pos = scene_to_view_space(scene_pos);
+
+	#ifdef POM
+	tangent_pos = (scene_pos - gbufferModelViewInverse[3].xyz) * tbn;
+	#endif
 #endif
+
 	vec4 clip_pos = project(gl_ProjectionMatrix, view_pos);
 
 #if   defined TAA && defined TAAU

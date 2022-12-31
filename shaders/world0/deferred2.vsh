@@ -1,2 +1,3 @@
 #version 400 compatibility
-#include "/program/fullscreen_quad.vsh"
+#define PROGRAM_SCALE taau_render_scale
+#include "/program/vertex_simple.vsh"

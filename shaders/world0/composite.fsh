@@ -13,7 +13,7 @@
 
 #include "/include/global.glsl"
 
-/* DRAWBUFFERS:56 */
+/* DRAWBUFFERS:67 */
 layout (location = 0) out vec3 fog_scattering;
 layout (location = 1) out vec3 fog_transimttance;
 
@@ -27,6 +27,7 @@ uniform sampler2D noisetex;
 
 uniform sampler2D colortex1; // Gbuffer data
 
+uniform sampler2D depthtex0;
 uniform sampler2D depthtex1;
 
 uniform sampler3D colortex3; // 3D worley noise
@@ -212,8 +213,8 @@ mat2x3 raymarch_air_fog(vec3 world_start_pos, vec3 world_end_pos, bool sky, floa
 		light_sky[1] *= skylight;
 	}
 
-	float LoV = dot(world_dir, light_dir);
-	float mie_phase = 0.7 * henyey_greenstein_phase(LoV, 0.5) + 0.3 * henyey_greenstein_phase(LoV, -0.2);
+	float lov = dot(world_dir, light_dir);
+	float mie_phase = 0.7 * henyey_greenstein_phase(lov, 0.5) + 0.3 * henyey_greenstein_phase(lov, -0.2);
 
 	/*
 	// Single scattering
@@ -242,7 +243,7 @@ void main() {
 	ivec2 fog_texel  = ivec2(gl_FragCoord.xy);
 	ivec2 view_texel = ivec2(gl_FragCoord.xy * taau_render_scale * rcp(VL_RENDER_SCALE));
 
-	float depth   = texelFetch(depthtex1, view_texel, 0).x;
+	float depth   = texelFetch(depthtex0, view_texel, 0).x;
 	vec4 gbuffer_data_0 = texelFetch(colortex1, view_texel, 0);
 
 	float skylight = unpack_unorm_2x8(gbuffer_data_0.w).y;

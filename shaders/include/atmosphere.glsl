@@ -38,7 +38,7 @@ const float atmosphere_outer_radius_sq = atmosphere_outer_radius * atmosphere_ou
 // Atmosphere coefficients
 
 const float air_mie_albedo = 0.9;
-const float air_mie_energy_parameter = 3000.0; // Energy parameter for Klein-Nishina phase function
+const float air_mie_energy_parameter = 3000.0; // Energy parameter for the Klein-Nishina phase function
 
 const vec2 air_scale_heights = vec2(8.4e3, 1.25e3); // m
 
@@ -155,13 +155,19 @@ vec3 atmosphere_scattering(float nu, float mu, float mu_s) {
 
 	vec3 scattering;
 
+#if defined MIE_PHASE_CLAMP
+	float mie_phase = min(klein_nishina_phase(nu, air_mie_energy_parameter), 1.0);
+#else
+	float mie_phase = klein_nishina_phase(nu, air_mie_energy_parameter);
+#endif
+
 	// Rayleigh + multiple scattering
 	uv.x *= 0.5;
 	scattering  = texture(ATMOSPHERE_SCATTERING_LUT, uv).rgb;
 
 	// Single mie scattering
 	uv.x += 0.5;
-	scattering += texture(ATMOSPHERE_SCATTERING_LUT, uv).rgb * klein_nishina_phase(nu, air_mie_energy_parameter);
+	scattering += texture(ATMOSPHERE_SCATTERING_LUT, uv).rgb * mie_phase;
 
 	return scattering;
 }
@@ -173,30 +179,9 @@ vec3 atmosphere_scattering(vec3 ray_dir, vec3 light_dir) {
 
 	return atmosphere_scattering(nu, mu, mu_s);
 }
-
-vec3 atmosphere_scattering_border_fog(vec3 ray_dir, vec3 light_dir) { // For border fog,
-	float nu = dot(ray_dir, light_dir);
-	float mu = ray_dir.y;
-	float mu_s = light_dir.y;
-
-#ifndef SKY_GROUND
-	float horizon_mu = mix(-0.01, 0.03, smoothstep(-0.05, 0.1, mu_s));
-	mu = max(mu, horizon_mu);
-#endif
-
-	vec3 uv = atmosphere_scattering_uv(nu, mu, mu_s);
-
-	vec3 scattering;
-
-	// Rayleigh + multiple scattering
-	uv.x *= 0.5;
-	scattering  = texture(ATMOSPHERE_SCATTERING_LUT, uv).rgb;
-
-	// Single mie scattering
-	uv.x += 0.5;
-	scattering += texture(ATMOSPHERE_SCATTERING_LUT, uv).rgb * min(klein_nishina_phase(nu, air_mie_energy_parameter), 1.0);
-
-	return scattering;
+#else
+vec3 atmosphere_scattering(vec3 ray_dir, vec3 light_dir) {
+	return vec3(0.0);
 }
 #endif
 

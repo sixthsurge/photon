@@ -32,9 +32,6 @@ const float taau_render_scale = 1.0;
 #define max0(x) max(x, 0.0)
 #define min1(x) min(x, 1.0)
 
-#define is_sky(depth)  ((depth) == 1.0)
-#define is_hand(depth) ((depth) < 0.56)
-
 float sqr(float x) { return x * x; }
 vec2  sqr(vec2  v) { return v * v; }
 vec3  sqr(vec3  v) { return v * v; }

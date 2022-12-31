@@ -1,6 +1,7 @@
 #if !defined FOG_INCLUDED
 #define FOG_INCLUDED
 
+#include "utility/bicubic.glsl"
 #include "utility/fast_math.glsl"
 
 // This file is for analytical fog effects; for volumetric fog, see composite.fsh
@@ -20,8 +21,8 @@ float border_fog(vec3 scene_pos, vec3 world_dir) {
 	float density = 1.0;
 #endif
 
-	float fog = cubic_length(scene_pos.xz) / far;
-	      fog = exp2(-12.0 * pow8(fog * density));
+	float fog = length(scene_pos.xz) / far;
+	      fog = exp2(-8.0 * pow12(fog * density));
 
 	return fog;
 }
@@ -29,39 +30,28 @@ float border_fog(vec3 scene_pos, vec3 world_dir) {
 //----------------------------------------------------------------------------//
 #if defined WORLD_OVERWORLD
 
-#include "atmosphere.glsl"
+#include "sky_projection.glsl"
 
-#if defined PROGRAM_DEFERRED3
 vec3 border_fog_color(vec3 world_dir, float fog) {
-	vec3 fog_color = sun_color * atmosphere_scattering_border_fog(world_dir, sun_dir)
-	               + moon_color * atmosphere_scattering_border_fog(world_dir, moon_dir);
-
-#ifdef BORDER_FOG_HIDE_SUNSET_GRADIENT
-	world_dir.y = min(world_dir.y, -0.1);
-	world_dir = normalize(world_dir);
-
 	float sunset_factor = pulse(float(worldTime), 13000.0, 800.0, 24000.0)  // dusk
 	                    + pulse(float(worldTime), 23000.0, 800.0, 24000.0); // dawn
 
-	vec3 fog_color_sunset = atmosphere_scattering_border_fog(world_dir, sun_dir) * sun_color
-	                      + atmosphere_scattering_border_fog(world_dir, moon_dir) * moon_color;
+	vec3 fog_color = bicubic_filter(colortex4, project_sky(world_dir)).rgb;
+	vec3 fog_color_sunset = texture(colortex4, project_sky(normalize(vec3(world_dir.xz, min(world_dir.y, -0.1)).xzy))).rgb;
 
 	fog_color = mix(fog_color, fog_color_sunset, sqr(sunset_factor));
-#endif
+	fog_color = mix(fog_color, cave_fog_color, biome_cave);
 
-	return mix(fog_color, cave_fog_color, biome_cave);
+	return fog_color;
 }
-#endif
 
 void apply_fog(inout vec3 scene_color, vec3 scene_pos, vec3 world_dir, bool sky) {
 	float fog;
 	float view_distance = length(scene_pos - gbufferModelView[3].xyz);
 
 	// Border fog
-#if defined BORDER_FOG && defined PROGRAM_DEFERRED3
 	fog = border_fog(scene_pos, world_dir);
 	scene_color = mix(border_fog_color(world_dir, fog), scene_color, clamp01(fog + float(sky)));
-#endif
 
 	// Cave fog
 

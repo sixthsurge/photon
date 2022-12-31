@@ -9,17 +9,17 @@ float f0_to_ior(float f0) {
 }
 
 // https://www.gdcvault.com/play/1024478/PBR-Diffuse-Lighting-for-GGX
-float distribution_ggx(float NoH_sq, float alpha_sq) {
-	return alpha_sq / (pi * sqr(1.0 - NoH_sq + NoH_sq * alpha_sq));
+float distribution_ggx(float noh_sq, float alpha_sq) {
+	return alpha_sq / (pi * sqr(1.0 - noh_sq + noh_sq * alpha_sq));
 }
 
 float v1_smith_ggx(float cos_theta, float alpha_sq) {
 	return 1.0 / (cos_theta + sqrt((-cos_theta * alpha_sq + cos_theta) * cos_theta + alpha_sq));
 }
 
-float v2_smith_ggx(float NoL, float NoV, float alpha_sq) {
-    float ggx_l = NoV * sqrt((-NoL * alpha_sq + NoL) * NoL + alpha_sq);
-    float ggx_v = NoL * sqrt((-NoV * alpha_sq + NoV) * NoV + alpha_sq);
+float v2_smith_ggx(float nol, float nov, float alpha_sq) {
+    float ggx_l = nov * sqrt((-nol * alpha_sq + nol) * nol + alpha_sq);
+    float ggx_v = nol * sqrt((-nov * alpha_sq + nov) * nov + alpha_sq);
     return 0.5 / (ggx_l + ggx_v);
 }
 
@@ -28,8 +28,7 @@ vec3 fresnel_schlick(float cos_theta, vec3 f0) {
 	return f + f0 * (1.0 - f);
 }
 
-vec3 fresnel_dielectric(float cos_theta, float f0) {
-	float n = f0_to_ior(f0);
+vec3 fresnel_dielectric_n(float cos_theta, float n) {
 	float g_sq = sqr(n) + sqr(cos_theta) - 1.0;
 
 	if (g_sq < 0.0) return vec3(1.0); // Imaginary g => TIR
@@ -39,6 +38,11 @@ vec3 fresnel_dielectric(float cos_theta, float f0) {
 	float b = g + cos_theta;
 
 	return vec3(0.5 * sqr(a / b) * (1.0 + sqr((b * cos_theta - 1.0) / (a * cos_theta + 1.0))));
+}
+
+vec3 fresnel_dielectric(float cos_theta, float f0) {
+	float n = f0_to_ior(f0);
+	return fresnel_dielectric_n(cos_theta, n);
 }
 
 vec3 fresnel_lazanyi_2019(float cos_theta, vec3 f0, vec3 f82) {
@@ -52,20 +56,20 @@ vec3 diffuse_hammon(
 	vec3 albedo,
 	float roughness,
 	float f0,
-	float NoL,
-	float NoV,
-	float NoH,
-	float LoV
+	float nol,
+	float nov,
+	float noh,
+	float lov
 ) {
-	if (NoL <= 0.0) return vec3(0.0);
+	if (nol <= 0.0) return vec3(0.0);
 
-	float facing = 0.5 * LoV + 0.5;
+	float facing = 0.5 * lov + 0.5;
 
-	float fresnel_nl = fresnel_dielectric(max(NoL, 1e-2), f0).x;
-	float fresnel_nv = fresnel_dielectric(max(NoV, 1e-2), f0).x;
+	float fresnel_nl = fresnel_dielectric(max(nol, 1e-2), f0).x;
+	float fresnel_nv = fresnel_dielectric(max(nov, 1e-2), f0).x;
 	float energy_conservation_factor = 1.0 - (4.0 * sqrt(f0) + 5.0 * f0 * f0) * (1.0 / 9.0);
 
-	float single_rough = max0(facing) * (-0.2 * facing + 0.45) * (1.0 / NoH + 2.0);
+	float single_rough = max0(facing) * (-0.2 * facing + 0.45) * (1.0 / noh + 2.0);
 	float single_smooth = (1.0 - fresnel_nl) * (1.0 - fresnel_nv) / energy_conservation_factor;
 
 	float single = mix(single_smooth, single_rough, roughness) * rcp_pi;
