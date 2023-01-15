@@ -168,6 +168,8 @@ void main() {
 	vec3 fog_scattering    = smooth_filter(colortex6, fog_uv).rgb;
 	vec3 fog_transmittance = smooth_filter(colortex7, fog_uv).rgb;
 
+	bool is_translucent = depth0 != depth1;
+
 	// Transformations
 
 	depth0 += 0.38 * float(depth0 < hand_depth); // Hand lighting fix from Capt Tatsu
@@ -181,8 +183,6 @@ void main() {
 	length_normalize(scene_pos - gbufferModelViewInverse[3].xyz, world_dir, view_dist);
 
 	// Unpack gbuffer data
-
-	bool is_translucent = depth0 != depth1;
 
 	mat4x2 data = mat4x2(
 		unpack_unorm_2x8(gbuffer_data_0.x),

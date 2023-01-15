@@ -18,7 +18,7 @@ bool raymarch_depth_buffer(
 
 	vec3 screen_dir = normalize(view_to_screen_space(view_pos + view_dir, true) - screen_pos);
 
-	float ray_length = min_of((sign(screen_dir) - screen_pos) / screen_dir);
+	float ray_length = min_of(abs(sign(screen_dir) - screen_pos) / max(abs(screen_dir), eps));
 
 	float step_length = ray_length * rcp(float(intersection_step_count));
 
@@ -34,7 +34,7 @@ bool raymarch_depth_buffer(
 	for (int i = 0; i < intersection_step_count; ++i, ray_pos += ray_step) {
 		if (clamp01(ray_pos) != ray_pos) return false;
 
-		float depth = texelFetch(depth_sampler, ivec2(ray_pos.xy * view_res), 0).x;
+		float depth = texelFetch(depth_sampler, ivec2(ray_pos.xy * view_res * taau_render_scale), 0).x;
 
 		if (depth < ray_pos.z && abs(depth_tolerance - (ray_pos.z - depth)) < depth_tolerance) {
 			hit = true;
@@ -52,7 +52,7 @@ bool raymarch_depth_buffer(
 	for (int i = 0; i < refinement_step_count; ++i) {
 		ray_step *= 0.5;
 
-		float depth = texelFetch(depth_sampler, ivec2(hit_pos.xy * view_res), 0).x;
+		float depth = texelFetch(depth_sampler, ivec2(hit_pos.xy * view_res * taau_render_scale), 0).x;
 
 		if (depth < hit_pos.z && abs(depth_tolerance - (hit_pos.z - depth)) < depth_tolerance)
 			hit_pos -= ray_step;
