@@ -14,55 +14,55 @@
 
 // GGX spherical area light approximation from Horizon: Zero Dawn
 // https://www.guerrilla-games.com/read/decima-engine-advances-in-lighting-and-aa
-float get_noh_squared(
-	float nol,
-	float nov,
-	float lov,
+float get_NoH_squared(
+	float NoL,
+	float NoV,
+	float LoV,
 	float light_radius
 ) {
 	float radius_cos = cos(light_radius);
 	float radius_tan = tan(light_radius);
 
 	// Early out if R falls within the disc​
-	float rol = 2.0 * nol * nov - lov;
-	if (rol >= radius_cos) return 1.0;
+	float RoL = 2.0 * NoL * NoV - LoV;
+	if (RoL >= radius_cos) return 1.0;
 
-	float r_over_length_t = radius_cos * radius_tan * inversesqrt(1.0 - rol * rol);
-	float not_r = r_over_length_t * (nov - rol * nol);
-	float vot_r = r_over_length_t * (2.0 * nov * nov - 1.0 - rol * lov);
+	float r_over_length_t = radius_cos * radius_tan * inversesqrt(1.0 - RoL * RoL);
+	float not_r = r_over_length_t * (NoV - RoL * NoL);
+	float vot_r = r_over_length_t * (2.0 * NoV * NoV - 1.0 - RoL * LoV);
 
 	// Calculate dot(cross(N, L), V). This could already be calculated and available.​
-	float triple = sqrt(clamp01(1.0 - nol * nol - nov * nov - lov * lov + 2.0 * nol * nov * lov));
+	float triple = sqrt(clamp01(1.0 - NoL * NoL - NoV * NoV - LoV * LoV + 2.0 * NoL * NoV * LoV));
 
 	// Do one Newton iteration to improve the bent light Direction​
-	float nob_r = r_over_length_t * triple, vob_r = r_over_length_t * (2.0 * triple * nov);
-	float nol_vt_r = nol * radius_cos + nov + not_r, lov_vt_r = lov * radius_cos + 1.0 + vot_r;
-	float p = nob_r * lov_vt_r, q = nol_vt_r * lov_vt_r, s = vob_r * nol_vt_r;
-	float x_num = q * (-0.5 * p + 0.25 * vob_r * nol_vt_r);
-	float x_denom = p * p + s * ((s - 2.0 * p)) + nol_vt_r * ((nol * radius_cos + nov) * lov_vt_r * lov_vt_r
-		+ q * (-0.5 * (lov_vt_r + lov * radius_cos) - 0.5));
+	float NoB_r = r_over_length_t * triple, VoB_r = r_over_length_t * (2.0 * triple * NoV);
+	float NoL_vt_r = NoL * radius_cos + NoV + not_r, LoV_vt_r = LoV * radius_cos + 1.0 + vot_r;
+	float p = NoB_r * LoV_vt_r, q = NoL_vt_r * LoV_vt_r, s = VoB_r * NoL_vt_r;
+	float x_num = q * (-0.5 * p + 0.25 * VoB_r * NoL_vt_r);
+	float x_denom = p * p + s * ((s - 2.0 * p)) + NoL_vt_r * ((NoL * radius_cos + NoV) * LoV_vt_r * LoV_vt_r
+		+ q * (-0.5 * (LoV_vt_r + LoV * radius_cos) - 0.5));
 	float two_x_1 = 2.0 * x_num / (x_denom * x_denom + x_num * x_num);
 	float sin_theta = two_x_1 * x_denom;
 	float cos_theta = 1.0 - two_x_1 * x_num;
-	not_r = cos_theta * not_r + sin_theta * nob_r; // use new T to update not_r​
-	vot_r = cos_theta * vot_r + sin_theta * vob_r; // use new T to update vot_r​
+	not_r = cos_theta * not_r + sin_theta * NoB_r; // use new T to update not_r​
+	vot_r = cos_theta * vot_r + sin_theta * VoB_r; // use new T to update vot_r​
 
 	// Calculate (N.H)^2 based on the bent light direction​
-	float new_nol = nol * radius_cos + not_r;
-	float new_lov = lov * radius_cos + vot_r;
-	float noh = nov + new_nol;
-	float hoh = 2.0 * new_lov + 2.0;
+	float new_NoL = NoL * radius_cos + not_r;
+	float new_LoV = LoV * radius_cos + vot_r;
+	float NoH = NoV + new_NoL;
+	float HoH = 2.0 * new_LoV + 2.0;
 
-	return clamp01(noh * noh / hoh);
+	return clamp01(NoH * NoH / HoH);
 }
 
 vec3 get_specular_highlight(
 	Material material,
-	float nol,
-	float nov,
-	float noh,
-	float lov,
-	float loh
+	float NoL,
+	float NoV,
+	float NoH,
+	float LoV,
+	float LoH
 ) {
 	const float specular_max_value = 4.0; // Maximum value imposed on specular highlight to prevent it from overloading bloom
 
@@ -72,25 +72,25 @@ vec3 get_specular_highlight(
 
 	vec3 fresnel;
 	if (material.is_hardcoded_metal) {
-		fresnel = fresnel_lazanyi_2019(loh, material.f0, material.f82);
+		fresnel = fresnel_lazanyi_2019(LoH, material.f0, material.f82);
 	} else if (material.is_metal) {
-		fresnel = fresnel_schlick(loh, material.albedo);
+		fresnel = fresnel_schlick(LoH, material.albedo);
 	} else {
-		fresnel = fresnel_dielectric(loh, material.f0.x);
+		fresnel = fresnel_dielectric(LoH, material.f0.x);
 	}
 
-	if (nol <= eps) return vec3(0.0);
+	if (NoL <= eps) return vec3(0.0);
 	if (all(lessThan(fresnel, vec3(1e-2)))) return vec3(0.0);
 
 	vec3 albedo_tint = mix(vec3(1.0), material.albedo, float(material.is_hardcoded_metal));
 
-	float noh_squared = get_noh_squared(nol, nov, lov, light_radius);
+	float NoH_squared = get_NoH_squared(NoL, NoV, LoV, light_radius);
 	float alpha_squared = material.roughness * material.roughness;
 
-	float d = distribution_ggx(noh_squared, alpha_squared);
-	float v = v2_smith_ggx(max(nol, 1e-2), max(nov, 1e-2), alpha_squared);
+	float d = distribution_ggx(NoH_squared, alpha_squared);
+	float v = v2_smith_ggx(max(NoL, 1e-2), max(NoV, 1e-2), alpha_squared);
 
-	return min((nol * d * v) * fresnel * albedo_tint, vec3(specular_max_value));
+	return min((NoL * d * v) * fresnel * albedo_tint, vec3(specular_max_value));
 }
 
 // ------------------------
@@ -190,66 +190,67 @@ vec3 get_specular_reflections(
 
 	float dither = r1(frameCounter, texelFetch(noisetex, ivec2(gl_FragCoord.xy) & 511, 0).b);
 
-/*
-#if defined SSR_ROUGHNESS_SUPPORT
-	vec2 hash = R2(
-		SSR_RAY_COUNT * frameCounter,
-		vec2(
-			texelFetch(noisetex, ivec2(gl_FragCoord.xy)                     & 511, 0).b,
-			texelFetch(noisetex, ivec2(gl_FragCoord.xy + vec2(239.0, 23.0)) & 511, 0).b
-		)
-	);
+#if defined SSR_ROUGHNESS_SUPPORT && defined SPECULAR_MAPPING
+	const float specular_bias = 0.25;
 
 	if (material.roughness > 5e-2) { // Rough reflection
-	 	float mip_level = sqrt(4.0 * dampen(material.roughness));
+	 	float mip_level = 8.0 * dampen(material.roughness);
 
 		vec3 reflection = vec3(0.0);
 
 		for (int i = 0; i < SSR_RAY_COUNT; ++i) {
-			vec3 microfacet_normal = tbn_matrix * sample_ggx_vndf(viewer_dir_tangent, vec2(material.roughness), hash);
-			vec3 ray_dir = reflect(-viewer_dir, microfacet_normal);
+			vec2 hash;
+			hash.x = interleaved_gradient_noise(gl_FragCoord.xy,                    frameCounter * SSR_RAY_COUNT + i);
+			hash.y = interleaved_gradient_noise(gl_FragCoord.xy + vec2(97.0, 23.0), frameCounter * SSR_RAY_COUNT + i);
+
+			vec3 microfacet_normal = tbn_matrix * sample_ggx_vndf(-tangent_dir, vec2(material.roughness), hash * vec2(1.0, 1.0 - specular_bias));
+			vec3 ray_dir = reflect(world_dir, microfacet_normal);
 
 			float NoL = dot(normal, ray_dir);
 			if (NoL < eps) continue;
 
-			vec3 radiance = trace_specular_ray(screen_pos, view_pos, ray_dir, dither, mip_level, skylight_falloff);
+			vec3 radiance = trace_specular_ray(screen_pos, view_pos, ray_dir, dither, skylight, SSR_INTERSECTION_STEPS_ROUGH, SSR_REFINEMENT_STEPS, int(mip_level));
 
-			NoL       = max(1e-2, NoL);
-			float NoV = max(1e-2, dot(normal, viewer_dir));
-			float MoV = clamp01(dot(microfacet_normal, viewer_dir));
+			float NoV = max(1e-2, dot(normal, -world_dir));
+			float MoV = max(1e-2, dot(microfacet_normal, -world_dir));
 
-			vec3 fresnel = material.is_metal ? fresnel_schlick(MoV, material.f0) : vec3(fresnel_dielectric(MoV, material.n));
-			float v1 = v_1_smith_ggx(NoV, alpha_sq);
-			float v2 = v_2_smith_ggx(NoL, NoV, alpha_sq);
+			vec3 fresnel;
+			if (material.is_hardcoded_metal) {
+				fresnel = fresnel_lazanyi_2019(NoV, material.f0, material.f82);
+			} else if (material.is_metal) {
+				fresnel = fresnel_schlick(NoV, material.albedo);
+			} else {
+				fresnel = fresnel_dielectric(NoV, material.f0.x);
+			}
+
+			float v1 = v1_smith_ggx(NoV, alpha_squared);
+			float v2 = v2_smith_ggx(NoL, NoV, alpha_squared);
 
 			reflection += radiance * fresnel * (2.0 * NoL * v2 / v1);
-
-			hash = R2Next(hash);
 		}
 
 		reflection *= albedo_tint * rcp(float(SSR_RAY_COUNT));
 		if (any(isnan(reflection))) reflection = vec3(0.0); // don't reflect NaNs
-		return reflection;
+		return reflection * material.ssr_multiplier;
 	}
 #endif
-*/
 
 	// Mirror-like reflections
 
 	vec3 ray_dir = reflect(world_dir, normal);
 
-	float nol = dot(normal, ray_dir);
-	float nov = clamp01(dot(normal, -world_dir));
+	float NoL = dot(normal, ray_dir);
+	float NoV = clamp01(dot(normal, -world_dir));
 
-	if (nol < eps) return vec3(0.0);
+	if (NoL < eps) return vec3(0.0);
 
 	vec3 fresnel;
 	if (material.is_hardcoded_metal) {
-		fresnel = fresnel_lazanyi_2019(nov, material.f0, material.f82);
+		fresnel = fresnel_lazanyi_2019(NoV, material.f0, material.f82);
 	} else if (material.is_metal) {
-		fresnel = fresnel_schlick(nov, material.albedo);
+		fresnel = fresnel_schlick(NoV, material.albedo);
 	} else {
-		fresnel = fresnel_dielectric(nov, material.f0.x);
+		fresnel = fresnel_dielectric(NoV, material.f0.x);
 	}
 
 	vec3 reflection  = trace_specular_ray(screen_pos, view_pos, ray_dir, dither, skylight, SSR_INTERSECTION_STEPS_SMOOTH, SSR_REFINEMENT_STEPS, 0);
@@ -257,7 +258,7 @@ vec3 get_specular_reflections(
 
 	if (any(isnan(reflection))) reflection = vec3(0.0); // don't reflect NaNs
 
-	return reflection;
+	return reflection * material.ssr_multiplier;
 }
 #endif // PROGRAM_COMPOSITE1
 

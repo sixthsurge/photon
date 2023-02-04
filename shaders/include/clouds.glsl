@@ -48,6 +48,9 @@ vec3 clouds_aerial_perspective(
 		air_transmittance = clamp01(trans_1 / trans_0);
 	}
 
+	clear_sky = mix(clear_sky, sky_color * rcp(tau), rainStrength * mix(1.0, 0.9, time_sunrise + time_sunset));
+	air_transmittance = mix(air_transmittance, vec3(air_transmittance.x), 0.8 * rainStrength);
+
 	return mix((1.0 - clouds_transmittance) * clear_sky, clouds_scattering, air_transmittance);
 }
 

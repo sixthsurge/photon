@@ -3,7 +3,7 @@
 /*
 --------------------------------------------------------------------------------
 
-  Photon Shader by SixthSurge
+  Photon Shaders by SixthSurge
 
   world0/deferred.fsh:
   Render sky capture
@@ -22,7 +22,7 @@
   const int colortex7Format = RGBA16F;        // clouds history (always), fog transmittance (composite -> composite1), TAAU max color (composite2 -> composite3 +flip)
 
   const bool colortex0Clear = false;
-  const bool colortex1Clear = false;
+  const bool colortex1Clear = true;
   const bool colortex2Clear = false;
   const bool colortex3Clear = true;
   const bool colortex4Clear = false;
@@ -53,6 +53,7 @@ uniform mat4 shadowModelViewInverse;
 
 uniform int worldTime;
 uniform float sunAngle;
+uniform float rainStrength;
 
 uniform int frameCounter;
 uniform float frameTimeCounter;

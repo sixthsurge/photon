@@ -1,7 +1,7 @@
 /*
 --------------------------------------------------------------------------------
 
-  Photon Shader by SixthSurge
+  Photon Shaders by SixthSurge
 
   program/gbuffer/basic.fsh:
   Handle lines
@@ -14,7 +14,7 @@
 /* RENDERTARGETS: 1 */
 layout (location = 0) out vec4 gbuffer_data;
 
-flat in vec2 light_access;
+flat in vec2 light_levels;
 flat in vec3 tint;
 
 uniform vec2 view_pixel_size;
@@ -32,5 +32,5 @@ void main() {
 	gbuffer_data.x = pack_unorm_2x8(tint.rg);
 	gbuffer_data.y = pack_unorm_2x8(tint.b, 254.0 / 255.0);
 	gbuffer_data.z = pack_unorm_2x8(encode_unit_vector(normal));
-	gbuffer_data.w = pack_unorm_2x8(light_access);
+	gbuffer_data.w = pack_unorm_2x8(light_levels);
 }

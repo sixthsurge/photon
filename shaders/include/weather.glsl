@@ -12,6 +12,8 @@ void clouds_coverage_variation(
 	out vec2 clouds_coverage_cc,
 	out vec2 clouds_coverage_ci
 ) {
+	// Daily coverage variation
+
 	switch (clouds_day) {
 	case 0u:
 		clouds_coverage_cu = vec2(0.44, 0.48);

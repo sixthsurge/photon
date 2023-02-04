@@ -16,12 +16,12 @@ struct Material {
 	float sss_amount;
 	float sheen_amount; // SSS "sheen" for tall grass
 	float porosity;
+	float ssr_multiplier;
 	bool is_metal;
 	bool is_hardcoded_metal;
-	bool has_reflections;
 };
 
-Material material_from(vec3 albedo_srgb, uint object_id, vec3 world_pos, inout vec2 light_access) {
+Material material_from(vec3 albedo_srgb, uint object_id, vec3 world_pos, inout vec2 light_levels) {
 	vec3 block_pos = fract(world_pos);
 
 	// Create material with default values
@@ -35,9 +35,9 @@ Material material_from(vec3 albedo_srgb, uint object_id, vec3 world_pos, inout v
 	material.sss_amount         = 0.0;
 	material.sheen_amount       = 0.0;
 	material.porosity           = 0.0;
+	material.ssr_multiplier     = 0.0;
 	material.is_metal           = false;
 	material.is_hardcoded_metal = false;
-	material.has_reflections    = false;
 
 	// Hardcoded materials for specific blocks
 	// Using binary split search to minimise branches per fragment (TODO: measure impact)
@@ -53,13 +53,13 @@ Material material_from(vec3 albedo_srgb, uint object_id, vec3 world_pos, inout v
 						#ifdef HARDCODED_EMISSION
 						// Bright full emissives
 						material.emission = 1.00 * albedo_sqrt * (0.1 + 0.9 * cube(hsl.z));
-						light_access.x *= 0.8;
+						light_levels.x *= 0.8;
 						#endif
 					} else {
 						#ifdef HARDCODED_EMISSION
 						// Medium full emissives
 						material.emission = 0.66 * albedo_sqrt * (0.1 + 0.9 * cube(hsl.z));
-						light_access.x *= 0.8;
+						light_levels.x *= 0.8;
 						#endif
 					}
 				}
@@ -69,14 +69,14 @@ Material material_from(vec3 albedo_srgb, uint object_id, vec3 world_pos, inout v
 						#ifdef HARDCODED_EMISSION
 						// Dim full emissives
 						material.emission = 0.2 * albedo_sqrt * (0.1 + 0.9 * pow4(hsl.z));
-						light_access.x *= 0.95;
+						light_levels.x *= 0.95;
 						#endif
 					} else {
 						#ifdef HARDCODED_EMISSION
 						// Partial emissives (brightest parts glow)
 						float blue = isolate_hue(hsl, 200.0, 30.0);
 						material.emission = 0.8 * albedo_sqrt * step(0.495 - 0.1 * blue, 0.2 * hsl.y + 0.5 * hsl.z);
-						light_access.x *= 0.88;
+						light_levels.x *= 0.88;
 						#endif
 					}
 				} else { // 6-8, Torches
@@ -89,8 +89,8 @@ Material material_from(vec3 albedo_srgb, uint object_id, vec3 world_pos, inout v
 						material.emission = 0.33 * sqrt(albedo_sqrt) * cube(linear_step(0.35, 0.6, block_pos.y));
 					}
 					material.emission  = max(material.emission, 0.85 * albedo_sqrt * step(0.5, 0.2 * hsl.y + 0.55 * hsl.z));
-					material.emission *= light_access.x;
-					light_access.x *= 0.8;
+					material.emission *= light_levels.x;
+					light_levels.x *= 0.8;
 					#endif
 				}
 			}
@@ -101,7 +101,7 @@ Material material_from(vec3 albedo_srgb, uint object_id, vec3 world_pos, inout v
 						#ifdef HARDCODED_EMISSION
 						// Lava
 						material.emission = 2.00 * albedo_sqrt * (0.2 + 0.8 * isolate_hue(hsl, 30.0, 15.0));
-						light_access.x *= 0.3;
+						light_levels.x *= 0.3;
 						#endif
 					} else {
 						#ifdef HARDCODED_EMISSION
@@ -117,13 +117,13 @@ Material material_from(vec3 albedo_srgb, uint object_id, vec3 world_pos, inout v
 						#ifdef HARDCODED_EMISSION
 						// Jack o' Lantern + nether mushrooms
 						material.emission = 0.80 * albedo_sqrt * step(0.73, 0.1 * hsl.y + 0.7 * hsl.z);
-						light_access.x *= 0.85;
+						light_levels.x *= 0.85;
 						#endif
 					} else {
 						#ifdef HARDCODED_EMISSION
 						// Beacon
 						material.emission = step(0.2, hsl.z) * albedo_sqrt * step(max_of(abs(block_pos - 0.5)), 0.4);
-						light_access.x *= 0.9;
+						light_levels.x *= 0.9;
 						#endif
 					}
 				}
@@ -150,7 +150,7 @@ Material material_from(vec3 albedo_srgb, uint object_id, vec3 world_pos, inout v
 						#ifdef HARDCODED_EMISSION
 						// Candles
 						material.emission = vec3(0.2) * pow4(clamp01(block_pos.y * 2.0));
-						light_access.x *= 0.9;
+						light_levels.x *= 0.9;
 						#endif
 					}
 				}
@@ -200,7 +200,7 @@ Material material_from(vec3 albedo_srgb, uint object_id, vec3 world_pos, inout v
 						#ifdef HARDCODED_SPECULAR
 						material.f0 = vec3(0.04);
 						material.roughness = 0.1;
-						material.has_reflections = true;
+						material.ssr_multiplier = 1.0;
 						#endif
 
 						#ifdef HARDCODED_SSS
@@ -309,8 +309,8 @@ void decode_specular_map(vec4 specular_map, inout Material material) {
 		material.f0 = max(material.f0, specular_map.g);
 
 		float has_sss = step(64.5 / 255.0, specular_map.b);
-		material.sss_amount = max(material.sss_amount, specular_map.b * has_sss);
-		material.porosity = specular_map.b - specular_map.b * has_sss;
+		material.sss_amount = max(material.sss_amount, linear_step(64.0 / 255.0, 1.0, specular_map.b * has_sss));
+		material.porosity = linear_step(0.0, 64.0 / 255.0, max0(specular_map.b - specular_map.b * has_sss));
 	} else if (specular_map.g < 237.5 / 255.0) {
 		// Hardcoded metals
 		uint metal_id = clamp(uint(255.0 * specular_map.g) - 230u, 0u, 7u);
@@ -325,7 +325,7 @@ void decode_specular_map(vec4 specular_map, inout Material material) {
 		material.is_metal = true;
 	}
 
-	material.has_reflections = (material.f0.x - material.f0.x * material.roughness * SSR_ROUGHNESS_THRESHOLD) > 0.01; // based on Kneemund's method
+	material.ssr_multiplier = step(0.01, (material.f0.x - material.f0.x * material.roughness * SSR_ROUGHNESS_THRESHOLD)); // based on Kneemund's method
 }
 #elif TEXTURE_FORMAT == TEXTURE_FORMAT_OLD
 void decode_specular_map(vec4 specular_map, inout Material material) {
@@ -334,7 +334,7 @@ void decode_specular_map(vec4 specular_map, inout Material material) {
 	material.f0        = material.is_metal ? material.albedo : material.f0;
 	material.emission  = max(material.emission, material.albedo * specular_map.b);
 
-	material.has_reflections = (material.f0.x - material.f0.x * material.roughness * SSR_ROUGHNESS_THRESHOLD) > 0.01; // based on Kneemund's method
+	material.ssr_multiplier = step(0.01, (material.f0.x - material.f0.x * material.roughness * SSR_ROUGHNESS_THRESHOLD)); // based on Kneemund's method
 }
 #endif
 

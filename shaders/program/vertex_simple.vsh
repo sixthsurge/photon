@@ -1,7 +1,7 @@
 /*
 --------------------------------------------------------------------------------
 
-  Photon Shader by SixthSurge
+  Photon Shaders by SixthSurge
 
   program/vertex_simple.vsh:
   Simple vertex shader for fullscreen passes

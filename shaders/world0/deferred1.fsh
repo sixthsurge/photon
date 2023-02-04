@@ -3,7 +3,7 @@
 /*
 --------------------------------------------------------------------------------
 
-  Photon Shader by SixthSurge
+  Photon Shaders by SixthSurge
 
   world0/deferred1.fsh:
   Render clouds
@@ -76,6 +76,9 @@ uniform vec2 taa_offset;
 uniform float world_age;
 
 uniform float biome_cave;
+
+uniform float time_sunrise;
+uniform float time_sunset;
 
 uniform vec3 clouds_light_dir;
 

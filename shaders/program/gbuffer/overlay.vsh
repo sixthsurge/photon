@@ -1,7 +1,7 @@
 /*
 --------------------------------------------------------------------------------
 
-  Photon Shader by SixthSurge
+  Photon Shaders by SixthSurge
 
   program/gbuffer/solid.vsh:
   Handle animated overlays (block breaking overlay and enchantment glint)

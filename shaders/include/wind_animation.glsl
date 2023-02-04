@@ -22,7 +22,7 @@ vec3 get_wind_offset(vec3 world_pos, float wind_speed, float wind_strength, bool
 
 vec3 animate_vertex(vec3 world_pos, bool is_top_vertex, float skylight, uint object_id) {
 	float wind_speed = 0.3;
-	float wind_strength = sqr(skylight) * (0.25 + 0.5 * rainStrength);
+	float wind_strength = sqr(skylight) * (0.25 + 0.66 * rainStrength);
 
 	switch (object_id) {
 #ifdef WAVING_PLANTS

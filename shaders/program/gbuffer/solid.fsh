@@ -1,7 +1,7 @@
 /*
 --------------------------------------------------------------------------------
 
-  Photon Shader by SixthSurge
+  Photon Shaders by SixthSurge
 
   program/gbuffer/solid.fsh:
   Handle terrain, entities, the hand, beacon beams and spider eyes
@@ -25,7 +25,7 @@ layout (location = 0) out vec4 gbuffer_data_0; // albedo, block ID, flat normal,
 layout (location = 1) out vec4 gbuffer_data_1; // detailed normal, specular map (optional)
 
 in vec2 uv;
-in vec2 light_access;
+in vec2 light_levels;
 
 flat in uint object_id;
 flat in vec4 tint;
@@ -197,16 +197,26 @@ void main() {
 #if defined PROGRAM_TERRAIN && defined POM
 	float view_distance = length(tangent_pos);
 
+	bool has_pom = view_distance < POM_DISTANCE; // Only calculate POM for close terrain
+         has_pom = has_pom && object_id != 1 && object_id != 8; // Do not calculate POM for water or lava
+
 	vec3 tangent_dir = -normalize(tangent_pos);
 	mat2 uv_gradient = mat2(dFdx(uv), dFdy(uv));
 
-	float pom_depth;
-	vec3 shadow_trace_pos;
+	vec2 parallax_uv;
 
-	vec2 parallax_uv = get_parallax_uv(tangent_dir, uv_gradient, view_distance, dither, shadow_trace_pos, pom_depth);
-#ifdef POM_SHADOW
-	parallax_shadow = get_parallax_shadow(shadow_trace_pos, uv_gradient, view_distance, dither);
-#endif
+	if (has_pom) {
+		float pom_depth;
+		vec3 shadow_trace_pos;
+
+		parallax_uv = get_parallax_uv(tangent_dir, uv_gradient, view_distance, dither, shadow_trace_pos, pom_depth);
+	#ifdef POM_SHADOW
+		parallax_shadow = get_parallax_shadow(shadow_trace_pos, uv_gradient, view_distance, dither);
+	#endif
+	} else {
+		parallax_uv = uv;
+		parallax_shadow = false;
+	}
 #endif
 
 	vec4 base_color   = read_tex(gtexture) * tint;
@@ -243,19 +253,21 @@ void main() {
 #endif
 
 #ifdef NORMAL_MAPPING
-	vec3 normal; float ao;
-	decode_normal_map(normal_map, normal, ao);
+	vec3 normal; float material_ao;
+	decode_normal_map(normal_map, normal, material_ao);
 
 #if defined PROGRAM_TERRAIN && defined POM && defined POM_SLOPE_NORMALS
 #endif
 
 	normal = tbn * normal;
+#else
+	const float material_ao = 1.0;
 #endif
 
 	gbuffer_data_0.x  = pack_unorm_2x8(base_color.rg);
 	gbuffer_data_0.y  = pack_unorm_2x8(base_color.b, clamp01(float(object_id) * rcp(255.0)));
 	gbuffer_data_0.z  = pack_unorm_2x8(encode_unit_vector(tbn[2]));
-	gbuffer_data_0.w  = pack_unorm_2x8(dither_8bit(light_access, dither));
+	gbuffer_data_0.w  = pack_unorm_2x8(dither_8bit(light_levels * mix(0.7, 1.0, material_ao), dither));
 
 #ifdef NORMAL_MAPPING
 	gbuffer_data_1.xy = encode_unit_vector(normal);

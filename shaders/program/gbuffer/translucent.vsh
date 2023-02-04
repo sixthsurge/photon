@@ -1,7 +1,7 @@
 /*
 --------------------------------------------------------------------------------
 
-  Photon Shader by SixthSurge
+  Photon Shaders by SixthSurge
 
   program/gbuffer/translucent.fsh:
   Handle translucent terrain, translucent handheld items, water and particles
@@ -12,7 +12,7 @@
 #include "/include/global.glsl"
 
 out vec2 uv;
-out vec2 light_access;
+out vec2 light_levels;
 
 flat out uint object_id;
 flat out vec4 tint;
@@ -41,7 +41,7 @@ uniform vec2 taa_offset;
 
 void main() {
 	uv           = gl_MultiTexCoord0.xy;
-	light_access = clamp01(gl_MultiTexCoord1.xy * rcp(240.0));
+	light_levels = clamp01(gl_MultiTexCoord1.xy * rcp(240.0));
 	tint         = gl_Color;
 	object_id    = uint(max0(mc_Entity.x - 10000.0));
 

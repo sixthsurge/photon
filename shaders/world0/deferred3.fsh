@@ -3,7 +3,7 @@
 /*
 --------------------------------------------------------------------------------
 
-  Photon Shader by SixthSurge
+  Photon Shaders by SixthSurge
 
   world0/deferred3.fsh:
   Shade terrain and entities, draw sky
@@ -66,6 +66,8 @@ uniform float far;
 
 uniform int worldTime;
 uniform float sunAngle;
+uniform float rainStrength;
+uniform float wetness;
 
 uniform int frameCounter;
 uniform float frameTimeCounter;
@@ -83,6 +85,7 @@ uniform vec2 view_pixel_size;
 uniform vec2 taa_offset;
 
 uniform float biome_cave;
+uniform float biome_may_rain;
 
 uniform float time_sunrise;
 uniform float time_noon;
@@ -108,6 +111,18 @@ uniform float time_midnight;
 /*
 const bool colortex7MipmapEnabled = true;
  */
+
+float get_puddle_noise(vec3 world_pos, vec3 flat_normal, vec2 light_levels) {
+	const float puddle_frequency = 0.025;
+
+	float puddle = texture(noisetex, world_pos.xz * puddle_frequency).w;
+	      puddle = linear_step(0.45, 0.55, puddle) * wetness * biome_may_rain * max0(flat_normal.y);
+
+	// Prevent puddles from appearing indoors
+	puddle *= (1.0 - cube(light_levels.x)) * pow5(light_levels.y);
+
+	return puddle;
+}
 
 void main() {
 	ivec2 texel = ivec2(gl_FragCoord.xy);
@@ -164,13 +179,13 @@ void main() {
 		vec3 albedo       = vec3(data[0], data[1].x);
 		uint object_id    = uint(255.0 * data[1].y);
 		vec3 flat_normal  = decode_unit_vector(data[2]);
-		vec2 light_access = data[3];
+		vec2 light_levels = data[3];
 
 		uint overlay_id = uint(255.0 * overlays.a);
 		albedo = overlay_id == 0u ? albedo + overlays.rgb : albedo; // enchantment glint
 		albedo = overlay_id == 1u ? 2.0 * albedo * overlays.rgb : albedo; // damage overlay
 
-		Material material = material_from(albedo, object_id, world_pos, light_access);
+		Material material = material_from(albedo, object_id, world_pos, light_levels);
 
 #ifdef NORMAL_MAPPING
 		vec3 normal = decode_unit_vector(gbuffer_data_1.xy);
@@ -190,12 +205,25 @@ void main() {
 		decode_specular_map(specular_map, material);
 #endif
 
-		float nol = dot(normal, light_dir);
-		float nov = clamp01(dot(normal, -world_dir));
-		float lov = dot(light_dir, -world_dir);
-		float halfway_norm = inversesqrt(2.0 * lov + 2.0);
-		float noh = (nol + nov) * halfway_norm;
-		float loh = lov * halfway_norm + halfway_norm;
+#ifdef RAIN_PUDDLES
+		if (wetness > eps && biome_may_rain > eps && wetness < 1.0 - eps) {
+			const float puddle_f0        = 0.02;
+			const float puddle_roughness = 0.002;
+
+			float puddle = get_puddle_noise(world_pos, flat_normal, light_levels) * float(!material.is_metal);
+
+			material.f0 = mix(material.f0, vec3(puddle_f0), puddle);
+			material.roughness = mix(material.roughness, puddle_roughness, puddle);
+			normal = normalize_safe(mix(normal, flat_normal, puddle));
+		}
+#endif
+
+		float NoL = dot(normal, light_dir);
+		float NoV = clamp01(dot(normal, -world_dir));
+		float LoV = dot(light_dir, -world_dir);
+		float halfway_norm = inversesqrt(2.0 * LoV + 2.0);
+		float NoH = (NoL + NoV) * halfway_norm;
+		float LoH = LoV * halfway_norm + halfway_norm;
 
 #ifdef GTAO
 		// Depth-aware upscaling for GTAO
@@ -221,7 +249,7 @@ void main() {
 		// Terrain diffuse lighting
 
 		float sss_depth;
-		vec3 shadows = calculate_shadows(scene_pos, flat_normal, light_access.y, material.sss_amount, sss_depth);
+		vec3 shadows = calculate_shadows(scene_pos, flat_normal, light_levels.y, material.sss_amount, sss_depth);
 
 #if defined POM && defined POM_SHADOW
 		shadows *= float(!parallax_shadow);
@@ -232,16 +260,18 @@ void main() {
 			normal,
 			flat_normal,
 			shadows,
-			light_access,
+			light_levels,
 			ao,
 			sss_depth,
-			nol,
-			nov,
-			noh,
-			lov
+			NoL,
+			NoV,
+			NoH,
+			LoV
 		);
 
-		scene_color += get_specular_highlight(material, nol, nov, noh, lov, loh) * light_color * shadows * ao;
+		// Specular highlight
+
+		scene_color += get_specular_highlight(material, NoL, NoV, NoH, LoV, LoH) * light_color * shadows * ao;
 	}
 
 	apply_fog(scene_color, scene_pos, world_dir, depth == 1.0);

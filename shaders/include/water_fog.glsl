@@ -10,7 +10,7 @@ const vec3 water_extinction_coeff = water_absorption_coeff + water_scattering_co
 
 mat2x3 get_simple_water_fog(
 	float dist,
-	float lov,
+	float LoV,
 	float sss_depth,
 	float skylight
 ) {
@@ -22,7 +22,7 @@ mat2x3 get_simple_water_fog(
 	vec3 transmittance = exp(-water_extinction_coeff * dist);
 
 	vec3 scattering  = light_color * exp(-water_extinction_coeff * sss_depth) * smoothstep(0.0, 0.25, skylight); // direct lighting
-		 scattering *= 0.7 * henyey_greenstein_phase(lov, 0.4) + 0.3 * isotropic_phase;                          // phase function for direct lighting
+		 scattering *= 0.7 * henyey_greenstein_phase(LoV, 0.4) + 0.3 * isotropic_phase;                          // phase function for direct lighting
 	     scattering += sky_samples[0] * pow4(skylight) * isotropic_phase;                                        // ambient lighting
 	     scattering *= (1.0 - transmittance) * water_scattering_coeff / water_extinction_coeff;                  // scattering integral
 		 scattering *= 1.0 + multiple_scattering_energy;                                                         // multiple scattering

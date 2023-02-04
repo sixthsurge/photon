@@ -3,7 +3,7 @@
 /*
 --------------------------------------------------------------------------------
 
-  Photon Shader by SixthSurge
+  Photon Shaders by SixthSurge
 
   world0/composite.fsh:
   Render volumetric fog
@@ -213,8 +213,8 @@ mat2x3 raymarch_air_fog(vec3 world_start_pos, vec3 world_end_pos, bool sky, floa
 		light_sky[1] *= skylight;
 	}
 
-	float lov = dot(world_dir, light_dir);
-	float mie_phase = 0.7 * henyey_greenstein_phase(lov, 0.5) + 0.3 * henyey_greenstein_phase(lov, -0.2);
+	float LoV = dot(world_dir, light_dir);
+	float mie_phase = 0.7 * henyey_greenstein_phase(LoV, 0.5) + 0.3 * henyey_greenstein_phase(LoV, -0.2);
 
 	/*
 	// Single scattering

@@ -54,8 +54,8 @@ const vec2[32] blue_noise_disk = vec2[](
 );
 
 // Fake, lightmap-based shadows for outside of the shadow range or when shadows are disabled
-float lightmap_shadows(float skylight, float nol, out float sss_depth) {
-	sss_depth = 0.5 * (6.15 - 6.0 * skylight) * clamp01(1.0 - 0.5 * max0(nol));
+float lightmap_shadows(float skylight, float NoL, out float sss_depth) {
+	sss_depth = 0.5 * (6.15 - 6.0 * skylight) * clamp01(1.0 - 0.5 * max0(NoL));
 	return smoothstep(13.5 / 15.0, 14.5 / 15.0, skylight);
 }
 
@@ -198,10 +198,10 @@ vec3 calculate_shadows(
 	float sss_amount,
 	out float sss_depth
 ) {
-	float nol = dot(flat_normal, light_dir);
-	if (nol < 1e-3 && sss_amount < 1e-3) return vec3(0.0);
+	float NoL = dot(flat_normal, light_dir);
+	if (NoL < 1e-3 && sss_amount < 1e-3) return vec3(0.0);
 
-	vec3 bias = get_shadow_bias(scene_pos, flat_normal, nol, skylight);
+	vec3 bias = get_shadow_bias(scene_pos, flat_normal, NoL, skylight);
 
 	vec3 shadow_view_pos = transform(shadowModelView, scene_pos + bias);
 	vec3 shadow_clip_pos = project_ortho(shadowProjection, shadow_view_pos);
@@ -212,7 +212,7 @@ vec3 calculate_shadows(
 #ifdef SSRT_DISTANT_SHADOWS
 	float distant_shadow = raytrace_shadows();
 #else
-	float distant_shadow = lightmap_shadows(skylight, nol, sss_depth);
+	float distant_shadow = lightmap_shadows(skylight, NoL, sss_depth);
 #endif
 
 	if (distance_fade >= 1.0) return vec3(distant_shadow);
@@ -227,7 +227,7 @@ vec3 calculate_shadows(
 	// SSS depth computed together with blocker depth
 	sss_depth = mix(blocker_search_result.y, sss_depth, distance_fade);
 
-	if (nol < 1e-3) return vec3(0.0); // now we can exit early for SSS blocks
+	if (NoL < 1e-3) return vec3(0.0); // now we can exit early for SSS blocks
 	if (blocker_search_result.x < eps) return vec3(distant_shadow); // blocker search empty handed => no occluders
 
 	float penumbra_size  = 16.0 * SHADOW_PENUMBRA_SCALE * (shadow_screen_pos.z - blocker_search_result.x) / blocker_search_result.x;
@@ -251,10 +251,10 @@ vec3 calculate_shadows(
 	float sss_amount,
 	out float sss_depth
 ) {
-	float nol = dot(flat_normal, light_dir);
-	if (nol < 1e-2 && sss_amount < 1e-2) return vec3(0.0);
+	float NoL = dot(flat_normal, light_dir);
+	if (NoL < 1e-2 && sss_amount < 1e-2) return vec3(0.0);
 
-	return vec3(lightmap_shadows(skylight, nol, sss_depth));
+	return vec3(lightmap_shadows(skylight, NoL, sss_depth));
 }
 #endif
 

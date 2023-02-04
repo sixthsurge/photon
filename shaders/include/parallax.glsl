@@ -29,7 +29,9 @@ vec2 get_parallax_uv(
 ) {
 	const float depth_step = rcp(float(POM_SAMPLES));
 
-	vec3 ray_step = vec3(tangent_dir.xy * rcp(-tangent_dir.z) * POM_DEPTH, 1.0) * depth_step;
+	float parallax_fade = linear_step(0.75 * POM_DISTANCE, POM_DISTANCE, view_distance);
+
+	vec3 ray_step = vec3(tangent_dir.xy * rcp(-tangent_dir.z) * POM_DEPTH * (1.0 - parallax_fade), 1.0) * depth_step;
 	vec3 pos = vec3(atlas_tile_coord + ray_step.xy * dither, 0.0);
 
 	float depth_value = 1.0;

@@ -3,7 +3,7 @@
 /*
 --------------------------------------------------------------------------------
 
-  Photon Shader by SixthSurge
+  Photon Shaders by SixthSurge
 
   world0/composite1.fsh:
   Shade translucent layer, apply SSR and VL
@@ -65,6 +65,8 @@ uniform float far;
 
 uniform float frameTimeCounter;
 uniform float sunAngle;
+uniform float rainStrength;
+uniform float wetness;
 
 uniform int worldTime;
 uniform int frameCounter;
@@ -84,6 +86,7 @@ uniform vec2 taa_offset;
 uniform float eye_skylight;
 
 uniform float biome_cave;
+uniform float biome_may_rain;
 
 uniform float time_sunrise;
 uniform float time_noon;
@@ -150,6 +153,84 @@ vec3 purkinje_shift(vec3 rgb, float purkinje_intensity) {
 	return max0(rgb);
 }
 
+// ----------------
+//   Rain Puddles
+// ----------------
+
+float get_ripple_height(vec2 coord) {
+	const float ripple_frequency = 0.3;
+	const float ripple_speed     = 0.1;
+	const vec2 ripple_dir_0       = vec2( 3.0,   4.0) / 5.0;
+	const vec2 ripple_dir_1       = vec2(-5.0, -12.0) / 13.0;
+
+	float ripple_noise_1 = texture(noisetex, coord * ripple_frequency + frameTimeCounter * ripple_speed * ripple_dir_0).y;
+	float ripple_noise_2 = texture(noisetex, coord * ripple_frequency + frameTimeCounter * ripple_speed * ripple_dir_1).y;
+
+	return mix(ripple_noise_1, ripple_noise_2, 0.5);
+}
+
+float get_puddle_noise(vec3 world_pos, vec3 flat_normal, vec2 light_levels) {
+	const float puddle_frequency = 0.025;
+
+	float puddle = texture(noisetex, world_pos.xz * puddle_frequency).w;
+	      puddle = linear_step(0.45, 0.55, puddle) * wetness * biome_may_rain * max0(flat_normal.y);
+
+	// Prevent puddles from appearing indoors
+	puddle *= (1.0 - cube(light_levels.x)) * pow5(light_levels.y);
+
+	return puddle;
+}
+
+bool get_rain_puddles(
+	vec3 world_pos,
+	vec3 flat_normal,
+	vec2 light_levels,
+	float distance_fade,
+	float porosity,
+	inout vec3 normal,
+	inout vec3 f0,
+	inout float roughness,
+	inout float ssr_multiplier
+) {
+	const float puddle_f0                      = 0.02;
+	const float puddle_roughness               = 0.002;
+	const float puddle_darkening_factor        = 0.2;
+	const float puddle_darkening_factor_porous = 0.3;
+
+	if (wetness < 0.0 || biome_may_rain < 0.0) return false;
+
+	float puddle = get_puddle_noise(world_pos, flat_normal, light_levels) * distance_fade;
+
+	if (puddle < eps) return false;
+
+	// Puddle darkening
+	scene_color *= 1.0 - puddle_darkening_factor_porous * porosity * puddle;
+	puddle *= 1.0 - porosity;
+	scene_color *= 1.0 - puddle_darkening_factor * puddle;
+
+	// Replace material with puddle material
+	f0             = max(f0, mix(f0, vec3(puddle_f0), puddle));
+	roughness      = puddle_roughness;
+	ssr_multiplier = max(ssr_multiplier, puddle);
+
+	// Ripple animation
+	const float h = 0.1;
+	float ripple0 = get_ripple_height(world_pos.xz);
+	float ripple1 = get_ripple_height(world_pos.xz + vec2(h, 0.0));
+	float ripple2 = get_ripple_height(world_pos.xz + vec2(0.0, h));
+
+	vec3 ripple_normal     = vec3(ripple1 - ripple0, ripple2 - ripple0, h);
+	     ripple_normal.xy *= 0.05 * smoothstep(0.0, 0.1, abs(dot(flat_normal, normalize(world_pos - cameraPosition))));
+	     ripple_normal     = normalize(ripple_normal);
+		 ripple_normal     = ripple_normal.xzy; // convert to world space
+
+	normal = mix(normal, flat_normal, puddle);
+	normal = mix(normal, ripple_normal, puddle * rainStrength);
+	normal = normalize_safe(normal);
+
+	return true;
+}
+
 void main() {
 	ivec2 texel = ivec2(gl_FragCoord.xy);
 
@@ -194,7 +275,7 @@ void main() {
 	vec3 albedo       = is_translucent ? blend_color.rgb : vec3(data[0], data[1].x);
 	uint object_id    = uint(255.0 * data[1].y);
 	vec3 flat_normal  = decode_unit_vector(data[2]);
-	vec2 light_access = data[3];
+	vec2 light_levels = data[3];
 
 	Material material;
 	vec3 normal = flat_normal;
@@ -217,9 +298,9 @@ void main() {
 		material.porosity           = 0.0;
 		material.is_metal           = false;
 		material.is_hardcoded_metal = false;
-		material.has_reflections    = true;
+		material.ssr_multiplier     = 1.0;
 	} else {
-		material = material_from(albedo, object_id, world_pos, light_access);
+		material = material_from(albedo, object_id, world_pos, light_levels);
 
 #ifdef NORMAL_MAPPING
 		normal = decode_unit_vector(gbuffer_data_1.xy);
@@ -263,45 +344,47 @@ void main() {
 
 	// Shade translucent layer
 
-	if (is_translucent) {
-		float nol = dot(normal, light_dir);
-		float nov = clamp01(dot(normal, -world_dir));
-		float lov = dot(light_dir, -world_dir);
-		float halfway_norm = inversesqrt(2.0 * lov + 2.0);
-		float noh = (nol + nov) * halfway_norm;
-		float loh = lov * halfway_norm + halfway_norm;
+	if (is_rain_particle) {
+		scene_color = mix(scene_color, get_rain_color(), RAIN_OPACITY);
+	} else if (is_translucent) {
+		float NoL = dot(normal, light_dir);
+		float NoV = clamp01(dot(normal, -world_dir));
+		float LoV = dot(light_dir, -world_dir);
+		float halfway_norm = inversesqrt(2.0 * LoV + 2.0);
+		float NoH = (NoL + NoV) * halfway_norm;
+		float LoH = LoV * halfway_norm + halfway_norm;
 
 		float sss_depth;
-		vec3 shadows = calculate_shadows(scene_pos, flat_normal, light_access.y, material.sss_amount, sss_depth);
+		vec3 shadows = calculate_shadows(scene_pos, flat_normal, light_levels.y, material.sss_amount, sss_depth);
 
 		vec3 translucent_color = get_diffuse_lighting(
 			material,
 			normal,
 			flat_normal,
 			shadows,
-			light_access,
+			light_levels,
 			material.sss_amount,
 			sss_depth,
-			nol,
-			nov,
-			noh,
-			lov
+			NoL,
+			NoV,
+			NoH,
+			LoV
 		);
 
-		translucent_color += get_specular_highlight(material, nol, nov, noh, lov, loh) * light_color * shadows;
+		translucent_color += get_specular_highlight(material, NoL, NoV, NoH, LoV, LoH) * light_color * shadows;
 
 		// Blend with background
 
 		if (is_water) {
 			float dist = (isEyeInWater == 1) ? 0.0 : distance(view_pos, view_back_pos);
-			float lov = dot(world_dir, light_dir);
+			float LoV = dot(world_dir, light_dir);
 			float water_n = isEyeInWater == 1 ? air_n / water_n : water_n / air_n;
 
-			mat2x3 water_fog = get_simple_water_fog(dist, lov, sss_depth, light_access.y);
+			mat2x3 water_fog = get_simple_water_fog(dist, LoV, sss_depth, light_levels.y);
 
 			scene_color *= water_fog[1];
 			scene_color += water_fog[0];
-			scene_color *= 1.0 - fresnel_dielectric_n(nov, water_n);
+			scene_color *= 1.0 - fresnel_dielectric_n(NoV, water_n);
 		} else {
 			vec3 tint = material.albedo;
 			float alpha = blend_color.a;
@@ -312,10 +395,33 @@ void main() {
 		scene_color += translucent_color;
 	}
 
+	float distance_fade = border_fog(scene_pos, world_dir);
+
+	// Rain puddles
+
+#ifdef RAIN_PUDDLES
+	bool puddle = get_rain_puddles(
+		world_pos,
+		flat_normal,
+		light_levels,
+		distance_fade,
+		material.porosity,
+		normal,
+		material.f0,
+		material.roughness,
+		material.ssr_multiplier
+	);
+
+	if (puddle) {
+		material.is_metal = false;
+		material.is_hardcoded_metal = false;
+	}
+#endif
+
 	// Specular reflections
 
 #ifdef SSR
-	if (material.has_reflections && depth0 < 1.0) {
+	if (material.ssr_multiplier > eps && depth0 < 1.0) {
 		scene_color += get_specular_reflections(
 			material,
 			tbn,
@@ -324,8 +430,8 @@ void main() {
 			normal,
 			world_dir,
 			world_dir * tbn,
-			light_access.y
-		);
+			light_levels.y
+		) * distance_fade;
 	}
 #endif
 
@@ -344,12 +450,12 @@ void main() {
 	// Purkinje shift
 
 #ifdef PURKINJE_SHIFT
-	light_access = (depth0 == 1.0) ? vec2(0.0, 1.0) : light_access;
+	light_levels = (depth0 == 1.0) ? vec2(0.0, 1.0) : light_levels;
 
 	float purkinje_intensity  = 0.066 * PURKINJE_SHIFT_INTENSITY;
-	      purkinje_intensity *= 1.0 - smoothstep(-0.12, -0.06, sun_dir.y) * light_access.y;
-		  purkinje_intensity *= 0.1 + 0.9 * light_access.y;
-	      purkinje_intensity *= clamp01(1.0 - light_access.x);
+	      purkinje_intensity *= 1.0 - smoothstep(-0.12, -0.06, sun_dir.y) * light_levels.y;
+		  purkinje_intensity *= 0.1 + 0.9 * light_levels.y;
+	      purkinje_intensity *= clamp01(1.0 - light_levels.x);
 
 	scene_color = purkinje_shift(scene_color, purkinje_intensity);
 #endif
@@ -366,6 +472,9 @@ void main() {
 	#ifdef CAVE_FOG
 	bloomy_fog *= spherical_fog(view_dist, 0.0, 0.005 * biome_cave * float(depth0 != 1.0));
 	#endif
-#endif
 
+	#ifdef BLOOMY_RAIN
+	bloomy_fog *= 1.0 - RAIN_OPACITY * float(is_rain_particle || is_snow_particle);
+	#endif
+#endif
 }

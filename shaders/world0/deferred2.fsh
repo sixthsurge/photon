@@ -3,7 +3,7 @@
 /*
 --------------------------------------------------------------------------------
 
-  Photon Shader by SixthSurge
+  Photon Shaders by SixthSurge
 
   world0/deferred2.fsh:
   Calculate ambient occlusion, cloud temporal upscaling
@@ -192,7 +192,7 @@ float ambient_occlusion(vec3 screen_pos, vec3 view_pos, vec3 view_normal, vec2 d
 	#define checkerboard_offsets checkerboard_offsets_4x4
 #endif
 
-#define CLOUDS_ACCUMULATION_LIMIT 30
+#define CLOUDS_ACCUMULATION_LIMIT 20
 
 vec4 upscale_clouds() {
 	const int checkerboard_area = CLOUDS_TEMPORAL_UPSCALING * CLOUDS_TEMPORAL_UPSCALING;
@@ -311,10 +311,10 @@ void main() {
 
 	// Depth rejection
 	float view_norm = rcp_length(view_pos);
-	float nov = abs(dot(view_normal, view_pos)) * view_norm; // nov / sqrt(length(view_pos))
+	float NoV = abs(dot(view_normal, view_pos)) * view_norm; // NoV / sqrt(length(view_pos))
 	float z0 = linearize_depth_fast(depth);
 	float z1 = linearize_depth_fast(1.0 - history_ao.z);
-	float depth_weight = exp2(-abs(z0 - z1) * depth_rejection_strength * nov * view_norm);
+	float depth_weight = exp2(-abs(z0 - z1) * depth_rejection_strength * NoV * view_norm);
 
 	pixel_age *= depth_weight * offcenter_rejection * float(history_ao.z != 1.0);
 

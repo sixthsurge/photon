@@ -3,7 +3,7 @@
 /*
 --------------------------------------------------------------------------------
 
-  Photon Shader by SixthSurge
+  Photon Shaders by SixthSurge
 
   world0/composite1.vsh:
   Calculate lighting colors and fog coefficients
@@ -21,6 +21,7 @@ flat out vec3 moon_color;
 flat out mat3 sky_samples;
 
 uniform float sunAngle;
+uniform float rainStrength;
 
 uniform int worldTime;
 

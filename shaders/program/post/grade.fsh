@@ -1,7 +1,7 @@
 /*
 --------------------------------------------------------------------------------
 
-  Photon Shader by SixthSurge
+  Photon Shaders by SixthSurge
 
   program/post/grade.fsh:
   Apply bloom, color grading and tone mapping then convert to rec. 709

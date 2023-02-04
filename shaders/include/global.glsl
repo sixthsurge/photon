@@ -6,6 +6,12 @@
 	#define gtexture gcolor
 #endif
 
+#if defined VSH
+	#define varying out
+#else
+	#define varying in
+#endif
+
 // Common constants
 
 const float eps          = 1e-6;

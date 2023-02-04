@@ -1,7 +1,7 @@
 /*
 --------------------------------------------------------------------------------
 
-  Photon Shader by SixthSurge
+  Photon Shaders by SixthSurge
 
   program/post/bloom/merge_buffers.fsh
   Copy bloom tiles from read buffer to write buffer

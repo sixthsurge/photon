@@ -7,6 +7,10 @@
 #include "atmosphere.glsl"
 #include "utility/color.glsl"
 
+// --------------------------
+//   Sunlight and moonlight
+// --------------------------
+
 // Magic brightness adjustments, pre-exposing for the light source to compensate
 // for the lack of auto exposure by default
 float get_sunlight_scale() {
@@ -50,8 +54,17 @@ vec3 get_light_color() {
 	     light_color *= sunlight_color * atmosphere_transmittance(light_dir.y, planet_radius) * vec3(0.97, 0.97, 1.0);
 	     light_color *= clamp01(rcp(0.02) * light_dir.y); // fade away during day/night transition
 		 light_color *= 1.0 - 0.25 * pulse(abs(light_dir.y), 0.15, 0.11);
+		 light_color *= 1.0 - rainStrength;
 
 	return light_color;
+}
+
+// -------
+//   Sky
+// -------
+
+vec3 get_rain_color() {
+	return mix(0.033, 0.40, smoothstep(-0.1, 0.5, sun_dir.y)) * sunlight_color * vec3(0.49, 0.65, 1.00);
 }
 
 vec3 get_sky_color() {
@@ -68,6 +81,7 @@ vec3 get_sky_color() {
 	sky_color = mix(sky_color, vec3(0.26, 0.28, 0.33), late_sunset);
 	sky_color = mix(sky_color, vec3(0.44, 0.45, 0.70), blue_hour);
 	sky_color = mix(vec3(0.0), sky_color, linear_step(-0.07, 0.0, sun_dir.y));
+	sky_color = mix(sky_color, 0.8 * get_rain_color() * tau, rainStrength);
 
 	return sky_color;
 }

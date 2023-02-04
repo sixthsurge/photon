@@ -1,7 +1,7 @@
 /*
 --------------------------------------------------------------------------------
 
-  Photon Shader by SixthSurge
+  Photon Shaders by SixthSurge
 
   program/gbuffer/solid.vsh:
   Handle terrain, entities, the hand, beacon beams and spider eyes
@@ -12,7 +12,7 @@
 #include "/include/global.glsl"
 
 out vec2 uv;
-out vec2 light_access;
+out vec2 light_levels;
 
 flat out uint object_id;
 flat out vec4 tint;
@@ -69,7 +69,7 @@ uniform int heldItemId2;
 
 void main() {
 	uv           = gl_MultiTexCoord0.xy;
-	light_access = clamp01(gl_MultiTexCoord1.xy * rcp(240.0));
+	light_levels = clamp01(gl_MultiTexCoord1.xy * rcp(240.0));
 	tint         = gl_Color;
 
 	tbn[0] = mat3(gbufferModelViewInverse) * normalize(gl_NormalMatrix * at_tangent.xyz);
@@ -99,14 +99,14 @@ void main() {
 
 #ifdef PROGRAM_SPIDEREYES
 	object_id = 2; // full emissive
-	light_access.x = 1.0;
+	light_levels.x = 1.0;
 #endif
 
 	vec3 view_pos = transform(gl_ModelViewMatrix, gl_Vertex.xyz);
 #if defined PROGRAM_TERRAIN
 	bool is_top_vertex = uv.y < mc_midTexCoord.y;
 	vec3 scene_pos = view_to_scene_space(view_pos);
-	scene_pos += animate_vertex(scene_pos + cameraPosition, is_top_vertex, light_access.y, object_id);
+	scene_pos += animate_vertex(scene_pos + cameraPosition, is_top_vertex, light_levels.y, object_id);
     view_pos = scene_to_view_space(scene_pos);
 
 	#ifdef POM

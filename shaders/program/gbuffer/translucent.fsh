@@ -1,7 +1,7 @@
 /*
 --------------------------------------------------------------------------------
 
-  Photon Shader by SixthSurge
+  Photon Shaders by SixthSurge
 
   program/gbuffer/translucent.fsh:
   Handle translucent terrain, translucent handheld items, water and particles
@@ -26,7 +26,7 @@ layout (location = 1) out vec4 gbuffer_data_0; // albedo, block ID, flat normal,
 layout (location = 2) out vec4 gbuffer_data_1; // detailed normal, specular map (optional)
 
 in vec2 uv;
-in vec2 light_access;
+in vec2 light_levels;
 
 flat in uint object_id;
 flat in vec4 tint;
@@ -112,7 +112,7 @@ void main() {
 	gbuffer_data_0.x  = pack_unorm_2x8(base_color.rg);
 	gbuffer_data_0.y  = pack_unorm_2x8(base_color.b, float(object_id) * rcp(255.0));
 	gbuffer_data_0.z  = pack_unorm_2x8(encode_unit_vector(tbn[2]));
-	gbuffer_data_0.w  = pack_unorm_2x8(dither_8bit(light_access, dither));
+	gbuffer_data_0.w  = pack_unorm_2x8(dither_8bit(light_levels, dither));
 
 #ifdef PROGRAM_TEXTURED
 	// Kill the little rain splash particles

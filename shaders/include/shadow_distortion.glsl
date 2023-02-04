@@ -35,9 +35,9 @@ vec3 undistort_shadow_space(vec3 shadow_clip_pos) {
 // and light leaking underground!)
 // Many thanks to Emin for letting me use it <3
 // https://www.complementary.dev/reimagined
-vec3 get_shadow_bias(vec3 scene_pos, vec3 normal, float nol, float skylight) {
+vec3 get_shadow_bias(vec3 scene_pos, vec3 normal, float NoL, float skylight) {
 	// Shadow bias without peter-panning
-	vec3 bias = 0.25 * normal * clamp01(0.12 + 0.01 * length(scene_pos)) * (2.0 - clamp01(nol));
+	vec3 bias = 0.25 * normal * clamp01(0.12 + 0.01 * length(scene_pos)) * (2.0 - clamp01(NoL));
 
 	// Fix light leaking in caves
 	vec3 edge_factor = 0.1 - 0.2 * fract(scene_pos + cameraPosition + normal * 0.01);

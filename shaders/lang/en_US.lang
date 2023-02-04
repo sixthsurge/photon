@@ -32,7 +32,7 @@ screen.fog_rlh_taiga                   = Taiga Color
 screen.fog_rlh_jungle                  = Jungle Color
 screen.fog_rlh_swamp                   = Swamp Color
 
-option.INFO                            = Photon Shader
+option.INFO                            = Photon Shaders
 value.INFO.0                           = §eby SixthSurge
 value.INFO.1                           = §aby SixthSurge
 value.INFO.2                           = §bby SixthSurge
@@ -42,6 +42,8 @@ value.INFO.3                           = §dby SixthSurge
 
 option.WAVING_PLANTS                   = Waving Plants
 option.WAVING_LEAVES                   = Waving Leaves
+option.SLANTED_RAIN                    = Slanted Rain
+option.RAIN_OPACITY                    = Rain Opacity
 option.SEA_LEVEL                       = Sea Level
 
 # Lighting settings
