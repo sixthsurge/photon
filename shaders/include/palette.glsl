@@ -16,8 +16,7 @@
 float get_sunlight_scale() {
 	const float base_scale = 7.0 * SUN_I;
 
-	float blue_hour = cube(pulse(float(worldTime), 13200.0, 830.0, 24000.0))  // dusk
-	                + cube(pulse(float(worldTime), 22800.0, 830.0, 24000.0)); // dawn
+	float blue_hour = linear_step(0.05, 1.0, exp(-190.0 * sqr(sun_dir.y + 0.09604)));
 
 	float daytime_mul = 1.0 + 0.5 * (time_sunset + time_sunrise) + 40.0 * blue_hour;
 
@@ -27,8 +26,7 @@ float get_sunlight_scale() {
 vec3 get_sunlight_tint() {
 	const vec3 base_tint = from_srgb(vec3(SUN_R, SUN_G, SUN_B));
 
-	float blue_hour = cube(pulse(float(worldTime), 13200.0, 800.0, 24000.0))  // dusk
-	                + cube(pulse(float(worldTime), 22800.0, 800.0, 24000.0)); // dawn
+	float blue_hour = linear_step(0.05, 1.0, exp(-190.0 * sqr(sun_dir.y + 0.09604)));
 
 	vec3 morning_evening_tint = vec3(1.05, 0.84, 0.93) * 1.2;
 	     morning_evening_tint = mix(vec3(1.0), morning_evening_tint, sqr(pulse(sun_dir.y, 0.17, 0.40)));
@@ -72,11 +70,9 @@ vec3 get_sky_color() {
 	               + vec3(0.69, 0.87, 1.67) * time_noon
 				   + vec3(0.48, 0.55, 0.75) * time_sunset;
 
-	float late_sunset = pulse(float(worldTime), 12500.0, 500.0, 24000.0)
-	                  + pulse(float(worldTime), 23500.0, 500.0, 24000.0);
+	float late_sunset = linear_step(0.05, 1.0, exp(-200.0 * sqr(sun_dir.y - 0.06514)));
 
-	float blue_hour = pulse(float(worldTime), 13000.0, 500.0, 24000.0)  // dusk
-	                + pulse(float(worldTime), 23000.0, 500.0, 24000.0); // dawn
+	float blue_hour = linear_step(0.05, 1.0, exp(-220.0 * sqr(sun_dir.y + 0.04964)));
 
 	sky_color = mix(sky_color, vec3(0.26, 0.28, 0.33), late_sunset);
 	sky_color = mix(sky_color, vec3(0.44, 0.45, 0.70), blue_hour);
@@ -88,7 +84,7 @@ vec3 get_sky_color() {
 
 float get_skylight_boost() {
 	float night_skylight_boost = 4.0 * (1.0 - smoothstep(-0.16, 0.0, sun_dir.y))
-	                           - 3.0 * dampen(pulse(float(worldTime), 18000.0, 6000.0));
+	                           - 3.0 * linear_step(0.1, 1.0, exp(-2.42 * sqr(sun_dir.y + 0.81)));
 
 	return 1.0 + max0(night_skylight_boost);
 }

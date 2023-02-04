@@ -33,8 +33,7 @@ float border_fog(vec3 scene_pos, vec3 world_dir) {
 #include "sky_projection.glsl"
 
 vec3 border_fog_color(vec3 world_dir, float fog) {
-	float sunset_factor = pulse(float(worldTime), 13000.0, 800.0, 24000.0)  // dusk
-	                    + pulse(float(worldTime), 23000.0, 800.0, 24000.0); // dawn
+	float sunset_factor = linear_step(0.1, 1.0, exp(-75.0 * sqr(sun_dir.y + 0.0496)));
 
 	vec3 fog_color = bicubic_filter(colortex4, project_sky(world_dir)).rgb;
 	vec3 fog_color_sunset = texture(colortex4, project_sky(normalize(vec3(world_dir.xz, min(world_dir.y, -0.1)).xzy))).rgb;

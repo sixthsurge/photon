@@ -46,8 +46,7 @@ mat2x3 air_fog_rayleigh_coeff() {
 
 mat2x3 air_fog_mie_coeff() {
 	// Increased mie density during late sunset / blue hour
-	float blue_hour = sqr(pulse(float(worldTime), 13100.0, 800.0, 24000.0))  // dusk
-	                + sqr(pulse(float(worldTime), 22900.0, 800.0, 24000.0)); // dawn
+	float blue_hour = linear_step(0.05, 1.0, exp(-190.0 * sqr(sun_dir.y + 0.07283)));
 
 	float mie_coeff = AIR_FOG_MIE_DENSITY_MORNING  * time_sunrise
 	                + AIR_FOG_MIE_DENSITY_NOON     * time_noon
