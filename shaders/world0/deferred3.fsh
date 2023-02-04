@@ -213,7 +213,7 @@ void main() {
 			float puddle = get_puddle_noise(world_pos, flat_normal, light_levels) * float(!material.is_metal);
 
 			material.f0 = mix(material.f0, vec3(puddle_f0), puddle);
-			material.roughness = mix(material.roughness, puddle_roughness, puddle);
+			material.roughness = mix(material.roughness, puddle_roughness, dampen(puddle));
 			normal = normalize_safe(mix(normal, flat_normal, puddle));
 		}
 #endif

@@ -39,47 +39,10 @@ uniform int frameCounter;
 uniform vec2 taa_offset;
 uniform vec2 view_pixel_size;
 
-// ------------------
-//   Fragment Stage
-// ------------------
-#if defined FSH
-
-layout (location = 0) out vec4 base_color;
-layout (location = 1) out vec4 gbuffer_data;
-
-/* DRAWBUFFERS:31 */
-
-#include "/include/utility/encoding.glsl"
-
-const uint rain_flag = 253u;
-const uint snow_flag = 254u;
-const float lod_bias = log2(taau_render_scale);
-
-void main() {
-#if defined TAA && defined TAAU
-	vec2 coord = gl_FragCoord.xy * view_pixel_size * rcp(taau_render_scale);
-	if (clamp01(coord) != coord) discard;
-#endif
-
-	base_color = texture(gtexture, uv, lod_bias) * tint;
-
-	if (base_color.a < 0.1) discard;
-
-	bool is_snow = abs(base_color.r - base_color.b) < eps;
-	uint object_id = is_snow ? snow_flag : rain_flag;
-
-	gbuffer_data.x  = pack_unorm_2x8(base_color.rg);
-	gbuffer_data.y  = pack_unorm_2x8(base_color.b, float(object_id) * rcp(255.0));
-	gbuffer_data.z  = pack_unorm_2x8(encode_unit_vector(vec3(0.0, 1.0, 0.0)));
-	gbuffer_data.w  = pack_unorm_2x8(vec2(1.0));
-}
-
-#endif
-
-// ----------------
-//   Vertex Stage
-// ----------------
-#if defined VSH
+// -----------------
+//   Vertex Shader
+// -----------------
+#if defined STAGE_VERTEX
 
 void main() {
 	uv = mat2(gl_TextureMatrix[0]) * gl_MultiTexCoord0.xy + gl_TextureMatrix[0][3].xy;
@@ -110,6 +73,43 @@ void main() {
 #endif
 
 	gl_Position = clip_pos;
+}
+
+#endif
+
+// -------------------
+//   Fragment Shader
+// -------------------
+#if defined STAGE_FRAGMENT
+
+layout (location = 0) out vec4 base_color;
+layout (location = 1) out vec4 gbuffer_data;
+
+/* DRAWBUFFERS:31 */
+
+#include "/include/utility/encoding.glsl"
+
+const uint rain_flag = 253u;
+const uint snow_flag = 254u;
+const float lod_bias = log2(taau_render_scale);
+
+void main() {
+#if defined TAA && defined TAAU
+	vec2 coord = gl_FragCoord.xy * view_pixel_size * rcp(taau_render_scale);
+	if (clamp01(coord) != coord) discard;
+#endif
+
+	base_color = texture(gtexture, uv, lod_bias) * tint;
+
+	if (base_color.a < 0.1) discard;
+
+	bool is_snow = abs(base_color.r - base_color.b) < eps;
+	uint object_id = is_snow ? snow_flag : rain_flag;
+
+	gbuffer_data.x  = pack_unorm_2x8(base_color.rg);
+	gbuffer_data.y  = pack_unorm_2x8(base_color.b, float(object_id) * rcp(255.0));
+	gbuffer_data.z  = pack_unorm_2x8(encode_unit_vector(vec3(0.0, 1.0, 0.0)));
+	gbuffer_data.w  = pack_unorm_2x8(vec2(1.0));
 }
 
 #endif
