@@ -649,8 +649,8 @@ vec4 renderClouds(
 	layer.coverage       = vec2(CLOUDS_LAYER3_COVERAGE);
 	layer.randomOffset   = vec2(-979530.0, -122390.0);
 	layer.wind           = polar(CLOUDS_LAYER3_WIND_SPEED * cloudsTime, CLOUDS_LAYER3_WIND_ANGLE * degree);
-	layer.detailStrength = CLOUDS_LAYER2_WISPINESS;
-	layer.curlStrength   = CLOUDS_LAYER2_SWIRLINESS;
+	layer.detailStrength = CLOUDS_LAYER3_WISPINESS;
+	layer.curlStrength   = CLOUDS_LAYER3_SWIRLINESS;
 
 
 #if CLOUDS_LAYER3_MODE == CLOUDS_MODE_PLANAR
