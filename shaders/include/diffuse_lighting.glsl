@@ -51,9 +51,13 @@ vec3 get_diffuse_lighting(
 
 	// Sunlight/moonlight
 
-	vec3 diffuse = vec3(lift(max0(NoL), 0.33) * (1.0 - 0.5 * material.sss_amount) * ao * mix(ao * ao, 1.0, NoL * NoL));
+	vec3 diffuse = vec3(lift(max0(NoL), 0.33) * (1.0 - 0.5 * material.sss_amount));
 	vec3 bounced = 0.08 * (1.0 - shadows * max0(NoL)) * (1.0 - 0.33 * max0(normal.y)) * pow1d5(ao + eps) * pow4(light_levels.y);
 	vec3 sss = sss_approx(material.albedo, material.sss_amount, material.sheen_amount, sss_depth, LoV);
+
+#ifdef AO_IN_SUNLIGHT
+	diffuse *= ao * mix(ao * ao, 1.0, NoL * NoL);
+#endif
 
 	lighting += light_color * (diffuse * shadows + bounced + sss);
 
@@ -69,7 +73,7 @@ vec3 get_diffuse_lighting(
 
 	float horizon_weight = 0.166 * (time_noon + time_midnight) + 0.03 * (time_sunrise + time_sunset);
 
-	vec3 rain_skylight  = get_rain_color() * mix(sqr(vanilla_diffuse), 0.95, step(eps, material.sss_amount));
+	vec3 rain_skylight  = get_weather_color() * mix(sqr(vanilla_diffuse), 0.95, step(eps, material.sss_amount));
 	     rain_skylight *= mix(4.0, 2.0, smoothstep(-0.1, 0.5, sun_dir.y));
 
 	vec3 skylight  = mix(sky_samples[0] * 1.3, horizon_color, horizon_weight);

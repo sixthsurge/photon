@@ -65,6 +65,7 @@ uniform float near;
 uniform float far;
 
 uniform int worldTime;
+uniform int moonPhase;
 uniform float sunAngle;
 uniform float rainStrength;
 uniform float wetness;
@@ -86,6 +87,7 @@ uniform vec2 taa_offset;
 
 uniform float biome_cave;
 uniform float biome_may_rain;
+uniform float biome_may_snow;
 
 uniform float time_sunrise;
 uniform float time_noon;
@@ -147,11 +149,10 @@ void main() {
 
 	if (depth == 1.0) { // Sky
 		float pixel_age = texelFetch(colortex6, texel, 0).w;
-		vec4 clouds = bicubic_filter(colortex7, uv * taau_render_scale);
 
 		// Soften clouds for new pixels
-		int ld = int(max0(3.0 - 0.25 * pixel_age));
-		clouds = mix(bicubic_filter_lod(colortex7, uv * taau_render_scale, ld), clouds, smoothstep(0.0, 30.0, pixel_age));
+		int ld = int(max0(3.0 - 0.5 * pixel_age));
+		vec4 clouds = bicubic_filter_lod(colortex7, uv * taau_render_scale, ld);
 
 		scene_color = draw_sky(world_dir, clouds);
 	} else { // Terrain

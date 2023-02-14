@@ -49,6 +49,7 @@ uniform float biome_taiga;
 uniform float biome_jungle;
 uniform float biome_swamp;
 uniform float biome_may_rain;
+uniform float biome_may_snow;
 uniform float biome_temperature;
 uniform float biome_humidity;
 
@@ -73,7 +74,7 @@ void main() {
 	const vec3 sky_dir = normalize(vec3(0.0, 1.0, -0.8)); // don't point direcly upwards to avoid the sun halo when the sun path rotation is 0
 	sky_color = atmosphere_scattering(sky_dir, sun_dir) * sun_color + atmosphere_scattering(sky_dir, moon_dir) * moon_color;
 	sky_color = tau * mix(sky_color, vec3(sky_color.b) * sqrt(2.0), rcp_pi);
-	sky_color = mix(sky_color, tau * get_rain_color(), rainStrength);
+	sky_color = mix(sky_color, tau * get_weather_color(), rainStrength);
 
 	vec2 vertex_pos = gl_Vertex.xy * taau_render_scale * rcp(float(CLOUDS_TEMPORAL_UPSCALING));
 	gl_Position = vec4(vertex_pos * 2.0 - 1.0, 0.0, 1.0);

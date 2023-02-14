@@ -203,7 +203,7 @@ vec4 upscale_clouds() {
 	vec2 previous_uv = reproject(vec3(uv, 1.0)).xy;
 
 	vec4 current = texelFetch(colortex5, src_texel, 0);
-	vec4 history = catmull_rom_filter(colortex7, previous_uv * taau_render_scale);
+	vec4 history = texture(colortex7, previous_uv * taau_render_scale);
 
 	float history_depth = min_of(textureGather(colortex6, previous_uv * gtao_render_scale, 2));
 
@@ -216,21 +216,17 @@ vec4 upscale_clouds() {
 
 	float pixel_age = max0(texture(colortex6, previous_uv * taau_render_scale).w) * float(!disocclusion);
 
+	// Checkerboard upscaling
+	ivec2 offset_0 = dst_texel % CLOUDS_TEMPORAL_UPSCALING;
+	ivec2 offset_1 = checkerboard_offsets[frameCounter % checkerboard_area];
+	if (offset_0 != offset_1 && !disocclusion) current = history;
+
 	// Reduce history weight when player is moving quickly
 	float movement_rejection = exp(-16.0 * length(cameraPosition - previousCameraPosition));
 	pixel_age *= movement_rejection * 0.07 + 0.93;
 
 	float history_weight  = 1.0 - rcp(max(pixel_age - checkerboard_area, 1.0));
 	      history_weight *= mix(1.0, movement_rejection, history_weight);
-
-	// Soft history sample using bicubic resampling
-	vec4 history_soft = max0(bicubic_filter(colortex7, previous_uv * taau_render_scale));
-	     history_soft = mix(history_soft, history, history_weight * 0.5 + 0.5);
-
-	// Checkerboard upscaling
-	ivec2 offset_0 = dst_texel % CLOUDS_TEMPORAL_UPSCALING;
-	ivec2 offset_1 = checkerboard_offsets[frameCounter % checkerboard_area];
-	if (offset_0 != offset_1 && !disocclusion) current = history_soft;
 
 	// Offcenter rejection
 	vec2 pixel_center_offset = 1.0 - abs(fract(previous_uv * view_res) * 2.0 - 1.0);

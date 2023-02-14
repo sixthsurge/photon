@@ -11,8 +11,18 @@
 
 #include "/include/global.glsl"
 
-/* RENDERTARGETS: 1 */
-layout (location = 0) out vec4 gbuffer_data;
+/* DRAWBUFFERS:1 */
+
+#ifdef NORMAL_MAPPING
+/* DRAWBUFFERS:12 */
+#endif
+
+#ifdef SPECULAR_MAPPING
+/* DRAWBUFFERS:12 */
+#endif
+
+layout (location = 0) out vec4 gbuffer_data_0; // albedo, block ID, flat normal, light levels
+layout (location = 1) out vec4 gbuffer_data_1; // detailed normal, specular map (optional)
 
 flat in vec2 light_levels;
 flat in vec3 tint;
@@ -29,8 +39,20 @@ void main() {
 	if (clamp01(coord) != coord) discard;
 #endif
 
-	gbuffer_data.x = pack_unorm_2x8(tint.rg);
-	gbuffer_data.y = pack_unorm_2x8(tint.b, 254.0 / 255.0);
-	gbuffer_data.z = pack_unorm_2x8(encode_unit_vector(normal));
-	gbuffer_data.w = pack_unorm_2x8(light_levels);
+	vec2 encoded_normal = encode_unit_vector(normal);
+
+	gbuffer_data_0.x = pack_unorm_2x8(tint.rg);
+	gbuffer_data_0.y = pack_unorm_2x8(tint.b, 0.0);
+	gbuffer_data_0.z = pack_unorm_2x8(encode_unit_vector(normal));
+	gbuffer_data_0.w = pack_unorm_2x8(light_levels);
+
+#ifdef NORMAL_MAPPING
+	gbuffer_data_1.xy = encoded_normal;
+#endif
+
+#ifdef SPECULAR_MAPPING
+	const vec4 specular_map = vec4(0.0);
+	gbuffer_data_1.z = pack_unorm_2x8(specular_map.xy);
+	gbuffer_data_1.w = pack_unorm_2x8(specular_map.zw);
+#endif
 }

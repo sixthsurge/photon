@@ -6,11 +6,13 @@
 
 #include "atmosphere.glsl"
 #include "palette.glsl"
+#include "bsdf.glsl"
 #include "utility/fast_math.glsl"
+#include "utility/geometry.glsl"
 #include "utility/random.glsl"
 
 const float sun_luminance  = 40.0; // luminance of sun disk
-const float moon_luminance = 5.0; // luminance of sun disk
+const float moon_luminance = 20.0; // luminance of sun disk
 
 vec3 draw_sun(vec3 ray_dir) {
 	float nu = dot(ray_dir, sun_dir);
@@ -120,7 +122,7 @@ vec3 draw_sky(vec3 ray_dir, vec4 clouds) {
 	sky += moon_color * atmosphere_scattering(ray_dir, moon_dir);
 
 	// Rain
-	vec3 rain_sky = get_rain_color() * (1.0 - exp2(-0.8 / clamp01(ray_dir.y)));
+	vec3 rain_sky = get_weather_color() * (1.0 - exp2(-0.8 / clamp01(ray_dir.y)));
 	sky = mix(sky, rain_sky, rainStrength * mix(1.0, 0.9, time_sunrise + time_sunset));
 
 	// Clouds

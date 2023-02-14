@@ -55,6 +55,7 @@ mat2x3 air_fog_mie_coeff() {
 	                + AIR_FOG_MIE_DENSITY_BLUE_HOUR * blue_hour;
 
 	mie_coeff = mix(mie_coeff, AIR_FOG_MIE_DENSITY_RAIN, rainStrength * biome_may_rain);
+	mie_coeff = mix(mie_coeff, AIR_FOG_MIE_DENSITY_SNOW, rainStrength * biome_may_snow);
 
 	float mie_albedo = mix(0.9, 0.5, rainStrength * biome_may_rain);
 

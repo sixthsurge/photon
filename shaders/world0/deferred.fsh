@@ -63,6 +63,7 @@ uniform vec3 sun_dir;
 uniform vec3 moon_dir;
 
 uniform float biome_cave;
+uniform float biome_may_snow;
 
 uniform float time_sunrise;
 uniform float time_noon;

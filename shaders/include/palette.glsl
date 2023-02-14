@@ -62,7 +62,15 @@ vec3 get_light_color() {
 // -------
 
 vec3 get_rain_color() {
-	return mix(0.033, 0.40, smoothstep(-0.1, 0.5, sun_dir.y)) * sunlight_color * vec3(0.49, 0.65, 1.00);
+	return mix(0.033, 0.50, smoothstep(-0.1, 0.5, sun_dir.y)) * sunlight_color * vec3(0.49, 0.65, 1.00);
+}
+
+vec3 get_snow_color() {
+	return mix(0.060, 1.60, smoothstep(-0.1, 0.5, sun_dir.y)) * sunlight_color * vec3(0.49, 0.65, 1.00);
+}
+
+vec3 get_weather_color() {
+	return mix(get_rain_color(), get_snow_color(), biome_may_snow);
 }
 
 vec3 get_sky_color() {
@@ -77,7 +85,7 @@ vec3 get_sky_color() {
 	sky_color = mix(sky_color, vec3(0.26, 0.28, 0.33), late_sunset);
 	sky_color = mix(sky_color, vec3(0.44, 0.45, 0.70), blue_hour);
 	sky_color = mix(vec3(0.0), sky_color, linear_step(-0.07, 0.0, sun_dir.y));
-	sky_color = mix(sky_color, 0.8 * get_rain_color() * tau, rainStrength);
+	sky_color = mix(sky_color, 0.8 * get_weather_color() * tau, rainStrength);
 
 	return sky_color;
 }

@@ -237,7 +237,7 @@ void main() {
 	base_color.rgb = vec3(1.0);
 #endif
 
-#if defined PROGRAM_TERRAIN
+#if defined PROGRAM_TERRAIN && defined VANILLA_AO
 	const float vertex_ao_strength = 0.9;
 	const float vertex_ao_lift     = 0.5;
 	base_color.rgb *= lift(vertex_ao, vertex_ao_lift) * vertex_ao_strength + (1.0 - vertex_ao_strength);

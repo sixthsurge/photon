@@ -87,6 +87,7 @@ uniform float eye_skylight;
 
 uniform float biome_cave;
 uniform float biome_may_rain;
+uniform float biome_may_snow;
 
 uniform float time_sunrise;
 uniform float time_noon;
@@ -194,8 +195,8 @@ bool get_rain_puddles(
 ) {
 	const float puddle_f0                      = 0.02;
 	const float puddle_roughness               = 0.002;
-	const float puddle_darkening_factor        = 0.2;
-	const float puddle_darkening_factor_porous = 0.3;
+	const float puddle_darkening_factor        = 0.25;
+	const float puddle_darkening_factor_porous = 0.4;
 
 	if (wetness < 0.0 || biome_may_rain < 0.0) return false;
 
@@ -345,7 +346,11 @@ void main() {
 	// Shade translucent layer
 
 	if (is_rain_particle) {
-		scene_color = mix(scene_color, get_rain_color(), RAIN_OPACITY);
+		vec3 rain_color = get_rain_color();
+		scene_color = mix(scene_color, rain_color, RAIN_OPACITY);
+	} else if (is_snow_particle) {
+		vec3 snow_color = mix(0.5, 3.0, smoothstep(-0.1, 0.5, sun_dir.y)) * sunlight_color * vec3(0.49, 0.65, 1.00);
+		scene_color = mix(scene_color, snow_color, SNOW_OPACITY);
 	} else if (is_translucent) {
 		float NoL = dot(normal, light_dir);
 		float NoV = clamp01(dot(normal, -world_dir));
@@ -386,10 +391,14 @@ void main() {
 			scene_color += water_fog[0];
 			scene_color *= 1.0 - fresnel_dielectric_n(NoV, water_n);
 		} else {
-			vec3 tint = material.albedo;
+			vec3 tint = normalize_safe(material.albedo);
 			float alpha = blend_color.a;
-			scene_color *= (1.0 - alpha) + tint * alpha;
-			scene_color *= 1.0 - alpha;
+
+			vec3 absorption_coeff = 3.0 * (1.0 - tint) * alpha;
+			float dist = clamp(distance(view_pos, view_back_pos), 0.25, 1.41);
+
+			scene_color *= exp(-absorption_coeff * dist);
+			scene_color *= 1.0 - cube(alpha);
 		}
 
 		scene_color += translucent_color;
@@ -474,7 +483,7 @@ void main() {
 	#endif
 
 	#ifdef BLOOMY_RAIN
-	bloomy_fog *= 1.0 - RAIN_OPACITY * float(is_rain_particle || is_snow_particle);
+	bloomy_fog *= 1.0 - RAIN_OPACITY * float(is_rain_particle) - SNOW_OPACITY * float(is_snow_particle);
 	#endif
 #endif
 }

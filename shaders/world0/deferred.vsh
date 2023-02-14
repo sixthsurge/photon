@@ -12,6 +12,7 @@ uniform float sunAngle;
 uniform int worldTime;
 
 uniform float rainStrength;
+uniform float biome_may_snow;
 
 uniform vec3 light_dir;
 uniform vec3 sun_dir;

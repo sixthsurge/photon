@@ -50,6 +50,7 @@ option.SEA_LEVEL                       = Sea Level
 
 option.GTAO                            = Shader AO
 option.VANILLA_AO                      = Vanilla AO
+option.AO_IN_SUNLIGHT                  = AO in Sunlight
 option.SH_SKYLIGHT                     = SH Skylight
 
 option.SHADOW                          = Shadow Mapping

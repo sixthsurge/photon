@@ -36,6 +36,7 @@ uniform float biome_taiga;
 uniform float biome_jungle;
 uniform float biome_swamp;
 uniform float biome_may_rain;
+uniform float biome_may_snow;
 uniform float biome_temperature;
 uniform float biome_humidity;
 
