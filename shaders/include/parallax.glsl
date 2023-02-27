@@ -62,5 +62,6 @@ bool get_parallax_shadow(vec3 pos, mat2 uv_gradient, float view_distance, float 
 
 	return false;
 }
+#endif
 
 #endif // PARALLAX_INCLUDED
