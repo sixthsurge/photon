@@ -13,9 +13,11 @@
 * http://momentsingraphics.de/ - Blue noise texture
 
 ## features
-* anti-aliasing and contrast-adaptive sharpening
-* volumetric clouds with multiple cloud layers
-* volumetric lighting
-* variable penumbra shadows
-* screen-space reflections
-* full labPBR resource pack support
+* Revamped lighting with variable penumbra shadows and high-quality ambient occlusion (GTAO)
+* Revamped sky with detailed volumetric clouds
+* Reflections (screen-space)
+* Volumetric fog
+* Full labPBR resource pack support
+* Lens effects like bloom and depth-of-field
+* Much improved image quality thanks to TAA, FXAA and CAS
+* Advanced TAA Upscaling (disabled by default) for low end devices
