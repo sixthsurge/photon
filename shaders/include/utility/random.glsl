@@ -1,5 +1,5 @@
-#if !defined UTILITY_RANDOM_INCLUDED
-#define UTILITY_RANDOM_INCLUDED
+#ifndef INCLUDE_UTILITY_RANDOM
+#define INCLUDE_UTILITY_RANDOM
 
 // http://extremelearning.com.au/unreasonable-effectiveness-of-quasirandom-sequences/
 
@@ -185,4 +185,4 @@ vec4 hash4(vec4 p4) {
 }
 //*/
 
-#endif // UTILITY_RANDOM_INCLUDED
+#endif // INCLUDE_UTILITY_RANDOM

@@ -1,5 +1,5 @@
-#if !defined UTILITY_ROTATION_INCLUDED
-#define UTILITY_ROTATION_INCLUDED
+#ifndef INCLUDE_UTILITY_ROTATION
+#define INCLUDE_UTILITY_ROTATION
 
 mat2 get_rotation_matrix(float angle) {
 	float cosine = cos(angle);
@@ -54,4 +54,4 @@ vec3 rotate(vec4 q, vec3 v) {
 }
 #endif
 
-#endif // UTILITY_ROTATION_INCLUDED
+#endif // INCLUDE_UTILITY_ROTATION

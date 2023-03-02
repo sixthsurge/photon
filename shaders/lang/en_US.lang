@@ -180,6 +180,14 @@ value.REFRACTION.REFRACTION_OFF        = §cOff
 value.REFRACTION.REFRACTION_WATER_ONLY = Water Only
 value.REFRACTION.REFRACTION_ALL        = §aAll
 
+option.SSR                             = Enabled
+option.SSR_ROUGHNESS_SUPPORT           = Roughness Support
+option.SSR_RAY_COUNT                   = Ray Count
+option.SSR_INTERSECTION_STEPS_SMOOTH   = Intersection Steps - Smooth
+option.SSR_INTERSECTION_STEPS_ROUGH    = Intersection Steps - Rough
+option.SSR_REFINEMENT_STEPS            = Refinement Steps
+option.SSR_ROUGHNESS_THRESHOLD         = Roughness Threshold
+
 # Water settings
 
 # Post-processing settings
@@ -205,8 +213,9 @@ option.tonemap                         = Tonemap Operator
 
 value.tonemap.academy_fit              = Academy Fit
 value.tonemap.academy_rrt              = Academy RRT
-value.tonemap.tonemap_lottes           = Lottes
+value.tonemap.tonemap_hejl_2015        = Hejl 2015
 value.tonemap.tonemap_hejl_burgess     = Hejl-Burgess
+value.tonemap.tonemap_lottes           = Lottes
 value.tonemap.tonemap_uncharted_2      = Uncharted 2
 value.tonemap.tonemap_tech             = Tech
 value.tonemap.tonemap_ozius            = Ozius
@@ -254,6 +263,7 @@ option.WHITE_WORLD                     = White World
 option.TONEMAP_COMPARISON              = Tonemap Comparison
 option.tonemap_left                    = Left Tonemap
 option.tonemap_right                   = Right Tonemap
+option.FANCY_NETHER_PORTAL             = Fancy Nether Portal
 
 value.DEBUG_VIEW.DEBUG_VIEW_NONE       = OFF
 value.DEBUG_VIEW.DEBUG_VIEW_SAMPLER    = Sampler
@@ -263,6 +273,7 @@ value.DEBUG_VIEW.DEBUG_VIEW_HISTOGRAM  = Histogram
 value.tonemap_left.academy_fit            = Academy Fit
 value.tonemap_left.academy_rrt            = Academy RRT
 value.tonemap_left.tonemap_lottes         = Lottes
+value.tonemap_left.tonemap_hejl_2015      = Hejl 2015
 value.tonemap_left.tonemap_hejl_burgess   = Hejl-Burgess
 value.tonemap_left.tonemap_uncharted_2    = Uncharted 2
 value.tonemap_left.tonemap_tech           = Tech
@@ -274,6 +285,7 @@ value.tonemap_right.academy_fit            = Academy Fit
 value.tonemap_right.academy_rrt            = Academy RRT
 value.tonemap_right.tonemap_lottes         = Lottes
 value.tonemap_right.tonemap_hejl_burgess   = Hejl-Burgess
+value.tonemap_right.tonemap_hejl_2015      = Hejl 2015
 value.tonemap_right.tonemap_uncharted_2    = Uncharted 2
 value.tonemap_right.tonemap_tech           = Tech
 value.tonemap_right.tonemap_ozius          = Ozius

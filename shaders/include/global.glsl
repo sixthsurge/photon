@@ -1,9 +1,13 @@
-// Settings
+#include "/settings.glsl"
 
-#include "/include/config.glsl"
+#if defined fsh
+	#define varying in
+#else
+	#define varying out
+#endif
 
 #if MC_VERSION < 11700
-	#define gtexture gcolor
+	#define gtexture tex
 #endif
 
 // Common constants

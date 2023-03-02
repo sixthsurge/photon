@@ -1,2 +1,4 @@
 #version 400 compatibility
-#include "/program/vertex_simple.vsh"
+#define WORLD_OVERWORLD
+#define vsh
+#include "/program/post/grade.glsl"

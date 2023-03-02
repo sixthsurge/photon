@@ -1,4 +1,5 @@
 #version 400 compatibility
 #define WORLD_OVERWORLD
-#define PROGRAM_ENTITIES
-#include "/program/gbuffer/solid.vsh"
+#define PROGRAM_GBUFFERS_ENTITIES
+#define vsh
+#include "/program/gbuffers/solid.glsl"

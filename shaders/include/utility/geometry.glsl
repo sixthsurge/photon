@@ -1,5 +1,5 @@
-#if !defined UTILITY_GEOMETRY_INCLUDED
-#define UTILITY_GEOMETRY_INCLUDED
+#ifndef INCLUDE_UTILITY_GEOMETRY
+#define INCLUDE_UTILITY_GEOMETRY
 
 // Sphere/AABB intersection methods from https://www.scratchapixel.com
 
@@ -81,4 +81,4 @@ vec2 intersect_spherical_shell(vec3 ray_origin, vec3 ray_dir, float inner_sphere
 	return dists;
 }
 
-#endif // UTILITY_GEOMETRY_INCLUDED
+#endif // INCLUDE_UTILITY_GEOMETRY

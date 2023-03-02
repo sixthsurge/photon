@@ -1,5 +1,5 @@
-#if !defined UTILITY_COLOR_INCLUDED
-#define UTILITY_COLOR_INCLUDED
+#ifndef INCLUDE_UTILITY_COLOR
+#define INCLUDE_UTILITY_COLOR
 
 const vec3 luminance_weights_rec709  = vec3(0.2126, 0.7152, 0.0722);
 const vec3 luminance_weights_rec2020 = vec3(0.2627, 0.6780, 0.0593);
@@ -128,4 +128,4 @@ float isolate_hue(vec3 hsl, float center, float width) {
 	return pulse(hsl.x * 360.0, center, width, 360.0);
 }
 
-#endif // UTILITY_COLOR_INCLUDED
+#endif // INCLUDE_UTILITY_COLOR

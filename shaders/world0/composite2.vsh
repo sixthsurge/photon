@@ -1,3 +1,4 @@
 #version 400 compatibility
-#define PROGRAM_SCALE taau_render_scale
-#include "/program/vertex_simple.vsh"
+#define WORLD_OVERWORLD
+#define vsh
+#include "/program/post/dof.glsl"

@@ -42,8 +42,8 @@
 --------------------------------------------------------------------------------
 */
 
-#if !defined UTILITY_TEXT_RENDERING_INCLUDED
-#define UTILITY_TEXT_RENDERING_INCLUDED
+#ifndef INCLUDE_UTILITY_TEXT_RENDERING
+#define INCLUDE_UTILITY_TEXT_RENDERING
 
 // Characters
 
@@ -334,4 +334,4 @@ void print_line() {
 	++text.char_pos.y;
 }
 
-#endif // UTILITY_TEXT_RENDERING_INCLUDED
+#endif // INCLUDE_UTILITY_TEXT_RENDERING

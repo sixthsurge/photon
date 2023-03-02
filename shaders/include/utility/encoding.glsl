@@ -1,5 +1,5 @@
-#if !defined UTILITY_ENCODING_INCLUDED
-#define UTILITY_ENCODING_INCLUDED
+#ifndef INCLUDE_UTILITY_ENCODING
+#define INCLUDE_UTILITY_ENCODING
 
 // Returns +-1
 vec2 sign_non_zero(vec2 v) {
@@ -93,4 +93,4 @@ vec4 unpack_unorm_arb(uint pack, const uvec4 bits) {
 	return vec4(unshifted) * rcp(vec4(max_value));
 }
 
-#endif // UTILITY_ENCODING_INCLUDED
+#endif // INCLUDE_UTILITY_ENCODING

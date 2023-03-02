@@ -1,4 +1,5 @@
 #version 400 compatibility
 #define WORLD_OVERWORLD
-#define PROGRAM_BASIC
-#include "/program/gbuffer/basic.vsh"
+#define PROGRAM_GBUFFERS_BASIC
+#define vsh
+#include "/program/gbuffers/basic.glsl"

@@ -1,5 +1,5 @@
-#if !defined UTILITY_BICUBIC_INCLUDED
-#define UTILITY_BICUBIC_INCLUDED
+#ifndef INCLUDE_UTILITY_BICUBIC
+#define INCLUDE_UTILITY_BICUBIC
 
 // Source for bicubic filter: https://stackoverflow.com/questions/13501081/efficient-bicubic-filtering-code-in-glsl
 
@@ -177,4 +177,4 @@ vec3 catmull_rom_filter_fast_rgb(sampler2D sampler, vec2 coord, const float shar
 	return color.rgb / color.a;
 }
 
-#endif // UTILITY_BICUBIC_INCLUDED
+#endif // INCLUDE_UTILITY_BICUBIC

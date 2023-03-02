@@ -1,3 +1,4 @@
 #version 400 compatibility
 #define WORLD_OVERWORLD
-#include "/program/post/fxaa.fsh"
+#define fsh
+#include "/program/post/fxaa.glsl"

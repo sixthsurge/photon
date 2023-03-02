@@ -1,5 +1,5 @@
-#if !defined UTILITY_SAMPLING_INCLUDED
-#define UTILITY_SAMPLING_INCLUDED
+#ifndef INCLUDE_UTILITY_SAMPLING
+#define INCLUDE_UTILITY_SAMPLING
 
 vec2 vogel_disk_sample(int step_index, int step_count, float rotation) {
 	const float golden_angle = 2.4;
@@ -26,4 +26,4 @@ vec3 cosine_weighted_hemisphere_sample(vec3 vector, vec2 hash) {
 	return dot(dir, vector) < 0.0 ? -dir : dir;
 }
 
-#endif // UTILITY_SAMPLING_INCLUDED
+#endif // INCLUDE_UTILITY_SAMPLING

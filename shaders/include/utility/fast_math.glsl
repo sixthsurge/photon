@@ -1,5 +1,5 @@
-#if !defined UTILITY_FAST_MATH_INCLUDED
-#define UTILITY_FAST_MATH_INCLUDED
+#ifndef INCLUDE_UTILITY_FAST_MATH
+#define INCLUDE_UTILITY_FAST_MATH
 
 // Faster alternative to acos
 // Source: https://seblagarde.wordpress.com/2014/12/01/inverse-trigonometric-functions-gpu-optimization-for-amd-gcn-architecture/#more-3316
@@ -81,4 +81,4 @@ void length_normalize(vec3 v, out vec3 normalized, out float len) {
 	normalized = rcp_len * v;
 }
 
-#endif // UTILITY_FAST_MATH_INCLUDED
+#endif // INCLUDE_UTILITY_FAST_MATH

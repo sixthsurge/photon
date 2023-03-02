@@ -1,4 +1,5 @@
 #version 400 compatibility
 #define WORLD_OVERWORLD
-#define PROGRAM_HAND_WATER
-#include "/program/gbuffer/translucent.vsh"
+#define PROGRAM_GBUFFERS_HAND_WATER
+#define vsh
+#include "/program/gbuffers/translucent.glsl"

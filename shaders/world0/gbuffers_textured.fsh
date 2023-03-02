@@ -1,4 +1,5 @@
 #version 400 compatibility
 #define WORLD_OVERWORLD
-#define PROGRAM_TEXTURED
-#include "/program/gbuffer/translucent.fsh"
+#define PROGRAM_GBUFFERS_TEXTURED
+#define fsh
+#include "/program/gbuffers/translucent.glsl"

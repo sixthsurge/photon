@@ -1,5 +1,5 @@
-#if !defined UTILITY_CHECKERBOARD_INCLUDED
-#define UTILITY_CHECKERBOARD_INCLUDED
+#ifndef INCLUDE_UTILITY_CHECKERBOARD
+#define INCLUDE_UTILITY_CHECKERBOARD
 
 const ivec2[2] checkerboard_offsets_2x1 = ivec2[2](
 	ivec2(0, 0),
@@ -55,4 +55,14 @@ const ivec2[16] checkerboard_offsets_4x4 = ivec2[16](
 	ivec2(2, 3)
 );
 
-#endif // UTILITY_CHECKERBOARD_INCLUDED
+#if   CLOUDS_TEMPORAL_UPSCALING == 1
+	#define clouds_checkerboard_offsets ivec2[1](ivec2(0))
+#elif CLOUDS_TEMPORAL_USPCALING == 2
+	#define clouds_checkerboard_offsets checkerboard_offsets_2x2
+#elif CLOUDS_TEMPORAL_UPSCALING == 3
+	#define clouds_checkerboard_offsets checkerboard_offsets_3x3
+#elif CLOUDS_TEMPORAL_UPSCALING == 4
+	#define clouds_checkerboard_offsets checkerboard_offsets_4x4
+#endif
+
+#endif // INCLUDE_UTILITY_CHECKERBOARD

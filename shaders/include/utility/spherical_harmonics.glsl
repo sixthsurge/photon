@@ -1,5 +1,5 @@
-#if !defined UTILITY_SPHERICAL_HARMONICS_INCLUDED
-#define UTILITY_SPHERICAL_HARMONICS_INCLUDED
+#ifndef INCLUDE_UTILITY_SPHERICAL_HARMONICS
+#define INCLUDE_UTILITY_SPHERICAL_HARMONICS
 
 float[4] sh_coeff_order_1(vec3 direction) {
 	float x = direction.x;
@@ -105,4 +105,4 @@ vec3 sh_evaluate_irradiance(vec3[9] sh, vec3 bent_normal, float visibility) {
 	return sh_evaluate_convolved(sh, kernel, bent_normal);
 }
 
-#endif // UTILITY_SPHERICAL_HARMONICS_INCLUDED
+#endif // INCLUDE_UTILITY_SPHERICAL_HARMONICS

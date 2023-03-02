@@ -1,5 +1,5 @@
-#if !defined UTILITY_SPACE_CONVERSION_INCLUDED
-#define UTILITY_SPACE_CONVERSION_INCLUDED
+#ifndef INCLUDE_UTILITY_SPACE_CONVERSION
+#define INCLUDE_UTILITY_SPACE_CONVERSION
 
 // https://wiki.shaderlabs.org/wiki/Shader_tricks#Linearizing_depth
 float linearize_depth(float depth) {
@@ -97,4 +97,4 @@ vec3 reproject(vec3 screen_pos, sampler2D velocity_sampler) {
 }
 #endif
 
-#endif // UTILITY_SPACE_CONVERSION_INCLUDED
+#endif // INCLUDE_UTILITY_SPACE_CONVERSION
