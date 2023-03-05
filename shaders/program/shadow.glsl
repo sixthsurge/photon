@@ -1,6 +1,8 @@
 #include "/include/global.glsl"
 
 varying vec2 uv;
+varying vec2 light_levels;
+varying vec3 world_pos;
 
 flat varying uint material_mask;
 flat varying vec3 tint;
@@ -13,6 +15,11 @@ flat varying mat3 tbn;
 uniform sampler2D tex;
 uniform sampler2D noisetex;
 
+uniform mat4 gbufferModelView;
+uniform mat4 gbufferModelViewInverse;
+uniform mat4 gbufferProjection;
+uniform mat4 gbufferProjectionInverse;
+
 uniform mat4 shadowModelView;
 uniform mat4 shadowModelViewInverse;
 
@@ -21,9 +28,12 @@ uniform vec3 cameraPosition;
 uniform float frameTimeCounter;
 uniform float rainStrength;
 
+uniform vec3 taa_offset;
+uniform vec3 light_dir;
+
 
 //----------------------------------------------------------------------------//
-#if defined vsh
+#if defined STAGE_VERTEX
 
 attribute vec4 at_tangent;
 attribute vec3 mc_Entity;
@@ -35,6 +45,7 @@ attribute vec2 mc_midTexCoord;
 void main()
 {
 	uv            = gl_MultiTexCoord0.xy;
+	light_levels  = clamp01(gl_MultiTexCoord1.xy * rcp(240.0));
 	material_mask = uint(mc_Entity.x - 10000.0);
 	tint          = gl_Color.rgb;
 
@@ -47,7 +58,10 @@ void main()
 	// Wind animation
 	vec3 scene_pos = transform(shadowModelViewInverse, shadow_view_pos);
 	bool is_top_vertex = uv.y < mc_midTexCoord.y;
-	scene_pos += animate_vertex(scene_pos + cameraPosition, is_top_vertex, clamp01(rcp(240.0) * gl_MultiTexCoord1.y), material_mask);
+
+	world_pos  = scene_pos + cameraPosition;
+	world_pos += animate_vertex(world_pos, is_top_vertex, clamp01(rcp(240.0) * gl_MultiTexCoord1.y), material_mask);
+	scene_pos  = world_pos - cameraPosition;
 	shadow_view_pos = transform(shadowModelView, scene_pos);
 
 	vec3 shadow_clip_pos = project_ortho(gl_ProjectionMatrix, shadow_view_pos);
@@ -62,19 +76,65 @@ void main()
 
 
 //----------------------------------------------------------------------------//
-#if defined fsh
+#if defined STAGE_FRAGMENT
 
 layout (location = 0) out vec3 shadowcolor0_out;
 
 /* DRAWBUFFERS:0 */
 
+#include "/include/misc/water_normal.glsl"
 #include "/include/utility/color.glsl"
+
+const float air_n   = 1.000293; // for 0°C and 1 atm
+const float water_n = 1.333;    // for 20°C
+const float distance_through_water = 5.0;
+
+const vec3 water_absorption_coeff = vec3(WATER_ABSORPTION_R, WATER_ABSORPTION_G, WATER_ABSORPTION_B) * rec709_to_working_color;
+const vec3 water_scattering_coeff = vec3(WATER_SCATTERING);
+const vec3 water_extinction_coeff = water_absorption_coeff + water_scattering_coeff;
+
+// using the built-in GLSL refract() seems to cause NaNs on Intel drivers, but with this
+// function, which does the exact same thing, it's fine
+vec3 refract_safe(vec3 I, vec3 N, float eta)
+{
+	float NoI = dot(N, I);
+	float k = 1.0 - eta * eta * (1.0 - NoI * NoI);
+	if (k < 0.0) {
+		return vec3(0.0);
+	} else {
+		return eta * I - (eta * NoI + sqrt(k)) * N;
+	}
+}
+
+float get_water_caustics()
+{
+#ifndef WATER_CAUSTICS
+	return 1.0;
+#else
+	vec2 coord = world_pos.xz - world_pos.y;
+
+	bool flowing_water = abs(tbn[2].y) < 0.99;
+	vec2 flow_dir = flowing_water ? normalize(tbn[2].xz) : vec2(0.0);
+
+	vec3 normal = tbn * get_water_normal(world_pos, tbn[2], coord, flow_dir, light_levels.y, flowing_water);
+
+	vec3 old_pos = world_pos;
+	vec3 new_pos = world_pos + refract_safe(light_dir, normal, air_n / water_n) * distance_through_water;
+
+	float old_area = length_squared(dFdx(old_pos)) * length_squared(dFdy(old_pos));
+	float new_area = length_squared(dFdx(new_pos)) * length_squared(dFdy(new_pos));
+
+	if (old_area == 0.0 || new_area == 0.0) return 1.0;
+
+	return inversesqrt(old_area / new_area);
+#endif
+}
 
 void main()
 {
 #ifdef SHADOW_COLOR
-	if (material_mask == 2) { // Water
-		shadowcolor0_out = vec3(1.0);
+	if (material_mask == 1) { // Water
+		shadowcolor0_out = clamp01(0.25 * exp(-water_extinction_coeff * distance_through_water) * get_water_caustics());
 	} else {
 		vec4 base_color = textureLod(tex, uv, 0);
 		if (base_color.a < 0.1) discard;

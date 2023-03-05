@@ -27,7 +27,7 @@ uniform vec2 taa_offset;
 
 
 //----------------------------------------------------------------------------//
-#if defined vsh
+#if defined STAGE_VERTEX
 
 void main()
 {
@@ -53,7 +53,7 @@ void main()
 
 
 //----------------------------------------------------------------------------//
-#if defined fsh
+#if defined STAGE_FRAGMENT
 
 layout (location = 0) out vec4 scene_color;
 

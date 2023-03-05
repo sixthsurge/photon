@@ -56,7 +56,7 @@ uniform vec2 taa_offset;
 
 
 //----------------------------------------------------------------------------//
-#if defined vsh
+#if defined STAGE_VERTEX
 
 #include "/include/utility/color.glsl"
 
@@ -195,7 +195,7 @@ void main()
 
 
 //----------------------------------------------------------------------------//
-#if defined fsh
+#if defined STAGE_FRAGMENT
 
 layout (location = 0) out vec3 bloom_input;
 layout (location = 1) out vec4 result;

@@ -31,6 +31,7 @@ screen.fog_rlh_snowy                   = Snowy Color
 screen.fog_rlh_taiga                   = Taiga Color
 screen.fog_rlh_jungle                  = Jungle Color
 screen.fog_rlh_swamp                   = Swamp Color
+screen.waterWaves                      = Waves
 
 option.INFO                            = Photon Shaders
 value.INFO.0                           = §eby SixthSurge
@@ -189,6 +190,18 @@ option.SSR_REFINEMENT_STEPS            = Refinement Steps
 option.SSR_ROUGHNESS_THRESHOLD         = Roughness Threshold
 
 # Water settings
+
+option.WATER_PARALLAX                  = Parallax
+option.WATER_CAUSTICS                  = Caustics
+
+option.WATER_WAVES                     = Enabled
+option.WATER_WAVE_ITERATIONS           = Iterations
+option.WATER_WAVE_STRENGTH             = Intensity
+option.WATER_WAVE_FREQUENCY            = Frequency
+option.WATER_WAVE_SPEED_STILL          = Speed (Still)
+option.WATER_WAVE_SPEED_FLOWING        = Speed (Flowing)
+option.WATER_WAVE_PERSISTENCE          = Persistence
+option.WATER_WAVE_LACUNARITY           = Lacunarity
 
 # Post-processing settings
 

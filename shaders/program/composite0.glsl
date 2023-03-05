@@ -90,7 +90,7 @@ uniform float time_sunset;
 uniform float time_midnight;
 
 //----------------------------------------------------------------------------//
-#if defined vsh
+#if defined STAGE_VERTEX
 
 #include "/include/misc/palette.glsl"
 #include "/include/misc/weather.glsl"
@@ -118,7 +118,7 @@ void main()
 
 
 //----------------------------------------------------------------------------//
-#if defined fsh
+#if defined STAGE_FRAGMENT
 
 layout (location = 0) out vec3 fog_scattering;
 layout (location = 1) out vec3 fog_transmittance;

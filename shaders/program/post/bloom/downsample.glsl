@@ -34,7 +34,7 @@ uniform sampler2D colortex0;
 
 
 //----------------------------------------------------------------------------//
-#if defined vsh
+#if defined STAGE_VERTEX
 
 const float tile_scale = bloom_tile_scale(BLOOM_TILE_INDEX);
 const vec2 tile_offset = bloom_tile_offset(BLOOM_TILE_INDEX);
@@ -54,7 +54,7 @@ void main()
 
 
 //----------------------------------------------------------------------------//
-#if defined fsh
+#if defined STAGE_FRAGMENT
 
 layout (location = 0) out vec3 bloom_tile;
 

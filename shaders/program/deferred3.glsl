@@ -96,7 +96,7 @@ uniform float time_midnight;
 
 
 //----------------------------------------------------------------------------//
-#if defined vsh
+#if defined STAGE_VERTEX
 
 #define ATMOSPHERE_SCATTERING_LUT depthtex0
 
@@ -163,7 +163,7 @@ void main()
 
 
 //----------------------------------------------------------------------------//
-#if defined fsh
+#if defined STAGE_FRAGMENT
 
 layout (location = 0) out vec3 scene_color;
 layout (location = 1) out vec4 colortex3_clear;

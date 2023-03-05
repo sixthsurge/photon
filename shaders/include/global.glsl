@@ -1,6 +1,6 @@
 #include "/settings.glsl"
 
-#if defined fsh
+#if defined STAGE_FRAGMENT
 	#define varying in
 #else
 	#define varying out

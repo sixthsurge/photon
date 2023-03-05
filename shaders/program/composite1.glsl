@@ -13,7 +13,7 @@
 
 varying vec2 uv;
 
-flat varying mat3 sky_samples;
+flat varying vec3 ambient_color;
 flat varying vec3 water_fog_color;
 
 #if defined WORLD_OVERWORLD
@@ -97,7 +97,7 @@ uniform float time_midnight;
 
 
 //----------------------------------------------------------------------------//
-#if defined vsh
+#if defined STAGE_VERTEX
 
 #include "/include/misc/palette.glsl"
 
@@ -110,9 +110,7 @@ void main()
 	sun_color   = get_sun_exposure() * get_sun_tint();
 	moon_color  = get_moon_exposure() * get_moon_tint();
 
-	sky_samples[0] = get_sky_color();
-	sky_samples[1] = sky_samples[0];
-	sky_samples[2] = sky_samples[0];
+	ambient_color = get_sky_color();
 #endif
 
 	vec2 vertex_pos = gl_Vertex.xy * taau_render_scale;
@@ -125,7 +123,7 @@ void main()
 
 
 //----------------------------------------------------------------------------//
-#if defined fsh
+#if defined STAGE_FRAGMENT
 
 layout (location = 0) out vec3 scene_color;
 layout (location = 1) out float bloomy_fog;
@@ -147,6 +145,7 @@ layout (location = 1) out float bloomy_fog;
 #include "/include/lighting/specular.glsl"
 #include "/include/misc/fog/simple_fog.glsl"
 #include "/include/misc/material.glsl"
+#include "/include/misc/water_normal.glsl"
 #include "/include/utility/color.glsl"
 #include "/include/utility/encoding.glsl"
 #include "/include/utility/fast_math.glsl"
@@ -331,7 +330,7 @@ void main()
 	if (is_water) {
 		material.albedo             = srgb_eotf_inv(albedo) * rec709_to_rec2020;
 		material.emission           = vec3(0.0);
-		material.f0                 = vec3(0.02);
+		material.f0                 = vec3(0.05);
 		material.roughness          = 0.002;
 		material.sss_amount         = 1.0;
 		material.sheen_amount       = 0.0;
@@ -339,6 +338,26 @@ void main()
 		material.is_metal           = false;
 		material.is_hardcoded_metal = false;
 		material.ssr_multiplier     = 1.0;
+
+		// Water waves
+
+#ifdef WATER_WAVES
+		if (flat_normal.y > 0.01 && isEyeInWater == 0
+		 || flat_normal.y < 0.01 && isEyeInWater != 0
+		) {
+			vec2 coord = world_pos.xz - world_pos.y;
+
+			bool flowing_water = abs(flat_normal.y) < 0.99;
+			vec2 flow_dir = flowing_water ? normalize(flat_normal.xz) : vec2(0.0);
+
+#ifdef WATER_PARALLAX
+			vec3 tangent_dir = world_dir * tbn;
+			coord = get_water_parallax_coord(tangent_dir, coord, flow_dir, flowing_water);
+#endif
+
+			normal = tbn * get_water_normal(world_pos, flat_normal, coord, flow_dir, light_levels.y, flowing_water);
+		}
+#endif
 	} else {
 		material = material_from(albedo, material_mask, world_pos, light_levels);
 
@@ -373,7 +392,7 @@ void main()
 	if (is_translucent) {
 #endif
 		vec3 tangent_normal = normal * tbn;
-		refracted_uv = uv + 0.5 * tangent_normal.xy * rcp(view_dist);
+		refracted_uv = uv + 0.5 * tangent_normal.xy * rcp(max(view_dist, 1.0));
 	}
 
 	scene_color = texture(colortex0, refracted_uv * taau_render_scale).rgb;
@@ -429,7 +448,7 @@ void main()
 			float LoV = dot(world_dir, light_dir);
 			float water_n = isEyeInWater == 1 ? air_n / water_n : water_n / air_n;
 
-			mat2x3 water_fog = water_fog_simple(light_color, sky_samples[0], dist, LoV, light_levels.y, sss_depth);
+			mat2x3 water_fog = water_fog_simple(light_color, ambient_color, dist, LoV, light_levels.y, sss_depth);
 
 			scene_color *= water_fog[1];
 			scene_color += water_fog[0];
@@ -453,21 +472,23 @@ void main()
 	// Rain puddles
 
 #ifdef RAIN_PUDDLES
-	bool puddle = get_rain_puddles(
-		world_pos,
-		flat_normal,
-		light_levels,
-		distance_fade,
-		material.porosity,
-		normal,
-		material.f0,
-		material.roughness,
-		material.ssr_multiplier
-	);
+	if (!is_water) {
+		bool puddle = get_rain_puddles(
+			world_pos,
+			flat_normal,
+			light_levels,
+			distance_fade,
+			material.porosity,
+			normal,
+			material.f0,
+			material.roughness,
+			material.ssr_multiplier
+		);
 
-	if (puddle) {
-		material.is_metal = false;
-		material.is_hardcoded_metal = false;
+		if (puddle) {
+			material.is_metal = false;
+			material.is_hardcoded_metal = false;
+		}
 	}
 #endif
 

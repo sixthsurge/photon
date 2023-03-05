@@ -17,7 +17,7 @@ uniform sampler2D colortex0;
 
 
 //----------------------------------------------------------------------------//
-#if defined vsh
+#if defined STAGE_VERTEX
 
 void main()
 {
@@ -33,7 +33,7 @@ void main()
 
 
 //----------------------------------------------------------------------------//
-#if defined fsh
+#if defined STAGE_FRAGMENT
 
 layout (location = 0) out vec3 min_color;
 layout (location = 1) out vec3 max_color;

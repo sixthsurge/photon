@@ -20,4 +20,4 @@
 * Full labPBR resource pack support
 * Lens effects like bloom and depth-of-field
 * Much improved image quality thanks to TAA, FXAA and CAS
-* Advanced TAA Upscaling (disabled by default) for low end devices
+* Advanced temporal upscaling (disabled by default) for low end devices

@@ -32,7 +32,7 @@ uniform vec2 view_pixel_size;
 
 
 //----------------------------------------------------------------------------//
-#if defined vsh
+#if defined STAGE_VERTEX
 
 void main()
 {
@@ -48,7 +48,7 @@ void main()
 
 
 //----------------------------------------------------------------------------//
-#if defined fsh
+#if defined STAGE_FRAGMENT
 
 layout (location = 0) out vec3 scene_color;
 

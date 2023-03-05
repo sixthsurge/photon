@@ -18,15 +18,15 @@ flat varying uint material_mask;
 flat varying vec4 tint;
 flat varying mat3 tbn;
 
-#if defined PROGRAM_GBUFFERS_TERRAIN
-varying float vanilla_ao;
-
 #if defined POM
 varying vec2 atlas_tile_coord;
 varying vec3 tangent_pos;
 flat varying vec2 atlas_tile_offset;
 flat varying vec2 atlas_tile_scale;
 #endif
+
+#if defined PROGRAM_GBUFFERS_TERRAIN
+varying float vanilla_ao;
 #endif
 
 // ------------
@@ -78,7 +78,7 @@ uniform vec4 entityColor;
 
 
 //----------------------------------------------------------------------------//
-#if defined vsh
+#if defined STAGE_VERTEX
 
 attribute vec4 at_tangent;
 attribute vec3 mc_Entity;
@@ -153,7 +153,7 @@ void main()
 
 
 //----------------------------------------------------------------------------//
-#if defined fsh
+#if defined STAGE_FRAGMENT
 
 layout (location = 0) out vec4 gbuffer_data_0; // albedo, block ID, flat normal, light levels
 layout (location = 1) out vec4 gbuffer_data_1; // detailed normal, specular map (optional)

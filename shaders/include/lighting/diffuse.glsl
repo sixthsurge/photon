@@ -63,17 +63,18 @@ vec3 get_diffuse_lighting(
 
 	// Skylight
 
-	float vanilla_diffuse = (0.9 + 0.1 * normal.x) * (0.8 + 0.2 * abs(flat_normal.y)); // Random directional shading to make faces easier to distinguish
+	float directional_lighting = (0.9 + 0.1 * normal.x) * (0.8 + 0.2 * abs(flat_normal.y)); // Random directional shading to make faces easier to distinguish
 
-#ifdef SH_SKYLIGHT
+#if defined PROGRAM_DEFERRED3
+	#ifdef SH_SKYLIGHT
 	vec3 skylight = sh_evaluate_irradiance(sky_sh, normal, ao);
-#else
+	#else
 	vec3 horizon_color = mix(sky_samples[1], sky_samples[2], dot(normal.xz, moon_dir.xz) * 0.5 + 0.5);
 	     horizon_color = mix(horizon_color, mix(sky_samples[1], sky_samples[2], step(sun_dir.y, 0.5)), abs(normal.y) * (time_noon + time_midnight));
 
 	float horizon_weight = 0.166 * (time_noon + time_midnight) + 0.03 * (time_sunrise + time_sunset);
 
-	vec3 rain_skylight  = get_weather_color() * mix(sqr(vanilla_diffuse), 0.95, step(eps, material.sss_amount));
+	vec3 rain_skylight  = get_weather_color() * mix(sqr(directional_lighting), 0.95, step(eps, material.sss_amount));
 	     rain_skylight *= mix(4.0, 2.0, smoothstep(-0.1, 0.5, sun_dir.y));
 
 	vec3 skylight  = mix(sky_samples[0] * 1.3, horizon_color, horizon_weight);
@@ -81,7 +82,10 @@ vec3 get_diffuse_lighting(
 	     skylight *= 1.0 - 0.75 * clamp01(-normal.y);
 	     skylight *= 1.0 + 0.33 * clamp01(flat_normal.y) * (1.0 - shadows.x * (1.0 - rainStrength)) * (time_noon + time_midnight);
 		 skylight  = mix(skylight, rain_skylight, rainStrength);
-	     skylight *= ao * pi;
+		 skylight *= ao * pi;
+	#endif
+#else
+	vec3 skylight  = ambient_color * ao;
 #endif
 
 	float skylight_falloff = sqr(light_levels.y);
@@ -95,14 +99,14 @@ vec3 get_diffuse_lighting(
 		  blocklight_falloff *= 1.0 - 0.2 * time_noon * light_levels.y - 0.2 * light_levels.y;                      // Reduce blocklight intensity in daylight
 		  blocklight_falloff += 2.5 * pow12(light_levels.x);                                                 // Strong highlight around the light source, visible even in the daylight
 
-	lighting += (blocklight_falloff * vanilla_diffuse) * (blocklight_scale * blocklight_color);
+	lighting += (blocklight_falloff * directional_lighting) * (blocklight_scale * blocklight_color);
 
 	lighting += material.emission * emission_scale;
 
 	// Cave lighting
 
-	lighting += CAVE_LIGHTING_I * vanilla_diffuse * ao * (1.0 - skylight_falloff);
-	lighting += nightVision * night_vision_scale * vanilla_diffuse * ao;
+	lighting += CAVE_LIGHTING_I * directional_lighting * ao * (1.0 - skylight_falloff);
+	lighting += nightVision * night_vision_scale * directional_lighting * ao;
 
 	return max0(lighting) * material.albedo * rcp_pi * mix(1.0, metal_diffuse_amount, float(material.is_metal));
 }

@@ -1,3 +1,3 @@
 #version 400 compatibility
-#define fsh
+#define STAGE_FRAGMENT
 #include "/program/gbuffers/skytextured.glsl"

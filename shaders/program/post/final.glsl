@@ -27,7 +27,7 @@ uniform float viewHeight;
 
 
 //----------------------------------------------------------------------------//
-#if defined vsh
+#if defined STAGE_VERTEX
 
 void main()
 {
@@ -43,7 +43,7 @@ void main()
 
 
 //----------------------------------------------------------------------------//
-#if defined fsh
+#if defined STAGE_FRAGMENT
 
 out vec3 scene_color;
 
