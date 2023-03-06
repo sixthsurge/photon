@@ -129,6 +129,7 @@ layout (location = 1) out vec3 fog_transmittance;
 #include "/include/misc/fog/air_fog_vl.glsl"
 #endif
 
+
 #include "/include/utility/encoding.glsl"
 #include "/include/utility/random.glsl"
 #include "/include/utility/space_conversion.glsl"
@@ -156,17 +157,28 @@ void main()
 	switch (isEyeInWater) {
 		case 0:
 #if defined WORLD_OVERWORLD
-			mat2x3 fog = raymarch_air_fog(world_start_pos, world_end_pos, depth == 1.0, skylight, dither);
+			mat2x3 air_fog = raymarch_air_fog(world_start_pos, world_end_pos, depth == 1.0, skylight, dither);
 
-			fog_scattering    = fog[0];
-			fog_transmittance = fog[1];
+			fog_scattering    = air_fog[0];
+			fog_transmittance = air_fog[1];
 #endif
 
 			break;
 
+		/*
+		case 1:
+			mat2x3 water_fog = raymarch_water_fog(world_start_pos, world_end_pos, depth == 1.0, dither);
+
+			fog_scattering    = water_fog[0];
+			fog_transmittance = water_fog[1];
+
+			break;
+		*/
+
 		default:
 			fog_scattering    = vec3(0.0);
 			fog_transmittance = vec3(1.0);
+
 			break;
 
 		// Prevent potential game crash due to empty switch statement

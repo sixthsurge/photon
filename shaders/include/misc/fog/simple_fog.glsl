@@ -26,6 +26,8 @@ float border_fog(vec3 scene_pos, vec3 world_dir) {
 	float fog = length(scene_pos.xz) / far;
 	      fog = exp2(-8.0 * pow12(fog * density));
 
+	if (isEyeInWater != 0.0) fog = 1.0;
+
 	return fog;
 }
 
@@ -78,8 +80,10 @@ void apply_fog(inout vec3 scene_color, vec3 scene_pos, vec3 world_dir, bool sky)
 	float view_distance = length(scene_pos - gbufferModelView[3].xyz);
 
 	// Border fog
+#ifdef BORDER_FOG
 	fog = border_fog(scene_pos, world_dir);
 	scene_color = mix(border_fog_color(world_dir, fog), scene_color, clamp01(fog + float(sky)));
+#endif
 
 	// Cave fog
 

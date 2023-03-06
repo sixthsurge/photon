@@ -106,10 +106,9 @@ void main()
 	uv = gl_MultiTexCoord0.xy;
 
 #if defined WORLD_OVERWORLD
-	light_color = get_light_color();
-	sun_color   = get_sun_exposure() * get_sun_tint();
-	moon_color  = get_moon_exposure() * get_moon_tint();
-
+	light_color   = get_light_color();
+	sun_color     = get_sun_exposure() * get_sun_tint();
+	moon_color    = get_moon_exposure() * get_moon_tint();
 	ambient_color = get_sky_color();
 #endif
 
@@ -345,10 +344,10 @@ void main()
 		if (flat_normal.y > 0.01 && isEyeInWater == 0
 		 || flat_normal.y < 0.01 && isEyeInWater != 0
 		) {
-			vec2 coord = world_pos.xz - world_pos.y;
-
 			bool flowing_water = abs(flat_normal.y) < 0.99;
 			vec2 flow_dir = flowing_water ? normalize(flat_normal.xz) : vec2(0.0);
+
+			vec2 coord = flowing_water ? world_pos.xz : world_pos.xz - world_pos.y;
 
 #ifdef WATER_PARALLAX
 			vec3 tangent_dir = world_dir * tbn;
@@ -541,7 +540,7 @@ void main()
 
 #ifdef BLOOMY_FOG
 	#ifdef VL
-	bloomy_fog = clamp01(dot(fog_transmittance, vec3(0.33)));
+	bloomy_fog = isEyeInWater == 0 ? clamp01(dot(fog_transmittance, vec3(0.33))) : 0.8;
 	#else
 	bloomy_fog = 1.0;
 	#endif

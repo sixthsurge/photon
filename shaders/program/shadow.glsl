@@ -25,10 +25,13 @@ uniform mat4 shadowModelViewInverse;
 
 uniform vec3 cameraPosition;
 
+uniform float near;
+uniform float far;
+
 uniform float frameTimeCounter;
 uniform float rainStrength;
 
-uniform vec3 taa_offset;
+uniform vec2 taa_offset;
 uniform vec3 light_dir;
 
 
@@ -85,8 +88,8 @@ layout (location = 0) out vec3 shadowcolor0_out;
 #include "/include/misc/water_normal.glsl"
 #include "/include/utility/color.glsl"
 
-const float air_n   = 1.000293; // for 0°C and 1 atm
-const float water_n = 1.333;    // for 20°C
+const float air_n = 1.000293; // for 0°C and 1 atm
+const float water_n = 1.333;  // for 20°C
 const float distance_through_water = 5.0;
 
 const vec3 water_absorption_coeff = vec3(WATER_ABSORPTION_R, WATER_ABSORPTION_G, WATER_ABSORPTION_B) * rec709_to_working_color;
@@ -111,10 +114,10 @@ float get_water_caustics()
 #ifndef WATER_CAUSTICS
 	return 1.0;
 #else
-	vec2 coord = world_pos.xz - world_pos.y;
-
 	bool flowing_water = abs(tbn[2].y) < 0.99;
 	vec2 flow_dir = flowing_water ? normalize(tbn[2].xz) : vec2(0.0);
+
+	vec2 coord = flowing_water ? world_pos.xz : world_pos.xz - world_pos.y;
 
 	vec3 normal = tbn * get_water_normal(world_pos, tbn[2], coord, flow_dir, light_levels.y, flowing_water);
 
