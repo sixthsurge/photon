@@ -1,7 +1,6 @@
 #include "/include/global.glsl"
 
 varying vec2 uv;
-varying vec2 light_levels;
 varying vec3 world_pos;
 
 flat varying uint material_mask;
@@ -48,7 +47,6 @@ attribute vec2 mc_midTexCoord;
 void main()
 {
 	uv            = gl_MultiTexCoord0.xy;
-	light_levels  = clamp01(gl_MultiTexCoord1.xy * rcp(240.0));
 	material_mask = uint(mc_Entity.x - 10000.0);
 	tint          = gl_Color.rgb;
 
@@ -114,12 +112,12 @@ float get_water_caustics()
 #ifndef WATER_CAUSTICS
 	return 1.0;
 #else
+	vec2 coord = world_pos.xz;
+
 	bool flowing_water = abs(tbn[2].y) < 0.99;
 	vec2 flow_dir = flowing_water ? normalize(tbn[2].xz) : vec2(0.0);
 
-	vec2 coord = flowing_water ? world_pos.xz : world_pos.xz - world_pos.y;
-
-	vec3 normal = tbn * get_water_normal(world_pos, tbn[2], coord, flow_dir, light_levels.y, flowing_water);
+	vec3 normal = tbn * get_water_normal(world_pos, tbn[2], coord, flow_dir, 1.0, flowing_water);
 
 	vec3 old_pos = world_pos;
 	vec3 new_pos = world_pos + refract_safe(light_dir, normal, air_n / water_n) * distance_through_water;

@@ -47,6 +47,10 @@ vec3 get_diffuse_lighting(
 	float NoH,
 	float LoV
 ) {
+#if defined PROGRAM_COMPOSITE1
+	if (max_of(material.albedo) < eps) return vec3(0.0);
+#endif
+
 	vec3 lighting = vec3(0.0);
 
 	// Sunlight/moonlight
@@ -95,9 +99,9 @@ vec3 get_diffuse_lighting(
 	// Blocklight
 
 	float blocklight_falloff  = 0.3 * pow5(light_levels.x) + 0.12 * sqr(light_levels.x) + 0.15 * dampen(light_levels.x); // Base falloff
-	      blocklight_falloff *= mix(ao, 1.0, clamp01(blocklight_falloff * 2.0));                          // Stronger AO further from the light source
-		  blocklight_falloff *= 1.0 - 0.2 * time_noon * light_levels.y - 0.2 * light_levels.y;                      // Reduce blocklight intensity in daylight
-		  blocklight_falloff += 2.5 * pow12(light_levels.x);                                                 // Strong highlight around the light source, visible even in the daylight
+	      blocklight_falloff *= mix(ao, 1.0, clamp01(blocklight_falloff * 2.0));                                         // Stronger AO further from the light source
+		  blocklight_falloff *= 1.0 - 0.2 * time_noon * light_levels.y - 0.2 * light_levels.y;                           // Reduce blocklight intensity in daylight
+		  blocklight_falloff += 2.5 * pow12(light_levels.x);                                                             // Strong highlight around the light source, visible even in the daylight
 
 	lighting += (blocklight_falloff * directional_lighting) * (blocklight_scale * blocklight_color);
 

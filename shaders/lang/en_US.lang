@@ -31,7 +31,8 @@ screen.fog_rlh_snowy                   = Snowy Color
 screen.fog_rlh_taiga                   = Taiga Color
 screen.fog_rlh_jungle                  = Jungle Color
 screen.fog_rlh_swamp                   = Swamp Color
-screen.waterWaves                      = Waves
+screen.water_waves                     = Water Waves
+screen.water_fog_coeff                 = Water Fog Coefficients
 
 option.INFO                            = Photon Shaders
 value.INFO.0                           = §eby SixthSurge
@@ -191,8 +192,10 @@ option.SSR_ROUGHNESS_THRESHOLD         = Roughness Threshold
 
 # Water settings
 
-option.WATER_PARALLAX                  = Parallax
-option.WATER_CAUSTICS                  = Caustics
+option.WATER_CAUSTICS                  = Water Caustics
+option.WATER_FOAM                      = Water Foam
+option.SNELLS_WINDOW                   = Snell's Window
+option.VANILLA_WATER_TEXTURE           = Vanilla Water Texture
 
 option.WATER_WAVES                     = Enabled
 option.WATER_WAVE_ITERATIONS           = Iterations
@@ -202,6 +205,18 @@ option.WATER_WAVE_SPEED_STILL          = Speed (Still)
 option.WATER_WAVE_SPEED_FLOWING        = Speed (Flowing)
 option.WATER_WAVE_PERSISTENCE          = Persistence
 option.WATER_WAVE_LACUNARITY           = Lacunarity
+option.WATER_PARALLAX                  = Water Parallax
+option.WATER_DISPLACEMENT              = Water Displacement
+
+option.WATER_ABSORPTION_R              = Red Absorption
+option.WATER_ABSORPTION_G              = Green Absorption
+option.WATER_ABSORPTION_B              = Blue Absorption
+option.WATER_SCATTERING                = Scattering
+
+option.WATER_ABSORPTION_R_UNDERWATER   = Red Absorption - Underwater
+option.WATER_ABSORPTION_G_UNDERWATER   = Green Absorption - Underwater
+option.WATER_ABSORPTION_B_UNDERWATER   = Blue Absorption - Underwater
+option.WATER_SCATTERING_UNDERWATER     = Scattering - Underwater
 
 # Post-processing settings
 

@@ -14,7 +14,6 @@
 varying vec2 uv;
 
 flat varying vec3 ambient_color;
-flat varying vec3 water_fog_color;
 
 #if defined WORLD_OVERWORLD
 flat varying vec3 light_color;
@@ -106,10 +105,10 @@ void main()
 	uv = gl_MultiTexCoord0.xy;
 
 #if defined WORLD_OVERWORLD
-	light_color   = get_light_color();
-	sun_color     = get_sun_exposure() * get_sun_tint();
-	moon_color    = get_moon_exposure() * get_moon_tint();
-	ambient_color = get_sky_color();
+	light_color     = get_light_color();
+	sun_color       = get_sun_exposure() * get_sun_tint();
+	moon_color      = get_moon_exposure() * get_moon_tint();
+	ambient_color   = get_sky_color();
 #endif
 
 	vec2 vertex_pos = gl_Vertex.xy * taau_render_scale;
@@ -274,6 +273,7 @@ void main()
 
 	// Texture fetches
 
+	scene_color         = texelFetch(colortex0, texel, 0).rgb;
 	float depth0        = texelFetch(depthtex0, texel, 0).x;
 	float depth1        = texelFetch(depthtex1, texel, 0).x;
 	vec4 gbuffer_data_0 = texelFetch(colortex1, texel, 0);
@@ -297,6 +297,8 @@ void main()
 	vec3 view_pos   = screen_to_view_space(screen_pos, true);
 	vec3 scene_pos  = view_to_scene_space(view_pos);
 	vec3 world_pos  = scene_pos + cameraPosition;
+
+	vec3 view_back_pos = screen_to_view_space(vec3(uv, depth1), true);
 
 	vec3 world_dir; float view_dist;
 	length_normalize(scene_pos - gbufferModelViewInverse[3].xyz, world_dir, view_dist);
@@ -338,16 +340,26 @@ void main()
 		material.is_hardcoded_metal = false;
 		material.ssr_multiplier     = 1.0;
 
+		// Vanilla water texture
+
+#ifdef VANILLA_WATER_TEXTURE
+		float texture_value     = data[0].x;
+		float texture_highlight = 0.5 * sqr(linear_step(0.63, 1.0, texture_value)) + 0.03 * texture_value;
+
+		material.albedo    += clamp01(0.33 * exp(-2.0 * water_extinction_coeff) * texture_highlight);
+		material.roughness += 0.3 * texture_highlight;
+#endif
+
 		// Water waves
 
 #ifdef WATER_WAVES
 		if (flat_normal.y > 0.01 && isEyeInWater == 0
 		 || flat_normal.y < 0.01 && isEyeInWater != 0
 		) {
+			vec2 coord = world_pos.xz;
+
 			bool flowing_water = abs(flat_normal.y) < 0.99;
 			vec2 flow_dir = flowing_water ? normalize(flat_normal.xz) : vec2(0.0);
-
-			vec2 coord = flowing_water ? world_pos.xz : world_pos.xz - world_pos.y;
 
 #ifdef WATER_PARALLAX
 			vec3 tangent_dir = world_dir * tbn;
@@ -380,9 +392,9 @@ void main()
 
 	// Refraction
 
-#if REFRACTION == REFRACTION_OFF
-	scene_color = texelFetch(colortex0, texel, 0).rgb;
-#else
+	float translucent_distance = abs(view_dist - length(view_back_pos));
+
+#if REFRACTION != REFRACTION_OFF
 	vec2 refracted_uv = uv;
 
 #if REFRACTION == REFRACTION_WATER_ONLY
@@ -391,13 +403,30 @@ void main()
 	if (is_translucent) {
 #endif
 		vec3 tangent_normal = normal * tbn;
-		refracted_uv = uv + 0.5 * tangent_normal.xy * rcp(max(view_dist, 1.0));
+
+		refracted_uv = uv + 0.1 * tangent_normal.xy * rcp(max(view_dist, 1.0)) * min(translucent_distance, 8.0);
+
+		vec3  refracted_color = texture(colortex0, refracted_uv * taau_render_scale).rgb;
+		float refracted_depth = texture(depthtex1, refracted_uv * taau_render_scale).x;
+
+		if (depth0 < refracted_depth) {
+			scene_color   = refracted_color;
+			depth1        = refracted_depth;
+			view_back_pos = screen_to_view_space(vec3(refracted_uv, depth1), true);
+		}
 	}
+#endif
 
-	scene_color = texture(colortex0, refracted_uv * taau_render_scale).rgb;
-	depth1      = texture(depthtex1, refracted_uv * taau_render_scale).x;
+	// Water foam
 
-	vec3 view_back_pos = screen_to_view_space(vec3(refracted_uv, depth1), true);
+#ifdef WATER_FOAM
+	if (is_water && flat_normal.y > 0.5) {
+		translucent_distance  = abs(view_dist - length(view_back_pos)) * max(abs(world_dir.y), eps);
+
+		float foam = cube(max0(1.0 - 2.71 * translucent_distance));
+
+		material.albedo += 0.1 * foam / mix(1.0, max(dot(ambient_color, luminance_weights_rec2020), 0.5), light_levels.y);
+	}
 #endif
 
 	// Shade translucent layer
@@ -430,7 +459,7 @@ void main()
 			flat_normal,
 			shadows,
 			light_levels,
-			material.sss_amount,
+			1.0,
 			sss_depth,
 			NoL,
 			NoV,
@@ -451,7 +480,10 @@ void main()
 
 			scene_color *= water_fog[1];
 			scene_color += water_fog[0];
+
+#ifdef SNELLS_WINDOW
 			scene_color *= 1.0 - fresnel_dielectric_n(NoV, water_n);
+#endif
 		} else {
 			vec3 tint = normalize_safe(material.albedo);
 			float alpha = blend_color.a;
@@ -522,6 +554,16 @@ void main()
 		scene_color * fog_transmittance + fog_scattering,
 		depth0 == 1.0 ? 1.0 : distance_fade
 	);
+#else
+	// Simple underwater fog
+	if (isEyeInWater == 1) {
+		float LoV = dot(world_dir, light_dir);
+
+		mat2x3 water_fog = water_fog_simple(light_color, ambient_color, view_dist, LoV, eye_skylight, 15.0 - 15.0 * eye_skylight);
+
+		scene_color *= water_fog[1];
+		scene_color += water_fog[0];
+	}
 #endif
 
 	// Purkinje shift
@@ -540,7 +582,8 @@ void main()
 
 #ifdef BLOOMY_FOG
 	#ifdef VL
-	bloomy_fog = isEyeInWater == 0 ? clamp01(dot(fog_transmittance, vec3(0.33))) : 0.8;
+	bloomy_fog = clamp01(dot(fog_transmittance, vec3(0.33)));
+	if (isEyeInWater == 1) bloomy_fog = sqrt(bloomy_fog);
 	#else
 	bloomy_fog = 1.0;
 	#endif

@@ -40,7 +40,7 @@ void main()
 //----------------------------------------------------------------------------//
 #if defined STAGE_FRAGMENT
 
-out vec3 scene_color;
+layout (location = 0) out vec3 scene_color;
 
 /* DRAWBUFFERS:0 */
 

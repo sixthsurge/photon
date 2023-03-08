@@ -1,13 +1,16 @@
 #include "/settings.glsl"
 
-#if defined STAGE_FRAGMENT
-	#define varying in
-#else
-	#define varying out
-#endif
-
 #if MC_VERSION < 11700
 	#define gtexture tex
+#endif
+
+#ifndef MC_GL_VENDOR_INTEL
+	#ifdef STAGE_FRAGMENT
+		#define varying in
+	#else
+		#define varying out
+		#define attribute in
+	#endif
 #endif
 
 // Common constants

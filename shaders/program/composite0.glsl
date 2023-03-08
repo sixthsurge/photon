@@ -129,6 +129,7 @@ layout (location = 1) out vec3 fog_transmittance;
 #include "/include/misc/fog/air_fog_vl.glsl"
 #endif
 
+#include "/include/misc/fog/water_fog_vl.glsl"
 
 #include "/include/utility/encoding.glsl"
 #include "/include/utility/random.glsl"
@@ -165,7 +166,6 @@ void main()
 
 			break;
 
-		/*
 		case 1:
 			mat2x3 water_fog = raymarch_water_fog(world_start_pos, world_end_pos, depth == 1.0, dither);
 
@@ -173,7 +173,6 @@ void main()
 			fog_transmittance = water_fog[1];
 
 			break;
-		*/
 
 		default:
 			fog_scattering    = vec3(0.0);

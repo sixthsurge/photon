@@ -44,7 +44,7 @@ void main()
 //----------------------------------------------------------------------------//
 #if defined STAGE_FRAGMENT
 
-out vec3 scene_color;
+layout (location = 0) out vec3 scene_color;
 
 #include "/include/utility/bicubic.glsl"
 #include "/include/utility/color.glsl"

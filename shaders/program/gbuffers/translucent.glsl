@@ -73,6 +73,37 @@ attribute vec2 mc_midTexCoord;
 
 #include "/include/utility/space_conversion.glsl"
 
+float gerstner_wave(vec2 coord, vec2 wave_dir, float t, float noise, float wavelength) {
+	// Gerstner wave function from Belmu in #snippets, modified
+	const float g = 9.8;
+
+	float k = tau / wavelength;
+	float w = sqrt(g * k);
+
+	float x = w * t - k * (dot(wave_dir, coord) + noise);
+
+	return sqr(sin(x) * 0.5 + 0.5);
+}
+
+vec3 apply_water_displacement(vec3 view_pos)
+{
+	const float wave_frequency = 0.3 * WATER_WAVE_FREQUENCY;
+	const float wave_speed     = 0.37 * WATER_WAVE_SPEED_STILL;
+	const float wave_angle     = 0.5;
+	const float wavelength     = 1.0;
+	const vec2  wave_dir       = vec2(cos(wave_angle), sin(wave_angle));
+
+	if (material_mask != 1) return view_pos;
+
+	vec3 scene_pos = view_to_scene_space(view_pos);
+
+	vec2 wave_coord = (scene_pos.xz + cameraPosition.xz) * wave_frequency;
+
+	scene_pos.y += gerstner_wave(wave_coord, wave_dir, frameTimeCounter * wave_speed, 0.0, wavelength) * 0.05 - 0.025;
+
+	return scene_to_view_space(scene_pos);
+}
+
 void main()
 {
 	uv           = gl_MultiTexCoord0.xy;
@@ -92,6 +123,10 @@ void main()
 	tbn[1] = cross(tbn[0], tbn[2]) * sign(at_tangent.w);
 
 	vec3 view_pos = transform(gl_ModelViewMatrix, gl_Vertex.xyz);
+#ifdef WATER_DISPLACEMENT
+	     view_pos = apply_water_displacement(view_pos);
+#endif
+
 	vec4 clip_pos = project(gl_ProjectionMatrix, view_pos);
 
 #if defined PROGRAM_GBUFFERS_WATER
@@ -216,7 +251,11 @@ void main()
 	bool is_nether_portal = material_mask == 251;
 
 	if (is_water) { // Water
+#ifdef VANILLA_WATER_TEXTURE
+		base_color = texture(gtexture, uv, lod_bias);
+#else
 		base_color = vec4(0.0);
+#endif
 #if defined PROGRAM_GBUFFERS_WATER && defined FANCY_NETHER_PORTAL
 	} else if (is_nether_portal) {
 		base_color = draw_nether_portal();
@@ -255,6 +294,10 @@ void main()
 	gbuffer_data_0.y  = pack_unorm_2x8(base_color.b, float(material_mask) * rcp(255.0));
 	gbuffer_data_0.z  = pack_unorm_2x8(encode_unit_vector(tbn[2]));
 	gbuffer_data_0.w  = pack_unorm_2x8(dither_8bit(light_levels, dither));
+
+#ifdef VANILLA_WATER_TEXTURE
+	if (is_water) base_color = vec4(0.0);
+#endif
 
 #ifdef PROGRAM_GBUFFERS_TEXTURED
 	// Kill the little rain splash particles
