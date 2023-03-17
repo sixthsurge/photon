@@ -41,7 +41,7 @@ attribute vec4 at_tangent;
 attribute vec3 mc_Entity;
 attribute vec2 mc_midTexCoord;
 
-#include "/include/lighting/distortion.glsl"
+#include "/include/light/distortion.glsl"
 #include "/include/vertex/wind_animation.glsl"
 
 void main()

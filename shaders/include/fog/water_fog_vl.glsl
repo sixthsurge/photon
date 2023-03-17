@@ -1,5 +1,5 @@
-#ifndef INCLUDE_MISC_FOG_WATER_FOG_VL
-#define INCLUDE_MISC_FOG_WATER_FOG_VL
+#ifndef INCLUDE_FOG_WATER_FOG_VL
+#define INCLUDE_FOG_WATER_FOG_VL
 
 #include "/include/utility/fast_math.glsl"
 
@@ -114,4 +114,4 @@ mat2x3 raymarch_water_fog(
 }
 
 
-#endif // INCLUDE_MISC_FOG_WATER_FOG_VL
+#endif // INCLUDE_FOG_WATER_FOG_VL

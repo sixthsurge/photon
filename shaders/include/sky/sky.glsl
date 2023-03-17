@@ -4,7 +4,7 @@
 //----------------------------------------------------------------------------//
 #if   defined WORLD_OVERWORLD
 
-#include "/include/lighting/bsdf.glsl"
+#include "/include/light/bsdf.glsl"
 
 #include "/include/misc/palette.glsl"
 
@@ -138,8 +138,8 @@ vec3 draw_sky(vec3 ray_dir) {
 	// Sky gradient
 
 	sky *= atmosphere_transmittance(ray_dir.y, planet_radius) * (1.0 - rainStrength);
-	sky += sun_color * atmosphere_scattering(ray_dir, sun_dir);
-	sky += moon_color * atmosphere_scattering(ray_dir, moon_dir);
+	sky += atmosphere_scattering(ray_dir, sun_dir) * sun_color;
+	sky += atmosphere_scattering(ray_dir, moon_dir) * moon_color;
 
 	// Rain
 	vec3 rain_sky = get_weather_color() * (1.0 - exp2(-0.8 / clamp01(ray_dir.y)));

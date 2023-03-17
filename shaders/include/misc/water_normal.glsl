@@ -19,18 +19,18 @@ float get_water_height(vec2 coord, vec2 flow_dir, bool flowing_water)
 {
 	const uint gerstner_iterations = WATER_WAVE_ITERATIONS;
 	const float wave_amplitude     = 1.0;
-	const float wave_frequency     = 0.3 * WATER_WAVE_FREQUENCY;
-	const float wave_speed_still   = 0.27 * WATER_WAVE_SPEED_STILL;
+	const float wave_frequency     = 0.36 * WATER_WAVE_FREQUENCY;
+	const float wave_speed_still   = 0.35 * WATER_WAVE_SPEED_STILL;
 	const float wave_speed_flowing = 0.60 * WATER_WAVE_SPEED_FLOWING;
 	const float wave_angle         = 0.5;
-	const float noise_frequency    = 0.008;
+	const float noise_frequency    = 0.02;
 	const float noise_strength     = 0.66;
-	const float noise_fade         = 2.0;
+	const float noise_fade         = 1.0;
 	const float persistence        = 0.5 * WATER_WAVE_PERSISTENCE;
 	const float lacunarity         = 2.0 * WATER_WAVE_LACUNARITY;
 
 	float t = (flowing_water ? wave_speed_flowing : wave_speed_still) * frameTimeCounter;
-	float noise = texture(noisetex, (coord + vec2(0.25 * t, 0.0)) * noise_frequency).x * noise_strength;
+	float noise = texture(noisetex, (coord + vec2(0.0, 0.25 * t)) * noise_frequency).x * noise_strength;
 
 	float height = 0.0;
 	float amplitude_sum = 0.0;
@@ -64,7 +64,7 @@ vec3 get_water_normal(vec3 world_pos, vec3 flat_normal, vec2 coord, vec2 flow_di
 	float wave1 = get_water_height(coord + vec2(h, 0.0), flow_dir, flowing_water);
 	float wave2 = get_water_height(coord + vec2(0.0, h), flow_dir, flowing_water);
 
-	float normal_influence  = mix(0.04, 0.15, dampen(skylight));
+	float normal_influence  = mix(0.04, 0.075, dampen(skylight));
 	      normal_influence *= smoothstep(0.0, 0.05, abs(flat_normal.y));
 	      normal_influence *= smoothstep(0.0, 0.15, abs(dot(flat_normal, normalize(world_pos - cameraPosition)))); // prevent noise when looking horizontally
 	      normal_influence *= WATER_WAVE_STRENGTH;
@@ -77,7 +77,7 @@ vec3 get_water_normal(vec3 world_pos, vec3 flat_normal, vec2 coord, vec2 flow_di
 
 vec2 get_water_parallax_coord(vec3 tangent_dir, vec2 coord, vec2 flow_dir, bool flowing_water) {
 	const int step_count = 4;
-	const float parallax_depth = 0.25;
+	const float parallax_depth = 0.2;
 
 	vec2 ray_step = tangent_dir.xy * rcp(-tangent_dir.z) * parallax_depth * rcp(float(step_count));
 

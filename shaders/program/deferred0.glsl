@@ -177,10 +177,9 @@ layout (location = 0) out vec3 sky_map;
 /* DRAWBUFFERS:4 */
 
 #define ATMOSPHERE_SCATTERING_LUT depthtex0
-#define CLAMP_MIE_SCATTERING
 
 #if defined WORLD_OVERWORLD
-#include "/include/misc/fog/air_fog_vl.glsl"
+#include "/include/fog/air_fog_vl.glsl"
 #include "/include/sky/clouds.glsl"
 #endif
 

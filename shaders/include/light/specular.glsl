@@ -1,5 +1,5 @@
-#ifndef INCLUDE_LIGHTING_SPECULAR
-#define INCLUDE_LIGHTING_SPECULAR
+#ifndef INCLUDE_LIGHT_SPECULAR
+#define INCLUDE_LIGHT_SPECULAR
 
 #include "/include/misc/raytracer.glsl"
 #include "/include/sky/projection.glsl"
@@ -145,7 +145,11 @@ vec3 trace_specular_ray(
 
 	vec3 hit_pos;
 	bool hit = raymarch_depth_buffer(
+#ifdef SSR_PREVIOUS_FRAME
 		depthtex0,
+#else
+		depthtex1,
+#endif
 		screen_pos,
 		view_pos,
 		view_dir,
@@ -162,10 +166,19 @@ vec3 trace_specular_ray(
 		float border_attenuation = (hit_pos.x * hit_pos.y - hit_pos.x) * (hit_pos.x * hit_pos.y - hit_pos.y);
 		      border_attenuation = dampen(linear_step(0.0, border_attenuation_factor, border_attenuation));
 
-		hit_pos = reproject(hit_pos);
-		if (clamp01(hit_pos) != hit_pos) return sky_reflection;
+#ifdef SSR_PREVIOUS_FRAME
+		vec3 hit_pos_prev = reproject(hit_pos);
+		if (clamp01(hit_pos_prev) != hit_pos_prev) return sky_reflection;
 
-		vec3 reflection = textureLod(colortex5, hit_pos.xy, mip_level).rgb;
+		// Un-apply volumetric fog scattering using fog from the current frame
+		vec2 fog_uv = clamp(hit_pos.xy * VL_RENDER_SCALE, vec2(0.0), floor(view_res * VL_RENDER_SCALE - 1.0) * view_pixel_size);
+		vec3 fog_scattering = texture(colortex6, fog_uv).rgb;
+
+		vec3 reflection = textureLod(colortex5, hit_pos_prev.xy, mip_level).rgb;
+		     reflection = max0(reflection - fog_scattering);
+#else
+		vec3 reflection = textureLod(colortex0, hit_pos.xy * taau_render_scale, mip_level).rgb;
+#endif
 
 		return mix(sky_reflection, reflection, border_attenuation);
 	} else {
@@ -267,4 +280,4 @@ vec3 get_specular_reflections(
 }
 #endif // PROGRAM_COMPOSITE1
 
-#endif // INCLUDE_LIGHTING_SPECULAR
+#endif // INCLUDE_LIGHT_SPECULAR

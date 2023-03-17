@@ -1,7 +1,7 @@
-#ifndef INCLUDE_LIGHTING_DIFFUSE
-#define INCLUDE_LIGHTING_DIFFUSE
+#ifndef INCLUDE_LIGHT_DIFFUSE
+#define INCLUDE_LIGHT_DIFFUSE
 
-#include "/include/lighting/bsdf.glsl"
+#include "/include/light/bsdf.glsl"
 #include "/include/misc/material.glsl"
 #include "/include/misc/palette.glsl"
 #include "/include/utility/phase_functions.glsl"
@@ -12,8 +12,8 @@
 #if   defined WORLD_OVERWORLD
 
 const vec3  blocklight_color     = from_srgb(vec3(BLOCKLIGHT_R, BLOCKLIGHT_G, BLOCKLIGHT_B)) * BLOCKLIGHT_I;
-const float blocklight_scale     = 9.0;
-const float emission_scale       = 40.0 * EMISSION_STRENGTH;
+const float blocklight_scale     = 7.7;
+const float emission_scale       = 30.0 * EMISSION_STRENGTH;
 const float sss_density          = 14.0;
 const float sss_scale            = 4.2;
 const float metal_diffuse_amount = 0.25; // Scales diffuse lighting on metals, ideally this would be zero but purely specular metals don't play well with SSR
@@ -56,7 +56,7 @@ vec3 get_diffuse_lighting(
 	// Sunlight/moonlight
 
 	vec3 diffuse = vec3(lift(max0(NoL), 0.33) * (1.0 - 0.5 * material.sss_amount));
-	vec3 bounced = 0.08 * (1.0 - shadows * max0(NoL)) * (1.0 - 0.33 * max0(normal.y)) * pow1d5(ao + eps) * pow4(light_levels.y);
+	vec3 bounced = 0.066 * (1.0 - shadows * max0(NoL)) * (1.0 - 0.33 * max0(normal.y)) * pow1d5(ao + eps) * pow4(light_levels.y);
 	vec3 sss = sss_approx(material.albedo, material.sss_amount, material.sheen_amount, sss_depth, LoV);
 
 #ifdef AO_IN_SUNLIGHT
@@ -99,9 +99,9 @@ vec3 get_diffuse_lighting(
 	// Blocklight
 
 	float blocklight_falloff  = 0.3 * pow5(light_levels.x) + 0.12 * sqr(light_levels.x) + 0.15 * dampen(light_levels.x); // Base falloff
-	      blocklight_falloff *= mix(ao, 1.0, clamp01(blocklight_falloff * 2.0));                                         // Stronger AO further from the light source
+	      blocklight_falloff *= mix(ao * ao * ao, 1.0, clamp01(blocklight_falloff));                                         // Stronger AO further from the light source
 		  blocklight_falloff *= 1.0 - 0.2 * time_noon * light_levels.y - 0.2 * light_levels.y;                           // Reduce blocklight intensity in daylight
-		  blocklight_falloff += 2.5 * pow12(light_levels.x);                                                             // Strong highlight around the light source, visible even in the daylight
+		  blocklight_falloff += min(2.0 * pow12(light_levels.x), 0.6);                                                   // Strong highlight around the light source, visible even in the daylight
 
 	lighting += (blocklight_falloff * directional_lighting) * (blocklight_scale * blocklight_color);
 
@@ -123,4 +123,4 @@ vec3 get_diffuse_lighting(
 
 #endif
 
-#endif // INCLUDE_LIGHTING_DIFFUSE
+#endif // INCLUDE_LIGHT_DIFFUSE

@@ -1,7 +1,7 @@
-#ifndef INCLUDE_LIGHTING_SHADOWS
-#define INCLUDE_LIGHTING_SHADOWS
+#ifndef INCLUDE_LIGHT_SHADOWS
+#define INCLUDE_LIGHT_SHADOWS
 
-#include "/include/lighting/distortion.glsl"
+#include "/include/light/distortion.glsl"
 #include "/include/utility/color.glsl"
 #include "/include/utility/dithering.glsl"
 #include "/include/utility/random.glsl"
@@ -257,4 +257,4 @@ vec3 calculate_shadows(
 }
 #endif
 
-#endif // INCLUDE_LIGHTING_SHADOWS
+#endif // INCLUDE_LIGHT_SHADOWS

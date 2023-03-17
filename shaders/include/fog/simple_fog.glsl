@@ -1,8 +1,10 @@
-#ifndef INCLUDE_MISC_FOG_SIMPLE
-#define INCLUDE_MISC_FOG_SIMPLE
+#ifndef INCLUDE_FOG_SIMPLE_FOG
+#define INCLUDE_FOG_SIMPLE_FOG
 
 #include "/include/utility/bicubic.glsl"
+#include "/include/utility/color.glsl"
 #include "/include/utility/fast_math.glsl"
+#include "/include/utility/phase_functions.glsl"
 
 const vec3 cave_fog_color = vec3(0.033);
 const vec3 lava_fog_color = from_srgb(vec3(0.839, 0.373, 0.075)) * 2.0;
@@ -17,14 +19,9 @@ float spherical_fog(float view_distance, float fog_start_distance, float fogDens
 }
 
 float border_fog(vec3 scene_pos, vec3 world_dir) {
-#if defined WORLD_OVERWORLD
-	float density = 1.0 - 0.2 * smoothstep(0.0, 0.25, world_dir.y);
-#else
-	float density = 1.0;
-#endif
-
-	float fog = length(scene_pos.xz) / far;
-	      fog = exp2(-8.0 * pow12(fog * density));
+	float fog = cubic_length(scene_pos.xz) / far;
+	      fog = exp2(-8.0 * pow8(fog));
+	      fog = mix(fog, 1.0, 0.75 * dampen(linear_step(0.0, 0.2, world_dir.y)));
 
 	if (isEyeInWater != 0.0) fog = 1.0;
 
@@ -61,28 +58,26 @@ mat2x3 water_fog_simple(
 //----------------------------------------------------------------------------//
 #if defined WORLD_OVERWORLD
 
+#include "/include/sky/atmosphere.glsl"
 #include "/include/sky/projection.glsl"
-
-vec3 border_fog_color(vec3 world_dir, float fog) {
-	float sunset_factor = linear_step(0.1, 1.0, exp(-75.0 * sqr(sun_dir.y + 0.0496)));
-
-	vec3 fog_color = bicubic_filter(colortex4, project_sky(world_dir)).rgb;
-	vec3 fog_color_sunset = texture(colortex4, project_sky(normalize(vec3(world_dir.xz, min(world_dir.y, -0.1)).xzy))).rgb;
-
-	fog_color = mix(fog_color, fog_color_sunset, sqr(sunset_factor));
-	fog_color = mix(fog_color, cave_fog_color, biome_cave);
-
-	return fog_color;
-}
 
 void apply_fog(inout vec3 scene_color, vec3 scene_pos, vec3 world_dir, bool sky) {
 	float fog;
 	float view_distance = length(scene_pos - gbufferModelView[3].xyz);
 
 	// Border fog
+#ifdef PROGRAM_DEFERRED3
 #ifdef BORDER_FOG
 	fog = border_fog(scene_pos, world_dir);
-	scene_color = mix(border_fog_color(world_dir, fog), scene_color, clamp01(fog + float(sky)));
+
+	if (fog < 0.999 && !sky) {
+		vec3 fog_color  = atmosphere_scattering_mie_clamp(world_dir, sun_dir) * sun_color;
+		     fog_color += atmosphere_scattering_mie_clamp(world_dir, moon_dir) * moon_color;
+			 fog_color *= 1.0 - biome_cave;
+
+		scene_color = mix(fog_color, scene_color, fog);
+	}
+#endif
 #endif
 
 	// Cave fog
@@ -124,4 +119,4 @@ void apply_fog(inout vec3 scene_color) {
 
 #endif
 
-#endif // INCLUDE_MISC_FOG_SIMPLE
+#endif // INCLUDE_FOG_SIMPLE_FOG

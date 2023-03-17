@@ -138,10 +138,10 @@ layout (location = 1) out float bloomy_fog;
 	#undef SH_SKYLIGHT
 #endif
 
-#include "/include/lighting/diffuse.glsl"
-#include "/include/lighting/shadows.glsl"
-#include "/include/lighting/specular.glsl"
-#include "/include/misc/fog/simple_fog.glsl"
+#include "/include/fog/simple_fog.glsl"
+#include "/include/light/diffuse.glsl"
+#include "/include/light/shadows.glsl"
+#include "/include/light/specular.glsl"
 #include "/include/misc/material.glsl"
 #include "/include/misc/water_normal.glsl"
 #include "/include/utility/color.glsl"
@@ -417,19 +417,31 @@ void main()
 	}
 #endif
 
+	float distance_fade = border_fog(scene_pos, world_dir);
+
 	// Water foam
 
 #ifdef WATER_FOAM
 	if (is_water && flat_normal.y > 0.5) {
 		translucent_distance  = abs(view_dist - length(view_back_pos)) * max(abs(world_dir.y), eps);
 
-		float foam = cube(max0(1.0 - 2.71 * translucent_distance));
+#ifdef VANILLA_WATER_TEXTURE
+		float texture_value     = data[0].x;
+		float texture_highlight = 0.5 * sqr(linear_step(0.63, 1.0, texture_value)) + 0.03 * texture_value;
+
+		float foam = cube(max0(1.0 - 2.0 * translucent_distance)) * (1.0 + 8.0 * texture_highlight);
+#else
+		float foam = cube(max0(1.0 - 2.0 * translucent_distance));
+#endif
 
 		material.albedo += 0.1 * foam / mix(1.0, max(dot(ambient_color, luminance_weights_rec2020), 0.5), light_levels.y);
+		material.albedo  = clamp01(material.albedo);
 	}
 #endif
 
 	// Shade translucent layer
+
+	vec3 background_color = scene_color;
 
 	if (is_rain_particle) {
 		vec3 rain_color = get_rain_color();
@@ -498,7 +510,7 @@ void main()
 		scene_color += translucent_color;
 	}
 
-	float distance_fade = border_fog(scene_pos, world_dir);
+	scene_color = mix(background_color, scene_color, distance_fade);
 
 	// Rain puddles
 
@@ -549,11 +561,7 @@ void main()
 	// Apply volumetric lighting
 
 #ifdef VL
-	scene_color = mix(
-		scene_color,
-		scene_color * fog_transmittance + fog_scattering,
-		depth0 == 1.0 ? 1.0 : distance_fade
-	);
+	scene_color = scene_color * fog_transmittance + fog_scattering;
 #else
 	// Simple underwater fog
 	if (isEyeInWater == 1) {
@@ -571,9 +579,10 @@ void main()
 #ifdef PURKINJE_SHIFT
 	light_levels = (depth0 == 1.0) ? vec2(0.0, 1.0) : light_levels;
 
-	float purkinje_intensity  = 0.04 * PURKINJE_SHIFT_INTENSITY;
+	float purkinje_intensity  = 0.03 * PURKINJE_SHIFT_INTENSITY;
 	      purkinje_intensity *= 1.0 - smoothstep(-0.12, -0.06, sun_dir.y) * light_levels.y;
 	      purkinje_intensity *= clamp01(1.0 - light_levels.x);
+	      purkinje_intensity *= clamp01(0.3 + 0.7 * cube(light_levels.y));
 
 	scene_color = purkinje_shift(scene_color, purkinje_intensity);
 #endif

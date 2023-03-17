@@ -126,10 +126,10 @@ layout (location = 1) out vec3 fog_transmittance;
 /* DRAWBUFFERS:67 */
 
 #if defined WORLD_OVERWORLD
-#include "/include/misc/fog/air_fog_vl.glsl"
+#include "/include/fog/air_fog_vl.glsl"
 #endif
 
-#include "/include/misc/fog/water_fog_vl.glsl"
+#include "/include/fog/water_fog_vl.glsl"
 
 #include "/include/utility/encoding.glsl"
 #include "/include/utility/random.glsl"

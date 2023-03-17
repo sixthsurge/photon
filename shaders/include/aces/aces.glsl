@@ -1,5 +1,5 @@
-#ifndef INCLUDE_MISC_ACES_ACES
-#define INCLUDE_MISC_ACES_ACES
+#ifndef INCLUDE_ACES_ACES
+#define INCLUDE_ACES_ACES
 
 /*
  * Implemented following the reference implementation given by the Academy at
@@ -206,4 +206,4 @@ vec3 rrt_and_odt_fit(vec3 rgb) {
 	return a / b;
 }
 
-#endif // INCLUDE_MISC_ACES_ACES
+#endif // INCLUDE_ACES_ACES

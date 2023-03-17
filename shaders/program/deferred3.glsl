@@ -172,10 +172,10 @@ layout (location = 1) out vec4 colortex3_clear;
 
 #define ATMOSPHERE_SCATTERING_LUT depthtex0
 
-#include "/include/lighting/diffuse.glsl"
-#include "/include/lighting/shadows.glsl"
-#include "/include/lighting/specular.glsl"
-#include "/include/misc/fog/simple_fog.glsl"
+#include "/include/fog/simple_fog.glsl"
+#include "/include/light/diffuse.glsl"
+#include "/include/light/shadows.glsl"
+#include "/include/light/specular.glsl"
 #include "/include/misc/material.glsl"
 #include "/include/sky/sky.glsl"
 #include "/include/utility/bicubic.glsl"

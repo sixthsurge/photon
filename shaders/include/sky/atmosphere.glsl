@@ -1,7 +1,7 @@
 #ifndef INCLUDE_SKY_ATMOSPHERE
 #define INCLUDE_SKY_ATMOSPHERE
 
-#include "/include/misc/aces/matrices.glsl"
+#include "/include/aces/matrices.glsl"
 
 #include "/include/utility/color.glsl"
 #include "/include/utility/fast_math.glsl"
@@ -152,13 +152,9 @@ vec3 atmosphere_scattering(float nu, float mu, float mu_s) {
 
 	vec3 uv = atmosphere_scattering_uv(nu, mu, mu_s);
 
-	vec3 scattering;
-
-#if defined CLAMP_MIE_SCATTERING
-	float mie_phase = min(klein_nishina_phase(nu, air_mie_energy_parameter), 1.0);
-#else
 	float mie_phase = klein_nishina_phase(nu, air_mie_energy_parameter);
-#endif
+
+	vec3 scattering;
 
 	// Rayleigh + multiple scattering
 	uv.x *= 0.5;
@@ -177,6 +173,37 @@ vec3 atmosphere_scattering(vec3 ray_dir, vec3 light_dir) {
 	float mu_s = light_dir.y;
 
 	return atmosphere_scattering(nu, mu, mu_s);
+}
+
+vec3 atmosphere_scattering_mie_clamp(float nu, float mu, float mu_s) {
+#ifndef SKY_GROUND
+	float horizon_mu = mix(-0.01, 0.03, smoothstep(-0.05, 0.1, mu_s));
+	mu = max(mu, horizon_mu);
+#endif
+
+	vec3 uv = atmosphere_scattering_uv(nu, mu, mu_s);
+
+	float mie_phase = min(klein_nishina_phase(nu, air_mie_energy_parameter), 1.0);
+
+	vec3 scattering;
+
+	// Rayleigh + multiple scattering
+	uv.x *= 0.5;
+	scattering  = texture(ATMOSPHERE_SCATTERING_LUT, uv).rgb;
+
+	// Single mie scattering
+	uv.x += 0.5;
+	scattering += texture(ATMOSPHERE_SCATTERING_LUT, uv).rgb * mie_phase;
+
+	return scattering;
+}
+
+vec3 atmosphere_scattering_mie_clamp(vec3 ray_dir, vec3 light_dir) {
+	float nu = dot(ray_dir, light_dir);
+	float mu = ray_dir.y;
+	float mu_s = light_dir.y;
+
+	return atmosphere_scattering_mie_clamp(nu, mu, mu_s);
 }
 #else
 vec3 atmosphere_scattering(vec3 ray_dir, vec3 light_dir) {

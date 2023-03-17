@@ -179,8 +179,8 @@ void main()
 	vec3 view_pos = screen_to_view_space(vec3(new_uv, 1.0), false);
 	vec3 ray_dir = mat3(gbufferModelViewInverse) * normalize(view_pos);
 
-	vec3 clear_sky = atmosphere_scattering(ray_dir, sun_dir) * sun_color
-	               + atmosphere_scattering(ray_dir, moon_dir) * moon_color;
+	vec3 clear_sky = atmosphere_scattering_mie_clamp(ray_dir, sun_dir) * sun_color
+	               + atmosphere_scattering_mie_clamp(ray_dir, moon_dir) * moon_color;
 
 	float dither = texelFetch(noisetex, ivec2(checkerboard_pos & 511), 0).b;
 	      dither = r1(frameCounter / checkerboard_area, dither);

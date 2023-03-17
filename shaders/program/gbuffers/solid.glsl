@@ -123,6 +123,10 @@ void main()
 	light_levels.x = 1.0;
 #endif
 
+#if defined PROGRAM_GBUFFERS_BEACONBEAM
+	material_mask = 2;
+#endif
+
 	vec3 view_pos = transform(gl_ModelViewMatrix, gl_Vertex.xyz);
 #if defined PROGRAM_GBUFFERS_TERRAIN
 	bool is_top_vertex = uv.y < mc_midTexCoord.y;

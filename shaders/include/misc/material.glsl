@@ -1,7 +1,7 @@
 #ifndef INCLUDE_MISC_MATERIAL
 #define INCLUDE_MISC_MATERIAL
 
-#include "/include/misc/aces/matrices.glsl"
+#include "/include/aces/matrices.glsl"
 #include "/include/utility/color.glsl"
 
 const float air_n   = 1.000293; // for 0°C and 1 atm
@@ -83,10 +83,10 @@ Material material_from(vec3 albedo_srgb, uint material_mask, vec3 world_pos, ino
 					#ifdef HARDCODED_EMISSION
 					if (material_mask == 6u) {
 						// Ground torches
-						material.emission = 0.33 * sqrt(albedo_sqrt) * cube(linear_step(0.12, 0.45, block_pos.y));
+						material.emission = 0.25 * sqrt(albedo_sqrt) * cube(linear_step(0.12, 0.45, block_pos.y));
 					} else {
 						// Wall torches
-						material.emission = 0.33 * sqrt(albedo_sqrt) * cube(linear_step(0.35, 0.6, block_pos.y));
+						material.emission = 0.25 * sqrt(albedo_sqrt) * cube(linear_step(0.35, 0.6, block_pos.y));
 					}
 					material.emission  = max(material.emission, 0.85 * albedo_sqrt * step(0.5, 0.2 * hsl.y + 0.55 * hsl.z));
 					material.emission *= light_levels.x;
@@ -281,7 +281,7 @@ Material material_from(vec3 albedo_srgb, uint material_mask, vec3 world_pos, ino
 						material.is_metal = true;
 						material.ssr_multiplier = 1.0;
 						#endif
-					} else {
+					} else if (material_mask == 31) {
 						// Shiny dielectrics
 						#ifdef HARDCODED_SPECULAR
 						float smoothness = sqrt(linear_step(0.1, 0.9, hsl.z));

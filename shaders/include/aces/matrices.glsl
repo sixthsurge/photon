@@ -1,5 +1,5 @@
-#ifndef INCLUDE_MISC_ACES_MATRICES
-#define INCLUDE_MISC_ACES_MATRICES
+#ifndef INCLUDE_ACES_MATRICES
+#define INCLUDE_ACES_MATRICES
 
 #include "/include/utility/color.glsl"
 
@@ -52,4 +52,4 @@ const mat3 ap1_to_rec709  = ap1_to_xyz * d60_to_d65 * xyz_to_rec709;
 const mat3 rec709_to_ap1_unlit = rec709_to_xyz * xyz_to_ap1;
 const mat3 rec2020_to_ap1_unlit = rec2020_to_xyz * xyz_to_ap1;
 
-#endif // INCLUDE_MISC_ACES_MATRICES
+#endif // INCLUDE_ACES_MATRICES

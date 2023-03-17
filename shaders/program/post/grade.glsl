@@ -53,7 +53,7 @@ layout (location = 0) out vec3 scene_color;
 
 /* DRAWBUFFERS:0 */
 
-#include "/include/misc/aces/aces.glsl"
+#include "/include/aces/aces.glsl"
 
 #include "/include/utility/bicubic.glsl"
 #include "/include/utility/color.glsl"
@@ -117,9 +117,15 @@ vec3 gain(vec3 x, float k) {
 // Color grading applied before tone mapping
 // rgb := color in acescg [0, inf]
 vec3 grade_input(vec3 rgb) {
-	const float brightness = 1.10 * GRADE_BRIGHTNESS;
-	const float contrast   = 1.12 * GRADE_CONTRAST;
-	const float saturation = 0.94 * GRADE_SATURATION;
+	float brightness = 1.10 * GRADE_BRIGHTNESS;
+	float contrast   = 1.12 * GRADE_CONTRAST;
+	float saturation = 0.94 * GRADE_SATURATION;
+
+	// Reduce contrast in the darks
+	float luminance = dot(rgb, luminance_weights);
+	float darkness_factor = cube(1.0 - linear_step(0.0, 0.15, luminance));
+	contrast   -= 0.20 * darkness_factor;
+	saturation += 0.07 * darkness_factor;
 
 	// Brightness
 	rgb *= brightness;
