@@ -16,7 +16,7 @@
 #include "/include/utility/random.glsl"
 
 const float sun_luminance  = 40.0; // luminance of sun disk
-const float moon_luminance = 20.0; // luminance of sun disk
+const float moon_luminance = 2.0; // luminance of sun disk
 
 vec3 draw_sun(vec3 ray_dir) {
 	float nu = dot(ray_dir, sun_dir);
@@ -112,6 +112,10 @@ vec3 draw_sky(vec3 ray_dir) {
 	vec3 vanilla_sky_color = from_srgb(vanilla_sky.rgb);
 	uint vanilla_sky_id = uint(255.0 * vanilla_sky.a);
 
+#ifdef STARS
+	sky += draw_stars(ray_dir);
+#endif
+
 #ifdef VANILLA_SUN
 	if (vanilla_sky_id == 2) {
 		const vec3 brightness_scale = sunlight_color * sun_luminance;
@@ -121,25 +125,23 @@ vec3 draw_sky(vec3 ray_dir) {
 	sky += draw_sun(ray_dir);
 #endif
 
-#ifdef VANILLA_MOON
 	if (vanilla_sky_id == 3) {
 		const vec3 brightness_scale = sunlight_color * moon_luminance;
+		sky *= 0.0; // Hide stars behind moon
 		sky += vanilla_sky_color * brightness_scale;
 	}
-#else
-	sky += draw_moon(ray_dir);
-#endif
 
-#ifdef STARS
-	sky += draw_stars(ray_dir);
+#ifdef CUSTOM_SKY
+	if (vanilla_sky_id == 4) {
+		sky += vanilla_sky_color * CUSTOM_SKY_BRIGHTNESS;
+	}
 #endif
 #endif
 
 	// Sky gradient
 
 	sky *= atmosphere_transmittance(ray_dir.y, planet_radius) * (1.0 - rainStrength);
-	sky += atmosphere_scattering(ray_dir, sun_dir) * sun_color;
-	sky += atmosphere_scattering(ray_dir, moon_dir) * moon_color;
+	sky += atmosphere_scattering(ray_dir, sun_color, sun_dir, moon_color, moon_dir);
 
 	// Rain
 	vec3 rain_sky = get_weather_color() * (1.0 - exp2(-0.8 / clamp01(ray_dir.y)));
@@ -148,7 +150,6 @@ vec3 draw_sky(vec3 ray_dir) {
 	// Clouds
 
 	vec4 clouds = get_clouds(ray_dir, sky);
-
 	sky *= clouds.a;   // transmittance
 	sky += clouds.rgb; // scattering
 

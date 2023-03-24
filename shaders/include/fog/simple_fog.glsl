@@ -71,8 +71,7 @@ void apply_fog(inout vec3 scene_color, vec3 scene_pos, vec3 world_dir, bool sky)
 	fog = border_fog(scene_pos, world_dir);
 
 	if (fog < 0.999 && !sky) {
-		vec3 fog_color  = atmosphere_scattering_mie_clamp(world_dir, sun_dir) * sun_color;
-		     fog_color += atmosphere_scattering_mie_clamp(world_dir, moon_dir) * moon_color;
+		vec3 fog_color  = atmosphere_scattering(world_dir, sun_color, sun_dir, moon_color, moon_dir);
 			 fog_color *= 1.0 - biome_cave;
 
 		scene_color = mix(fog_color, scene_color, fog);

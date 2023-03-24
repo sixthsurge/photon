@@ -19,7 +19,9 @@ const float sss_scale            = 4.2;
 const float metal_diffuse_amount = 0.25; // Scales diffuse lighting on metals, ideally this would be zero but purely specular metals don't play well with SSR
 const float night_vision_scale   = 1.5;
 
-vec3 sss_approx(vec3 albedo, float sss_amount, float sheen_amount, float sss_depth, float LoV) {
+#ifdef SHADOW_VPS
+vec3 sss_approx(vec3 albedo, float sss_amount, float sheen_amount, float sss_depth, float LoV, float shadow) {
+	// Transmittance-based SSS
 	if (sss_amount < eps) return vec3(0.0);
 
 	vec3 coeff = albedo * inversesqrt(dot(albedo, luminance_weights) + eps);
@@ -33,6 +35,15 @@ vec3 sss_approx(vec3 albedo, float sss_amount, float sheen_amount, float sss_dep
 
 	return sss + sheen * sheen_amount;
 }
+#else
+vec3 sss_approx(vec3 albedo, float sss_amount, float sheen_amount, float sss_depth, float LoV, float shadow) {
+	// Shadow-based SSS
+	float sss = 0.06 * sss_scale * pi;
+	vec3 sheen = 0.8 * rcp(albedo + eps) * henyey_greenstein_phase(-LoV, 0.5) * linear_step(-0.8, -0.2, -LoV) * shadow;
+
+	return sss + sheen * sheen_amount;
+}
+#endif
 
 vec3 get_diffuse_lighting(
 	Material material,
@@ -56,14 +67,20 @@ vec3 get_diffuse_lighting(
 	// Sunlight/moonlight
 
 	vec3 diffuse = vec3(lift(max0(NoL), 0.33) * (1.0 - 0.5 * material.sss_amount));
-	vec3 bounced = 0.066 * (1.0 - shadows * max0(NoL)) * (1.0 - 0.33 * max0(normal.y)) * pow1d5(ao + eps) * pow4(light_levels.y);
-	vec3 sss = sss_approx(material.albedo, material.sss_amount, material.sheen_amount, sss_depth, LoV);
+	vec3 bounced = 0.066 * (1.0 - shadows * max0(NoL)) * (1.0 - 0.33 * max0(normal.y)) * pow1d5(ao + eps) * pow4(light_levels.y) * BOUNCED_LIGHT_I;
+	vec3 sss = sss_approx(material.albedo, material.sss_amount, material.sheen_amount, sss_depth, LoV, shadows.x);
 
 #ifdef AO_IN_SUNLIGHT
 	diffuse *= sqrt(ao) * mix(ao * ao, 1.0, NoL * NoL);
 #endif
 
+#ifdef SHADOW_VPS
+	// Add SSS and diffuse
 	lighting += light_color * (diffuse * shadows + bounced + sss);
+#else
+	// Blend SSS and diffuse
+	lighting += light_color * (mix(diffuse, sss, material.sss_amount) * shadows + bounced);
+#endif
 
 	// Skylight
 
@@ -109,7 +126,7 @@ vec3 get_diffuse_lighting(
 
 	// Cave lighting
 
-	lighting += CAVE_LIGHTING_I * directional_lighting * ao * (1.0 - skylight_falloff);
+	lighting += 0.2 * CAVE_LIGHTING_I * directional_lighting * ao * (1.0 - skylight_falloff);
 	lighting += nightVision * night_vision_scale * directional_lighting * ao;
 
 	return max0(lighting) * material.albedo * rcp_pi * mix(1.0, metal_diffuse_amount, float(material.is_metal));

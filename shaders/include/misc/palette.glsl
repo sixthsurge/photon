@@ -44,7 +44,9 @@ float get_moon_exposure() {
 }
 
 vec3 get_moon_tint() {
-	return vec3(1.0);
+	const vec3 base_tint = from_srgb(vec3(MOON_R, MOON_G, MOON_B));
+
+	return base_tint;
 }
 
 vec3 get_light_color() {

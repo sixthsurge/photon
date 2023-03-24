@@ -21,6 +21,7 @@ flat varying vec3 tint;
 
 uniform sampler2D gtexture;
 
+uniform int moonPhase;
 uniform int renderStage;
 
 uniform vec2 taa_offset;
@@ -74,12 +75,14 @@ void main()
 		offset = uv * 2.0 - 1.0;
 		if (max_of(abs(offset)) > 0.25) discard;
 
+		scene_color.rgb = texture(gtexture, new_uv).rgb;
+
 		break;
 #endif
 
 #ifdef VANILLA_MOON
 	case MC_RENDER_STAGE_MOON:
-	 	// alpha of 3 <=> moon
+	 	// Alpha of 3 <=> moon
 		scene_color.a = 3.0 / 255.0;
 
 		// Cut out the moon itself (discard the halo around it) and flip moon texture along the
@@ -89,19 +92,76 @@ void main()
 		offset = offset * 2.0 - 1.0;
 		if (max_of(abs(offset)) > 0.25) discard;
 
+		scene_color.rgb = texture(gtexture, new_uv).rgb;
+
+		break;
+#else
+	case MC_RENDER_STAGE_MOON:
+	 	// Alpha of 3 <=> moon
+		scene_color.a = 3.0 / 255.0;
+
+		// Shader moon
+		const float angle      = 0.7;
+		const mat2  rot        = mat2(cos(angle), sin(angle), -sin(angle), cos(angle));
+		const vec3  lit_color  = vec3(1.0, 0.85, 0.75);
+		const vec3  glow_color = vec3(0.7, 0.8, 1.0);
+
+		offset = (fract(vec2(4.0, 2.0) * uv) - 0.5) * rcp(0.15);
+		offset = rot * offset;
+
+		float dist = length(offset);
+		float moon = 1.0 - linear_step(0.85, 1.0, dist);
+		float moon_shadow = 1.0;
+		float a = sqrt(1.0 - offset.x * offset.x);
+
+		switch (moonPhase) {
+		case 0: // Full moon
+			break;
+
+		case 1: // Waning gibbous
+			moon_shadow = 1.0 - linear_step(a * 0.6 - 0.12, a * 0.6 + 0.12, -offset.y); break;
+
+		case 2: // Last quarter
+			moon_shadow = 1.0 - linear_step(a * 0.1 - 0.15, a * 0.1 + 0.15, -offset.y); break;
+
+		case 3: // Waning crescent
+			moon_shadow = linear_step(a * 0.5 - 0.12, a * 0.5 + 0.12, offset.y); break;
+
+		case 4: // New moon
+			moon_shadow = 0.0; break;
+
+		case 5: // Waxing crescent
+			moon_shadow = linear_step(a * 0.6 - 0.12, a * 0.5 + 0.12, -offset.y); break;
+
+		case 6: // First quarter
+			moon_shadow = linear_step(a * 0.1 - 0.15, a * 0.1 + 0.15, -offset.y); break;
+
+		case 7: // Waxing gibbous
+			moon_shadow = 1.0 - linear_step(a * 0.6 - 0.12, a * 0.6 + 0.12, offset.y); break;
+		}
+
+		scene_color.rgb = max(
+			moon * moon_shadow * lit_color,
+			(0.1 * glow_color) * pulse(dist, 0.95, 0.3) // Moon glow
+		);
+
+		if (dist > 1.3) discard;
+
 		break;
 #endif
 
+#ifdef CUSTOM_SKY
 	case MC_RENDER_STAGE_CUSTOM_SKY:
 	 	// alpha of 4 <=> custom sky
 		scene_color.a = 4.0 / 255.0;
+		scene_color.rgb = texture(gtexture, new_uv).rgb;
+
 		break;
+#endif
 
 	default:
 		discard;
 	}
-
-	scene_color.rgb = texture(gtexture, new_uv).rgb;
 }
 
 #endif

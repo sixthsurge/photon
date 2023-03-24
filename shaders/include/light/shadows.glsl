@@ -53,8 +53,7 @@ const vec2[32] blue_noise_disk = vec2[](
 );
 
 // Fake, lightmap-based shadows for outside of the shadow range or when shadows are disabled
-float lightmap_shadows(float skylight, float NoL, out float sss_depth) {
-	sss_depth = 0.5 * (6.15 - 6.0 * skylight) * clamp01(1.0 - 0.5 * max0(NoL));
+float lightmap_shadows(float skylight, float NoL) {
 	return smoothstep(13.5 / 15.0, 14.5 / 15.0, skylight);
 }
 
@@ -211,7 +210,7 @@ vec3 calculate_shadows(
 #ifdef SSRT_DISTANT_SHADOWS
 	float distant_shadow = raytrace_shadows();
 #else
-	float distant_shadow = lightmap_shadows(skylight, NoL, sss_depth);
+	float distant_shadow = lightmap_shadows(skylight, NoL);
 #endif
 
 	if (distance_fade >= 1.0) return vec3(distant_shadow);
@@ -233,7 +232,10 @@ vec3 calculate_shadows(
 	      penumbra_size  = min(penumbra_size, SHADOW_BLOCKER_SEARCH_RADIUS);
 	      penumbra_size *= shadowProjection[0].x;
 #else
-	const float penumbra_size = sqrt(0.5) * shadow_map_pixel_size * SHADOW_PENUMBRA_SCALE;
+	float penumbra_size = sqrt(0.5) * shadow_map_pixel_size * SHADOW_PENUMBRA_SCALE;
+
+	// Increase blur radius to approximate subsurface scattering
+	penumbra_size *= 1.0 + 7.0 * sss_amount;
 #endif
 
 #ifdef SHADOW_PCF
