@@ -76,6 +76,7 @@ uniform float frameTimeCounter;
 uniform int isEyeInWater;
 uniform float blindness;
 uniform float nightVision;
+uniform float darknessFactor;
 
 uniform vec3 light_dir;
 uniform vec3 sun_dir;
@@ -107,8 +108,7 @@ uniform float time_midnight;
 #include "/include/utility/sampling.glsl"
 #include "/include/utility/spherical_harmonics.glsl"
 
-void main()
-{
+void main() {
 	uv = gl_MultiTexCoord0.xy;
 
 #if defined WORLD_OVERWORLD
@@ -141,16 +141,9 @@ void main()
 	vec3 dir1 = normalize(vec3(sun_dir.xz + 0.1, 0.066).xzy);  // Sun-facing horizon
 	vec3 dir2 = normalize(vec3(moon_dir.xz + 0.1, 0.066).xzy); // Opposite horizon
 
-	sky_samples[0] = sun_color  * atmosphere_scattering(dir0, sun_dir)
-	               + moon_color * atmosphere_scattering(dir0, moon_dir);
-	sky_samples[1] = sun_color  * atmosphere_scattering(dir1, sun_dir)
-	               + moon_color * atmosphere_scattering(dir1, moon_dir);
-	sky_samples[2] = sun_color  * atmosphere_scattering(dir2, sun_dir)
-	               + moon_color * atmosphere_scattering(dir2, moon_dir);
-
-	sky_samples[0] *= skylight_boost;
-	sky_samples[1] *= skylight_boost;
-	sky_samples[2] *= skylight_boost;
+	sky_samples[0] = atmosphere_scattering(dir0, sun_color, sun_dir, moon_color, moon_dir) * skylight_boost;
+	sky_samples[1] = atmosphere_scattering(dir1, sun_color, sun_dir, moon_color, moon_dir) * skylight_boost;
+	sky_samples[2] = atmosphere_scattering(dir2, sun_color, sun_dir, moon_color, moon_dir) * skylight_boost;
 #endif
 
 	vec2 vertex_pos = gl_Vertex.xy * taau_render_scale;
@@ -187,8 +180,7 @@ layout (location = 1) out vec4 colortex3_clear;
 const bool colortex7MipmapEnabled = true;
  */
 
-float get_puddle_noise(vec3 world_pos, vec3 flat_normal, vec2 light_levels)
-{
+float get_puddle_noise(vec3 world_pos, vec3 flat_normal, vec2 light_levels) {
 	const float puddle_frequency = 0.025;
 
 	float puddle = texture(noisetex, world_pos.xz * puddle_frequency).w;
@@ -200,8 +192,7 @@ float get_puddle_noise(vec3 world_pos, vec3 flat_normal, vec2 light_levels)
 	return puddle;
 }
 
-void main()
-{
+void main() {
 	ivec2 texel = ivec2(gl_FragCoord.xy);
 
 	// Texture fetches
@@ -222,8 +213,10 @@ void main()
 	vec3 world_pos = scene_pos + cameraPosition;
 	vec3 world_dir = normalize(scene_pos - gbufferModelViewInverse[3].xyz);
 
+	vec3 atmosphere = atmosphere_scattering(world_dir, sun_color, sun_dir, moon_color, moon_dir);
+
 	if (depth == 1.0) { // Sky
-		scene_color = draw_sky(world_dir);
+		scene_color = draw_sky(world_dir, atmosphere);
 	} else { // Terrain
 		// Sample half-res lighting data many operations before using it (latency hiding)
 
@@ -265,14 +258,17 @@ void main()
 
 #ifdef SPECULAR_MAPPING
 		vec4 specular_map = vec4(unpack_unorm_2x8(gbuffer_data_1.z), unpack_unorm_2x8(gbuffer_data_1.w));
+		decode_specular_map(specular_map, material);
+#endif
 
 #if defined POM && defined POM_SHADOW
+	#ifdef SPECULAR_MAPPING
 		// Specular map alpha >= 0.5 => parallax shadow
 		bool parallax_shadow = specular_map.a >= 0.5;
 		specular_map.a = fract(specular_map.a * 2.0);
-#endif
-
-		decode_specular_map(specular_map, material);
+	#else
+		bool parallax_shadow = gbuffer_data_1.z >= 0.5;
+	#endif
 #endif
 
 #if defined WORLD_OVERWORLD && defined RAIN_PUDDLES
@@ -330,6 +326,9 @@ void main()
 		const vec3 shadows = vec3(0.0);
 #endif
 
+		vec3 horizon_dir = normalize(vec3(world_dir.xz, min(world_dir.y, -0.1)).xzy);
+		vec3 atmosphere_horizon = texture(colortex4, project_sky(horizon_dir)).rgb;
+
 		scene_color = get_diffuse_lighting(
 			material,
 			normal,
@@ -346,10 +345,24 @@ void main()
 
 		// Specular highlight
 
+#ifdef SHADOW
 		scene_color += get_specular_highlight(material, NoL, NoV, NoH, LoV, LoH) * light_color * shadows * ao;
-	}
+#else
+		scene_color += get_specular_highlight(material, NoL, NoV, NoH, LoV, LoH) * light_color * ao * sqrt(ao) * pow8(light_levels.y);
+#endif
 
-	apply_fog(scene_color, scene_pos, world_dir, depth == 1.0);
+		// Border fog
+
+#ifdef BORDER_FOG
+		float horizon_factor = linear_step(0.1, 1.0, exp(-75.0 * sqr(sun_dir.y + 0.0496)));
+			  horizon_factor = clamp01(horizon_factor + step(0.01, rainStrength));
+
+		float fog = border_fog(scene_pos, world_dir);
+		vec3 fog_color = mix(atmosphere, atmosphere_horizon, sqr(horizon_factor)) * (1.0 - biome_cave);
+
+		scene_color = mix(fog_color, scene_color, fog);
+#endif
+	}
 
 	// Clear colortex3 so that translucents can write to it
 	colortex3_clear = vec4(0.0);

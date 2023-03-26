@@ -95,8 +95,7 @@ uniform float time_midnight;
 #include "/include/misc/palette.glsl"
 #include "/include/misc/weather.glsl"
 
-void main()
-{
+void main() {
 	uv = gl_MultiTexCoord0.xy;
 
 #if defined WORLD_OVERWORLD
@@ -135,8 +134,7 @@ layout (location = 1) out vec3 fog_transmittance;
 #include "/include/utility/random.glsl"
 #include "/include/utility/space_conversion.glsl"
 
-void main()
-{
+void main() {
 	ivec2 fog_texel  = ivec2(gl_FragCoord.xy);
 	ivec2 view_texel = ivec2(gl_FragCoord.xy * taau_render_scale * rcp(VL_RENDER_SCALE));
 

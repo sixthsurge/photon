@@ -39,8 +39,7 @@ uniform sampler2D colortex0;
 const float tile_scale = bloom_tile_scale(BLOOM_TILE_INDEX);
 const vec2 tile_offset = bloom_tile_offset(BLOOM_TILE_INDEX);
 
-void main()
-{
+void main() {
 	uv = gl_MultiTexCoord0.xy;
 
 	vec2 vertex_pos = gl_Vertex.xy * tile_scale + tile_offset;
@@ -68,8 +67,7 @@ const float src_tile_scale = bloom_tile_scale(BLOOM_TILE_INDEX - 1);
 const vec2 src_tile_offset = bloom_tile_offset(BLOOM_TILE_INDEX - 1);
 #endif
 
-void main()
-{
+void main() {
 	vec2 pad_amount = 3.0 * view_pixel_size * rcp(src_tile_scale);
 	vec2 uv_src = clamp(uv, pad_amount, 1.0 - pad_amount) * src_tile_scale + src_tile_offset;
 

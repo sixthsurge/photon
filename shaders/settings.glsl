@@ -208,7 +208,8 @@ const float wetnessHalflife         = 70.0;
 
 // Reflections
 
-  #define SSR // Screen-space reflections. Makes water and shiny blocks reflect their environment. Big performance impact
+  #define ENVIRONMENT_REFLECTIONS // Screen-space reflections. Makes water and shiny blocks reflect their environment. Big performance impact
+  #define SKY_REFLECTIONS // Makes water and shiny blocks reflect the sky
   #define SSR_ROUGHNESS_SUPPORT // Makes reflections on rough surfaces actually appear rough. Big performance impact
   #define SSR_PREVIOUS_FRAME // Use previous frame data for reflections, so that translucents and reflections appear in reflections
   #define SSR_RAY_COUNT 4 // Number of rays traced for rough reflections. More rays mean less noise but worse performance [1 2 3 4 5 6 7 8]

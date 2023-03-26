@@ -71,16 +71,18 @@ mat2x3 raymarch_water_fog(
 
 		// Calculate sunlight transmittance through the volume
 		float distance_traveled = abs(depth0 - shadow_screen_pos.z) * -shadowProjectionInverse[2].z * rcp(SHADOW_DEPTH_SCALE);
-		vec3 light_transmittance = exp(-extinction_coeff * distance_traveled) * shadow;
-#else
-		#define light_transmittance 1.0
-		#define distance_traveled 0.0
-#endif
 
-		// Guess the transmittance to sky using trig
+		// Guess the transmittance to sky using trigonometry
 		float distance_traveled_sky = distance_traveled * light_dir.y;
 		      distance_traveled_sky = min(distance_traveled_sky, 15.0 - 15.0 * eye_skylight + max0(eyeAltitude - world_pos.y));
-		vec3 sky_transmittance = exp(-extinction_coeff * distance_traveled_sky);
+#else
+		#define shadow 1.0
+		#define distance_traveled 0.0
+		float distance_traveled_sky = 15.0 - 15.0 * eye_skylight + max0(eyeAltitude - world_pos.y);
+#endif
+
+		vec3 light_transmittance = exp(-extinction_coeff * distance_traveled) * shadow;
+		vec3 sky_transmittance   = exp(-extinction_coeff * distance_traveled_sky);
 
 		// Caustics pattern to create underwater light shafts
 		float caustics  = 0.67 * texture(noisetex, (caustics_pos + caustics_dir_0 * t) * 0.02).y;

@@ -19,8 +19,7 @@ uniform sampler2D colortex0;
 //----------------------------------------------------------------------------//
 #if defined STAGE_VERTEX
 
-void main()
-{
+void main() {
 	uv = gl_MultiTexCoord0.xy;
 
 	vec2 vertex_pos = gl_Vertex.xy * taau_render_scale;
@@ -42,18 +41,15 @@ layout (location = 1) out vec3 max_color;
 
 #include "/include/utility/color.glsl"
 
-vec3 min_of(vec3 a, vec3 b, vec3 c, vec3 d, vec3 f)
-{
+vec3 min_of(vec3 a, vec3 b, vec3 c, vec3 d, vec3 f) {
     return min(a, min(b, min(c, min(d, f))));
 }
 
-vec3 max_of(vec3 a, vec3 b, vec3 c, vec3 d, vec3 f)
-{
+vec3 max_of(vec3 a, vec3 b, vec3 c, vec3 d, vec3 f) {
     return max(a, max(b, max(c, max(d, f))));
 }
 
-void main()
-{
+void main() {
 	ivec2 texel = ivec2(gl_FragCoord.xy);
 
 	// Fetch 3x3 neighborhood

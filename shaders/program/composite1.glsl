@@ -74,6 +74,7 @@ uniform int frameCounter;
 uniform int isEyeInWater;
 uniform float blindness;
 uniform float nightVision;
+uniform float darknessFactor;
 
 uniform vec3 light_dir;
 uniform vec3 sun_dir;
@@ -100,8 +101,7 @@ uniform float time_midnight;
 
 #include "/include/misc/palette.glsl"
 
-void main()
-{
+void main() {
 	uv = gl_MultiTexCoord0.xy;
 
 #if defined WORLD_OVERWORLD
@@ -154,8 +154,7 @@ const bool colortex5MipmapEnabled = true;
  */
 
 // https://iquilezles.org/www/articles/texture/texture.htm
-vec4 smooth_filter(sampler2D sampler, vec2 coord)
-{
+vec4 smooth_filter(sampler2D sampler, vec2 coord) {
 	vec2 res = vec2(textureSize(sampler, 0));
 
 	coord = coord * res + 0.5;
@@ -169,8 +168,7 @@ vec4 smooth_filter(sampler2D sampler, vec2 coord)
 }
 
 // http://www.diva-portal.org/smash/get/diva2:24136/FULLTEXT01.pdf
-vec3 purkinje_shift(vec3 rgb, float purkinje_intensity)
-{
+vec3 purkinje_shift(vec3 rgb, float purkinje_intensity) {
 	const vec3 purkinje_tint = vec3(0.5, 0.7, 1.0) * rec709_to_rec2020;
 	const vec3 rod_response = vec3(7.15e-5, 4.81e-1, 3.28e-1) * rec709_to_rec2020;
 
@@ -191,8 +189,7 @@ vec3 purkinje_shift(vec3 rgb, float purkinje_intensity)
 //   puddles
 // -----------
 
-float get_ripple_height(vec2 coord)
-{
+float get_ripple_height(vec2 coord) {
 	const float ripple_frequency = 0.3;
 	const float ripple_speed     = 0.1;
 	const vec2 ripple_dir_0       = vec2( 3.0,   4.0) / 5.0;
@@ -204,8 +201,7 @@ float get_ripple_height(vec2 coord)
 	return mix(ripple_noise_1, ripple_noise_2, 0.5);
 }
 
-float get_puddle_noise(vec3 world_pos, vec3 flat_normal, vec2 light_levels)
-{
+float get_puddle_noise(vec3 world_pos, vec3 flat_normal, vec2 light_levels) {
 	const float puddle_frequency = 0.025;
 
 	float puddle = texture(noisetex, world_pos.xz * puddle_frequency).w;
@@ -221,7 +217,6 @@ bool get_rain_puddles(
 	vec3 world_pos,
 	vec3 flat_normal,
 	vec2 light_levels,
-	float distance_fade,
 	float porosity,
 	inout vec3 normal,
 	inout vec3 f0,
@@ -235,7 +230,7 @@ bool get_rain_puddles(
 
 	if (wetness < 0.0 || biome_may_rain < 0.0) return false;
 
-	float puddle = get_puddle_noise(world_pos, flat_normal, light_levels) * distance_fade;
+	float puddle = get_puddle_noise(world_pos, flat_normal, light_levels);
 
 	if (puddle < eps) return false;
 
@@ -267,8 +262,7 @@ bool get_rain_puddles(
 	return true;
 }
 
-void main()
-{
+void main() {
 	ivec2 texel = ivec2(gl_FragCoord.xy);
 
 	// Texture fetches
@@ -392,7 +386,7 @@ void main()
 
 	// Refraction
 
-	float translucent_distance = abs(view_dist - length(view_back_pos));
+	float layer_dist = abs(view_dist - length(view_back_pos));
 
 #if REFRACTION != REFRACTION_OFF
 	vec2 refracted_uv = uv;
@@ -404,7 +398,7 @@ void main()
 #endif
 		vec3 tangent_normal = normal * tbn;
 
-		refracted_uv = uv + 0.1 * tangent_normal.xy * rcp(max(view_dist, 1.0)) * min(translucent_distance, 8.0);
+		refracted_uv = uv + 0.1 * tangent_normal.xy * rcp(max(view_dist, 1.0)) * min(layer_dist, 8.0);
 
 		vec3  refracted_color = texture(colortex0, refracted_uv * taau_render_scale).rgb;
 		float refracted_depth = texture(depthtex1, refracted_uv * taau_render_scale).x;
@@ -417,27 +411,35 @@ void main()
 	}
 #endif
 
-	float distance_fade = border_fog(scene_pos, world_dir);
-
 	// Water foam
+
+	layer_dist  = abs(view_dist - length(view_back_pos));
 
 #ifdef WATER_FOAM
 	if (is_water && flat_normal.y > 0.5) {
-		translucent_distance  = abs(view_dist - length(view_back_pos)) * max(abs(world_dir.y), eps);
+		float d = layer_dist * max(abs(world_dir.y), eps);
 
 #ifdef VANILLA_WATER_TEXTURE
 		float texture_value     = data[0].x;
 		float texture_highlight = 0.5 * sqr(linear_step(0.63, 1.0, texture_value)) + 0.03 * texture_value;
 
-		float foam = cube(max0(1.0 - 2.0 * translucent_distance)) * (1.0 + 8.0 * texture_highlight);
+		float foam = cube(max0(1.0 - 2.0 * d)) * (1.0 + 8.0 * texture_highlight);
 #else
-		float foam = cube(max0(1.0 - 2.0 * translucent_distance));
+		float foam = cube(max0(1.0 - 2.0 * d));
 #endif
 
 		material.albedo += 0.1 * foam / mix(1.0, max(dot(ambient_color, luminance_weights_rec2020), 0.5), light_levels.y);
 		material.albedo  = clamp01(material.albedo);
 	}
 #endif
+
+	// Apply fog behind translucents
+
+	if (is_translucent) {
+		vec4 fog = get_simple_fog(world_dir, layer_dist, light_levels.y, isEyeInWater == 0 ^^ is_water, depth1 == 1.0);
+		scene_color *= fog.a;
+		scene_color += fog.rgb;
+	}
 
 	// Shade translucent layer
 
@@ -479,12 +481,16 @@ void main()
 			LoV
 		);
 
+#ifdef SHADOW
 		translucent_color += get_specular_highlight(material, NoL, NoV, NoH, LoV, LoH) * light_color * shadows;
+#else
+		translucent_color += get_specular_highlight(material, NoL, NoV, NoH, LoV, LoH) * light_color * pow8(light_levels.y);
+#endif
 
 		// Blend with background
 
 		if (is_water) {
-			float dist = (isEyeInWater == 1) ? 0.0 : distance(view_pos, view_back_pos);
+			float dist = (isEyeInWater == 1) ? 0.0 : layer_dist;
 			float LoV = dot(world_dir, light_dir);
 			float water_n = isEyeInWater == 1 ? air_n / water_n : water_n / air_n;
 
@@ -501,7 +507,7 @@ void main()
 			float alpha = blend_color.a;
 
 			vec3 absorption_coeff = 3.0 * (1.0 - tint) * alpha;
-			float dist = clamp(distance(view_pos, view_back_pos), 0.25, 1.41);
+			float dist = clamp(layer_dist, 0.25, 1.41);
 
 			scene_color *= exp(-absorption_coeff * dist);
 			scene_color *= 1.0 - cube(alpha);
@@ -509,8 +515,6 @@ void main()
 
 		scene_color += translucent_color;
 	}
-
-	scene_color = mix(background_color, scene_color, distance_fade);
 
 	// Rain puddles
 
@@ -520,7 +524,6 @@ void main()
 			world_pos,
 			flat_normal,
 			light_levels,
-			distance_fade,
 			material.porosity,
 			normal,
 			material.f0,
@@ -537,7 +540,7 @@ void main()
 
 	// Specular reflections
 
-#ifdef SSR
+#if defined ENVIRONMENT_REFLECTIONS || defined SKY_REFLECTIONS
 	if (material.ssr_multiplier > eps && depth0 < 1.0) {
 		scene_color += get_specular_reflections(
 			material,
@@ -548,20 +551,22 @@ void main()
 			world_dir,
 			world_dir * tbn,
 			light_levels.y
-		) * distance_fade;
+		);
 	}
 #endif
 
-	// Apply fog to translucents
+	// Apply fog
 
-	if (is_translucent) {
-		apply_fog(scene_color, scene_pos, world_dir, false);
-	}
+	bloomy_fog = 1.0;
 
-	// Apply volumetric lighting
+	// Border fog
+	scene_color = mix(background_color, scene_color, border_fog(scene_pos, world_dir));
 
 #ifdef VL
+	// Volumetric fog
 	scene_color = scene_color * fog_transmittance + fog_scattering;
+
+	bloomy_fog *= clamp01(dot(fog_transmittance, vec3(0.33)));
 #else
 	// Simple underwater fog
 	if (isEyeInWater == 1) {
@@ -571,8 +576,31 @@ void main()
 
 		scene_color *= water_fog[1];
 		scene_color += water_fog[0];
+
+		bloomy_fog *= clamp01(dot(water_fog[1], vec3(0.33)));
 	}
 #endif
+
+	if (isEyeInWater == 1) bloomy_fog = sqrt(bloomy_fog);
+
+	// Simple fog effects
+	vec4 fog = get_simple_fog(
+		world_dir,
+		view_dist,
+		light_levels.y,
+	#ifdef VL
+		false,
+	#else
+		isEyeInWater == 0,
+	#endif
+		depth0 == 1.0
+	);
+
+	scene_color *= fog.a;
+	scene_color += fog.rgb;
+
+	bloomy_fog *= fog.a * 0.5 + 0.5;
+	bloomy_fog *= 1.0 - 0.1 * darknessFactor;
 
 	// Purkinje shift
 
@@ -585,25 +613,6 @@ void main()
 	      purkinje_intensity *= clamp01(0.3 + 0.7 * cube(light_levels.y));
 
 	scene_color = purkinje_shift(scene_color, purkinje_intensity);
-#endif
-
-	// Calculate bloomy fog amount
-
-#ifdef BLOOMY_FOG
-	#ifdef VL
-	bloomy_fog = clamp01(dot(fog_transmittance, vec3(0.33)));
-	if (isEyeInWater == 1) bloomy_fog = sqrt(bloomy_fog);
-	#else
-	bloomy_fog = 1.0;
-	#endif
-
-	#ifdef CAVE_FOG
-	bloomy_fog *= spherical_fog(view_dist, 0.0, 0.005 * biome_cave * float(depth0 != 1.0));
-	#endif
-
-	#ifdef BLOOMY_RAIN
-	bloomy_fog *= 1.0 - RAIN_OPACITY * float(is_rain_particle) - SNOW_OPACITY * float(is_snow_particle);
-	#endif
 #endif
 }
 

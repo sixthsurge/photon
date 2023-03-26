@@ -21,8 +21,7 @@ varying vec2 uv;
 //----------------------------------------------------------------------------//
 #if defined STAGE_VERTEX
 
-void main()
-{
+void main() {
 
 }
 
@@ -34,8 +33,7 @@ void main()
 //----------------------------------------------------------------------------//
 #if defined STAGE_FRAGMENT
 
-void main()
-{
+void main() {
 
 }
 

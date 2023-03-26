@@ -143,6 +143,7 @@ vec3 trace_specular_ray(
 ) {
 	vec3 view_dir = mat3(gbufferModelView) * ray_dir;
 
+#ifdef ENVIRONMENT_REFLECTIONS
 	vec3 hit_pos;
 	bool hit = raymarch_depth_buffer(
 #ifdef SSR_PREVIOUS_FRAME
@@ -158,8 +159,16 @@ vec3 trace_specular_ray(
 		refinement_step_count,
 		hit_pos
 	);
+#else
+	const bool hit = false;
+	const vec3 hit_pos = vec3(0.0);
+#endif
 
+#ifdef SKY_REFLECTIONS
 	vec3 sky_reflection = get_sky_reflection(ray_dir, skylight);
+#else
+	const vec3 sky_reflection = vec3(0.0);
+#endif
 
 	if (hit) {
 		float border_attenuation_factor = mix(0.01, eps, pow4(clamp01(1.0 - gbufferModelViewInverse[2].y)));
@@ -170,9 +179,13 @@ vec3 trace_specular_ray(
 		vec3 hit_pos_prev = reproject(hit_pos);
 		if (clamp01(hit_pos_prev) != hit_pos_prev) return sky_reflection;
 
+#ifdef VL
 		// Un-apply volumetric fog scattering using fog from the current frame
 		vec2 fog_uv = clamp(hit_pos.xy * VL_RENDER_SCALE, vec2(0.0), floor(view_res * VL_RENDER_SCALE - 1.0) * view_pixel_size);
 		vec3 fog_scattering = texture(colortex6, fog_uv).rgb;
+#else
+		vec3 fog_scattering = vec3(0.0);
+#endif
 
 		vec3 reflection = textureLod(colortex5, hit_pos_prev.xy, mip_level).rgb;
 		     reflection = max0(reflection - fog_scattering);

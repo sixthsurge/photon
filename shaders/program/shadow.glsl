@@ -44,8 +44,7 @@ attribute vec2 mc_midTexCoord;
 #include "/include/light/distortion.glsl"
 #include "/include/vertex/wind_animation.glsl"
 
-void main()
-{
+void main() {
 	uv            = gl_MultiTexCoord0.xy;
 	material_mask = uint(mc_Entity.x - 10000.0);
 	tint          = gl_Color.rgb;
@@ -96,8 +95,7 @@ const vec3 water_extinction_coeff = water_absorption_coeff + water_scattering_co
 
 // using the built-in GLSL refract() seems to cause NaNs on Intel drivers, but with this
 // function, which does the exact same thing, it's fine
-vec3 refract_safe(vec3 I, vec3 N, float eta)
-{
+vec3 refract_safe(vec3 I, vec3 N, float eta) {
 	float NoI = dot(N, I);
 	float k = 1.0 - eta * eta * (1.0 - NoI * NoI);
 	if (k < 0.0) {
@@ -107,8 +105,7 @@ vec3 refract_safe(vec3 I, vec3 N, float eta)
 	}
 }
 
-float get_water_caustics()
-{
+float get_water_caustics() {
 #ifndef WATER_CAUSTICS
 	return 1.0;
 #else
@@ -131,8 +128,7 @@ float get_water_caustics()
 #endif
 }
 
-void main()
-{
+void main() {
 #ifdef SHADOW_COLOR
 	if (material_mask == 1) { // Water
 		shadowcolor0_out = clamp01(0.25 * exp(-water_extinction_coeff * distance_through_water) * get_water_caustics());

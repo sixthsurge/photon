@@ -30,8 +30,7 @@ uniform vec2 taa_offset;
 //----------------------------------------------------------------------------//
 #if defined STAGE_VERTEX
 
-void main()
-{
+void main() {
 	uv   = mat2(gl_TextureMatrix[0]) * gl_MultiTexCoord0.xy + gl_TextureMatrix[0][3].xy;
 	tint = gl_Color.rgb;
 
@@ -60,8 +59,7 @@ layout (location = 0) out vec4 scene_color;
 
 /* DRAWBUFFERS:3 */
 
-void main()
-{
+void main() {
 	vec2 new_uv = uv;
 	vec2 offset;
 

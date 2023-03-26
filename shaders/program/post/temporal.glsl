@@ -79,8 +79,7 @@ float manual_exposure_value = mix(min_luminance, max_luminance, screenBrightness
 const float manual_exposure_value = MANUAL_EXPOSURE_VALUE;
 #endif
 
-float get_bin_from_luminance(float luminance)
-{
+float get_bin_from_luminance(float luminance) {
 	const float bin_count = HISTOGRAM_BINS;
 	const float rcp_log_luminance_range = 1.0 / (max_log_luminance - min_log_luminance);
 	const float scaled_min_log_luminance = min_log_luminance * rcp_log_luminance_range;
@@ -92,8 +91,7 @@ float get_bin_from_luminance(float luminance)
 	return min(bin_count * log_luminance, bin_count - 1.0);
 }
 
-float get_luminance_from_bin(int bin)
-{
+float get_luminance_from_bin(int bin) {
 	const float log_luminance_range = max_log_luminance - min_log_luminance;
 
 	float log_luminance = bin * rcp(float(HISTOGRAM_BINS));
@@ -101,8 +99,7 @@ float get_luminance_from_bin(int bin)
 	return exp2(log_luminance * log_luminance_range + min_log_luminance);
 }
 
-void build_histogram(out float[HISTOGRAM_BINS] pdf)
-{
+void build_histogram(out float[HISTOGRAM_BINS] pdf) {
 	// Initialize PDF to 0
 	for (int i = 0; i < HISTOGRAM_BINS; ++i) pdf[i] = 0.0;
 
@@ -137,8 +134,7 @@ void build_histogram(out float[HISTOGRAM_BINS] pdf)
 	for (int i = 0; i < HISTOGRAM_BINS; ++i) pdf[i] *= tile_area;
 }
 
-float get_median_luminance(float[HISTOGRAM_BINS] pdf)
-{
+float get_median_luminance(float[HISTOGRAM_BINS] pdf) {
 	float cdf = 0.0;
 
 	for (int i = 0; i < HISTOGRAM_BINS; ++i) {
@@ -149,8 +145,7 @@ float get_median_luminance(float[HISTOGRAM_BINS] pdf)
 	return 0.0; // ??
 }
 
-void main()
-{
+void main() {
 	uv = gl_MultiTexCoord0.xy;
 
 	// Auto exposure
@@ -219,32 +214,27 @@ layout (location = 1) out vec4 result;
 const bool colortex0MipmapEnabled = true;
  */
 
-vec3 min_of(vec3 a, vec3 b, vec3 c, vec3 d, vec3 f)
-{
+vec3 min_of(vec3 a, vec3 b, vec3 c, vec3 d, vec3 f) {
     return min(a, min(b, min(c, min(d, f))));
 }
 
-vec3 max_of(vec3 a, vec3 b, vec3 c, vec3 d, vec3 f)
-{
+vec3 max_of(vec3 a, vec3 b, vec3 c, vec3 d, vec3 f) {
     return max(a, max(b, max(c, max(d, f))));
 }
 
 // Invertible tonemapping operator (Reinhard) applied before blending the current and previous frames
 // Improves the appearance of emissive objects
-vec3 reinhard(vec3 rgb)
-{
+vec3 reinhard(vec3 rgb) {
 	return rgb / (rgb + 1.0);
 }
 
-vec3 reinhard_inverse(vec3 rgb)
-{
+vec3 reinhard_inverse(vec3 rgb) {
 	return rgb / (1.0 - rgb);
 }
 
 // Estimates the closest fragment in a 5x5 radius with 5 samples in a cross pattern
 // Improves reprojection for objects in motion
-vec3 get_closest_fragment(ivec2 texel0)
-{
+vec3 get_closest_fragment(ivec2 texel0) {
 	ivec2 texel1 = texel0 + ivec2(-2, -2);
 	ivec2 texel2 = texel0 + ivec2( 2, -2);
 	ivec2 texel3 = texel0 + ivec2(-2,  2);
@@ -265,8 +255,7 @@ vec3 get_closest_fragment(ivec2 texel0)
 }
 
 // AABB clipping from "Temporal Reprojection Anti-Aliasing in INSIDE"
-vec3 clip_aabb(vec3 history_color, vec3 min_color, vec3 max_color, out bool history_clipped)
-{
+vec3 clip_aabb(vec3 history_color, vec3 min_color, vec3 max_color, out bool history_clipped) {
 	vec3 p_clip = 0.5 * (max_color + min_color);
 	vec3 e_clip = 0.5 * (max_color - min_color);
 
@@ -279,16 +268,14 @@ vec3 clip_aabb(vec3 history_color, vec3 min_color, vec3 max_color, out bool hist
 	return history_clipped ? p_clip + v_clip / ma_unit : history_color;
 }
 
-vec3 clip_aabb(vec3 history_color, vec3 min_color, vec3 max_color)
-{
+vec3 clip_aabb(vec3 history_color, vec3 min_color, vec3 max_color) {
 	bool history_clipped;
 	return clip_aabb(history_color, min_color, max_color, history_clipped);
 }
 
 // Flicker reduction using the "distance to clamp" method from "High Quality Temporal Supersampling"
 // by Brian Karis. Only used for TAAU
-float get_flicker_reduction(vec3 history_color, vec3 min_color, vec3 max_color)
-{
+float get_flicker_reduction(vec3 history_color, vec3 min_color, vec3 max_color) {
 	const float flicker_sensitivity = 5.0;
 
 	vec3 min_offset = (history_color - min_color);
@@ -298,8 +285,7 @@ float get_flicker_reduction(vec3 history_color, vec3 min_color, vec3 max_color)
 	return clamp01(distance_to_clip);
 }
 
-vec3 neighborhood_clipping(ivec2 texel, vec3 current_color, vec3 history_color)
-{
+vec3 neighborhood_clipping(ivec2 texel, vec3 current_color, vec3 history_color) {
 	vec3 min_color, max_color;
 
 	// Fetch 3x3 neighborhood
@@ -363,8 +349,7 @@ vec3 neighborhood_clipping(ivec2 texel, vec3 current_color, vec3 history_color)
 }
 
 #if AUTO_EXPOSURE == AUTO_EXPOSURE_HISTOGRAM && DEBUG_VIEW == DEBUG_VIEW_HISTOGRAM
-void draw_histogram(ivec2 texel)
-{
+void draw_histogram(ivec2 texel) {
 	const int width  = 512;
 	const int height = 256;
 
@@ -388,8 +373,7 @@ void draw_histogram(ivec2 texel)
 }
 #endif
 
-void main()
-{
+void main() {
 	ivec2 texel = ivec2(gl_FragCoord.xy * taau_render_scale);
 
 #ifdef TAA

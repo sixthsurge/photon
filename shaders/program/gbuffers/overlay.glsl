@@ -26,8 +26,7 @@ uniform vec2 view_pixel_size;
 //----------------------------------------------------------------------------//
 #if defined STAGE_VERTEX
 
-void main()
-{
+void main() {
 	uv = mat2(gl_TextureMatrix[0]) * gl_MultiTexCoord0.xy + gl_TextureMatrix[0][3].xy;
 
 	vec3 view_pos = transform(gl_ModelViewMatrix, gl_Vertex.xyz);
@@ -57,8 +56,7 @@ layout (location = 0) out vec4 overlays;
 
 const float lod_bias = log2(taau_render_scale);
 
-void main()
-{
+void main() {
 #if defined TAA && defined TAAU
 	vec2 coord = gl_FragCoord.xy * view_pixel_size * rcp(taau_render_scale);
 	if (clamp01(coord) != coord) discard;

@@ -15,8 +15,7 @@ float gerstner_wave(vec2 coord, vec2 wave_dir, float t, float noise, float wavel
 	return sqr(sin(x) * 0.5 + 0.5);
 }
 
-float get_water_height(vec2 coord, vec2 flow_dir, bool flowing_water)
-{
+float get_water_height(vec2 coord, vec2 flow_dir, bool flowing_water) {
 	const uint gerstner_iterations = WATER_WAVE_ITERATIONS;
 	const float wave_amplitude     = 1.0;
 	const float wave_frequency     = 0.36 * WATER_WAVE_FREQUENCY;
@@ -57,8 +56,7 @@ float get_water_height(vec2 coord, vec2 flow_dir, bool flowing_water)
 	return height / amplitude_sum;
 }
 
-vec3 get_water_normal(vec3 world_pos, vec3 flat_normal, vec2 coord, vec2 flow_dir, float skylight, bool flowing_water)
-{
+vec3 get_water_normal(vec3 world_pos, vec3 flat_normal, vec2 coord, vec2 flow_dir, float skylight, bool flowing_water) {
 	const float h = 0.1;
 	float wave0 = get_water_height(coord, flow_dir, flowing_water);
 	float wave1 = get_water_height(coord + vec2(h, 0.0), flow_dir, flowing_water);

@@ -25,8 +25,7 @@ uniform vec2 view_res;
 //----------------------------------------------------------------------------//
 #if defined STAGE_VERTEX
 
-void main()
-{
+void main() {
 	uv = gl_MultiTexCoord0.xy;
 
 	gl_Position = vec4(gl_Vertex.xy * 2.0 - 1.0, 0.0, 1.0);
@@ -44,8 +43,7 @@ layout (location = 0) out vec3 bloom_tiles;
 
 /* DRAWBUFFERS:0 */
 
-void main()
-{
+void main() {
 	int tile_index = int(-log2(1.0 - uv.x));
 
 	if ((tile_index & 1) == 1) {

@@ -43,14 +43,11 @@ flat varying vec3 moon_color;
 flat varying vec3 base_light_color;
 flat varying vec3 light_color;
 flat varying vec3 sky_color;
-flat varying vec3 sky_color_fog;
 
 flat varying vec2 clouds_coverage_cu;
 flat varying vec2 clouds_coverage_ac;
 flat varying vec2 clouds_coverage_cc;
 flat varying vec2 clouds_coverage_ci;
-
-flat varying mat2x3 air_fog_coeff[2];
 #endif
 
 // ------------
@@ -132,8 +129,7 @@ uniform vec3 clouds_light_dir;
 #include "/include/misc/palette.glsl"
 #include "/include/misc/weather.glsl"
 
-void main()
-{
+void main() {
 	uv = gl_MultiTexCoord0.xy;
 
 #if defined WORLD_OVERWORLD
@@ -143,7 +139,7 @@ void main()
 	base_light_color = mix(sun_color, moon_color, float(clouds_moonlit)) * (1.0 - rainStrength);
 
 	const vec3 sky_dir = normalize(vec3(0.0, 1.0, -0.8)); // don't point direcly upwards to avoid the sun halo when the sun path rotation is 0
-	sky_color = atmosphere_scattering(sky_dir, sun_dir) * sun_color + atmosphere_scattering(sky_dir, moon_dir) * moon_color;
+	sky_color = atmosphere_scattering(sky_dir, sun_color, sun_dir, moon_color, moon_dir);
 	sky_color = tau * mix(sky_color, vec3(sky_color.b) * sqrt(2.0), rcp_pi);
 	sky_color = mix(sky_color, tau * get_weather_color(), rainStrength);
 
@@ -153,12 +149,6 @@ void main()
 		clouds_coverage_cc,
 		clouds_coverage_ci
 	);
-
-	mat2x3 rayleigh_coeff = air_fog_rayleigh_coeff(), mie_coeff = air_fog_mie_coeff();
-	air_fog_coeff[0] = mat2x3(rayleigh_coeff[0], mie_coeff[0]);
-	air_fog_coeff[1] = mat2x3(rayleigh_coeff[1], mie_coeff[1]);
-
-	sky_color_fog = get_sky_color();
 #endif
 
 	gl_Position = vec4(gl_Vertex.xy * 2.0 - 1.0, 0.0, 1.0);
@@ -179,31 +169,18 @@ layout (location = 0) out vec3 sky_map;
 #define ATMOSPHERE_SCATTERING_LUT depthtex0
 
 #if defined WORLD_OVERWORLD
-#include "/include/fog/air_fog_vl.glsl"
 #include "/include/sky/clouds.glsl"
 #endif
 
 #include "/include/sky/sky.glsl"
 #include "/include/sky/projection.glsl"
 
-void main()
-{
+void main() {
 	ivec2 texel = ivec2(gl_FragCoord.xy);
 
 	vec3 ray_dir = unproject_sky(uv);
 
 	sky_map = draw_sky(ray_dir);
-
-#if defined WORLD_OVERWORLD
-	// Apply volumetric fog to sky capture
-	vec3 world_start_pos = vec3(cameraPosition);
-	vec3 world_end_pos   = world_start_pos + ray_dir;
-
-	mat2x3 fog = raymarch_air_fog(world_start_pos, world_end_pos, true, eye_skylight, 0.5);
-
-	sky_map *= fog[1];
-	sky_map += fog[0];
-#endif
 }
 
 #endif

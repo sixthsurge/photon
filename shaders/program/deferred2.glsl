@@ -56,8 +56,7 @@ uniform bool world_age_changed;
 //----------------------------------------------------------------------------//
 #if defined STAGE_VERTEX
 
-void main()
-{
+void main() {
 	uv = gl_MultiTexCoord0.xy;
 
 	vec2 vertex_pos = gl_Vertex.xy * taau_render_scale;
@@ -89,8 +88,7 @@ layout (location = 1) out vec4 clouds;
 
 const float gtao_render_scale = 0.5;
 
-vec4 smooth_filter(sampler2D sampler, vec2 coord)
-{
+vec4 smooth_filter(sampler2D sampler, vec2 coord) {
 	// from https://iquilezles.org/www/articles/texture/texture.htm
 	vec2 res = vec2(textureSize(sampler, 0));
 
@@ -113,8 +111,7 @@ vec4 smooth_filter(sampler2D sampler, vec2 coord)
 #define GTAO_RADIUS        2.0
 #define GTAO_FALLOFF_START 0.75
 
-float integrate_arc(vec2 h, float n, float cos_n)
-{
+float integrate_arc(vec2 h, float n, float cos_n) {
 	vec2 tmp = cos_n + 2.0 * h * sin(n) - cos(2.0 * h - n);
 	return 0.25 * (tmp.x + tmp.y);
 }
@@ -154,8 +151,7 @@ float calculate_maximum_horizon_angle(
 	return fast_acos(clamp(max_cos_theta, -1.0, 1.0));
 }
 
-float ambient_occlusion(vec3 screen_pos, vec3 view_pos, vec3 view_normal, vec2 dither)
-{
+float ambient_occlusion(vec3 screen_pos, vec3 view_pos, vec3 view_normal, vec2 dither) {
 	float ao = 0.0;
 	// vec3 bent_normal = vec3(0.0);
 
@@ -207,8 +203,7 @@ float ambient_occlusion(vec3 screen_pos, vec3 view_pos, vec3 view_normal, vec2 d
 //   clouds upscaling
 // --------------------
 
-vec4 upscale_clouds()
-{
+vec4 upscale_clouds() {
 	const int checkerboard_area = CLOUDS_TEMPORAL_UPSCALING * CLOUDS_TEMPORAL_UPSCALING;
 
 	ivec2 dst_texel = ivec2(gl_FragCoord.xy);
@@ -255,8 +250,7 @@ vec4 upscale_clouds()
 	return mix(current, history, history_weight);
 }
 
-void main()
-{
+void main() {
 #if defined WORLD_OVERWORLD
 	clouds = upscale_clouds();
 #endif

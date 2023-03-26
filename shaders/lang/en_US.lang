@@ -203,7 +203,8 @@ value.REFRACTION.REFRACTION_OFF        = §cOff
 value.REFRACTION.REFRACTION_WATER_ONLY = Water Only
 value.REFRACTION.REFRACTION_ALL        = §aAll
 
-option.SSR                             = Enabled
+option.ENVIRONMENT_REFLECTIONS         = Environment Reflections
+option.SKY_REFLECTIONS                 = Sky Reflections
 option.SSR_ROUGHNESS_SUPPORT           = Roughness Support
 option.SSR_RAY_COUNT                   = Ray Count
 option.SSR_INTERSECTION_STEPS_SMOOTH   = Intersection Steps - Smooth

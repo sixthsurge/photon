@@ -102,7 +102,7 @@ vec4 get_clouds(vec3 ray_dir, vec3 clear_sky) {
 #endif
 }
 
-vec3 draw_sky(vec3 ray_dir) {
+vec3 draw_sky(vec3 ray_dir, vec3 atmosphere) {
 	vec3 sky = vec3(0.0);
 
 	// Sun, moon and stars
@@ -141,7 +141,7 @@ vec3 draw_sky(vec3 ray_dir) {
 	// Sky gradient
 
 	sky *= atmosphere_transmittance(ray_dir.y, planet_radius) * (1.0 - rainStrength);
-	sky += atmosphere_scattering(ray_dir, sun_color, sun_dir, moon_color, moon_dir);
+	sky += atmosphere;
 
 	// Rain
 	vec3 rain_sky = get_weather_color() * (1.0 - exp2(-0.8 / clamp01(ray_dir.y)));
@@ -159,6 +159,11 @@ vec3 draw_sky(vec3 ray_dir) {
 	sky = mix(sky, vec3(0.0), underground_sky_fade);
 
 	return sky;
+}
+
+vec3 draw_sky(vec3 ray_dir) {
+	vec3 atmosphere = atmosphere_scattering(ray_dir, sun_color, sun_dir, moon_color, moon_dir);
+	return draw_sky(ray_dir, atmosphere);
 }
 
 //----------------------------------------------------------------------------//

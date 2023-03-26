@@ -29,8 +29,7 @@ uniform float viewHeight;
 //----------------------------------------------------------------------------//
 #if defined STAGE_VERTEX
 
-void main()
-{
+void main() {
 	uv = gl_MultiTexCoord0.xy;
 
 	gl_Position = vec4(gl_Vertex.xy * 2.0 - 1.0, 0.0, 1.0);
@@ -54,20 +53,17 @@ layout (location = 0) out vec3 scene_color;
 const int debug_text_scale = 2;
 ivec2 debug_text_position = ivec2(0, int(viewHeight) / debug_text_scale);
 
-vec3 min_of(vec3 a, vec3 b, vec3 c, vec3 d, vec3 f)
-{
+vec3 min_of(vec3 a, vec3 b, vec3 c, vec3 d, vec3 f) {
 	return min(a, min(b, min(c, min(d, f))));
 }
 
-vec3 max_of(vec3 a, vec3 b, vec3 c, vec3 d, vec3 f)
-{
+vec3 max_of(vec3 a, vec3 b, vec3 c, vec3 d, vec3 f) {
 	return max(a, max(b, max(c, max(d, f))));
 }
 
 // FidelityFX contrast-adaptive sharpening filter
 // https://github.com/GPUOpen-Effects/FidelityFX-CAS
-vec3 cas_filter(sampler2D sampler, ivec2 texel, const float sharpness)
-{
+vec3 cas_filter(sampler2D sampler, ivec2 texel, const float sharpness) {
 #ifndef CAS
 	return display_eotf(texelFetch(sampler, texel, 0).rgb);
 #endif
@@ -117,8 +113,7 @@ vec3 cas_filter(sampler2D sampler, ivec2 texel, const float sharpness)
 	return clamp01((b + d + f + h) * w + e) / weight_sum;
 }
 
-void main()
-{
+void main() {
     ivec2 texel = ivec2(gl_FragCoord.xy);
 
 	if (abs(MC_RENDER_QUALITY - 1.0) < 0.01) {

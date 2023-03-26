@@ -36,8 +36,7 @@ uniform int frameCounter;
 //----------------------------------------------------------------------------//
 #if defined STAGE_VERTEX
 
-void main()
-{
+void main() {
 	uv = gl_MultiTexCoord0.xy;
 
 	vec2 vertex_pos = gl_Vertex.xy * taau_render_scale;
@@ -59,13 +58,11 @@ layout (location = 0) out vec3 scene_color;
 #include "/include/utility/random.glsl"
 #include "/include/utility/sampling.glsl"
 
-float reverse_linear_depth(float linear_z)
-{
+float reverse_linear_depth(float linear_z) {
 	return (far + near) / (far - near) + (2.0 * far * near) / (linear_z * (far - near));
 }
 
-void main()
-{
+void main() {
 	ivec2 texel = ivec2(gl_FragCoord.xy);
 
 	float depth = texelFetch(depthtex0, texel, 0).x;

@@ -25,8 +25,7 @@ uniform vec2 view_pixel_size;
 //----------------------------------------------------------------------------//
 #if defined STAGE_VERTEX
 
-void main()
-{
+void main() {
 	uv = gl_MultiTexCoord0.xy;
 
 	gl_Position = vec4(gl_Vertex.xy * 2.0 - 1.0, 0.0, 1.0);
@@ -51,24 +50,20 @@ const float edge_threshold_min = 0.0312;
 const float edge_threshold_max = 0.125;
 const float subpixel_quality  = 0.75;
 
-float get_luma(vec3 rgb)
-{
+float get_luma(vec3 rgb) {
 	const vec3 luminance_weights_r_709 = vec3(0.2126, 0.7152, 0.0722);
 	return sqrt(dot(rgb, luminance_weights_r_709));
 }
 
-float min_of(float a, float b, float c, float d, float e)
-{
+float min_of(float a, float b, float c, float d, float e) {
 	return min(a, min(b, min(c, min(d, e))));
 }
 
-float max_of(float a, float b, float c, float d, float e)
-{
+float max_of(float a, float b, float c, float d, float e) {
 	return max(a, max(b, max(c, max(d, e))));
 }
 
-void main()
-{
+void main() {
 	ivec2 texel = ivec2(gl_FragCoord.xy);
 
 	// Detecting where to apply AA

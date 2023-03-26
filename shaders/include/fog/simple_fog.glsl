@@ -1,6 +1,7 @@
 #ifndef INCLUDE_FOG_SIMPLE_FOG
 #define INCLUDE_FOG_SIMPLE_FOG
 
+#include "/include/sky/projection.glsl"
 #include "/include/utility/bicubic.glsl"
 #include "/include/utility/color.glsl"
 #include "/include/utility/fast_math.glsl"
@@ -8,14 +9,14 @@
 
 const vec3 cave_fog_color = vec3(0.033);
 const vec3 lava_fog_color = from_srgb(vec3(0.839, 0.373, 0.075)) * 2.0;
-const vec3 snow_fog_color = from_srgb(vec3(0.957, 0.988, 0.988)) * 0.8;
+const vec3 snow_fog_color = from_srgb(vec3(0.957, 0.988, 0.988)) * 0.3;
 
 const vec3 water_absorption_coeff = vec3(WATER_ABSORPTION_R, WATER_ABSORPTION_G, WATER_ABSORPTION_B) * rec709_to_working_color;
 const vec3 water_scattering_coeff = vec3(WATER_SCATTERING);
 const vec3 water_extinction_coeff = water_absorption_coeff + water_scattering_coeff;
 
-float spherical_fog(float view_distance, float fog_start_distance, float fogDensity) {
-	return exp2(-fogDensity * max0(view_distance - fog_start_distance));
+float spherical_fog(float view_dist, float fog_start_distance, float fog_density) {
+	return exp2(-fog_density * max0(view_dist - fog_start_distance));
 }
 
 float border_fog(vec3 scene_pos, vec3 world_dir) {
@@ -28,6 +29,7 @@ float border_fog(vec3 scene_pos, vec3 world_dir) {
 	return fog;
 }
 
+// Simple water fog applied behind water or when volumetric fog is disabled
 mat2x3 water_fog_simple(
 	vec3 light_color,
 	vec3 ambient_color,
@@ -61,45 +63,59 @@ mat2x3 water_fog_simple(
 #include "/include/sky/atmosphere.glsl"
 #include "/include/sky/projection.glsl"
 
-void apply_fog(inout vec3 scene_color, vec3 scene_pos, vec3 world_dir, bool sky) {
-	float fog;
-	float view_distance = length(scene_pos - gbufferModelView[3].xyz);
+vec4 get_simple_fog(
+	vec3 world_dir,
+	float view_dist,
+	float skylight,
+	bool do_normal_fog,
+	bool sky
+) {
+	vec4 fog = vec4(vec3(0.0), 1.0);
 
-	// Border fog
-#ifdef PROGRAM_DEFERRED3
-#ifdef BORDER_FOG
-	fog = border_fog(scene_pos, world_dir);
+	// Normal fog
 
-	if (fog < 0.999 && !sky) {
-		vec3 fog_color  = atmosphere_scattering(world_dir, sun_color, sun_dir, moon_color, moon_dir);
-			 fog_color *= 1.0 - biome_cave;
+	if (do_normal_fog && !sky) {
+		vec3 horizon_dir = normalize(vec3(world_dir.xz, min(world_dir.y, -0.1)).xzy);
+		vec3 horizon_color = texture(colortex4, project_sky(horizon_dir)).rgb;
 
-		scene_color = mix(fog_color, scene_color, fog);
+		float normal_fog = spherical_fog(view_dist, 0.0, 0.001 * cube(skylight));
+
+		fog.rgb += horizon_color - horizon_color * normal_fog;
+		fog.a   *= normal_fog;
 	}
-#endif
-#endif
 
 	// Cave fog
 
 #ifdef CAVE_FOG
-	fog = spherical_fog(view_distance, 0.0, 0.0033 * biome_cave * float(!sky));
-	scene_color = mix(cave_fog_color, scene_color, fog);
+	float cave_fog = spherical_fog(view_dist, 0.0, 0.0033 * biome_cave * float(!sky));
+	fog.rgb += cave_fog_color - cave_fog_color * cave_fog;
+	fog.a   *= cave_fog;
 #endif
-
-	// Blindness fog
-
-	fog = spherical_fog(view_distance, 2.0, blindness);
-	scene_color *= fog;
 
 	// Lava fog
 
-	fog = spherical_fog(view_distance, 0.33, 3.0 * float(isEyeInWater == 2));
-	scene_color = mix(lava_fog_color, scene_color, fog);
+	float lava_fog = spherical_fog(view_dist, 0.33, 3.0 * float(isEyeInWater == 2));
+	fog.rgb += lava_fog_color - lava_fog_color * lava_fog;
+	fog.a   *= lava_fog;
 
 	// Powdered snow fog
 
-	fog = spherical_fog(view_distance, 0.5, 5.0 * float(isEyeInWater == 3));
-	scene_color = mix(snow_fog_color, scene_color, fog);
+	float snow_fog = spherical_fog(view_dist, 0.5, 1.0 * float(isEyeInWater == 3));
+	fog.rgb += snow_fog_color - snow_fog_color * snow_fog;
+	fog.a   *= snow_fog;
+
+	// Blindness fog
+
+	float blindness_fog = spherical_fog(view_dist, 2.0, blindness);
+	fog.rgb *= blindness_fog;
+	fog.a   *= blindness_fog;
+
+	// Darkness fog
+	float darkness_fog = spherical_fog(view_dist, 2.0, 0.05 * darknessFactor) * 0.7 + 0.3;
+	fog.rgb *= darkness_fog;
+	fog.a   *= darkness_fog;
+
+	return fog;
 }
 
 //----------------------------------------------------------------------------//

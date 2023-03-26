@@ -87,8 +87,7 @@ attribute vec2 mc_midTexCoord;
 #include "/include/utility/space_conversion.glsl"
 #include "/include/vertex/wind_animation.glsl"
 
-void main()
-{
+void main() {
 	uv           = gl_MultiTexCoord0.xy;
 	light_levels = clamp01(gl_MultiTexCoord1.xy * rcp(240.0));
 	tint         = gl_Color;
@@ -183,15 +182,13 @@ layout (location = 1) out vec4 gbuffer_data_1; // detailed normal, specular map 
 #include "/include/utility/space_conversion.glsl"
 
 #if   TEXTURE_FORMAT == TEXTURE_FORMAT_LAB
-void decode_normal_map(vec3 normal_map, out vec3 normal, out float ao)
-{
+void decode_normal_map(vec3 normal_map, out vec3 normal, out float ao) {
 	normal.xy = normal_map.xy * 2.0 - 1.0;
 	normal.z  = sqrt(clamp01(1.0 - dot(normal.xy, normal.xy)));
 	ao        = normal_map.z;
 }
 #elif TEXTURE_FORMAT == TEXTURE_FORMAT_OLD
-void decode_normal_map(vec3 normal_map, out vec3 normal, out float ao)
-{
+void decode_normal_map(vec3 normal_map, out vec3 normal, out float ao) {
 	normal  = normal_map * 2.0 - 1.0;
 	ao      = length(normal);
 	normal *= rcp(ao);
@@ -199,8 +196,7 @@ void decode_normal_map(vec3 normal_map, out vec3 normal, out float ao)
 #endif
 
 #if defined PROGRAM_GBUFFERS_BLOCK
-vec3 draw_end_portal()
-{
+vec3 draw_end_portal() {
 	const int   layer_count = 8;       // Number of layers
 	const float depth_scale = 0.33;    // Apparent distance between layers
 	const float depth_fade = 0.5;      // How quickly the layers fade to black
@@ -287,8 +283,7 @@ const float lod_bias = log2(taau_render_scale);
 	#define read_tex(x) texture(x, uv, lod_bias)
 #endif
 
-void main()
-{
+void main() {
 #if defined TAA && defined TAAU
 	vec2 coord = gl_FragCoord.xy * view_pixel_size * rcp(taau_render_scale);
 	if (clamp01(coord) != coord) discard;
@@ -314,7 +309,11 @@ void main()
 
 		parallax_uv = get_parallax_uv(tangent_dir, uv_gradient, view_distance, dither, shadow_trace_pos, pom_depth);
 	#ifdef POM_SHADOW
-		parallax_shadow = get_parallax_shadow(shadow_trace_pos, uv_gradient, view_distance, dither);
+		if (dot(tbn[2], light_dir) >= eps) {
+			parallax_shadow = get_parallax_shadow(shadow_trace_pos, uv_gradient, view_distance, dither);
+		} else {
+			parallax_shadow = false;
+		}
 	#endif
 	} else {
 		parallax_uv = uv;
@@ -341,8 +340,14 @@ void main()
 #endif
 
 #if defined PROGRAM_GBUFFERS_TERRAIN && defined VANILLA_AO
+	#ifdef GTAO
 	const float vanilla_ao_strength = 0.9;
 	const float vanilla_ao_lift     = 0.5;
+	#else
+	const float vanilla_ao_strength = 1.0;
+	const float vanilla_ao_lift     = 0.0;
+	#endif
+
 	base_color.rgb *= lift(vanilla_ao, vanilla_ao_lift) * vanilla_ao_strength + (1.0 - vanilla_ao_strength);
 #endif
 
@@ -364,9 +369,6 @@ void main()
 	vec3 normal; float material_ao;
 	decode_normal_map(normal_map, normal, material_ao);
 
-#if defined PROGRAM_GBUFFERS_TERRAIN && defined POM && defined POM_SLOPE_NORMALS
-#endif
-
 	normal = tbn * normal;
 #else
 	const float material_ao = 1.0;
@@ -382,15 +384,19 @@ void main()
 #endif
 
 #ifdef SPECULAR_MAPPING
-#if defined POM && defined POM_SHADOW
+	#if defined POM && defined POM_SHADOW
 	// Pack parallax shadow in alpha component of specular map
 	// Specular map alpha >= 0.5 => parallax shadow
 	specular_map.a *= step(specular_map.a, 0.999);
 	specular_map.a  = clamp01(specular_map.a * 0.5 + 0.5 * float(parallax_shadow));
-#endif
+	#endif
 
 	gbuffer_data_1.z  = pack_unorm_2x8(specular_map.xy);
 	gbuffer_data_1.w  = pack_unorm_2x8(specular_map.zw);
+#else
+	#if defined POM && defined POM_SHADOW
+	gbuffer_data_1.z  = float(parallax_shadow);
+	#endif
 #endif
 }
 

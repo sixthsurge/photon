@@ -16,9 +16,10 @@
 float get_sun_exposure() {
 	const float base_scale = 7.0 * SUN_I;
 
+	float early_morning = linear_step(0.05, 1.0, exp(-80.0 * sqr(sun_dir.y - 0.6)));
 	float blue_hour = linear_step(0.05, 1.0, exp(-190.0 * sqr(sun_dir.y + 0.09604)));
 
-	float daytime_mul = 1.0 + 0.5 * (time_sunset + time_sunrise) + 40.0 * blue_hour;
+	float daytime_mul = 1.0 + 0.15 * early_morning + 0.5 * (time_sunset + time_sunrise) + 40.0 * blue_hour;
 
 	return base_scale * daytime_mul;
 }
@@ -93,10 +94,11 @@ vec3 get_sky_color() {
 }
 
 float get_skylight_boost() {
+	float early_morning = linear_step(0.05, 1.0, exp(-80.0 * sqr(sun_dir.y - 0.6)));
 	float night_skylight_boost = 4.0 * (1.0 - smoothstep(-0.16, 0.0, sun_dir.y))
 	                           - 3.0 * linear_step(0.1, 1.0, exp(-2.42 * sqr(sun_dir.y + 0.81)));
 
-	return 1.0 + max0(night_skylight_boost);
+	return 1.0 + 0.33 * early_morning + max0(night_skylight_boost);
 }
 
 //----------------------------------------------------------------------------//

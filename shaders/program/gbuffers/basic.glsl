@@ -26,8 +26,7 @@ uniform vec2 view_pixel_size;
 //----------------------------------------------------------------------------//
 #if defined STAGE_VERTEX
 
-void main()
-{
+void main() {
 	light_levels = clamp01(gl_MultiTexCoord1.xy * rcp(240.0));
 	tint = gl_Color.rgb;
 
@@ -100,8 +99,7 @@ layout (location = 1) out vec4 gbuffer_data_1; // detailed normal, specular map 
 
 const vec3 normal = vec3(0.0, 1.0, 0.0);
 
-void main()
-{
+void main() {
 #if defined TAA && defined TAAU
 	vec2 coord = gl_FragCoord.xy * view_pixel_size * rcp(taau_render_scale);
 	if (clamp01(coord) != coord) discard;

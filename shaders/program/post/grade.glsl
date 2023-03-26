@@ -23,6 +23,8 @@ uniform sampler2D colortex5; // scene color
 
 uniform float aspectRatio;
 uniform float blindness;
+uniform float darknessFactor;
+uniform float frameTimeCounter;
 
 uniform float biome_cave;
 uniform float time_noon;
@@ -34,8 +36,7 @@ uniform vec2 view_pixel_size;
 //----------------------------------------------------------------------------//
 #if defined STAGE_VERTEX
 
-void main()
-{
+void main() {
 	uv = gl_MultiTexCoord0.xy;
 
 	gl_Position = vec4(gl_Vertex.xy * 2.0 - 1.0, 0.0, 1.0);
@@ -219,8 +220,7 @@ vec3 academy_fit(vec3 rgb) {
 	return rgb * ap1_to_rec2020;
 }
 
-vec3 tonemap_hejl_2015(vec3 rgb)
-{
+vec3 tonemap_hejl_2015(vec3 rgb) {
 	const float white_point = 5.0;
 
 	vec4 vh = vec4(rgb, white_point);
@@ -304,8 +304,10 @@ float vignette(vec2 uv) {
     const float vignette_size = 16.0;
     const float vignette_intensity = 0.08 * VIGNETTE_INTENSITY;
 
+	float darkness_pulse = 1.0 - dampen(abs(cos(2.0 * frameTimeCounter)));
+
     float vignette = vignette_size * (uv.x * uv.y - uv.x) * (uv.x * uv.y - uv.y);
-          vignette = pow(vignette, vignette_intensity + 0.1 * biome_cave + 0.3 * blindness);
+          vignette = pow(vignette, vignette_intensity + 0.1 * biome_cave + 0.3 * blindness + 0.2 * darkness_pulse * darknessFactor);
 
     return vignette;
 }

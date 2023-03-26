@@ -66,20 +66,32 @@ vec3 get_diffuse_lighting(
 
 	// Sunlight/moonlight
 
+#ifdef SHADOW
 	vec3 diffuse = vec3(lift(max0(NoL), 0.33) * (1.0 - 0.5 * material.sss_amount));
 	vec3 bounced = 0.066 * (1.0 - shadows * max0(NoL)) * (1.0 - 0.33 * max0(normal.y)) * pow1d5(ao + eps) * pow4(light_levels.y) * BOUNCED_LIGHT_I;
 	vec3 sss = sss_approx(material.albedo, material.sss_amount, material.sheen_amount, sss_depth, LoV, shadows.x);
 
-#ifdef AO_IN_SUNLIGHT
+	#ifdef AO_IN_SUNLIGHT
 	diffuse *= sqrt(ao) * mix(ao * ao, 1.0, NoL * NoL);
-#endif
+	#endif
 
-#ifdef SHADOW_VPS
+	#ifdef SHADOW_VPS
 	// Add SSS and diffuse
 	lighting += light_color * (diffuse * shadows + bounced + sss);
-#else
+	#else
 	// Blend SSS and diffuse
 	lighting += light_color * (mix(diffuse, sss, material.sss_amount) * shadows + bounced);
+	#endif
+#else
+	// Simple shading for when shadows are disabled
+	vec3 sss = 0.09 * sss_scale * pi + 0.5 * material.sheen_amount * rcp(material.albedo + eps) * henyey_greenstein_phase(-LoV, 0.5) * linear_step(-0.8, -0.2, -LoV);
+
+	vec3 diffuse  = vec3(lift(max0(NoL), 0.5) * 0.6 + 0.4) * (shadows * 0.8 + 0.2);
+	     diffuse  = mix(diffuse, sss, lift(material.sss_amount, 5.0));
+	     diffuse *= 1.1 * (0.9 + 0.1 * normal.x) * (0.8 + 0.2 * abs(flat_normal.y));
+	     diffuse *= pow1d5(ao) * pow4(light_levels.y) * (dampen(light_dir.y) * 0.5 + 0.5);
+
+	lighting += light_color * diffuse;
 #endif
 
 	// Skylight
@@ -116,7 +128,8 @@ vec3 get_diffuse_lighting(
 	// Blocklight
 
 	float blocklight_falloff  = 0.3 * pow5(light_levels.x) + 0.12 * sqr(light_levels.x) + 0.15 * dampen(light_levels.x); // Base falloff
-	      blocklight_falloff *= mix(ao * ao * ao, 1.0, clamp01(blocklight_falloff));                                         // Stronger AO further from the light source
+	      blocklight_falloff *= mix(ao * ao * ao, 1.0, clamp01(blocklight_falloff));                                     // Stronger AO further from the light source
+		  blocklight_falloff *= mix(1.0, ao * dampen(abs(cos(2.0 * frameTimeCounter))) * 0.67 + 0.2, darknessFactor);           // Pulsing blocklight with darkness effect
 		  blocklight_falloff *= 1.0 - 0.2 * time_noon * light_levels.y - 0.2 * light_levels.y;                           // Reduce blocklight intensity in daylight
 		  blocklight_falloff += min(2.0 * pow12(light_levels.x), 0.6);                                                   // Strong highlight around the light source, visible even in the daylight
 
@@ -126,7 +139,7 @@ vec3 get_diffuse_lighting(
 
 	// Cave lighting
 
-	lighting += 0.2 * CAVE_LIGHTING_I * directional_lighting * ao * (1.0 - skylight_falloff);
+	lighting += 0.2 * CAVE_LIGHTING_I * directional_lighting * ao * (1.0 - skylight_falloff) * (1.0 - 0.7 * darknessFactor);
 	lighting += nightVision * night_vision_scale * directional_lighting * ao;
 
 	return max0(lighting) * material.albedo * rcp_pi * mix(1.0, metal_diffuse_amount, float(material.is_metal));

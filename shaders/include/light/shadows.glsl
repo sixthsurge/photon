@@ -196,6 +196,8 @@ vec3 calculate_shadows(
 	float sss_amount,
 	out float sss_depth
 ) {
+	sss_depth = 0.0;
+
 	float NoL = dot(flat_normal, light_dir);
 	if (NoL < 1e-3 && sss_amount < 1e-3) return vec3(0.0);
 
@@ -252,10 +254,8 @@ vec3 calculate_shadows(
 	float sss_amount,
 	out float sss_depth
 ) {
-	float NoL = dot(flat_normal, light_dir);
-	if (NoL < 1e-2 && sss_amount < 1e-2) return vec3(0.0);
-
-	return vec3(lightmap_shadows(skylight, NoL, sss_depth));
+	sss_depth = 0.0;
+	return vec3(1.0);
 }
 #endif
 

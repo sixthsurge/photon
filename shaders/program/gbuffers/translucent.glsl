@@ -85,8 +85,7 @@ float gerstner_wave(vec2 coord, vec2 wave_dir, float t, float noise, float wavel
 	return sqr(sin(x) * 0.5 + 0.5);
 }
 
-vec3 apply_water_displacement(vec3 view_pos)
-{
+vec3 apply_water_displacement(vec3 view_pos) {
 	const float wave_frequency = 0.3 * WATER_WAVE_FREQUENCY;
 	const float wave_speed     = 0.37 * WATER_WAVE_SPEED_STILL;
 	const float wave_angle     = 0.5;
@@ -104,8 +103,7 @@ vec3 apply_water_displacement(vec3 view_pos)
 	return scene_to_view_space(scene_pos);
 }
 
-void main()
-{
+void main() {
 	uv           = gl_MultiTexCoord0.xy;
 	light_levels = clamp01(gl_MultiTexCoord1.xy * rcp(240.0));
 	tint         = gl_Color;
@@ -185,15 +183,13 @@ layout (location = 2) out vec4 gbuffer_data_1; // detailed normal, specular map 
 const float lod_bias = log2(taau_render_scale);
 
 #if   TEXTURE_FORMAT == TEXTURE_FORMAT_LAB
-void decode_normal_map(vec3 normal_map, out vec3 normal, out float ao)
-{
+void decode_normal_map(vec3 normal_map, out vec3 normal, out float ao) {
 	normal.xy = normal_map.xy * 2.0 - 1.0;
 	normal.z  = sqrt(clamp01(1.0 - dot(normal.xy, normal.xy)));
 	ao        = normal_map.z;
 }
 #elif TEXTURE_FORMAT == TEXTURE_FORMAT_OLD
-void decode_normal_map(vec3 normal_map, out vec3 normal, out float ao)
-{
+void decode_normal_map(vec3 normal_map, out vec3 normal, out float ao) {
 	normal  = normal_map * 2.0 - 1.0;
 	ao      = length(normal);
 	normal *= rcp(ao);
@@ -205,8 +201,7 @@ void decode_normal_map(vec3 normal_map, out vec3 normal, out float ao)
 
 // Parallax nether portal effect inspired by Complementary Reimagined Shaders by EminGT
 // Thanks to Emin for letting me use his idea!
-vec4 draw_nether_portal()
-{
+vec4 draw_nether_portal() {
 	const int step_count          = 20;
 	const float parallax_depth    = 0.2;
 	const float portal_brightness = 4.0;
@@ -240,8 +235,7 @@ vec4 draw_nether_portal()
 }
 #endif
 
-void main()
-{
+void main() {
 #if defined TAA && defined TAAU
 	vec2 coord = gl_FragCoord.xy * view_pixel_size * rcp(taau_render_scale);
 	if (clamp01(coord) != coord) discard;

@@ -98,8 +98,7 @@ uniform vec3 clouds_light_dir;
 #include "/include/misc/weather.glsl"
 #include "/include/sky/atmosphere.glsl"
 
-void main()
-{
+void main() {
 	uv = gl_MultiTexCoord0.xy;
 
 #if defined WORLD_OVERWORLD
@@ -150,8 +149,7 @@ layout (location = 0) out vec4 clouds;
 
 const int checkerboard_area = CLOUDS_TEMPORAL_UPSCALING * CLOUDS_TEMPORAL_UPSCALING;
 
-float depth_max_4x4(sampler2D depth_sampler)
-{
+float depth_max_4x4(sampler2D depth_sampler) {
 	vec4 depth_samples_0 = textureGather(depth_sampler, uv * taau_render_scale + vec2( 2.0 * view_pixel_size.x,  2.0 * view_pixel_size.y));
 	vec4 depth_samples_1 = textureGather(depth_sampler, uv * taau_render_scale + vec2(-2.0 * view_pixel_size.x,  2.0 * view_pixel_size.y));
 	vec4 depth_samples_2 = textureGather(depth_sampler, uv * taau_render_scale + vec2( 2.0 * view_pixel_size.x, -2.0 * view_pixel_size.y));
@@ -163,8 +161,7 @@ float depth_max_4x4(sampler2D depth_sampler)
 	);
 }
 
-void main()
-{
+void main() {
 	ivec2 texel = ivec2(gl_FragCoord.xy);
 
 #if defined WORLD_OVERWORLD

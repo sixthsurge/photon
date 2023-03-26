@@ -25,8 +25,7 @@ uniform vec2 view_res;
 //----------------------------------------------------------------------------//
 #if defined STAGE_VERTEX
 
-void main()
-{
+void main() {
 	uv = gl_MultiTexCoord0.xy;
 
 	gl_Position = vec4(gl_Vertex.xy * 2.0 - 1.0, 0.0, 1.0);
@@ -58,8 +57,7 @@ const float[5] binomial_weights_9 = float[5](
    0.00390625
 );
 
-void main()
-{
+void main() {
 	ivec2 texel = ivec2(gl_FragCoord.xy);
 
 	// Calculate the bounds of the tile containing the fragment
