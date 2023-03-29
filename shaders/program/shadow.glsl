@@ -35,7 +35,7 @@ uniform vec3 light_dir;
 
 
 //----------------------------------------------------------------------------//
-#if defined STAGE_VERTEX
+#if defined vsh
 
 attribute vec4 at_tangent;
 attribute vec3 mc_Entity;
@@ -43,6 +43,34 @@ attribute vec2 mc_midTexCoord;
 
 #include "/include/light/distortion.glsl"
 #include "/include/vertex/wind_animation.glsl"
+
+float gerstner_wave(vec2 coord, vec2 wave_dir, float t, float noise, float wavelength) {
+	// Gerstner wave function from Belmu in #snippets, modified
+	const float g = 9.8;
+
+	float k = tau / wavelength;
+	float w = sqrt(g * k);
+
+	float x = w * t - k * (dot(wave_dir, coord) + noise);
+
+	return sqr(sin(x) * 0.5 + 0.5);
+}
+
+vec3 apply_water_displacement(vec3 world_pos) {
+	const float wave_frequency = 0.3 * WATER_WAVE_FREQUENCY;
+	const float wave_speed     = 0.37 * WATER_WAVE_SPEED_STILL;
+	const float wave_angle     = 0.5;
+	const float wavelength     = 1.0;
+	const vec2  wave_dir       = vec2(cos(wave_angle), sin(wave_angle));
+
+	if (material_mask != 1) return world_pos;
+
+	vec2 wave_coord = world_pos.xz * wave_frequency;
+
+	world_pos.y += (gerstner_wave(wave_coord, wave_dir, frameTimeCounter * wave_speed, 0.0, wavelength) * 0.05 - 0.025);
+
+	return world_pos;
+}
 
 void main() {
 	uv            = gl_MultiTexCoord0.xy;
@@ -61,6 +89,9 @@ void main() {
 
 	world_pos  = scene_pos + cameraPosition;
 	world_pos += animate_vertex(world_pos, is_top_vertex, clamp01(rcp(240.0) * gl_MultiTexCoord1.y), material_mask);
+#ifdef WATER_DISPLACEMENT
+	if (material_mask == 1) world_pos = apply_water_displacement(world_pos);
+#endif
 	scene_pos  = world_pos - cameraPosition;
 	shadow_view_pos = transform(shadowModelView, scene_pos);
 
@@ -76,7 +107,7 @@ void main() {
 
 
 //----------------------------------------------------------------------------//
-#if defined STAGE_FRAGMENT
+#if defined fsh
 
 layout (location = 0) out vec3 shadowcolor0_out;
 

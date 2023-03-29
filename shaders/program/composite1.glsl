@@ -97,7 +97,7 @@ uniform float time_midnight;
 
 
 //----------------------------------------------------------------------------//
-#if defined STAGE_VERTEX
+#if defined vsh
 
 #include "/include/misc/palette.glsl"
 
@@ -121,7 +121,7 @@ void main() {
 
 
 //----------------------------------------------------------------------------//
-#if defined STAGE_FRAGMENT
+#if defined fsh
 
 layout (location = 0) out vec3 scene_color;
 layout (location = 1) out float bloomy_fog;
@@ -265,7 +265,7 @@ bool get_rain_puddles(
 void main() {
 	ivec2 texel = ivec2(gl_FragCoord.xy);
 
-	// Texture fetches
+	// Sample textures
 
 	scene_color         = texelFetch(colortex0, texel, 0).rgb;
 	float depth0        = texelFetch(depthtex0, texel, 0).x;
@@ -323,7 +323,6 @@ void main() {
 	bool is_snow_particle = material_mask == 254;
 
 	if (is_water) {
-		material.albedo             = srgb_eotf_inv(albedo) * rec709_to_rec2020;
 		material.emission           = vec3(0.0);
 		material.f0                 = vec3(0.05);
 		material.roughness          = 0.002;
@@ -337,11 +336,15 @@ void main() {
 		// Vanilla water texture
 
 #ifdef VANILLA_WATER_TEXTURE
-		float texture_value     = data[0].x;
+		const vec3 absorption_coeff = vec3(WATER_ABSORPTION_R, WATER_ABSORPTION_G, WATER_ABSORPTION_B) * rec709_to_working_color;
+
+		float texture_value     = blend_color.r / blend_color.a;
 		float texture_highlight = 0.5 * sqr(linear_step(0.63, 1.0, texture_value)) + 0.03 * texture_value;
 
-		material.albedo    += clamp01(0.33 * exp(-2.0 * water_extinction_coeff) * texture_highlight);
+		material.albedo     = clamp01(0.2 * exp(-2.0 * absorption_coeff) * texture_highlight);
 		material.roughness += 0.3 * texture_highlight;
+#else
+		material.albedo = srgb_eotf_inv(albedo) * rec709_to_rec2020;
 #endif
 
 		// Water waves
@@ -494,7 +497,10 @@ void main() {
 			float LoV = dot(world_dir, light_dir);
 			float water_n = isEyeInWater == 1 ? air_n / water_n : water_n / air_n;
 
-			mat2x3 water_fog = water_fog_simple(light_color, ambient_color, dist, LoV, light_levels.y, sss_depth);
+			vec3 biome_water_color = srgb_eotf_inv(vec3(data[0].xy, data[1].x)) * rec709_to_working_color;
+			vec3 absorption_coeff = water_absorption_coeff(biome_water_color);
+
+			mat2x3 water_fog = water_fog_simple(light_color, ambient_color, absorption_coeff, dist, LoV, light_levels.y, sss_depth);
 
 			scene_color *= water_fog[1];
 			scene_color += water_fog[0];
@@ -572,7 +578,9 @@ void main() {
 	if (isEyeInWater == 1) {
 		float LoV = dot(world_dir, light_dir);
 
-		mat2x3 water_fog = water_fog_simple(light_color, ambient_color, view_dist, LoV, eye_skylight, 15.0 - 15.0 * eye_skylight);
+		const vec3 absorption_coeff = vec3(WATER_ABSORPTION_R, WATER_ABSORPTION_G, WATER_ABSORPTION_B) * rec709_to_working_color;
+
+		mat2x3 water_fog = water_fog_simple(light_color, ambient_color, absorption_coeff, view_dist, LoV, eye_skylight, 15.0 - 15.0 * eye_skylight);
 
 		scene_color *= water_fog[1];
 		scene_color += water_fog[0];

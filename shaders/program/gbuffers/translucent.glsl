@@ -14,9 +14,9 @@
 
 varying vec2 uv;
 varying vec2 light_levels;
+varying vec4 tint;
 
 flat varying uint material_mask;
-flat varying vec4 tint;
 flat varying mat3 tbn;
 
 #if defined PROGRAM_GBUFFERS_WATER
@@ -65,7 +65,7 @@ uniform vec4 entityColor;
 
 
 //----------------------------------------------------------------------------//
-#if defined STAGE_VERTEX
+#if defined vsh
 
 attribute vec4 at_tangent;
 attribute vec3 mc_Entity;
@@ -98,7 +98,7 @@ vec3 apply_water_displacement(vec3 view_pos) {
 
 	vec2 wave_coord = (scene_pos.xz + cameraPosition.xz) * wave_frequency;
 
-	scene_pos.y += gerstner_wave(wave_coord, wave_dir, frameTimeCounter * wave_speed, 0.0, wavelength) * 0.05 - 0.025;
+	scene_pos.y += (gerstner_wave(wave_coord, wave_dir, frameTimeCounter * wave_speed, 0.0, wavelength) * 0.05 - 0.025) * (light_levels.y * 0.9 + 0.1);
 
 	return scene_to_view_space(scene_pos);
 }
@@ -160,7 +160,7 @@ void main() {
 
 
 //----------------------------------------------------------------------------//
-#if defined STAGE_FRAGMENT
+#if defined fsh
 
 layout (location = 0) out vec4 base_color;
 layout (location = 1) out vec4 gbuffer_data_0; // albedo, block ID, flat normal, light levels
@@ -284,14 +284,12 @@ void main() {
 
 	float dither = interleaved_gradient_noise(gl_FragCoord.xy, frameCounter);
 
-	gbuffer_data_0.x  = pack_unorm_2x8(base_color.rg);
-	gbuffer_data_0.y  = pack_unorm_2x8(base_color.b, float(material_mask) * rcp(255.0));
+	vec3 stored_color = is_water ? tint.rgb : base_color.rgb;
+
+	gbuffer_data_0.x  = pack_unorm_2x8(stored_color.rg);
+	gbuffer_data_0.y  = pack_unorm_2x8(stored_color.b, float(material_mask) * rcp(255.0));
 	gbuffer_data_0.z  = pack_unorm_2x8(encode_unit_vector(tbn[2]));
 	gbuffer_data_0.w  = pack_unorm_2x8(dither_8bit(light_levels, dither));
-
-#ifdef VANILLA_WATER_TEXTURE
-	if (is_water) base_color = vec4(0.0);
-#endif
 
 #ifdef PROGRAM_GBUFFERS_TEXTURED
 	// Kill the little rain splash particles

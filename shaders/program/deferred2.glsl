@@ -54,7 +54,7 @@ uniform bool world_age_changed;
 
 
 //----------------------------------------------------------------------------//
-#if defined STAGE_VERTEX
+#if defined vsh
 
 void main() {
 	uv = gl_MultiTexCoord0.xy;
@@ -69,7 +69,7 @@ void main() {
 
 
 //----------------------------------------------------------------------------//
-#if defined STAGE_FRAGMENT
+#if defined fsh
 
 layout (location = 0) out vec4 ao;
 layout (location = 1) out vec4 clouds;

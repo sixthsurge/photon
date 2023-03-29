@@ -13,11 +13,12 @@
 * http://momentsingraphics.de/ - Blue noise texture
 
 ## features
-* Revamped lighting with variable penumbra shadows and high-quality ambient occlusion (GTAO)
-* Revamped sky with detailed volumetric clouds
-* Reflections (screen-space)
-* Volumetric fog
+* Lighting effects - variable penumbra shadows, fancy ambient occlusion
+* Camera effects - bloom, depth-of-field, motion-blur
+* Custom sky with atmospheric scattering and volumetric clouds
+* Revamped water
+* Reflections (SSR)
+* Volumetric lighting
 * Full labPBR resource pack support
-* Lens effects like bloom and depth-of-field
 * Much improved image quality thanks to TAA, FXAA and CAS
 * Advanced temporal upscaling (disabled by default) for low end devices

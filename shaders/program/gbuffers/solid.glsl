@@ -13,9 +13,9 @@
 
 varying vec2 uv;
 varying vec2 light_levels;
+varying vec4 tint;
 
 flat varying uint material_mask;
-flat varying vec4 tint;
 flat varying mat3 tbn;
 
 #if defined POM
@@ -23,6 +23,10 @@ varying vec2 atlas_tile_coord;
 varying vec3 tangent_pos;
 flat varying vec2 atlas_tile_offset;
 flat varying vec2 atlas_tile_scale;
+#endif
+
+#if defined DIRECTIONAL_LIGHTMAPS
+varying vec3 pos;
 #endif
 
 #if defined PROGRAM_GBUFFERS_TERRAIN
@@ -78,7 +82,7 @@ uniform vec4 entityColor;
 
 
 //----------------------------------------------------------------------------//
-#if defined STAGE_VERTEX
+#if defined vsh
 
 attribute vec4 at_tangent;
 attribute vec3 mc_Entity;
@@ -127,6 +131,7 @@ void main() {
 #endif
 
 	vec3 view_pos = transform(gl_ModelViewMatrix, gl_Vertex.xyz);
+
 #if defined PROGRAM_GBUFFERS_TERRAIN
 	bool is_top_vertex = uv.y < mc_midTexCoord.y;
 	vec3 scene_pos = view_to_scene_space(view_pos);
@@ -136,6 +141,10 @@ void main() {
 	#ifdef POM
 	tangent_pos = (scene_pos - gbufferModelViewInverse[3].xyz) * tbn;
 	#endif
+#endif
+
+#ifdef DIRECTIONAL_LIGHTMAPS
+	pos = view_to_scene_space(view_pos);
 #endif
 
 	vec4 clip_pos = project(gl_ProjectionMatrix, view_pos);
@@ -156,7 +165,7 @@ void main() {
 
 
 //----------------------------------------------------------------------------//
-#if defined STAGE_FRAGMENT
+#if defined fsh
 
 layout (location = 0) out vec4 gbuffer_data_0; // albedo, block ID, flat normal, light levels
 layout (location = 1) out vec4 gbuffer_data_1; // detailed normal, specular map (optional)
@@ -321,6 +330,8 @@ void main() {
 	}
 #endif
 
+	//--//
+
 	vec4 base_color   = read_tex(gtexture) * tint;
 #ifdef NORMAL_MAPPING
 	vec3 normal_map   = read_tex(normals).xyz;
@@ -365,19 +376,45 @@ void main() {
 	if (base_color.a < 0.99) discard;
 #endif
 
+	vec2 adjusted_light_levels = light_levels;
+
 #ifdef NORMAL_MAPPING
 	vec3 normal; float material_ao;
 	decode_normal_map(normal_map, normal, material_ao);
 
 	normal = tbn * normal;
-#else
-	const float material_ao = 1.0;
+
+	adjusted_light_levels *= mix(0.7, 1.0, material_ao);
+
+	#ifdef DIRECTIONAL_LIGHTMAPS
+	// based on Ninjamike's implementation in #snippets
+	vec2 lightmap_gradient; vec3 lightmap_dir;
+	mat2x3 pos_gradient = mat2x3(dFdx(pos), dFdy(pos));
+
+	// blocklight
+
+	lightmap_gradient = vec2(dFdx(light_levels.x), dFdy(light_levels.x));
+	lightmap_dir = pos_gradient * lightmap_gradient;
+
+	if (length_squared(lightmap_gradient) > 1e-12) {
+		adjusted_light_levels.x *= (clamp01(dot(normalize(lightmap_dir), normal) + 0.8) * DIRECTIONAL_LIGHTMAPS_INTENSITY + (1.0 - DIRECTIONAL_LIGHTMAPS_INTENSITY)) * inversesqrt(sqrt(light_levels.x) + eps);
+	}
+
+	// skylight
+
+	lightmap_gradient = vec2(dFdx(light_levels.y), dFdy(light_levels.y));
+	lightmap_dir = pos_gradient * lightmap_gradient;
+
+	if (length_squared(lightmap_gradient) > 1e-12) {
+		adjusted_light_levels.y *= (clamp01(dot(normalize(lightmap_dir), normal) + 0.8) * DIRECTIONAL_LIGHTMAPS_INTENSITY + (1.0 - DIRECTIONAL_LIGHTMAPS_INTENSITY)) * inversesqrt(sqrt(light_levels.y) + eps);
+	}
+	#endif
 #endif
 
 	gbuffer_data_0.x  = pack_unorm_2x8(base_color.rg);
 	gbuffer_data_0.y  = pack_unorm_2x8(base_color.b, clamp01(float(material_mask) * rcp(255.0)));
 	gbuffer_data_0.z  = pack_unorm_2x8(encode_unit_vector(tbn[2]));
-	gbuffer_data_0.w  = pack_unorm_2x8(dither_8bit(light_levels * mix(0.7, 1.0, material_ao), dither));
+	gbuffer_data_0.w  = pack_unorm_2x8(dither_8bit(adjusted_light_levels, dither));
 
 #ifdef NORMAL_MAPPING
 	gbuffer_data_1.xy = encode_unit_vector(normal);

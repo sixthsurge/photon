@@ -1,4 +1,4 @@
 #version 400 compatibility
 #define WORLD_OVERWORLD
-#define STAGE_VERTEX
+#define vsh
 #include "/program/post/bloom/gaussian1.glsl"

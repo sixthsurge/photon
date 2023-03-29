@@ -90,7 +90,7 @@ uniform vec3 clouds_light_dir;
 
 
 //----------------------------------------------------------------------------//
-#if defined STAGE_VERTEX
+#if defined vsh
 
 #define ATMOSPHERE_SCATTERING_LUT depthtex0
 
@@ -129,7 +129,7 @@ void main() {
 
 
 //----------------------------------------------------------------------------//
-#if defined STAGE_FRAGMENT
+#if defined fsh
 
 layout (location = 0) out vec4 clouds;
 

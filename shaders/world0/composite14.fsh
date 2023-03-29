@@ -1,4 +1,4 @@
 #version 400 compatibility
 #define WORLD_OVERWORLD
-#define STAGE_FRAGMENT
+#define fsh
 #include "/program/post/grade.glsl"

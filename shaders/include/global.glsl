@@ -5,7 +5,7 @@
 #endif
 
 #ifndef MC_GL_VENDOR_INTEL
-	#ifdef STAGE_FRAGMENT
+	#ifdef fsh
 		#define varying in
 	#else
 		#define varying out

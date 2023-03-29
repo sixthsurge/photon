@@ -24,7 +24,7 @@ uniform vec2 view_pixel_size;
 
 
 //----------------------------------------------------------------------------//
-#if defined STAGE_VERTEX
+#if defined vsh
 
 void main() {
 	light_levels = clamp01(gl_MultiTexCoord1.xy * rcp(240.0));
@@ -80,7 +80,7 @@ void main() {
 
 
 //----------------------------------------------------------------------------//
-#if defined STAGE_FRAGMENT
+#if defined fsh
 
 layout (location = 0) out vec4 gbuffer_data_0; // albedo, block ID, flat normal, light levels
 layout (location = 1) out vec4 gbuffer_data_1; // detailed normal, specular map (optional)

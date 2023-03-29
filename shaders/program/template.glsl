@@ -19,7 +19,7 @@ varying vec2 uv;
 
 
 //----------------------------------------------------------------------------//
-#if defined STAGE_VERTEX
+#if defined vsh
 
 void main() {
 
@@ -31,7 +31,7 @@ void main() {
 
 
 //----------------------------------------------------------------------------//
-#if defined STAGE_FRAGMENT
+#if defined fsh
 
 void main() {
 

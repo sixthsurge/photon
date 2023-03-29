@@ -27,7 +27,7 @@ uniform float viewHeight;
 
 
 //----------------------------------------------------------------------------//
-#if defined STAGE_VERTEX
+#if defined vsh
 
 void main() {
 	uv = gl_MultiTexCoord0.xy;
@@ -41,7 +41,7 @@ void main() {
 
 
 //----------------------------------------------------------------------------//
-#if defined STAGE_FRAGMENT
+#if defined fsh
 
 layout (location = 0) out vec3 scene_color;
 

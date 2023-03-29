@@ -1,3 +1,3 @@
 #version 410 compatibility
-#define STAGE_VERTEX
+#define vsh
 #include "/program/gbuffers/skytextured.glsl"
