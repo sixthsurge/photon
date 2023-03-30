@@ -5,12 +5,7 @@
 #endif
 
 #ifndef MC_GL_VENDOR_INTEL
-	#ifdef fsh
-		#define varying in
-	#else
-		#define varying out
-		#define attribute in
-	#endif
+	#define attribute in
 #endif
 
 // Common constants

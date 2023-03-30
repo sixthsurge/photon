@@ -43,7 +43,7 @@ vec3 r3_next(vec3 u) {
 	return fract(u + alpha);
 }
 
-//----------------------------------------------------------------------------//
+//------------------------------------------------------------------------------
 
 // https://nullprogram.com/blog/2018/07/31/
 
@@ -74,7 +74,7 @@ vec2 rand_next_vec2(inout uint state) { return vec2(rand_next_float(state), rand
 vec3 rand_next_vec3(inout uint state) { return vec3(rand_next_float(state), rand_next_float(state), rand_next_float(state)); }
 vec4 rand_next_vec4(inout uint state) { return vec4(rand_next_float(state), rand_next_float(state), rand_next_float(state), rand_next_float(state)); }
 
-//----------------------------------------------------------------------------//
+//------------------------------------------------------------------------------
 
 // https://www.shadertoy.com/view/4dj_s_r_w
 // Uncomment when needed

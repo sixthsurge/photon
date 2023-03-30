@@ -11,7 +11,31 @@
 
 #include "/include/global.glsl"
 
-varying vec2 uv;
+
+//------------------------------------------------------------------------------
+#if defined STAGE_VERTEX
+
+out vec2 uv;
+
+void main() {
+	uv = gl_MultiTexCoord0.xy;
+
+	gl_Position = vec4(gl_Vertex.xy * 2.0 - 1.0, 0.0, 1.0);
+}
+
+#endif
+//------------------------------------------------------------------------------
+
+
+
+//------------------------------------------------------------------------------
+#if defined STAGE_FRAGMENT
+
+layout (location = 0) out vec3 scene_color;
+
+/* DRAWBUFFERS:0 */
+
+in vec2 uv;
 
 // ------------
 //   uniforms
@@ -39,28 +63,6 @@ uniform float far;
 uniform vec2 view_res;
 uniform vec2 view_pixel_size;
 uniform vec2 taa_offset;
-
-
-//----------------------------------------------------------------------------//
-#if defined vsh
-
-void main() {
-	uv = gl_MultiTexCoord0.xy;
-
-	gl_Position = vec4(gl_Vertex.xy * 2.0 - 1.0, 0.0, 1.0);
-}
-
-#endif
-//----------------------------------------------------------------------------//
-
-
-
-//----------------------------------------------------------------------------//
-#if defined fsh
-
-layout (location = 0) out vec3 scene_color;
-
-/* DRAWBUFFERS:0 */
 
 #define TEMPORAL_REPROJECTION
 #include "/include/utility/space_conversion.glsl"
@@ -100,7 +102,7 @@ void main() {
 }
 
 #endif
-//----------------------------------------------------------------------------//
+//------------------------------------------------------------------------------
 
 #ifndef MOTION_BLUR
 	#error "This program should be disabled if Motion Blur is disabled"

@@ -12,29 +12,37 @@
 
 #include "/include/global.glsl"
 
-varying vec2 uv;
-varying vec2 light_levels;
-varying vec4 tint;
 
-flat varying uint material_mask;
-flat varying mat3 tbn;
+//------------------------------------------------------------------------------
+#if defined STAGE_VERTEX
+
+out vec2 uv;
+out vec2 light_levels;
+out vec4 tint;
+
+flat out uint material_mask;
+flat out mat3 tbn;
 
 #if defined PROGRAM_GBUFFERS_WATER
-varying vec2 atlas_tile_coord;
-varying vec3 tangent_pos;
-flat varying vec2 atlas_tile_offset;
-flat varying vec2 atlas_tile_scale;
+out vec2 atlas_tile_coord;
+out vec3 tangent_pos;
+flat out vec2 atlas_tile_offset;
+flat out vec2 atlas_tile_scale;
 #endif
+
+// --------------
+//   attributes
+// --------------
+
+attribute vec4 at_tangent;
+attribute vec3 mc_Entity;
+attribute vec2 mc_midTexCoord;
 
 // ------------
 //   uniforms
 // ------------
 
 uniform sampler2D noisetex;
-
-uniform sampler2D gtexture;
-uniform sampler2D normals;
-uniform sampler2D specular;
 
 uniform mat4 gbufferModelView;
 uniform mat4 gbufferModelViewInverse;
@@ -62,14 +70,6 @@ uniform vec3 light_dir;
 uniform int entityId;
 uniform vec4 entityColor;
 #endif
-
-
-//----------------------------------------------------------------------------//
-#if defined vsh
-
-attribute vec4 at_tangent;
-attribute vec3 mc_Entity;
-attribute vec2 mc_midTexCoord;
 
 #include "/include/utility/space_conversion.glsl"
 
@@ -155,12 +155,12 @@ void main() {
 }
 
 #endif
-//----------------------------------------------------------------------------//
+//------------------------------------------------------------------------------
 
 
 
-//----------------------------------------------------------------------------//
-#if defined fsh
+//------------------------------------------------------------------------------
+#if defined STAGE_FRAGMENT
 
 layout (location = 0) out vec4 base_color;
 layout (location = 1) out vec4 gbuffer_data_0; // albedo, block ID, flat normal, light levels
@@ -174,6 +174,55 @@ layout (location = 2) out vec4 gbuffer_data_1; // detailed normal, specular map 
 
 #ifdef SPECULAR_MAPPING
 /* DRAWBUFFERS:312 */
+#endif
+
+in vec2 uv;
+in vec2 light_levels;
+in vec4 tint;
+
+flat in uint material_mask;
+flat in mat3 tbn;
+
+#if defined PROGRAM_GBUFFERS_WATER
+in vec2 atlas_tile_coord;
+in vec3 tangent_pos;
+flat in vec2 atlas_tile_offset;
+flat in vec2 atlas_tile_scale;
+#endif
+
+// ------------
+//   uniforms
+// ------------
+
+uniform sampler2D noisetex;
+
+uniform sampler2D gtexture;
+uniform sampler2D normals;
+uniform sampler2D specular;
+
+uniform mat4 gbufferModelView;
+uniform mat4 gbufferModelViewInverse;
+uniform mat4 gbufferProjection;
+uniform mat4 gbufferProjectionInverse;
+
+uniform vec3 cameraPosition;
+
+uniform float near;
+uniform float far;
+
+uniform int frameCounter;
+uniform float frameTimeCounter;
+uniform float rainStrength;
+
+uniform vec2 view_res;
+uniform vec2 view_pixel_size;
+uniform vec2 taa_offset;
+
+uniform vec3 light_dir;
+
+#if defined PROGRAM_GBUFFERS_ENTITIES_TRANSLUCENT
+uniform int entityId;
+uniform vec4 entityColor;
 #endif
 
 #include "/include/utility/color.glsl"
@@ -298,4 +347,4 @@ void main() {
 }
 
 #endif
-//----------------------------------------------------------------------------//
+//------------------------------------------------------------------------------

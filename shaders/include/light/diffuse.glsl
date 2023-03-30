@@ -8,7 +8,7 @@
 #include "/include/utility/fast_math.glsl"
 #include "/include/utility/spherical_harmonics.glsl"
 
-//----------------------------------------------------------------------------//
+//------------------------------------------------------------------------------
 #if   defined WORLD_OVERWORLD
 
 const vec3  blocklight_color     = from_srgb(vec3(BLOCKLIGHT_R, BLOCKLIGHT_G, BLOCKLIGHT_B)) * BLOCKLIGHT_I;
@@ -145,10 +145,10 @@ vec3 get_diffuse_lighting(
 	return max0(lighting) * material.albedo * rcp_pi * mix(1.0, metal_diffuse_amount, float(material.is_metal));
 }
 
-//----------------------------------------------------------------------------//
+//------------------------------------------------------------------------------
 #elif defined WORLD_NETHER
 
-//----------------------------------------------------------------------------//
+//------------------------------------------------------------------------------
 #elif defined WORLD_END
 
 #endif

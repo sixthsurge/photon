@@ -176,10 +176,19 @@ vec3 trace_specular_ray(
 		      border_attenuation = dampen(linear_step(0.0, border_attenuation_factor, border_attenuation));
 
 #ifdef SSR_PREVIOUS_FRAME
+	#ifdef VL
+		// Un-apply volumetric fog scattering using fog from the current frame
+		vec2 fog_uv = clamp(hit_pos.xy * VL_RENDER_SCALE, vec2(0.0), floor(view_res * VL_RENDER_SCALE - 1.0) * view_pixel_size);
+		vec3 fog_scattering = texture(colortex6, fog_uv).rgb;
+	#else
+		vec3 fog_scattering = vec3(0.0);
+	#endif
+
 		vec3 hit_pos_prev = reproject(hit_pos);
 		if (clamp01(hit_pos_prev) != hit_pos_prev) return sky_reflection;
 
 		vec3 reflection = textureLod(colortex5, hit_pos_prev.xy, mip_level).rgb;
+		     reflection = max0(reflection - fog_scattering);
 #else
 		vec3 reflection = textureLod(colortex0, hit_pos.xy * taau_render_scale, mip_level).rgb;
 #endif

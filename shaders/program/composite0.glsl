@@ -11,12 +11,92 @@
 
 #include "/include/global.glsl"
 
-varying vec2 uv;
+
+//------------------------------------------------------------------------------
+#if defined STAGE_VERTEX
+
+out vec2 uv;
 
 #if defined WORLD_OVERWORLD
-flat varying vec3 light_color;
-flat varying vec3 sky_color;
-flat varying mat2x3 air_fog_coeff[2];
+flat out vec3 light_color;
+flat out vec3 sky_color;
+flat out mat2x3 air_fog_coeff[2];
+#endif
+
+// ------------
+//   uniforms
+// ------------
+
+uniform float eyeAltitude;
+uniform float blindness;
+uniform float rainStrength;
+uniform float sunAngle;
+uniform float frameTimeCounter;
+
+uniform int isEyeInWater;
+uniform int worldTime;
+uniform int frameCounter;
+
+uniform vec3 light_dir;
+uniform vec3 sun_dir;
+uniform vec3 moon_dir;
+
+uniform float eye_skylight;
+
+uniform float biome_temperate;
+uniform float biome_arid;
+uniform float biome_snowy;
+uniform float biome_taiga;
+uniform float biome_jungle;
+uniform float biome_swamp;
+uniform float biome_may_rain;
+uniform float biome_may_snow;
+uniform float biome_temperature;
+uniform float biome_humidity;
+
+uniform float time_sunrise;
+uniform float time_noon;
+uniform float time_sunset;
+uniform float time_midnight;
+
+#include "/include/misc/palette.glsl"
+#include "/include/misc/weather.glsl"
+
+void main() {
+	uv = gl_MultiTexCoord0.xy;
+
+#if defined WORLD_OVERWORLD
+	light_color = get_light_color();
+	sky_color = get_sky_color();
+
+	mat2x3 rayleigh_coeff = air_fog_rayleigh_coeff(), mie_coeff = air_fog_mie_coeff();
+	air_fog_coeff[0] = mat2x3(rayleigh_coeff[0], mie_coeff[0]);
+	air_fog_coeff[1] = mat2x3(rayleigh_coeff[1], mie_coeff[1]);
+#endif
+
+	vec2 vertex_pos = gl_Vertex.xy * VL_RENDER_SCALE;
+	gl_Position = vec4(vertex_pos * 2.0 - 1.0, 0.0, 1.0);
+}
+
+#endif
+//------------------------------------------------------------------------------
+
+
+
+//------------------------------------------------------------------------------
+#if defined STAGE_FRAGMENT
+
+layout (location = 0) out vec3 fog_scattering;
+layout (location = 1) out vec3 fog_transmittance;
+
+/* DRAWBUFFERS:67 */
+
+in vec2 uv;
+
+#if defined WORLD_OVERWORLD
+flat in vec3 light_color;
+flat in vec3 sky_color;
+flat in mat2x3 air_fog_coeff[2];
 #endif
 
 // ------------
@@ -25,7 +105,7 @@ flat varying mat2x3 air_fog_coeff[2];
 
 uniform sampler2D noisetex;
 
-uniform sampler2D colortex1; // Gbuffer data
+uniform sampler2D colortex1; // gbuffer data
 uniform sampler3D colortex3; // 3D worley noise
 
 uniform sampler2D depthtex0;
@@ -51,10 +131,6 @@ uniform mat4 shadowProjectionInverse;
 
 uniform vec3 cameraPosition;
 
-uniform int isEyeInWater;
-uniform int worldTime;
-uniform int frameCounter;
-
 uniform float near;
 uniform float far;
 uniform float eyeAltitude;
@@ -62,6 +138,10 @@ uniform float blindness;
 uniform float rainStrength;
 uniform float sunAngle;
 uniform float frameTimeCounter;
+
+uniform int isEyeInWater;
+uniform int worldTime;
+uniform int frameCounter;
 
 uniform vec3 light_dir;
 uniform vec3 sun_dir;
@@ -73,56 +153,10 @@ uniform vec2 taa_offset;
 
 uniform float eye_skylight;
 
-uniform float biome_temperate;
-uniform float biome_arid;
-uniform float biome_snowy;
-uniform float biome_taiga;
-uniform float biome_jungle;
-uniform float biome_swamp;
-uniform float biome_may_rain;
-uniform float biome_may_snow;
-uniform float biome_temperature;
-uniform float biome_humidity;
-
 uniform float time_sunrise;
 uniform float time_noon;
 uniform float time_sunset;
 uniform float time_midnight;
-
-//----------------------------------------------------------------------------//
-#if defined vsh
-
-#include "/include/misc/palette.glsl"
-#include "/include/misc/weather.glsl"
-
-void main() {
-	uv = gl_MultiTexCoord0.xy;
-
-#if defined WORLD_OVERWORLD
-	light_color = get_light_color();
-	sky_color = get_sky_color();
-
-	mat2x3 rayleigh_coeff = air_fog_rayleigh_coeff(), mie_coeff = air_fog_mie_coeff();
-	air_fog_coeff[0] = mat2x3(rayleigh_coeff[0], mie_coeff[0]);
-	air_fog_coeff[1] = mat2x3(rayleigh_coeff[1], mie_coeff[1]);
-#endif
-
-	vec2 vertex_pos = gl_Vertex.xy * VL_RENDER_SCALE;
-	gl_Position = vec4(vertex_pos * 2.0 - 1.0, 0.0, 1.0);
-}
-
-#endif
-//----------------------------------------------------------------------------//
-
-
-
-//----------------------------------------------------------------------------//
-#if defined fsh
-
-layout (location = 0) out vec3 fog_scattering;
-layout (location = 1) out vec3 fog_transmittance;
-
-/* DRAWBUFFERS:67 */
 
 #if defined WORLD_OVERWORLD
 #include "/include/fog/air_fog_vl.glsl"
@@ -185,4 +219,4 @@ void main() {
 }
 
 #endif
-//----------------------------------------------------------------------------//
+//------------------------------------------------------------------------------

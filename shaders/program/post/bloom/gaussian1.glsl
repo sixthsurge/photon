@@ -11,19 +11,17 @@
 
 #include "/include/global.glsl"
 
-varying vec2 uv;
-
-// ------------
-//   uniforms
-// ------------
-
-uniform sampler2D colortex0;
-
-uniform vec2 view_res;
+#define bloom_tile_scale(i) 0.5 * exp2(-(i))
+#define bloom_tile_offset(i) vec2(            \
+	1.0 - exp2(-(i)),                       \
+	float((i) & 1) * (1.0 - 0.5 * exp2(-(i))) \
+)
 
 
-//----------------------------------------------------------------------------//
-#if defined vsh
+//------------------------------------------------------------------------------
+#if defined STAGE_VERTEX
+
+out vec2 uv;
 
 void main() {
 	uv = gl_MultiTexCoord0.xy;
@@ -32,22 +30,22 @@ void main() {
 }
 
 #endif
-//----------------------------------------------------------------------------//
+//------------------------------------------------------------------------------
 
 
 
-//----------------------------------------------------------------------------//
-#if defined fsh
+//------------------------------------------------------------------------------
+#if defined STAGE_FRAGMENT
 
 layout (location = 0) out vec3 bloom_tiles;
 
 /* DRAWBUFFERS:0 */
 
-#define bloom_tile_scale(i) 0.5 * exp2(-(i))
-#define bloom_tile_offset(i) vec2(            \
-	1.0 - exp2(-(i)),                       \
-	float((i) & 1) * (1.0 - 0.5 * exp2(-(i))) \
-)
+in vec2 uv;
+
+uniform sampler2D colortex0;
+
+uniform vec2 view_res;
 
 const float[5] binomial_weights_9 = float[5](
    0.2734375,
@@ -106,4 +104,4 @@ void main() {
 	bloom_tiles /= weight_sum;
 }
 #endif
-//----------------------------------------------------------------------------//
+//------------------------------------------------------------------------------

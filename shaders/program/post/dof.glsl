@@ -11,7 +11,32 @@
 
 #include "/include/global.glsl"
 
-varying vec2 uv;
+
+//------------------------------------------------------------------------------
+#if defined STAGE_VERTEX
+
+out vec2 uv;
+
+void main() {
+	uv = gl_MultiTexCoord0.xy;
+
+	vec2 vertex_pos = gl_Vertex.xy * taau_render_scale;
+	gl_Position = vec4(vertex_pos * 2.0 - 1.0, 0.0, 1.0);
+}
+
+#endif
+//------------------------------------------------------------------------------
+
+
+
+//------------------------------------------------------------------------------
+#if defined STAGE_FRAGMENT
+
+layout (location = 0) out vec3 scene_color;
+
+/* DRAWBUFFERS:0 */
+
+in vec2 uv;
 
 // ------------
 //   uniforms
@@ -31,29 +56,6 @@ uniform float aspectRatio;
 uniform float centerDepthSmooth;
 
 uniform int frameCounter;
-
-
-//----------------------------------------------------------------------------//
-#if defined vsh
-
-void main() {
-	uv = gl_MultiTexCoord0.xy;
-
-	vec2 vertex_pos = gl_Vertex.xy * taau_render_scale;
-	gl_Position = vec4(vertex_pos * 2.0 - 1.0, 0.0, 1.0);
-}
-
-#endif
-//----------------------------------------------------------------------------//
-
-
-
-//----------------------------------------------------------------------------//
-#if defined fsh
-
-layout (location = 0) out vec3 scene_color;
-
-/* DRAWBUFFERS:0 */
 
 #include "/include/utility/random.glsl"
 #include "/include/utility/sampling.glsl"
@@ -92,4 +94,4 @@ void main() {
 }
 
 #endif
-//----------------------------------------------------------------------------//
+//------------------------------------------------------------------------------

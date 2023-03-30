@@ -11,23 +11,17 @@
 
 #include "/include/global.glsl"
 
-varying vec2 uv;
 
-flat varying vec4 tint;
+//------------------------------------------------------------------------------
+#if defined STAGE_VERTEX
+
+out vec2 uv;
+
+flat out vec4 tint;
 
 // ------------
 //   uniforms
 // ------------
-
-uniform sampler2D gtexture;
-
-#if defined NORMAL_MAPPING
-uniform sampler2D normals;
-#endif
-
-#ifdef SPECULAR_MAPPING
-uniform sampler2D specular;
-#endif
 
 uniform mat4 gbufferModelView;
 uniform mat4 gbufferModelViewInverse;
@@ -38,10 +32,6 @@ uniform int frameCounter;
 
 uniform vec2 taa_offset;
 uniform vec2 view_pixel_size;
-
-
-//----------------------------------------------------------------------------//
-#if defined vsh
 
 void main() {
 	uv = mat2(gl_TextureMatrix[0]) * gl_MultiTexCoord0.xy + gl_TextureMatrix[0][3].xy;
@@ -75,17 +65,32 @@ void main() {
 }
 
 #endif
-//----------------------------------------------------------------------------//
+//------------------------------------------------------------------------------
 
 
 
-//----------------------------------------------------------------------------//
-#if defined fsh
+//------------------------------------------------------------------------------
+#if defined STAGE_FRAGMENT
 
 layout (location = 0) out vec4 base_color;
 layout (location = 1) out vec4 gbuffer_data;
 
 /* DRAWBUFFERS:31 */
+
+in vec2 uv;
+
+flat in vec4 tint;
+
+// ------------
+//   uniforms
+// ------------
+
+uniform sampler2D gtexture;
+
+uniform int frameCounter;
+
+uniform vec2 taa_offset;
+uniform vec2 view_pixel_size;
 
 #include "/include/utility/encoding.glsl"
 
@@ -113,4 +118,4 @@ void main() {
 }
 
 #endif
-//----------------------------------------------------------------------------//
+//------------------------------------------------------------------------------

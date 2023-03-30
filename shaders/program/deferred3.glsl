@@ -11,18 +11,137 @@
 
 #include "/include/global.glsl"
 
-varying vec2 uv;
+
+//------------------------------------------------------------------------------
+#if defined STAGE_VERTEX
+
+out vec2 uv;
 
 #if defined WORLD_OVERWORLD
-flat varying vec3 light_color;
-flat varying vec3 sun_color;
-flat varying vec3 moon_color;
+flat out vec3 light_color;
+flat out vec3 sun_color;
+flat out vec3 moon_color;
 #endif
 
 #if defined SH_SKYLIGHT
-flat varying vec3 sky_sh[9];
+flat out vec3 sky_sh[9];
 #else
-flat varying mat3 sky_samples;
+flat out mat3 sky_samples;
+#endif
+
+// ------------
+//   uniforms
+// ------------
+
+uniform sampler3D depthtex0; // atmosphere scattering LUT
+
+uniform int worldTime;
+uniform int moonPhase;
+uniform float sunAngle;
+uniform float rainStrength;
+uniform float wetness;
+
+uniform int frameCounter;
+uniform float frameTimeCounter;
+
+uniform int isEyeInWater;
+uniform float blindness;
+uniform float nightVision;
+uniform float darknessFactor;
+
+uniform vec3 light_dir;
+uniform vec3 sun_dir;
+uniform vec3 moon_dir;
+
+uniform float biome_cave;
+uniform float biome_may_rain;
+uniform float biome_may_snow;
+
+uniform float time_sunrise;
+uniform float time_noon;
+uniform float time_sunset;
+uniform float time_midnight;
+
+// ------------
+//   includes
+// ------------
+
+#define ATMOSPHERE_SCATTERING_LUT depthtex0
+
+#include "/include/misc/palette.glsl"
+#include "/include/sky/atmosphere.glsl"
+#include "/include/sky/projection.glsl"
+#include "/include/utility/random.glsl"
+#include "/include/utility/sampling.glsl"
+#include "/include/utility/spherical_harmonics.glsl"
+
+void main() {
+	uv = gl_MultiTexCoord0.xy;
+
+#if defined WORLD_OVERWORLD
+	light_color = get_light_color();
+	sun_color   = get_sun_exposure() * get_sun_tint();
+	moon_color  = get_moon_exposure() * get_moon_tint();
+#endif
+
+	float skylight_boost = get_skylight_boost();
+
+#ifdef SH_SKYLIGHT
+	// Initialize SH to 0
+	for (uint band = 0; band < 9; ++band) sky_sh[band] = vec3(0.0);
+
+	// Sample into SH
+	const uint step_count = 256;
+	for (uint i = 0; i < step_count; ++i) {
+		vec3 direction = uniform_hemisphere_sample(vec3(0.0, 1.0, 0.0), r2(int(i)));
+		vec3 radiance  = texture(colortex4, project_sky(direction)).rgb;
+		float[9] coeff = sh_coeff_order_2(direction);
+
+		for (uint band = 0; band < 9; ++band) sky_sh[band] += radiance * coeff[band];
+	}
+
+	// Apply skylight boost and normalize SH
+	const float step_solid_angle = tau / float(step_count);
+	for (uint band = 0; band < 9; ++band) sky_sh[band] *= skylight_boost * step_solid_angle;
+#elif defined WORLD_OVERWORLD
+	vec3 dir0 = normalize(vec3(0.0, 1.0, -0.8));               // Up
+	vec3 dir1 = normalize(vec3(sun_dir.xz + 0.1, 0.066).xzy);  // Sun-facing horizon
+	vec3 dir2 = normalize(vec3(moon_dir.xz + 0.1, 0.066).xzy); // Opposite horizon
+
+	sky_samples[0] = atmosphere_scattering(dir0, sun_color, sun_dir, moon_color, moon_dir) * skylight_boost;
+	sky_samples[1] = atmosphere_scattering(dir1, sun_color, sun_dir, moon_color, moon_dir) * skylight_boost;
+	sky_samples[2] = atmosphere_scattering(dir2, sun_color, sun_dir, moon_color, moon_dir) * skylight_boost;
+#endif
+
+	vec2 vertex_pos = gl_Vertex.xy * taau_render_scale;
+	gl_Position = vec4(vertex_pos * 2.0 - 1.0, 0.0, 1.0);
+}
+
+#endif
+//------------------------------------------------------------------------------
+
+
+
+//------------------------------------------------------------------------------
+#if defined STAGE_FRAGMENT
+
+layout (location = 0) out vec3 scene_color;
+layout (location = 1) out vec4 colortex3_clear;
+
+/* DRAWBUFFERS:03 */
+
+in vec2 uv;
+
+#if defined WORLD_OVERWORLD
+flat in vec3 light_color;
+flat in vec3 sun_color;
+flat in vec3 moon_color;
+#endif
+
+#if defined SH_SKYLIGHT
+flat in vec3 sky_sh[9];
+#else
+flat in mat3 sky_samples;
 #endif
 
 // ------------
@@ -95,73 +214,9 @@ uniform float time_noon;
 uniform float time_sunset;
 uniform float time_midnight;
 
-
-//----------------------------------------------------------------------------//
-#if defined vsh
-
-#define ATMOSPHERE_SCATTERING_LUT depthtex0
-
-#include "/include/misc/palette.glsl"
-#include "/include/sky/atmosphere.glsl"
-#include "/include/sky/projection.glsl"
-#include "/include/utility/random.glsl"
-#include "/include/utility/sampling.glsl"
-#include "/include/utility/spherical_harmonics.glsl"
-
-void main() {
-	uv = gl_MultiTexCoord0.xy;
-
-#if defined WORLD_OVERWORLD
-	light_color = get_light_color();
-	sun_color   = get_sun_exposure() * get_sun_tint();
-	moon_color  = get_moon_exposure() * get_moon_tint();
-#endif
-
-	float skylight_boost = get_skylight_boost();
-
-#ifdef SH_SKYLIGHT
-	// Initialize SH to 0
-	for (uint band = 0; band < 9; ++band) sky_sh[band] = vec3(0.0);
-
-	// Sample into SH
-	const uint step_count = 256;
-	for (uint i = 0; i < step_count; ++i) {
-		vec3 direction = uniform_hemisphere_sample(vec3(0.0, 1.0, 0.0), r2(int(i)));
-		vec3 radiance  = texture(colortex4, project_sky(direction)).rgb;
-		float[9] coeff = sh_coeff_order_2(direction);
-
-		for (uint band = 0; band < 9; ++band) sky_sh[band] += radiance * coeff[band];
-	}
-
-	// Apply skylight boost and normalize SH
-	const float step_solid_angle = tau / float(step_count);
-	for (uint band = 0; band < 9; ++band) sky_sh[band] *= skylight_boost * step_solid_angle;
-#elif defined WORLD_OVERWORLD
-	vec3 dir0 = normalize(vec3(0.0, 1.0, -0.8));               // Up
-	vec3 dir1 = normalize(vec3(sun_dir.xz + 0.1, 0.066).xzy);  // Sun-facing horizon
-	vec3 dir2 = normalize(vec3(moon_dir.xz + 0.1, 0.066).xzy); // Opposite horizon
-
-	sky_samples[0] = atmosphere_scattering(dir0, sun_color, sun_dir, moon_color, moon_dir) * skylight_boost;
-	sky_samples[1] = atmosphere_scattering(dir1, sun_color, sun_dir, moon_color, moon_dir) * skylight_boost;
-	sky_samples[2] = atmosphere_scattering(dir2, sun_color, sun_dir, moon_color, moon_dir) * skylight_boost;
-#endif
-
-	vec2 vertex_pos = gl_Vertex.xy * taau_render_scale;
-	gl_Position = vec4(vertex_pos * 2.0 - 1.0, 0.0, 1.0);
-}
-
-#endif
-//----------------------------------------------------------------------------//
-
-
-
-//----------------------------------------------------------------------------//
-#if defined fsh
-
-layout (location = 0) out vec3 scene_color;
-layout (location = 1) out vec4 colortex3_clear;
-
-/* DRAWBUFFERS:03 */
+// ------------
+//   includes
+// ------------
 
 #define ATMOSPHERE_SCATTERING_LUT depthtex0
 
@@ -195,7 +250,7 @@ float get_puddle_noise(vec3 world_pos, vec3 flat_normal, vec2 light_levels) {
 void main() {
 	ivec2 texel = ivec2(gl_FragCoord.xy);
 
-	// Texture fetches
+	// Sample textures
 
 	float depth         = texelFetch(depthtex1, texel, 0).x;
 	vec4 gbuffer_data_0 = texelFetch(colortex1, texel, 0);
@@ -204,7 +259,7 @@ void main() {
 #endif
 	vec4 overlays       = texelFetch(colortex3, texel, 0);
 
-	// Transformations
+	// Space conversions
 
 	depth += 0.38 * float(depth < hand_depth); // Hand lighting fix from Capt Tatsu
 
@@ -369,4 +424,4 @@ void main() {
 }
 
 #endif
-//----------------------------------------------------------------------------//
+//------------------------------------------------------------------------------

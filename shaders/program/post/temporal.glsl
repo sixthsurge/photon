@@ -11,52 +11,29 @@
 
 #include "/include/global.glsl"
 
-varying vec2 uv;
 
-flat varying float exposure;
+
+//------------------------------------------------------------------------------
+#if defined STAGE_VERTEX
+
+out vec2 uv;
+
+flat out float exposure;
 
 #if DEBUG_VIEW == DEBUG_VIEW_HISTOGRAM
-flat varying vec4[HISTOGRAM_BINS / 4] histogram_pdf;
-flat varying float histogram_selected_bin;
+flat out vec4[HISTOGRAM_BINS / 4] histogram_pdf;
+flat out float histogram_selected_bin;
 #endif
-
-// ------------
-//   uniforms
-// ------------
 
 uniform sampler2D colortex0; // Scene color
 uniform sampler2D colortex5; // Scene history
 
-#ifdef TAAU
-uniform sampler2D colortex6; // TAA min color
-uniform sampler2D colortex7; // TAA max color
-#endif
-
-uniform sampler2D depthtex0;
-
-uniform mat4 gbufferModelView;
-uniform mat4 gbufferModelViewInverse;
-uniform mat4 gbufferProjection;
-uniform mat4 gbufferProjectionInverse;
-
-uniform mat4 gbufferPreviousModelView;
-uniform mat4 gbufferPreviousProjection;
-
-uniform vec3 cameraPosition;
-uniform vec3 previousCameraPosition;
-
 uniform float frameTime;
 uniform float screenBrightness;
-uniform float near;
-uniform float far;
 
 uniform vec2 view_res;
 uniform vec2 view_pixel_size;
 uniform vec2 taa_offset;
-
-
-//----------------------------------------------------------------------------//
-#if defined vsh
 
 #include "/include/utility/color.glsl"
 
@@ -185,17 +162,59 @@ void main() {
 }
 
 #endif
-//----------------------------------------------------------------------------//
+//------------------------------------------------------------------------------
 
 
 
-//----------------------------------------------------------------------------//
-#if defined fsh
+//------------------------------------------------------------------------------
+#if defined STAGE_FRAGMENT
 
 layout (location = 0) out vec3 bloom_input;
 layout (location = 1) out vec4 result;
 
 /* DRAWBUFFERS:05 */
+
+in vec2 uv;
+
+flat in float exposure;
+
+#if DEBUG_VIEW == DEBUG_VIEW_HISTOGRAM
+flat in vec4[HISTOGRAM_BINS / 4] histogram_pdf;
+flat in float histogram_selected_bin;
+#endif
+
+// ------------
+//   uniforms
+// ------------
+
+uniform sampler2D colortex0; // Scene color
+uniform sampler2D colortex5; // Scene history
+
+#ifdef TAAU
+uniform sampler2D colortex6; // TAA min color
+uniform sampler2D colortex7; // TAA max color
+#endif
+
+uniform sampler2D depthtex0;
+
+uniform mat4 gbufferModelView;
+uniform mat4 gbufferModelViewInverse;
+uniform mat4 gbufferProjection;
+uniform mat4 gbufferProjectionInverse;
+
+uniform mat4 gbufferPreviousModelView;
+uniform mat4 gbufferPreviousProjection;
+
+uniform vec3 cameraPosition;
+uniform vec3 previousCameraPosition;
+
+uniform float frameTime;
+uniform float near;
+uniform float far;
+
+uniform vec2 view_res;
+uniform vec2 view_pixel_size;
+uniform vec2 taa_offset;
 
 #define TEMPORAL_REPROJECTION
 
@@ -446,4 +465,4 @@ void main() {
 }
 
 #endif
-//----------------------------------------------------------------------------//
+//------------------------------------------------------------------------------

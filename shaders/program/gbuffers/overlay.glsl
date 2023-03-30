@@ -11,20 +11,14 @@
 
 #include "/include/global.glsl"
 
-varying vec2 uv;
 
-// ------------
-//   uniforms
-// ------------
+//------------------------------------------------------------------------------
+#if defined STAGE_VERTEX
 
-uniform sampler2D gtexture;
+out vec2 uv;
 
 uniform vec2 taa_offset;
 uniform vec2 view_pixel_size;
-
-
-//----------------------------------------------------------------------------//
-#if defined vsh
 
 void main() {
 	uv = mat2(gl_TextureMatrix[0]) * gl_MultiTexCoord0.xy + gl_TextureMatrix[0][3].xy;
@@ -43,16 +37,27 @@ void main() {
 }
 
 #endif
-//----------------------------------------------------------------------------//
+//------------------------------------------------------------------------------
 
 
 
-//----------------------------------------------------------------------------//
-#if defined fsh
+//------------------------------------------------------------------------------
+#if defined STAGE_FRAGMENT
 
 layout (location = 0) out vec4 overlays;
 
 /* DRAWBUFFERS:3 */
+
+out vec2 uv;
+
+// ------------
+//   uniforms
+// ------------
+
+uniform sampler2D gtexture;
+
+uniform vec2 taa_offset;
+uniform vec2 view_pixel_size;
 
 const float lod_bias = log2(taau_render_scale);
 
@@ -75,4 +80,4 @@ void main() {
 }
 
 #endif
-//----------------------------------------------------------------------------//
+//------------------------------------------------------------------------------

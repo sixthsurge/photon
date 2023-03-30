@@ -11,7 +11,31 @@
 
 #include "/include/global.glsl"
 
-varying vec2 uv;
+
+//------------------------------------------------------------------------------
+#if defined STAGE_VERTEX
+
+out vec2 uv;
+
+void main() {
+	uv = gl_MultiTexCoord0.xy;
+
+	gl_Position = vec4(gl_Vertex.xy * 2.0 - 1.0, 0.0, 1.0);
+}
+
+#endif
+//------------------------------------------------------------------------------
+
+
+
+//------------------------------------------------------------------------------
+#if defined STAGE_FRAGMENT
+
+layout (location = 0) out vec3 scene_color;
+
+/* DRAWBUFFERS:0 */
+
+in vec2 uv;
 
 // ------------
 //   uniforms
@@ -31,28 +55,6 @@ uniform float time_noon;
 uniform float eye_skylight;
 
 uniform vec2 view_pixel_size;
-
-
-//----------------------------------------------------------------------------//
-#if defined vsh
-
-void main() {
-	uv = gl_MultiTexCoord0.xy;
-
-	gl_Position = vec4(gl_Vertex.xy * 2.0 - 1.0, 0.0, 1.0);
-}
-
-#endif
-//----------------------------------------------------------------------------//
-
-
-
-//----------------------------------------------------------------------------//
-#if defined fsh
-
-layout (location = 0) out vec3 scene_color;
-
-/* DRAWBUFFERS:0 */
 
 #include "/include/aces/aces.glsl"
 
@@ -362,4 +364,4 @@ void main() {
 }
 
 #endif
-//----------------------------------------------------------------------------//
+//------------------------------------------------------------------------------

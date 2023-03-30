@@ -11,20 +11,13 @@
 
 #include "/include/global.glsl"
 
-flat varying vec2 light_levels;
-flat varying vec3 tint;
+//------------------------------------------------------------------------------
+#if defined STAGE_VERTEX
 
-// ------------
-//   uniforms
-// ------------
+flat out vec2 light_levels;
+flat out vec3 tint;
 
 uniform vec2 taa_offset;
-uniform vec2 view_res;
-uniform vec2 view_pixel_size;
-
-
-//----------------------------------------------------------------------------//
-#if defined vsh
 
 void main() {
 	light_levels = clamp01(gl_MultiTexCoord1.xy * rcp(240.0));
@@ -75,12 +68,12 @@ void main() {
 }
 
 #endif
-//----------------------------------------------------------------------------//
+//------------------------------------------------------------------------------
 
 
 
-//----------------------------------------------------------------------------//
-#if defined fsh
+//------------------------------------------------------------------------------
+#if defined STAGE_FRAGMENT
 
 layout (location = 0) out vec4 gbuffer_data_0; // albedo, block ID, flat normal, light levels
 layout (location = 1) out vec4 gbuffer_data_1; // detailed normal, specular map (optional)
@@ -94,6 +87,16 @@ layout (location = 1) out vec4 gbuffer_data_1; // detailed normal, specular map 
 #ifdef SPECULAR_MAPPING
 /* DRAWBUFFERS:12 */
 #endif
+
+flat in vec2 light_levels;
+flat in vec3 tint;
+
+// ------------
+//   uniforms
+// ------------
+
+uniform vec2 view_res;
+uniform vec2 view_pixel_size;
 
 #include "/include/utility/encoding.glsl"
 
@@ -124,4 +127,4 @@ void main() {
 }
 
 #endif
-//----------------------------------------------------------------------------//
+//------------------------------------------------------------------------------

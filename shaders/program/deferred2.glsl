@@ -11,7 +11,33 @@
 
 #include "/include/global.glsl"
 
-varying vec2 uv;
+
+//------------------------------------------------------------------------------
+#if defined STAGE_VERTEX
+
+out vec2 uv;
+
+void main() {
+	uv = gl_MultiTexCoord0.xy;
+
+	vec2 vertex_pos = gl_Vertex.xy * taau_render_scale;
+	gl_Position = vec4(vertex_pos * 2.0 - 1.0, 0.0, 1.0);
+}
+
+#endif
+//------------------------------------------------------------------------------
+
+
+
+//------------------------------------------------------------------------------
+#if defined STAGE_FRAGMENT
+
+layout (location = 0) out vec4 ao;
+layout (location = 1) out vec4 clouds;
+
+/* DRAWBUFFERS:67 */
+
+in vec2 uv;
 
 // ------------
 //   uniforms
@@ -52,29 +78,9 @@ uniform vec2 clouds_offset;
 
 uniform bool world_age_changed;
 
-
-//----------------------------------------------------------------------------//
-#if defined vsh
-
-void main() {
-	uv = gl_MultiTexCoord0.xy;
-
-	vec2 vertex_pos = gl_Vertex.xy * taau_render_scale;
-	gl_Position = vec4(vertex_pos * 2.0 - 1.0, 0.0, 1.0);
-}
-
-#endif
-//----------------------------------------------------------------------------//
-
-
-
-//----------------------------------------------------------------------------//
-#if defined fsh
-
-layout (location = 0) out vec4 ao;
-layout (location = 1) out vec4 clouds;
-
-/* DRAWBUFFERS:67 */
+// ------------
+//   includes
+// ------------
 
 #define TEMPORAL_REPROJECTION
 
@@ -333,4 +339,4 @@ void main() {
 }
 
 #endif
-//----------------------------------------------------------------------------//
+//------------------------------------------------------------------------------

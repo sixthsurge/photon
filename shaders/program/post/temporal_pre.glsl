@@ -11,13 +11,11 @@
 
 #include "/include/global.glsl"
 
-varying vec2 uv;
 
-uniform sampler2D colortex0;
+//------------------------------------------------------------------------------
+#if defined STAGE_VERTEX
 
-
-//----------------------------------------------------------------------------//
-#if defined vsh
+out vec2 uv;
 
 void main() {
 	uv = gl_MultiTexCoord0.xy;
@@ -27,17 +25,21 @@ void main() {
 }
 
 #endif
-//----------------------------------------------------------------------------//
+//------------------------------------------------------------------------------
 
 
 
-//----------------------------------------------------------------------------//
-#if defined fsh
+//------------------------------------------------------------------------------
+#if defined STAGE_FRAGMENT
 
 layout (location = 0) out vec3 min_color;
 layout (location = 1) out vec3 max_color;
 
 /* DRAWBUFFERS:67 */
+
+in vec2 uv;
+
+uniform sampler2D colortex0;
 
 #include "/include/utility/color.glsl"
 
@@ -91,7 +93,7 @@ void main() {
 }
 
 #endif
-//----------------------------------------------------------------------------//
+//------------------------------------------------------------------------------
 
 #ifndef TAAU
 	#error "This program should be disabled if TAAU is disabled"

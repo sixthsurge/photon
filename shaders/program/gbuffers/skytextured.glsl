@@ -11,24 +11,20 @@
 
 #include "/include/global.glsl"
 
-varying vec2 uv;
 
-flat varying vec3 tint;
+//------------------------------------------------------------------------------
+
+#if defined STAGE_VERTEX
+
+out vec2 uv;
+
+flat out vec3 tint;
 
 // ------------
 //   uniforms
 // ------------
 
-uniform sampler2D gtexture;
-
-uniform int moonPhase;
-uniform int renderStage;
-
 uniform vec2 taa_offset;
-
-
-//----------------------------------------------------------------------------//
-#if defined vsh
 
 void main() {
 	uv   = mat2(gl_TextureMatrix[0]) * gl_MultiTexCoord0.xy + gl_TextureMatrix[0][3].xy;
@@ -48,16 +44,29 @@ void main() {
 }
 
 #endif
-//----------------------------------------------------------------------------//
+//------------------------------------------------------------------------------
 
 
 
-//----------------------------------------------------------------------------//
-#if defined fsh
+//------------------------------------------------------------------------------
+#if defined STAGE_FRAGMENT
 
 layout (location = 0) out vec4 scene_color;
 
 /* DRAWBUFFERS:3 */
+
+in vec2 uv;
+
+flat in vec3 tint;
+
+// ------------
+//   uniforms
+// ------------
+
+uniform sampler2D gtexture;
+
+uniform int moonPhase;
+uniform int renderStage;
 
 void main() {
 	vec2 new_uv = uv;
@@ -163,4 +172,4 @@ void main() {
 }
 
 #endif
-//----------------------------------------------------------------------------//
+//------------------------------------------------------------------------------

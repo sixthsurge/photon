@@ -11,7 +11,29 @@
 
 #include "/include/global.glsl"
 
-varying vec2 uv;
+
+//------------------------------------------------------------------------------
+#if defined STAGE_VERTEX
+
+out vec2 uv;
+
+void main() {
+	uv = gl_MultiTexCoord0.xy;
+
+	gl_Position = vec4(gl_Vertex.xy * 2.0 - 1.0, 0.0, 1.0);
+}
+
+#endif
+//------------------------------------------------------------------------------
+
+
+
+//------------------------------------------------------------------------------
+#if defined STAGE_FRAGMENT
+
+layout (location = 0) out vec3 scene_color;
+
+in vec2 uv;
 
 // ------------
 //   uniforms
@@ -24,26 +46,6 @@ uniform sampler2D DEBUG_SAMPLER;
 #endif
 
 uniform float viewHeight;
-
-
-//----------------------------------------------------------------------------//
-#if defined vsh
-
-void main() {
-	uv = gl_MultiTexCoord0.xy;
-
-	gl_Position = vec4(gl_Vertex.xy * 2.0 - 1.0, 0.0, 1.0);
-}
-
-#endif
-//----------------------------------------------------------------------------//
-
-
-
-//----------------------------------------------------------------------------//
-#if defined fsh
-
-layout (location = 0) out vec3 scene_color;
 
 #include "/include/utility/bicubic.glsl"
 #include "/include/utility/color.glsl"
@@ -134,4 +136,4 @@ void main() {
 }
 
 #endif
-//----------------------------------------------------------------------------//
+//------------------------------------------------------------------------------

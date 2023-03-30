@@ -1,11 +1,34 @@
+/*
+--------------------------------------------------------------------------------
+
+  Photon Shaders by SixthSurge
+
+  program/shadow.glsl:
+  Render shadow map
+
+--------------------------------------------------------------------------------
+*/
+
 #include "/include/global.glsl"
 
-varying vec2 uv;
-varying vec3 world_pos;
+//------------------------------------------------------------------------------
 
-flat varying uint material_mask;
-flat varying vec3 tint;
-flat varying mat3 tbn;
+#if defined STAGE_VERTEX
+
+out vec2 uv;
+out vec3 world_pos;
+
+flat out uint material_mask;
+flat out vec3 tint;
+flat out mat3 tbn;
+
+// --------------
+//   attributes
+// --------------
+
+attribute vec4 at_tangent;
+attribute vec3 mc_Entity;
+attribute vec2 mc_midTexCoord;
 
 // ------------
 //   uniforms
@@ -33,13 +56,9 @@ uniform float rainStrength;
 uniform vec2 taa_offset;
 uniform vec3 light_dir;
 
-
-//----------------------------------------------------------------------------//
-#if defined vsh
-
-attribute vec4 at_tangent;
-attribute vec3 mc_Entity;
-attribute vec2 mc_midTexCoord;
+// ------------
+//   includes
+// ------------
 
 #include "/include/light/distortion.glsl"
 #include "/include/vertex/wind_animation.glsl"
@@ -102,16 +121,39 @@ void main() {
 }
 
 #endif
-//----------------------------------------------------------------------------//
+//------------------------------------------------------------------------------
 
 
 
-//----------------------------------------------------------------------------//
-#if defined fsh
+//------------------------------------------------------------------------------
+#if defined STAGE_FRAGMENT
 
 layout (location = 0) out vec3 shadowcolor0_out;
 
 /* DRAWBUFFERS:0 */
+
+in vec2 uv;
+in vec3 world_pos;
+
+flat in uint material_mask;
+flat in vec3 tint;
+flat in mat3 tbn;
+
+// ------------
+//   uniforms
+// ------------
+
+uniform sampler2D tex;
+uniform sampler2D noisetex;
+
+uniform float near;
+uniform float far;
+
+uniform float frameTimeCounter;
+uniform float rainStrength;
+
+uniform vec2 taa_offset;
+uniform vec3 light_dir;
 
 #include "/include/misc/water_normal.glsl"
 #include "/include/utility/color.glsl"
@@ -177,4 +219,4 @@ void main() {
 }
 
 #endif
-//----------------------------------------------------------------------------//
+//------------------------------------------------------------------------------

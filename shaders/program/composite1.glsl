@@ -11,14 +11,84 @@
 
 #include "/include/global.glsl"
 
-varying vec2 uv;
 
-flat varying vec3 ambient_color;
+//------------------------------------------------------------------------------
+#if defined STAGE_VERTEX
+
+out vec2 uv;
+
+flat out vec3 ambient_color;
 
 #if defined WORLD_OVERWORLD
-flat varying vec3 light_color;
-flat varying vec3 sun_color;
-flat varying vec3 moon_color;
+flat out vec3 light_color;
+flat out vec3 sun_color;
+flat out vec3 moon_color;
+#endif
+
+// ------------
+//   uniforms
+// ------------
+
+uniform float frameTimeCounter;
+uniform float sunAngle;
+uniform float rainStrength;
+uniform float wetness;
+
+uniform int worldTime;
+uniform int frameCounter;
+
+uniform vec3 light_dir;
+uniform vec3 sun_dir;
+uniform vec3 moon_dir;
+
+uniform float eye_skylight;
+
+uniform float time_sunrise;
+uniform float time_noon;
+uniform float time_sunset;
+uniform float time_midnight;
+
+uniform float biome_cave;
+uniform float biome_may_rain;
+uniform float biome_may_snow;
+
+#include "/include/misc/palette.glsl"
+
+void main() {
+	uv = gl_MultiTexCoord0.xy;
+
+#if defined WORLD_OVERWORLD
+	light_color     = get_light_color();
+	sun_color       = get_sun_exposure() * get_sun_tint();
+	moon_color      = get_moon_exposure() * get_moon_tint();
+	ambient_color   = get_sky_color();
+#endif
+
+	vec2 vertex_pos = gl_Vertex.xy * taau_render_scale;
+	gl_Position = vec4(vertex_pos * 2.0 - 1.0, 0.0, 1.0);
+}
+
+#endif
+//------------------------------------------------------------------------------
+
+
+
+//------------------------------------------------------------------------------
+#if defined STAGE_FRAGMENT
+
+layout (location = 0) out vec3 scene_color;
+layout (location = 1) out float bloomy_fog;
+
+/* DRAWBUFFERS:03 */
+
+in vec2 uv;
+
+flat in vec3 ambient_color;
+
+#if defined WORLD_OVERWORLD
+flat in vec3 light_color;
+flat in vec3 sun_color;
+flat in vec3 moon_color;
 #endif
 
 // ------------
@@ -95,39 +165,6 @@ uniform float time_noon;
 uniform float time_sunset;
 uniform float time_midnight;
 
-
-//----------------------------------------------------------------------------//
-#if defined vsh
-
-#include "/include/misc/palette.glsl"
-
-void main() {
-	uv = gl_MultiTexCoord0.xy;
-
-#if defined WORLD_OVERWORLD
-	light_color     = get_light_color();
-	sun_color       = get_sun_exposure() * get_sun_tint();
-	moon_color      = get_moon_exposure() * get_moon_tint();
-	ambient_color   = get_sky_color();
-#endif
-
-	vec2 vertex_pos = gl_Vertex.xy * taau_render_scale;
-	gl_Position = vec4(vertex_pos * 2.0 - 1.0, 0.0, 1.0);
-}
-
-#endif
-//----------------------------------------------------------------------------//
-
-
-
-//----------------------------------------------------------------------------//
-#if defined fsh
-
-layout (location = 0) out vec3 scene_color;
-layout (location = 1) out float bloomy_fog;
-
-/* DRAWBUFFERS:03 */
-
 #define TEMPORAL_REPROJECTION
 
 #ifdef SHADOW_COLOR
@@ -151,7 +188,7 @@ layout (location = 1) out float bloomy_fog;
 
 /*
 const bool colortex5MipmapEnabled = true;
- */
+*/
 
 // https://iquilezles.org/www/articles/texture/texture.htm
 vec4 smooth_filter(sampler2D sampler, vec2 coord) {
@@ -283,7 +320,7 @@ void main() {
 
 	bool is_translucent = depth0 != depth1;
 
-	// Transformations
+	// Space conversions
 
 	depth0 += 0.38 * float(depth0 < hand_depth); // Hand lighting fix from Capt Tatsu
 
@@ -625,4 +662,4 @@ void main() {
 }
 
 #endif
-//----------------------------------------------------------------------------//
+//------------------------------------------------------------------------------

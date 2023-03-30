@@ -35,19 +35,129 @@
 
 #include "/include/global.glsl"
 
-varying vec2 uv;
+
+//------------------------------------------------------------------------------
+#if defined STAGE_VERTEX
+
+out vec2 uv;
 
 #if defined WORLD_OVERWORLD
-flat varying vec3 sun_color;
-flat varying vec3 moon_color;
-flat varying vec3 base_light_color;
-flat varying vec3 light_color;
-flat varying vec3 sky_color;
+flat out vec3 sun_color;
+flat out vec3 moon_color;
+flat out vec3 base_light_color;
+flat out vec3 light_color;
+flat out vec3 sky_color;
 
-flat varying vec2 clouds_coverage_cu;
-flat varying vec2 clouds_coverage_ac;
-flat varying vec2 clouds_coverage_cc;
-flat varying vec2 clouds_coverage_ci;
+flat out vec2 clouds_coverage_cu;
+flat out vec2 clouds_coverage_ac;
+flat out vec2 clouds_coverage_cc;
+flat out vec2 clouds_coverage_ci;
+#endif
+
+// ------------
+//   uniforms
+// ------------
+
+uniform sampler3D depthtex0; // atmospheric scattering LUT
+
+uniform float eyeAltitude;
+uniform float rainStrength;
+uniform float blindness;
+
+uniform int worldTime;
+uniform float sunAngle;
+
+uniform int frameCounter;
+uniform float frameTimeCounter;
+
+uniform int isEyeInWater;
+
+uniform vec3 light_dir;
+uniform vec3 sun_dir;
+uniform vec3 moon_dir;
+
+uniform float world_age;
+uniform float eye_skylight;
+
+uniform float time_sunrise;
+uniform float time_noon;
+uniform float time_sunset;
+uniform float time_midnight;
+
+uniform float biome_cave;
+uniform float biome_temperate;
+uniform float biome_arid;
+uniform float biome_snowy;
+uniform float biome_taiga;
+uniform float biome_jungle;
+uniform float biome_swamp;
+uniform float biome_may_rain;
+uniform float biome_may_snow;
+uniform float biome_temperature;
+uniform float biome_humidity;
+
+uniform bool clouds_moonlit;
+uniform vec3 clouds_light_dir;
+
+// ------------
+//   includes
+// ------------
+
+#define ATMOSPHERE_SCATTERING_LUT depthtex0
+
+#include "/include/misc/palette.glsl"
+#include "/include/misc/weather.glsl"
+
+void main() {
+	uv = gl_MultiTexCoord0.xy;
+
+#if defined WORLD_OVERWORLD
+	light_color = get_light_color();
+	sun_color = get_sun_exposure() * get_sun_tint();
+	moon_color = get_moon_exposure() * get_moon_tint();
+	base_light_color = mix(sun_color, moon_color, float(clouds_moonlit)) * (1.0 - rainStrength);
+
+	const vec3 sky_dir = normalize(vec3(0.0, 1.0, -0.8)); // don't point direcly upwards to avoid the sun halo when the sun path rotation is 0
+	sky_color = atmosphere_scattering(sky_dir, sun_color, sun_dir, moon_color, moon_dir);
+	sky_color = tau * mix(sky_color, vec3(sky_color.b) * sqrt(2.0), rcp_pi);
+	sky_color = mix(sky_color, tau * get_weather_color(), rainStrength);
+
+	clouds_weather_variation(
+		clouds_coverage_cu,
+		clouds_coverage_ac,
+		clouds_coverage_cc,
+		clouds_coverage_ci
+	);
+#endif
+
+	gl_Position = vec4(gl_Vertex.xy * 2.0 - 1.0, 0.0, 1.0);
+}
+
+#endif
+//------------------------------------------------------------------------------
+
+
+
+//------------------------------------------------------------------------------
+#if defined STAGE_FRAGMENT
+
+layout (location = 0) out vec3 sky_map;
+
+/* DRAWBUFFERS:4 */
+
+in vec2 uv;
+
+#if defined WORLD_OVERWORLD
+flat in vec3 sun_color;
+flat in vec3 moon_color;
+flat in vec3 base_light_color;
+flat in vec3 light_color;
+flat in vec3 sky_color;
+
+flat in vec2 clouds_coverage_cu;
+flat in vec2 clouds_coverage_ac;
+flat in vec2 clouds_coverage_cc;
+flat in vec2 clouds_coverage_ci;
 #endif
 
 // ------------
@@ -99,72 +209,18 @@ uniform vec2 taa_offset;
 
 uniform float world_age;
 uniform float eye_skylight;
-
 uniform float time_sunrise;
-uniform float time_noon;
 uniform float time_sunset;
-uniform float time_midnight;
 
 uniform float biome_cave;
-uniform float biome_temperate;
-uniform float biome_arid;
-uniform float biome_snowy;
-uniform float biome_taiga;
-uniform float biome_jungle;
-uniform float biome_swamp;
-uniform float biome_may_rain;
 uniform float biome_may_snow;
-uniform float biome_temperature;
-uniform float biome_humidity;
 
 uniform bool clouds_moonlit;
 uniform vec3 clouds_light_dir;
 
-
-//----------------------------------------------------------------------------//
-#if defined vsh
-
-#define ATMOSPHERE_SCATTERING_LUT depthtex0
-
-#include "/include/misc/palette.glsl"
-#include "/include/misc/weather.glsl"
-
-void main() {
-	uv = gl_MultiTexCoord0.xy;
-
-#if defined WORLD_OVERWORLD
-	light_color = get_light_color();
-	sun_color = get_sun_exposure() * get_sun_tint();
-	moon_color = get_moon_exposure() * get_moon_tint();
-	base_light_color = mix(sun_color, moon_color, float(clouds_moonlit)) * (1.0 - rainStrength);
-
-	const vec3 sky_dir = normalize(vec3(0.0, 1.0, -0.8)); // don't point direcly upwards to avoid the sun halo when the sun path rotation is 0
-	sky_color = atmosphere_scattering(sky_dir, sun_color, sun_dir, moon_color, moon_dir);
-	sky_color = tau * mix(sky_color, vec3(sky_color.b) * sqrt(2.0), rcp_pi);
-	sky_color = mix(sky_color, tau * get_weather_color(), rainStrength);
-
-	clouds_weather_variation(
-		clouds_coverage_cu,
-		clouds_coverage_ac,
-		clouds_coverage_cc,
-		clouds_coverage_ci
-	);
-#endif
-
-	gl_Position = vec4(gl_Vertex.xy * 2.0 - 1.0, 0.0, 1.0);
-}
-
-#endif
-//----------------------------------------------------------------------------//
-
-
-
-//----------------------------------------------------------------------------//
-#if defined fsh
-
-layout (location = 0) out vec3 sky_map;
-
-/* DRAWBUFFERS:4 */
+// ------------
+//   includes
+// ------------
 
 #define ATMOSPHERE_SCATTERING_LUT depthtex0
 
@@ -184,4 +240,4 @@ void main() {
 }
 
 #endif
-//----------------------------------------------------------------------------//
+//------------------------------------------------------------------------------

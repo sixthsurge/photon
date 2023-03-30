@@ -11,19 +11,11 @@
 
 #include "/include/global.glsl"
 
-varying vec2 uv;
 
-// ------------
-//   uniforms
-// ------------
+//------------------------------------------------------------------------------
+#if defined STAGE_VERTEX
 
-uniform sampler2D colortex0;
-
-uniform vec2 view_pixel_size;
-
-
-//----------------------------------------------------------------------------//
-#if defined vsh
+out vec2 uv;
 
 void main() {
 	uv = gl_MultiTexCoord0.xy;
@@ -32,16 +24,22 @@ void main() {
 }
 
 #endif
-//----------------------------------------------------------------------------//
+//------------------------------------------------------------------------------
 
 
 
-//----------------------------------------------------------------------------//
-#if defined fsh
+//------------------------------------------------------------------------------
+#if defined STAGE_FRAGMENT
 
 layout (location = 0) out vec3 scene_color;
 
 /* DRAWBUFFERS:0 */
+
+in vec2 uv;
+
+uniform sampler2D colortex0;
+
+uniform vec2 view_pixel_size;
 
 const int max_iterations = 12;
 const float[12] quality = float[12](1.0, 1.0, 1.0, 1.0, 1.0, 1.5, 2.0, 2.0, 2.0, 2.0, 4.0, 8.0);
@@ -272,7 +270,7 @@ void main() {
 }
 
 #endif
-//----------------------------------------------------------------------------//
+//------------------------------------------------------------------------------
 
 #ifndef FXAA
 	#error "This program should be disabled if FXAA is disabled"

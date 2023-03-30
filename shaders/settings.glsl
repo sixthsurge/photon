@@ -98,7 +98,7 @@ const float wetnessHalflife         = 70.0;
 // Sun and Moon
 
   #define SUN_ANGULAR_RADIUS 2.0 // [0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0 1.1 1.2 1.3 1.4 1.5 1.6 1.7 1.8 1.9 2.0 2.1 2.2 2.3 2.4 2.5 2.6 2.7 2.8 2.9 3.0 3.1 3.2 3.3 3.4 3.5 3.6 3.7 3.8 3.9 4.0]
-  #define MOON_ANGULAR_RADIUS 2.0 // [0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0 1.1 1.2 1.3 1.4 1.5 1.6 1.7 1.8 1.9 2.0 2.1 2.2 2.3 2.4 2.5 2.6 2.7 2.8 2.9 3.0 3.1 3.2 3.3 3.4 3.5 3.6 3.7 3.8 3.9 4.0]
+  #define MOON_ANGULAR_RADIUS 2.5 // [0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0 1.1 1.2 1.3 1.4 1.5 1.6 1.7 1.8 1.9 2.0 2.1 2.2 2.3 2.4 2.5 2.6 2.7 2.8 2.9 3.0 3.1 3.2 3.3 3.4 3.5 3.6 3.7 3.8 3.9 4.0]
 //#define VANILLA_SUN
 //#define VANILLA_MOON
 
@@ -227,7 +227,7 @@ const float wetnessHalflife         = 70.0;
   #define WATER_PARALLAX // Makes water waves appear 3D
   #define WATER_DISPLACEMENT // Similar to how waving leaves work, it makes the water geometry itself wave slightly, so the shore line appears less flat
 //#define WATER_CAUSTICS // Dancing light patterns beneath water
-//#define WATER_FOAM // White highlights where water meets terrain. Helps to make water more easily visible in some cases
+  #define WATER_FOAM // White highlights where water meets terrain. Helps to make water more easily visible in some cases
 //#define VANILLA_WATER_TEXTURE // Whether to show the vanilla water texture
 //#define SNELLS_WINDOW // Total internal reflection underwater
   #define BIOME_WATER_COLOR // Water absorption takes the biome water colour into account

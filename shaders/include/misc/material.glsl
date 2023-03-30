@@ -195,7 +195,7 @@ Material material_from(vec3 albedo_srgb, uint material_mask, vec3 world_pos, ino
 					}
 				}
 			} else { // 20-24
-				if (material_mask < 24u) { // 20-22
+				if (material_mask < 22u) { // 20-22
 					if (material_mask == 20u) {
 						// Stained glass and slime
 						#ifdef HARDCODED_SPECULAR
@@ -220,7 +220,16 @@ Material material_from(vec3 albedo_srgb, uint material_mask, vec3 world_pos, ino
 						material.sss_amount = 0.6;
 						#endif
 					} else {
+						// Snow
+						#ifdef HARDCODED_SPECULAR
+						float smoothness = pow5(linear_step(0.95, 1.0, hsl.z)) * 0.6;
+						material.roughness = sqr(1.0 - smoothness);
+						material.f0 = vec3(0.02);
+						#endif
 
+						#ifdef HARDCODED_SSS
+						material.sss_amount = 0.6;
+						#endif
 					}
 				}
 			}
@@ -235,6 +244,18 @@ Material material_from(vec3 albedo_srgb, uint material_mask, vec3 world_pos, ino
 						material.f0 = vec3(0.02);
 						#endif
 					} else {
+						// Ice
+						#ifdef HARDCODED_SPECULAR
+						float smoothness = pow4(linear_step(0.4, 0.8, hsl.z)) * 0.6;
+						material.roughness = sqr(1.0 - smoothness);
+						material.f0 = vec3(0.02);
+						material.ssr_multiplier = 1.0;
+						#endif
+
+						#ifdef HARDCODED_SSS
+						// Strong SSS
+						material.sss_amount = 0.75;
+						#endif
 					}
 				} else { // 26-28
 					if (material_mask == 26u) {

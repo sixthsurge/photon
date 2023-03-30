@@ -37,7 +37,7 @@ mat2x3 raymarch_water_fog(
 	// Jitter ray origin
 	vec3 world_pos = world_start_pos + world_dir * step_length * dither;
 
-	// Transformations
+	// Space conversions
 
 	vec3 shadow_pos = transform(shadowModelView, world_pos - cameraPosition);
 	     shadow_pos = project_ortho(shadowProjection, shadow_pos);
