@@ -1,4 +1,4 @@
-#ifndef INCLUDE_LIGHT_DISTORTION
+#if !defined INCLUDE_LIGHT_DISTORTION
 #define INCLUDE_LIGHT_DISTORTION
 
 #include "/include/utility/fast_math.glsl"

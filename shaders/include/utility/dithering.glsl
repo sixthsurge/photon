@@ -1,4 +1,4 @@
-#ifndef INCLUDE_UTILITY_DITHERING
+#if !defined INCLUDE_UTILITY_DITHERING
 #define INCLUDE_UTILITY_DITHERING
 
 float bayer2(vec2 a) {

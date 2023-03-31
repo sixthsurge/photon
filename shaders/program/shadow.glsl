@@ -11,19 +11,21 @@
 
 #include "/include/global.glsl"
 
-//------------------------------------------------------------------------------
-
-#if defined STAGE_VERTEX
+//----------------------------------------------------------------------------//
+#if defined vsh
 
 out vec2 uv;
-out vec3 world_pos;
 
 flat out uint material_mask;
 flat out vec3 tint;
 flat out mat3 tbn;
 
+#ifdef WATER_CAUSTICS
+out vec3 scene_pos;
+#endif
+
 // --------------
-//   attributes
+//   Attributes
 // --------------
 
 attribute vec4 at_tangent;
@@ -31,7 +33,7 @@ attribute vec3 mc_Entity;
 attribute vec2 mc_midTexCoord;
 
 // ------------
-//   uniforms
+//   Uniforms
 // ------------
 
 uniform sampler2D tex;
@@ -57,39 +59,11 @@ uniform vec2 taa_offset;
 uniform vec3 light_dir;
 
 // ------------
-//   includes
+//   Includes
 // ------------
 
 #include "/include/light/distortion.glsl"
-#include "/include/vertex/wind_animation.glsl"
-
-float gerstner_wave(vec2 coord, vec2 wave_dir, float t, float noise, float wavelength) {
-	// Gerstner wave function from Belmu in #snippets, modified
-	const float g = 9.8;
-
-	float k = tau / wavelength;
-	float w = sqrt(g * k);
-
-	float x = w * t - k * (dot(wave_dir, coord) + noise);
-
-	return sqr(sin(x) * 0.5 + 0.5);
-}
-
-vec3 apply_water_displacement(vec3 world_pos) {
-	const float wave_frequency = 0.3 * WATER_WAVE_FREQUENCY;
-	const float wave_speed     = 0.37 * WATER_WAVE_SPEED_STILL;
-	const float wave_angle     = 0.5;
-	const float wavelength     = 1.0;
-	const vec2  wave_dir       = vec2(cos(wave_angle), sin(wave_angle));
-
-	if (material_mask != 1) return world_pos;
-
-	vec2 wave_coord = world_pos.xz * wave_frequency;
-
-	world_pos.y += (gerstner_wave(wave_coord, wave_dir, frameTimeCounter * wave_speed, 0.0, wavelength) * 0.05 - 0.025);
-
-	return world_pos;
-}
+#include "/include/vertex/displacement.glsl"
 
 void main() {
 	uv            = gl_MultiTexCoord0.xy;
@@ -100,20 +74,19 @@ void main() {
 	tbn[2] = mat3(shadowModelViewInverse) * normalize(gl_NormalMatrix * gl_Normal);
 	tbn[1] = cross(tbn[0], tbn[2]) * sign(at_tangent.w);
 
-	vec3 shadow_view_pos = transform(gl_ModelViewMatrix, gl_Vertex.xyz);
-
-	// Wind animation
-	vec3 scene_pos = transform(shadowModelViewInverse, shadow_view_pos);
 	bool is_top_vertex = uv.y < mc_midTexCoord.y;
 
-	world_pos  = scene_pos + cameraPosition;
-	world_pos += animate_vertex(world_pos, is_top_vertex, clamp01(rcp(240.0) * gl_MultiTexCoord1.y), material_mask);
-#ifdef WATER_DISPLACEMENT
-	if (material_mask == 1) world_pos = apply_water_displacement(world_pos);
-#endif
-	scene_pos  = world_pos - cameraPosition;
-	shadow_view_pos = transform(shadowModelView, scene_pos);
+	vec3 pos = transform(gl_ModelViewMatrix, gl_Vertex.xyz);
+	     pos = transform(shadowModelViewInverse, pos);
+	     pos = pos + cameraPosition;
+	     pos = animate_vertex(pos, is_top_vertex, clamp01(rcp(240.0) * gl_MultiTexCoord1.y), material_mask);
+		 pos = pos - cameraPosition;
 
+#ifdef WATER_CAUSTICS
+	scene_pos = pos;
+#endif
+
+	vec3 shadow_view_pos = transform(shadowModelView, pos);
 	vec3 shadow_clip_pos = project_ortho(gl_ProjectionMatrix, shadow_view_pos);
 	     shadow_clip_pos = distort_shadow_space(shadow_clip_pos);
 
@@ -121,12 +94,12 @@ void main() {
 }
 
 #endif
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------//
 
 
 
-//------------------------------------------------------------------------------
-#if defined STAGE_FRAGMENT
+//----------------------------------------------------------------------------//
+#if defined fsh
 
 layout (location = 0) out vec3 shadowcolor0_out;
 
@@ -139,12 +112,18 @@ flat in uint material_mask;
 flat in vec3 tint;
 flat in mat3 tbn;
 
+#ifdef WATER_CAUSTICS
+in vec3 scene_pos;
+#endif
+
 // ------------
-//   uniforms
+//   Uniforms
 // ------------
 
 uniform sampler2D tex;
 uniform sampler2D noisetex;
+
+uniform vec3 cameraPosition;
 
 uniform float near;
 uniform float far;
@@ -182,6 +161,7 @@ float get_water_caustics() {
 #ifndef WATER_CAUSTICS
 	return 1.0;
 #else
+	vec3 world_pos = scene_pos + cameraPosition;
 	vec2 coord = world_pos.xz;
 
 	bool flowing_water = abs(tbn[2].y) < 0.99;
@@ -219,4 +199,4 @@ void main() {
 }
 
 #endif
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------//

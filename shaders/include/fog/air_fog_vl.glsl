@@ -1,4 +1,4 @@
-#ifndef INCLUDE_FOG_AIR_FOG_VL
+#if !defined INCLUDE_FOG_AIR_FOG_VL
 #define INCLUDE_FOG_AIR_FOG_VL
 
 #include "/include/light/distortion.glsl"
@@ -104,7 +104,7 @@ mat2x3 raymarch_air_fog(vec3 world_start_pos, vec3 world_end_pos, bool sky, floa
 	#ifdef AIR_FOG_COLORED_LIGHT_SHAFTS
 		float depth0 = texelFetch(shadowtex0, shadow_texel, 0).x;
 		float depth1 = texelFetch(shadowtex1, shadow_texel, 0).x;
-		vec3  color = texelFetch(shadowcolor0, shadow_texel, 0).rgb;
+		vec3  color = clamp01(texelFetch(shadowcolor0, shadow_texel, 0).rgb * 4.0);
 		float color_weight = step(depth0, shadow_screen_pos.z) * step(eps, max_of(color));
 
 		color = color * color_weight + (1.0 - color_weight);

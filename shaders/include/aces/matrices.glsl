@@ -1,4 +1,4 @@
-#ifndef INCLUDE_ACES_MATRICES
+#if !defined INCLUDE_ACES_MATRICES
 #define INCLUDE_ACES_MATRICES
 
 #include "/include/utility/color.glsl"

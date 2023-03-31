@@ -1,4 +1,4 @@
-#ifndef INCLUDE_SKY_ATMOSPHERE
+#if !defined INCLUDE_SKY_ATMOSPHERE
 #define INCLUDE_SKY_ATMOSPHERE
 
 #include "/include/aces/matrices.glsl"

@@ -1,4 +1,4 @@
-#ifndef INCLUDE_MISC_PARALLAX
+#if !defined INCLUDE_MISC_PARALLAX
 #define INCLUDE_MISC_PARALLAX
 
 vec2 get_uv_from_local_coord(vec2 local_coord) {

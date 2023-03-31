@@ -1,4 +1,4 @@
-#ifndef INCLUDE_SKY_CLOUDS
+#if !defined INCLUDE_SKY_CLOUDS
 #define INCLUDE_SKY_CLOUDS
 
 #include "/include/sky/atmosphere.glsl"

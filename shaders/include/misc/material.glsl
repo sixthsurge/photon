@@ -1,4 +1,4 @@
-#ifndef INCLUDE_MISC_MATERIAL
+#if !defined INCLUDE_MISC_MATERIAL
 #define INCLUDE_MISC_MATERIAL
 
 #include "/include/aces/matrices.glsl"

@@ -1,4 +1,4 @@
-#ifndef INCLUDE_ACES_TONESCALES
+#if !defined INCLUDE_ACES_TONESCALES
 #define INCLUDE_ACES_TONESCALES
 
 #include "utility.glsl"

@@ -1,4 +1,4 @@
-#ifndef INCLUDE_LIGHT_SPECULAR
+#if !defined INCLUDE_LIGHT_SPECULAR
 #define INCLUDE_LIGHT_SPECULAR
 
 #include "/include/misc/raytracer.glsl"

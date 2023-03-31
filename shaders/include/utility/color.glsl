@@ -1,4 +1,4 @@
-#ifndef INCLUDE_UTILITY_COLOR
+#if !defined INCLUDE_UTILITY_COLOR
 #define INCLUDE_UTILITY_COLOR
 
 const vec3 luminance_weights_rec709  = vec3(0.2126, 0.7152, 0.0722);

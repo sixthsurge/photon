@@ -13,8 +13,8 @@
 #include "/include/global.glsl"
 
 
-//------------------------------------------------------------------------------
-#if defined STAGE_VERTEX
+//----------------------------------------------------------------------------//
+#if defined vsh
 
 out vec2 uv;
 out vec2 light_levels;
@@ -30,8 +30,12 @@ flat out vec2 atlas_tile_offset;
 flat out vec2 atlas_tile_scale;
 #endif
 
+#if defined DIRECTIONAL_LIGHTMAPS
+out vec3 scene_pos;
+#endif
+
 // --------------
-//   attributes
+//   Attributes
 // --------------
 
 attribute vec4 at_tangent;
@@ -39,7 +43,7 @@ attribute vec3 mc_Entity;
 attribute vec2 mc_midTexCoord;
 
 // ------------
-//   uniforms
+//   Uniforms
 // ------------
 
 uniform sampler2D noisetex;
@@ -68,40 +72,10 @@ uniform vec3 light_dir;
 
 #if defined PROGRAM_GBUFFERS_ENTITIES_TRANSLUCENT
 uniform int entityId;
-uniform vec4 entityColor;
 #endif
 
 #include "/include/utility/space_conversion.glsl"
-
-float gerstner_wave(vec2 coord, vec2 wave_dir, float t, float noise, float wavelength) {
-	// Gerstner wave function from Belmu in #snippets, modified
-	const float g = 9.8;
-
-	float k = tau / wavelength;
-	float w = sqrt(g * k);
-
-	float x = w * t - k * (dot(wave_dir, coord) + noise);
-
-	return sqr(sin(x) * 0.5 + 0.5);
-}
-
-vec3 apply_water_displacement(vec3 view_pos) {
-	const float wave_frequency = 0.3 * WATER_WAVE_FREQUENCY;
-	const float wave_speed     = 0.37 * WATER_WAVE_SPEED_STILL;
-	const float wave_angle     = 0.5;
-	const float wavelength     = 1.0;
-	const vec2  wave_dir       = vec2(cos(wave_angle), sin(wave_angle));
-
-	if (material_mask != 1) return view_pos;
-
-	vec3 scene_pos = view_to_scene_space(view_pos);
-
-	vec2 wave_coord = (scene_pos.xz + cameraPosition.xz) * wave_frequency;
-
-	scene_pos.y += (gerstner_wave(wave_coord, wave_dir, frameTimeCounter * wave_speed, 0.0, wavelength) * 0.05 - 0.025) * (light_levels.y * 0.9 + 0.1);
-
-	return scene_to_view_space(scene_pos);
-}
+#include "/include/vertex/displacement.glsl"
 
 void main() {
 	uv           = gl_MultiTexCoord0.xy;
@@ -116,21 +90,8 @@ void main() {
 	material_mask = 0;
 #endif
 
-	tbn[2] = mat3(gbufferModelViewInverse) * normalize(gl_NormalMatrix * gl_Normal);
-	tbn[0] = mat3(gbufferModelViewInverse) * normalize(gl_NormalMatrix * at_tangent.xyz);
-	tbn[1] = cross(tbn[0], tbn[2]) * sign(at_tangent.w);
-
-	vec3 view_pos = transform(gl_ModelViewMatrix, gl_Vertex.xyz);
-#ifdef WATER_DISPLACEMENT
-	     view_pos = apply_water_displacement(view_pos);
-#endif
-
-	vec4 clip_pos = project(gl_ProjectionMatrix, view_pos);
-
 #if defined PROGRAM_GBUFFERS_WATER
 	tint.a = 1.0;
-
-	tangent_pos = transform(gbufferModelViewInverse, view_pos) * tbn;
 
 	// from fayer3
 	vec2 uv_minus_mid = uv - mc_midTexCoord;
@@ -138,6 +99,29 @@ void main() {
 	atlas_tile_scale = abs(uv_minus_mid) * 2.0;
 	atlas_tile_coord = sign(uv_minus_mid) * 0.5 + 0.5;
 #endif
+
+	tbn[2] = mat3(gbufferModelViewInverse) * normalize(gl_NormalMatrix * gl_Normal);
+	tbn[0] = mat3(gbufferModelViewInverse) * normalize(gl_NormalMatrix * at_tangent.xyz);
+	tbn[1] = cross(tbn[0], tbn[2]) * sign(at_tangent.w);
+
+	bool is_top_vertex = uv.y < mc_midTexCoord.y;
+
+	vec3 pos = transform(gl_ModelViewMatrix, gl_Vertex.xyz);
+	     pos = view_to_scene_space(pos);
+	     pos = pos + cameraPosition;
+	     pos = animate_vertex(pos, is_top_vertex, light_levels.y, material_mask);
+		 pos = pos - cameraPosition;
+
+#if defined DIRECTIONAL_LIGHTMAPS
+	scene_pos = pos;
+#endif
+
+#if defined PROGRAM_GBUFFERS_WATER
+	tangent_pos = (pos - gbufferModelViewInverse[3].xyz) * tbn;
+#endif
+
+	vec3 view_pos = scene_to_view_space(pos);
+	vec4 clip_pos = project(gl_ProjectionMatrix, view_pos);
 
 #if defined PROGRAM_GBUFFERS_TEXTURED
 	// Make nether particles glow
@@ -155,12 +139,12 @@ void main() {
 }
 
 #endif
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------//
 
 
 
-//------------------------------------------------------------------------------
-#if defined STAGE_FRAGMENT
+//----------------------------------------------------------------------------//
+#if defined fsh
 
 layout (location = 0) out vec4 base_color;
 layout (location = 1) out vec4 gbuffer_data_0; // albedo, block ID, flat normal, light levels
@@ -190,8 +174,12 @@ flat in vec2 atlas_tile_offset;
 flat in vec2 atlas_tile_scale;
 #endif
 
+#if defined DIRECTIONAL_LIGHTMAPS
+in vec3 scene_pos;
+#endif
+
 // ------------
-//   uniforms
+//   Uniforms
 // ------------
 
 uniform sampler2D noisetex;
@@ -221,13 +209,18 @@ uniform vec2 taa_offset;
 uniform vec3 light_dir;
 
 #if defined PROGRAM_GBUFFERS_ENTITIES_TRANSLUCENT
-uniform int entityId;
 uniform vec4 entityColor;
 #endif
 
 #include "/include/utility/color.glsl"
 #include "/include/utility/dithering.glsl"
 #include "/include/utility/encoding.glsl"
+
+#if defined PROGRAM_GBUFFERS_WATER && defined POM
+	#define read_tex(x) textureGrad(x, parallax_uv, uv_gradient[0], uv_gradient[1])
+#else
+	#define read_tex(x) texture(x, uv, lod_bias)
+#endif
 
 const float lod_bias = log2(taau_render_scale);
 
@@ -290,55 +283,122 @@ void main() {
 	if (clamp01(coord) != coord) discard;
 #endif
 
+	float dither = interleaved_gradient_noise(gl_FragCoord.xy, frameCounter);
+
+	vec2 adjusted_light_levels = light_levels;
+
 	bool is_water = material_mask == 1;
 	bool is_nether_portal = material_mask == 251;
 
-	if (is_water) { // Water
-#ifdef VANILLA_WATER_TEXTURE
+	if (is_water) { //--------------------------------------------------------//
+		// Water
+#if defined VANILLA_WATER_TEXTURE
 		base_color = texture(gtexture, uv, lod_bias);
 #else
 		base_color = vec4(0.0);
 #endif
 #if defined PROGRAM_GBUFFERS_WATER && defined FANCY_NETHER_PORTAL
-	} else if (is_nether_portal) {
+	} else if (is_nether_portal) { //-----------------------------------------//
+		// Nether portal
 		base_color = draw_nether_portal();
 #endif
-	} else {
-		base_color        = texture(gtexture, uv, lod_bias) * tint;
-#ifdef SPECULAR_MAPPING
-		vec4 specular_map = texture(specular, uv, lod_bias);
+	} else { //---------------------------------------------------------------//
+		// Other translucent stuff
+		bool parallax_shadow = false;
+
+#if defined PROGRAM_GBUFFERS_WATER && defined POM
+		float view_distance = length(tangent_pos);
+
+		bool has_pom = view_distance < POM_DISTANCE; // Only calculate POM for close terrain
+			 has_pom = has_pom && material_mask != 1 && material_mask != 8; // Do not calculate POM for water or lava
+
+		vec3 tangent_dir = -normalize(tangent_pos);
+		mat2 uv_gradient = mat2(dFdx(uv), dFdy(uv));
+
+		vec2 parallax_uv;
+
+		if (has_pom) {
+			float pom_depth;
+			vec3 shadow_trace_pos;
+
+			parallax_uv = get_parallax_uv(tangent_dir, uv_gradient, view_distance, dither, shadow_trace_pos, pom_depth);
+		} else {
+			parallax_uv = uv;
+			parallax_shadow = false;
+		}
 #endif
 
+		base_color        = read_tex(gtexture) * tint;
 #ifdef NORMAL_MAPPING
-		vec3 normal_map   = texture(normals, uv, lod_bias).xyz;
+		vec3 normal_map   = read_tex(normals).xyz;
+#endif
+#ifdef SPECULAR_MAPPING
+		vec4 specular_map = read_tex(specular);
+#endif
 
-		vec3 normal; float ao;
-		decode_normal_map(normal_map, normal, ao);
+		if (base_color.a < 0.1) { discard; return; }
+
+#ifdef NORMAL_MAPPING
+		vec3 normal; float material_ao;
+		decode_normal_map(normal_map, normal, material_ao);
 		normal = tbn * normal;
 
 		gbuffer_data_1.xy = encode_unit_vector(normal);
+
+		adjusted_light_levels *= mix(0.7, 1.0, material_ao);
+
+	#ifdef DIRECTIONAL_LIGHTMAPS
+		// Based on Ninjamike's implementation in #snippets
+		vec2 lightmap_gradient; vec3 lightmap_dir;
+		mat2x3 pos_gradient = mat2x3(dFdx(scene_pos), dFdy(scene_pos));
+
+		// Blocklight
+
+		lightmap_gradient = vec2(dFdx(light_levels.x), dFdy(light_levels.x));
+		lightmap_dir = pos_gradient * lightmap_gradient;
+
+		if (length_squared(lightmap_gradient) > 1e-12) {
+			adjusted_light_levels.x *= (clamp01(dot(normalize(lightmap_dir), normal) + 0.8) * DIRECTIONAL_LIGHTMAPS_INTENSITY + (1.0 - DIRECTIONAL_LIGHTMAPS_INTENSITY)) * inversesqrt(sqrt(light_levels.x) + eps);
+		}
+
+		// Skylight
+
+		lightmap_gradient = vec2(dFdx(light_levels.y), dFdy(light_levels.y));
+		lightmap_dir = pos_gradient * lightmap_gradient;
+
+		if (length_squared(lightmap_gradient) > 1e-12) {
+			adjusted_light_levels.y *= (clamp01(dot(normalize(lightmap_dir), normal) + 0.8) * DIRECTIONAL_LIGHTMAPS_INTENSITY + (1.0 - DIRECTIONAL_LIGHTMAPS_INTENSITY)) * inversesqrt(sqrt(light_levels.y) + eps);
+		}
+	#endif
 #endif
 
 #ifdef SPECULAR_MAPPING
+	#if defined POM && defined POM_SHADOW
+		// Pack parallax shadow in alpha component of specular map
+		// Specular map alpha >= 0.5 => parallax shadow
+		specular_map.a *= step(specular_map.a, 0.999);
+		specular_map.a  = clamp01(specular_map.a * 0.5 + 0.5 * float(parallax_shadow));
+	#endif
+
 		gbuffer_data_1.z  = pack_unorm_2x8(specular_map.xy);
 		gbuffer_data_1.w  = pack_unorm_2x8(specular_map.zw);
+#else
+	#if defined POM && defined POM_SHADOW
+		gbuffer_data_1.z  = float(parallax_shadow);
+	#endif
 #endif
-
-		if (base_color.a < 0.1) discard;
 	}
 
 #ifdef PROGRAM_GBUFFERS_ENTITIES_TRANSLUCENT
 	base_color.rgb = mix(base_color.rgb, entityColor.rgb, entityColor.a);
 #endif
 
-	float dither = interleaved_gradient_noise(gl_FragCoord.xy, frameCounter);
+	vec3 color_to_store = is_water ? tint.rgb : base_color.rgb;
 
-	vec3 stored_color = is_water ? tint.rgb : base_color.rgb;
-
-	gbuffer_data_0.x  = pack_unorm_2x8(stored_color.rg);
-	gbuffer_data_0.y  = pack_unorm_2x8(stored_color.b, float(material_mask) * rcp(255.0));
+	gbuffer_data_0.x  = pack_unorm_2x8(color_to_store.rg);
+	gbuffer_data_0.y  = pack_unorm_2x8(color_to_store.b, float(material_mask) * rcp(255.0));
 	gbuffer_data_0.z  = pack_unorm_2x8(encode_unit_vector(tbn[2]));
-	gbuffer_data_0.w  = pack_unorm_2x8(dither_8bit(light_levels, dither));
+	gbuffer_data_0.w  = pack_unorm_2x8(dither_8bit(adjusted_light_levels, dither));
 
 #ifdef PROGRAM_GBUFFERS_TEXTURED
 	// Kill the little rain splash particles
@@ -347,4 +407,4 @@ void main() {
 }
 
 #endif
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------//

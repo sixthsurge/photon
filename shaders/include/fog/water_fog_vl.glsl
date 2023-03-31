@@ -1,4 +1,4 @@
-#ifndef INCLUDE_FOG_WATER_FOG_VL
+#if !defined INCLUDE_FOG_WATER_FOG_VL
 #define INCLUDE_FOG_WATER_FOG_VL
 
 #include "/include/utility/fast_math.glsl"

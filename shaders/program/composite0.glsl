@@ -12,8 +12,8 @@
 #include "/include/global.glsl"
 
 
-//------------------------------------------------------------------------------
-#if defined STAGE_VERTEX
+//----------------------------------------------------------------------------//
+#if defined vsh
 
 out vec2 uv;
 
@@ -24,7 +24,7 @@ flat out mat2x3 air_fog_coeff[2];
 #endif
 
 // ------------
-//   uniforms
+//   Uniforms
 // ------------
 
 uniform float eyeAltitude;
@@ -79,12 +79,12 @@ void main() {
 }
 
 #endif
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------//
 
 
 
-//------------------------------------------------------------------------------
-#if defined STAGE_FRAGMENT
+//----------------------------------------------------------------------------//
+#if defined fsh
 
 layout (location = 0) out vec3 fog_scattering;
 layout (location = 1) out vec3 fog_transmittance;
@@ -100,7 +100,7 @@ flat in mat2x3 air_fog_coeff[2];
 #endif
 
 // ------------
-//   uniforms
+//   Uniforms
 // ------------
 
 uniform sampler2D noisetex;
@@ -157,6 +157,10 @@ uniform float time_sunrise;
 uniform float time_noon;
 uniform float time_sunset;
 uniform float time_midnight;
+
+// ------------
+//   Includes
+// ------------
 
 #if defined WORLD_OVERWORLD
 #include "/include/fog/air_fog_vl.glsl"
@@ -219,4 +223,4 @@ void main() {
 }
 
 #endif
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------//

@@ -1,4 +1,4 @@
-#ifndef INCLUDE_UTILITY_BICUBIC
+#if !defined INCLUDE_UTILITY_BICUBIC
 #define INCLUDE_UTILITY_BICUBIC
 
 // Source for bicubic filter: https://stackoverflow.com/questions/13501081/efficient-bicubic-filtering-code-in-glsl

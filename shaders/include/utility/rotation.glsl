@@ -1,4 +1,4 @@
-#ifndef INCLUDE_UTILITY_ROTATION
+#if !defined INCLUDE_UTILITY_ROTATION
 #define INCLUDE_UTILITY_ROTATION
 
 mat2 get_rotation_matrix(float angle) {

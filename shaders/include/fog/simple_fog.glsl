@@ -1,4 +1,4 @@
-#ifndef INCLUDE_FOG_SIMPLE_FOG
+#if !defined INCLUDE_FOG_SIMPLE_FOG
 #define INCLUDE_FOG_SIMPLE_FOG
 
 #include "/include/sky/projection.glsl"
@@ -11,6 +11,7 @@ const vec3 cave_fog_color = vec3(0.033);
 const vec3 lava_fog_color = from_srgb(vec3(0.839, 0.373, 0.075)) * 2.0;
 const vec3 snow_fog_color = from_srgb(vec3(0.957, 0.988, 0.988)) * 0.3;
 
+const vec3 water_absorption_coeff = vec3(WATER_ABSORPTION_R, WATER_ABSORPTION_G, WATER_ABSORPTION_B) * rec709_to_working_color;
 
 float spherical_fog(float view_dist, float fog_start_distance, float fog_density) {
 	return exp2(-fog_density * max0(view_dist - fog_start_distance));
@@ -26,8 +27,8 @@ float border_fog(vec3 scene_pos, vec3 world_dir) {
 	return fog;
 }
 
-vec3 water_absorption_coeff(vec3 biome_water_color) {
-	const float density_scale = 0.12;
+vec3 biome_water_coeff(vec3 biome_water_color) {
+	const float density_scale = 0.15;
 	const float biome_color_contribution = 0.33;
 
 	const vec3 base_absorption_coeff = vec3(WATER_ABSORPTION_R, WATER_ABSORPTION_G, WATER_ABSORPTION_B) * rec709_to_working_color;
@@ -36,7 +37,7 @@ vec3 water_absorption_coeff(vec3 biome_water_color) {
 #ifdef BIOME_WATER_COLOR
 	vec3 biome_absorption_coeff = -density_scale * log(biome_water_color + eps) - forest_absorption_coeff;
 
-	return max0(base_absorption_coeff + biome_absorption_coeff * biome_color_contribution);
+	return max0(water_absorption_coeff + biome_absorption_coeff * biome_color_contribution);
 #else
 	return base_absorption_coeff;
 #endif
@@ -74,7 +75,7 @@ mat2x3 water_fog_simple(
 	return mat2x3(scattering, transmittance);
 }
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------//
 #if defined WORLD_OVERWORLD
 
 #include "/include/sky/atmosphere.glsl"
@@ -135,14 +136,14 @@ vec4 get_simple_fog(
 	return fog;
 }
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------//
 #elif defined WORLD_NETHER
 
 void apply_fog(inout vec3 scene_color) {
 
 }
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------//
 #elif defined WORLD_END
 
 void apply_fog(inout vec3 scene_color) {

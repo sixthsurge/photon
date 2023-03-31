@@ -1,4 +1,4 @@
-#ifndef INCLUDE_LIGHT_BSDF
+#if !defined INCLUDE_LIGHT_BSDF
 #define INCLUDE_LIGHT_BSDF
 
 #include "/include/utility/fast_math.glsl"

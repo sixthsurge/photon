@@ -1,4 +1,4 @@
-#ifndef INCLUDE_UTILITY_SAMPLING
+#if !defined INCLUDE_UTILITY_SAMPLING
 #define INCLUDE_UTILITY_SAMPLING
 
 vec2 vogel_disk_sample(int step_index, int step_count, float rotation) {

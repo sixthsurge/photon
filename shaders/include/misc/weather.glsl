@@ -1,9 +1,9 @@
-#ifndef INCLUDE_MISC_WEATHER
+#if !defined INCLUDE_MISC_WEATHER
 #define INCLUDE_MISC_WEATHER
 
 #include "/include/utility/color.glsl"
 
-// clouds
+// Clouds
 
 void clouds_weather_variation(
 	out vec2 clouds_coverage_cu,
@@ -14,7 +14,7 @@ void clouds_weather_variation(
 	clouds_coverage_cu = vec2(0.4, 0.6);
 }
 
-// air fog
+// Overworld fog
 
 mat2x3 air_fog_rayleigh_coeff() {
 	const vec3 rayleigh_normal = from_srgb(vec3(AIR_FOG_RAYLEIGH_R,        AIR_FOG_RAYLEIGH_G,        AIR_FOG_RAYLEIGH_B       )) * AIR_FOG_RAYLEIGH_DENSITY;

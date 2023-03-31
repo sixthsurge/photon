@@ -1,4 +1,4 @@
-#ifndef INCLUDE_SKY_PROJECTION
+#if !defined INCLUDE_SKY_PROJECTION
 #define INCLUDE_SKY_PROJECTION
 
 #include "/include/utility/fast_math.glsl"

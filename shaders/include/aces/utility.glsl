@@ -1,4 +1,4 @@
-#ifndef INCLUDE_ACES_UTILITY
+#if !defined INCLUDE_ACES_UTILITY
 #define INCLUDE_ACES_UTILITY
 
 #include "/include/utility/color.glsl"
@@ -32,7 +32,7 @@ vec3 y_to_lin_c_v(vec3 y, float y_max, float y_min) {
 	return (y - y_min) / (y_max - y_min);
 }
 
-// Space conversions between CIE XYZ tristimulus values and CIE x,y chromaticity
+// Transformations between CIE XYZ tristimulus values and CIE x,y chromaticity
 // coordinates
 vec3 XYZ_to_xy_y(vec3 XYZ) {
 	float mul = 1.0 / max(XYZ.x + XYZ.y + XYZ.z, 1e-10);
@@ -53,7 +53,7 @@ vec3 xy_y_to_XYZ(vec3 xy_y) {
 	);
 }
 
-// Space conversions from RGB to other color representations
+// Transformations from RGB to other color representations
 
 float rgb_to_saturation(vec3 rgb) {
 	float max_component = max(max_of(rgb), 1e-10);

@@ -1,4 +1,4 @@
-#ifndef INCLUDE_ACES_ACES
+#if !defined INCLUDE_ACES_ACES
 #define INCLUDE_ACES_ACES
 
 /*

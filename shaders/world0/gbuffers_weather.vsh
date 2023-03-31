@@ -1,5 +1,5 @@
 #version 400 compatibility
 #define WORLD_OVERWORLD
 #define PROGRAM_WEATHER
-#define STAGE_VERTEX
+#define vsh
 #include "/program/gbuffers/weather.glsl"

@@ -12,8 +12,8 @@
 #include "/include/global.glsl"
 
 
-//------------------------------------------------------------------------------
-#if defined STAGE_VERTEX
+//----------------------------------------------------------------------------//
+#if defined vsh
 
 out vec2 uv;
 
@@ -30,7 +30,7 @@ flat out vec2 clouds_coverage_ci;
 #endif
 
 // ------------
-//   uniforms
+//   Uniforms
 // ------------
 
 uniform sampler3D depthtex0; // atmospheric scattering LUT
@@ -72,7 +72,7 @@ uniform bool clouds_moonlit;
 uniform vec3 clouds_light_dir;
 
 // ------------
-//   includes
+//   Includes
 // ------------
 
 #define ATMOSPHERE_SCATTERING_LUT depthtex0
@@ -107,12 +107,12 @@ void main() {
 }
 
 #endif
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------//
 
 
 
-//------------------------------------------------------------------------------
-#if defined STAGE_FRAGMENT
+//----------------------------------------------------------------------------//
+#if defined fsh
 
 layout (location = 0) out vec4 clouds;
 
@@ -133,7 +133,7 @@ flat in vec2 clouds_coverage_ci;
 #endif
 
 // ------------
-//   uniforms
+//   Uniforms
 // ------------
 
 uniform sampler3D colortex6; // 3D worley noise
@@ -196,7 +196,7 @@ uniform bool clouds_moonlit;
 uniform vec3 clouds_light_dir;
 
 // ------------
-//   includes
+//   Includes
 // ------------
 
 #define ATMOSPHERE_SCATTERING_LUT depthtex0
@@ -250,4 +250,4 @@ void main() {
 }
 
 #endif
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------//

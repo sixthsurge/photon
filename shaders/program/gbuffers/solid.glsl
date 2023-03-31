@@ -12,8 +12,8 @@
 #include "/include/global.glsl"
 
 
-//------------------------------------------------------------------------------
-#if defined STAGE_VERTEX
+//----------------------------------------------------------------------------//
+#if defined vsh
 
 out vec2 uv;
 out vec2 light_levels;
@@ -30,7 +30,7 @@ flat out vec2 atlas_tile_scale;
 #endif
 
 #if defined DIRECTIONAL_LIGHTMAPS
-out vec3 pos;
+out vec3 scene_pos;
 #endif
 
 #if defined PROGRAM_GBUFFERS_TERRAIN
@@ -38,7 +38,7 @@ out float vanilla_ao;
 #endif
 
 // --------------
-//   attributes
+//   Attributes
 // --------------
 
 attribute vec4 at_tangent;
@@ -46,7 +46,7 @@ attribute vec3 mc_Entity;
 attribute vec2 mc_midTexCoord;
 
 // ------------
-//   uniforms
+//   Uniforms
 // ------------
 
 uniform sampler2D noisetex;
@@ -78,7 +78,7 @@ uniform int entityId;
 #endif
 
 #include "/include/utility/space_conversion.glsl"
-#include "/include/vertex/wind_animation.glsl"
+#include "/include/vertex/displacement.glsl"
 
 void main() {
 	uv           = gl_MultiTexCoord0.xy;
@@ -95,6 +95,11 @@ void main() {
 	material_mask = uint(max(entityId - 10000, 0));
 #elif defined PROGRAM_GBUFFERS_BLOCK
 	material_mask = uint(max(blockEntityId - 10000, 0));
+#elif defined PROGRAM_GBUFFERS_BEACONBEAM
+	material_mask = 2; // full emissive
+#elif defined PROGRAM_GBUFFERS_SPIDEREYES
+	material_mask = 2; // full emissive
+	light_levels.x = 1.0;
 #endif
 
 #if defined PROGRAM_GBUFFERS_TERRAIN
@@ -110,32 +115,23 @@ void main() {
 	#endif
 #endif
 
-#if defined PROGRAM_SPIDEREYES
-	material_mask = 2; // full emissive
-	light_levels.x = 1.0;
-#endif
-
-#if defined PROGRAM_GBUFFERS_BEACONBEAM
-	material_mask = 2;
-#endif
-
-	vec3 view_pos = transform(gl_ModelViewMatrix, gl_Vertex.xyz);
-
-#if defined PROGRAM_GBUFFERS_TERRAIN
 	bool is_top_vertex = uv.y < mc_midTexCoord.y;
-	vec3 scene_pos = view_to_scene_space(view_pos);
-	scene_pos += animate_vertex(scene_pos + cameraPosition, is_top_vertex, light_levels.y, material_mask);
-    view_pos = scene_to_view_space(scene_pos);
 
-	#ifdef POM
-	tangent_pos = (scene_pos - gbufferModelViewInverse[3].xyz) * tbn;
-	#endif
+	vec3 pos = transform(gl_ModelViewMatrix, gl_Vertex.xyz);
+	     pos = view_to_scene_space(pos);
+	     pos = pos + cameraPosition;
+	     pos = animate_vertex(pos, is_top_vertex, light_levels.y, material_mask);
+	     pos = pos - cameraPosition;
+
+#if defined DIRECTIONAL_LIGHTMAPS
+	scene_pos = pos;
 #endif
 
-#ifdef DIRECTIONAL_LIGHTMAPS
-	pos = view_to_scene_space(view_pos);
+#if defined POM && defined PROGRAM_GBUFFERS_TERRAIN
+	tangent_pos = (pos - gbufferModelViewInverse[3].xyz) * tbn;
 #endif
 
+	vec3 view_pos = scene_to_view_space(pos);
 	vec4 clip_pos = project(gl_ProjectionMatrix, view_pos);
 
 #if   defined TAA && defined TAAU
@@ -149,12 +145,12 @@ void main() {
 }
 
 #endif
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------//
 
 
 
-//------------------------------------------------------------------------------
-#if defined STAGE_FRAGMENT
+//----------------------------------------------------------------------------//
+#if defined fsh
 
 layout (location = 0) out vec4 gbuffer_data_0; // albedo, block ID, flat normal, light levels
 layout (location = 1) out vec4 gbuffer_data_1; // detailed normal, specular map (optional)
@@ -184,7 +180,7 @@ flat in vec2 atlas_tile_scale;
 #endif
 
 #if defined DIRECTIONAL_LIGHTMAPS
-in vec3 pos;
+in vec3 scene_pos;
 #endif
 
 #if defined PROGRAM_GBUFFERS_TERRAIN
@@ -192,7 +188,7 @@ in float vanilla_ao;
 #endif
 
 // ------------
-//   uniforms
+//   Uniforms
 // ------------
 
 uniform sampler2D noisetex;
@@ -239,6 +235,12 @@ uniform vec4 entityColor;
 #include "/include/utility/fast_math.glsl"
 #include "/include/utility/random.glsl"
 #include "/include/utility/space_conversion.glsl"
+
+#if defined PROGRAM_GBUFFERS_TERRAIN && defined POM
+	#define read_tex(x) textureGrad(x, parallax_uv, uv_gradient[0], uv_gradient[1])
+#else
+	#define read_tex(x) texture(x, uv, lod_bias)
+#endif
 
 #if   TEXTURE_FORMAT == TEXTURE_FORMAT_LAB
 void decode_normal_map(vec3 normal_map, out vec3 normal, out float ao) {
@@ -336,12 +338,6 @@ vec3 draw_end_portal() {
 
 const float lod_bias = log2(taau_render_scale);
 
-#if defined PROGRAM_GBUFFERS_TERRAIN && defined POM
-	#define read_tex(x) textureGrad(x, parallax_uv, uv_gradient[0], uv_gradient[1])
-#else
-	#define read_tex(x) texture(x, uv, lod_bias)
-#endif
-
 void main() {
 #if defined TAA && defined TAAU
 	vec2 coord = gl_FragCoord.xy * view_pixel_size * rcp(taau_render_scale);
@@ -391,9 +387,9 @@ void main() {
 #endif
 
 #if defined PROGRAM_GBUFFERS_ENTITIES
-	if (base_color.a < 0.1 && material_mask != 101) discard; // Save transparent quad in boats, which material_masks out water
+	if (base_color.a < 0.1 && material_mask != 101) { discard; return; } // Save transparent quad in boats, which material_masks out water
 #else
-	if (base_color.a < 0.1) discard;
+	if (base_color.a < 0.1) { discard; return; }
 #endif
 
 #ifdef WHITE_WORLD
@@ -437,11 +433,11 @@ void main() {
 	adjusted_light_levels *= mix(0.7, 1.0, material_ao);
 
 	#ifdef DIRECTIONAL_LIGHTMAPS
-	// based on Ninjamike's implementation in #snippets
+	// Based on Ninjamike's implementation in #snippets
 	vec2 lightmap_gradient; vec3 lightmap_dir;
-	mat2x3 pos_gradient = mat2x3(dFdx(pos), dFdy(pos));
+	mat2x3 pos_gradient = mat2x3(dFdx(scene_pos), dFdy(scene_pos));
 
-	// blocklight
+	// Blocklight
 
 	lightmap_gradient = vec2(dFdx(light_levels.x), dFdy(light_levels.x));
 	lightmap_dir = pos_gradient * lightmap_gradient;
@@ -450,7 +446,7 @@ void main() {
 		adjusted_light_levels.x *= (clamp01(dot(normalize(lightmap_dir), normal) + 0.8) * DIRECTIONAL_LIGHTMAPS_INTENSITY + (1.0 - DIRECTIONAL_LIGHTMAPS_INTENSITY)) * inversesqrt(sqrt(light_levels.x) + eps);
 	}
 
-	// skylight
+	// Skylight
 
 	lightmap_gradient = vec2(dFdx(light_levels.y), dFdy(light_levels.y));
 	lightmap_dir = pos_gradient * lightmap_gradient;
@@ -488,4 +484,4 @@ void main() {
 }
 
 #endif
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------//

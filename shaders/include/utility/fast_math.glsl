@@ -1,4 +1,4 @@
-#ifndef INCLUDE_UTILITY_FAST_MATH
+#if !defined INCLUDE_UTILITY_FAST_MATH
 #define INCLUDE_UTILITY_FAST_MATH
 
 // Faster alternative to acos

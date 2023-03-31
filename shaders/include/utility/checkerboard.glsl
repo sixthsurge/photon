@@ -1,4 +1,4 @@
-#ifndef INCLUDE_UTILITY_CHECKERBOARD
+#if !defined INCLUDE_UTILITY_CHECKERBOARD
 #define INCLUDE_UTILITY_CHECKERBOARD
 
 const ivec2[2] checkerboard_offsets_2x1 = ivec2[2](

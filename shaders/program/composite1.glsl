@@ -12,8 +12,8 @@
 #include "/include/global.glsl"
 
 
-//------------------------------------------------------------------------------
-#if defined STAGE_VERTEX
+//----------------------------------------------------------------------------//
+#if defined vsh
 
 out vec2 uv;
 
@@ -26,7 +26,7 @@ flat out vec3 moon_color;
 #endif
 
 // ------------
-//   uniforms
+//   Uniforms
 // ------------
 
 uniform float frameTimeCounter;
@@ -69,12 +69,12 @@ void main() {
 }
 
 #endif
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------//
 
 
 
-//------------------------------------------------------------------------------
-#if defined STAGE_FRAGMENT
+//----------------------------------------------------------------------------//
+#if defined fsh
 
 layout (location = 0) out vec3 scene_color;
 layout (location = 1) out float bloomy_fog;
@@ -92,7 +92,7 @@ flat in vec3 moon_color;
 #endif
 
 // ------------
-//   uniforms
+//   Uniforms
 // ------------
 
 uniform sampler2D noisetex;
@@ -165,6 +165,10 @@ uniform float time_noon;
 uniform float time_sunset;
 uniform float time_midnight;
 
+// ------------
+//   Includes
+// ------------
+
 #define TEMPORAL_REPROJECTION
 
 #ifdef SHADOW_COLOR
@@ -221,10 +225,6 @@ vec3 purkinje_shift(vec3 rgb, float purkinje_intensity) {
 
 	return max0(rgb);
 }
-
-// -----------
-//   puddles
-// -----------
 
 float get_ripple_height(vec2 coord) {
 	const float ripple_frequency = 0.3;
@@ -373,12 +373,10 @@ void main() {
 		// Vanilla water texture
 
 #ifdef VANILLA_WATER_TEXTURE
-		const vec3 absorption_coeff = vec3(WATER_ABSORPTION_R, WATER_ABSORPTION_G, WATER_ABSORPTION_B) * rec709_to_working_color;
-
 		float texture_value     = blend_color.r / blend_color.a;
 		float texture_highlight = 0.5 * sqr(linear_step(0.63, 1.0, texture_value)) + 0.03 * texture_value;
 
-		material.albedo     = clamp01(0.2 * exp(-2.0 * absorption_coeff) * texture_highlight);
+		material.albedo     = clamp01(0.2 * exp(-2.0 * water_absorption_coeff) * texture_highlight);
 		material.roughness += 0.3 * texture_highlight;
 #else
 		material.albedo = srgb_eotf_inv(albedo) * rec709_to_rec2020;
@@ -535,7 +533,7 @@ void main() {
 			float water_n = isEyeInWater == 1 ? air_n / water_n : water_n / air_n;
 
 			vec3 biome_water_color = srgb_eotf_inv(vec3(data[0].xy, data[1].x)) * rec709_to_working_color;
-			vec3 absorption_coeff = water_absorption_coeff(biome_water_color);
+			vec3 absorption_coeff = biome_water_coeff(biome_water_color);
 
 			mat2x3 water_fog = water_fog_simple(light_color, ambient_color, absorption_coeff, dist, LoV, light_levels.y, sss_depth);
 
@@ -615,9 +613,7 @@ void main() {
 	if (isEyeInWater == 1) {
 		float LoV = dot(world_dir, light_dir);
 
-		const vec3 absorption_coeff = vec3(WATER_ABSORPTION_R, WATER_ABSORPTION_G, WATER_ABSORPTION_B) * rec709_to_working_color;
-
-		mat2x3 water_fog = water_fog_simple(light_color, ambient_color, absorption_coeff, view_dist, LoV, eye_skylight, 15.0 - 15.0 * eye_skylight);
+		mat2x3 water_fog = water_fog_simple(light_color, ambient_color, water_absorption_coeff, view_dist, LoV, eye_skylight, 15.0 - 15.0 * eye_skylight);
 
 		scene_color *= water_fog[1];
 		scene_color += water_fog[0];
@@ -662,4 +658,4 @@ void main() {
 }
 
 #endif
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------//

@@ -1,4 +1,4 @@
-#ifndef INCLUDE_UTILITY_GEOMETRY
+#if !defined INCLUDE_UTILITY_GEOMETRY
 #define INCLUDE_UTILITY_GEOMETRY
 
 // Sphere/AABB intersection methods from https://www.scratchapixel.com

@@ -1,4 +1,4 @@
-#ifndef INCLUDE_MISC_RAYTRACER
+#if !defined INCLUDE_MISC_RAYTRACER
 #define INCLUDE_MISC_RAYTRACER
 
 #include "/include/utility/geometry.glsl"

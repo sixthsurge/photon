@@ -42,7 +42,7 @@
 --------------------------------------------------------------------------------
 */
 
-#ifndef INCLUDE_UTILITY_TEXT_RENDERING
+#if !defined INCLUDE_UTILITY_TEXT_RENDERING
 #define INCLUDE_UTILITY_TEXT_RENDERING
 
 // Characters

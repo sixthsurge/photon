@@ -1,7 +1,7 @@
-#ifndef INCLUDE_MISC_PALETTE
+#if !defined INCLUDE_MISC_PALETTE
 #define INCLUDE_MISC_PALETTE
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------//
 #if   defined WORLD_OVERWORLD
 
 #include "/include/sky/atmosphere.glsl"
@@ -101,14 +101,14 @@ float get_skylight_boost() {
 	return 1.0 + 0.33 * early_morning + max0(night_skylight_boost);
 }
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------//
 #elif defined WORLD_NETHER
 
 float get_skylight_boost() {
 	return 1.0;
 }
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------//
 #elif defined WORLD_END
 
 float get_skylight_boost() {

@@ -1,4 +1,4 @@
-#ifndef INCLUDE_LIGHT_SHADOWS
+#if !defined INCLUDE_LIGHT_SHADOWS
 #define INCLUDE_LIGHT_SHADOWS
 
 #include "/include/light/distortion.glsl"

@@ -1,4 +1,4 @@
-#ifndef INCLUDE_UTILITY_SPACE_CONVERSION
+#if !defined INCLUDE_UTILITY_SPACE_CONVERSION
 #define INCLUDE_UTILITY_SPACE_CONVERSION
 
 // https://wiki.shaderlabs.org/wiki/Shader_tricks#Linearizing_depth

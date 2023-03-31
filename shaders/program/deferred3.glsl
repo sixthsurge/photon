@@ -12,8 +12,8 @@
 #include "/include/global.glsl"
 
 
-//------------------------------------------------------------------------------
-#if defined STAGE_VERTEX
+//----------------------------------------------------------------------------//
+#if defined vsh
 
 out vec2 uv;
 
@@ -30,10 +30,10 @@ flat out mat3 sky_samples;
 #endif
 
 // ------------
-//   uniforms
+//   Uniforms
 // ------------
 
-uniform sampler3D depthtex0; // atmosphere scattering LUT
+uniform sampler3D depthtex0; // Atmosphere scattering LUT
 
 uniform int worldTime;
 uniform int moonPhase;
@@ -63,7 +63,7 @@ uniform float time_sunset;
 uniform float time_midnight;
 
 // ------------
-//   includes
+//   Includes
 // ------------
 
 #define ATMOSPHERE_SCATTERING_LUT depthtex0
@@ -118,12 +118,12 @@ void main() {
 }
 
 #endif
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------//
 
 
 
-//------------------------------------------------------------------------------
-#if defined STAGE_FRAGMENT
+//----------------------------------------------------------------------------//
+#if defined fsh
 
 layout (location = 0) out vec3 scene_color;
 layout (location = 1) out vec4 colortex3_clear;
@@ -145,7 +145,7 @@ flat in mat3 sky_samples;
 #endif
 
 // ------------
-//   uniforms
+//   Uniforms
 // ------------
 
 uniform sampler2D noisetex;
@@ -215,7 +215,7 @@ uniform float time_sunset;
 uniform float time_midnight;
 
 // ------------
-//   includes
+//   Includes
 // ------------
 
 #define ATMOSPHERE_SCATTERING_LUT depthtex0
@@ -313,7 +313,6 @@ void main() {
 
 #ifdef SPECULAR_MAPPING
 		vec4 specular_map = vec4(unpack_unorm_2x8(gbuffer_data_1.z), unpack_unorm_2x8(gbuffer_data_1.w));
-		decode_specular_map(specular_map, material);
 #endif
 
 #if defined POM && defined POM_SHADOW
@@ -324,6 +323,10 @@ void main() {
 	#else
 		bool parallax_shadow = gbuffer_data_1.z >= 0.5;
 	#endif
+#endif
+
+#ifdef SPECULAR_MAPPING
+		decode_specular_map(specular_map, material);
 #endif
 
 #if defined WORLD_OVERWORLD && defined RAIN_PUDDLES
@@ -424,4 +427,4 @@ void main() {
 }
 
 #endif
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------//

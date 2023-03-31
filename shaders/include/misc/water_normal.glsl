@@ -1,4 +1,4 @@
-#ifndef INCLUDE_MISC_WATER_NORMAL
+#if !defined INCLUDE_MISC_WATER_NORMAL
 #define INCLUDE_MISC_WATER_NORMAL
 
 #include "/include/utility/space_conversion.glsl"
@@ -21,7 +21,7 @@ float get_water_height(vec2 coord, vec2 flow_dir, bool flowing_water) {
 	const float wave_frequency     = 0.4 * WATER_WAVE_FREQUENCY;
 	const float wave_speed_still   = 0.5 * WATER_WAVE_SPEED_STILL;
 	const float wave_speed_flowing = 0.50 * WATER_WAVE_SPEED_FLOWING;
-	const float wave_angle         = 0.5;
+	const float wave_angle         = 30.0 * degree;
 	const float noise_frequency    = 0.02;
 	const float noise_strength     = 0.66;
 	const float noise_fade         = 1.0;
