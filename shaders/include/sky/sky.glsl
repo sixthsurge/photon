@@ -90,7 +90,7 @@ vec4 get_clouds(vec3 ray_dir, vec3 clear_sky) {
 #if   defined PROGRAM_DEFERRED0
 	float dither = interleaved_gradient_noise(gl_FragCoord.xy);
 
-	return draw_clouds_cu(ray_dir, clear_sky, dither);
+	return draw_clouds(ray_dir, clear_sky, dither);
 #elif defined PROGRAM_DEFERRED3
 	// Soften clouds for new pixels
 	float pixel_age = texelFetch(colortex6, ivec2(gl_FragCoord.xy), 0).w;

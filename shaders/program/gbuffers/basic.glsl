@@ -11,6 +11,7 @@
 
 #include "/include/global.glsl"
 
+
 //----------------------------------------------------------------------------//
 #if defined vsh
 
@@ -18,6 +19,8 @@ flat out vec2 light_levels;
 flat out vec3 tint;
 
 uniform vec2 taa_offset;
+uniform vec2 view_res;
+uniform vec2 view_pixel_size;
 
 void main() {
 	light_levels = clamp01(gl_MultiTexCoord1.xy * rcp(240.0));

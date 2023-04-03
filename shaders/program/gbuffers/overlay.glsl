@@ -48,7 +48,7 @@ layout (location = 0) out vec4 overlays;
 
 /* DRAWBUFFERS:3 */
 
-out vec2 uv;
+in vec2 uv;
 
 // ------------
 //   Uniforms

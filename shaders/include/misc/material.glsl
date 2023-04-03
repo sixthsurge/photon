@@ -137,7 +137,7 @@ Material material_from(vec3 albedo_srgb, uint material_mask, vec3 world_pos, ino
 					} else {
 						#ifdef HARDCODED_EMISSION
 						// Sculk
-						material.emission = 0.2 * material.albedo * isolate_hue(hsl, 200.0, 40.0) * smoothstep(0.5, 0.7, hsl.z);
+						material.emission = 0.2 * material.albedo * isolate_hue(hsl, 200.0, 40.0) * smoothstep(0.5, 0.7, hsl.z) * (1.0 - linear_step(0.0, 20.0, distance(world_pos, cameraPosition)));
 						#endif
 					}
 				} else { // 14-16

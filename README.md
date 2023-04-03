@@ -13,9 +13,9 @@
 * http://momentsingraphics.de/ - Blue noise texture
 
 ## features
-* Lighting effects - variable penumbra shadows, fancy ambient occlusion
+* Lighting effects - variable penumbra shadows, ambient occlusion
 * Camera effects - bloom, depth-of-field, motion-blur
-* Custom sky with atmospheric scattering and volumetric clouds
+* Custom sky with multiple cloud layers
 * Revamped water
 * Reflections (SSR)
 * Volumetric lighting

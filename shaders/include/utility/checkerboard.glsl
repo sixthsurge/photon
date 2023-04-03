@@ -57,7 +57,7 @@ const ivec2[16] checkerboard_offsets_4x4 = ivec2[16](
 
 #if   CLOUDS_TEMPORAL_UPSCALING == 1
 	#define clouds_checkerboard_offsets ivec2[1](ivec2(0))
-#elif CLOUDS_TEMPORAL_USPCALING == 2
+#elif CLOUDS_TEMPORAL_UPSCALING == 2
 	#define clouds_checkerboard_offsets checkerboard_offsets_2x2
 #elif CLOUDS_TEMPORAL_UPSCALING == 3
 	#define clouds_checkerboard_offsets checkerboard_offsets_3x3

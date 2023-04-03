@@ -35,6 +35,7 @@ uniform float frameTimeCounter;
 
 uniform int isEyeInWater;
 uniform int worldTime;
+uniform int worldDay;
 uniform int frameCounter;
 
 uniform vec3 light_dir;
@@ -59,6 +60,8 @@ uniform float time_noon;
 uniform float time_sunset;
 uniform float time_midnight;
 
+#define WEATHER_FOG
+
 #include "/include/misc/palette.glsl"
 #include "/include/misc/weather.glsl"
 
@@ -66,7 +69,9 @@ void main() {
 	uv = gl_MultiTexCoord0.xy;
 
 #if defined WORLD_OVERWORLD
-	light_color = get_light_color();
+	float overcastness = daily_weather_blend(daily_weather_overcastness);
+
+	light_color = get_light_color() * (1.0 - 0.33 * overcastness);
 	sky_color = get_sky_color();
 
 	mat2x3 rayleigh_coeff = air_fog_rayleigh_coeff(), mie_coeff = air_fog_mie_coeff();

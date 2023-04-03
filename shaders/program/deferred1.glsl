@@ -18,14 +18,14 @@
 out vec2 uv;
 
 #if defined WORLD_OVERWORLD
-flat out vec3 base_light_color;
-flat out vec3 sky_color;
+flat out float overcastness;
+
 flat out vec3 sun_color;
 flat out vec3 moon_color;
+flat out vec3 sky_color;
 
 flat out vec2 clouds_coverage_cu;
 flat out vec2 clouds_coverage_ac;
-flat out vec2 clouds_coverage_cc;
 flat out vec2 clouds_coverage_ci;
 #endif
 
@@ -36,6 +36,7 @@ flat out vec2 clouds_coverage_ci;
 uniform sampler3D depthtex0; // atmospheric scattering LUT
 
 uniform int worldTime;
+uniform int worldDay;
 uniform float sunAngle;
 
 uniform int frameCounter;
@@ -68,14 +69,12 @@ uniform float biome_may_snow;
 uniform float biome_temperature;
 uniform float biome_humidity;
 
-uniform bool clouds_moonlit;
-uniform vec3 clouds_light_dir;
-
 // ------------
 //   Includes
 // ------------
 
 #define ATMOSPHERE_SCATTERING_LUT depthtex0
+#define WEATHER_CLOUDS
 
 #include "/include/misc/palette.glsl"
 #include "/include/misc/weather.glsl"
@@ -85,19 +84,20 @@ void main() {
 	uv = gl_MultiTexCoord0.xy;
 
 #if defined WORLD_OVERWORLD
+	overcastness = daily_weather_blend(daily_weather_overcastness);
+
 	sun_color = get_sun_exposure() * get_sun_tint();
 	moon_color = get_moon_exposure() * get_moon_tint();
-	base_light_color = mix(sun_color, moon_color, float(clouds_moonlit)) * (1.0 - rainStrength);
 
 	const vec3 sky_dir = normalize(vec3(0.0, 1.0, -0.8)); // don't point direcly upwards to avoid the sun halo when the sun path rotation is 0
 	sky_color = atmosphere_scattering(sky_dir, sun_dir) * sun_color + atmosphere_scattering(sky_dir, moon_dir) * moon_color;
 	sky_color = tau * mix(sky_color, vec3(sky_color.b) * sqrt(2.0), rcp_pi);
 	sky_color = mix(sky_color, tau * get_weather_color(), rainStrength);
+	sky_color = mix(sky_color, vec3(2.0 * dot(sky_color, luminance_weights_rec2020)), 0.5 * overcastness * linear_step(0.3, 0.5, light_dir.y));
 
 	clouds_weather_variation(
 		clouds_coverage_cu,
 		clouds_coverage_ac,
-		clouds_coverage_cc,
 		clouds_coverage_ci
 	);
 #endif
@@ -121,14 +121,14 @@ layout (location = 0) out vec4 clouds;
 in vec2 uv;
 
 #if defined WORLD_OVERWORLD
-flat in vec3 base_light_color;
-flat in vec3 sky_color;
+flat in float overcastness;
+
 flat in vec3 sun_color;
 flat in vec3 moon_color;
+flat in vec3 sky_color;
 
 flat in vec2 clouds_coverage_cu;
 flat in vec2 clouds_coverage_ac;
-flat in vec2 clouds_coverage_cc;
 flat in vec2 clouds_coverage_ci;
 #endif
 
@@ -192,9 +192,6 @@ uniform float biome_may_snow;
 uniform float biome_temperature;
 uniform float biome_humidity;
 
-uniform bool clouds_moonlit;
-uniform vec3 clouds_light_dir;
-
 // ------------
 //   Includes
 // ------------
@@ -245,7 +242,7 @@ void main() {
 	float dither = texelFetch(noisetex, ivec2(checkerboard_pos & 511), 0).b;
 	      dither = r1(frameCounter / checkerboard_area, dither);
 
-	clouds = draw_clouds_cu(ray_dir, clear_sky, dither);
+	clouds = draw_clouds(ray_dir, clear_sky, dither);
 #endif
 }
 

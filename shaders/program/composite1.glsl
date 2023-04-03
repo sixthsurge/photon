@@ -23,6 +23,8 @@ flat out vec3 ambient_color;
 flat out vec3 light_color;
 flat out vec3 sun_color;
 flat out vec3 moon_color;
+
+flat out float overcastness;
 #endif
 
 // ------------
@@ -35,6 +37,7 @@ uniform float rainStrength;
 uniform float wetness;
 
 uniform int worldTime;
+uniform int worldDay;
 uniform int frameCounter;
 
 uniform vec3 light_dir;
@@ -53,15 +56,17 @@ uniform float biome_may_rain;
 uniform float biome_may_snow;
 
 #include "/include/misc/palette.glsl"
+#include "/include/misc/weather.glsl"
 
 void main() {
 	uv = gl_MultiTexCoord0.xy;
 
 #if defined WORLD_OVERWORLD
-	light_color     = get_light_color();
-	sun_color       = get_sun_exposure() * get_sun_tint();
-	moon_color      = get_moon_exposure() * get_moon_tint();
-	ambient_color   = get_sky_color();
+	overcastness  = daily_weather_blend(daily_weather_overcastness);
+	light_color   = get_light_color() * (1.0 - 0.4 * overcastness);
+	sun_color     = get_sun_exposure() * get_sun_tint();
+	moon_color    = get_moon_exposure() * get_moon_tint();
+	ambient_color = get_sky_color();
 #endif
 
 	vec2 vertex_pos = gl_Vertex.xy * taau_render_scale;
@@ -89,6 +94,8 @@ flat in vec3 ambient_color;
 flat in vec3 light_color;
 flat in vec3 sun_color;
 flat in vec3 moon_color;
+
+flat in float overcastness;
 #endif
 
 // ------------
@@ -648,7 +655,7 @@ void main() {
 #ifdef PURKINJE_SHIFT
 	light_levels = (depth0 == 1.0) ? vec2(0.0, 1.0) : light_levels;
 
-	float purkinje_intensity  = 0.03 * PURKINJE_SHIFT_INTENSITY;
+	float purkinje_intensity  = 0.05 * PURKINJE_SHIFT_INTENSITY;
 	      purkinje_intensity *= 1.0 - smoothstep(-0.12, -0.06, sun_dir.y) * light_levels.y;
 	      purkinje_intensity *= clamp01(1.0 - light_levels.x);
 	      purkinje_intensity *= clamp01(0.3 + 0.7 * cube(light_levels.y));

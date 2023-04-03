@@ -21,6 +21,8 @@ out vec2 uv;
 flat out vec3 light_color;
 flat out vec3 sun_color;
 flat out vec3 moon_color;
+
+flat out float overcastness;
 #endif
 
 #if defined SH_SKYLIGHT
@@ -35,7 +37,12 @@ flat out mat3 sky_samples;
 
 uniform sampler3D depthtex0; // Atmosphere scattering LUT
 
+#ifdef SH_SKYLIGHT
+uniform sampler2D colortex4; // sky map
+#endif
+
 uniform int worldTime;
+uniform int worldDay;
 uniform int moonPhase;
 uniform float sunAngle;
 uniform float rainStrength;
@@ -69,19 +76,22 @@ uniform float time_midnight;
 #define ATMOSPHERE_SCATTERING_LUT depthtex0
 
 #include "/include/misc/palette.glsl"
+#include "/include/misc/weather.glsl"
 #include "/include/sky/atmosphere.glsl"
 #include "/include/sky/projection.glsl"
 #include "/include/utility/random.glsl"
 #include "/include/utility/sampling.glsl"
 #include "/include/utility/spherical_harmonics.glsl"
+#include "/include/utility/text_rendering.glsl"
 
 void main() {
 	uv = gl_MultiTexCoord0.xy;
 
 #if defined WORLD_OVERWORLD
-	light_color = get_light_color();
-	sun_color   = get_sun_exposure() * get_sun_tint();
-	moon_color  = get_moon_exposure() * get_moon_tint();
+	overcastness = daily_weather_blend(daily_weather_overcastness);
+	light_color  = get_light_color() * (1.0 - 0.4 * overcastness);
+	sun_color    = get_sun_exposure() * get_sun_tint();
+	moon_color   = get_moon_exposure() * get_moon_tint();
 #endif
 
 	float skylight_boost = get_skylight_boost();
@@ -136,6 +146,8 @@ in vec2 uv;
 flat in vec3 light_color;
 flat in vec3 sun_color;
 flat in vec3 moon_color;
+
+flat in float overcastness;
 #endif
 
 #if defined SH_SKYLIGHT
@@ -230,6 +242,7 @@ uniform float time_midnight;
 #include "/include/utility/color.glsl"
 #include "/include/utility/encoding.glsl"
 #include "/include/utility/space_conversion.glsl"
+#include "/include/utility/text_rendering.glsl"
 
 /*
 const bool colortex7MipmapEnabled = true;

@@ -117,6 +117,7 @@ vec3 get_diffuse_lighting(
 	     skylight *= 1.0 + 0.33 * clamp01(flat_normal.y) * (1.0 - shadows.x * (1.0 - rainStrength)) * (time_noon + time_midnight);
 		 skylight  = mix(skylight, rain_skylight, rainStrength);
 		 skylight *= ao * pi;
+		 skylight  = mix(skylight, vec3(pi * dot(skylight, luminance_weights_rec2020)), 0.5 * overcastness * linear_step(0.3, 0.5, light_dir.y));
 	#endif
 #else
 	vec3 skylight  = ambient_color * ao;

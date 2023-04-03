@@ -18,10 +18,11 @@ out vec2 uv;
 
 flat out uint material_mask;
 flat out vec3 tint;
-flat out mat3 tbn;
 
 #ifdef WATER_CAUSTICS
 out vec3 scene_pos;
+
+flat out mat3 tbn;
 #endif
 
 // --------------
@@ -70,10 +71,6 @@ void main() {
 	material_mask = uint(mc_Entity.x - 10000.0);
 	tint          = gl_Color.rgb;
 
-	tbn[0] = mat3(shadowModelViewInverse) * normalize(gl_NormalMatrix * at_tangent.xyz);
-	tbn[2] = mat3(shadowModelViewInverse) * normalize(gl_NormalMatrix * gl_Normal);
-	tbn[1] = cross(tbn[0], tbn[2]) * sign(at_tangent.w);
-
 	bool is_top_vertex = uv.y < mc_midTexCoord.y;
 
 	vec3 pos = transform(gl_ModelViewMatrix, gl_Vertex.xyz);
@@ -83,6 +80,10 @@ void main() {
 		 pos = pos - cameraPosition;
 
 #ifdef WATER_CAUSTICS
+	tbn[0] = mat3(shadowModelViewInverse) * normalize(gl_NormalMatrix * at_tangent.xyz);
+	tbn[2] = mat3(shadowModelViewInverse) * normalize(gl_NormalMatrix * gl_Normal);
+	tbn[1] = cross(tbn[0], tbn[2]) * sign(at_tangent.w);
+
 	scene_pos = pos;
 #endif
 
@@ -110,10 +111,11 @@ in vec3 world_pos;
 
 flat in uint material_mask;
 flat in vec3 tint;
-flat in mat3 tbn;
 
 #ifdef WATER_CAUSTICS
 in vec3 scene_pos;
+
+flat in mat3 tbn;
 #endif
 
 // ------------
@@ -122,6 +124,11 @@ in vec3 scene_pos;
 
 uniform sampler2D tex;
 uniform sampler2D noisetex;
+
+uniform mat4 gbufferModelView;
+uniform mat4 gbufferModelViewInverse;
+uniform mat4 gbufferProjection;
+uniform mat4 gbufferProjectionInverse;
 
 uniform vec3 cameraPosition;
 
