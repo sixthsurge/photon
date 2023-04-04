@@ -3,7 +3,7 @@
 
   Photon Shaders by SixthSurge
 
-  program/composite.glsl:
+  program/composite0.glsl:
   Render volumetric fog
 
 --------------------------------------------------------------------------------

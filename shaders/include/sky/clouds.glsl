@@ -583,7 +583,7 @@ vec4 draw_clouds_ac(vec3 ray_dir, vec3 clear_sky, float dither) {
 const float clouds_radius_ci     = planet_radius + CLOUDS_CI_ALTITUDE;
 const float clouds_thickness_ci  = CLOUDS_CI_ALTITUDE * CLOUDS_AC_THICKNESS;
 const float clouds_top_radius_ci = clouds_radius_ci + clouds_thickness_ci;
-const float clouds_extinction_coeff_ci = 0.15 * CLOUDS_CI_DENSITY;
+const float clouds_extinction_coeff_ci = 0.15;
 const float clouds_scattering_coeff_ci = clouds_extinction_coeff_ci;
 
 // from https://iquilezles.org/articles/gradientnoise/
@@ -671,7 +671,7 @@ float clouds_density_ci(vec2 coord, float altitude_fraction, out float cirrus, o
 	cirrocumulus -= texture(noisetex, coord * 0.00040 + (0.9 * CLOUDS_CC_CURL_STRENGTH) * curl).y * (CLOUDS_CC_DETAIL_STRENGTH * 0.10);
 	cirrocumulus  = max0(cirrocumulus);
 
-	density += 0.2 * cube(max0(cirrocumulus)) * height_shaping * dampen(height_shaping);
+	density += 0.2 * cube(max0(cirrocumulus)) * height_shaping * dampen(height_shaping) * CLOUDS_CC_DENSITY;
 
 	density = max(density, 0.008 * overcastness);
 
@@ -779,7 +779,7 @@ vec4 draw_clouds_ci(vec3 ray_dir, vec3 clear_sky, float dither) {
 	//   Cloud Lighting
 	// ------------------
 
-	bool moonlit = sun_dir.y < -0.049;
+	bool moonlit = false;
 	vec3 light_dir = moonlit ? moon_dir : sun_dir;
 	float cos_theta = dot(ray_dir, light_dir);
 
