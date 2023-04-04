@@ -779,7 +779,7 @@ vec4 draw_clouds_ci(vec3 ray_dir, vec3 clear_sky, float dither) {
 	//   Cloud Lighting
 	// ------------------
 
-	bool moonlit = false;
+	bool moonlit = sun_dir.y < -0.049;
 	vec3 light_dir = moonlit ? moon_dir : sun_dir;
 	float cos_theta = dot(ray_dir, light_dir);
 
