@@ -38,7 +38,7 @@ flat out mat3 sky_samples;
 uniform sampler3D depthtex0; // Atmosphere scattering LUT
 
 #ifdef SH_SKYLIGHT
-uniform sampler2D colortex4; // sky map
+uniform sampler2D colortex4; // Sky map
 #endif
 
 uniform int worldTime;
@@ -82,7 +82,6 @@ uniform float time_midnight;
 #include "/include/utility/random.glsl"
 #include "/include/utility/sampling.glsl"
 #include "/include/utility/spherical_harmonics.glsl"
-#include "/include/utility/text_rendering.glsl"
 
 void main() {
 	uv = gl_MultiTexCoord0.xy;

@@ -18,15 +18,27 @@
 flat out vec2 light_levels;
 flat out vec3 tint;
 
+#ifdef PROGRAM_GBUFFERS_LINE
+// gbuffers_line seems to break in Iris 1.6 when the compatibility profile is
+// used, so we must use the core spec
+in vec3  vaPosition;
+in vec3  vaNormal;
+in vec4  vaColor;
+in ivec2 vaUV2;
+
+uniform mat4 projectionMatrix;
+uniform mat4 modelViewMatrix;
+#endif
+
 uniform vec2 taa_offset;
 uniform vec2 view_res;
 uniform vec2 view_pixel_size;
 
 void main() {
-	light_levels = clamp01(gl_MultiTexCoord1.xy * rcp(240.0));
-	tint = gl_Color.rgb;
-
 #if defined PROGRAM_GBUFFERS_LINE
+	light_levels = clamp01(vec2(vaUV2) * rcp(240.0));
+	tint = vaColor.rgb;
+
 	// Taken from Minecraft 1.17's rendertype_lines.vsh
 
 	const float view_shrink = 1.0 - (1.0 / 256.0);
@@ -39,10 +51,10 @@ void main() {
 
 	const float line_width = 2.0;
 
-	vec4 line_pos_start = vec4(gl_Vertex.xyz, 1.0);
-	     line_pos_start = gl_ProjectionMatrix * view_scale * gl_ModelViewMatrix * line_pos_start;
-	vec4 line_pos_end = vec4(gl_Vertex.xyz + gl_Normal, 1.0);
-	     line_pos_end = gl_ProjectionMatrix * view_scale * gl_ModelViewMatrix * line_pos_start;
+	vec4 line_pos_start = vec4(vaPosition, 1.0);
+	     line_pos_start = projectionMatrix * view_scale * modelViewMatrix * line_pos_start;
+	vec4 line_pos_end = vec4(vaPosition + vaNormal, 1.0);
+	     line_pos_end = projectionMatrix * view_scale * modelViewMatrix * line_pos_start;
 
 	vec3 ndc1 = line_pos_start.xyz / line_pos_start.w;
 	vec3 ndc2 = line_pos_end.xyz / line_pos_end.w;
@@ -56,6 +68,9 @@ void main() {
 		? vec4((ndc1 + vec3(line_offset, 0.0)) * line_pos_start.w, line_pos_start.w)
 		: vec4((ndc1 - vec3(line_offset, 0.0)) * line_pos_start.w, line_pos_start.w);
 #else
+	light_levels = clamp01(gl_MultiTexCoord1.xy * rcp(240.0));
+	tint = gl_Color.rgb;
+
 	vec3 view_pos = transform(gl_ModelViewMatrix, gl_Vertex.xyz);
 	vec4 clip_pos = project(gl_ProjectionMatrix, view_pos);
 #endif
@@ -78,17 +93,18 @@ void main() {
 //----------------------------------------------------------------------------//
 #if defined fsh
 
-layout (location = 0) out vec4 gbuffer_data_0; // albedo, block ID, flat normal, light levels
-layout (location = 1) out vec4 gbuffer_data_1; // detailed normal, specular map (optional)
+layout (location = 0) out vec4 base_color;
+layout (location = 1) out vec4 gbuffer_data_0; // albedo, block ID, flat normal, light levels
+layout (location = 2) out vec4 gbuffer_data_1; // detailed normal, specular map (optional)
 
-/* DRAWBUFFERS:1 */
+/* DRAWBUFFERS:31 */
 
 #ifdef NORMAL_MAPPING
-/* DRAWBUFFERS:12 */
+/* DRAWBUFFERS:312 */
 #endif
 
 #ifdef SPECULAR_MAPPING
-/* DRAWBUFFERS:12 */
+/* DRAWBUFFERS:312 */
 #endif
 
 flat in vec2 light_levels;
@@ -126,6 +142,12 @@ void main() {
 	const vec4 specular_map = vec4(0.0);
 	gbuffer_data_1.z = pack_unorm_2x8(specular_map.xy);
 	gbuffer_data_1.w = pack_unorm_2x8(specular_map.zw);
+#endif
+
+#if defined IS_IRIS && defined PROGRAM_GBUFFERS_LINE
+	base_color = vec4(tint, 1.0);
+#else
+	base_color = vec4(0.0);
 #endif
 }
 

@@ -41,13 +41,15 @@ void main() {
 	vec3 view_pos = transform(gl_ModelViewMatrix, gl_Vertex.xyz);
 
 #ifdef SLANTED_RAIN
-	const float rain_tilt_amount = 0.2;
+	const float rain_tilt_amount = 0.25;
+	const float rain_tilt_angle  = 30.0 * degree;
+	const vec2  rain_tilt_offset = rain_tilt_amount * vec2(cos(rain_tilt_angle), sin(rain_tilt_angle));
 
 	vec3 scene_pos = transform(gbufferModelViewInverse, view_pos);
 	vec3 world_pos = scene_pos + cameraPosition;
 
 	float tilt_wave = 0.7 + 0.3 * sin(dot(world_pos, vec3(5.0)));
-	scene_pos.xz -= rain_tilt_amount * tilt_wave * scene_pos.y;
+	scene_pos.xz -= rain_tilt_offset * tilt_wave * scene_pos.y;
 
 	view_pos = transform(gbufferModelView, scene_pos);
 #endif

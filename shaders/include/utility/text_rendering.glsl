@@ -1,10 +1,12 @@
 /*
 --------------------------------------------------------------------------------
 
-  GLSL Debug Text Renderer by SixthSurge
+  GLSL Debug Text Renderer by SixthSurge (updated 2023-04-08)
 
   Character set based on Monocraft by IdreesInc
   https://github.com/IdreesInc/Monocraft
+
+  With additional characters added by WoMspace
 
   Usage:
 
@@ -47,73 +49,86 @@
 
 // Characters
 
-const uint _A     = 0x747f18c4;
-const uint _B     = 0xf47d18f8;
-const uint _C     = 0x746108b8;
-const uint _D     = 0xf46318f8;
-const uint _E     = 0xfc39087c;
-const uint _F     = 0xfc390840;
-const uint _G     = 0x7c2718b8;
-const uint _H     = 0x8c7f18c4;
-const uint _I     = 0x71084238;
-const uint _J     = 0x084218b8;
-const uint _K     = 0x8cb928c4;
-const uint _L     = 0x8421087c;
-const uint _M     = 0x8eeb18c4;
-const uint _N     = 0x8e6b38c4;
-const uint _O     = 0x746318b8;
-const uint _P     = 0xf47d0840;
-const uint _Q     = 0x74631934;
-const uint _R     = 0xf47d18c4;
-const uint _S     = 0x7c1c18b8;
-const uint _T     = 0xf9084210;
-const uint _U     = 0x8c6318b8;
-const uint _V     = 0x8c62a510;
-const uint _W     = 0x8c635dc4;
-const uint _X     = 0x8a88a8c4;
-const uint _Y     = 0x8a884210;
-const uint _Z     = 0xf844447c;
-const uint _a     = 0x0382f8bc;
-const uint _b     = 0x85b318f8;
-const uint _c     = 0x03a308b8;
-const uint _d     = 0x0b6718bc;
-const uint _e     = 0x03a3f83c;
-const uint _f     = 0x323c8420;
-const uint _g     = 0x03e2f0f8;
-const uint _h     = 0x842d98c4;
-const uint _i     = 0x40308418;
-const uint _j     = 0x080218b8;
-const uint _k     = 0x4254c524;
-const uint _l     = 0x6108420c;
-const uint _m     = 0x06ab5ac4;
-const uint _n     = 0x07a318c4;
-const uint _o     = 0x03a318b8;
-const uint _p     = 0x05b31f40;
-const uint _q     = 0x03671784;
-const uint _r     = 0x05b30840;
-const uint _s     = 0x03e0e0f8;
-const uint _t     = 0x211c420c;
-const uint _u     = 0x046318bc;
-const uint _v     = 0x04631510;
-const uint _w     = 0x04635abc;
-const uint _x     = 0x04544544;
-const uint _y     = 0x0462f0f8;
-const uint _z     = 0x07c4447c;
-const uint _0     = 0x746b58b8;
-const uint _1     = 0x23084238;
-const uint _2     = 0x744c88fc;
-const uint _3     = 0x744c18b8;
-const uint _4     = 0x19531f84;
-const uint _5     = 0xfc3c18b8;
-const uint _6     = 0x3221e8b8;
-const uint _7     = 0xfc422210;
-const uint _8     = 0x745d18b8;
-const uint _9     = 0x745e1130;
-const uint _space = 0x0000000;
-const uint _dot   = 0x000010;
-const uint _minus = 0x0000e000;
-const uint _comma = 0x00000220;
-const uint _colon = 0x02000020;
+const uint _A     = 0x747f18c4u;
+const uint _B     = 0xf47d18f8u;
+const uint _C     = 0x746108b8u;
+const uint _D     = 0xf46318f8u;
+const uint _E     = 0xfc39087cu;
+const uint _F     = 0xfc390840u;
+const uint _G     = 0x7c2718b8u;
+const uint _H     = 0x8c7f18c4u;
+const uint _I     = 0x71084238u;
+const uint _J     = 0x084218b8u;
+const uint _K     = 0x8cb928c4u;
+const uint _L     = 0x8421087cu;
+const uint _M     = 0x8eeb18c4u;
+const uint _N     = 0x8e6b38c4u;
+const uint _O     = 0x746318b8u;
+const uint _P     = 0xf47d0840u;
+const uint _Q     = 0x74631934u;
+const uint _R     = 0xf47d18c4u;
+const uint _S     = 0x7c1c18b8u;
+const uint _T     = 0xf9084210u;
+const uint _U     = 0x8c6318b8u;
+const uint _V     = 0x8c62a510u;
+const uint _W     = 0x8c635dc4u;
+const uint _X     = 0x8a88a8c4u;
+const uint _Y     = 0x8a884210u;
+const uint _Z     = 0xf844447cu;
+const uint _a     = 0x0382f8bcu;
+const uint _b     = 0x85b318f8u;
+const uint _c     = 0x03a308b8u;
+const uint _d     = 0x0b6718bcu;
+const uint _e     = 0x03a3f83cu;
+const uint _f     = 0x323c8420u;
+const uint _g     = 0x03e2f0f8u;
+const uint _h     = 0x842d98c4u;
+const uint _i     = 0x40308418u;
+const uint _j     = 0x080218b8u;
+const uint _k     = 0x4254c524u;
+const uint _l     = 0x6108420cu;
+const uint _m     = 0x06ab5ac4u;
+const uint _n     = 0x07a318c4u;
+const uint _o     = 0x03a318b8u;
+const uint _p     = 0x05b31f40u;
+const uint _q     = 0x03671784u;
+const uint _r     = 0x05b30840u;
+const uint _s     = 0x03e0e0f8u;
+const uint _t     = 0x211c420cu;
+const uint _u     = 0x046318bcu;
+const uint _v     = 0x04631510u;
+const uint _w     = 0x04635abcu;
+const uint _x     = 0x04544544u;
+const uint _y     = 0x0462f0f8u;
+const uint _z     = 0x07c4447cu;
+const uint _0     = 0x746b58b8u;
+const uint _1     = 0x23084238u;
+const uint _2     = 0x744c88fcu;
+const uint _3     = 0x744c18b8u;
+const uint _4     = 0x19531f84u;
+const uint _5     = 0xfc3c18b8u;
+const uint _6     = 0x3221e8b8u;
+const uint _7     = 0xfc422210u;
+const uint _8     = 0x745d18b8u;
+const uint _9     = 0x745e1130u;
+const uint _space = 0x0000000u;
+const uint _dot   = 0x000010u;
+const uint _minus = 0x0000e000u;
+const uint _comma = 0x00000220u;
+const uint _colon = 0x02000020u;
+
+// Additional characters added by WoMspace <3
+const uint _underscore           = 0x000007Cu;  // _
+const uint _quote                = 0x52800000u; // "
+const uint _bang                 = 0x21084010u; // !
+const uint _open_bracket         = 0x11084208u; // (
+const uint _close_bracket        = 0x41084220u; // )
+const uint _open_square_bracket  = 0x3908421Cu; // [
+const uint _close_square_bracket = 0xE1084270u; // ]
+const uint _open_chevron         = 0x00888208u; // <
+const uint _close_chevron        = 0x02082220u; // >
+const uint _block                = 0xFFFFFFFCu; // █
+const uint _copyright            = 0x03AB9AB8u; // ©️
 
 const int char_width   = 5;
 const int char_height  = 6;
@@ -156,7 +171,7 @@ void end_text(inout vec3 scene_color) {
 void print_char(uint character) {
 	ivec2 pos = text.frag_pos - text.text_pos - space_size * text.char_pos * ivec2(1, -1) + ivec2(0, space_size.y);
 
-	uint index = uint(char_width - pos.x + pos.y * char_width + 1u);
+	uint index = uint(char_width - pos.x + pos.y * char_width + 1);
 
 	// Draw background
 	if (clamp(pos, ivec2(0), space_size - 1) == pos)
@@ -188,7 +203,7 @@ void print_unsigned_int(uint value, int len) {
 
 	// Write number backwards
 	for (int i = 0; i < len; ++i) {
-		print_char(digits[value % text.base]);
+		print_char(digits[int(value) % text.base]);
 		value /= text.base;
 		text.char_pos.x -= 2;
 	}
@@ -198,7 +213,7 @@ void print_unsigned_int(uint value, int len) {
 }
 
 void print_unsigned_int(uint value) {
-	float log_value = log(float(value));
+	float log_value = log(float(value)) + 1e-6;
 	float log_base  = log(float(text.base));
 
 	int len = int(ceil(log_value / log_base));

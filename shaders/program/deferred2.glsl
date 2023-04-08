@@ -127,9 +127,10 @@ float calculate_maximum_horizon_angle(
 	vec3 viewer_dir,
 	vec3 screen_pos,
 	vec3 view_pos,
+	float radius,
 	float dither
 ) {
-	const float step_size = GTAO_RADIUS * rcp(float(GTAO_HORIZON_STEPS));
+	float step_size = (GTAO_RADIUS * rcp(float(GTAO_HORIZON_STEPS))) * radius;
 
 	float max_cos_theta = -1.0;
 
@@ -146,7 +147,7 @@ float calculate_maximum_horizon_angle(
 		float len_sq = length_squared(offset);
 		float norm = inversesqrt(len_sq);
 
-		float distance_falloff = linear_step(GTAO_FALLOFF_START * GTAO_RADIUS, GTAO_RADIUS, len_sq * norm);
+		float distance_falloff = linear_step(GTAO_FALLOFF_START * GTAO_RADIUS, GTAO_RADIUS, len_sq * norm * rcp(radius));
 
 		float cos_theta = dot(viewer_dir, offset) * norm;
 		      cos_theta = mix(cos_theta, -1.0, distance_falloff);
@@ -167,6 +168,9 @@ float ambient_occlusion(vec3 screen_pos, vec3 view_pos, vec3 view_normal, vec2 d
 	vec3 viewer_up    = cross(viewer_dir, viewer_right);
 	mat3 local_to_view = mat3(viewer_right, viewer_up, viewer_dir);
 
+	// Reduce AO radius very close up, makes some screen-space artifacts less obvious
+	float ao_radius = 0.25 + 0.75 * smoothstep(0.0, 81.0, length_squared(view_pos));
+
 	for (int i = 0; i < GTAO_SLICES; ++i) {
 		float slice_angle = (i + dither.x) * (pi / float(GTAO_SLICES));
 
@@ -185,8 +189,8 @@ float ambient_occlusion(vec3 screen_pos, vec3 view_pos, vec3 view_normal, vec2 d
 		float gamma = sgn_gamma * fast_acos(cos_gamma);
 
 		vec2 max_horizon_angles;
-		max_horizon_angles.x = calculate_maximum_horizon_angle(-view_slice_dir, viewer_dir, screen_pos, view_pos, dither.y);
-		max_horizon_angles.y = calculate_maximum_horizon_angle( view_slice_dir, viewer_dir, screen_pos, view_pos, dither.y);
+		max_horizon_angles.x = calculate_maximum_horizon_angle(-view_slice_dir, viewer_dir, screen_pos, view_pos, ao_radius, dither.y);
+		max_horizon_angles.y = calculate_maximum_horizon_angle( view_slice_dir, viewer_dir, screen_pos, view_pos, ao_radius, dither.y);
 
 		max_horizon_angles = gamma + clamp(vec2(-1.0, 1.0) * max_horizon_angles - gamma, -half_pi, half_pi);
 		ao += integrate_arc(max_horizon_angles, gamma, cos_gamma) * len_sq * norm;
