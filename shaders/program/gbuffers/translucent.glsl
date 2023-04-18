@@ -61,6 +61,7 @@ uniform float far;
 uniform ivec2 atlasSize;
 
 uniform int frameCounter;
+uniform int renderStage;
 uniform float frameTimeCounter;
 uniform float rainStrength;
 
@@ -72,6 +73,10 @@ uniform vec3 light_dir;
 
 #if defined PROGRAM_GBUFFERS_ENTITIES_TRANSLUCENT
 uniform int entityId;
+#endif
+
+#if defined PROGRAM_GBUFFERS_BLOCK_TRANSLUCENT
+uniform int blockEntityId;
 #endif
 
 #include "/include/utility/space_conversion.glsl"
@@ -86,6 +91,8 @@ void main() {
 	material_mask = uint(max0(mc_Entity.x - 10000.0));
 #elif defined PROGRAM_GBUFFERS_ENTITIES_TRANSLUCENT
 	material_mask = uint(max(entityId - 10000, 0));
+#elif defined PROGRAM_GBUFFERS_BLOCK_TRANSLUCENT
+	material_mask = uint(max(blockEntityId - 10000, 0));
 #else
 	material_mask = 0;
 #endif
@@ -124,7 +131,12 @@ void main() {
 	vec4 clip_pos = project(gl_ProjectionMatrix, view_pos);
 
 #if defined PROGRAM_GBUFFERS_TEXTURED
-	// Make nether particles glow
+	// Make world border emissive
+	if (renderStage == MC_RENDER_STAGE_WORLD_BORDER) material_mask = 4;
+#endif
+
+#if defined PROGRAM_GBUFFERS_TEXTURED && !defined IS_IRIS
+	// Make enderman/nether portal particles glow
 	if (gl_Color.r > gl_Color.g && gl_Color.g < 0.6 && gl_Color.b > 0.4) material_mask = 14;
 #endif
 
@@ -389,7 +401,7 @@ void main() {
 #endif
 	}
 
-#ifdef PROGRAM_GBUFFERS_ENTITIES_TRANSLUCENT
+#if defined PROGRAM_GBUFFERS_ENTITIES_TRANSLUCENT
 	base_color.rgb = mix(base_color.rgb, entityColor.rgb, entityColor.a);
 #endif
 
@@ -400,7 +412,7 @@ void main() {
 	gbuffer_data_0.z  = pack_unorm_2x8(encode_unit_vector(tbn[2]));
 	gbuffer_data_0.w  = pack_unorm_2x8(dither_8bit(adjusted_light_levels, dither));
 
-#ifdef PROGRAM_GBUFFERS_TEXTURED
+#if defined PROGRAM_GBUFFERS_TEXTURED && !defined IS_IRIS
 	// Kill the little rain splash particles
 	if (base_color.r < 0.29 && base_color.g < 0.45 && base_color.b > 0.75) discard;
 #endif

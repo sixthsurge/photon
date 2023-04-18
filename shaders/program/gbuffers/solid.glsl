@@ -102,6 +102,11 @@ void main() {
 	light_levels.x = 1.0;
 #endif
 
+#if defined PROGRAM_GBUFFERS_PARTICLES
+	// Make enderman/nether portal particles glow
+	if (gl_Color.r > gl_Color.g && gl_Color.g < 0.6 && gl_Color.b > 0.4) material_mask = 14;
+#endif
+
 #if defined PROGRAM_GBUFFERS_TERRAIN
 	vanilla_ao = gl_Color.a < 0.1 ? 1.0 : gl_Color.a; // fixes models where vanilla ao breaks (eg lecterns)
 	tint.a = 1.0;
@@ -483,6 +488,11 @@ void main() {
 	#if defined POM && defined POM_SHADOW
 	gbuffer_data_1.z  = float(parallax_shadow);
 	#endif
+#endif
+
+#if defined PROGRAM_GBUFFERS_PARTICLES
+	// Kill the little rain splash particles
+	if (base_color.r < 0.29 && base_color.g < 0.45 && base_color.b > 0.75) discard;
 #endif
 }
 

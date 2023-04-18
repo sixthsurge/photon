@@ -325,7 +325,8 @@ void main() {
 	vec3 fog_scattering    = smooth_filter(colortex6, fog_uv).rgb;
 	vec3 fog_transmittance = smooth_filter(colortex7, fog_uv).rgb;
 
-	bool is_translucent = depth0 != depth1;
+	bool is_translucent = depth0 != depth1 || blend_color.a > 0.1;
+	depth0 *= float(depth0 != depth1 || !is_translucent);
 
 	// Space conversions
 

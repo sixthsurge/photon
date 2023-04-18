@@ -19,7 +19,7 @@ float get_sun_exposure() {
 	float early_morning = linear_step(0.05, 1.0, exp(-80.0 * sqr(sun_dir.y - 0.6)));
 	float blue_hour = linear_step(0.05, 1.0, exp(-190.0 * sqr(sun_dir.y + 0.09604)));
 
-	float daytime_mul = 1.0 + 0.15 * early_morning + 0.5 * (time_sunset + time_sunrise) + 40.0 * blue_hour;
+	float daytime_mul = 1.0 + 0.1 * early_morning + 0.5 * (time_sunset + time_sunrise) + 40.0 * blue_hour;
 
 	return base_scale * daytime_mul;
 }

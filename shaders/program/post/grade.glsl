@@ -120,7 +120,7 @@ vec3 gain(vec3 x, float k) {
 // Color grading applied before tone mapping
 // rgb := color in acescg [0, inf]
 vec3 grade_input(vec3 rgb) {
-	float brightness = 1.10 * GRADE_BRIGHTNESS;
+	float brightness = 1.05 * GRADE_BRIGHTNESS;
 	float contrast   = 1.12 * GRADE_CONTRAST;
 	float saturation = 0.94 * GRADE_SATURATION;
 
