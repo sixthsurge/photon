@@ -506,8 +506,9 @@ void main() {
 		float LoH = LoV * halfway_norm + halfway_norm;
 
 #if defined WORLD_OVERWORLD || defined WORLD_END
-		float sss_depth;
-		vec3 shadows = calculate_shadows(scene_pos, flat_normal, light_levels.y, material.sss_amount, sss_depth);
+		float sss_depth = 0.0;
+		float shadow_distance_fade = 0.0;
+		vec3 shadows = calculate_shadows(scene_pos, flat_normal, light_levels.y, shadow_distance_fade, material.sss_amount, sss_depth);
 #else
 		const float sss_depth = 0.0;
 		const vec3 shadows = vec3(0.0);
@@ -521,6 +522,7 @@ void main() {
 			light_levels,
 			1.0,
 			sss_depth,
+			shadow_distance_fade,
 			NoL,
 			NoV,
 			NoH,

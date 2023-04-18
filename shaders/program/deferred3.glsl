@@ -385,8 +385,9 @@ void main() {
 		// Terrain diffuse lighting
 
 #if defined WORLD_OVERWORLD || defined WORLD_END
-		float sss_depth;
-		vec3 shadows = calculate_shadows(scene_pos, flat_normal, light_levels.y, material.sss_amount, sss_depth);
+		float sss_depth = 0.0;
+		float shadow_distance_fade = 0.0;
+		vec3 shadows = calculate_shadows(scene_pos, flat_normal, light_levels.y, material.sss_amount, shadow_distance_fade, sss_depth);
 
 	#if defined POM && defined POM_SHADOW
 		shadows *= float(!parallax_shadow);
@@ -407,6 +408,7 @@ void main() {
 			light_levels,
 			ao,
 			sss_depth,
+			shadow_distance_fade,
 			NoL,
 			NoV,
 			NoH,

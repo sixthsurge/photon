@@ -193,7 +193,8 @@ vec3 calculate_shadows(
 	vec3 scene_pos,
 	vec3 flat_normal,
 	float skylight,
-	float sss_amount,
+	inout float sss_amount,
+	out float distance_fade,
 	out float sss_depth
 ) {
 	sss_depth = 0.0;
@@ -207,7 +208,10 @@ vec3 calculate_shadows(
 	vec3 shadow_clip_pos = project_ortho(shadowProjection, shadow_view_pos);
 	vec3 shadow_screen_pos = distort_shadow_space(shadow_clip_pos) * 0.5 + 0.5;
 
-	float distance_fade = pow16(length_squared(scene_pos) * rcp(shadowDistance * shadowDistance) * max_of(abs(shadow_screen_pos.xy)));
+	distance_fade = pow32(max(
+		max_of(abs(shadow_screen_pos.xy * 2.0 - 1.0)),
+		mix(1.0, 0.55, linear_step(0.33, 0.8, light_dir.y)) * length_squared(scene_pos) * rcp(shadowDistance * shadowDistance))
+	);
 
 #ifdef SSRT_DISTANT_SHADOWS
 	float distant_shadow = raytrace_shadows();
@@ -256,8 +260,10 @@ vec3 calculate_shadows(
 	vec3 flat_normal,
 	float skylight,
 	float sss_amount,
+	out float distance_fade,
 	out float sss_depth
 ) {
+	distance_fade = 0.0;
 	sss_depth = 0.0;
 	return vec3(1.0);
 }

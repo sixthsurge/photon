@@ -53,6 +53,7 @@ vec3 get_diffuse_lighting(
 	vec2 light_levels,
 	float ao,
 	float sss_depth,
+	float shadow_distance_fade,
 	float NoL,
 	float NoV,
 	float NoH,
@@ -71,6 +72,9 @@ vec3 get_diffuse_lighting(
 	vec3 diffuse = vec3(lift(max0(NoL), 0.33) * (1.0 - 0.5 * material.sss_amount));
 	vec3 bounced = 0.066 * (1.0 - shadows * max0(NoL)) * (1.0 - 0.33 * max0(normal.y)) * pow1d5(ao + eps) * pow4(light_levels.y) * BOUNCED_LIGHT_I;
 	vec3 sss = sss_approx(material.albedo, material.sss_amount, material.sheen_amount, sss_depth, LoV, shadows.x);
+
+	// Adjust SSS outside of shadow distance
+	sss *= mix(1.0, ao * (clamp01(NoL) * 0.9 + 0.1), clamp01(shadow_distance_fade));
 
 	#ifdef AO_IN_SUNLIGHT
 	diffuse *= sqrt(ao) * mix(ao * ao, 1.0, NoL * NoL);
