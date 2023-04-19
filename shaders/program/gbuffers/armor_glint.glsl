@@ -3,8 +3,8 @@
 
   Photon Shaders by SixthSurge
 
-  program/gbuffers/overlay.glsl:
-  Handle animated overlays (block breaking overlay and enchantment glint)
+  program/gbuffers/armor_glint.glsl:
+  Handle enchantment glint (+ block breaking overlay in OptiFine)
 
 --------------------------------------------------------------------------------
 */
@@ -17,13 +17,39 @@
 
 out vec2 uv;
 
+uniform sampler2D noisetex;
+
+uniform mat4 gbufferModelView;
+uniform mat4 gbufferModelViewInverse;
+uniform mat4 gbufferProjection;
+uniform mat4 gbufferProjectionInverse;
+
+uniform vec3 cameraPosition;
+
+uniform float near;
+uniform float far;
+
+uniform ivec2 atlasSize;
+
+uniform float frameTimeCounter;
+uniform float rainStrength;
+
 uniform vec2 taa_offset;
-uniform vec2 view_pixel_size;
+uniform vec3 light_dir;
+
+#include "/include/utility/space_conversion.glsl"
+#include "/include/vertex/displacement.glsl"
 
 void main() {
 	uv = mat2(gl_TextureMatrix[0]) * gl_MultiTexCoord0.xy + gl_TextureMatrix[0][3].xy;
 
-	vec3 view_pos = transform(gl_ModelViewMatrix, gl_Vertex.xyz);
+	vec3 pos = transform(gl_ModelViewMatrix, gl_Vertex.xyz);
+	     pos = view_to_scene_space(pos);
+	     pos = pos + cameraPosition;
+	     pos = animate_vertex(pos, false, 1.0, 0);
+	     pos = pos - cameraPosition;
+
+	vec3 view_pos = scene_to_view_space(pos);
 	vec4 clip_pos = project(gl_ProjectionMatrix, view_pos);
 
 #if   defined TAA && defined TAAU
@@ -44,7 +70,7 @@ void main() {
 //----------------------------------------------------------------------------//
 #if defined fsh
 
-layout (location = 0) out vec4 overlays;
+layout (location = 3) out vec4 armor_glint;
 
 /* DRAWBUFFERS:3 */
 
@@ -67,16 +93,12 @@ void main() {
 	if (clamp01(coord) != coord) discard;
 #endif
 
-	overlays = texture(gtexture, uv, lod_bias);
-	if (overlays.a < 0.1) discard;
+	armor_glint = texture(gtexture, uv, lod_bias);
+	if (armor_glint.a < 0.1) discard;
 
-#if   defined PROGRAM_GBUFFERS_ARMOR_GLINT
+	// Old overlay handling
 	// alpha of 0 <=> enchantment glint
-	overlays.a = 0.0 / 255.0;
-#elif defined PROGRAM_GBUFFERS_DAMAGEDBLOCK
-	// alpha of 1 <=> block breaking overlay
-	overlays.a = 1.0 / 255.0;
-#endif
+	armor_glint.a = 0.0 / 255.0;
 }
 
 #endif

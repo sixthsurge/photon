@@ -73,7 +73,7 @@ vec3 clouds_aerial_perspective(
 const float clouds_radius_cu     = planet_radius + CLOUDS_CU_ALTITUDE;
 const float clouds_thickness_cu  = CLOUDS_CU_ALTITUDE * CLOUDS_CU_THICKNESS;
 const float clouds_top_radius_cu = clouds_radius_cu + clouds_thickness_cu;
-float clouds_extinction_coeff_cu = mix(0.05, 0.1, smoothstep(0.0, 0.3, abs(sun_dir.y))) * CLOUDS_CU_DENSITY;
+float clouds_extinction_coeff_cu = mix(0.05, 0.1, smoothstep(0.0, 0.3, abs(sun_dir.y))) * (1.0 - 0.33 * overcastness) * CLOUDS_CU_DENSITY;
 float clouds_scattering_coeff_cu = clouds_extinction_coeff_cu * mix(1.00, 0.66, rainStrength);
 float clouds_cirrus_shadow       = 1.0 - 0.9 * overcastness;
 float dynamic_thickness_cu       = mix(0.5, 1.0, smoothstep(0.4, 0.6, clouds_coverage_cu.y));
@@ -331,7 +331,8 @@ vec4 draw_clouds_cu(vec3 ray_dir, vec3 clear_sky, float dither) {
 const float clouds_radius_ac     = planet_radius + CLOUDS_AC_ALTITUDE;
 const float clouds_thickness_ac  = CLOUDS_AC_ALTITUDE * CLOUDS_AC_THICKNESS;
 const float clouds_top_radius_ac = clouds_radius_ac + clouds_thickness_ac;
-float clouds_extinction_coeff_ac = mix(0.05, 0.1, smoothstep(0.0, 0.3, abs(sun_dir.y))) * CLOUDS_AC_DENSITY;
+float day_factor                 = smoothstep(0.0, 0.3, abs(sun_dir.y));
+float clouds_extinction_coeff_ac = mix(0.05, 0.1, day_factor) * CLOUDS_AC_DENSITY;
 float clouds_scattering_coeff_ac = clouds_extinction_coeff_ac * mix(1.00, 0.66, rainStrength);
 float dynamic_thickness_ac       = mix(0.5, 1.0, smoothstep(0.4, 0.6, clouds_coverage_ac.y));
 
@@ -653,7 +654,7 @@ float clouds_density_ci(vec2 coord, float altitude_fraction, out float cirrus, o
 		coord += 0.3 * wind_velocity * world_age;
 	}
 
-	density += cube(max0(cirrus)) * sqr(height_shaping) * CLOUDS_CI_DENSITY;
+	density += mix(1.0, 0.75, day_factor) * cube(max0(cirrus)) * sqr(height_shaping) * CLOUDS_CI_DENSITY;
 
 	// -----------------------
 	//   Cirrocumulus Clouds
@@ -673,7 +674,8 @@ float clouds_density_ci(vec2 coord, float altitude_fraction, out float cirrus, o
 
 	density += 0.2 * cube(max0(cirrocumulus)) * height_shaping * dampen(height_shaping) * CLOUDS_CC_DENSITY;
 
-	density = max(density, 0.008 * overcastness);
+	// overcastness
+	density = max(density, 0.008 * linear_step(0.8, 1.0, overcastness));
 
 	return density;
 }
@@ -729,7 +731,7 @@ vec2 clouds_scattering_ci(
 	vec2 scattering = vec2(0.0);
 
 	float phase = clouds_phase_single(cos_theta);
-	vec3 phase_g = vec3(0.4, 0.9, 0.3);
+	vec3 phase_g = vec3(0.7, 0.9, 0.3);
 
 	float powder_effect = 4.0 * (1.0 - exp(-40.0 * density));
 	      powder_effect = mix(powder_effect, 1.0, pow1d5(cos_theta * 0.5 + 0.5));

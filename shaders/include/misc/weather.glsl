@@ -4,11 +4,13 @@
 #include "/include/utility/color.glsl"
 #include "/include/utility/random.glsl"
 
-#define daily_weather_blend(weather_function) mix(weather_function(worldDay), weather_function(worldDay + 1), cubic_smooth(linear_step(0.5, 1.0, sunAngle)))
+#define daily_weather_blend(weather_function) mix(weather_function(worldDay), weather_function(worldDay + 1), weather_mix_factor())
 
-float daily_weather_fogginess(int world_day) {
+uint weather_day_index(int world_day) {
+	// Start at noon
+	world_day -= int(worldTime < 6000);
+
 	const uint day_count = 12;
-	const float[] fogginess = float[12](WEATHER_D0_FOGGINESS, WEATHER_D1_FOGGINESS, WEATHER_D2_FOGGINESS, WEATHER_D3_FOGGINESS, WEATHER_D4_FOGGINESS, WEATHER_D5_FOGGINESS, WEATHER_D6_FOGGINESS, WEATHER_D7_FOGGINESS, WEATHER_D8_FOGGINESS, WEATHER_D9_FOGGINESS, WEATHER_D10_FOGGINESS, WEATHER_D11_FOGGINESS);
 
 #if WEATHER_DAY == -1
 	uint day_index = uint(world_day);
@@ -17,21 +19,23 @@ float daily_weather_fogginess(int world_day) {
 	uint day_index = WEATHER_DAY;
 #endif
 
-	return fogginess[day_index];
+	return day_index;
+}
+
+float weather_mix_factor() {
+	return cubic_smooth(fract(float(worldTime) * rcp(24000.0) - 0.25));
+}
+
+float daily_weather_fogginess(int world_day) {
+	const float[] fogginess = float[12](WEATHER_D0_FOGGINESS, WEATHER_D1_FOGGINESS, WEATHER_D2_FOGGINESS, WEATHER_D3_FOGGINESS, WEATHER_D4_FOGGINESS, WEATHER_D5_FOGGINESS, WEATHER_D6_FOGGINESS, WEATHER_D7_FOGGINESS, WEATHER_D8_FOGGINESS, WEATHER_D9_FOGGINESS, WEATHER_D10_FOGGINESS, WEATHER_D11_FOGGINESS);
+
+	return fogginess[weather_day_index(world_day)];
 }
 
 float daily_weather_overcastness(int world_day) {
-	const uint day_count = 12;
 	const float[] overcastness = float[12](WEATHER_D0_OVERCASTNESS, WEATHER_D1_OVERCASTNESS, WEATHER_D2_OVERCASTNESS, WEATHER_D3_OVERCASTNESS, WEATHER_D4_OVERCASTNESS, WEATHER_D5_OVERCASTNESS, WEATHER_D6_OVERCASTNESS, WEATHER_D7_OVERCASTNESS, WEATHER_D8_OVERCASTNESS, WEATHER_D9_OVERCASTNESS, WEATHER_D10_OVERCASTNESS, WEATHER_D11_OVERCASTNESS);
 
-#if WEATHER_DAY == -1
-	uint day_index = uint(world_day);
-	     day_index = lowbias32(day_index) % day_count;
-#else
-	uint day_index = WEATHER_DAY;
-#endif
-
-	return overcastness[day_index];
+	return overcastness[weather_day_index(world_day)];
 }
 
 void daily_weather_clouds(
@@ -42,12 +46,7 @@ void daily_weather_clouds(
 ) {
 	const uint day_count = 12;
 
-#if WEATHER_DAY == -1
-	uint day_index = uint(world_day);
-	     day_index = lowbias32(day_index) % day_count;
-#else
-	uint day_index = WEATHER_DAY;
-#endif
+	uint day_index = weather_day_index(world_day);
 
 	switch (day_index) {
 	case 0:
@@ -140,8 +139,7 @@ void clouds_weather_variation(
 	daily_weather_clouds(worldDay + 0, coverage_cu_0, coverage_ac_0, coverage_ci_0);
 	daily_weather_clouds(worldDay + 1, coverage_cu_1, coverage_ac_1, coverage_ci_1);
 
-	float mix_factor = linear_step(0.5, 1.0, sunAngle);
-	      mix_factor = cubic_smooth(mix_factor);
+	float mix_factor = weather_mix_factor();
 
 	clouds_coverage_cu = mix(coverage_cu_0, coverage_cu_1, mix_factor);
 	clouds_coverage_ac = mix(coverage_ac_0, coverage_ac_1, mix_factor);

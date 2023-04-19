@@ -137,9 +137,6 @@ void main() {
 #endif
 
 	vec3 view_pos = scene_to_view_space(pos);
-#ifdef PROGRAM_GBUFFERS_HAND
-	     view_pos = transform(gl_ModelViewMatrix, gl_Vertex.xyz);
-#endif
 	vec4 clip_pos = project(gl_ProjectionMatrix, view_pos);
 
 #if   defined TAA && defined TAAU

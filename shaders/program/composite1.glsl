@@ -617,7 +617,7 @@ void main() {
 	// Volumetric fog
 	scene_color = scene_color * fog_transmittance + fog_scattering;
 
-	bloomy_fog *= clamp01(dot(fog_transmittance, vec3(0.33)));
+	bloomy_fog *= clamp01(dot(fog_transmittance, vec3(luminance_weights_rec2020)));
 #else
 	// Simple underwater fog
 	if (isEyeInWater == 1) {

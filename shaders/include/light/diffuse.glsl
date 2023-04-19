@@ -12,7 +12,7 @@
 #if   defined WORLD_OVERWORLD
 
 const vec3  blocklight_color     = from_srgb(vec3(BLOCKLIGHT_R, BLOCKLIGHT_G, BLOCKLIGHT_B)) * BLOCKLIGHT_I;
-const float blocklight_scale     = 7.7;
+const float blocklight_scale     = 7.0;
 const float emission_scale       = 30.0 * EMISSION_STRENGTH;
 const float sss_density          = 14.0;
 const float sss_scale            = 4.2;
@@ -70,7 +70,7 @@ vec3 get_diffuse_lighting(
 
 #ifdef SHADOW
 	vec3 diffuse = vec3(lift(max0(NoL), 0.33) * (1.0 - 0.5 * material.sss_amount));
-	vec3 bounced = 0.066 * (1.0 - shadows * max0(NoL)) * (1.0 - 0.33 * max0(normal.y)) * pow1d5(ao + eps) * pow4(light_levels.y) * BOUNCED_LIGHT_I;
+	vec3 bounced = 0.08 * (1.0 - shadows * diffuse) * (1.0 - 0.33 * max0(normal.y)) * pow1d5(ao + eps) * pow4(light_levels.y) * BOUNCED_LIGHT_I;
 	vec3 sss = sss_approx(material.albedo, material.sss_amount, material.sheen_amount, sss_depth, LoV, shadows.x);
 
 	// Adjust SSS outside of shadow distance
@@ -121,7 +121,7 @@ vec3 get_diffuse_lighting(
 	     skylight *= 1.0 + 0.33 * clamp01(flat_normal.y) * (1.0 - shadows.x * (1.0 - rainStrength)) * (time_noon + time_midnight);
 		 skylight  = mix(skylight, rain_skylight, rainStrength);
 		 skylight *= ao * pi;
-		 skylight  = mix(skylight, vec3(pi * dot(skylight, luminance_weights_rec2020)), 0.5 * overcastness * linear_step(0.3, 0.5, light_dir.y));
+		 skylight  = mix(skylight, vec3(2.0 * dot(skylight, luminance_weights_rec2020)), 0.5 * overcastness * linear_step(0.3, 0.5, light_dir.y));
 	#endif
 #else
 	vec3 skylight  = ambient_color * ao;
