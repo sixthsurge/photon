@@ -41,12 +41,14 @@
 
 out vec2 uv;
 
+flat out vec3 ambient_color;
+flat out vec3 light_color;
+
 #if defined WORLD_OVERWORLD
 flat out float overcastness;
 
 flat out vec3 sun_color;
 flat out vec3 moon_color;
-flat out vec3 light_color;
 flat out vec3 sky_color;
 
 flat out vec2 clouds_coverage_cu;
@@ -72,6 +74,8 @@ uniform int frameCounter;
 uniform float frameTimeCounter;
 
 uniform int isEyeInWater;
+
+uniform vec3 fogColor;
 
 uniform vec3 light_dir;
 uniform vec3 sun_dir;
@@ -104,8 +108,16 @@ uniform float biome_humidity;
 #define ATMOSPHERE_SCATTERING_LUT depthtex0
 #define WEATHER_CLOUDS
 
-#include "/include/misc/palette.glsl"
+#if defined WORLD_OVERWORLD
+#include "/include/light/colors/light_color.glsl"
+#include "/include/light/colors/sky_color.glsl"
+#include "/include/light/colors/weather_color.glsl"
 #include "/include/misc/weather.glsl"
+#endif
+
+#if defined WORLD_NETHER
+#include "/include/light/colors/nether_color.glsl"
+#endif
 
 void main() {
 	uv = gl_MultiTexCoord0.xy;
@@ -129,6 +141,11 @@ void main() {
 	);
 #endif
 
+#if defined WORLD_NETHER
+	light_color   = vec3(0.0);
+	ambient_color = get_nether_color();
+#endif
+
 	gl_Position = vec4(gl_Vertex.xy * 2.0 - 1.0, 0.0, 1.0);
 }
 
@@ -146,12 +163,14 @@ layout (location = 0) out vec3 sky_map;
 
 in vec2 uv;
 
+flat in vec3 ambient_color;
+flat in vec3 light_color;
+
 #if defined WORLD_OVERWORLD
 flat in float overcastness;
 
 flat in vec3 sun_color;
 flat in vec3 moon_color;
-flat in vec3 light_color;
 flat in vec3 sky_color;
 
 flat in vec2 clouds_coverage_cu;

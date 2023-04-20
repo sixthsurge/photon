@@ -20,7 +20,9 @@ float spherical_fog(float view_dist, float fog_start_distance, float fog_density
 float border_fog(vec3 scene_pos, vec3 world_dir) {
 	float fog = cubic_length(scene_pos.xz) / far;
 	      fog = exp2(-8.0 * pow8(fog));
+#if defined WORLD_OVERWORLD || defined WORLD_END
 	      fog = mix(fog, 1.0, 0.75 * dampen(linear_step(0.0, 0.2, world_dir.y)));
+#endif
 
 	if (isEyeInWater != 0.0) fog = 1.0;
 
@@ -112,7 +114,7 @@ vec4 get_simple_fog(
 
 	// Lava fog
 
-	float lava_fog = spherical_fog(view_dist, 0.33, 3.0 * float(isEyeInWater == 2));
+	float lava_fog = spherical_fog(view_dist, 0.33, float(isEyeInWater == 2));
 	fog.rgb += lava_fog_color - lava_fog_color * lava_fog;
 	fog.a   *= lava_fog;
 
@@ -139,16 +141,51 @@ vec4 get_simple_fog(
 //----------------------------------------------------------------------------//
 #elif defined WORLD_NETHER
 
-void apply_fog(inout vec3 scene_color) {
+vec4 get_simple_fog(
+	vec3 world_dir,
+	float view_dist,
+	float skylight,
+	bool do_normal_fog,
+	bool sky
+) {
+	if (sky) view_dist = far;
 
+	vec4 fog = vec4(vec3(0.0), 1.0);
+
+	// Normal fog
+
+	float nether_fog = spherical_fog(view_dist, 0.0, 0.0083 * NETHER_FOG_INTENSITY);
+	fog.rgb += ambient_color - ambient_color * nether_fog;
+	fog.a   *= nether_fog;
+
+	// Lava fog
+
+	float lava_fog = spherical_fog(view_dist, 0.33, float(isEyeInWater == 2));
+	fog.rgb += lava_fog_color - lava_fog_color * lava_fog;
+	fog.a   *= lava_fog;
+
+	// Powdered snow fog
+
+	float snow_fog = spherical_fog(view_dist, 0.5, 1.0 * float(isEyeInWater == 3));
+	fog.rgb += snow_fog_color - snow_fog_color * snow_fog;
+	fog.a   *= snow_fog;
+
+	// Blindness fog
+
+	float blindness_fog = spherical_fog(view_dist, 2.0, blindness);
+	fog.rgb *= blindness_fog;
+	fog.a   *= blindness_fog;
+
+	// Darkness fog
+	float darkness_fog = spherical_fog(view_dist, 2.0, 0.05 * darknessFactor) * 0.7 + 0.3;
+	fog.rgb *= darkness_fog;
+	fog.a   *= darkness_fog;
+
+	return fog;
 }
 
 //----------------------------------------------------------------------------//
 #elif defined WORLD_END
-
-void apply_fog(inout vec3 scene_color) {
-
-}
 
 #endif
 

@@ -17,9 +17,10 @@
 
 out vec2 uv;
 
-#if defined WORLD_OVERWORLD
+flat out vec3 ambient_color;
 flat out vec3 light_color;
-flat out vec3 sky_color;
+
+#if defined WORLD_OVERWORLD
 flat out mat2x3 air_fog_coeff[2];
 #endif
 
@@ -37,6 +38,8 @@ uniform int isEyeInWater;
 uniform int worldTime;
 uniform int worldDay;
 uniform int frameCounter;
+
+uniform vec3 fogColor;
 
 uniform vec3 light_dir;
 uniform vec3 sun_dir;
@@ -62,8 +65,15 @@ uniform float time_midnight;
 
 #define WEATHER_FOG
 
-#include "/include/misc/palette.glsl"
+#if defined WORLD_OVERWORLD
+#include "/include/light/colors/light_color.glsl"
+#include "/include/light/colors/sky_color.glsl"
 #include "/include/misc/weather.glsl"
+#endif
+
+#if defined WORLD_NETHER
+#include "/include/light/colors/nether_color.glsl"
+#endif
 
 void main() {
 	uv = gl_MultiTexCoord0.xy;
@@ -72,11 +82,16 @@ void main() {
 	float overcastness = daily_weather_blend(daily_weather_overcastness);
 
 	light_color = get_light_color() * (1.0 - 0.33 * overcastness);
-	sky_color = get_sky_color();
+	ambient_color = get_sky_color();
 
 	mat2x3 rayleigh_coeff = air_fog_rayleigh_coeff(), mie_coeff = air_fog_mie_coeff();
 	air_fog_coeff[0] = mat2x3(rayleigh_coeff[0], mie_coeff[0]);
 	air_fog_coeff[1] = mat2x3(rayleigh_coeff[1], mie_coeff[1]);
+#endif
+
+#if defined WORLD_NETHER
+	light_color   = vec3(0.0);
+	ambient_color = get_nether_color();
 #endif
 
 	vec2 vertex_pos = gl_Vertex.xy * VL_RENDER_SCALE;
@@ -98,9 +113,10 @@ layout (location = 1) out vec3 fog_transmittance;
 
 in vec2 uv;
 
-#if defined WORLD_OVERWORLD
+flat in vec3 ambient_color;
 flat in vec3 light_color;
-flat in vec3 sky_color;
+
+#if defined WORLD_OVERWORLD
 flat in mat2x3 air_fog_coeff[2];
 #endif
 
@@ -116,11 +132,13 @@ uniform sampler3D colortex3; // 3D worley noise
 uniform sampler2D depthtex0;
 uniform sampler2D depthtex1;
 
+#ifdef WORLD_OVERWORLD
 #ifdef SHADOW
 uniform sampler2D shadowtex0;
 uniform sampler2D shadowtex1;
 #ifdef SHADOW_COLOR
 uniform sampler2D shadowcolor0;
+#endif
 #endif
 #endif
 
@@ -197,15 +215,15 @@ void main() {
 	vec3 world_end_pos   = world_pos;
 
 	switch (isEyeInWater) {
-		case 0:
 #if defined WORLD_OVERWORLD
+		case 0:
 			mat2x3 air_fog = raymarch_air_fog(world_start_pos, world_end_pos, depth == 1.0, skylight, dither);
 
 			fog_scattering    = air_fog[0];
 			fog_transmittance = air_fog[1];
-#endif
 
 			break;
+#endif
 
 		case 1:
 			mat2x3 water_fog = raymarch_water_fog(world_start_pos, world_end_pos, depth == 1.0, dither);

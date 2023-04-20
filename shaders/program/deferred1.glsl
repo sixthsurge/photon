@@ -76,9 +76,13 @@ uniform float biome_humidity;
 #define ATMOSPHERE_SCATTERING_LUT depthtex0
 #define WEATHER_CLOUDS
 
-#include "/include/misc/palette.glsl"
+#if defined WORLD_OVERWORLD
+#include "/include/light/colors/light_color.glsl"
+#include "/include/light/colors/sky_color.glsl"
+#include "/include/light/colors/weather_color.glsl"
 #include "/include/misc/weather.glsl"
 #include "/include/sky/atmosphere.glsl"
+#endif
 
 void main() {
 	uv = gl_MultiTexCoord0.xy;

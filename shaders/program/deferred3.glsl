@@ -17,12 +17,13 @@
 
 out vec2 uv;
 
-#if defined WORLD_OVERWORLD
+flat out vec3 ambient_color;
 flat out vec3 light_color;
+
+#if defined WORLD_OVERWORLD
+flat out float overcastness;
 flat out vec3 sun_color;
 flat out vec3 moon_color;
-
-flat out float overcastness;
 #endif
 
 #if defined SH_SKYLIGHT
@@ -56,6 +57,8 @@ uniform float blindness;
 uniform float nightVision;
 uniform float darknessFactor;
 
+uniform vec3 fogColor;
+
 uniform vec3 light_dir;
 uniform vec3 sun_dir;
 uniform vec3 moon_dir;
@@ -75,9 +78,17 @@ uniform float time_midnight;
 
 #define ATMOSPHERE_SCATTERING_LUT depthtex0
 
-#include "/include/misc/palette.glsl"
+#if defined WORLD_OVERWORLD
+#include "/include/light/colors/light_color.glsl"
+#include "/include/light/colors/sky_color.glsl"
 #include "/include/misc/weather.glsl"
 #include "/include/sky/atmosphere.glsl"
+#endif
+
+#if defined WORLD_NETHER
+#include "/include/light/colors/nether_color.glsl"
+#endif
+
 #include "/include/sky/projection.glsl"
 #include "/include/utility/random.glsl"
 #include "/include/utility/sampling.glsl"
@@ -91,11 +102,10 @@ void main() {
 	light_color  = get_light_color() * (1.0 - 0.4 * overcastness);
 	sun_color    = get_sun_exposure() * get_sun_tint();
 	moon_color   = get_moon_exposure() * get_moon_tint();
-#endif
 
 	float skylight_boost = get_skylight_boost();
 
-#ifdef SH_SKYLIGHT
+	#ifdef SH_SKYLIGHT
 	// Initialize SH to 0
 	for (uint band = 0; band < 9; ++band) sky_sh[band] = vec3(0.0);
 
@@ -112,7 +122,7 @@ void main() {
 	// Apply skylight boost and normalize SH
 	const float step_solid_angle = tau / float(step_count);
 	for (uint band = 0; band < 9; ++band) sky_sh[band] *= skylight_boost * step_solid_angle;
-#elif defined WORLD_OVERWORLD
+	#else
 	vec3 dir0 = normalize(vec3(0.0, 1.0, -0.8));               // Up
 	vec3 dir1 = normalize(vec3(sun_dir.xz + 0.1, 0.066).xzy);  // Sun-facing horizon
 	vec3 dir2 = normalize(vec3(moon_dir.xz + 0.1, 0.066).xzy); // Opposite horizon
@@ -120,6 +130,12 @@ void main() {
 	sky_samples[0] = atmosphere_scattering(dir0, sun_color, sun_dir, moon_color, moon_dir) * skylight_boost;
 	sky_samples[1] = atmosphere_scattering(dir1, sun_color, sun_dir, moon_color, moon_dir) * skylight_boost;
 	sky_samples[2] = atmosphere_scattering(dir2, sun_color, sun_dir, moon_color, moon_dir) * skylight_boost;
+	#endif
+#endif
+
+#if defined WORLD_NETHER
+	light_color   = vec3(0.0);
+	ambient_color = get_nether_color();
 #endif
 
 	vec2 vertex_pos = gl_Vertex.xy * taau_render_scale;
@@ -141,12 +157,13 @@ layout (location = 1) out vec4 colortex3_clear;
 
 in vec2 uv;
 
-#if defined WORLD_OVERWORLD
+flat in vec3 ambient_color;
 flat in vec3 light_color;
+
+#if defined WORLD_OVERWORLD
+flat in float overcastness;
 flat in vec3 sun_color;
 flat in vec3 moon_color;
-
-flat in float overcastness;
 #endif
 
 #if defined SH_SKYLIGHT
@@ -171,11 +188,13 @@ uniform sampler2D colortex7; // clouds
 uniform sampler3D depthtex0; // atmosphere scattering LUT
 uniform sampler2D depthtex1;
 
+#ifdef WORLD_OVERWORLD
 #ifdef SHADOW
 uniform sampler2D shadowtex0;
 uniform sampler2DShadow shadowtex1;
 #ifdef SHADOW_COLOR
 uniform sampler2D shadowcolor0;
+#endif
 #endif
 #endif
 
@@ -241,7 +260,6 @@ uniform float time_midnight;
 #include "/include/utility/color.glsl"
 #include "/include/utility/encoding.glsl"
 #include "/include/utility/space_conversion.glsl"
-#include "/include/utility/text_rendering.glsl"
 
 /*
 const bool colortex7MipmapEnabled = true;
@@ -280,10 +298,16 @@ void main() {
 	vec3 world_pos = scene_pos + cameraPosition;
 	vec3 world_dir = normalize(scene_pos - gbufferModelViewInverse[3].xyz);
 
+#ifdef WORLD_OVERWORLD
 	vec3 atmosphere = atmosphere_scattering(world_dir, sun_color, sun_dir, moon_color, moon_dir);
+#endif
 
 	if (depth == 1.0) { // Sky
+#ifdef WORLD_OVERWORLD
 		scene_color = draw_sky(world_dir, atmosphere);
+#else
+		scene_color = draw_sky(world_dir);
+#endif
 	} else { // Terrain
 		// Sample half-res lighting data many operations before using it (latency hiding)
 
@@ -385,8 +409,8 @@ void main() {
 		// Terrain diffuse lighting
 
 #if defined WORLD_OVERWORLD || defined WORLD_END
-		float sss_depth = 0.0;
-		float shadow_distance_fade = 0.0;
+		float sss_depth;
+		float shadow_distance_fade;
 		vec3 shadows = calculate_shadows(scene_pos, flat_normal, light_levels.y, material.sss_amount, shadow_distance_fade, sss_depth);
 
 	#if defined POM && defined POM_SHADOW
@@ -394,6 +418,7 @@ void main() {
 	#endif
 #else
 		const float sss_depth = 0.0;
+		const float shadow_distance_fade = 0.0;
 		const vec3 shadows = vec3(0.0);
 #endif
 
@@ -417,20 +442,27 @@ void main() {
 
 		// Specular highlight
 
-#ifdef SHADOW
+#if defined WORLD_OVERWORLD || defined WORLD_END
+	#ifdef SHADOW
 		scene_color += get_specular_highlight(material, NoL, NoV, NoH, LoV, LoH) * light_color * shadows * ao;
-#else
+	#else
 		scene_color += get_specular_highlight(material, NoL, NoV, NoH, LoV, LoH) * light_color * ao * sqrt(ao) * pow8(light_levels.y);
+	#endif
 #endif
 
 		// Border fog
 
 #ifdef BORDER_FOG
+	#ifdef WORLD_OVERWORLD
 		float horizon_factor = linear_step(0.1, 1.0, exp(-75.0 * sqr(sun_dir.y + 0.0496)));
 			  horizon_factor = clamp01(horizon_factor + step(0.01, rainStrength));
 
-		float fog = border_fog(scene_pos, world_dir);
 		vec3 fog_color = mix(atmosphere, atmosphere_horizon, sqr(horizon_factor)) * (1.0 - biome_cave);
+	#else
+		vec3 fog_color = ambient_color;
+	#endif
+
+		float fog = border_fog(scene_pos, world_dir);
 
 		scene_color = mix(fog_color, scene_color, fog);
 #endif

@@ -102,6 +102,9 @@ Material material_from(vec3 albedo_srgb, uint material_mask, vec3 world_pos, ino
 						// Lava
 						material.emission = 2.00 * albedo_sqrt * (0.2 + 0.8 * isolate_hue(hsl, 30.0, 15.0));
 						light_levels.x *= 0.3;
+						#ifdef WORLD_NETHER
+						material.emission *= 0.75;
+						#endif
 						#endif
 					} else {
 						#ifdef HARDCODED_EMISSION
@@ -183,7 +186,7 @@ Material material_from(vec3 albedo_srgb, uint material_mask, vec3 world_pos, ino
 					} else {
 						// Leaves
 						#ifdef HARDCODED_SPECULAR
-						float smoothness = 0.33 * smoothstep(0.16, 0.5, hsl.z);
+						float smoothness = 0.5 * smoothstep(0.16, 0.5, hsl.z);
 						material.roughness = sqr(1.0 - smoothness);
 						material.f0 = vec3(0.02);
 						material.sheen_amount = 0.5;

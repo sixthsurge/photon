@@ -18,13 +18,12 @@
 out vec2 uv;
 
 flat out vec3 ambient_color;
+flat out vec3 light_color;
 
 #if defined WORLD_OVERWORLD
-flat out vec3 light_color;
+flat out float overcastness;
 flat out vec3 sun_color;
 flat out vec3 moon_color;
-
-flat out float overcastness;
 #endif
 
 // ------------
@@ -39,6 +38,8 @@ uniform float wetness;
 uniform int worldTime;
 uniform int worldDay;
 uniform int frameCounter;
+
+uniform vec3 fogColor;
 
 uniform vec3 light_dir;
 uniform vec3 sun_dir;
@@ -55,8 +56,15 @@ uniform float biome_cave;
 uniform float biome_may_rain;
 uniform float biome_may_snow;
 
-#include "/include/misc/palette.glsl"
+#if defined WORLD_OVERWORLD
+#include "/include/light/colors/light_color.glsl"
+#include "/include/light/colors/sky_color.glsl"
 #include "/include/misc/weather.glsl"
+#endif
+
+#if defined WORLD_NETHER
+#include "/include/light/colors/nether_color.glsl"
+#endif
 
 void main() {
 	uv = gl_MultiTexCoord0.xy;
@@ -67,6 +75,11 @@ void main() {
 	sun_color     = get_sun_exposure() * get_sun_tint();
 	moon_color    = get_moon_exposure() * get_moon_tint();
 	ambient_color = get_sky_color();
+#endif
+
+#if defined WORLD_NETHER
+	light_color   = vec3(0.0);
+	ambient_color = get_nether_color();
 #endif
 
 	vec2 vertex_pos = gl_Vertex.xy * taau_render_scale;
@@ -89,13 +102,12 @@ layout (location = 1) out float bloomy_fog;
 in vec2 uv;
 
 flat in vec3 ambient_color;
+flat in vec3 light_color;
 
 #if defined WORLD_OVERWORLD
-flat in vec3 light_color;
+flat in float overcastness;
 flat in vec3 sun_color;
 flat in vec3 moon_color;
-
-flat in float overcastness;
 #endif
 
 // ------------
@@ -116,9 +128,11 @@ uniform sampler2D colortex7; // Volumetric fog transmittance
 uniform sampler2D depthtex0;
 uniform sampler2D depthtex1;
 
+#ifdef WORLD_OVERWORLD
 #ifdef SHADOW
 uniform sampler2D shadowtex0;
 uniform sampler2DShadow shadowtex1;
+#endif
 #endif
 
 uniform mat4 gbufferModelView;
@@ -492,11 +506,15 @@ void main() {
 	vec3 background_color = scene_color;
 
 	if (is_rain_particle) {
+#ifdef WORLD_OVERWORLD
 		vec3 rain_color = get_rain_color();
 		scene_color = mix(scene_color, rain_color, RAIN_OPACITY);
+#endif
 	} else if (is_snow_particle) {
+#ifdef WORLD_OVERWORLD
 		vec3 snow_color = mix(0.5, 3.0, smoothstep(-0.1, 0.5, sun_dir.y)) * sunlight_color * vec3(0.49, 0.65, 1.00);
 		scene_color = mix(scene_color, snow_color, SNOW_OPACITY);
+#endif
 	} else if (is_translucent) {
 		float NoL = dot(normal, light_dir);
 		float NoV = clamp01(dot(normal, -world_dir));
@@ -506,11 +524,12 @@ void main() {
 		float LoH = LoV * halfway_norm + halfway_norm;
 
 #if defined WORLD_OVERWORLD || defined WORLD_END
-		float sss_depth = 0.0;
-		float shadow_distance_fade = 0.0;
+		float sss_depth;
+		float shadow_distance_fade;
 		vec3 shadows = calculate_shadows(scene_pos, flat_normal, light_levels.y, shadow_distance_fade, material.sss_amount, sss_depth);
 #else
 		const float sss_depth = 0.0;
+		const float shadow_distance_fade = 0.0;
 		const vec3 shadows = vec3(0.0);
 #endif
 
@@ -529,10 +548,12 @@ void main() {
 			LoV
 		);
 
-#ifdef SHADOW
+#if defined WORLD_OVERWORLD || defined WORLD_END
+	#ifdef SHADOW
 		translucent_color += get_specular_highlight(material, NoL, NoV, NoH, LoV, LoH) * light_color * shadows;
-#else
+	#else
 		translucent_color += get_specular_highlight(material, NoL, NoV, NoH, LoV, LoH) * light_color * pow8(light_levels.y);
+	#endif
 #endif
 
 		// Blend with background
@@ -613,7 +634,7 @@ void main() {
 	// Border fog
 	scene_color = mix(background_color, scene_color, border_fog(scene_pos, world_dir));
 
-#ifdef VL
+#if defined VL && defined WORLD_OVERWORLD
 	// Volumetric fog
 	scene_color = scene_color * fog_transmittance + fog_scattering;
 
@@ -650,11 +671,17 @@ void main() {
 	scene_color *= fog.a;
 	scene_color += fog.rgb;
 
+#if defined WORLD_NETHER
+	bloomy_fog *= lift(fog.a, 0.5);
+#else
 	bloomy_fog *= fog.a * 0.5 + 0.5;
+#endif
+
 	bloomy_fog *= 1.0 - 0.1 * darknessFactor;
 
 	// Purkinje shift
 
+#if defined WORLD_OVERWORLD
 #ifdef PURKINJE_SHIFT
 	light_levels = (depth0 == 1.0) ? vec2(0.0, 1.0) : light_levels;
 
@@ -664,6 +691,7 @@ void main() {
 	      purkinje_intensity *= clamp01(0.3 + 0.7 * cube(light_levels.y));
 
 	scene_color = purkinje_shift(scene_color, purkinje_intensity);
+#endif
 #endif
 }
 

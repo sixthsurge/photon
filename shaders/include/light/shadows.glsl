@@ -1,6 +1,8 @@
 #if !defined INCLUDE_LIGHT_SHADOWS
 #define INCLUDE_LIGHT_SHADOWS
 
+#if defined WORLD_OVERWORLD || defined WORLD_END
+
 #include "/include/light/distortion.glsl"
 #include "/include/utility/color.glsl"
 #include "/include/utility/dithering.glsl"
@@ -198,6 +200,7 @@ vec3 calculate_shadows(
 	out float sss_depth
 ) {
 	sss_depth = 0.0;
+	distance_fade = 0.0;
 
 	float NoL = dot(flat_normal, light_dir);
 	if (NoL < 1e-3 && sss_amount < 1e-3) return vec3(0.0);
@@ -267,6 +270,8 @@ vec3 calculate_shadows(
 	sss_depth = 0.0;
 	return vec3(1.0);
 }
+#endif
+
 #endif
 
 #endif // INCLUDE_LIGHT_SHADOWS

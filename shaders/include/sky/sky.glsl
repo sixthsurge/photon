@@ -4,12 +4,10 @@
 //----------------------------------------------------------------------------//
 #if   defined WORLD_OVERWORLD
 
+#include "/include/light/colors/light_color.glsl"
+#include "/include/light/colors/weather_color.glsl"
 #include "/include/light/bsdf.glsl"
-
-#include "/include/misc/palette.glsl"
-
 #include "/include/sky/atmosphere.glsl"
-
 #include "/include/utility/dithering.glsl"
 #include "/include/utility/fast_math.glsl"
 #include "/include/utility/geometry.glsl"
@@ -168,6 +166,10 @@ vec3 draw_sky(vec3 ray_dir) {
 
 //----------------------------------------------------------------------------//
 #elif defined WORLD_NETHER
+
+vec3 draw_sky(vec3 ray_dir) {
+	return ambient_color;
+}
 
 //----------------------------------------------------------------------------//
 #elif defined WORLD_END

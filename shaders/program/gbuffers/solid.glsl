@@ -95,9 +95,7 @@ void main() {
 	material_mask = uint(max(entityId - 10000, 0));
 #elif defined PROGRAM_GBUFFERS_BLOCK
 	material_mask = uint(max(blockEntityId - 10000, 0));
-#elif defined PROGRAM_GBUFFERS_BEACONBEAM
-	material_mask = 2; // full emissive
-#elif defined PROGRAM_GBUFFERS_SPIDEREYES
+#elif defined PROGRAM_GBUFFERS_BEACONBEAM || defined PROGRAM_GBUFFERS_SPIDEREYES
 	material_mask = 2; // full emissive
 	light_levels.x = 1.0;
 #endif

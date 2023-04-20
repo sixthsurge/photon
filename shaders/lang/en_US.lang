@@ -100,6 +100,7 @@ option.MOON_I                          = Moonlight Intensity
 option.SKYLIGHT_I                      = Skylight Intensity
 option.BOUNCED_LIGHT_I                 = Bounced Sunlight Intensity
 option.CAVE_LIGHTING_I                 = Cave Brightness
+option.NETHER_I                        = Nether Brightness
 
 option.BLOCKLIGHT_R                    = Red
 option.BLOCKLIGHT_G                    = Green
@@ -216,6 +217,7 @@ option.BORDER_FOG                      = Border Fog
 option.CAVE_FOG                        = Cave Fog
 option.BLOOMY_FOG                      = Bloomy Fog
 option.BLOOMY_FOG_INTENSITY            = Bloomy Fog Intensity
+option.NETHER_FOG_INTENSITY            = Nether Fog Intensity
 option.VL                              = Volumetric Lighting
 option.VL_RENDER_SCALE                 = VL Render Scale
 option.AIR_FOG_CLOUDY_NOISE            = Cloudy Fog

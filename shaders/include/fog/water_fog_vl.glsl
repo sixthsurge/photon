@@ -1,7 +1,10 @@
 #if !defined INCLUDE_FOG_WATER_FOG_VL
 #define INCLUDE_FOG_WATER_FOG_VL
 
+#include "/include/light/distortion.glsl"
+#include "/include/utility/color.glsl"
 #include "/include/utility/fast_math.glsl"
+#include "/include/utility/phase_functions.glsl"
 
 mat2x3 raymarch_water_fog(
 	vec3 world_start_pos,
@@ -63,7 +66,7 @@ mat2x3 raymarch_water_fog(
 	for (int i = 0; i < step_count; ++i, world_pos += world_step, shadow_pos += shadow_step, caustics_pos += caustics_step) {
 		vec3 shadow_screen_pos = distort_shadow_space(shadow_pos) * 0.5 + 0.5;
 
-#if defined SHADOW
+#if defined SHADOW && (defined WORLD_OVERWORLD || defined WORLD_END)
 	 	ivec2 shadow_texel = ivec2(shadow_screen_pos.xy * shadowMapResolution * MC_SHADOW_QUALITY);
 		float depth0 = texelFetch(shadowtex0, shadow_texel, 0).x;
 		float depth1 = texelFetch(shadowtex1, shadow_texel, 0).x;
@@ -98,7 +101,7 @@ mat2x3 raymarch_water_fog(
 			scattering += light_color * caustics * mie_phase * light_transmittance * transmittance * scattering_amount;
 
 			// Skylight
-			scattering += sky_color * isotropic_phase * transmittance * scattering_amount * sky_transmittance;
+			scattering += ambient_color * isotropic_phase * transmittance * scattering_amount * sky_transmittance;
 
 			anisotropy *= 0.5;
 			scattering_amount *= 0.5;

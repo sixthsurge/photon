@@ -4,6 +4,7 @@
 #include "/include/misc/raytracer.glsl"
 #include "/include/sky/projection.glsl"
 #include "/include/utility/bicubic.glsl"
+#include "/include/utility/random.glsl"
 #include "/include/utility/sampling.glsl"
 #include "/include/utility/space_conversion.glsl"
 
@@ -67,6 +68,8 @@ vec3 get_specular_highlight(
 
 #if   defined WORLD_OVERWORLD
 	float light_radius = (sunAngle < 0.5) ? sun_angular_radius : moon_angular_radius;
+#else
+	const float light_radius = 1.0 * degree;
 #endif
 
 	vec3 fresnel;
@@ -128,6 +131,8 @@ vec3 sample_ggx_vndf(vec3 viewer_dir, vec2 alpha, vec2 hash) {
 vec3 get_sky_reflection(vec3 ray_dir, float skylight) {
 #if defined WORLD_OVERWORLD
 	return bicubic_filter(colortex4, project_sky(ray_dir)).rgb * pow12(linear_step(0.0, 0.75, skylight));
+#else
+	return 0.25 * texture(colortex4, project_sky(ray_dir)).rgb;
 #endif
 }
 

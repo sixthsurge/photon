@@ -1,23 +1,22 @@
 #if !defined INCLUDE_LIGHT_DIFFUSE
 #define INCLUDE_LIGHT_DIFFUSE
 
+#include "/include/light/colors/blocklight_color.glsl"
+#include "/include/light/colors/weather_color.glsl"
 #include "/include/light/bsdf.glsl"
 #include "/include/misc/material.glsl"
-#include "/include/misc/palette.glsl"
 #include "/include/utility/phase_functions.glsl"
 #include "/include/utility/fast_math.glsl"
 #include "/include/utility/spherical_harmonics.glsl"
 
+const float night_vision_scale = 1.5;
+const float metal_diffuse_amount = 0.25; // Scales diffuse lighting on metals, ideally this would be zero but purely specular metals don't play well with SSR
+
 //----------------------------------------------------------------------------//
 #if   defined WORLD_OVERWORLD
 
-const vec3  blocklight_color     = from_srgb(vec3(BLOCKLIGHT_R, BLOCKLIGHT_G, BLOCKLIGHT_B)) * BLOCKLIGHT_I;
-const float blocklight_scale     = 7.0;
-const float emission_scale       = 30.0 * EMISSION_STRENGTH;
-const float sss_density          = 14.0;
-const float sss_scale            = 4.2;
-const float metal_diffuse_amount = 0.25; // Scales diffuse lighting on metals, ideally this would be zero but purely specular metals don't play well with SSR
-const float night_vision_scale   = 1.5;
+const float sss_density = 14.0;
+const float sss_scale   = 4.2;
 
 #ifdef SHADOW_VPS
 vec3 sss_approx(vec3 albedo, float sss_amount, float sheen_amount, float sss_depth, float LoV, float shadow) {
@@ -70,7 +69,7 @@ vec3 get_diffuse_lighting(
 
 #ifdef SHADOW
 	vec3 diffuse = vec3(lift(max0(NoL), 0.33) * (1.0 - 0.5 * material.sss_amount));
-	vec3 bounced = 0.08 * (1.0 - shadows * diffuse) * (1.0 - 0.33 * max0(normal.y)) * pow1d5(ao + eps) * pow4(light_levels.y) * BOUNCED_LIGHT_I;
+	vec3 bounced = 0.08 * (1.0 - shadows) * (1.0 - 0.1 * max0(normal.y)) * pow1d5(ao + eps) * pow4(light_levels.y) * BOUNCED_LIGHT_I;
 	vec3 sss = sss_approx(material.albedo, material.sss_amount, material.sheen_amount, sss_depth, LoV, shadows.x);
 
 	// Adjust SSS outside of shadow distance
@@ -153,6 +152,44 @@ vec3 get_diffuse_lighting(
 
 //----------------------------------------------------------------------------//
 #elif defined WORLD_NETHER
+
+vec3 get_diffuse_lighting(
+	Material material,
+	vec3 normal,
+	vec3 flat_normal,
+	vec3 shadows,
+	vec2 light_levels,
+	float ao,
+	float sss_depth,
+	float shadow_distance_fade,
+	float NoL,
+	float NoV,
+	float NoH,
+	float LoV
+) {
+#if defined PROGRAM_COMPOSITE1
+	// Small optimization, don't calculate diffuse lighting when albedo is 0 (eg water)
+	if (max_of(material.albedo) < eps) return vec3(0.0);
+#endif
+
+	float directional_lighting = (0.9 + 0.1 * normal.x) * (0.8 + 0.2 * abs(flat_normal.y)); // Random directional shading to make faces easier to distinguish
+
+	vec3 lighting = 12.0 * directional_lighting * ao * mix(ambient_color, vec3(dot(ambient_color, luminance_weights_rec2020)), 0.5);
+
+	// Blocklight
+
+	float blocklight_falloff  = 0.3 * pow5(light_levels.x) + 0.12 * sqr(light_levels.x) + 0.15 * dampen(light_levels.x); // Base falloff
+	      blocklight_falloff *= mix(ao * ao * ao, 1.0, clamp01(blocklight_falloff));                                     // Stronger AO further from the light source
+		  blocklight_falloff *= mix(1.0, ao * dampen(abs(cos(2.0 * frameTimeCounter))) * 0.67 + 0.2, darknessFactor);           // Pulsing blocklight with darkness effect
+		  blocklight_falloff *= 1.0 - 0.2 * time_noon * light_levels.y - 0.2 * light_levels.y;                           // Reduce blocklight intensity in daylight
+		  blocklight_falloff += min(2.0 * pow12(light_levels.x), 0.6);                                                   // Strong highlight around the light source, visible even in the daylight
+
+	lighting += (blocklight_falloff * directional_lighting) * (blocklight_scale * blocklight_color);
+
+	lighting += material.emission * emission_scale;
+
+	return max0(lighting) * material.albedo * rcp_pi * mix(1.0, metal_diffuse_amount, float(material.is_metal));
+}
 
 //----------------------------------------------------------------------------//
 #elif defined WORLD_END
