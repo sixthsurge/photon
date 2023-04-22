@@ -171,8 +171,8 @@ void main() {
 	vec2 uv2 = current_uv + offset;
 
 	// Read the lumas at both current extremities of the exploration segment, and compute the delta wrt the local average luma
-	float luma_end_1 = get_luma(texture(colortex0, uv1).rgb);
-	float luma_end_2 = get_luma(texture(colortex0, uv2).rgb);
+	float luma_end_1 = get_luma(textureLod(colortex0, uv1, 0).rgb);
+	float luma_end_2 = get_luma(textureLod(colortex0, uv2, 0).rgb);
 	luma_end_1 -= luma_local_average;
 	luma_end_2 -= luma_local_average;
 
@@ -192,12 +192,12 @@ void main() {
 		for (int i = 2; i < max_iterations; ++i) {
 			// If needed, read luma in 1st direction, compute delta
 			if (!reached1) {
-				luma_end_1  = get_luma(texture(colortex0, uv1).rgb);
+				luma_end_1  = get_luma(textureLod(colortex0, uv1, 0).rgb);
 				luma_end_1 -= luma_local_average;
 			}
 			// If needed, read luma in the opposite direction, compute delta
 			if (!reached2) {
-				luma_end_2  = get_luma(texture(colortex0, uv2).rgb);
+				luma_end_2  = get_luma(textureLod(colortex0, uv2, 0).rgb);
 				luma_end_2 -= luma_local_average;
 			}
 
@@ -266,7 +266,7 @@ void main() {
 	}
 
 	// Return the color at the new UV uvinates
-	scene_color = texture(colortex0, final_uv).rgb;
+	scene_color = textureLod(colortex0, final_uv, 0).rgb;
 }
 
 #endif
