@@ -4,6 +4,7 @@
 #include "/include/misc/raytracer.glsl"
 #include "/include/sky/projection.glsl"
 #include "/include/utility/bicubic.glsl"
+#include "/include/utility/dithering.glsl"
 #include "/include/utility/random.glsl"
 #include "/include/utility/sampling.glsl"
 #include "/include/utility/space_conversion.glsl"

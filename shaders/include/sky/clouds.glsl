@@ -10,6 +10,8 @@
 #include "/include/utility/random.glsl"
 #include "/include/utility/sampling.glsl"
 
+#define clouds_cirrus_shadow (1.0 - 0.9 * overcastness)
+
 float clouds_phase_single(float cos_theta) { // Single scattering phase function
 	return 0.8 * klein_nishina_phase(cos_theta, 2600.0)    // forwards lobe
 	     + 0.2 * henyey_greenstein_phase(cos_theta, -0.2); // backwards lobe
@@ -75,7 +77,6 @@ const float clouds_thickness_cu  = CLOUDS_CU_ALTITUDE * CLOUDS_CU_THICKNESS;
 const float clouds_top_radius_cu = clouds_radius_cu + clouds_thickness_cu;
 float clouds_extinction_coeff_cu = mix(0.05, 0.1, smoothstep(0.0, 0.3, abs(sun_dir.y))) * (1.0 - 0.33 * overcastness) * CLOUDS_CU_DENSITY;
 float clouds_scattering_coeff_cu = clouds_extinction_coeff_cu * mix(1.00, 0.66, rainStrength);
-float clouds_cirrus_shadow       = 1.0 - 0.9 * overcastness;
 float dynamic_thickness_cu       = mix(0.5, 1.0, smoothstep(0.4, 0.6, clouds_coverage_cu.y));
 
 // altitude_fraction := 0 at the bottom of the cloud layer and 1 at the top
