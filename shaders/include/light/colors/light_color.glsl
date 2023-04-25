@@ -15,7 +15,7 @@ float get_sun_exposure() {
 	return base_scale * daytime_mul;
 }
 
-vec3 get_sun_tint() {
+vec3 get_sun_tint(float overcastness) {
 	const vec3 base_tint = from_srgb(vec3(SUN_R, SUN_G, SUN_B));
 
 	float blue_hour = linear_step(0.05, 1.0, exp(-190.0 * sqr(sun_dir.y + 0.09604)));
@@ -26,7 +26,10 @@ vec3 get_sun_tint() {
 	vec3 blue_hour_tint = vec3(1.0, 0.85, 0.95);
 	     blue_hour_tint = mix(vec3(1.0), blue_hour_tint, blue_hour);
 
-	return base_tint * morning_evening_tint * blue_hour_tint;
+	vec3 overcast_tint = vec3(0.8, 0.9, 1.0);
+	     overcast_tint = mix(vec3(1.0), overcast_tint, overcastness);
+
+	return base_tint * morning_evening_tint * blue_hour_tint * overcast_tint;
 }
 
 float get_moon_exposure() {
@@ -35,18 +38,22 @@ float get_moon_exposure() {
 	return base_scale;
 }
 
-vec3 get_moon_tint() {
+vec3 get_moon_tint(float overcastness) {
 	const vec3 base_tint = from_srgb(vec3(MOON_R, MOON_G, MOON_B));
 
-	return base_tint;
+	vec3 overcast_tint = vec3(0.8, 0.9, 1.0);
+	     overcast_tint = mix(vec3(1.0), overcast_tint, overcastness);
+
+	return base_tint * overcast_tint;
 }
 
-vec3 get_light_color() {
-	vec3 light_color  = mix(get_sun_exposure() * get_sun_tint(), get_moon_exposure() * get_moon_tint(), step(0.5, sunAngle));
+vec3 get_light_color(float overcastness) {
+	vec3 light_color  = mix(get_sun_exposure() * get_sun_tint(overcastness), get_moon_exposure() * get_moon_tint(overcastness), step(0.5, sunAngle));
 	     light_color *= sunlight_color * atmosphere_transmittance(light_dir.y, planet_radius) * vec3(0.96, 0.96, 1.0);
 	     light_color *= clamp01(rcp(0.02) * light_dir.y); // fade away during day/night transition
 		 light_color *= 1.0 - 0.25 * pulse(abs(light_dir.y), 0.15, 0.11);
 		 light_color *= 1.0 - rainStrength;
+		 light_color *= 1.0 - 0.45 * overcastness;
 
 	return light_color;
 }

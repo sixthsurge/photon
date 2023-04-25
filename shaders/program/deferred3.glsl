@@ -99,9 +99,9 @@ void main() {
 
 #if defined WORLD_OVERWORLD
 	overcastness = daily_weather_blend(daily_weather_overcastness);
-	light_color  = get_light_color() * (1.0 - 0.4 * overcastness);
-	sun_color    = get_sun_exposure() * get_sun_tint();
-	moon_color   = get_moon_exposure() * get_moon_tint();
+	light_color  = get_light_color(overcastness);
+	sun_color    = get_sun_exposure() * get_sun_tint(overcastness);
+	moon_color   = get_moon_exposure() * get_moon_tint(overcastness);
 
 	float skylight_boost = get_skylight_boost();
 

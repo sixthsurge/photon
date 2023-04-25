@@ -64,7 +64,7 @@ mat2x3 water_fog_simple(
 	vec3 multiple_scattering_energy = multiple_scattering_factor / (1.0 - multiple_scattering_factor);
 
 	// Minimum distance so that water is always easily visible
-	dist = max(dist, 2.5);
+	dist = max(dist, 1.0);
 
 	vec3 transmittance = exp(-extinction_coeff * dist);
 

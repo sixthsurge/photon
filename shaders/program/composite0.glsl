@@ -81,7 +81,7 @@ void main() {
 #if defined WORLD_OVERWORLD
 	float overcastness = daily_weather_blend(daily_weather_overcastness);
 
-	light_color = get_light_color() * (1.0 - 0.33 * overcastness);
+	light_color = get_light_color(overcastness) * (1.0 - 0.33 * overcastness);
 	ambient_color = get_sky_color();
 
 	mat2x3 rayleigh_coeff = air_fog_rayleigh_coeff(), mie_coeff = air_fog_mie_coeff();
@@ -156,9 +156,12 @@ uniform vec3 cameraPosition;
 
 uniform float near;
 uniform float far;
-uniform float eyeAltitude;
+
 uniform float blindness;
+uniform float eyeAltitude;
 uniform float rainStrength;
+uniform float wetness;
+
 uniform float sunAngle;
 uniform float frameTimeCounter;
 

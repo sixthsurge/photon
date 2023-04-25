@@ -62,9 +62,10 @@ flat out vec2 clouds_coverage_ci;
 
 uniform sampler3D depthtex0; // atmospheric scattering LUT
 
+uniform float blindness;
 uniform float eyeAltitude;
 uniform float rainStrength;
-uniform float blindness;
+uniform float wetness;
 
 uniform int worldTime;
 uniform int worldDay;
@@ -125,9 +126,9 @@ void main() {
 #if defined WORLD_OVERWORLD
 	overcastness = daily_weather_blend(daily_weather_overcastness);
 
-	light_color = get_light_color();
-	sun_color = get_sun_exposure() * get_sun_tint();
-	moon_color = get_moon_exposure() * get_moon_tint();
+	light_color = get_light_color(overcastness);
+	sun_color = get_sun_exposure() * get_sun_tint(overcastness);
+	moon_color = get_moon_exposure() * get_moon_tint(overcastness);
 
 	const vec3 sky_dir = normalize(vec3(0.0, 1.0, -0.8)); // don't point direcly upwards to avoid the sun halo when the sun path rotation is 0
 	sky_color = atmosphere_scattering(sky_dir, sun_color, sun_dir, moon_color, moon_dir);

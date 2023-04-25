@@ -24,7 +24,7 @@ float get_water_height(vec2 coord, vec2 flow_dir, bool flowing_water) {
 	const float wave_angle         = 30.0 * degree;
 	const float noise_frequency    = 0.01;
 	const float noise_strength     = 2.0;
-	const float noise_fade         = 1.0;
+	const float noise_fade         = 1.33;
 	const float persistence        = 0.5 * WATER_WAVE_PERSISTENCE;
 	const float lacunarity         = 2.3 * WATER_WAVE_LACUNARITY;
 

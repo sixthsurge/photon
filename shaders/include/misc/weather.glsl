@@ -35,7 +35,7 @@ float daily_weather_fogginess(int world_day) {
 float daily_weather_overcastness(int world_day) {
 	const float[] overcastness = float[12](WEATHER_D0_OVERCASTNESS, WEATHER_D1_OVERCASTNESS, WEATHER_D2_OVERCASTNESS, WEATHER_D3_OVERCASTNESS, WEATHER_D4_OVERCASTNESS, WEATHER_D5_OVERCASTNESS, WEATHER_D6_OVERCASTNESS, WEATHER_D7_OVERCASTNESS, WEATHER_D8_OVERCASTNESS, WEATHER_D9_OVERCASTNESS, WEATHER_D10_OVERCASTNESS, WEATHER_D11_OVERCASTNESS);
 
-	return overcastness[weather_day_index(world_day)];
+	return overcastness[weather_day_index(world_day)] * (1.0 - rainStrength);
 }
 
 void daily_weather_clouds(
@@ -131,6 +131,8 @@ void clouds_weather_variation(
 	out vec2 clouds_coverage_ac,
 	out vec2 clouds_coverage_ci
 ) {
+	// Daily weather variation
+
 #ifdef CLOUDS_DAILY_WEATHER
 	vec2 coverage_cu_0, coverage_cu_1;
 	vec2 coverage_ac_0, coverage_ac_1;
@@ -150,7 +152,14 @@ void clouds_weather_variation(
 	clouds_coverage_ci = vec2(0.4, 0.5);
 #endif
 
-	// User coverage settings
+	// Weather influence
+
+	clouds_coverage_cu = mix(clouds_coverage_cu, vec2(0.6, 0.8), wetness);
+	clouds_coverage_ac = mix(clouds_coverage_ac, vec2(0.4, 0.9), wetness * 0.75);
+	clouds_coverage_ci = mix(clouds_coverage_ci, vec2(0.7, 0.0), wetness * 0.50);
+
+	// User config values
+
 	clouds_coverage_cu *= CLOUDS_CU_COVERAGE;
 	clouds_coverage_ac *= CLOUDS_AC_COVERAGE;
 	clouds_coverage_ci *= vec2(CLOUDS_CI_COVERAGE, CLOUDS_CC_COVERAGE);

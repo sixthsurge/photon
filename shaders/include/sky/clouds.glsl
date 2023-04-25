@@ -75,7 +75,7 @@ vec3 clouds_aerial_perspective(
 const float clouds_radius_cu     = planet_radius + CLOUDS_CU_ALTITUDE;
 const float clouds_thickness_cu  = CLOUDS_CU_ALTITUDE * CLOUDS_CU_THICKNESS;
 const float clouds_top_radius_cu = clouds_radius_cu + clouds_thickness_cu;
-float clouds_extinction_coeff_cu = mix(0.05, 0.1, smoothstep(0.0, 0.3, abs(sun_dir.y))) * (1.0 - 0.33 * overcastness) * CLOUDS_CU_DENSITY;
+float clouds_extinction_coeff_cu = mix(0.05, 0.1, smoothstep(0.0, 0.3, abs(sun_dir.y))) * (1.0 - 0.33 * max(overcastness, rainStrength)) * CLOUDS_CU_DENSITY;
 float clouds_scattering_coeff_cu = clouds_extinction_coeff_cu * mix(1.00, 0.66, rainStrength);
 float dynamic_thickness_cu       = mix(0.5, 1.0, smoothstep(0.4, 0.6, clouds_coverage_cu.y));
 
@@ -333,7 +333,7 @@ const float clouds_radius_ac     = planet_radius + CLOUDS_AC_ALTITUDE;
 const float clouds_thickness_ac  = CLOUDS_AC_ALTITUDE * CLOUDS_AC_THICKNESS;
 const float clouds_top_radius_ac = clouds_radius_ac + clouds_thickness_ac;
 float day_factor                 = smoothstep(0.0, 0.3, abs(sun_dir.y));
-float clouds_extinction_coeff_ac = mix(0.05, 0.1, day_factor) * CLOUDS_AC_DENSITY;
+float clouds_extinction_coeff_ac = mix(0.05, 0.1, day_factor) * CLOUDS_AC_DENSITY * (1.0 - 0.33 * max(overcastness, rainStrength));
 float clouds_scattering_coeff_ac = clouds_extinction_coeff_ac * mix(1.00, 0.66, rainStrength);
 float dynamic_thickness_ac       = mix(0.5, 1.0, smoothstep(0.4, 0.6, clouds_coverage_ac.y));
 

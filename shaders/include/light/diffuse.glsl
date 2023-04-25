@@ -16,7 +16,7 @@ const float metal_diffuse_amount = 0.25; // Scales diffuse lighting on metals, i
 #if   defined WORLD_OVERWORLD
 
 const float sss_density = 14.0;
-const float sss_scale   = 4.2;
+const float sss_scale   = 4.2 * SSS_INTENSITY;
 
 #ifdef SHADOW_VPS
 vec3 sss_approx(vec3 albedo, float sss_amount, float sheen_amount, float sss_depth, float LoV, float shadow) {
@@ -30,9 +30,13 @@ vec3 sss_approx(vec3 albedo, float sss_amount, float sheen_amount, float sss_dep
 	float phase = mix(isotropic_phase, henyey_greenstein_phase(-LoV, 0.7), 0.33);
 
 	vec3 sss = sss_scale * phase * exp2(-coeff * sss_depth) * dampen(sss_amount) * pi;
-	vec3 sheen = 0.8 * rcp(albedo + eps) * exp2(-1.0 * coeff * sss_depth) * henyey_greenstein_phase(-LoV, 0.5) * linear_step(-0.8, -0.2, -LoV);
 
+#ifdef SSS_SHEEN
+	vec3 sheen = (0.8 * SSS_INTENSITY) * rcp(albedo + eps) * exp2(-1.0 * coeff * sss_depth) * henyey_greenstein_phase(-LoV, 0.5) * linear_step(-0.8, -0.2, -LoV);
 	return sss + sheen * sheen_amount;
+#else
+	return sss;
+#endif
 }
 #else
 vec3 sss_approx(vec3 albedo, float sss_amount, float sheen_amount, float sss_depth, float LoV, float shadow) {
@@ -68,7 +72,7 @@ vec3 get_diffuse_lighting(
 	// Sunlight/moonlight
 
 #ifdef SHADOW
-	vec3 diffuse = vec3(lift(max0(NoL), 0.33) * (1.0 - 0.5 * material.sss_amount));
+	vec3 diffuse = vec3(lift(max0(NoL), 0.33 * rcp(SHADING_STRENGTH)) * (1.0 - 0.5 * material.sss_amount));
 	vec3 bounced = 0.08 * (1.0 - shadows) * (1.0 - 0.1 * max0(normal.y)) * pow1d5(ao + eps) * pow4(light_levels.y) * BOUNCED_LIGHT_I;
 	vec3 sss = sss_approx(material.albedo, material.sss_amount, material.sheen_amount, sss_depth, LoV, shadows.x);
 
@@ -90,7 +94,7 @@ vec3 get_diffuse_lighting(
 	// Simple shading for when shadows are disabled
 	vec3 sss = 0.09 * sss_scale * pi + 0.5 * material.sheen_amount * rcp(material.albedo + eps) * henyey_greenstein_phase(-LoV, 0.5) * linear_step(-0.8, -0.2, -LoV);
 
-	vec3 diffuse  = vec3(lift(max0(NoL), 0.5) * 0.6 + 0.4) * (shadows * 0.8 + 0.2);
+	vec3 diffuse  = vec3(lift(max0(NoL), 0.5 * rcp(SHADING_STRENGTH)) * 0.6 + 0.4) * (shadows * 0.8 + 0.2);
 	     diffuse  = mix(diffuse, sss, lift(material.sss_amount, 5.0));
 	     diffuse *= 1.1 * (0.9 + 0.1 * normal.x) * (0.8 + 0.2 * abs(flat_normal.y));
 	     diffuse *= pow1d5(ao) * pow4(light_levels.y) * (dampen(light_dir.y) * 0.5 + 0.5);
@@ -174,7 +178,7 @@ vec3 get_diffuse_lighting(
 
 	float directional_lighting = (0.9 + 0.1 * normal.x) * (0.8 + 0.2 * abs(flat_normal.y)); // Random directional shading to make faces easier to distinguish
 
-	vec3 lighting = 12.0 * directional_lighting * ao * mix(ambient_color, vec3(dot(ambient_color, luminance_weights_rec2020)), 0.5);
+	vec3 lighting = 16.0 * directional_lighting * ao * mix(ambient_color, vec3(dot(ambient_color, luminance_weights_rec2020)), 0.33);
 
 	// Blocklight
 

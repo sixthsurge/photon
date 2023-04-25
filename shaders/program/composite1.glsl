@@ -71,9 +71,9 @@ void main() {
 
 #if defined WORLD_OVERWORLD
 	overcastness  = daily_weather_blend(daily_weather_overcastness);
-	light_color   = get_light_color() * (1.0 - 0.4 * overcastness);
-	sun_color     = get_sun_exposure() * get_sun_tint();
-	moon_color    = get_moon_exposure() * get_moon_tint();
+	light_color   = get_light_color(overcastness) * (1.0 - 0.4 * overcastness);
+	sun_color     = get_sun_exposure() * get_sun_tint(overcastness);
+	moon_color    = get_moon_exposure() * get_moon_tint(overcastness);
 	ambient_color = get_sky_color();
 #endif
 
@@ -453,12 +453,14 @@ void main() {
 
 #if REFRACTION == REFRACTION_WATER_ONLY
 	if (is_water) {
+		#define refraction_mul REFRACTION_INTENSITY_WATER
 #elif REFRACTION == REFRACTION_ALL
 	if (is_translucent) {
+		float refraction_mul = is_water ? REFRACTION_INTENSITY_WATER : REFRACTION_INTENSITY_RP;
 #endif
 		vec3 tangent_normal = normal * tbn;
 
-		refracted_uv = uv + 0.1 * tangent_normal.xy * rcp(max(view_dist, 1.0)) * min(layer_dist, 8.0);
+		refracted_uv = uv + (0.1 * refraction_mul) * tangent_normal.xy * rcp(max(view_dist, 1.0)) * min(layer_dist, 8.0);
 
 		vec3  refracted_color = texture(colortex0, refracted_uv * taau_render_scale).rgb;
 		float refracted_depth = texture(depthtex1, refracted_uv * taau_render_scale).x;

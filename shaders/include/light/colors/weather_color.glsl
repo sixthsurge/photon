@@ -4,7 +4,7 @@
 #include "/include/sky/atmosphere.glsl"
 
 vec3 get_rain_color() {
-	return mix(0.033, 0.50, smoothstep(-0.1, 0.5, sun_dir.y)) * sunlight_color * vec3(0.49, 0.65, 1.00);
+	return mix(0.033, 0.66, smoothstep(-0.1, 0.5, sun_dir.y)) * sunlight_color * vec3(0.49, 0.65, 1.00);
 }
 
 vec3 get_snow_color() {

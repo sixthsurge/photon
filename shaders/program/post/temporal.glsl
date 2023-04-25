@@ -421,6 +421,11 @@ void main() {
 	float confidence; // Confidence-of-quality factor, see "A Survey of Temporal Antialiasing Techniques" section 5.1
 	vec3 current_color = catmull_rom_filter(colortex0, pos, confidence).rgb;
 
+	if (min_of(current_color) < 0.0) {
+		// Fix negatives arising around very dark objects
+		current_color = texture(colortex0, pos).rgb;
+	}
+
 	// Interpolate AABB bounds across pixels
 	vec3 min_color = texture(colortex6, pos).rgb;
 	vec3 max_color = texture(colortex7, pos).rgb;

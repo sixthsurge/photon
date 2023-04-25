@@ -77,6 +77,9 @@ option.GTAO                            = Shader AO
 option.VANILLA_AO                      = Vanilla AO
 option.AO_IN_SUNLIGHT                  = AO in Sunlight
 option.SH_SKYLIGHT                     = SH Skylight
+option.SSS_SHEEN                       = SSS Sheen
+option.SSS_INTENSITY                   = SSS Intensity
+option.SHADING_STRENGTH                = Shading Strength
 
 option.SHADOW                          = Shadow Mapping
 option.SHADOW_PCF                      = Shadow Filtering
@@ -285,6 +288,7 @@ option.POM_SHADOW                      = POM Self-Shadowing
 option.POM_SHADOW_SAMPLES              = POM Self-Shadow Samples
 option.POM_SLOPE_NORMALS               = POM Slope Normals
 option.POM_DISTANCE                    = POM Distance
+option.REFRACTION_INTENSITY_RP         = Refraction Intensity
 
 suffix.POM_DEPTH                       = m
 suffix.POM_DISTANCE                    = m
@@ -312,6 +316,7 @@ option.WATER_FOAM                      = Water Foam
 option.SNELLS_WINDOW                   = Snell's Window
 option.VANILLA_WATER_TEXTURE           = Vanilla Water Texture
 option.BIOME_WATER_COLOR               = Biome-Colored Water
+option.REFRACTION_INTENSITY_WATER      = Refraction Intensity
 
 option.WATER_WAVES                     = Enabled
 option.WATER_WAVE_ITERATIONS           = Iterations

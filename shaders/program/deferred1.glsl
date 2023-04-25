@@ -45,6 +45,7 @@ uniform float frameTimeCounter;
 uniform int isEyeInWater;
 uniform float eyeAltitude;
 uniform float rainStrength;
+uniform float wetness;
 
 uniform vec3 light_dir;
 uniform vec3 sun_dir;
@@ -90,8 +91,8 @@ void main() {
 #if defined WORLD_OVERWORLD
 	overcastness = daily_weather_blend(daily_weather_overcastness);
 
-	sun_color = get_sun_exposure() * get_sun_tint();
-	moon_color = get_moon_exposure() * get_moon_tint();
+	sun_color = get_sun_exposure() * get_sun_tint(0.0);
+	moon_color = get_moon_exposure() * get_moon_tint(0.0);
 
 	const vec3 sky_dir = normalize(vec3(0.0, 1.0, -0.8)); // don't point direcly upwards to avoid the sun halo when the sun path rotation is 0
 	sky_color = atmosphere_scattering(sky_dir, sun_dir) * sun_color + atmosphere_scattering(sky_dir, moon_dir) * moon_color;
@@ -168,6 +169,7 @@ uniform float frameTimeCounter;
 uniform int isEyeInWater;
 uniform float eyeAltitude;
 uniform float rainStrength;
+uniform float wetness;
 
 uniform vec3 light_dir;
 uniform vec3 sun_dir;
@@ -247,6 +249,11 @@ void main() {
 	      dither = r1(frameCounter / checkerboard_area, dither);
 
 	clouds = draw_clouds(ray_dir, clear_sky, dither);
+
+	vec3 overcast_tint = vec3(0.8, 0.9, 1.0);
+	     overcast_tint = mix(vec3(1.0), overcast_tint, overcastness);
+
+	clouds.rgb *= overcast_tint;
 #endif
 }
 
