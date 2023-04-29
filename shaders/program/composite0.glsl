@@ -4,7 +4,7 @@
   Photon Shaders by SixthSurge
 
   program/composite0.glsl:
-  Render volumetric fog
+  Render volumetric fog and Minecraft-style volumetric clouds
 
 --------------------------------------------------------------------------------
 */
@@ -21,6 +21,8 @@ flat out vec3 ambient_color;
 flat out vec3 light_color;
 
 #if defined WORLD_OVERWORLD
+flat out vec3 sun_color;
+flat out vec3 moon_color;
 flat out mat2x3 air_fog_coeff[2];
 #endif
 
@@ -81,8 +83,10 @@ void main() {
 #if defined WORLD_OVERWORLD
 	float overcastness = daily_weather_blend(daily_weather_overcastness);
 
-	light_color = get_light_color(overcastness) * (1.0 - 0.33 * overcastness);
+	light_color   = get_light_color(overcastness) * (1.0 - 0.33 * overcastness);
 	ambient_color = get_sky_color();
+	sun_color     = get_sun_exposure() * get_sun_tint(overcastness);
+	moon_color    = get_moon_exposure() * get_moon_tint(overcastness);
 
 	mat2x3 rayleigh_coeff = air_fog_rayleigh_coeff(), mie_coeff = air_fog_mie_coeff();
 	air_fog_coeff[0] = mat2x3(rayleigh_coeff[0], mie_coeff[0]);
@@ -106,8 +110,8 @@ void main() {
 //----------------------------------------------------------------------------//
 #if defined fsh
 
-layout (location = 0) out vec3 fog_scattering;
-layout (location = 1) out vec3 fog_transmittance;
+layout (location = 0) out vec4 fog_scattering;
+layout (location = 1) out vec4 fog_transmittance;
 
 /* DRAWBUFFERS:67 */
 
@@ -117,6 +121,8 @@ flat in vec3 ambient_color;
 flat in vec3 light_color;
 
 #if defined WORLD_OVERWORLD
+flat in vec3 sun_color;
+flat in vec3 moon_color;
 flat in mat2x3 air_fog_coeff[2];
 #endif
 
@@ -140,6 +146,10 @@ uniform sampler2D shadowtex1;
 uniform sampler2D shadowcolor0;
 #endif
 #endif
+#endif
+
+#ifdef MINECRAFTY_CLOUDS
+uniform sampler2D depthtex2; // minecraft cloud texture
 #endif
 
 uniform mat4 gbufferModelView;
@@ -169,6 +179,8 @@ uniform int isEyeInWater;
 uniform int worldTime;
 uniform int frameCounter;
 
+uniform float world_age;
+
 uniform vec3 light_dir;
 uniform vec3 sun_dir;
 uniform vec3 moon_dir;
@@ -190,6 +202,10 @@ uniform float time_midnight;
 
 #if defined WORLD_OVERWORLD
 #include "/include/fog/air_fog_vl.glsl"
+#endif
+
+#if defined WORLD_OVERWORLD && defined MINECRAFTY_CLOUDS
+#include "/include/sky/minecrafty_clouds.glsl"
 #endif
 
 #include "/include/fog/water_fog_vl.glsl"
@@ -217,13 +233,32 @@ void main() {
 	vec3 world_start_pos = gbufferModelViewInverse[3].xyz + cameraPosition;
 	vec3 world_end_pos   = world_pos;
 
+	fog_scattering = vec4(0.0, 0.0, 0.0, 1.0);
+
+	// Minecraft-style clouds
+
+#if defined WORLD_OVERWORLD && defined MINECRAFTY_CLOUDS
+	vec4 clouds = raymarch_minecrafty_clouds(world_start_pos, world_end_pos, depth == 1.0, minecrafty_clouds_altitude_l0, dither);
+	fog_scattering.rgb += clouds.xyz;
+	fog_scattering.a   *= clouds.a;
+
+#ifdef MINECRAFTY_CLOUDS_LAYER_2
+	clouds = raymarch_minecrafty_clouds(world_start_pos, world_end_pos, depth == 1.0, minecrafty_clouds_altitude_l1, dither);
+	fog_scattering.rgb += clouds.xyz * cube(fog_scattering.a);
+	fog_scattering.a   *= clouds.a;
+#endif
+#endif
+
+	// Volumetric lighting
+
+#if defined VL
 	switch (isEyeInWater) {
 #if defined WORLD_OVERWORLD
 		case 0:
 			mat2x3 air_fog = raymarch_air_fog(world_start_pos, world_end_pos, depth == 1.0, skylight, dither);
 
-			fog_scattering    = air_fog[0];
-			fog_transmittance = air_fog[1];
+			fog_scattering.rgb   += air_fog[0];
+			fog_transmittance.rgb = air_fog[1];
 
 			break;
 #endif
@@ -231,14 +266,14 @@ void main() {
 		case 1:
 			mat2x3 water_fog = raymarch_water_fog(world_start_pos, world_end_pos, depth == 1.0, dither);
 
-			fog_scattering    = water_fog[0];
-			fog_transmittance = water_fog[1];
+			fog_scattering.rgb   += water_fog[0];
+			fog_transmittance.rgb = water_fog[1];
 
 			break;
 
 		default:
-			fog_scattering    = vec3(0.0);
-			fog_transmittance = vec3(1.0);
+			fog_scattering.rgb    = vec3(0.0);
+			fog_transmittance.rgb = vec3(1.0);
 
 			break;
 
@@ -246,6 +281,7 @@ void main() {
 		case -1:
 			break;
 	}
+#endif
 }
 
 #endif

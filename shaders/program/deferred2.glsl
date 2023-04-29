@@ -169,7 +169,7 @@ float ambient_occlusion(vec3 screen_pos, vec3 view_pos, vec3 view_normal, vec2 d
 	mat3 local_to_view = mat3(viewer_right, viewer_up, viewer_dir);
 
 	// Reduce AO radius very close up, makes some screen-space artifacts less obvious
-	float ao_radius = 0.25 + 0.75 * smoothstep(0.0, 81.0, length_squared(view_pos));
+	float ao_radius = max(0.25 + 0.75 * smoothstep(0.0, 81.0, length_squared(view_pos)), 0.5);
 
 	for (int i = 0; i < GTAO_SLICES; ++i) {
 		float slice_angle = (i + dither.x) * (pi / float(GTAO_SLICES));
@@ -261,7 +261,7 @@ vec4 upscale_clouds() {
 }
 
 void main() {
-#if defined WORLD_OVERWORLD
+#if defined WORLD_OVERWORLD && !defined MINECRAFTY_CLOUDS
 	clouds = upscale_clouds();
 #endif
 

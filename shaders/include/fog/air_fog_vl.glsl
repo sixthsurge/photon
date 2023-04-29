@@ -63,7 +63,7 @@ mat2x3 raymarch_air_fog(vec3 world_start_pos, vec3 world_end_pos, bool sky, floa
 	if (eyeAltitude < air_fog_volume_bottom) {
 		// Below volume
 		distance_to_volume_start = distance_to_lower_plane;
-		distance_to_volume_end = world_dir.y < 0.0 ? -1.0 : distance_to_lower_plane;
+		distance_to_volume_end = world_dir.y < 0.0 ? -1.0 : distance_to_upper_plane;
 	} else if (eyeAltitude < air_fog_volume_top) {
 		// Inside volume
 		distance_to_volume_start = 0.0;

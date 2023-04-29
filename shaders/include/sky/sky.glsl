@@ -147,9 +147,11 @@ vec3 draw_sky(vec3 ray_dir, vec3 atmosphere) {
 
 	// Clouds
 
+#ifndef MINECRAFTY_CLOUDS
 	vec4 clouds = get_clouds(ray_dir, sky);
 	sky *= clouds.a;   // transmittance
 	sky += clouds.rgb; // scattering
+#endif
 
 	// Fade lower part of sky into cave fog color when underground so that the sky isn't visible
 	// beyond the render distance

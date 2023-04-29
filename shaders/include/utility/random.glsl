@@ -96,7 +96,7 @@ float hash1(vec2 p) {
 }
 //*/
 
-/*
+//*
 float hash1(vec3 p3) {
 	p3  = fract(p3 * .1031);
     p3 += dot(p3, p3.zyx + 31.32);

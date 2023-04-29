@@ -336,8 +336,12 @@ void main() {
 
 	vec2 fog_uv = clamp(uv * VL_RENDER_SCALE, vec2(0.0), floor(view_res * VL_RENDER_SCALE - 1.0) * view_pixel_size);
 
-	vec3 fog_scattering    = smooth_filter(colortex6, fog_uv).rgb;
 	vec3 fog_transmittance = smooth_filter(colortex7, fog_uv).rgb;
+#ifndef MINECRAFTY_CLOUDS
+	vec4 fog_scattering    = smooth_filter(colortex6, fog_uv);
+#else
+	vec4 fog_scattering    = bicubic_filter(colortex6, clamp(fog_uv, vec2(0.0), VL_RENDER_SCALE - 2.0 * view_pixel_size));
+#endif
 
 	bool is_translucent = depth0 != depth1 || blend_color.a > 0.1;
 	depth0 *= float(depth0 != depth1 || !is_translucent);
@@ -638,7 +642,11 @@ void main() {
 
 #if defined VL && defined WORLD_OVERWORLD
 	// Volumetric fog
-	scene_color = scene_color * fog_transmittance + fog_scattering;
+#ifdef MINECRAFTY_CLOUDS
+	scene_color *= fog_scattering.a;
+#endif
+
+	scene_color = scene_color * fog_transmittance + fog_scattering.rgb;
 
 	bloomy_fog *= clamp01(dot(fog_transmittance, vec3(luminance_weights_rec2020)));
 #else

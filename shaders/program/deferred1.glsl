@@ -231,7 +231,7 @@ float depth_max_4x4(sampler2D depth_sampler) {
 void main() {
 	ivec2 texel = ivec2(gl_FragCoord.xy);
 
-#if defined WORLD_OVERWORLD
+#if defined WORLD_OVERWORLD && !defined MINECRAFTY_CLOUDS
 	ivec2 checkerboard_pos = CLOUDS_TEMPORAL_UPSCALING * texel + clouds_checkerboard_offsets[frameCounter % checkerboard_area];
 
 	vec2 new_uv = vec2(checkerboard_pos) / vec2(view_res) * rcp(float(taau_render_scale));

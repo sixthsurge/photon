@@ -27,6 +27,7 @@ screen.clouds                          = Clouds
 screen.clouds_cumulus                  = Cumulus Clouds Settings
 screen.clouds_altocumulus              = Altocumulus Clouds Settings
 screen.clouds_cirrus                   = Planar Clouds Settings
+screen.clouds_minecrafty               = Minecraft-style Clouds Settings
 
 screen.fog_rlh                         = Rayleigh Coefficient
 screen.fog_mie                         = Mie Coefficient
@@ -180,6 +181,14 @@ option.CLOUDS_AC_WIND_SPEED            = Wind Speed
 suffix.CLOUDS_AC_ALTITUDE              = m/s
 option.CLOUDS_AC_WIND_ANGLE            = Wind Angle
 suffix.CLOUDS_AC_ALTITUDE              = °
+
+option.MINECRAFTY_CLOUDS               = Minecraft-style Clouds
+option.MINECRAFTY_CLOUDS_LAYER_2       = Second Layer
+option.MINECRAFTY_CLOUDS_THICKNESS     = Tallness
+option.MINECRAFTY_CLOUDS_ALTITUDE      = Altitude
+option.MINECRAFTY_CLOUDS_ALTITUDE_2    = Second Layer Altitude
+option.MINECRAFTY_CLOUDS_ROUNDNESS     = Roundness
+option.MINECRAFTY_CLOUDS_SHARPNESS     = Sharpness
 
 option.CLOUDS_TEMPORAL_UPSCALING       = Temporal Upscaling
 option.CLOUDS_DAILY_WEATHER            = Daily Weather Variation
