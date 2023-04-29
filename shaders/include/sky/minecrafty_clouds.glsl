@@ -50,16 +50,16 @@ float minecrafty_clouds_density(vec3 world_pos, float altitude_fraction, float l
 	const float roundness = 0.5 * MINECRAFTY_CLOUDS_ROUNDNESS; // Controls the roundness of the clouds
 	const float sharpness = 0.5 * MINECRAFTY_CLOUDS_SHARPNESS;  // Controls the sharpness of the cloud edges
 
-	// adjust position
+	// Adjust position
 
 	world_pos.xz  = abs(world_pos.xz + 3000.0 + layer_offset);
 	world_pos.xz += wind_velocity * world_age;
 
-	// minecraft cloud noise
+	// Base cloud noise
 
 	float density  = texture_soft(depthtex2, world_pos.xz * 0.00009, roundness).x;
 
-	// adjust density
+	// Adjust density
 	density *= linear_step(0.0, roundness, altitude_fraction);
 	density *= linear_step(0.0, roundness, 1.0 - altitude_fraction);
 	density  = linear_step(sharpness, 1.0 - sharpness, density);
