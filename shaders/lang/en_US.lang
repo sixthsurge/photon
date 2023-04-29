@@ -71,6 +71,8 @@ option.WAVING_LEAVES                   = Waving Leaves
 option.SLANTED_RAIN                    = Slanted Rain
 option.RAIN_OPACITY                    = Rain Opacity
 option.SEA_LEVEL                       = Sea Level
+option.EDGE_HIGHLIGHT                  = Edge Highlight
+option.EDGE_HIGHLIGHT_SCALE            = Edge Highlight Scale
 
 # Lighting settings
 

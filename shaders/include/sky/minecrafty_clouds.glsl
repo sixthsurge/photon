@@ -9,6 +9,8 @@
 #include "/include/utility/phase_functions.glsl"
 #include "/include/utility/random.glsl"
 
+// Minecraft-style volumetric clouds
+
 const float minecrafty_clouds_altitude_l0 = MINECRAFTY_CLOUDS_ALTITUDE;
 const float minecrafty_clouds_altitude_l1 = MINECRAFTY_CLOUDS_ALTITUDE_2;
 const float minecrafty_clouds_thickness   = MINECRAFTY_CLOUDS_THICKNESS;

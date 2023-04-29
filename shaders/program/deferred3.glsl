@@ -254,6 +254,7 @@ uniform float time_midnight;
 #include "/include/light/diffuse.glsl"
 #include "/include/light/shadows.glsl"
 #include "/include/light/specular.glsl"
+#include "/include/misc/edge_highlight.glsl"
 #include "/include/misc/material.glsl"
 #include "/include/sky/sky.glsl"
 #include "/include/utility/bicubic.glsl"
@@ -448,6 +449,12 @@ void main() {
 	#else
 		scene_color += get_specular_highlight(material, NoL, NoV, NoH, LoV, LoH) * light_color * ao * sqrt(ao) * pow8(light_levels.y);
 	#endif
+#endif
+
+		// Edge highlight
+
+#ifdef EDGE_HIGHLIGHT
+		scene_color *= 1.0 + 0.5 * get_edge_highlight(scene_pos, flat_normal, depth, material_mask);
 #endif
 
 		// Border fog
