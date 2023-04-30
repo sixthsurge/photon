@@ -96,7 +96,7 @@ vec3 get_diffuse_lighting(
 
 	vec3 diffuse  = vec3(lift(max0(NoL), 0.5 * rcp(SHADING_STRENGTH)) * 0.6 + 0.4) * (shadows * 0.8 + 0.2);
 	     diffuse  = mix(diffuse, sss, lift(material.sss_amount, 5.0));
-	     diffuse *= 1.1 * (0.9 + 0.1 * normal.x) * (0.8 + 0.2 * abs(flat_normal.y));
+	     diffuse *= 1.0 * (0.9 + 0.1 * normal.x) * (0.8 + 0.2 * abs(flat_normal.y));
 	     diffuse *= ao * pow4(light_levels.y) * (dampen(light_dir.y) * 0.5 + 0.5);
 
 	lighting += light_color * diffuse;
