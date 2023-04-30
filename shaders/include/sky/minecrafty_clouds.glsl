@@ -29,18 +29,19 @@ float minecrafty_clouds_phase_multi(float cos_theta, vec3 g) { // Multiple scatt
 	     + 0.25 * henyey_greenstein_phase(cos_theta, -g.z); // backwards lobe
 }
 
-vec4 texture_soft(sampler2D sampler, vec2 coord, float softness) {
+float texture_soft(sampler2D sampler, vec2 coord, float softness) {
 	vec2 res = vec2(textureSize(sampler, 0));
 
 	coord = coord * res + 0.5;
 	vec2 i, f = modf(coord, i);
 
 	f = smoothstep(0.5 - softness, 0.5 + softness, f); // the closer the borders are to 0.5, the sharper the cloud edge
-	coord = i + f;
+	coord = i * rcp(res) + rcp(res);
 
-	coord = (coord - 0.5) / res;
+	vec4 samples = textureGather(sampler, coord, 3);
+	vec4 weights = vec4(f.y - f.x * f.y, f.x * f.y, f.x - f.x * f.y, 1.0 - f.x - f.y + f.x * f.y);
 
-	return texture(sampler, coord);
+	return dot(samples, weights);
 }
 
 float minecrafty_clouds_density(vec3 world_pos, float altitude_fraction, float layer_offset) {
@@ -55,9 +56,9 @@ float minecrafty_clouds_density(vec3 world_pos, float altitude_fraction, float l
 	world_pos.xz  = abs(world_pos.xz + 3000.0 + layer_offset);
 	world_pos.xz += wind_velocity * world_age;
 
-	// Base cloud noise
+	// Minecraft cloud noise
 
-	float density  = texture_soft(depthtex2, world_pos.xz * 0.00009, roundness).x;
+	float density = texture_soft(depthtex2, world_pos.xz * 0.00018, roundness);
 
 	// Adjust density
 	density *= linear_step(0.0, roundness, altitude_fraction);

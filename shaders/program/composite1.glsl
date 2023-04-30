@@ -402,7 +402,7 @@ void main() {
 		float texture_value     = blend_color.r / blend_color.a;
 		float texture_highlight = 0.5 * sqr(linear_step(0.63, 1.0, texture_value)) + 0.03 * texture_value;
 
-		material.albedo     = clamp01(0.2 * exp(-2.0 * water_absorption_coeff) * texture_highlight);
+		material.albedo    += clamp01(0.2 * exp(-2.0 * water_absorption_coeff) * texture_highlight);
 		material.roughness += 0.3 * texture_highlight;
 #else
 		material.albedo = srgb_eotf_inv(albedo) * rec709_to_rec2020;

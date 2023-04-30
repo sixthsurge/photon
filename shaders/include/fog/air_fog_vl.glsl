@@ -11,7 +11,7 @@
 #if defined PROGRAM_DEFERRED0
 	#define NOISE_3D colortex6
 #else
-	#define NOISE_3D colortex3
+	#define NOISE_3D colortex0
 #endif
 
 const uint  air_fog_min_step_count    = 8;

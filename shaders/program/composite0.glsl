@@ -132,8 +132,9 @@ flat in mat2x3 air_fog_coeff[2];
 
 uniform sampler2D noisetex;
 
+uniform sampler3D colortex0; // 3D worley noise
 uniform sampler2D colortex1; // gbuffer data
-uniform sampler3D colortex3; // 3D worley noise
+uniform sampler2D colortex3; // translucent color
 
 uniform sampler2D depthtex0;
 uniform sampler2D depthtex1;
@@ -243,6 +244,8 @@ void main() {
 	// Minecraft-style clouds
 
 #if defined WORLD_OVERWORLD && defined MINECRAFTY_CLOUDS
+	float alpha = texelFetch(colortex3, view_texel, 0).a;
+
 	vec3 clouds_start_pos = depth0 == depth1 ? world_start_pos : world_pos;
 	vec3 clouds_end_pos   = depth0 == depth1 ? world_end_pos : world_back_pos;
 
@@ -251,10 +254,14 @@ void main() {
 	fog_scattering.a   *= clouds.a;
 
 #ifdef MINECRAFTY_CLOUDS_LAYER_2
+	float visibility = pow4(clouds.a);
 	clouds = raymarch_minecrafty_clouds(world_start_pos, world_end_pos, depth1 == 1.0, minecrafty_clouds_altitude_l1, dither);
-	fog_scattering.rgb += clouds.xyz * cube(fog_scattering.a);
-	fog_scattering.a   *= clouds.a;
+	fog_scattering.rgb += clouds.xyz * visibility;
+	fog_scattering.a   *= mix(1.0, clouds.a, visibility);
 #endif
+
+	fog_scattering.rgb *= 1.0 - alpha;
+	fog_scattering.a    = mix(fog_scattering.a, 1.0, alpha);
 #endif
 
 	// Volumetric lighting
@@ -265,7 +272,7 @@ void main() {
 		case 0:
 			mat2x3 air_fog = raymarch_air_fog(world_start_pos, world_end_pos, depth0 == 1.0, skylight, dither);
 
-			fog_scattering.rgb   += air_fog[0];
+			fog_scattering.rgb    = fog_scattering.rgb * air_fog[1] + air_fog[0];
 			fog_transmittance.rgb = air_fog[1];
 
 			break;
@@ -274,7 +281,7 @@ void main() {
 		case 1:
 			mat2x3 water_fog = raymarch_water_fog(world_start_pos, world_end_pos, depth0 == 1.0, dither);
 
-			fog_scattering.rgb   += water_fog[0];
+			fog_scattering.rgb    = fog_scattering.rgb * water_fog[1] + water_fog[0];
 			fog_transmittance.rgb = water_fog[1];
 
 			break;
