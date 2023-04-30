@@ -682,7 +682,7 @@ void main() {
 	scene_color += fog.rgb;
 
 #if defined WORLD_NETHER
-	bloomy_fog *= lift(fog.a, 0.5);
+	bloomy_fog *= lift(fog.a, 2.0);
 #else
 	bloomy_fog *= fog.a * 0.5 + 0.5;
 #endif
