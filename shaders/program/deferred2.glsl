@@ -4,7 +4,7 @@
   Photon Shaders by SixthSurge
 
   program/deferred2.glsl:
-  Calculate ambient occlusion, cloud temporal upscaling
+  Ambient occlusion, temporal upscaling for clouds
 
 --------------------------------------------------------------------------------
 */

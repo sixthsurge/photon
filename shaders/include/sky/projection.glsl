@@ -5,7 +5,7 @@
 
 // Sky map projection from https://sebh.github.io/publications/egsr2020.pdf
 
-const ivec2 sky_map_res = ivec2(192, 108);
+const ivec2 sky_map_res = ivec2(191, 108);
 
 vec2 project_sky(vec3 direction) {
 	vec2 projected_dir = normalize(direction.xz);
@@ -18,14 +18,14 @@ vec2 project_sky(vec3 direction) {
 	coord.y = 0.5 + 0.5 * sign(altitude_angle) * sqrt(2.0 * rcp_pi * abs(altitude_angle)); // Section 5.3
 
 	return vec2(
-		get_uv_from_unit_range(coord.x, sky_map_res.x),
+		get_uv_from_unit_range(coord.x, sky_map_res.x) * (255.0 / 256.0),
 		get_uv_from_unit_range(coord.y, sky_map_res.y)
 	);
 }
 
 vec3 unproject_sky(vec2 coord) {
 	coord = vec2(
-		get_unit_range_from_uv(coord.x, sky_map_res.x),
+		get_unit_range_from_uv(coord.x * (256.0 / 255.0), sky_map_res.x),
 		get_unit_range_from_uv(coord.y, sky_map_res.y)
 	);
 

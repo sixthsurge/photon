@@ -45,8 +45,6 @@ flat out vec3 ambient_color;
 flat out vec3 light_color;
 
 #if defined WORLD_OVERWORLD
-flat out float overcastness;
-
 flat out vec3 sun_color;
 flat out vec3 moon_color;
 flat out vec3 sky_color;
@@ -111,7 +109,6 @@ uniform float biome_humidity;
 
 #if defined WORLD_OVERWORLD
 #include "/include/light/colors/light_color.glsl"
-#include "/include/light/colors/sky_color.glsl"
 #include "/include/light/colors/weather_color.glsl"
 #include "/include/misc/weather.glsl"
 #endif
@@ -124,16 +121,16 @@ void main() {
 	uv = gl_MultiTexCoord0.xy;
 
 #if defined WORLD_OVERWORLD
-	overcastness = daily_weather_blend(daily_weather_overcastness);
-
-	light_color = get_light_color(overcastness);
-	sun_color = get_sun_exposure() * get_sun_tint(overcastness);
-	moon_color = get_moon_exposure() * get_moon_tint(overcastness);
+	sun_color = get_sun_exposure() * get_sun_tint();
+	moon_color = get_moon_exposure() * get_moon_tint();
 
 	const vec3 sky_dir = normalize(vec3(0.0, 1.0, -0.8)); // don't point direcly upwards to avoid the sun halo when the sun path rotation is 0
 	sky_color = atmosphere_scattering(sky_dir, sun_color, sun_dir, moon_color, moon_dir);
 	sky_color = tau * mix(sky_color, vec3(sky_color.b) * sqrt(2.0), rcp_pi);
 	sky_color = mix(sky_color, tau * get_weather_color(), rainStrength);
+
+	light_color   = get_light_color();
+	ambient_color = sky_color;
 
 	clouds_weather_variation(
 		clouds_coverage_cu,
@@ -168,8 +165,6 @@ flat in vec3 ambient_color;
 flat in vec3 light_color;
 
 #if defined WORLD_OVERWORLD
-flat in float overcastness;
-
 flat in vec3 sun_color;
 flat in vec3 moon_color;
 flat in vec3 sky_color;
@@ -253,9 +248,22 @@ uniform float biome_may_snow;
 void main() {
 	ivec2 texel = ivec2(gl_FragCoord.xy);
 
-	vec3 ray_dir = unproject_sky(uv);
+	if (texel.x == sky_map_res.x) { // Store lighting colors
+		sky_map = vec3(0.0);
+		switch (texel.y) {
+		case 0:
+			sky_map = light_color;
+			break;
 
-	sky_map = draw_sky(ray_dir);
+		case 1:
+			sky_map = ambient_color;
+			break;
+		}
+	} else { // Draw sky map
+		vec3 ray_dir = unproject_sky(uv);
+
+		sky_map = draw_sky(ray_dir);
+	}
 }
 
 #endif

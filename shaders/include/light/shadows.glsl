@@ -247,10 +247,6 @@ vec3 calculate_shadows(
 	penumbra_size *= 1.0 + 7.0 * sss_amount;
 #endif
 
-#ifdef WORLD_OVERWORLD
-	penumbra_size *= 1.0 + 3.3 * overcastness;
-#endif
-
 #ifdef SHADOW_PCF
 	return distant_shadow * shadow_pcf(shadow_screen_pos, shadow_clip_pos, penumbra_size, dither);
 #else

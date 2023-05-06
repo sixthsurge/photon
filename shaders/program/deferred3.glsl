@@ -21,7 +21,6 @@ flat out vec3 ambient_color;
 flat out vec3 light_color;
 
 #if defined WORLD_OVERWORLD
-flat out float overcastness;
 flat out vec3 sun_color;
 flat out vec3 moon_color;
 #endif
@@ -38,9 +37,7 @@ flat out mat3 sky_samples;
 
 uniform sampler3D depthtex0; // Atmosphere scattering LUT
 
-#ifdef SH_SKYLIGHT
-uniform sampler2D colortex4; // Sky map
-#endif
+uniform sampler2D colortex4; // Sky map, lighting colors
 
 uniform int worldTime;
 uniform int worldDay;
@@ -80,7 +77,6 @@ uniform float time_midnight;
 
 #if defined WORLD_OVERWORLD
 #include "/include/light/colors/light_color.glsl"
-#include "/include/light/colors/sky_color.glsl"
 #include "/include/misc/weather.glsl"
 #include "/include/sky/atmosphere.glsl"
 #endif
@@ -97,11 +93,12 @@ uniform float time_midnight;
 void main() {
 	uv = gl_MultiTexCoord0.xy;
 
+	light_color   = texelFetch(colortex4, ivec2(191, 0), 0).rgb;
+	ambient_color = texelFetch(colortex4, ivec2(191, 1), 0).rgb;
+
 #if defined WORLD_OVERWORLD
-	overcastness = daily_weather_blend(daily_weather_overcastness);
-	light_color  = get_light_color(overcastness);
-	sun_color    = get_sun_exposure() * get_sun_tint(overcastness);
-	moon_color   = get_moon_exposure() * get_moon_tint(overcastness);
+	sun_color    = get_sun_exposure() * get_sun_tint();
+	moon_color   = get_moon_exposure() * get_moon_tint();
 
 	float skylight_boost = get_skylight_boost();
 
@@ -133,11 +130,6 @@ void main() {
 	#endif
 #endif
 
-#if defined WORLD_NETHER
-	light_color   = vec3(0.0);
-	ambient_color = get_nether_color();
-#endif
-
 	vec2 vertex_pos = gl_Vertex.xy * taau_render_scale;
 	gl_Position = vec4(vertex_pos * 2.0 - 1.0, 0.0, 1.0);
 }
@@ -151,9 +143,8 @@ void main() {
 #if defined fsh
 
 layout (location = 0) out vec3 scene_color;
-layout (location = 1) out vec4 colortex3_clear;
 
-/* DRAWBUFFERS:03 */
+/* DRAWBUFFERS:0 */
 
 in vec2 uv;
 
@@ -161,7 +152,6 @@ flat in vec3 ambient_color;
 flat in vec3 light_color;
 
 #if defined WORLD_OVERWORLD
-flat in float overcastness;
 flat in vec3 sun_color;
 flat in vec3 moon_color;
 #endif
@@ -188,6 +178,10 @@ uniform sampler2D colortex7; // clouds
 uniform sampler3D depthtex0; // atmosphere scattering LUT
 uniform sampler2D depthtex1;
 
+#ifdef BLOCKY_CLOUDS
+uniform sampler2D depthtex2; // minecraft cloud texture
+#endif
+
 #ifdef WORLD_OVERWORLD
 #ifdef SHADOW
 uniform sampler2D shadowtex0;
@@ -210,6 +204,7 @@ uniform mat4 shadowProjectionInverse;
 
 uniform vec3 cameraPosition;
 
+uniform float eyeAltitude;
 uniform float near;
 uniform float far;
 
@@ -235,6 +230,8 @@ uniform vec2 view_res;
 uniform vec2 view_pixel_size;
 uniform vec2 taa_offset;
 
+uniform float world_age;
+
 uniform float biome_cave;
 uniform float biome_may_rain;
 uniform float biome_may_snow;
@@ -256,27 +253,20 @@ uniform float time_midnight;
 #include "/include/light/specular.glsl"
 #include "/include/misc/edge_highlight.glsl"
 #include "/include/misc/material.glsl"
+#include "/include/misc/rain_puddles.glsl"
 #include "/include/sky/sky.glsl"
 #include "/include/utility/bicubic.glsl"
 #include "/include/utility/color.glsl"
 #include "/include/utility/encoding.glsl"
 #include "/include/utility/space_conversion.glsl"
 
+#if defined WORLD_OVERWORLD && defined BLOCKY_CLOUDS
+#include "/include/sky/blocky_clouds.glsl"
+#endif
+
 /*
 const bool colortex7MipmapEnabled = true;
  */
-
-float get_puddle_noise(vec3 world_pos, vec3 flat_normal, vec2 light_levels) {
-	const float puddle_frequency = 0.025;
-
-	float puddle = texture(noisetex, world_pos.xz * puddle_frequency).w;
-	      puddle = linear_step(0.45, 0.55, puddle) * wetness * biome_may_rain * max0(flat_normal.y);
-
-	// Prevent puddles from appearing indoors
-	puddle *= (1.0 - cube(light_levels.x)) * pow5(light_levels.y);
-
-	return puddle;
-}
 
 void main() {
 	ivec2 texel = ivec2(gl_FragCoord.xy);
@@ -299,18 +289,45 @@ void main() {
 	vec3 world_pos = scene_pos + cameraPosition;
 	vec3 world_dir = normalize(scene_pos - gbufferModelViewInverse[3].xyz);
 
-#ifdef WORLD_OVERWORLD
-	vec3 atmosphere = atmosphere_scattering(world_dir, sun_color, sun_dir, moon_color, moon_dir);
+#if defined WORLD_OVERWORLD
+	vec3 atmosphere = atmosphere_scattering(world_dir, sun_color, sun_dir, moon_color, moon_dir);;
+
+	// Blocky clouds
+
+#ifdef BLOCKY_CLOUDS
+	vec3 world_start_pos = gbufferModelViewInverse[3].xyz + cameraPosition;
+	vec3 world_end_pos   = world_pos;
+
+	float dither = texelFetch(noisetex, texel & 511, 0).b;
+	      dither = r1(frameCounter, dither);
+
+	vec4 blocky_clouds = raymarch_blocky_clouds(world_start_pos, world_end_pos, depth == 1.0, blocky_clouds_altitude_l0, dither);
+
+	#ifdef BLOCKY_CLOUDS_LAYER_2
+	float visibility = pow4(blocky_clouds.a);
+	vec4 blocky_clouds_l2 = raymarch_blocky_clouds(world_start_pos, world_end_pos, depth == 1.0, blocky_clouds_altitude_l1, dither);
+	blocky_clouds.rgb += blocky_clouds_l2.xyz * visibility;
+	blocky_clouds.a   *= mix(1.0, blocky_clouds_l2.a, visibility);
+	#endif
+#endif
 #endif
 
 	if (depth == 1.0) { // Sky
-#ifdef WORLD_OVERWORLD
+#if defined WORLD_OVERWORLD
 		scene_color = draw_sky(world_dir, atmosphere);
+
+	#ifdef BLOCKY_CLOUDS
+		scene_color = scene_color * blocky_clouds.a + blocky_clouds.rgb;
+	#endif
 #else
 		scene_color = draw_sky(world_dir);
 #endif
+
+		// Apply common fog
+		vec4 fog = common_fog(far, true);
+		scene_color = mix(fog.rgb, scene_color.rgb, fog.a);
 	} else { // Terrain
-		// Sample half-res lighting data many operations before using it (latency hiding)
+		// Sample ambient occlusion a while before using it (latency hiding)
 
 		vec2 half_res_pos = gl_FragCoord.xy * (0.5 / taau_render_scale) - 0.5;
 
@@ -340,6 +357,8 @@ void main() {
 		albedo = overlay_id == 0u ? albedo + overlays.rgb : albedo; // enchantment glint
 		albedo = overlay_id == 1u ? 2.0 * albedo * overlays.rgb : albedo; // damage overlay
 
+		// Get material and normal
+
 		Material material = material_from(albedo, material_mask, world_pos, light_levels);
 
 #ifdef NORMAL_MAPPING
@@ -349,22 +368,14 @@ void main() {
 #endif
 
 #ifdef SPECULAR_MAPPING
+		bool parallax_shadow;
 		vec4 specular_map = vec4(unpack_unorm_2x8(gbuffer_data_1.z), unpack_unorm_2x8(gbuffer_data_1.w));
-#endif
-
-#if defined POM && defined POM_SHADOW
-	#ifdef SPECULAR_MAPPING
-		// Specular map alpha >= 0.5 => parallax shadow
-		bool parallax_shadow = specular_map.a >= 0.5;
-		specular_map.a = fract(specular_map.a * 2.0);
-	#else
+		decode_specular_map(specular_map, material, parallax_shadow);
+#elif defined NORMAL_MAPPING
 		bool parallax_shadow = gbuffer_data_1.z >= 0.5;
-	#endif
 #endif
 
-#ifdef SPECULAR_MAPPING
-		decode_specular_map(specular_map, material);
-#endif
+		// Rain puddles
 
 #if defined WORLD_OVERWORLD && defined RAIN_PUDDLES
 		if (wetness > eps && biome_may_rain > eps && wetness < 1.0 - eps) {
@@ -379,16 +390,9 @@ void main() {
 		}
 #endif
 
-		float NoL = dot(normal, light_dir);
-		float NoV = clamp01(dot(normal, -world_dir));
-		float LoV = dot(light_dir, -world_dir);
-		float halfway_norm = inversesqrt(2.0 * LoV + 2.0);
-		float NoH = (NoL + NoV) * halfway_norm;
-		float LoH = LoV * halfway_norm + halfway_norm;
+		// Upscale ambient occlusion
 
 #ifdef GTAO
-		// Depth-aware upscaling for GTAO
-
 		float lin_z = linearize_depth_fast(depth);
 
 		#define depth_weight(reversed_depth) exp2(-10.0 * abs(linearize_depth_fast(1.0 - reversed_depth) - lin_z))
@@ -407,24 +411,30 @@ void main() {
 		#define ao 1.0
 #endif
 
-		// Terrain diffuse lighting
+		// Shadows
+
+		float NoL = dot(normal, light_dir);
+		float NoV = clamp01(dot(normal, -world_dir));
+		float LoV = dot(light_dir, -world_dir);
+		float halfway_norm = inversesqrt(2.0 * LoV + 2.0);
+		float NoH = (NoL + NoV) * halfway_norm;
+		float LoH = LoV * halfway_norm + halfway_norm;
 
 #if defined WORLD_OVERWORLD || defined WORLD_END
 		float sss_depth;
 		float shadow_distance_fade;
 		vec3 shadows = calculate_shadows(scene_pos, flat_normal, light_levels.y, material.sss_amount, shadow_distance_fade, sss_depth);
-
-	#if defined POM && defined POM_SHADOW
-		shadows *= float(!parallax_shadow);
-	#endif
 #else
-		const float sss_depth = 0.0;
-		const float shadow_distance_fade = 0.0;
-		const vec3 shadows = vec3(0.0);
+		vec3 shadows = vec3(sqrt(ao) * pow8(light_levels.y));
+		#define sss_depth 0.0
+		#define shadow_distance_fade 0.0
 #endif
 
-		vec3 horizon_dir = normalize(vec3(world_dir.xz, min(world_dir.y, -0.1)).xzy);
-		vec3 atmosphere_horizon = texture(colortex4, project_sky(horizon_dir)).rgb;
+#if defined POM && defined POM_SHADOW
+		shadows *= float(!parallax_shadow);
+#endif
+
+		// Diffuse lighting
 
 		scene_color = get_diffuse_lighting(
 			material,
@@ -444,11 +454,7 @@ void main() {
 		// Specular highlight
 
 #if defined WORLD_OVERWORLD || defined WORLD_END
-	#ifdef SHADOW
 		scene_color += get_specular_highlight(material, NoL, NoV, NoH, LoV, LoH) * light_color * shadows * ao;
-	#else
-		scene_color += get_specular_highlight(material, NoL, NoV, NoH, LoV, LoH) * light_color * ao * sqrt(ao) * pow8(light_levels.y);
-	#endif
 #endif
 
 		// Edge highlight
@@ -457,26 +463,32 @@ void main() {
 		scene_color *= 1.0 + 0.5 * get_edge_highlight(scene_pos, flat_normal, depth, material_mask);
 #endif
 
-		// Border fog
+		// Apply fog
+
+		vec4 fog = common_fog(length(view_pos), false);
+		scene_color = scene_color * fog.a + fog.rgb;
 
 #ifdef BORDER_FOG
 	#ifdef WORLD_OVERWORLD
+		vec3 horizon_dir = normalize(vec3(world_dir.xz, min(world_dir.y, -0.1)).xzy);
+		vec3 horizon_color = texture(colortex4, project_sky(horizon_dir)).rgb;
+
 		float horizon_factor = linear_step(0.1, 1.0, exp(-75.0 * sqr(sun_dir.y + 0.0496)));
 			  horizon_factor = clamp01(horizon_factor + step(0.01, rainStrength));
 
-		vec3 fog_color = mix(atmosphere, atmosphere_horizon, sqr(horizon_factor)) * (1.0 - biome_cave);
+		vec3 border_fog_color = mix(atmosphere, horizon_color, sqr(horizon_factor)) * (1.0 - biome_cave);
 	#else
-		vec3 fog_color = ambient_color;
+		vec3 border_fog_color = ambient_color;
 	#endif
 
-		float fog = border_fog(scene_pos, world_dir);
+		float border_fog = border_fog(scene_pos, world_dir);
+		scene_color = mix(border_fog_color, scene_color, border_fog);
+#endif
 
-		scene_color = mix(fog_color, scene_color, fog);
+#ifdef BLOCKY_CLOUDS
+		scene_color = scene_color * blocky_clouds.a + blocky_clouds.rgb * fog.a;
 #endif
 	}
-
-	// Clear colortex3 so that translucents can write to it
-	colortex3_clear = vec4(0.0);
 }
 
 #endif

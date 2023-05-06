@@ -79,31 +79,14 @@ uniform int entityId;
 
 #include "/include/utility/space_conversion.glsl"
 #include "/include/vertex/displacement.glsl"
+#include "/include/vertex/utility.glsl"
 
 void main() {
-	uv           = gl_MultiTexCoord0.xy;
-	light_levels = clamp01(gl_MultiTexCoord1.xy * rcp(240.0));
-	tint         = gl_Color;
-
-	tbn[0] = mat3(gbufferModelViewInverse) * normalize(gl_NormalMatrix * at_tangent.xyz);
-	tbn[2] = mat3(gbufferModelViewInverse) * normalize(gl_NormalMatrix * gl_Normal);
-	tbn[1] = cross(tbn[0], tbn[2]) * sign(at_tangent.w);
-
-#if   defined PROGRAM_GBUFFERS_TERRAIN
-	material_mask = uint(max0(mc_Entity.x - 10000.0));
-#elif defined PROGRAM_GBUFFERS_ENTITIES
-	material_mask = uint(max(entityId - 10000, 0));
-#elif defined PROGRAM_GBUFFERS_BLOCK
-	material_mask = uint(max(blockEntityId - 10000, 0));
-#elif defined PROGRAM_GBUFFERS_BEACONBEAM || defined PROGRAM_GBUFFERS_SPIDEREYES
-	material_mask = 2; // full emissive
-	light_levels.x = 1.0;
-#endif
-
-#if defined PROGRAM_GBUFFERS_PARTICLES
-	// Make enderman/nether portal particles glow
-	if (gl_Color.r > gl_Color.g && gl_Color.g < 0.6 && gl_Color.b > 0.4) material_mask = 14;
-#endif
+	uv            = gl_MultiTexCoord0.xy;
+	light_levels  = clamp01(gl_MultiTexCoord1.xy * rcp(240.0));
+	tint          = gl_Color;
+	material_mask = get_material_mask();
+	tbn           = get_tbn_matrix();
 
 #if defined PROGRAM_GBUFFERS_TERRAIN
 	vanilla_ao = gl_Color.a < 0.1 ? 1.0 : gl_Color.a; // fixes models where vanilla ao breaks (eg lecterns)
@@ -116,6 +99,11 @@ void main() {
 	atlas_tile_scale = abs(uv_minus_mid) * 2.0;
 	atlas_tile_coord = sign(uv_minus_mid) * 0.5 + 0.5;
 	#endif
+#endif
+
+#if defined PROGRAM_GBUFFERS_PARTICLES
+	// Make enderman/nether portal particles glow
+	if (gl_Color.r > gl_Color.g && gl_Color.g < 0.6 && gl_Color.b > 0.4) material_mask = 14;
 #endif
 
 	bool is_top_vertex = uv.y < mc_midTexCoord.y;
@@ -231,6 +219,10 @@ uniform vec4 entityColor;
 
 #if defined PROGRAM_GBUFFERS_TERRAIN && defined POM
 #include "/include/misc/parallax.glsl"
+#endif
+
+#ifdef DIRECTIONAL_LIGHTMAPS
+#include "/include/light/directional_lightmaps.glsl"
 #endif
 
 #include "/include/utility/dithering.glsl"
@@ -436,27 +428,7 @@ void main() {
 	adjusted_light_levels *= mix(0.7, 1.0, material_ao);
 
 	#ifdef DIRECTIONAL_LIGHTMAPS
-	// Based on Ninjamike's implementation in #snippets
-	vec2 lightmap_gradient; vec3 lightmap_dir;
-	mat2x3 pos_gradient = mat2x3(dFdx(scene_pos), dFdy(scene_pos));
-
-	// Blocklight
-
-	lightmap_gradient = vec2(dFdx(light_levels.x), dFdy(light_levels.x));
-	lightmap_dir = pos_gradient * lightmap_gradient;
-
-	if (length_squared(lightmap_gradient) > 1e-12) {
-		adjusted_light_levels.x *= (clamp01(dot(normalize(lightmap_dir), normal) + 0.8) * DIRECTIONAL_LIGHTMAPS_INTENSITY + (1.0 - DIRECTIONAL_LIGHTMAPS_INTENSITY)) * inversesqrt(sqrt(light_levels.x) + eps);
-	}
-
-	// Skylight
-
-	lightmap_gradient = vec2(dFdx(light_levels.y), dFdy(light_levels.y));
-	lightmap_dir = pos_gradient * lightmap_gradient;
-
-	if (length_squared(lightmap_gradient) > 1e-12) {
-		adjusted_light_levels.y *= (clamp01(dot(normalize(lightmap_dir), normal) + 0.8) * DIRECTIONAL_LIGHTMAPS_INTENSITY + (1.0 - DIRECTIONAL_LIGHTMAPS_INTENSITY)) * inversesqrt(sqrt(light_levels.y) + eps);
-	}
+	adjusted_light_levels *= get_directional_lightmaps(normal);
 	#endif
 #endif
 

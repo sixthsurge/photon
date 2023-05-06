@@ -21,6 +21,8 @@ struct Material {
 	bool is_hardcoded_metal;
 };
 
+const Material water_material = Material(vec3(0.0), vec3(0.0), vec3(0.02), vec3(0.0), 0.002, 1.0, 0.0, 0.0, 1.0, false, false);
+
 Material material_from(vec3 albedo_srgb, uint material_mask, vec3 world_pos, inout vec2 light_levels) {
 	vec3 block_pos = fract(world_pos);
 
@@ -385,5 +387,15 @@ void decode_specular_map(vec4 specular_map, inout Material material) {
 	material.ssr_multiplier = step(0.01, (material.f0.x - material.f0.x * material.roughness * SSR_ROUGHNESS_THRESHOLD)); // based on Kneemund's method
 }
 #endif
+
+void decode_specular_map(vec4 specular_map, inout Material material, out bool parallax_shadow) {
+#if defined POM && defined POM_SHADOW
+		// Specular map alpha >= 0.5 => parallax shadow
+		parallax_shadow = specular_map.a >= 0.5;
+		specular_map.a = fract(specular_map.a * 2.0);
+#endif
+
+		decode_specular_map(specular_map, material);
+}
 
 #endif // INCLUDE_MISC_MATERIAL

@@ -92,7 +92,7 @@ vec4 get_clouds(vec3 ray_dir, vec3 clear_sky) {
 #elif defined PROGRAM_DEFERRED3
 	// Soften clouds for new pixels
 	float pixel_age = texelFetch(colortex6, ivec2(gl_FragCoord.xy), 0).w;
-	int ld = int(max0(3.0 - 0.5 * pixel_age));
+	int ld = int(3.0 * dampen(max0(1.0 - 0.1 * pixel_age)));
 
 	return bicubic_filter_lod(colortex7, uv * taau_render_scale, ld);
 #else
@@ -147,7 +147,7 @@ vec3 draw_sky(vec3 ray_dir, vec3 atmosphere) {
 
 	// Clouds
 
-#ifndef MINECRAFTY_CLOUDS
+#ifndef BLOCKY_CLOUDS
 	vec4 clouds = get_clouds(ray_dir, sky);
 	sky *= clouds.a;   // transmittance
 	sky += clouds.rgb; // scattering

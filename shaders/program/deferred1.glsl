@@ -18,8 +18,6 @@
 out vec2 uv;
 
 #if defined WORLD_OVERWORLD
-flat out float overcastness;
-
 flat out vec3 sun_color;
 flat out vec3 moon_color;
 flat out vec3 sky_color;
@@ -79,7 +77,6 @@ uniform float biome_humidity;
 
 #if defined WORLD_OVERWORLD
 #include "/include/light/colors/light_color.glsl"
-#include "/include/light/colors/sky_color.glsl"
 #include "/include/light/colors/weather_color.glsl"
 #include "/include/misc/weather.glsl"
 #include "/include/sky/atmosphere.glsl"
@@ -89,16 +86,13 @@ void main() {
 	uv = gl_MultiTexCoord0.xy;
 
 #if defined WORLD_OVERWORLD
-	overcastness = daily_weather_blend(daily_weather_overcastness);
-
-	sun_color = get_sun_exposure() * get_sun_tint(0.0);
-	moon_color = get_moon_exposure() * get_moon_tint(0.0);
+	sun_color = get_sun_exposure() * get_sun_tint();
+	moon_color = get_moon_exposure() * get_moon_tint();
 
 	const vec3 sky_dir = normalize(vec3(0.0, 1.0, -0.8)); // don't point direcly upwards to avoid the sun halo when the sun path rotation is 0
 	sky_color = atmosphere_scattering(sky_dir, sun_dir) * sun_color + atmosphere_scattering(sky_dir, moon_dir) * moon_color;
 	sky_color = tau * mix(sky_color, vec3(sky_color.b) * sqrt(2.0), rcp_pi);
 	sky_color = mix(sky_color, tau * get_weather_color(), rainStrength);
-	sky_color = mix(sky_color, vec3(2.0 * dot(sky_color, luminance_weights_rec2020)), 0.5 * overcastness * linear_step(0.3, 0.5, light_dir.y));
 
 	clouds_weather_variation(
 		clouds_coverage_cu,
@@ -126,8 +120,6 @@ layout (location = 0) out vec4 clouds;
 in vec2 uv;
 
 #if defined WORLD_OVERWORLD
-flat in float overcastness;
-
 flat in vec3 sun_color;
 flat in vec3 moon_color;
 flat in vec3 sky_color;
@@ -231,7 +223,7 @@ float depth_max_4x4(sampler2D depth_sampler) {
 void main() {
 	ivec2 texel = ivec2(gl_FragCoord.xy);
 
-#if defined WORLD_OVERWORLD && !defined MINECRAFTY_CLOUDS
+#if defined WORLD_OVERWORLD && !defined BLOCKY_CLOUDS
 	ivec2 checkerboard_pos = CLOUDS_TEMPORAL_UPSCALING * texel + clouds_checkerboard_offsets[frameCounter % checkerboard_area];
 
 	vec2 new_uv = vec2(checkerboard_pos) / vec2(view_res) * rcp(float(taau_render_scale));
@@ -249,11 +241,6 @@ void main() {
 	      dither = r1(frameCounter / checkerboard_area, dither);
 
 	clouds = draw_clouds(ray_dir, clear_sky, dither);
-
-	vec3 overcast_tint = vec3(0.8, 0.9, 1.0);
-	     overcast_tint = mix(vec3(1.0), overcast_tint, overcastness);
-
-	clouds.rgb *= overcast_tint;
 #endif
 }
 

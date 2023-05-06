@@ -74,10 +74,10 @@ void main() {
 //----------------------------------------------------------------------------//
 #if defined fsh
 
-layout (location = 0) out vec4 base_color;
+layout (location = 0) out vec4 scene_color;
 layout (location = 1) out vec4 gbuffer_data;
 
-/* DRAWBUFFERS:31 */
+/* DRAWBUFFERS:01 */
 
 in vec2 uv;
 
@@ -91,14 +91,18 @@ uniform sampler2D gtexture;
 
 uniform int frameCounter;
 
+uniform vec3 sun_dir;
+
 uniform vec2 taa_offset;
 uniform vec2 view_pixel_size;
 
+uniform float biome_may_snow;
+
+#include "/include/light/colors/weather_color.glsl"
 #include "/include/utility/encoding.glsl"
 
 const uint rain_flag = 253u;
 const uint snow_flag = 254u;
-const float lod_bias = log2(taau_render_scale);
 
 void main() {
 #if defined TAA && defined TAAU
@@ -106,12 +110,16 @@ void main() {
 	if (clamp01(coord) != coord) discard;
 #endif
 
-	base_color = texture(gtexture, uv, lod_bias) * tint;
-
+	vec4 base_color = texture(gtexture, uv);
 	if (base_color.a < 0.1) discard;
 
-	bool is_snow = abs(base_color.r - base_color.b) < eps;
-	uint material_mask = is_snow ? snow_flag : rain_flag;
+	bool is_rain = (abs(base_color.r - base_color.b) > eps);
+
+	scene_color = is_rain
+		? vec4(get_rain_color(), RAIN_OPACITY * base_color.a) * tint
+		: vec4(get_snow_color(), SNOW_OPACITY * base_color.a) * tint;
+
+	uint material_mask = is_rain ? rain_flag : snow_flag;
 
 	gbuffer_data.x  = pack_unorm_2x8(base_color.rg);
 	gbuffer_data.y  = pack_unorm_2x8(base_color.b, float(material_mask) * rcp(255.0));

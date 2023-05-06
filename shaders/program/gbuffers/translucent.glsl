@@ -18,8 +18,11 @@
 
 out vec2 uv;
 out vec2 light_levels;
+out vec3 scene_pos;
 out vec4 tint;
 
+flat out vec3 light_color;
+flat out vec3 ambient_color;
 flat out uint material_mask;
 flat out mat3 tbn;
 
@@ -28,10 +31,6 @@ out vec2 atlas_tile_coord;
 out vec3 tangent_pos;
 flat out vec2 atlas_tile_offset;
 flat out vec2 atlas_tile_scale;
-#endif
-
-#if defined DIRECTIONAL_LIGHTMAPS
-out vec3 scene_pos;
 #endif
 
 // --------------
@@ -47,6 +46,8 @@ attribute vec2 mc_midTexCoord;
 // ------------
 
 uniform sampler2D noisetex;
+
+uniform sampler2D colortex4; // Sky map, lighting colors
 
 uniform mat4 gbufferModelView;
 uniform mat4 gbufferModelViewInverse;
@@ -81,54 +82,40 @@ uniform int blockEntityId;
 
 #include "/include/utility/space_conversion.glsl"
 #include "/include/vertex/displacement.glsl"
+#include "/include/vertex/utility.glsl"
 
 void main() {
-	uv           = gl_MultiTexCoord0.xy;
-	light_levels = clamp01(gl_MultiTexCoord1.xy * rcp(240.0));
-	tint         = gl_Color;
+	uv            = mat2(gl_TextureMatrix[0]) * gl_MultiTexCoord0.xy + gl_TextureMatrix[0][3].xy;
+	light_levels  = clamp01(gl_MultiTexCoord1.xy * rcp(240.0));
+	tint          = gl_Color;
+	material_mask = get_material_mask();
+	tbn           = get_tbn_matrix();
 
-#if   defined PROGRAM_GBUFFERS_WATER
-	material_mask = uint(max0(mc_Entity.x - 10000.0));
-#elif defined PROGRAM_GBUFFERS_ENTITIES_TRANSLUCENT
-	material_mask = uint(max(entityId - 10000, 0));
-#elif defined PROGRAM_GBUFFERS_BLOCK_TRANSLUCENT
-	material_mask = uint(max(blockEntityId - 10000, 0));
-#else
-	material_mask = 0;
-#endif
+	light_color   = texelFetch(colortex4, ivec2(191, 0), 0).rgb;
+	ambient_color = texelFetch(colortex4, ivec2(191, 1), 0).rgb;
+
+	bool is_top_vertex = uv.y < mc_midTexCoord.y;
+
+	scene_pos = transform(gl_ModelViewMatrix, gl_Vertex.xyz);                            // To view space
+	scene_pos = view_to_scene_space(scene_pos);                                          // To scene space
+	scene_pos = scene_pos + cameraPosition;                                              // To world space
+	scene_pos = animate_vertex(scene_pos, is_top_vertex, light_levels.y, material_mask); // Apply vertex animations
+	scene_pos = scene_pos - cameraPosition;                                              // Back to scene space
 
 #if defined PROGRAM_GBUFFERS_WATER
 	tint.a = 1.0;
 
-	// from fayer3
-	vec2 uv_minus_mid = uv - mc_midTexCoord;
-	atlas_tile_offset = min(uv, mc_midTexCoord - uv_minus_mid);
-	atlas_tile_scale = abs(uv_minus_mid) * 2.0;
-	atlas_tile_coord = sign(uv_minus_mid) * 0.5 + 0.5;
+	if (material_mask == 251) {
+		// Nether portal
+		tangent_pos = (scene_pos - gbufferModelViewInverse[3].xyz) * tbn;
+
+		// (from fayer3)
+		vec2 uv_minus_mid = uv - mc_midTexCoord;
+		atlas_tile_offset = min(uv, mc_midTexCoord - uv_minus_mid);
+		atlas_tile_scale = abs(uv_minus_mid) * 2.0;
+		atlas_tile_coord = sign(uv_minus_mid) * 0.5 + 0.5;
+	}
 #endif
-
-	tbn[2] = mat3(gbufferModelViewInverse) * normalize(gl_NormalMatrix * gl_Normal);
-	tbn[0] = mat3(gbufferModelViewInverse) * normalize(gl_NormalMatrix * at_tangent.xyz);
-	tbn[1] = cross(tbn[0], tbn[2]) * sign(at_tangent.w);
-
-	bool is_top_vertex = uv.y < mc_midTexCoord.y;
-
-	vec3 pos = transform(gl_ModelViewMatrix, gl_Vertex.xyz);
-	     pos = view_to_scene_space(pos);
-	     pos = pos + cameraPosition;
-	     pos = animate_vertex(pos, is_top_vertex, light_levels.y, material_mask);
-		 pos = pos - cameraPosition;
-
-#if defined DIRECTIONAL_LIGHTMAPS
-	scene_pos = pos;
-#endif
-
-#if defined PROGRAM_GBUFFERS_WATER
-	tangent_pos = (pos - gbufferModelViewInverse[3].xyz) * tbn;
-#endif
-
-	vec3 view_pos = scene_to_view_space(pos);
-	vec4 clip_pos = project(gl_ProjectionMatrix, view_pos);
 
 #if defined PROGRAM_GBUFFERS_TEXTURED
 	// Make world border emissive
@@ -139,6 +126,9 @@ void main() {
 	// Make enderman/nether portal particles glow
 	if (gl_Color.r > gl_Color.g && gl_Color.g < 0.6 && gl_Color.b > 0.4) material_mask = 14;
 #endif
+
+	vec3 view_pos = scene_to_view_space(scene_pos);
+	vec4 clip_pos = project(gl_ProjectionMatrix, view_pos);
 
 #if   defined TAA && defined TAAU
 	clip_pos.xy  = clip_pos.xy * taau_render_scale + clip_pos.w * (taau_render_scale - 1.0);
@@ -158,24 +148,27 @@ void main() {
 //----------------------------------------------------------------------------//
 #if defined fsh
 
-layout (location = 0) out vec4 base_color;
+layout (location = 0) out vec4 scene_color;
 layout (location = 1) out vec4 gbuffer_data_0; // albedo, block ID, flat normal, light levels
 layout (location = 2) out vec4 gbuffer_data_1; // detailed normal, specular map (optional)
 
-/* DRAWBUFFERS:31 */
+/* DRAWBUFFERS:01 */
 
 #ifdef NORMAL_MAPPING
-/* DRAWBUFFERS:312 */
+/* DRAWBUFFERS:012 */
 #endif
 
 #ifdef SPECULAR_MAPPING
-/* DRAWBUFFERS:312 */
+/* DRAWBUFFERS:012 */
 #endif
 
 in vec2 uv;
 in vec2 light_levels;
+in vec3 scene_pos;
 in vec4 tint;
 
+flat in vec3 light_color;
+flat in vec3 ambient_color;
 flat in uint material_mask;
 flat in mat3 tbn;
 
@@ -184,10 +177,6 @@ in vec2 atlas_tile_coord;
 in vec3 tangent_pos;
 flat in vec2 atlas_tile_offset;
 flat in vec2 atlas_tile_scale;
-#endif
-
-#if defined DIRECTIONAL_LIGHTMAPS
-in vec3 scene_pos;
 #endif
 
 // ------------
@@ -200,39 +189,94 @@ uniform sampler2D gtexture;
 uniform sampler2D normals;
 uniform sampler2D specular;
 
+uniform sampler2D depthtex1;
+
+#ifdef WORLD_OVERWORLD
+#ifdef SHADOW
+uniform sampler2D shadowtex0;
+uniform sampler2DShadow shadowtex1;
+#endif
+#endif
+
 uniform mat4 gbufferModelView;
 uniform mat4 gbufferModelViewInverse;
 uniform mat4 gbufferProjection;
 uniform mat4 gbufferProjectionInverse;
 
+uniform mat4 gbufferPreviousModelView;
+uniform mat4 gbufferPreviousProjection;
+
+uniform mat4 shadowModelView;
+uniform mat4 shadowModelViewInverse;
+uniform mat4 shadowProjection;
+uniform mat4 shadowProjectionInverse;
+
 uniform vec3 cameraPosition;
+uniform vec3 previousCameraPosition;
 
 uniform float near;
 uniform float far;
 
-uniform int frameCounter;
 uniform float frameTimeCounter;
+uniform float sunAngle;
 uniform float rainStrength;
+uniform float wetness;
+
+uniform int worldTime;
+uniform int frameCounter;
+
+uniform int isEyeInWater;
+uniform float blindness;
+uniform float nightVision;
+uniform float darknessFactor;
+
+uniform vec3 light_dir;
+uniform vec3 sun_dir;
+uniform vec3 moon_dir;
 
 uniform vec2 view_res;
 uniform vec2 view_pixel_size;
 uniform vec2 taa_offset;
 
-uniform vec3 light_dir;
+uniform float eye_skylight;
 
-#if defined PROGRAM_GBUFFERS_ENTITIES_TRANSLUCENT
-uniform vec4 entityColor;
+uniform float biome_cave;
+uniform float biome_may_rain;
+uniform float biome_may_snow;
+
+uniform float time_sunrise;
+uniform float time_noon;
+uniform float time_sunset;
+uniform float time_midnight;
+
+// ------------
+//   Includes
+// ------------
+
+#define TEMPORAL_REPROJECTION
+
+#ifdef SHADOW_COLOR
+	#undef SHADOW_COLOR
 #endif
 
+#ifdef SH_SKYLIGHT
+	#undef SH_SKYLIGHT
+#endif
+
+#ifdef DIRECTIONAL_LIGHTMAPS
+#include "/include/light/directional_lightmaps.glsl"
+#endif
+
+#include "/include/fog/simple_fog.glsl"
+#include "/include/light/diffuse.glsl"
+#include "/include/light/shadows.glsl"
+#include "/include/light/specular.glsl"
+#include "/include/misc/material.glsl"
+#include "/include/misc/water_normal.glsl"
 #include "/include/utility/color.glsl"
-#include "/include/utility/dithering.glsl"
 #include "/include/utility/encoding.glsl"
-
-#if defined PROGRAM_GBUFFERS_WATER && defined POM
-	#define read_tex(x) textureGrad(x, parallax_uv, uv_gradient[0], uv_gradient[1])
-#else
-	#define read_tex(x) texture(x, uv, lod_bias)
-#endif
+#include "/include/utility/fast_math.glsl"
+#include "/include/utility/space_conversion.glsl"
 
 const float lod_bias = log2(taau_render_scale);
 
@@ -251,10 +295,17 @@ void decode_normal_map(vec3 normal_map, out vec3 normal, out float ao) {
 #endif
 
 #if defined PROGRAM_GBUFFERS_WATER
-#include "/include/misc/parallax.glsl"
-
 // Parallax nether portal effect inspired by Complementary Reimagined Shaders by EminGT
 // Thanks to Emin for letting me use his idea!
+
+vec2 get_uv_from_local_coord(vec2 local_coord) {
+	return atlas_tile_offset + atlas_tile_scale * fract(local_coord);
+}
+
+vec2 get_local_coord_from_uv(vec2 uv) {
+	return (uv - atlas_tile_offset) * rcp(atlas_tile_scale);
+}
+
 vec4 draw_nether_portal() {
 	const int step_count          = 20;
 	const float parallax_depth    = 0.2;
@@ -287,134 +338,228 @@ vec4 draw_nether_portal() {
 
 	return clamp01(result * portal_brightness * depth_step);
 }
+#else
+vec4 draw_nether_portal() { return vec4(0.0); }
 #endif
 
 void main() {
-#if defined TAA && defined TAAU
 	vec2 coord = gl_FragCoord.xy * view_pixel_size * rcp(taau_render_scale);
+
+	// Clip to TAAU viewport
+
+#if defined TAA && defined TAAU
 	if (clamp01(coord) != coord) discard;
 #endif
 
-	float dither = interleaved_gradient_noise(gl_FragCoord.xy, frameCounter);
+	// Space conversions
+
+	float depth0 = gl_FragCoord.z;
+	float depth1 = texelFetch(depthtex1, ivec2(gl_FragCoord.xy), 0).x;
+
+	vec3 world_pos = scene_pos + cameraPosition;
+	vec3 world_dir = normalize(scene_pos - gbufferModelViewInverse[3].xyz);
+
+	vec3 view_back_pos = screen_to_view_space(vec3(coord, depth1), true);
+	vec3 scene_back_pos = view_to_scene_space(view_back_pos);
+
+	float layer_dist = distance(scene_pos, scene_back_pos); // distance to solid layer along view ray
+
+	// Get material and normal
+
+	Material material; vec4 base_color;
+	vec3 normal = tbn[2];
+
+	bool is_water         = material_mask == 1;
+	bool is_nether_portal = material_mask == 251;
 
 	vec2 adjusted_light_levels = light_levels;
 
-	bool is_water = material_mask == 1;
-	bool is_nether_portal = material_mask == 251;
+	//------------------------------------------------------------------------//
+	if (is_water) {
+		material = water_material;
 
-	if (is_water) { //--------------------------------------------------------//
-		// Water
-#if defined VANILLA_WATER_TEXTURE
-		base_color = texture(gtexture, uv, lod_bias);
-#else
+#if   WATER_TEXTURE == WATER_TEXTURE_NONE
 		base_color = vec4(0.0);
+#elif WATER_TEXTURE == WATER_TEXTURE_HIGHLIGHT
+		base_color = texture(gtexture, uv, lod_bias);
+		float texture_highlight = 0.5 * sqr(linear_step(0.63, 1.0, base_color.r)) + 0.03 * base_color.r;
+
+		material.albedo     = clamp01(0.33 * exp(-2.0 * water_absorption_coeff) * texture_highlight);
+		material.roughness += 0.3 * texture_highlight;
+#elif WATER_TEXTURE == WATER_TEXTURE_VANILLA
+		base_color = texture(gtexture, uv, lod_bias) * tint;
+		material.albedo = srgb_eotf_inv(base_color.rgb * base_color.a) * rec709_to_working_color;
 #endif
-#if defined PROGRAM_GBUFFERS_WATER && defined FANCY_NETHER_PORTAL
-	} else if (is_nether_portal) { //-----------------------------------------//
-		// Nether portal
-		base_color = draw_nether_portal();
+
+#ifdef WATER_FOAM
+		float dist = layer_dist * max(abs(world_dir.y), eps);
+
+	#if WATER_TEXTURE == WATER_TEXTURE_HIGHLIGHT
+		float foam = cube(max0(1.0 - 2.0 * dist)) * (1.0 + 8.0 * texture_highlight);
+	#else
+		float foam = cube(max0(1.0 - 2.0 * dist));
+	#endif
+
+		material.albedo += 0.05 * foam / mix(1.0, max(dot(ambient_color, luminance_weights_rec2020), 0.5), light_levels.y);
+		material.albedo  = clamp01(material.albedo);
 #endif
-	} else { //---------------------------------------------------------------//
-		// Other translucent stuff
-		bool parallax_shadow = false;
 
-#if defined PROGRAM_GBUFFERS_WATER && defined POM
-		float view_distance = length(tangent_pos);
+	//------------------------------------------------------------------------//
+	} else {
+		// Sample textures
 
-		bool has_pom = view_distance < POM_DISTANCE; // Only calculate POM for close terrain
-			 has_pom = has_pom && material_mask != 1 && material_mask != 8; // Do not calculate POM for water or lava
+		base_color        = texture(gtexture, uv, lod_bias) * tint;
+#ifdef NORMAL_MAPPING
+		vec3 normal_map   = texture(normals, uv, lod_bias).xyz;
+#endif
+#ifdef SPECULAR_MAPPING
+		vec4 specular_map = texture(specular, uv, lod_bias);
+#endif
 
-		vec3 tangent_dir = -normalize(tangent_pos);
-		mat2 uv_gradient = mat2(dFdx(uv), dFdy(uv));
-
-		vec2 parallax_uv;
-
-		if (has_pom) {
-			float pom_depth;
-			vec3 shadow_trace_pos;
-
-			parallax_uv = get_parallax_uv(tangent_dir, uv_gradient, view_distance, dither, shadow_trace_pos, pom_depth);
-		} else {
-			parallax_uv = uv;
-			parallax_shadow = false;
+#ifdef FANCY_NETHER_PORTAL
+		if (is_nether_portal) {
+			base_color = draw_nether_portal();
 		}
 #endif
 
-		base_color        = read_tex(gtexture) * tint;
-#ifdef NORMAL_MAPPING
-		vec3 normal_map   = read_tex(normals).xyz;
-#endif
-#ifdef SPECULAR_MAPPING
-		vec4 specular_map = read_tex(specular);
-#endif
+		if (base_color.a < 0.1) discard;
 
-		if (base_color.a < 0.1) { discard; return; }
+		material = material_from(base_color.rgb * base_color.a, material_mask, world_pos, adjusted_light_levels);
+
+		//--//
 
 #ifdef NORMAL_MAPPING
-		vec3 normal; float material_ao;
+		float material_ao;
 		decode_normal_map(normal_map, normal, material_ao);
-		normal = tbn * normal;
 
-		gbuffer_data_1.xy = encode_unit_vector(normal);
+		normal = tbn * normal;
 
 		adjusted_light_levels *= mix(0.7, 1.0, material_ao);
 
 	#ifdef DIRECTIONAL_LIGHTMAPS
-		// Based on Ninjamike's implementation in #snippets
-		vec2 lightmap_gradient; vec3 lightmap_dir;
-		mat2x3 pos_gradient = mat2x3(dFdx(scene_pos), dFdy(scene_pos));
-
-		// Blocklight
-
-		lightmap_gradient = vec2(dFdx(light_levels.x), dFdy(light_levels.x));
-		lightmap_dir = pos_gradient * lightmap_gradient;
-
-		if (length_squared(lightmap_gradient) > 1e-12) {
-			adjusted_light_levels.x *= (clamp01(dot(normalize(lightmap_dir), normal) + 0.8) * DIRECTIONAL_LIGHTMAPS_INTENSITY + (1.0 - DIRECTIONAL_LIGHTMAPS_INTENSITY)) * inversesqrt(sqrt(light_levels.x) + eps);
-		}
-
-		// Skylight
-
-		lightmap_gradient = vec2(dFdx(light_levels.y), dFdy(light_levels.y));
-		lightmap_dir = pos_gradient * lightmap_gradient;
-
-		if (length_squared(lightmap_gradient) > 1e-12) {
-			adjusted_light_levels.y *= (clamp01(dot(normalize(lightmap_dir), normal) + 0.8) * DIRECTIONAL_LIGHTMAPS_INTENSITY + (1.0 - DIRECTIONAL_LIGHTMAPS_INTENSITY)) * inversesqrt(sqrt(light_levels.y) + eps);
-		}
+		adjusted_light_levels *= get_directional_lightmaps(normal);
 	#endif
 #endif
 
 #ifdef SPECULAR_MAPPING
-	#if defined POM && defined POM_SHADOW
-		// Pack parallax shadow in alpha component of specular map
-		// Specular map alpha >= 0.5 => parallax shadow
-		specular_map.a *= step(specular_map.a, 0.999);
-		specular_map.a  = clamp01(specular_map.a * 0.5 + 0.5 * float(parallax_shadow));
-	#endif
+		decode_specular_map(specular_map, material);
+#endif
 
-		gbuffer_data_1.z  = pack_unorm_2x8(specular_map.xy);
-		gbuffer_data_1.w  = pack_unorm_2x8(specular_map.zw);
-#else
-	#if defined POM && defined POM_SHADOW
-		gbuffer_data_1.z  = float(parallax_shadow);
-	#endif
+#if defined PROGRAM_GBUFFERS_ARMOR_GLINT
+		base_color.a = 0.1;
+		material.emission = vec3(0.33);
 #endif
 	}
 
-#if defined PROGRAM_GBUFFERS_ENTITIES_TRANSLUCENT
-	base_color.rgb = mix(base_color.rgb, entityColor.rgb, entityColor.a);
+	// Shadows
+
+	float NoL = dot(normal, light_dir);
+	float NoV = clamp01(dot(normal, -world_dir));
+	float LoV = dot(light_dir, -world_dir);
+	float halfway_norm = inversesqrt(2.0 * LoV + 2.0);
+	float NoH = (NoL + NoV) * halfway_norm;
+	float LoH = LoV * halfway_norm + halfway_norm;
+
+#if defined WORLD_OVERWORLD || defined WORLD_END
+	float sss_depth;
+	float shadow_distance_fade;
+	vec3 shadows = calculate_shadows(scene_pos, tbn[2], adjusted_light_levels.y, material.sss_amount, shadow_distance_fade, sss_depth);
+#else
+	vec3 shadows = vec3(pow8(adjusted_light_levels.y));
+	#define sss_depth 0.0
+	#define shadow_distance_fade 0.0
 #endif
 
-	vec3 color_to_store = is_water ? tint.rgb : base_color.rgb;
+	// Diffuse lighting
+
+	vec3 radiance = get_diffuse_lighting(
+		material,
+		normal,
+		tbn[2],
+		shadows,
+		adjusted_light_levels,
+		1.0,
+		sss_depth,
+		shadow_distance_fade,
+		NoL,
+		NoV,
+		NoH,
+		LoV
+	);
+
+	// Specular highlight
+
+#if defined WORLD_OVERWORLD || defined WORLD_END
+	#ifdef WATER_WAVES
+	if (!is_water) // Specular highlight on water must be applied in composite, after waves are calculated
+	#endif
+	{
+		radiance += get_specular_highlight(material, NoL, NoV, NoH, LoV, LoH) * light_color * shadows;
+	}
+#endif
+
+	// Blending
+
+	float alpha;
+
+	if (is_water) {
+		// Water absorption
+
+		vec3 biome_water_color = srgb_eotf_inv(tint.rgb) * rec709_to_working_color;
+		vec3 absorption_coeff = biome_water_coeff(biome_water_color);
+
+		mat2x3 water_fog = water_fog_simple(
+			light_color,
+			ambient_color,
+			absorption_coeff,
+			layer_dist * float(isEyeInWater != 1),
+			-LoV,
+			adjusted_light_levels.y,
+			sss_depth
+		);
+
+		radiance += water_fog[0] * (1.0 + 8.0 * sqr(water_fog[1])) * (1.0 - exp(-0.5 * layer_dist));
+		alpha     = 1.0 - dot(water_fog[1], luminance_weights_rec2020);
+	} else {
+		alpha     = base_color.a;
+	}
+
+	scene_color = vec4(radiance / max(alpha, eps), alpha);
+
+	// Apply fog
+
+	vec4 fog = common_fog(length(scene_pos), false);
+	scene_color.rgb = scene_color.rgb * fog.a + fog.rgb;
+
+	scene_color.a *= border_fog(scene_pos, world_dir);
+
+	// Encode gbuffer data
+
+	vec3 color_to_store = is_water ? shadows : base_color.rgb;
 
 	gbuffer_data_0.x  = pack_unorm_2x8(color_to_store.rg);
-	gbuffer_data_0.y  = pack_unorm_2x8(color_to_store.b, float(material_mask) * rcp(255.0));
+	gbuffer_data_0.y  = pack_unorm_2x8(color_to_store.b, clamp01(float(material_mask) * rcp(255.0)));
 	gbuffer_data_0.z  = pack_unorm_2x8(encode_unit_vector(tbn[2]));
-	gbuffer_data_0.w  = pack_unorm_2x8(dither_8bit(adjusted_light_levels, dither));
+	gbuffer_data_0.w  = pack_unorm_2x8(dither_8bit(adjusted_light_levels, 0.5));
 
-#if defined PROGRAM_GBUFFERS_TEXTURED && !defined IS_IRIS
-	// Kill the little rain splash particles
-	if (base_color.r < 0.29 && base_color.g < 0.45 && base_color.b > 0.75) discard;
+#ifdef NORMAL_MAPPING
+	gbuffer_data_1.xy = encode_unit_vector(normal);
+#endif
+
+#ifdef SPECULAR_MAPPING
+	#if defined POM && defined POM_SHADOW
+	// Pack parallax shadow in alpha component of specular map
+	// Specular map alpha >= 0.5 => parallax shadow
+	specular_map.a *= step(specular_map.a, 0.999);
+	specular_map.a  = clamp01(specular_map.a * 0.5);
+	#endif
+
+	gbuffer_data_1.z = pack_unorm_2x8(specular_map.xy);
+	gbuffer_data_1.w = pack_unorm_2x8(specular_map.zw);
+#else
+	#if defined POM && defined POM_SHADOW
+	gbuffer_data_1.z = 0.0;
+	#endif
 #endif
 }
 

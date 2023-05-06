@@ -1,5 +1,5 @@
-#if !defined INCLUDE_SKY_MINECRAFTY_CLOUDS
-#define INCLUDE_SKY_MINECRAFTY_CLOUDS
+#if !defined INCLUDE_SKY_BLOCKY_CLOUDS
+#define INCLUDE_SKY_BLOCKY_CLOUDS
 
 #include "/include/sky/atmosphere.glsl"
 
@@ -9,21 +9,21 @@
 #include "/include/utility/phase_functions.glsl"
 #include "/include/utility/random.glsl"
 
-// Minecraft-style volumetric clouds
+// Blocky volumetric clouds
 
-const float minecrafty_clouds_altitude_l0 = MINECRAFTY_CLOUDS_ALTITUDE;
-const float minecrafty_clouds_altitude_l1 = MINECRAFTY_CLOUDS_ALTITUDE_2;
-const float minecrafty_clouds_thickness   = MINECRAFTY_CLOUDS_THICKNESS;
+const float blocky_clouds_altitude_l0 = BLOCKY_CLOUDS_ALTITUDE;
+const float blocky_clouds_altitude_l1 = BLOCKY_CLOUDS_ALTITUDE_2;
+const float blocky_clouds_thickness   = BLOCKY_CLOUDS_THICKNESS;
 
-float minecrafty_clouds_extinction_coeff = mix(0.66, 0.8, smoothstep(0.0, 0.3, abs(sun_dir.y)));
-float minecrafty_clouds_scattering_coeff = minecrafty_clouds_extinction_coeff;
+float blocky_clouds_extinction_coeff = mix(0.66, 1.0, smoothstep(0.0, 0.3, abs(sun_dir.y)));
+float blocky_clouds_scattering_coeff = blocky_clouds_extinction_coeff;
 
-float minecrafty_clouds_phase_single(float cos_theta) { // Single scattering phase function
+float blocky_clouds_phase_single(float cos_theta) { // Single scattering phase function
 	return 0.7 * klein_nishina_phase(cos_theta, 2600.0)    // forwards lobe
 	     + 0.3 * henyey_greenstein_phase(cos_theta, -0.2); // backwards lobe
 }
 
-float minecrafty_clouds_phase_multi(float cos_theta, vec3 g) { // Multiple scattering phase function
+float blocky_clouds_phase_multi(float cos_theta, vec3 g) { // Multiple scattering phase function
 	return 0.65 * henyey_greenstein_phase(cos_theta,  g.x)  // forwards lobe
 	     + 0.10 * henyey_greenstein_phase(cos_theta,  g.y)  // forwards peak
 	     + 0.25 * henyey_greenstein_phase(cos_theta, -g.z); // backwards lobe
@@ -44,12 +44,12 @@ float texture_soft(sampler2D sampler, vec2 coord, float softness) {
 	return dot(samples, weights);
 }
 
-float minecrafty_clouds_density(vec3 world_pos, float altitude_fraction, float layer_offset) {
+float blocky_clouds_density(vec3 world_pos, float altitude_fraction, float layer_offset) {
 	const float wind_angle = 30.0 * degree;
-	const vec2 wind_velocity = 0.25 * vec2(cos(wind_angle), sin(wind_angle));
+	const vec2 wind_velocity = 0.33 * vec2(cos(wind_angle), sin(wind_angle));
 
-	const float roundness = 0.5 * MINECRAFTY_CLOUDS_ROUNDNESS; // Controls the roundness of the clouds
-	const float sharpness = 0.5 * MINECRAFTY_CLOUDS_SHARPNESS;  // Controls the sharpness of the cloud edges
+	const float roundness = 0.5 * BLOCKY_CLOUDS_ROUNDNESS; // Controls the roundness of the clouds
+	const float sharpness = 0.5 * BLOCKY_CLOUDS_SHARPNESS;  // Controls the sharpness of the cloud edges
 
 	// Adjust position
 
@@ -68,7 +68,7 @@ float minecrafty_clouds_density(vec3 world_pos, float altitude_fraction, float l
 	return clamp01(density);
 }
 
-float minecrafty_clouds_optical_depth(
+float blocky_clouds_optical_depth(
 	vec3 ray_origin,
 	vec3 ray_dir,
 	float layer_altitude,
@@ -78,7 +78,7 @@ float minecrafty_clouds_optical_depth(
 ) {
 	const float step_growth = 1.2;
 
-	float step_length = minecrafty_clouds_thickness / float(step_count); // m
+	float step_length = blocky_clouds_thickness / float(step_count); // m
 
 	vec3 ray_pos = ray_origin;
 	vec4 ray_step = vec4(ray_dir, 1.0) * step_length;
@@ -88,15 +88,15 @@ float minecrafty_clouds_optical_depth(
 	for (uint i = 0u; i < step_count; ++i, ray_pos += ray_step.xyz) {
 		ray_step *= step_growth;
 		vec3 world_pos = ray_pos + ray_step.xyz * dither;
-		float altitude_fraction = clamp01((world_pos.y - layer_altitude) * rcp(minecrafty_clouds_thickness));
+		float altitude_fraction = clamp01((world_pos.y - layer_altitude) * rcp(blocky_clouds_thickness));
 
-		optical_depth += minecrafty_clouds_density(world_pos, altitude_fraction, layer_offset) * ray_step.w;
+		optical_depth += blocky_clouds_density(world_pos, altitude_fraction, layer_offset) * ray_step.w;
 	}
 
 	return optical_depth;
 }
 
-vec2 minecrafty_clouds_scattering(
+vec2 blocky_clouds_scattering(
 	float density,
 	float light_optical_depth,
 	float sky_optical_depth,
@@ -107,14 +107,14 @@ vec2 minecrafty_clouds_scattering(
 ) {
 	vec2 scattering = vec2(0.0);
 
-	float scatter_amount = minecrafty_clouds_scattering_coeff;
-	float extinct_amount = minecrafty_clouds_extinction_coeff;
+	float scatter_amount = blocky_clouds_scattering_coeff;
+	float extinct_amount = blocky_clouds_extinction_coeff;
 
 	float powder = 4.0 * (1.0 - exp2(-8.0 * density));
 
-	float scattering_integral_times_density = (1.0 - step_transmittance) / minecrafty_clouds_extinction_coeff;
+	float scattering_integral_times_density = (1.0 - step_transmittance) / blocky_clouds_extinction_coeff;
 
-	float phase = minecrafty_clouds_phase_single(cos_theta);
+	float phase = blocky_clouds_phase_single(cos_theta);
 	vec3 phase_g = pow(vec3(0.6, 0.9, 0.3), vec3(1.0 + light_optical_depth));
 
 	for (uint i = 0u; i < 8u; ++i) {
@@ -126,21 +126,21 @@ vec2 minecrafty_clouds_scattering(
 		extinct_amount *= 0.5;
 		phase_g *= 0.8;
 
-		phase = minecrafty_clouds_phase_multi(cos_theta, phase_g);
+		phase = blocky_clouds_phase_multi(cos_theta, phase_g);
 	}
 
 	return scattering * scattering_integral_times_density * powder;
 }
 
-vec4 raymarch_minecrafty_clouds(
+vec4 raymarch_blocky_clouds(
 	vec3 world_start_pos,
 	vec3 world_end_pos,
 	bool sky,
 	float layer_altitude,
 	float dither
 ) {
-	const uint  primary_steps     = 20;
-	const uint  lighting_steps    = 6;
+	const uint  primary_steps     = 8;
+	const uint  lighting_steps    = 4;
 	const float max_ray_length    = 512;
 	const float min_transmittance = 0.075;
 
@@ -156,14 +156,14 @@ vec4 raymarch_minecrafty_clouds(
 	world_dir *= norm;
 
 	float distance_to_lower_plane = (layer_altitude - eyeAltitude) / world_dir.y;
-	float distance_to_upper_plane = (layer_altitude + minecrafty_clouds_thickness - eyeAltitude) / world_dir.y;
+	float distance_to_upper_plane = (layer_altitude + blocky_clouds_thickness - eyeAltitude) / world_dir.y;
 	float distance_to_volume_start, distance_to_volume_end;
 
 	if (eyeAltitude < layer_altitude) {
 		// Below volume
 		distance_to_volume_start = distance_to_lower_plane;
 		distance_to_volume_end   = world_dir.y < 0.0 ? -1.0 : distance_to_upper_plane;
-	} else if (eyeAltitude < layer_altitude + minecrafty_clouds_thickness) {
+	} else if (eyeAltitude < layer_altitude + blocky_clouds_thickness) {
 		// Inside volume
 		distance_to_volume_start = 0.0;
 		distance_to_volume_end   = world_dir.y < 0.0 ? distance_to_lower_plane : distance_to_upper_plane;
@@ -192,13 +192,14 @@ vec4 raymarch_minecrafty_clouds(
 
 	float lighting_dither = interleaved_gradient_noise(gl_FragCoord.xy, frameCounter);
 
-	bool moonlit = sun_dir.y < -0.04;
+	bool moonlit = sun_dir.y < -0.06;
 
 	vec3 light_dir = moonlit ? moon_dir : sun_dir;
 
 	vec3 light_color  = moonlit ? moon_color : sun_color;
 	     light_color *= atmosphere_transmittance(light_dir.y, planet_radius + 1e3);
 		 light_color *= 1.5 - 0.5 * smoothstep(0.0, 0.15, abs(sun_dir.y));
+		 light_color *= 1.0 - rainStrength;
 
 	float cos_theta = dot(world_dir, light_dir);
 	float bounced_light = 0.0;
@@ -208,9 +209,9 @@ vec4 raymarch_minecrafty_clouds(
 	float distance_sum = 0.0;
 	float distance_weight_sum = 0.0;
 
-#ifdef MINECRAFTY_CLOUDS_LAYER_2
+#ifdef BLOCKY_CLOUDS_LAYER_2
 	// Offset upper layer so it isn't identical to the below
-	float layer_offset = abs(layer_altitude - minecrafty_clouds_altitude_l1) < 0.5
+	float layer_offset = abs(layer_altitude - blocky_clouds_altitude_l1) < 0.5
 		? 3000.0
 		: 0.0;
 #else
@@ -224,19 +225,19 @@ vec4 raymarch_minecrafty_clouds(
 	for (uint i = 0u; i < primary_steps; ++i, world_pos += world_step) {
 		if (transmittance < min_transmittance) break;
 
-		float altitude_fraction = (world_pos.y - layer_altitude) * rcp(minecrafty_clouds_thickness);
+		float altitude_fraction = (world_pos.y - layer_altitude) * rcp(blocky_clouds_thickness);
 
-		float density = minecrafty_clouds_density(world_pos, altitude_fraction, layer_offset);
+		float density = blocky_clouds_density(world_pos, altitude_fraction, layer_offset);
 		if (density < eps) continue;
 
-		float step_optical_depth = density * minecrafty_clouds_extinction_coeff * step_length;
+		float step_optical_depth = density * blocky_clouds_extinction_coeff * step_length;
 		float step_transmittance = exp(-step_optical_depth);
 
-		float light_optical_depth  = minecrafty_clouds_optical_depth(world_pos, light_dir, layer_altitude, layer_offset, lighting_dither, lighting_steps);
-		float ground_optical_depth = minecrafty_clouds_thickness * altitude_fraction;
-		float sky_optical_depth    = minecrafty_clouds_thickness * (1.0 - altitude_fraction);
+		float light_optical_depth  = blocky_clouds_optical_depth(world_pos, light_dir, layer_altitude, layer_offset, lighting_dither, lighting_steps);
+		float ground_optical_depth = blocky_clouds_thickness * altitude_fraction;
+		float sky_optical_depth    = blocky_clouds_thickness * (1.0 - altitude_fraction);
 
-		scattering += light_colors * minecrafty_clouds_scattering(
+		scattering += light_colors * blocky_clouds_scattering(
 			density,
 			light_optical_depth,
 			sky_optical_depth,
@@ -268,4 +269,4 @@ vec4 raymarch_minecrafty_clouds(
 	return vec4(scattering, transmittance);
 }
 
-#endif // INCLUDE_SKY_MINECRAFTY_CLOUDS
+#endif // INCLUDE_SKY_BLOCKY_CLOUDS

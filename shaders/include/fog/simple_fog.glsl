@@ -7,11 +7,23 @@
 #include "/include/utility/fast_math.glsl"
 #include "/include/utility/phase_functions.glsl"
 
-const vec3 cave_fog_color = vec3(0.033);
-const vec3 lava_fog_color = from_srgb(vec3(0.839, 0.373, 0.075)) * 2.0;
-const vec3 snow_fog_color = from_srgb(vec3(0.957, 0.988, 0.988)) * 0.3;
+const float lava_fog_start   = 0.33;
+const float lava_fog_density = 1.0;
+const vec3  lava_fog_color   = from_srgb(vec3(0.839, 0.373, 0.075)) * 2.0;
 
-const vec3 water_absorption_coeff = vec3(WATER_ABSORPTION_R, WATER_ABSORPTION_G, WATER_ABSORPTION_B) * rec709_to_working_color;
+const float snow_fog_start   = 0.5;
+const float snow_fog_density = 1.0;
+const vec3  snow_fog_color   = from_srgb(vec3(0.957, 0.988, 0.988)) * 0.3;
+
+const float cave_fog_start   = 1.0;
+const float cave_fog_density = 0.0033;
+const vec3  cave_fog_color   = vec3(0.033);
+
+const float nether_fog_start   = 0.0;
+const float nether_fog_density = 0.0083 * NETHER_FOG_INTENSITY;
+
+const float blindness_fog_start   = 2.0;
+const float blindness_fog_density = 1.0;
 
 float spherical_fog(float view_dist, float fog_start_distance, float fog_density) {
 	return exp2(-fog_density * max0(view_dist - fog_start_distance));
@@ -24,10 +36,73 @@ float border_fog(vec3 scene_pos, vec3 world_dir) {
 	      fog = mix(fog, 1.0, 0.75 * dampen(linear_step(0.0, 0.2, world_dir.y)));
 #endif
 
-	if (isEyeInWater != 0.0) fog = 1.0;
+	return fog;
+}
+
+vec4 common_fog(float view_dist, const bool sky) {
+	vec4 fog = vec4(vec3(0.0), 1.0);
+
+	// Lava fog
+	float lava_fog = spherical_fog(view_dist, lava_fog_start, lava_fog_density * float(isEyeInWater == 2));
+	fog.rgb += lava_fog_color - lava_fog_color * lava_fog;
+	fog.a   *= lava_fog;
+
+	// Powdered snow fog
+	float snow_fog = spherical_fog(view_dist, snow_fog_start, snow_fog_density * float(isEyeInWater == 3));
+	fog.rgb += snow_fog_color - snow_fog_color * snow_fog;
+	fog.a   *= snow_fog;
+
+	// Blindness fog
+	float blindness_fog = spherical_fog(view_dist, blindness_fog_start, blindness * blindness_fog_density);
+	fog.rgb *= blindness_fog;
+	fog.a   *= blindness_fog;
+
+#if defined WORLD_OVERWORLD
+	// Cave fog
+	float cave_fog = spherical_fog(view_dist, cave_fog_start, cave_fog_density * biome_cave * float(!sky));
+	fog.rgb += cave_fog_color - cave_fog_color * cave_fog;
+	fog.a   *= cave_fog;
+#endif
+
+#if defined WORLD_NETHER
+	// Nether fog
+	float nether_fog = spherical_fog(view_dist, nether_fog_start, nether_fog_density);
+	fog.rgb += ambient_color - ambient_color * nether_fog;
+	fog.a   *= nether_fog;
+#endif
 
 	return fog;
 }
+
+// Calculates the alpha component only
+float common_fog_alpha(float view_dist, bool sky) {
+	float fog = 1.0;
+
+	// Lava fog
+	fog *= spherical_fog(view_dist, lava_fog_start, lava_fog_density * float(isEyeInWater == 2));
+
+	// Powdered snow fog
+	fog *= spherical_fog(view_dist, snow_fog_start, snow_fog_density * float(isEyeInWater == 3));
+
+	// Blindness fog
+	fog *= spherical_fog(view_dist, blindness_fog_start, blindness * blindness_fog_density);
+
+#if defined WORLD_OVERWORLD
+	// Cave fog
+	fog *= spherical_fog(view_dist, cave_fog_start, cave_fog_density * biome_cave * float(!sky)); // Cave fog
+#endif
+
+#if defined WORLD_NETHER
+	// Nether fog
+	fog *= spherical_fog(view_dist, nether_fog_start, nether_fog_density);
+#endif
+
+	return fog;
+}
+
+// Water fog
+
+const vec3 water_absorption_coeff = vec3(WATER_ABSORPTION_R, WATER_ABSORPTION_G, WATER_ABSORPTION_B) * rec709_to_working_color;
 
 vec3 biome_water_coeff(vec3 biome_water_color) {
 	const float density_scale = 0.15;
@@ -39,7 +114,7 @@ vec3 biome_water_coeff(vec3 biome_water_color) {
 #ifdef BIOME_WATER_COLOR
 	vec3 biome_absorption_coeff = -density_scale * log(biome_water_color + eps) - forest_absorption_coeff;
 
-	return max0(water_absorption_coeff + biome_absorption_coeff * biome_color_contribution);
+	return max0(base_absorption_coeff + biome_absorption_coeff * biome_color_contribution);
 #else
 	return base_absorption_coeff;
 #endif
@@ -76,117 +151,5 @@ mat2x3 water_fog_simple(
 
 	return mat2x3(scattering, transmittance);
 }
-
-//----------------------------------------------------------------------------//
-#if defined WORLD_OVERWORLD
-
-#include "/include/sky/atmosphere.glsl"
-#include "/include/sky/projection.glsl"
-
-vec4 get_simple_fog(
-	vec3 world_dir,
-	float view_dist,
-	float skylight,
-	bool do_normal_fog,
-	bool sky
-) {
-	vec4 fog = vec4(vec3(0.0), 1.0);
-
-	// Normal fog
-
-	if (do_normal_fog && !sky) {
-		vec3 horizon_dir = normalize(vec3(world_dir.xz, min(world_dir.y, -0.1)).xzy);
-		vec3 horizon_color = texture(colortex4, project_sky(horizon_dir)).rgb;
-
-		float normal_fog = spherical_fog(view_dist, 0.0, 0.001 * cube(skylight));
-
-		fog.rgb += horizon_color - horizon_color * normal_fog;
-		fog.a   *= normal_fog;
-	}
-
-	// Cave fog
-
-#ifdef CAVE_FOG
-	float cave_fog = spherical_fog(view_dist, 0.0, 0.0033 * biome_cave * float(!sky));
-	fog.rgb += cave_fog_color - cave_fog_color * cave_fog;
-	fog.a   *= cave_fog;
-#endif
-
-	// Lava fog
-
-	float lava_fog = spherical_fog(view_dist, 0.33, float(isEyeInWater == 2));
-	fog.rgb += lava_fog_color - lava_fog_color * lava_fog;
-	fog.a   *= lava_fog;
-
-	// Powdered snow fog
-
-	float snow_fog = spherical_fog(view_dist, 0.5, 1.0 * float(isEyeInWater == 3));
-	fog.rgb += snow_fog_color - snow_fog_color * snow_fog;
-	fog.a   *= snow_fog;
-
-	// Blindness fog
-
-	float blindness_fog = spherical_fog(view_dist, 2.0, blindness);
-	fog.rgb *= blindness_fog;
-	fog.a   *= blindness_fog;
-
-	// Darkness fog
-	float darkness_fog = spherical_fog(view_dist, 2.0, 0.05 * darknessFactor) * 0.7 + 0.3;
-	fog.rgb *= darkness_fog;
-	fog.a   *= darkness_fog;
-
-	return fog;
-}
-
-//----------------------------------------------------------------------------//
-#elif defined WORLD_NETHER
-
-vec4 get_simple_fog(
-	vec3 world_dir,
-	float view_dist,
-	float skylight,
-	bool do_normal_fog,
-	bool sky
-) {
-	if (sky) view_dist = far;
-
-	vec4 fog = vec4(vec3(0.0), 1.0);
-
-	// Normal fog
-
-	float nether_fog = spherical_fog(view_dist, 0.0, 0.0083 * NETHER_FOG_INTENSITY);
-	fog.rgb += ambient_color - ambient_color * nether_fog;
-	fog.a   *= nether_fog;
-
-	// Lava fog
-
-	float lava_fog = spherical_fog(view_dist, 0.33, float(isEyeInWater == 2));
-	fog.rgb += lava_fog_color - lava_fog_color * lava_fog;
-	fog.a   *= lava_fog;
-
-	// Powdered snow fog
-
-	float snow_fog = spherical_fog(view_dist, 0.5, 1.0 * float(isEyeInWater == 3));
-	fog.rgb += snow_fog_color - snow_fog_color * snow_fog;
-	fog.a   *= snow_fog;
-
-	// Blindness fog
-
-	float blindness_fog = spherical_fog(view_dist, 2.0, blindness);
-	fog.rgb *= blindness_fog;
-	fog.a   *= blindness_fog;
-
-	// Darkness fog
-	float darkness_fog = spherical_fog(view_dist, 2.0, 0.05 * darknessFactor) * 0.7 + 0.3;
-	fog.rgb *= darkness_fog;
-	fog.a   *= darkness_fog;
-
-	return fog;
-}
-
-//----------------------------------------------------------------------------//
-#elif defined WORLD_END
-
-#endif
 
 #endif // INCLUDE_FOG_SIMPLE_FOG

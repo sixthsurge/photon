@@ -4,7 +4,7 @@
   Photon Shaders by SixthSurge
 
   program/composite0.glsl:
-  Render volumetric fog and Minecraft-style volumetric clouds
+  Render volumetric fog and Blocky volumetric clouds
 
 --------------------------------------------------------------------------------
 */
@@ -21,14 +21,14 @@ flat out vec3 ambient_color;
 flat out vec3 light_color;
 
 #if defined WORLD_OVERWORLD
-flat out vec3 sun_color;
-flat out vec3 moon_color;
 flat out mat2x3 air_fog_coeff[2];
 #endif
 
 // ------------
 //   Uniforms
 // ------------
+
+uniform sampler2D colortex4; // Sky map, lighting color palette
 
 uniform float eyeAltitude;
 uniform float blindness;
@@ -69,7 +69,6 @@ uniform float time_midnight;
 
 #if defined WORLD_OVERWORLD
 #include "/include/light/colors/light_color.glsl"
-#include "/include/light/colors/sky_color.glsl"
 #include "/include/misc/weather.glsl"
 #endif
 
@@ -80,22 +79,13 @@ uniform float time_midnight;
 void main() {
 	uv = gl_MultiTexCoord0.xy;
 
+	light_color   = texelFetch(colortex4, ivec2(191, 0), 0).rgb;
+	ambient_color = texelFetch(colortex4, ivec2(191, 1), 0).rgb;
+
 #if defined WORLD_OVERWORLD
-	float overcastness = daily_weather_blend(daily_weather_overcastness);
-
-	light_color   = get_light_color(overcastness) * (1.0 - 0.33 * overcastness);
-	ambient_color = get_sky_color();
-	sun_color     = get_sun_exposure() * get_sun_tint(overcastness);
-	moon_color    = get_moon_exposure() * get_moon_tint(overcastness);
-
 	mat2x3 rayleigh_coeff = air_fog_rayleigh_coeff(), mie_coeff = air_fog_mie_coeff();
 	air_fog_coeff[0] = mat2x3(rayleigh_coeff[0], mie_coeff[0]);
 	air_fog_coeff[1] = mat2x3(rayleigh_coeff[1], mie_coeff[1]);
-#endif
-
-#if defined WORLD_NETHER
-	light_color   = vec3(0.0);
-	ambient_color = get_nether_color();
 #endif
 
 	vec2 vertex_pos = gl_Vertex.xy * VL_RENDER_SCALE;
@@ -110,8 +100,8 @@ void main() {
 //----------------------------------------------------------------------------//
 #if defined fsh
 
-layout (location = 0) out vec4 fog_scattering;
-layout (location = 1) out vec4 fog_transmittance;
+layout (location = 0) out vec3 fog_scattering;
+layout (location = 1) out vec3 fog_transmittance;
 
 /* DRAWBUFFERS:67 */
 
@@ -121,8 +111,6 @@ flat in vec3 ambient_color;
 flat in vec3 light_color;
 
 #if defined WORLD_OVERWORLD
-flat in vec3 sun_color;
-flat in vec3 moon_color;
 flat in mat2x3 air_fog_coeff[2];
 #endif
 
@@ -147,10 +135,6 @@ uniform sampler2D shadowtex1;
 uniform sampler2D shadowcolor0;
 #endif
 #endif
-#endif
-
-#ifdef MINECRAFTY_CLOUDS
-uniform sampler2D depthtex2; // minecraft cloud texture
 #endif
 
 uniform mat4 gbufferModelView;
@@ -205,10 +189,6 @@ uniform float time_midnight;
 #include "/include/fog/air_fog_vl.glsl"
 #endif
 
-#if defined WORLD_OVERWORLD && defined MINECRAFTY_CLOUDS
-#include "/include/sky/minecrafty_clouds.glsl"
-#endif
-
 #include "/include/fog/water_fog_vl.glsl"
 
 #include "/include/utility/encoding.glsl"
@@ -239,31 +219,6 @@ void main() {
 	vec3 world_start_pos = gbufferModelViewInverse[3].xyz + cameraPosition;
 	vec3 world_end_pos   = world_pos;
 
-	fog_scattering = vec4(0.0, 0.0, 0.0, 1.0);
-
-	// Minecraft-style clouds
-
-#if defined WORLD_OVERWORLD && defined MINECRAFTY_CLOUDS
-	float alpha = texelFetch(colortex3, view_texel, 0).a;
-
-	vec3 clouds_start_pos = depth0 == depth1 ? world_start_pos : world_pos;
-	vec3 clouds_end_pos   = depth0 == depth1 ? world_end_pos : world_back_pos;
-
-	vec4 clouds = raymarch_minecrafty_clouds(world_start_pos, world_end_pos, depth1 == 1.0, minecrafty_clouds_altitude_l0, dither);
-	fog_scattering.rgb += clouds.xyz;
-	fog_scattering.a   *= clouds.a;
-
-#ifdef MINECRAFTY_CLOUDS_LAYER_2
-	float visibility = pow4(clouds.a);
-	clouds = raymarch_minecrafty_clouds(world_start_pos, world_end_pos, depth1 == 1.0, minecrafty_clouds_altitude_l1, dither);
-	fog_scattering.rgb += clouds.xyz * visibility;
-	fog_scattering.a   *= mix(1.0, clouds.a, visibility);
-#endif
-
-	fog_scattering.rgb *= 1.0 - alpha;
-	fog_scattering.a    = mix(fog_scattering.a, 1.0, alpha);
-#endif
-
 	// Volumetric lighting
 
 #if defined VL
@@ -272,8 +227,8 @@ void main() {
 		case 0:
 			mat2x3 air_fog = raymarch_air_fog(world_start_pos, world_end_pos, depth0 == 1.0, skylight, dither);
 
-			fog_scattering.rgb    = fog_scattering.rgb * air_fog[1] + air_fog[0];
-			fog_transmittance.rgb = air_fog[1];
+			fog_scattering    = air_fog[0];
+			fog_transmittance = air_fog[1];
 
 			break;
 #endif
@@ -281,14 +236,14 @@ void main() {
 		case 1:
 			mat2x3 water_fog = raymarch_water_fog(world_start_pos, world_end_pos, depth0 == 1.0, dither);
 
-			fog_scattering.rgb    = fog_scattering.rgb * water_fog[1] + water_fog[0];
-			fog_transmittance.rgb = water_fog[1];
+			fog_scattering    = water_fog[0];
+			fog_transmittance = water_fog[1];
 
 			break;
 
 		default:
-			fog_scattering.rgb    = vec3(0.0);
-			fog_transmittance.rgb = vec3(1.0);
+			fog_scattering    = vec3(0.0);
+			fog_transmittance = vec3(1.0);
 
 			break;
 

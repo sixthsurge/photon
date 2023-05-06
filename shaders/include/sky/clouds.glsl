@@ -10,8 +10,6 @@
 #include "/include/utility/random.glsl"
 #include "/include/utility/sampling.glsl"
 
-#define clouds_cirrus_shadow (1.0 - 0.9 * overcastness)
-
 float clouds_phase_single(float cos_theta) { // Single scattering phase function
 	return 0.8 * klein_nishina_phase(cos_theta, 2600.0)    // forwards lobe
 	     + 0.2 * henyey_greenstein_phase(cos_theta, -0.2); // backwards lobe
@@ -75,7 +73,7 @@ vec3 clouds_aerial_perspective(
 const float clouds_radius_cu     = planet_radius + CLOUDS_CU_ALTITUDE;
 const float clouds_thickness_cu  = CLOUDS_CU_ALTITUDE * CLOUDS_CU_THICKNESS;
 const float clouds_top_radius_cu = clouds_radius_cu + clouds_thickness_cu;
-float clouds_extinction_coeff_cu = mix(0.05, 0.1, smoothstep(0.0, 0.3, abs(sun_dir.y))) * (1.0 - 0.33 * max(overcastness, rainStrength)) * CLOUDS_CU_DENSITY;
+float clouds_extinction_coeff_cu = mix(0.05, 0.1, smoothstep(0.0, 0.3, abs(sun_dir.y))) * (1.0 - 0.33 * rainStrength) * CLOUDS_CU_DENSITY;
 float clouds_scattering_coeff_cu = clouds_extinction_coeff_cu * mix(1.00, 0.66, rainStrength);
 float dynamic_thickness_cu       = mix(0.5, 1.0, smoothstep(0.4, 0.6, clouds_coverage_cu.y));
 
@@ -250,7 +248,7 @@ vec4 draw_clouds_cu(vec3 ray_dir, vec3 clear_sky, float dither) {
 	bool moonlit = sun_dir.y < -0.04;
 	vec3 light_dir = moonlit ? moon_dir : sun_dir;
 	float cos_theta = dot(ray_dir, light_dir);
-	float bounced_light = planet_albedo * light_dir.y * rcp_pi / clouds_cirrus_shadow;
+	float bounced_light = planet_albedo * light_dir.y * rcp_pi;
 
 	// --------------------
 	//   Raymarching Loop
@@ -299,8 +297,6 @@ vec4 draw_clouds_cu(vec3 ray_dir, vec3 clear_sky, float dither) {
 		distance_weight_sum += density;
 	}
 
-	scattering.x *= clouds_cirrus_shadow;
-
 	// Get main light color for this layer
 	vec3 light_color  = moonlit ? moon_color : sun_color;
 	     light_color *= sunlight_color * atmosphere_transmittance(ray_origin, light_dir);
@@ -333,7 +329,7 @@ const float clouds_radius_ac     = planet_radius + CLOUDS_AC_ALTITUDE;
 const float clouds_thickness_ac  = CLOUDS_AC_ALTITUDE * CLOUDS_AC_THICKNESS;
 const float clouds_top_radius_ac = clouds_radius_ac + clouds_thickness_ac;
 float day_factor                 = smoothstep(0.0, 0.3, abs(sun_dir.y));
-float clouds_extinction_coeff_ac = mix(0.05, 0.1, day_factor) * CLOUDS_AC_DENSITY * (1.0 - 0.33 * max(overcastness, rainStrength));
+float clouds_extinction_coeff_ac = mix(0.05, 0.1, day_factor) * CLOUDS_AC_DENSITY * (1.0 - 0.33 * rainStrength);
 float clouds_scattering_coeff_ac = clouds_extinction_coeff_ac * mix(1.00, 0.66, rainStrength);
 float dynamic_thickness_ac       = mix(0.5, 1.0, smoothstep(0.4, 0.6, clouds_coverage_ac.y));
 
@@ -503,7 +499,7 @@ vec4 draw_clouds_ac(vec3 ray_dir, vec3 clear_sky, float dither) {
 	bool moonlit = sun_dir.y < -0.045;
 	vec3 light_dir = moonlit ? moon_dir : sun_dir;
 	float cos_theta = dot(ray_dir, light_dir);
-	float bounced_light = planet_albedo * light_dir.y * rcp_pi / clouds_cirrus_shadow;
+	float bounced_light = planet_albedo * light_dir.y * rcp_pi;
 
 	// --------------------
 	//   Raymarching Loop
@@ -551,8 +547,6 @@ vec4 draw_clouds_ac(vec3 ray_dir, vec3 clear_sky, float dither) {
 		distance_sum += distance_to_sample * density;
 		distance_weight_sum += density;
 	}
-
-	scattering.x *= clouds_cirrus_shadow;
 
 	// Get main light color for this layer
 	vec3 light_color  = moonlit ? moon_color : sun_color;
@@ -674,9 +668,6 @@ float clouds_density_ci(vec2 coord, float altitude_fraction, out float cirrus, o
 	cirrocumulus  = max0(cirrocumulus);
 
 	density += 0.2 * cube(max0(cirrocumulus)) * height_shaping * dampen(height_shaping) * CLOUDS_CC_DENSITY;
-
-	// overcastness
-	density = max(density, 0.008 * linear_step(0.8, 1.0, overcastness));
 
 	return density;
 }
@@ -817,17 +808,14 @@ vec4 draw_clouds_ci(vec3 ray_dir, vec3 clear_sky, float dither) {
 vec4 draw_clouds(vec3 ray_dir, vec3 clear_sky, float dither) {
 	vec4 clouds = vec4(0.0, 0.0, 0.0, 1.0);
 
-	// Blend to gray when cirrus coverage is high
-	vec3 overcast_sky = mix(clear_sky, vec3(dot(clear_sky, luminance_weights_rec2020)), overcastness * linear_step(0.2, 0.5, light_dir.y));
-
 #ifdef CLOUDS_CU
-	vec4 clouds_cu = draw_clouds_cu(ray_dir, overcast_sky, dither);
+	vec4 clouds_cu = draw_clouds_cu(ray_dir, clear_sky, dither);
 	clouds = clouds_cu;
 	if (clouds.a < 1e-3) return clouds;
 #endif
 
 #ifdef CLOUDS_AC
-	vec4 clouds_ac = draw_clouds_ac(ray_dir, overcast_sky, dither);
+	vec4 clouds_ac = draw_clouds_ac(ray_dir, clear_sky, dither);
 	clouds.rgb += clouds_ac.rgb * clouds.a;
 	clouds.a   *= clouds_ac.a;
 	if (clouds.a < 1e-3) return clouds;

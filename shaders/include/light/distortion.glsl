@@ -3,9 +3,6 @@
 
 #include "/include/utility/fast_math.glsl"
 
-#define SHADOW_DEPTH_SCALE 0.2
-#define SHADOW_DISTORTION 0.85
-
 // Euclidian distance is defined as sqrt(a^2 + b^2 + ...). This function instead does
 // quartic_root(a^4 + b^4 + ...). This results in smaller distances along the diagonal axes
 float quartic_length(vec2 v) {
