@@ -444,11 +444,6 @@ void main() {
 #ifdef SPECULAR_MAPPING
 		decode_specular_map(specular_map, material);
 #endif
-
-#if defined PROGRAM_GBUFFERS_ARMOR_GLINT
-		base_color.a = 0.1;
-		material.emission = vec3(0.33);
-#endif
 	}
 
 	// Shadows
