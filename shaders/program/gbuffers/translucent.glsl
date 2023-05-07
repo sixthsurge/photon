@@ -249,6 +249,10 @@ uniform float time_noon;
 uniform float time_sunset;
 uniform float time_midnight;
 
+#if defined PROGRAM_GBUFFERS_ENTITIES_TRANSLUCENT
+uniform vec4 entityColor;
+#endif
+
 // ------------
 //   Includes
 // ------------
@@ -424,6 +428,10 @@ void main() {
 
 		if (base_color.a < 0.1) discard;
 
+#if defined PROGRAM_GBUFFERS_ENTITIES_TRANSLUCENT
+		base_color.rgb = mix(base_color.rgb, entityColor.rgb, entityColor.a);
+#endif
+
 		material = material_from(base_color.rgb * base_color.a, material_mask, world_pos, adjusted_light_levels);
 
 		//--//
@@ -472,7 +480,7 @@ void main() {
 	float NoH = (NoL + NoV) * halfway_norm;
 	float LoH = LoV * halfway_norm + halfway_norm;
 
-#if defined WORLD_OVERWORLD || defined WORLD_END
+#if defined SHADOW && (defined WORLD_OVERWORLD || defined WORLD_END)
 	float sss_depth;
 	float shadow_distance_fade;
 	vec3 shadows = calculate_shadows(scene_pos, tbn[2], adjusted_light_levels.y, material.sss_amount, shadow_distance_fade, sss_depth);

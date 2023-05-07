@@ -420,7 +420,7 @@ void main() {
 		float NoH = (NoL + NoV) * halfway_norm;
 		float LoH = LoV * halfway_norm + halfway_norm;
 
-#if defined WORLD_OVERWORLD || defined WORLD_END
+#if defined SHADOW && (defined WORLD_OVERWORLD || defined WORLD_END)
 		float sss_depth;
 		float shadow_distance_fade;
 		vec3 shadows = calculate_shadows(scene_pos, flat_normal, light_levels.y, material.sss_amount, shadow_distance_fade, sss_depth);
