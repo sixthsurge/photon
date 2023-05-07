@@ -439,10 +439,27 @@ void main() {
 	#ifdef DIRECTIONAL_LIGHTMAPS
 		adjusted_light_levels *= get_directional_lightmaps(normal);
 	#endif
+
+		// Pack normal
+		gbuffer_data_1.xy = encode_unit_vector(normal);
 #endif
 
 #ifdef SPECULAR_MAPPING
 		decode_specular_map(specular_map, material);
+
+		// Pack specular map
+
+	#if defined POM && defined POM_SHADOW
+		// Pack parallax shadow in alpha component of specular map
+		// Specular map alpha >= 0.5 => parallax shadow
+		specular_map.a *= step(specular_map.a, 0.999);
+		specular_map.a  = clamp01(specular_map.a * 0.5);
+	#endif
+
+		gbuffer_data_1.z = pack_unorm_2x8(specular_map.xy);
+		gbuffer_data_1.w = pack_unorm_2x8(specular_map.zw);
+#elif defined POM && defined POM_SHADOW
+		gbuffer_data_1.z = 0.0;
 #endif
 	}
 
@@ -536,26 +553,6 @@ void main() {
 	gbuffer_data_0.y  = pack_unorm_2x8(color_to_store.b, clamp01(float(material_mask) * rcp(255.0)));
 	gbuffer_data_0.z  = pack_unorm_2x8(encode_unit_vector(tbn[2]));
 	gbuffer_data_0.w  = pack_unorm_2x8(dither_8bit(adjusted_light_levels, 0.5));
-
-#ifdef NORMAL_MAPPING
-	gbuffer_data_1.xy = encode_unit_vector(normal);
-#endif
-
-#ifdef SPECULAR_MAPPING
-	#if defined POM && defined POM_SHADOW
-	// Pack parallax shadow in alpha component of specular map
-	// Specular map alpha >= 0.5 => parallax shadow
-	specular_map.a *= step(specular_map.a, 0.999);
-	specular_map.a  = clamp01(specular_map.a * 0.5);
-	#endif
-
-	gbuffer_data_1.z = pack_unorm_2x8(specular_map.xy);
-	gbuffer_data_1.w = pack_unorm_2x8(specular_map.zw);
-#else
-	#if defined POM && defined POM_SHADOW
-	gbuffer_data_1.z = 0.0;
-	#endif
-#endif
 }
 
 #endif

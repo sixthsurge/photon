@@ -4,7 +4,7 @@
   Photon Shaders by SixthSurge
 
   program/gbuffers/armor_glint.glsl:
-  Handle enchantment glint (+ block breaking overlay in OptiFine)
+  Handle enchantment glint
 
 --------------------------------------------------------------------------------
 */
