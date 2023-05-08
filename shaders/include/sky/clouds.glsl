@@ -274,7 +274,11 @@ vec4 draw_clouds_cu(vec3 ray_dir, vec3 clear_sky, float dither) {
 		float step_optical_depth = density * clouds_extinction_coeff_cu * step_length;
 		float step_transmittance = exp(-step_optical_depth);
 
+#if defined PROGRAM_DEFERRED0
+		vec2 hash = vec2(0.0);
+#else
 		vec2 hash = hash2(fract(ray_pos)); // used to dither the light rays
+#endif
 
 		float light_optical_depth  = clouds_optical_depth_cu(ray_pos, light_dir, hash.x, lighting_steps);
 		float sky_optical_depth    = clouds_optical_depth_cu(ray_pos, sky_dir, hash.y, ambient_steps);
@@ -525,7 +529,11 @@ vec4 draw_clouds_ac(vec3 ray_dir, vec3 clear_sky, float dither) {
 		float step_optical_depth = density * clouds_extinction_coeff_ac * step_length;
 		float step_transmittance = exp(-step_optical_depth);
 
+#if defined PROGRAM_DEFERRED0
+		vec2 hash = vec2(0.0);
+#else
 		vec2 hash = hash2(fract(ray_pos)); // used to dither the light rays
+#endif
 
 		float light_optical_depth  = clouds_optical_depth_ac(ray_pos, light_dir, hash.x, lighting_steps);
 		float sky_optical_depth    = clouds_optical_depth_ac(ray_pos, sky_dir, hash.y, ambient_steps);

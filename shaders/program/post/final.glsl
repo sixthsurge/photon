@@ -128,6 +128,7 @@ void main() {
 	scene_color = dither_8bit(scene_color, bayer16(vec2(texel)));
 
 #if   DEBUG_VIEW == DEBUG_VIEW_SAMPLER
+	texel;
 	if (clamp(texel, ivec2(0), ivec2(textureSize(DEBUG_SAMPLER, 0))) == texel) {
 		scene_color = texelFetch(DEBUG_SAMPLER, texel, 0).rgb;
 		scene_color = display_eotf(scene_color);

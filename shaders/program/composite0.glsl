@@ -4,7 +4,7 @@
   Photon Shaders by SixthSurge
 
   program/composite0.glsl:
-  Render volumetric fog and Blocky volumetric clouds
+  Calculate volumetric fog
 
 --------------------------------------------------------------------------------
 */
@@ -30,22 +30,13 @@ flat out mat2x3 air_fog_coeff[2];
 
 uniform sampler2D colortex4; // Sky map, lighting color palette
 
-uniform float eyeAltitude;
-uniform float blindness;
 uniform float rainStrength;
 uniform float sunAngle;
-uniform float frameTimeCounter;
 
-uniform int isEyeInWater;
 uniform int worldTime;
 uniform int worldDay;
-uniform int frameCounter;
 
-uniform vec3 fogColor;
-
-uniform vec3 light_dir;
 uniform vec3 sun_dir;
-uniform vec3 moon_dir;
 
 uniform float eye_skylight;
 
@@ -65,15 +56,9 @@ uniform float time_noon;
 uniform float time_sunset;
 uniform float time_midnight;
 
-#define WEATHER_FOG
-
 #if defined WORLD_OVERWORLD
-#include "/include/light/colors/light_color.glsl"
+#define WEATHER_FOG
 #include "/include/misc/weather.glsl"
-#endif
-
-#if defined WORLD_NETHER
-#include "/include/light/colors/nether_color.glsl"
 #endif
 
 void main() {

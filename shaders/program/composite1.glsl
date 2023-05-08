@@ -149,7 +149,7 @@ vec4 smooth_filter(sampler2D sampler, vec2 coord) {
 
 // http://www.diva-portal.org/smash/get/diva2:24136/FULLTEXT01.pdf
 vec3 purkinje_shift(vec3 rgb, vec2 light_levels) {
-#if !defined WORLD_OVERWORLD
+#if !(defined PURKINJE_SHIFT && defined WORLD_OVERWORLD)
 	return rgb;
 #else
 	float purkinje_intensity  = 0.05 * PURKINJE_SHIFT_INTENSITY;

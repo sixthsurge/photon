@@ -54,8 +54,6 @@ uniform float blindness;
 uniform float nightVision;
 uniform float darknessFactor;
 
-uniform vec3 fogColor;
-
 uniform vec3 light_dir;
 uniform vec3 sun_dir;
 uniform vec3 moon_dir;
@@ -79,10 +77,6 @@ uniform float time_midnight;
 #include "/include/light/colors/light_color.glsl"
 #include "/include/misc/weather.glsl"
 #include "/include/sky/atmosphere.glsl"
-#endif
-
-#if defined WORLD_NETHER
-#include "/include/light/colors/nether_color.glsl"
 #endif
 
 #include "/include/sky/projection.glsl"
@@ -290,7 +284,7 @@ void main() {
 	vec3 world_dir = normalize(scene_pos - gbufferModelViewInverse[3].xyz);
 
 #if defined WORLD_OVERWORLD
-	vec3 atmosphere = atmosphere_scattering(world_dir, sun_color, sun_dir, moon_color, moon_dir);;
+	vec3 atmosphere = atmosphere_scattering(world_dir, sun_color, sun_dir, moon_color, moon_dir);
 
 	// Blocky clouds
 
