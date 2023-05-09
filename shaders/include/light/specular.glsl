@@ -294,8 +294,11 @@ vec3 get_specular_reflections(
 		fresnel = fresnel_dielectric(NoV, material.f0.x);
 	}
 
+	float v1 = v1_smith_ggx(NoV, alpha_squared);
+	float v2 = v2_smith_ggx(NoL, NoV, alpha_squared);
+
 	vec3 reflection  = trace_specular_ray(screen_pos, view_pos, ray_dir, dither, skylight, SSR_INTERSECTION_STEPS_SMOOTH, SSR_REFINEMENT_STEPS, 0);
-	     reflection *= albedo_tint * fresnel;
+	     reflection *= albedo_tint * fresnel * (NoL * v2 / v1);
 
 	if (any(isnan(reflection))) reflection = vec3(0.0); // don't reflect NaNs
 

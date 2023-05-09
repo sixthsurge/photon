@@ -41,6 +41,8 @@ in vec2 uv;
 //   Uniforms
 // ------------
 
+uniform sampler3D colortex1; // tony mcmapface LUT
+
 uniform sampler2D colortex0; // bloom tiles
 uniform sampler2D colortex3; // fog transmittance
 uniform sampler2D colortex5; // scene color
@@ -57,7 +59,7 @@ uniform float eye_skylight;
 uniform vec2 view_pixel_size;
 
 #include "/include/aces/aces.glsl"
-
+#include "/include/misc/tony_mcmapface.glsl"
 #include "/include/utility/bicubic.glsl"
 #include "/include/utility/color.glsl"
 
@@ -120,21 +122,15 @@ vec3 gain(vec3 x, float k) {
 // Color grading applied before tone mapping
 // rgb := color in acescg [0, inf]
 vec3 grade_input(vec3 rgb) {
-	float brightness = 1.04 * GRADE_BRIGHTNESS;
-	float contrast   = 1.11 * GRADE_CONTRAST;
-	float saturation = 0.93 * GRADE_SATURATION;
-
-	// Reduce contrast in the darks
-	float luminance = dot(rgb, luminance_weights);
-	float darkness_factor = cube(1.0 - linear_step(0.0, 0.15, luminance));
-	contrast   -= 0.20 * darkness_factor;
-	saturation += 0.07 * darkness_factor;
+	float brightness = 1.30 * GRADE_BRIGHTNESS;
+	float contrast   = 1.25 * GRADE_CONTRAST;
+	float saturation = 0.97 * GRADE_SATURATION;
 
 	// Brightness
 	rgb *= brightness;
 
 	// Contrast
-	const float log_midpoint = log2(0.33);
+	const float log_midpoint = log2(0.18);
 	rgb = log2(rgb + eps);
 	rgb = contrast * (rgb - log_midpoint) + log_midpoint;
 	rgb = max0(exp2(rgb) - eps);
@@ -220,6 +216,10 @@ vec3 academy_fit(vec3 rgb) {
 	rgb = mix(grayscale, rgb, odt_sat_factor);
 
 	return rgb * ap1_to_rec2020;
+}
+
+vec3 tony_mcmapface(vec3 rgb) {
+	return TonyMcMapface(colortex1, rgb);
 }
 
 vec3 tonemap_hejl_2015(vec3 rgb) {
@@ -341,6 +341,7 @@ void main() {
 #endif
 
 	scene_color = grade_input(scene_color);
+	scene_color = scene_color * working_to_display_color;
 
 #ifdef TONEMAP_COMPARISON
 	scene_color = uv.x < 0.5 ? tonemap_left(scene_color) : tonemap_right(scene_color);
@@ -348,7 +349,7 @@ void main() {
 	scene_color = tonemap(scene_color);
 #endif
 
-	scene_color = clamp01(scene_color * working_to_display_color);
+	scene_color = clamp01(scene_color);
 	scene_color = grade_output(scene_color);
 
 #if 0 // Tonemap plot

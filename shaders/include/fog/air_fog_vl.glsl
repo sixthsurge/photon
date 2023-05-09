@@ -161,9 +161,10 @@ mat2x3 raymarch_air_fog(vec3 world_start_pos, vec3 world_end_pos, bool sky, floa
 	vec3 ambient_color = ambient_color_fog;
 #endif
 
+	scattering += light_sky * vec2(isotropic_phase) * ambient_color;
+
 	for (int i = 0; i < 4; ++i) {
 		scattering += scatter_amount * (light_sun * vec2(isotropic_phase, mie_phase)) * light_color;
-		scattering += scatter_amount * (light_sky * vec2(isotropic_phase)) * ambient_color;
 
 		scatter_amount *= 0.5;
 		mie_phase = mix(mie_phase, isotropic_phase, 0.3);

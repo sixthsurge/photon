@@ -157,7 +157,7 @@ vec3 purkinje_shift(vec3 rgb, vec2 light_levels) {
 	      purkinje_intensity *= clamp01(1.0 - light_levels.x); // Reduce purkinje intensity in blocklight
 	      purkinje_intensity *= clamp01(0.3 + 0.7 * cube(light_levels.y)); // Reduce purkinje intensity underground
 
-	if (purkinje_intensity == 0.0) return rgb;
+	if (purkinje_intensity < eps) return rgb;
 
 	const vec3 purkinje_tint = vec3(0.5, 0.7, 1.0) * rec709_to_rec2020;
 	const vec3 rod_response = vec3(7.15e-5, 4.81e-1, 3.28e-1) * rec709_to_rec2020;

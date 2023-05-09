@@ -110,7 +110,7 @@ vec2 blocky_clouds_scattering(
 	float scatter_amount = blocky_clouds_scattering_coeff;
 	float extinct_amount = blocky_clouds_extinction_coeff;
 
-	float powder = 4.0 * (1.0 - exp2(-8.0 * density));
+	float powder = 5.0 * (1.0 - exp2(-8.0 * density));
 
 	float scattering_integral_times_density = (1.0 - step_transmittance) / blocky_clouds_extinction_coeff;
 

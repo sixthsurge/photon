@@ -110,7 +110,7 @@ void main() {
 		// Shader moon
 		const float angle      = 0.7;
 		const mat2  rot        = mat2(cos(angle), sin(angle), -sin(angle), cos(angle));
-		const vec3  lit_color  = vec3(1.0, 0.85, 0.75);
+		const vec3  lit_color  = vec3(0.75, 0.80, 1.0);
 		const vec3  glow_color = vec3(0.7, 0.8, 1.0);
 
 		offset = (fract(vec2(4.0, 2.0) * uv) - 0.5) * rcp(0.15);

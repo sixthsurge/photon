@@ -340,7 +340,7 @@ vec4 draw_nether_portal() {
 		pos += ray_step;
 	}
 
-	return clamp01(result * portal_brightness * depth_step);
+	return clamp01(result * portal_brightness * depth_step * vec4(1.0, 0.75, 0.8, 1.0));
 }
 #else
 vec4 draw_nether_portal() { return vec4(0.0); }
@@ -382,7 +382,7 @@ void main() {
 	if (is_water) {
 		material = water_material;
 
-#if   WATER_TEXTURE == WATER_TEXTURE_NONE
+#if   WATER_TEXTURE == WATER_TEXTURE_OFF
 		base_color = vec4(0.0);
 #elif WATER_TEXTURE == WATER_TEXTURE_HIGHLIGHT
 		base_color = texture(gtexture, uv, lod_bias);
@@ -538,7 +538,7 @@ void main() {
 			sss_depth
 		);
 
-		radiance += water_fog[0] * (1.0 + 8.0 * sqr(water_fog[1])) * (1.0 - exp(-0.5 * layer_dist));
+		radiance += water_fog[0] * (1.0 + 6.6 * sqr(water_fog[1])) * (1.0 - exp(-0.33 * layer_dist));
 		alpha     = 1.0 - dot(water_fog[1], luminance_weights_rec2020);
 	} else {
 		alpha     = base_color.a;

@@ -11,6 +11,7 @@
 * [Jessie](https://github.com/Jessie-LC) - f0 and f82 values for labPBR hardcoded metals
 * [Sledgehammer Games](https://www.sledgehammergames.com/) - Bloom downsampling method used in Call of Duty Advanced Warfare (described [here](http://www.iryoku.com/next-generation-post-processing-in-call-of-duty-advanced-warfare))
 * http://momentsingraphics.de/ - Blue noise texture
+* [h3r2tic](https://github.com/h3r2tic) - Excellent [Tony McMapface](https://github.com/h3r2tic/tony-mc-mapface) tonemapping operator (thanks also to [snurf](https://www.patreon.com/snurf) for converting it to a format that Minecraft shaders can use)
 
 ## features
 * Custom lighting with variable penumbra shadows and GTAO

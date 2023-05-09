@@ -102,7 +102,7 @@ Material material_from(vec3 albedo_srgb, uint material_mask, vec3 world_pos, ino
 					if (material_mask == 8u) {
 						#ifdef HARDCODED_EMISSION
 						// Lava
-						material.emission = 2.00 * albedo_sqrt * (0.2 + 0.8 * isolate_hue(hsl, 30.0, 15.0));
+						material.emission = vec3(2.00) * (0.2 + 0.8 * isolate_hue(hsl, 30.0, 15.0));
 						light_levels.x *= 0.3;
 						#ifdef WORLD_NETHER
 						material.emission *= 0.66;
