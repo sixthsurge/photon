@@ -199,7 +199,7 @@ vec3 academy_rrt(vec3 rgb) {
 	rgb = aces_rrt(rgb);
 	rgb = aces_odt(rgb);
 
-	return rgb * ap1_to_rec2020;
+	return rgb * ap1_to_rec709;
 }
 
 // ACES RRT and ODT approximation
@@ -215,7 +215,7 @@ vec3 academy_fit(vec3 rgb) {
 	vec3 grayscale = vec3(dot(rgb, luminance_weights));
 	rgb = mix(grayscale, rgb, odt_sat_factor);
 
-	return rgb * ap1_to_rec2020;
+	return rgb * ap1_to_rec709;
 }
 
 vec3 tony_mcmapface(vec3 rgb) {
