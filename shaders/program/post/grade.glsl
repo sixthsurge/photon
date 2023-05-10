@@ -194,7 +194,7 @@ vec3 grade_output(vec3 rgb) {
 vec3 academy_rrt(vec3 rgb) {
 	rgb *= 1.6; // Match the exposure to the RRT
 
-	rgb = rgb * rec2020_to_ap0;
+	rgb = rgb * rec709_to_ap0;
 
 	rgb = aces_rrt(rgb);
 	rgb = aces_odt(rgb);
@@ -206,7 +206,7 @@ vec3 academy_rrt(vec3 rgb) {
 vec3 academy_fit(vec3 rgb) {
 	rgb *= 1.6; // Match the exposure to the RRT
 
-	rgb = rgb * rec2020_to_ap0;
+	rgb = rgb * rec709_to_ap0;
 
 	rgb = rrt_sweeteners(rgb);
 	rgb = rrt_and_odt_fit(rgb);

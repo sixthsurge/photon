@@ -16,8 +16,6 @@ float get_sun_exposure() {
 }
 
 vec3 get_sun_tint() {
-	const vec3 base_tint = from_srgb(vec3(SUN_R, SUN_G, SUN_B));
-
 	float blue_hour = linear_step(0.05, 1.0, exp(-190.0 * sqr(sun_dir.y + 0.09604)));
 
 	vec3 morning_evening_tint = vec3(1.05, 0.84, 0.93) * 1.2;
@@ -26,7 +24,16 @@ vec3 get_sun_tint() {
 	vec3 blue_hour_tint = vec3(1.0, 0.85, 0.95);
 	     blue_hour_tint = mix(vec3(1.0), blue_hour_tint, blue_hour);
 
-	return base_tint * morning_evening_tint * blue_hour_tint;
+	// User tint
+
+	const vec3 tint_morning = from_srgb(vec3(SUN_MR, SUN_MG, SUN_MB));
+	const vec3 tint_noon    = from_srgb(vec3(SUN_NR, SUN_NG, SUN_NB));
+	const vec3 tint_evening = from_srgb(vec3(SUN_ER, SUN_EG, SUN_EB));
+
+	vec3 user_tint = mix(tint_noon, tint_morning, time_sunrise);
+	     user_tint = mix(user_tint, tint_evening, time_sunset);
+
+	return morning_evening_tint * blue_hour_tint * user_tint;
 }
 
 float get_moon_exposure() {
@@ -52,7 +59,6 @@ vec3 get_light_color() {
 }
 
 float get_skylight_boost() {
-	float early_morning = linear_step(0.05, 1.0, exp(-80.0 * sqr(sun_dir.y - 0.6)));
 	float night_skylight_boost = 4.0 * (1.0 - smoothstep(-0.16, 0.0, sun_dir.y))
 	                           - 3.0 * linear_step(0.1, 1.0, exp(-2.42 * sqr(sun_dir.y + 0.81)));
 

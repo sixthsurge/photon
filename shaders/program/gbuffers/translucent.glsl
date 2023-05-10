@@ -267,6 +267,10 @@ uniform vec4 entityColor;
 	#undef SH_SKYLIGHT
 #endif
 
+#if defined PROGRAM_GBUFFERS_TEXTURED || defined PROGRAM_GBUFFERS_PARTICLES_TRANSLUCENT
+	#define NO_NORMAL
+#endif
+
 #ifdef DIRECTIONAL_LIGHTMAPS
 #include "/include/light/directional_lightmaps.glsl"
 #endif
@@ -420,6 +424,10 @@ void main() {
 		vec4 specular_map = texture(specular, uv, lod_bias);
 #endif
 
+#if defined PROGRAM_GBUFFERS_ENTITIES_TRANSLUCENT
+		if (material_mask == 102) base_color = vec4(1.0);
+#endif
+
 #ifdef FANCY_NETHER_PORTAL
 		if (is_nether_portal) {
 			base_color = draw_nether_portal();
@@ -469,11 +477,20 @@ void main() {
 #elif defined POM && defined POM_SHADOW
 		gbuffer_data_1.z = 0.0;
 #endif
+
+#ifdef NO_NORMAL
+		// No normal vector => make one from screen-space partial derivatives
+		normal = normalize(cross(dFdx(scene_pos), dFdy(scene_pos)));
+#endif
 	}
 
 	// Shadows
 
+#ifndef NO_NORMAL
 	float NoL = dot(normal, light_dir);
+#else
+	float NoL = 1.0;
+#endif
 	float NoV = clamp01(dot(normal, -world_dir));
 	float LoV = dot(light_dir, -world_dir);
 	float halfway_norm = inversesqrt(2.0 * LoV + 2.0);

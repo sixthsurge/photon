@@ -479,7 +479,7 @@ void main() {
 		scene_color = mix(border_fog_color, scene_color, border_fog);
 #endif
 
-#ifdef BLOCKY_CLOUDS
+#if defined WORLD_OVERWORLD && defined BLOCKY_CLOUDS
 		scene_color = scene_color * blocky_clouds.a + blocky_clouds.rgb * fog.a;
 #endif
 	}

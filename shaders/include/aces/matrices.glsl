@@ -40,12 +40,14 @@ const mat3 d65_to_d60 = mat3(
 const mat3 ap0_to_ap1 = ap0_to_xyz * xyz_to_ap1;
 const mat3 ap1_to_ap0 = ap1_to_xyz * xyz_to_ap0;
 
+const mat3 rec709_to_ap0  = rec709_to_xyz * d65_to_d60 * xyz_to_ap0;
+const mat3 ap0_to_rec709  = ap0_to_xyz * d60_to_d65 * xyz_to_rec709;
+const mat3 rec709_to_ap1  = rec709_to_xyz * d65_to_d60 * xyz_to_ap1;
+const mat3 ap1_to_rec709  = ap1_to_xyz * d60_to_d65 * xyz_to_rec709;
 const mat3 rec2020_to_ap0 = rec2020_to_xyz * d65_to_d60 * xyz_to_ap0;
 const mat3 ap0_to_rec2020 = ap0_to_xyz * d60_to_d65 * xyz_to_rec2020;
 const mat3 rec2020_to_ap1 = rec2020_to_xyz * d65_to_d60 * xyz_to_ap1;
 const mat3 ap1_to_rec2020 = ap1_to_xyz * d60_to_d65 * xyz_to_rec2020;
-const mat3 rec709_to_ap1  = rec709_to_xyz * d65_to_d60 * xyz_to_ap1;
-const mat3 ap1_to_rec709  = ap1_to_xyz * d60_to_d65 * xyz_to_rec709;
 
 // Used for quantities that are multiplied by an illuminant, like the diffuse albedo. These take
 // the white point of the light source

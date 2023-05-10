@@ -149,8 +149,7 @@ const vec3 water_absorption_coeff = vec3(WATER_ABSORPTION_R, WATER_ABSORPTION_G,
 const vec3 water_scattering_coeff = vec3(WATER_SCATTERING);
 const vec3 water_extinction_coeff = water_absorption_coeff + water_scattering_coeff;
 
-const float water_absorption_distance = 7.0;
-const float water_caustics_distance   = 5.0;
+const float distance_through_water = 5.0; // m
 
 // using the built-in GLSL refract() seems to cause NaNs on Intel drivers, but with this
 // function, which does the exact same thing, it's fine
@@ -200,7 +199,7 @@ float get_water_caustics() {
 	vec3 normal = tbn * get_water_normal(world_pos, tbn[2], coord, flow_dir, 1.0, flowing_water);
 
 	vec3 old_pos = world_pos;
-	vec3 new_pos = world_pos + refract_safe(light_dir, normal, air_n / water_n) * water_caustics_distance;
+	vec3 new_pos = world_pos + refract_safe(light_dir, normal, air_n / water_n) * distance_through_water;
 
 	float old_area = length_squared(dFdx(old_pos)) * length_squared(dFdy(old_pos));
 	float new_area = length_squared(dFdx(new_pos)) * length_squared(dFdy(new_pos));
@@ -217,7 +216,7 @@ void main() {
 		vec3 biome_water_color = srgb_eotf_inv(tint) * rec709_to_working_color;
 		vec3 absorption_coeff = biome_water_coeff(biome_water_color);
 
-		shadowcolor0_out = clamp01(0.25 * exp(-absorption_coeff * water_absorption_distance) * get_water_caustics());
+		shadowcolor0_out = clamp01(0.25 * exp(-absorption_coeff * distance_through_water) * get_water_caustics());
 	} else {
 		vec4 base_color = textureLod(tex, uv, 0);
 		if (base_color.a < 0.1) discard;

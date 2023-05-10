@@ -207,6 +207,14 @@ vec3 calculate_shadows(
 
 	vec3 bias = get_shadow_bias(scene_pos, flat_normal, NoL, skylight);
 
+#ifdef PIXELATED_SHADOWS
+	// Snap position to the nearest block texel
+	const float pixel_scale = float(PIXELATED_SHADOWS_RESOLUTION);
+	scene_pos = scene_pos + cameraPosition;
+	scene_pos = floor(scene_pos * pixel_scale + 0.01) * rcp(pixel_scale) + (0.5 / pixel_scale);
+	scene_pos = scene_pos - cameraPosition;
+#endif
+
 	vec3 shadow_view_pos = transform(shadowModelView, scene_pos + bias);
 	vec3 shadow_clip_pos = project_ortho(shadowProjection, shadow_view_pos);
 	vec3 shadow_screen_pos = distort_shadow_space(shadow_clip_pos) * 0.5 + 0.5;
