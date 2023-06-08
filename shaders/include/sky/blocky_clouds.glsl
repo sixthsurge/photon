@@ -245,7 +245,7 @@ vec4 raymarch_blocky_clouds(
 			step_transmittance,
 			cos_theta,
 			bounced_light
-		) * transmittance * mix(0.66, 1.25, cubic_smooth(altitude_fraction));
+		) * transmittance * mix(0.8, 1.25, cubic_smooth(altitude_fraction));
 
 		transmittance *= step_transmittance;
 

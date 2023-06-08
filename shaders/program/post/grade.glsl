@@ -244,7 +244,7 @@ vec3 tonemap_hejl_burgess(vec3 rgb) {
 // https://gpuopen.com/wp-content/uploads/2016/03/GdcVdrLottes.pdf
 vec3 tonemap_lottes(vec3 rgb) {
 	const vec3 a      = vec3(1.5); // Contrast
-	const vec3 d      = vec3(0.94); // Shoulder contrast
+	const vec3 d      = vec3(0.91); // Shoulder contrast
 	const vec3 hdr_max = vec3(8.0);  // White point
 	const vec3 mid_in  = vec3(0.26); // Fixed midpoint x
 	const vec3 mid_out = vec3(0.32); // Fixed midput y

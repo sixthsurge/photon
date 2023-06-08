@@ -20,7 +20,7 @@ const float cave_fog_density = 0.0033;
 const vec3  cave_fog_color   = vec3(0.033);
 
 const float nether_fog_start   = 0.0;
-const float nether_fog_density = 0.005 * NETHER_FOG_INTENSITY;
+const float nether_fog_density = 0.01 * NETHER_FOG_INTENSITY;
 
 const float blindness_fog_start   = 2.0;
 const float blindness_fog_density = 1.0;

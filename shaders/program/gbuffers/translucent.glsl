@@ -555,8 +555,8 @@ void main() {
 			sss_depth
 		);
 
-		radiance += water_fog[0] * (1.0 + 6.6 * sqr(water_fog[1])) * (1.0 - exp(-0.33 * layer_dist));
-		alpha     = 1.0 - dot(water_fog[1], luminance_weights_rec2020);
+		radiance += water_fog[0] * (1.0 + 6.0 * sqr(water_fog[1])) * (1.0 - exp(-0.33 * layer_dist));
+		alpha     = 1.0 - water_fog[1].x;
 	} else {
 		alpha     = base_color.a;
 	}

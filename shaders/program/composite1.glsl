@@ -305,11 +305,12 @@ void main() {
 		vec2 refracted_uv = uv + tangent_normal.xy * rcp(max(view_dist, 1.0)) * min(layer_dist, 8.0) * (0.1 * WATER_REFRACTION_INTENSITY);
 
 		vec3  refracted_color = texture(colortex0, refracted_uv * taau_render_scale).rgb;
-		float refracted_depth = texture(depthtex1, refracted_uv * taau_render_scale).x;
 
-		if (depth0 < refracted_depth) {
-			scene_color = refracted_color;
-		}
+		// Make sure the refracted object is behind water
+		float refracted_data  = texelFetch(colortex1, ivec2(refracted_uv * taau_render_scale * view_res), 0).y;
+		uint  refracted_mask  = uint(unpack_unorm_2x8(refracted_data).y * 255.0);
+
+		if (refracted_mask == 1) scene_color = refracted_color;
 #endif
 
 #ifdef SNELLS_WINDOW
@@ -353,6 +354,7 @@ void main() {
 			screen_pos,
 			view_pos,
 			normal,
+			flat_normal,
 			world_dir,
 			world_dir * tbn,
 			light_levels.y
@@ -403,7 +405,7 @@ void main() {
 #endif
 
 #if defined WORLD_NETHER
-	bloomy_fog = spherical_fog(view_dist, nether_fog_start, nether_fog_density * (1.0 - blindness)) * 0.5 + 0.5;
+	bloomy_fog = sqrt(spherical_fog(view_dist, nether_fog_start, nether_fog_density * (1.0 - blindness)));
 #endif
 
 	// Apply purkinje shift

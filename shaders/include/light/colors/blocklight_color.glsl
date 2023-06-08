@@ -3,6 +3,6 @@
 
 const vec3  blocklight_color = from_srgb(vec3(BLOCKLIGHT_R, BLOCKLIGHT_G, BLOCKLIGHT_B)) * BLOCKLIGHT_I;
 const float blocklight_scale = 6.0;
-const float emission_scale   = 20.0 * EMISSION_STRENGTH;
+const float emission_scale   = 25.0 * EMISSION_STRENGTH;
 
 #endif // INCLUDE_LIGHT_COLORS_BLOCKLIGHT_COLOR
