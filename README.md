@@ -4,6 +4,12 @@
 
 <p align = "center">A gameplay-focused shader pack for Minecraft</p>
 
+<div align = "center">
+	<a href="http://www.youtube.com/watch?feature=player_embedded&v=vxE_CVeU8Rs" target="_blank"><img src="http://img.youtube.com/vi/vxE_CVeU8Rs/0.jpg" border="0"/></a>
+	<p> awesome showcase video by iambeen
+	<br><br>
+</div>
+
 ## acknowledgments
 
 * [Tomasz Stachowiak](https://github.com/h3r2tic) - Excellent [Tony McMapface](https://github.com/h3r2tic/tony-mc-mapface) tonemapping operator (thanks also to [snurf](https://www.patreon.com/snurf) for converting it to a format that Minecraft shaders can use)
