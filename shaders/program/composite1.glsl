@@ -159,7 +159,7 @@ vec3 purkinje_shift(vec3 rgb, vec2 light_levels) {
 
 	if (purkinje_intensity < eps) return rgb;
 
-	const vec3 purkinje_tint = vec3(0.5, 0.7, 1.0) * rec709_to_rec2020;
+	const vec3 purkinje_tint = vec3(0.45, 0.66, 1.0);
 	const vec3 rod_response = vec3(7.15e-5, 4.81e-1, 3.28e-1) * rec709_to_rec2020;
 
 	vec3 xyz = rgb * rec2020_to_xyz;
@@ -203,7 +203,7 @@ void main() {
 #endif
 
 #if defined WORLD_NETHER
-		bloomy_fog = spherical_fog(far, nether_fog_start, nether_fog_density * (1.0 - blindness)) * 0.5 + 0.5;
+		bloomy_fog = spherical_fog(far, nether_fog_start, nether_bloomy_fog_density * (1.0 - blindness)) * 0.5 + 0.5;
 #endif
 
 		// Apply purkinje shift
@@ -405,7 +405,7 @@ void main() {
 #endif
 
 #if defined WORLD_NETHER
-	bloomy_fog = sqrt(spherical_fog(view_dist, nether_fog_start, nether_fog_density * (1.0 - blindness)));
+	bloomy_fog = spherical_fog(view_dist, nether_fog_start, nether_bloomy_fog_density) * 0.33 + 0.67;
 #endif
 
 	// Apply purkinje shift

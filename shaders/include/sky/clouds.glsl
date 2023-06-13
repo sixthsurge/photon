@@ -10,6 +10,8 @@
 #include "/include/utility/random.glsl"
 #include "/include/utility/sampling.glsl"
 
+float day_factor = smoothstep(0.0, 0.3, abs(sun_dir.y));
+
 float clouds_phase_single(float cos_theta) { // Single scattering phase function
 	return 0.8 * klein_nishina_phase(cos_theta, 2600.0)    // forwards lobe
 	     + 0.2 * henyey_greenstein_phase(cos_theta, -0.2); // backwards lobe
@@ -332,7 +334,6 @@ vec4 draw_clouds_cu(vec3 ray_dir, vec3 clear_sky, float dither) {
 const float clouds_radius_ac     = planet_radius + CLOUDS_AC_ALTITUDE;
 const float clouds_thickness_ac  = CLOUDS_AC_ALTITUDE * CLOUDS_AC_THICKNESS;
 const float clouds_top_radius_ac = clouds_radius_ac + clouds_thickness_ac;
-float day_factor                 = smoothstep(0.0, 0.3, abs(sun_dir.y));
 float clouds_extinction_coeff_ac = mix(0.05, 0.1, day_factor) * CLOUDS_AC_DENSITY * (1.0 - 0.33 * rainStrength);
 float clouds_scattering_coeff_ac = clouds_extinction_coeff_ac * mix(1.00, 0.66, rainStrength);
 float dynamic_thickness_ac       = mix(0.5, 1.0, smoothstep(0.4, 0.6, clouds_coverage_ac.y));

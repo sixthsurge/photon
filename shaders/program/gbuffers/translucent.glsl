@@ -344,7 +344,7 @@ vec4 draw_nether_portal() {
 		pos += ray_step;
 	}
 
-	return clamp01(result * portal_brightness * depth_step * vec4(1.0, 0.75, 0.8, 1.0));
+	return clamp01(result * portal_brightness * depth_step);
 }
 #else
 vec4 draw_nether_portal() { return vec4(0.0); }

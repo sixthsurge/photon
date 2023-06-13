@@ -37,7 +37,7 @@ vec3 get_sun_tint() {
 }
 
 float get_moon_exposure() {
-	const float base_scale = 0.66 * MOON_I;
+	const float base_scale = 0.5 * MOON_I;
 
 	return base_scale;
 }

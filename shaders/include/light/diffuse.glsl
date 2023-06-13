@@ -13,7 +13,7 @@ const float night_vision_scale = 1.5;
 const float metal_diffuse_amount = 0.25; // Scales diffuse lighting on metals, ideally this would be zero but purely specular metals don't play well with SSR
 
 float get_blocklight_falloff(float blocklight, float skylight, float ao) {
-	float falloff  = 0.3 * pow5(blocklight) + 0.12 * sqr(blocklight) + 0.11 * dampen(blocklight);          // Base falloff
+	float falloff  = 1.25 * pow12(blocklight) + 0.17 * sqr(blocklight) + 0.12 * dampen(blocklight);          // Base falloff
 	      falloff *= mix(cube(ao), 1.0, clamp01(falloff));                                                 // Stronger AO further from the light source
 		  falloff *= mix(1.0, ao * dampen(abs(cos(2.0 * frameTimeCounter))) * 0.67 + 0.2, darknessFactor); // Pulsing blocklight with darkness effect
 		  falloff *= 1.0 - 0.2 * time_noon * skylight - 0.2 * skylight;                                    // Reduce blocklight intensity in daylight
@@ -153,7 +153,7 @@ vec3 get_diffuse_lighting(
 
 	// Cave lighting
 
-	lighting += 0.1 * CAVE_LIGHTING_I * directional_lighting * ao * (1.0 - skylight_falloff) * (1.0 - 0.7 * darknessFactor);
+	lighting += 0.15 * CAVE_LIGHTING_I * directional_lighting * ao * (1.0 - skylight_falloff) * (1.0 - 0.7 * darknessFactor);
 	lighting += nightVision * night_vision_scale * directional_lighting * ao;
 
 	return max0(lighting) * material.albedo * rcp_pi * mix(1.0, metal_diffuse_amount, float(material.is_metal));
