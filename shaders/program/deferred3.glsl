@@ -459,9 +459,6 @@ void main() {
 
 		// Apply fog
 
-		vec4 fog = common_fog(length(view_pos), false);
-		scene_color = scene_color * fog.a + fog.rgb;
-
 #ifdef BORDER_FOG
 	#ifdef WORLD_OVERWORLD
 		vec3 horizon_dir = normalize(vec3(world_dir.xz, min(world_dir.y, -0.1)).xzy);
@@ -478,6 +475,9 @@ void main() {
 		float border_fog = border_fog(scene_pos, world_dir);
 		scene_color = mix(border_fog_color, scene_color, border_fog);
 #endif
+
+		vec4 fog = common_fog(length(view_pos), false);
+		scene_color = scene_color * fog.a + fog.rgb;
 
 #if defined WORLD_OVERWORLD && defined BLOCKY_CLOUDS
 		scene_color = scene_color * blocky_clouds.a + blocky_clouds.rgb * fog.a;

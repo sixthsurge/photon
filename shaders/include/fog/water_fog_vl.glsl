@@ -48,7 +48,7 @@ mat2x3 raymarch_water_fog(
 	vec3 shadow_step = mat3(shadowModelView) * world_step;
 	     shadow_step = diagonal(shadowProjection).xyz * shadow_step;
 
-	vec2 caustics_pos  = (mat3(shadowModelView) * world_pos).xy;
+	vec2 caustics_pos  = (mat3(shadowModelView) * mod(world_pos, 512.0)).xy;
 	vec2 caustics_step = (mat3(shadowModelView) * world_step).xy;
 
 	// Calculations moved out of the loop

@@ -836,7 +836,7 @@ vec4 draw_clouds(vec3 ray_dir, vec3 clear_sky, float dither) {
 	clouds.a   *= clouds_ci.a;
 #endif
 
-	return clouds;
+	return max0(clouds);
 }
 
 #endif // INCLUDE_SKY_CLOUDS

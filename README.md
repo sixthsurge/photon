@@ -1,11 +1,5 @@
 <br><br>
 
-<div align = "center">
-	<a href="http://www.youtube.com/watch?feature=player_embedded&v=vxE_CVeU8Rs" target="_blank"><img src="http://img.youtube.com/vi/vxE_CVeU8Rs/0.jpg" border="0"/></a>
-	<p> awesome showcase video by iambeen
-	<br><br>
-</div>
-
 <h1 align = "center">Photon Shaders</h1>
 
 <p align = "center">A gameplay-focused shader pack for Minecraft</p>
@@ -28,3 +22,9 @@
 * Full labPBR resource pack support
 * Much improved image quality thanks to TAA, FXAA and CAS
 * Advanced temporal upscaling (disabled by default) for low end devices
+
+<div align = "center">
+	<a href="http://www.youtube.com/watch?feature=player_embedded&v=vxE_CVeU8Rs" target="_blank"><img src="http://img.youtube.com/vi/vxE_CVeU8Rs/0.jpg" border="0"/></a>
+	<p> awesome showcase video by iambeen
+	<br><br>
+</div>

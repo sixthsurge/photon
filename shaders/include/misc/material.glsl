@@ -85,10 +85,10 @@ Material material_from(vec3 albedo_srgb, uint material_mask, vec3 world_pos, ino
 					#ifdef HARDCODED_EMISSION
 					if (material_mask == 6u) {
 						// Ground torches
-						material.emission = 0.33 * sqrt(albedo_sqrt) * cube(linear_step(0.12, 0.45, block_pos.y));
+						material.emission = 0.2 * sqrt(albedo_sqrt) * cube(linear_step(0.12, 0.45, block_pos.y));
 					} else {
 						// Wall torches
-						material.emission = 0.33 * sqrt(albedo_sqrt) * cube(linear_step(0.35, 0.6, block_pos.y));
+						material.emission = 0.2 * sqrt(albedo_sqrt) * cube(linear_step(0.35, 0.6, block_pos.y));
 					}
 					material.emission  = max(material.emission, 0.85 * albedo_sqrt * step(0.5, 0.2 * hsl.y + 0.55 * hsl.z));
 					material.emission *= light_levels.x;
