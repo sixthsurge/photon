@@ -81,6 +81,8 @@ option.EDGE_HIGHLIGHT_SCALE            = Edge Highlight Scale
 # Lighting settings
 
 option.COLORED_LIGHTS                  = Colored Lights
+option.HANDHELD_LIGHTING               = Handheld Lighting
+option.HANDHELD_LIGHTING_INTENSITY     = Handheld Lighting Intensity
 option.GTAO                            = Shader AO
 option.VANILLA_AO                      = Vanilla AO
 option.AO_IN_SUNLIGHT                  = AO in Sunlight

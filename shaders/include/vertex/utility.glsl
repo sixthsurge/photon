@@ -7,10 +7,17 @@ uint get_material_mask() {
 	return uint(max0(mc_Entity.x - 10000.0));
 #elif defined PROGRAM_GBUFFERS_ENTITIES || defined PROGRAM_GBUFFERS_ENTITIES_TRANSLUCENT
 	// Entities
-	return uint(max(entityId - 10000, 0));
+	uint id = uint(max(entityId - 10000, 0));
+#ifdef IS_IRIS
+	uint item_id = uint(max(currentRenderedItemId - 10000, 0));
+	id = id == 100 ? item_id : id;
+#endif
+	return id;
 #elif defined PROGRAM_GBUFFERS_BLOCK || defined PROGRAM_GBUFFERS_BLOCK_TRANSLUCENT
 	// Block entities
 	return uint(max(blockEntityId - 10000, 0));
+#elif (defined PROGRAM_GBUFFERS_HAND || defined PROGRAM_GBUFFERS_HAND_WATER) && defined IS_IRIS
+	return uint(max(currentRenderedItemId - 10000, 0));
 #elif defined PROGRAM_GBUFFERS_BEACONBEAM || defined PROGRAM_GBUFFERS_SPIDEREYES
 	// Glowing stuff
 	light_levels.x = 1.0;

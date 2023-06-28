@@ -8,15 +8,19 @@
 #include "/include/utility/fast_math.glsl"
 #include "/include/utility/spherical_harmonics.glsl"
 
-#ifdef COLORED_LIGHTS
-#include "/include/light/lpv/blocklight.glsl"
-#endif
-
 const vec3  blocklight_color     = from_srgb(vec3(BLOCKLIGHT_R, BLOCKLIGHT_G, BLOCKLIGHT_B)) * BLOCKLIGHT_I;
 const float blocklight_scale     = 6.0;
 const float emission_scale       = 40.0 * EMISSION_STRENGTH;
 const float night_vision_scale   = 1.5;
 const float metal_diffuse_amount = 0.25; // Scales diffuse lighting on metals, ideally this would be zero but purely specular metals don't play well with SSR
+
+#ifdef COLORED_LIGHTS
+#include "/include/light/lpv/blocklight.glsl"
+#endif
+
+#ifdef HANDHELD_LIGHTING
+#include "/include/light/handheld_lighting.glsl"
+#endif
 
 float get_blocklight_falloff(float blocklight, float skylight, float ao) {
 	float falloff  = pow8(blocklight) + 0.18 * sqr(blocklight) + 0.16 * dampen(blocklight);          // Base falloff
@@ -86,6 +90,8 @@ vec3 get_diffuse_lighting(
 
 	vec3 lighting = vec3(0.0);
 
+	float directional_lighting = (0.9 + 0.1 * normal.x) * (0.8 + 0.2 * abs(flat_normal.y)); // Random directional shading to make faces easier to distinguish
+
 	// Sunlight/moonlight
 
 #ifdef SHADOW
@@ -120,8 +126,6 @@ vec3 get_diffuse_lighting(
 #endif
 
 	// Skylight
-
-	float directional_lighting = (0.9 + 0.1 * normal.x) * (0.8 + 0.2 * abs(flat_normal.y)); // Random directional shading to make faces easier to distinguish
 
 #if defined PROGRAM_DEFERRED3
 	#ifdef SH_SKYLIGHT
@@ -159,6 +163,10 @@ vec3 get_diffuse_lighting(
 	lighting += get_lpv_blocklight(scene_pos, normal, mc_blocklight, ao * directional_lighting);
 #else
 	lighting += mc_blocklight;
+#endif
+
+#ifdef HANDHELD_LIGHTING
+	lighting += get_handheld_lighting(scene_pos, ao);
 #endif
 
 	lighting += material.emission * emission_scale;

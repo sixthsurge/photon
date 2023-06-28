@@ -77,6 +77,10 @@ uniform int blockEntityId;
 uniform int entityId;
 #endif
 
+#if (defined PROGRAM_GBUFFERS_ENTITIES || defined PROGRAM_GBUFFERS_HAND) && defined IS_IRIS
+uniform int currentRenderedItemId;
+#endif
+
 #include "/include/utility/space_conversion.glsl"
 #include "/include/vertex/displacement.glsl"
 #include "/include/vertex/utility.glsl"

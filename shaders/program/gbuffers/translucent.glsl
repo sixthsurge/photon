@@ -80,6 +80,10 @@ uniform int entityId;
 uniform int blockEntityId;
 #endif
 
+#if (defined PROGRAM_GBUFFERS_ENTITIES_TRANSLUCENT || defined PROGRAM_GBUFFERS_HAND_WATER) && defined IS_IRIS
+uniform int currentRenderedItemId;
+#endif
+
 #include "/include/utility/space_conversion.glsl"
 #include "/include/vertex/displacement.glsl"
 #include "/include/vertex/utility.glsl"
