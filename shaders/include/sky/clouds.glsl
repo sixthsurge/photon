@@ -40,6 +40,10 @@ vec3 clouds_aerial_perspective(
 ) {
 	vec3 air_transmittance;
 
+#if CLOUDS_AERIAL_PERSPECTIVE_BOOST != 0
+	ray_end = mix(ray_origin, ray_end, float(1 << CLOUDS_AERIAL_PERSPECTIVE_BOOST));
+#endif
+
 	if (length_squared(ray_origin) < length_squared(ray_end)) {
 		vec3 trans_0 = atmosphere_transmittance(ray_origin, ray_dir);
 		vec3 trans_1 = atmosphere_transmittance(ray_end,    ray_dir);

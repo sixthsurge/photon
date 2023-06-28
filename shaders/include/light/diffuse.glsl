@@ -1,7 +1,6 @@
 #if !defined INCLUDE_LIGHT_DIFFUSE
 #define INCLUDE_LIGHT_DIFFUSE
 
-#include "/include/light/colors/blocklight_color.glsl"
 #include "/include/light/colors/weather_color.glsl"
 #include "/include/light/bsdf.glsl"
 #include "/include/misc/material.glsl"
@@ -9,7 +8,14 @@
 #include "/include/utility/fast_math.glsl"
 #include "/include/utility/spherical_harmonics.glsl"
 
-const float night_vision_scale = 1.5;
+#ifdef COLORED_LIGHTS
+#include "/include/light/lpv/blocklight.glsl"
+#endif
+
+const vec3  blocklight_color     = from_srgb(vec3(BLOCKLIGHT_R, BLOCKLIGHT_G, BLOCKLIGHT_B)) * BLOCKLIGHT_I;
+const float blocklight_scale     = 6.0;
+const float emission_scale       = 40.0 * EMISSION_STRENGTH;
+const float night_vision_scale   = 1.5;
 const float metal_diffuse_amount = 0.25; // Scales diffuse lighting on metals, ideally this would be zero but purely specular metals don't play well with SSR
 
 float get_blocklight_falloff(float blocklight, float skylight, float ao) {
@@ -60,6 +66,7 @@ vec3 sss_approx(vec3 albedo, float sss_amount, float sheen_amount, float sss_dep
 
 vec3 get_diffuse_lighting(
 	Material material,
+	vec3 scene_pos,
 	vec3 normal,
 	vec3 flat_normal,
 	vec3 shadows,
@@ -90,7 +97,7 @@ vec3 get_diffuse_lighting(
 	sss *= mix(1.0, ao * (clamp01(NoL) * 0.9 + 0.1), clamp01(shadow_distance_fade));
 
 	#ifdef AO_IN_SUNLIGHT
-	diffuse *= ao * (ao);
+	diffuse *= sqr(ao);
 	#endif
 
 	#ifdef SHADOW_VPS
@@ -146,8 +153,13 @@ vec3 get_diffuse_lighting(
 	// Blocklight
 
 	float blocklight_falloff = get_blocklight_falloff(light_levels.x, light_levels.y, ao);
+	vec3 mc_blocklight = (blocklight_falloff * directional_lighting) * (blocklight_scale * blocklight_color);
 
-	lighting += (blocklight_falloff * directional_lighting) * (blocklight_scale * blocklight_color);
+#ifdef COLORED_LIGHTS
+	lighting += get_lpv_blocklight(scene_pos, normal, mc_blocklight, ao * directional_lighting);
+#else
+	lighting += mc_blocklight;
+#endif
 
 	lighting += material.emission * emission_scale;
 
@@ -164,6 +176,7 @@ vec3 get_diffuse_lighting(
 
 vec3 get_diffuse_lighting(
 	Material material,
+	vec3 scene_pos,
 	vec3 normal,
 	vec3 flat_normal,
 	vec3 shadows,
@@ -187,9 +200,14 @@ vec3 get_diffuse_lighting(
 
 	// Blocklight
 
-	float blocklight_falloff = get_blocklight_falloff(light_levels.x, 0.0, ao);
+	float blocklight_falloff = get_blocklight_falloff(light_levels.x, light_levels.y, ao);
+	vec3 mc_blocklight = (blocklight_falloff * directional_lighting) * (blocklight_scale * blocklight_color);
 
-	lighting += (blocklight_falloff * directional_lighting) * (blocklight_scale * blocklight_color);
+#ifdef COLORED_LIGHTS
+	lighting += get_lpv_blocklight(scene_pos, flat_normal, mc_blocklight, ao * directional_lighting);
+#else
+	lighting += mc_blocklight;
+#endif
 
 	lighting += material.emission * emission_scale;
 

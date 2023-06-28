@@ -13,13 +13,14 @@
 * http://momentsingraphics.de/ - Blue noise texture
 
 ## features
-* Custom lighting with variable penumbra shadows and GTAO
+* Custom shading with variable penumbra shadows and ambient occlusion
+* [Colored lighting](https://media.discordapp.net/attachments/945403130277924914/1123585019307364394/2023-06-28_13.02.33.png?width=1058&height=584) using flood-fill algorithm (enabled with Ultra profile, requires Iris)
 * Custom sky with multiple volumetric cloud layers
-* Revamped water
-* Reflections (SSR)
-* Volumetric lighting
 * Camera effects - bloom, depth-of-field, motion-blur
 * Full labPBR resource pack support
+* Revamped water
+* Screen-space reflections
+* Volumetric lighting
 * Much improved image quality thanks to TAA, FXAA and CAS
 * Advanced temporal upscaling (disabled by default) for low end devices
 

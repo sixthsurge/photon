@@ -105,7 +105,7 @@ void main() {
 #if defined PROGRAM_GBUFFERS_WATER
 	tint.a = 1.0;
 
-	if (material_mask == 251) {
+	if (material_mask == 62) {
 		// Nether portal
 		tangent_pos = (scene_pos - gbufferModelViewInverse[3].xyz) * tbn;
 
@@ -124,7 +124,7 @@ void main() {
 
 #if defined PROGRAM_GBUFFERS_TEXTURED && !defined IS_IRIS
 	// Make enderman/nether portal particles glow
-	if (gl_Color.r > gl_Color.g && gl_Color.g < 0.6 && gl_Color.b > 0.4) material_mask = 14;
+	if (gl_Color.r > gl_Color.g && gl_Color.g < 0.6 && gl_Color.b > 0.4) material_mask = 47;
 #endif
 
 	vec3 view_pos = scene_to_view_space(scene_pos);
@@ -196,6 +196,11 @@ uniform sampler2D depthtex1;
 uniform sampler2D shadowtex0;
 uniform sampler2DShadow shadowtex1;
 #endif
+#endif
+
+#ifdef COLORED_LIGHTS
+uniform sampler3D light_sampler_a;
+uniform sampler3D light_sampler_b;
 #endif
 
 uniform mat4 gbufferModelView;
@@ -378,7 +383,7 @@ void main() {
 	vec3 normal = tbn[2];
 
 	bool is_water         = material_mask == 1;
-	bool is_nether_portal = material_mask == 251;
+	bool is_nether_portal = material_mask == 62;
 
 	vec2 adjusted_light_levels = light_levels;
 
@@ -511,6 +516,7 @@ void main() {
 
 	vec3 radiance = get_diffuse_lighting(
 		material,
+		scene_pos,
 		normal,
 		tbn[2],
 		shadows,

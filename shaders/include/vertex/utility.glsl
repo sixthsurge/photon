@@ -14,7 +14,7 @@ uint get_material_mask() {
 #elif defined PROGRAM_GBUFFERS_BEACONBEAM || defined PROGRAM_GBUFFERS_SPIDEREYES
 	// Glowing stuff
 	light_levels.x = 1.0;
-	return 2u; // full emissive
+	return 32u; // full emissive
 #else
 	// Other
 	return 0u;

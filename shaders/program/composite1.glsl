@@ -159,7 +159,7 @@ vec3 purkinje_shift(vec3 rgb, vec2 light_levels) {
 
 	if (purkinje_intensity < eps) return rgb;
 
-	const vec3 purkinje_tint = vec3(0.45, 0.66, 1.0);
+	const vec3 purkinje_tint = vec3(0.5, 0.7, 1.0) * rec709_to_rec2020;
 	const vec3 rod_response = vec3(7.15e-5, 4.81e-1, 3.28e-1) * rec709_to_rec2020;
 
 	vec3 xyz = rgb * rec2020_to_xyz;

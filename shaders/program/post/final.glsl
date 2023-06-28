@@ -46,6 +46,11 @@ uniform sampler2D DEBUG_SAMPLER;
 #endif
 
 uniform float viewHeight;
+uniform float frameTimeCounter;
+
+#ifdef COLORED_LIGHTS
+uniform sampler2D shadowtex0;
+#endif
 
 #include "/include/utility/bicubic.glsl"
 #include "/include/utility/color.glsl"
@@ -115,7 +120,28 @@ vec3 cas_filter(sampler2D sampler, ivec2 texel, const float sharpness) {
 	return clamp01((b + d + f + h) * w + e) / weight_sum;
 }
 
+void draw_iris_required_error_message() {
+	scene_color = vec3(sqr(sin(uv.xy + vec2(0.4, 0.2) * frameTimeCounter)) * 0.5 + 0.3, 1.0);
+	begin_text(ivec2(gl_FragCoord.xy) / 3, ivec2(0, viewHeight / 3));
+	text.fg_col = vec4(0.0, 0.0, 0.0, 1.0);
+	text.bg_col = vec4(0.0);
+	print((_I, _r, _i, _s, _space, _i, _s, _space, _r, _e, _q, _u, _i, _r, _e, _d, _space, _f, _o, _r, _space, _f, _e, _a, _t, _u, _r, _e, _space, _quote, _C, _o, _l, _o, _r, _e, _d, _space, _L, _i, _g, _h, _t, _s, _quote));
+	print_line(); print_line(); print_line();
+	print((_H, _o, _w, _space, _t, _o, _space, _f, _i, _x, _colon));
+	print_line();
+	print((_space, _space, _minus, _space, _D, _i, _s, _a, _b, _l, _e, _space, _C, _o, _l, _o, _r, _e, _d, _space, _L, _i, _g, _h, _t, _s, _space, _i, _n, _space, _t, _h, _e, _space, _L, _i, _g, _h, _t, _i, _n, _g, _space, _m, _e, _n, _u));
+	print_line();
+	print((_space, _space, _minus, _space, _I, _n, _s, _t, _a, _l, _l, _space, _I, _r, _i, _s, _space, _1, _dot, _6, _space, _o, _r, _space, _a, _b, _o, _v, _e));
+	print_line();
+	end_text(scene_color);
+}
+
 void main() {
+#if defined COLORED_LIGHTS && !defined IS_IRIS
+	draw_iris_required_error_message();
+	return;
+#endif
+
     ivec2 texel = ivec2(gl_FragCoord.xy);
 
 	if (abs(MC_RENDER_QUALITY - 1.0) < 0.01) {
@@ -128,10 +154,16 @@ void main() {
 	scene_color = dither_8bit(scene_color, bayer16(vec2(texel)));
 
 #if   DEBUG_VIEW == DEBUG_VIEW_SAMPLER
-	texel;
 	if (clamp(texel, ivec2(0), ivec2(textureSize(DEBUG_SAMPLER, 0))) == texel) {
 		scene_color = texelFetch(DEBUG_SAMPLER, texel, 0).rgb;
 		scene_color = display_eotf(scene_color);
+	}
+#endif
+
+#if defined COLORED_LIGHTS && (defined WORLD_NETHER || !defined SHADOW)
+	// Must sample shadowtex0 so that the shadow map is rendered
+	if (uv.x < 0.0) {
+		scene_color = texture(shadowtex0, uv).rgb;
 	}
 #endif
 }

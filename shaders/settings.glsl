@@ -37,6 +37,7 @@ const float wetnessHalflife         = 70.0;
 //   Lighting
 // ------------
 
+//#define COLORED_LIGHTS // Variable-color block lighting using flood fill algorithm. Requires Iris 1.6 or above
   #define GTAO // Ground-truth based ambient occlusion (GTAO). Adds soft shadows in corners
   #define VANILLA_AO // Minecraft's built-in ambient occlusion
   #define AO_IN_SUNLIGHT // Whether to apply shader ambient occlusion in direct sunlight/moonlight
@@ -93,6 +94,10 @@ const float wetnessHalflife         = 70.0;
   #define SHADOW_DEPTH_SCALE 0.2
   #define SHADOW_DISTORTION 0.85
 
+// Colored Lights Settings
+
+  #define VOXEL_VOLUME_SIZE 128 // High performance impact, also affected by shadow distance [64 128 256]
+
 // -------
 //   Sky
 // -------
@@ -103,6 +108,7 @@ const float wetnessHalflife         = 70.0;
 
   #define CLOUDS_TEMPORAL_UPSCALING 4 // [1 2 3 4]
   #define CLOUDS_DAILY_WEATHER // Clouds are affected by the daily weather system
+  #define CLOUDS_AERIAL_PERSPECTIVE_BOOST 0 // [0 1 2 3 4]
   #define CLOUDS_ACCUMULATION_LIMIT 20
 
   #define CLOUDS_CU // Low-altitude volumetric clouds made to resemble cumulus clouds
@@ -521,4 +527,7 @@ const float wetnessHalflife         = 70.0;
   #endif
 
   #ifdef PURKINJE_SHIFT
+  #endif
+
+  #ifdef COLORED_LIGHTS
   #endif

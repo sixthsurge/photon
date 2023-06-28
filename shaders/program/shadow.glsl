@@ -28,6 +28,7 @@ out vec3 scene_pos;
 //   Attributes
 // --------------
 
+attribute vec3 at_midBlock;
 attribute vec4 at_tangent;
 attribute vec3 mc_Entity;
 attribute vec2 mc_midTexCoord;
@@ -58,6 +59,12 @@ uniform float rainStrength;
 uniform vec2 taa_offset;
 uniform vec3 light_dir;
 
+#ifdef COLORED_LIGHTS
+writeonly uniform uimage3D voxel_img;
+
+uniform int renderStage;
+#endif
+
 // ------------
 //   Includes
 // ------------
@@ -65,10 +72,18 @@ uniform vec3 light_dir;
 #include "/include/light/distortion.glsl"
 #include "/include/vertex/displacement.glsl"
 
+#ifdef COLORED_LIGHTS
+#include "/include/light/lpv/voxelization.glsl"
+#endif
+
 void main() {
 	uv            = gl_MultiTexCoord0.xy;
 	material_mask = uint(mc_Entity.x - 10000.0);
 	tint          = gl_Color.rgb;
+
+#ifdef COLORED_LIGHTS
+	update_voxel_map(material_mask);
+#endif
 
 	bool is_top_vertex = uv.y < mc_midTexCoord.y;
 

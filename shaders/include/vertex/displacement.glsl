@@ -70,18 +70,18 @@ vec3 animate_vertex(vec3 world_pos, bool is_top_vertex, float skylight, uint mat
 #endif
 
 #ifdef WAVING_PLANTS
-	case 16:
+	case 2:
 		return world_pos + get_wind_displacement(world_pos, wind_speed, wind_strength, false) * float(is_top_vertex);
 
-	case 17:
+	case 3:
 		return world_pos + get_wind_displacement(world_pos, wind_speed, wind_strength, false) * float(is_top_vertex);
 
-	case 18:
+	case 4:
 		return world_pos + get_wind_displacement(world_pos, wind_speed, wind_strength, is_top_vertex);
 #endif
 
 #ifdef WAVING_LEAVES
-	case 19:
+	case 5:
 		return world_pos + get_wind_displacement(world_pos, wind_speed, wind_strength * 0.5, false);
 #endif
 

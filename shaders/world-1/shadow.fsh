@@ -1,5 +1,5 @@
-#version 400 compatibility
+#version 430 compatibility
 #define WORLD_NETHER
 #define PROGRAM_SHADOW
-#define vsh
+#define fsh
 #include "/program/shadow.glsl"

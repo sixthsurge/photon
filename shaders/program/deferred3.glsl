@@ -23,13 +23,14 @@ flat out vec3 light_color;
 #if defined WORLD_OVERWORLD
 flat out vec3 sun_color;
 flat out vec3 moon_color;
-#endif
 
 #if defined SH_SKYLIGHT
 flat out vec3 sky_sh[9];
 #else
 flat out mat3 sky_samples;
 #endif
+#endif
+
 
 // ------------
 //   Uniforms
@@ -77,9 +78,9 @@ uniform float time_midnight;
 #include "/include/light/colors/light_color.glsl"
 #include "/include/misc/weather.glsl"
 #include "/include/sky/atmosphere.glsl"
+#include "/include/sky/projection.glsl"
 #endif
 
-#include "/include/sky/projection.glsl"
 #include "/include/utility/random.glsl"
 #include "/include/utility/sampling.glsl"
 #include "/include/utility/spherical_harmonics.glsl"
@@ -148,12 +149,12 @@ flat in vec3 light_color;
 #if defined WORLD_OVERWORLD
 flat in vec3 sun_color;
 flat in vec3 moon_color;
-#endif
 
 #if defined SH_SKYLIGHT
 flat in vec3 sky_sh[9];
 #else
 flat in mat3 sky_samples;
+#endif
 #endif
 
 // ------------
@@ -184,6 +185,11 @@ uniform sampler2DShadow shadowtex1;
 uniform sampler2D shadowcolor0;
 #endif
 #endif
+#endif
+
+#ifdef COLORED_LIGHTS
+uniform sampler3D light_sampler_a;
+uniform sampler3D light_sampler_b;
 #endif
 
 uniform mat4 gbufferModelView;
@@ -432,6 +438,7 @@ void main() {
 
 		scene_color = get_diffuse_lighting(
 			material,
+			scene_pos,
 			normal,
 			flat_normal,
 			shadows,

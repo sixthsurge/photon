@@ -103,7 +103,12 @@ void main() {
 
 #if defined PROGRAM_GBUFFERS_PARTICLES
 	// Make enderman/nether portal particles glow
-	if (gl_Color.r > gl_Color.g && gl_Color.g < 0.6 && gl_Color.b > 0.4) material_mask = 14;
+	if (gl_Color.r > gl_Color.g && gl_Color.g < 0.6 && gl_Color.b > 0.4) material_mask = 47;
+#endif
+
+#if defined PROGRAM_GBUFFERS_BEACONBEAM
+	// Make beacon beam glow
+	material_mask = 32;
 #endif
 
 	bool is_top_vertex = uv.y < mc_midTexCoord.y;
@@ -410,7 +415,7 @@ void main() {
 
 #if defined PROGRAM_GBUFFERS_BLOCK
 	// parallax end portal
-	if (material_mask == 250) base_color.rgb = draw_end_portal();
+	if (material_mask == 63) base_color.rgb = draw_end_portal();
 #endif
 
 #if defined PROGRAM_GBUFFERS_BEACONBEAM

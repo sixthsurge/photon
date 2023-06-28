@@ -1,4 +1,4 @@
-#version 400 compatibility
+#version 430 compatibility
 #define WORLD_OVERWORLD
 #define BLOOM_TILE_INDEX 4
 #define fsh
