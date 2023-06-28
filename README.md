@@ -34,8 +34,14 @@
 </div>
 
 ## screenshots
-<div align = "center">
-	![Bamboo house night](https://github.com/FormalSnake/photon/assets/90651091/8ab0b5a9-a55b-4736-9028-3832dd88e7a4)
-	<p> screenshots by FormalSnake
-	<br><br>
-</div>
+
+![Bamboo house day](https://raw.githubusercontent.com/FormalSnake/photon/main/assets/screenshots/bamboohouse_day.png)
+![Bamboo house night](https://raw.githubusercontent.com/FormalSnake/photon/main/assets/screenshots/bamboohouse_night.png)
+![Bamboo house rain](https://raw.githubusercontent.com/FormalSnake/photon/main/assets/screenshots/bamboohouse_rain.png)
+![Bamboo house underwater](https://raw.githubusercontent.com/FormalSnake/photon/main/assets/screenshots/bamboohouse_underwater.png)
+![Cave](https://raw.githubusercontent.com/FormalSnake/photon/main/assets/screenshots/cave.png)
+![Cherry house ground](https://raw.githubusercontent.com/FormalSnake/photon/main/assets/screenshots/cherryhouse-ground.png)
+![Cherry house](https://raw.githubusercontent.com/FormalSnake/photon/main/assets/screenshots/cherryhouse.png)
+![Landscape](https://raw.githubusercontent.com/FormalSnake/photon/main/assets/screenshots/landscape.png)
+![Mancave](https://raw.githubusercontent.com/FormalSnake/photon/main/assets/screenshots/mancave.png)
+Screenshots by [FormalSnake](https://github.com/formalsnake)
