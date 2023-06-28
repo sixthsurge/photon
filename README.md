@@ -4,6 +4,10 @@
 
 <p align = "center">A gameplay-focused shader pack for Minecraft</p>
 
+## why use this shader?
+* It runs really well
+* It looks beautiful
+
 ## acknowledgments
 
 * [Emin](https://github.com/EminGT) - Shadow bias method from [Complementary Reimagined](https://www.complementary.dev/reimagined/) (fully fixes peter panning and light leaking underground!)
@@ -26,5 +30,12 @@
 <div align = "center">
 	<a href="http://www.youtube.com/watch?feature=player_embedded&v=vxE_CVeU8Rs" target="_blank"><img src="http://img.youtube.com/vi/vxE_CVeU8Rs/0.jpg" border="0"/></a>
 	<p> awesome showcase video by iambeen
+	<br><br>
+</div>
+
+## screenshots
+<div align = "center">
+	![Bamboo house night](https://github.com/FormalSnake/photon/assets/90651091/8ab0b5a9-a55b-4736-9028-3832dd88e7a4)
+	<p> screenshots by FormalSnake
 	<br><br>
 </div>
