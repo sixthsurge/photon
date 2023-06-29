@@ -4,7 +4,7 @@
   Photon Shaders by SixthSurge
 
   program/lpv/floodfill.csh:
-  Perform one floodfill iteration
+  Perform floodfill iteration
 
 --------------------------------------------------------------------------------
 */
@@ -19,6 +19,8 @@ const ivec3 workGroups = ivec3(2, 64, 64);
 const ivec3 workGroups = ivec3(4, 64, 128);
 #elif VOXEL_VOLUME_SIZE == 256
 const ivec3 workGroups = ivec3(8, 64, 256);
+#elif VOXEL_VOLUME_SIZE == 512
+const ivec3 workGroups = ivec3(16, 64, 512);
 #endif
 
 layout (std430, binding = 0) buffer LightData {

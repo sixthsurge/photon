@@ -117,6 +117,7 @@ float clouds_density_cu(vec3 pos) {
 
 	if (density < eps) return 0.0;
 
+#ifndef PROGRAM_PREPARE
 	// Curl noise used to warp the 3D noise into swirling shapes
 	vec3 curl = (0.181 * CLOUDS_CU_CURL_STRENGTH) * texture(colortex7, 0.002 * pos).xyz * smoothstep(0.4, 1.0, 1.0 - altitude_fraction);
 	vec3 wind = vec3(wind_velocity * world_age, 0.0).xzy;
@@ -124,6 +125,10 @@ float clouds_density_cu(vec3 pos) {
 	// 3D worley noise for detail
 	float worley_0 = texture(colortex6, (pos + 0.2 * wind) * 0.001 + curl * 1.0).x;
 	float worley_1 = texture(colortex6, (pos + 0.4 * wind) * 0.005 + curl * 3.0).x;
+#else
+	const float worley_0 = 0.5;
+	const float worley_1 = 0.5;
+#endif
 
 	float detail_fade = 0.20 * smoothstep(0.85, 1.0, 1.0 - altitude_fraction)
 	                  - 0.35 * smoothstep(0.05, 0.5, altitude_fraction) + 0.6;
@@ -376,12 +381,16 @@ float clouds_density_ac(vec3 pos) {
 
 	if (density < eps) return 0.0;
 
+#ifndef PROGRAM_PREPARE
 	// Curl noise used to warp the 3D noise into swirling shapes
 	vec3 curl = (0.181 * CLOUDS_AC_CURL_STRENGTH) * texture(colortex7, 0.002 * pos).xyz * smoothstep(0.4, 1.0, 1.0 - altitude_fraction);
 	vec3 wind = vec3(wind_velocity * world_age, 0.0).xzy;
 
 	// 3D worley noise for detail
 	float worley = texture(colortex6, (pos + 0.2 * wind) * 0.001 + curl * 1.0).x;
+#else
+	const float worley = 0.5;
+#endif
 
 	density -= (0.44 * CLOUDS_AC_DETAIL_STRENGTH) * sqr(worley) * dampen(clamp01(1.0 - density));
 
@@ -775,7 +784,7 @@ vec4 draw_clouds_ci(vec3 ray_dir, vec3 clear_sky, float dither) {
 	vec2 dists = intersect_sphere(air_viewer_pos, ray_dir, clouds_radius_ci);
 	bool planet_intersected = intersect_sphere(air_viewer_pos, ray_dir, min(r - 10.0, planet_radius)).y >= 0.0;
 
-	if (dists.y < 0.0                              // plane not intersected
+	if (dists.y < 0.0                              // sphere not intersected
 	 || planet_intersected && r < clouds_radius_ci // planet blocking clouds
 	) { return vec4(0.0, 0.0, 0.0, 1.0); }
 
@@ -842,5 +851,41 @@ vec4 draw_clouds(vec3 ray_dir, vec3 clear_sky, float dither) {
 
 	return max0(clouds);
 }
+
+#ifdef CLOUD_SHADOWS
+float render_cloud_shadow_map(vec3 scene_pos) {
+	// Transform position from scene-space to clouds-space
+	vec3 ray_origin = scene_pos;
+	vec3 air_viewer_pos = vec3(0.0, planet_radius + eyeAltitude, 0.0);
+	ray_origin.y += eyeAltitude + (planet_radius);
+
+	vec3 pos; float t, density;
+	float shadow = 1.0;
+
+#ifdef CLOUDS_CU
+	t = intersect_sphere(ray_origin, light_dir,	clouds_radius_cu + 0.5 * clouds_thickness_cu).y;
+	pos = ray_origin + light_dir * t;
+	density = clouds_density_cu(pos);
+	shadow *= exp(-0.50 * clouds_extinction_coeff_cu * clouds_thickness_cu * rcp(abs(light_dir.y) + eps) * density);
+#endif
+
+#ifdef CLOUDS_AC
+	t = intersect_sphere(ray_origin, light_dir,	clouds_radius_ac + 0.5 * clouds_thickness_ac).y;
+	pos = ray_origin + light_dir * t;
+	density = clouds_density_ac(pos);
+	shadow *= exp(-0.50 * clouds_extinction_coeff_ac * clouds_thickness_ac * rcp(abs(light_dir.y) + eps) * density);
+#endif
+
+#ifdef CLOUDS_CI
+	float cirrus, cirrocumulus;
+	t = intersect_sphere(ray_origin, light_dir,	clouds_radius_ci).y;
+	pos = ray_origin + light_dir * t;
+	density = clouds_density_ci(pos.xy, 0.5, cirrus, cirrocumulus);
+	shadow *= exp(-0.25 * clouds_extinction_coeff_ci * clouds_thickness_ci * rcp(abs(light_dir.y) + eps) * density) * 0.5 + 0.5;
+#endif
+
+	return shadow;
+}
+#endif
 
 #endif // INCLUDE_SKY_CLOUDS

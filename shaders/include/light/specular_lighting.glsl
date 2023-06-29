@@ -1,5 +1,5 @@
-#if !defined INCLUDE_LIGHT_SPECULAR
-#define INCLUDE_LIGHT_SPECULAR
+#if !defined INCLUDE_LIGHT_SPECULAR_LIGHTING
+#define INCLUDE_LIGHT_SPECULAR_LIGHTING
 
 #include "/include/light/bsdf.glsl"
 #include "/include/misc/material.glsl"
@@ -73,6 +73,9 @@ vec3 get_specular_highlight(
 	const float sun_angular_radius = SUN_ANGULAR_RADIUS * degree;
 	const float moon_angular_radius = MOON_ANGULAR_RADIUS * degree;
 	float light_radius = (sunAngle < 0.5) ? sun_angular_radius : moon_angular_radius;
+
+	// No specular highlight on a new moon
+	if (sunAngle > 0.5 && moonPhase == 4) return vec3(0.0);
 #else
 	const float light_radius = 1.0 * degree;
 #endif
@@ -329,4 +332,4 @@ vec3 get_specular_reflections(
 }
 #endif // PROGRAM_COMPOSITE1
 
-#endif // INCLUDE_LIGHT_SPECULAR
+#endif // INCLUDE_LIGHT_SPECULAR_LIGHTING

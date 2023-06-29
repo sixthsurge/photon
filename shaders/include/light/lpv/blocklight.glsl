@@ -22,9 +22,13 @@ vec3 get_lpv_blocklight(vec3 scene_pos, vec3 normal, vec3 mc_blocklight, float a
 	vec3 voxel_pos = scene_to_voxel_space(scene_pos);
 
 	if (is_inside_voxel_volume(voxel_pos)) {
+#ifndef NO_NORMAL
 		vec3 sample_pos = clamp01((voxel_pos + normal * 0.5) / vec3(voxel_volume_size));
-
 		vec3 lpv_blocklight = sqrt(read_lpv_linear(sample_pos)) * ao;
+#else
+		vec3 sample_pos = clamp01(voxel_pos / vec3(voxel_volume_size));
+		vec3 lpv_blocklight = sqrt(read_lpv_linear(sample_pos));
+#endif
 
 		float distance_fade = lpv_distance_fade(scene_pos);
 

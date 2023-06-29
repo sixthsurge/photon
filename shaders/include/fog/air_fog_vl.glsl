@@ -110,6 +110,7 @@ mat2x3 raymarch_air_fog(vec3 world_start_pos, vec3 world_end_pos, bool sky, floa
 		color = color * color_weight + (1.0 - color_weight);
 
 		vec3 shadow = step(shadow_screen_pos.z, depth1) * color;
+		     shadow = (clamp01(shadow_screen_pos) == shadow_screen_pos) ? shadow : vec3(1.0);
 	#else
 		float depth1 = texelFetch(shadowtex1, shadow_texel, 0).x;
 		float shadow = step(float(clamp01(shadow_screen_pos) == shadow_screen_pos) * shadow_screen_pos.z, depth1);

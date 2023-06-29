@@ -77,6 +77,7 @@ option.RAIN_OPACITY                    = Rain Opacity
 option.SEA_LEVEL                       = Sea Level
 option.EDGE_HIGHLIGHT                  = Edge Highlight
 option.EDGE_HIGHLIGHT_SCALE            = Edge Highlight Scale
+option.MOON_PHASE_AFFECTS_BRIGHTNESS   = Moon Phase Affects Brightness
 
 # Lighting settings
 
@@ -86,6 +87,8 @@ option.HANDHELD_LIGHTING_INTENSITY     = Handheld Lighting Intensity
 option.GTAO                            = Shader AO
 option.VANILLA_AO                      = Vanilla AO
 option.AO_IN_SUNLIGHT                  = AO in Sunlight
+option.CLOUD_SHADOWS                   = Cloud Shadows
+option.CLOUD_SHADOWS_INTENSITY         = Cloud Shadows Intensity
 option.SH_SKYLIGHT                     = SH Skylight
 option.SSS_SHEEN                       = SSS Sheen
 option.SSS_INTENSITY                   = SSS Intensity

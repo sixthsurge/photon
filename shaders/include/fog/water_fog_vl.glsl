@@ -53,7 +53,7 @@ mat2x3 raymarch_water_fog(
 
 	// Calculations moved out of the loop
 
-	float t = frameTimeCounter * 0.75;
+	float t = frameTimeCounter * 0.25;
 	float skylight = eye_skylight;
 
 	float LoV = dot(world_dir, light_dir);

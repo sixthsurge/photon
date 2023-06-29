@@ -193,6 +193,10 @@ uniform sampler2D gtexture;
 uniform sampler2D normals;
 uniform sampler2D specular;
 
+#ifdef CLOUD_SHADOWS
+uniform sampler2D colortex8; // cloud shadow map
+#endif
+
 uniform sampler2D depthtex1;
 
 #ifdef WORLD_OVERWORLD
@@ -232,6 +236,7 @@ uniform float rainStrength;
 uniform float wetness;
 
 uniform int worldTime;
+uniform int moonPhase;
 uniform int frameCounter;
 
 uniform int isEyeInWater;
@@ -285,15 +290,19 @@ uniform vec4 entityColor;
 #endif
 
 #include "/include/fog/simple_fog.glsl"
-#include "/include/light/diffuse.glsl"
+#include "/include/light/diffuse_lighting.glsl"
 #include "/include/light/shadows.glsl"
-#include "/include/light/specular.glsl"
+#include "/include/light/specular_lighting.glsl"
 #include "/include/misc/material.glsl"
 #include "/include/misc/water_normal.glsl"
 #include "/include/utility/color.glsl"
 #include "/include/utility/encoding.glsl"
 #include "/include/utility/fast_math.glsl"
 #include "/include/utility/space_conversion.glsl"
+
+#ifdef CLOUD_SHADOWS
+#include "/include/light/cloud_shadows.glsl"
+#endif
 
 const float lod_bias = log2(taau_render_scale);
 
@@ -516,6 +525,11 @@ void main() {
 	#define shadow_distance_fade 0.0
 #endif
 
+#ifdef CLOUD_SHADOWS
+		float cloud_shadows = get_cloud_shadows(colortex8, scene_pos);
+		shadows *= cloud_shadows;
+#endif
+
 	// Diffuse lighting
 
 	vec3 radiance = get_diffuse_lighting(
@@ -527,6 +541,9 @@ void main() {
 		adjusted_light_levels,
 		1.0,
 		sss_depth,
+#ifdef CLOUD_SHADOWS
+		cloud_shadows,
+#endif
 		shadow_distance_fade,
 		NoL,
 		NoV,

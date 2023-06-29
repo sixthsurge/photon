@@ -30,6 +30,11 @@
 
   const vec4 colortex3ClearColor = vec4(0.0, 0.0, 0.0, 0.0);
 
+  #ifdef CLOUD_SHADOWS
+  const int colortex8Format = R16;            // cloud shadow map
+  const bool colortex8Clear = false;
+  #endif
+
 --------------------------------------------------------------------------------
 */
 

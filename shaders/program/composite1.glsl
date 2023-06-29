@@ -87,6 +87,7 @@ uniform float rainStrength;
 uniform float wetness;
 
 uniform int worldTime;
+uniform int moonPhase;
 uniform int frameCounter;
 
 uniform int isEyeInWater;
@@ -120,7 +121,7 @@ uniform float time_midnight;
 #define TEMPORAL_REPROJECTION
 
 #include "/include/fog/simple_fog.glsl"
-#include "/include/light/specular.glsl"
+#include "/include/light/specular_lighting.glsl"
 #include "/include/misc/material.glsl"
 #include "/include/misc/rain_puddles.glsl"
 #include "/include/misc/water_normal.glsl"

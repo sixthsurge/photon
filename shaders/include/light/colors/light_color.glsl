@@ -4,6 +4,8 @@
 #include "/include/sky/atmosphere.glsl"
 #include "/include/utility/color.glsl"
 
+uniform float moon_phase_brightness;
+
 // Magic brightness adjustment so that auto exposure isn't needed
 float get_sun_exposure() {
 	const float base_scale = 7.0 * SUN_I;
@@ -37,9 +39,9 @@ vec3 get_sun_tint() {
 }
 
 float get_moon_exposure() {
-	const float base_scale = 0.5 * MOON_I;
+	const float base_scale = 0.75 * MOON_I;
 
-	return base_scale;
+	return base_scale * moon_phase_brightness;
 }
 
 vec3 get_moon_tint() {

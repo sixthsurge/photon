@@ -1,5 +1,5 @@
-#if !defined INCLUDE_LIGHT_DIFFUSE
-#define INCLUDE_LIGHT_DIFFUSE
+#if !defined INCLUDE_LIGHT_DIFFUSE_LIGHTING
+#define INCLUDE_LIGHT_DIFFUSE_LIGHTING
 
 #include "/include/light/colors/weather_color.glsl"
 #include "/include/light/bsdf.glsl"
@@ -23,7 +23,7 @@ const float metal_diffuse_amount = 0.25; // Scales diffuse lighting on metals, i
 #endif
 
 float get_blocklight_falloff(float blocklight, float skylight, float ao) {
-	float falloff  = pow8(blocklight) + 0.18 * sqr(blocklight) + 0.16 * dampen(blocklight);          // Base falloff
+	float falloff  = pow8(blocklight) + 0.18 * sqr(blocklight) + 0.16 * dampen(blocklight);                // Base falloff
 	      falloff *= mix(cube(ao), 1.0, clamp01(falloff));                                                 // Stronger AO further from the light source
 		  falloff *= mix(1.0, ao * dampen(abs(cos(2.0 * frameTimeCounter))) * 0.67 + 0.2, darknessFactor); // Pulsing blocklight with darkness effect
 		  falloff *= 1.0 - 0.2 * time_noon * skylight - 0.2 * skylight;                                    // Reduce blocklight intensity in daylight
@@ -77,6 +77,9 @@ vec3 get_diffuse_lighting(
 	vec2 light_levels,
 	float ao,
 	float sss_depth,
+#ifdef CLOUD_SHADOWS
+	float cloud_shadows,
+#endif
 	float shadow_distance_fade,
 	float NoL,
 	float NoV,
@@ -106,6 +109,11 @@ vec3 get_diffuse_lighting(
 	diffuse *= sqr(ao);
 	#endif
 
+	#ifdef CLOUD_SHADOWS
+	bounced *= cloud_shadows;
+	sss     *= cloud_shadows;
+	#endif
+
 	#ifdef SHADOW_VPS
 	// Add SSS and diffuse
 	lighting += light_color * (diffuse * shadows + bounced + sss);
@@ -123,6 +131,10 @@ vec3 get_diffuse_lighting(
 	     diffuse *= ao * pow4(light_levels.y) * (dampen(light_dir.y) * 0.5 + 0.5);
 
 	lighting += light_color * diffuse;
+
+	#ifdef CLOUD_SHADOWS
+	lighting *= cloud_shadows;
+	#endif
 #endif
 
 	// Skylight
@@ -160,7 +172,7 @@ vec3 get_diffuse_lighting(
 	vec3 mc_blocklight = (blocklight_falloff * directional_lighting) * (blocklight_scale * blocklight_color);
 
 #ifdef COLORED_LIGHTS
-	lighting += get_lpv_blocklight(scene_pos, normal, mc_blocklight, ao * directional_lighting);
+	lighting += get_lpv_blocklight(scene_pos, flat_normal, mc_blocklight, ao * directional_lighting);
 #else
 	lighting += mc_blocklight;
 #endif
@@ -191,6 +203,9 @@ vec3 get_diffuse_lighting(
 	vec2 light_levels,
 	float ao,
 	float sss_depth,
+#ifdef CLOUD_SHADOWS
+	float cloud_shadows,
+#endif
 	float shadow_distance_fade,
 	float NoL,
 	float NoV,
@@ -217,6 +232,10 @@ vec3 get_diffuse_lighting(
 	lighting += mc_blocklight;
 #endif
 
+#ifdef HANDHELD_LIGHTING
+	lighting += get_handheld_lighting(scene_pos, ao);
+#endif
+
 	lighting += material.emission * emission_scale;
 
 	return max0(lighting) * material.albedo * rcp_pi * mix(1.0, metal_diffuse_amount, float(material.is_metal));
@@ -227,4 +246,4 @@ vec3 get_diffuse_lighting(
 
 #endif
 
-#endif // INCLUDE_LIGHT_DIFFUSE
+#endif // INCLUDE_LIGHT_DIFFUSE_LIGHTING

@@ -31,7 +31,6 @@ flat out mat3 sky_samples;
 #endif
 #endif
 
-
 // ------------
 //   Uniforms
 // ------------
@@ -170,6 +169,10 @@ uniform sampler2D colortex4; // sky map
 uniform sampler2D colortex6; // ambient occlusion
 uniform sampler2D colortex7; // clouds
 
+#ifdef CLOUD_SHADOWS
+uniform sampler2D colortex8; // cloud shadow map
+#endif
+
 uniform sampler3D depthtex0; // atmosphere scattering LUT
 uniform sampler2D depthtex1;
 
@@ -248,9 +251,9 @@ uniform float time_midnight;
 #define ATMOSPHERE_SCATTERING_LUT depthtex0
 
 #include "/include/fog/simple_fog.glsl"
-#include "/include/light/diffuse.glsl"
+#include "/include/light/diffuse_lighting.glsl"
 #include "/include/light/shadows.glsl"
-#include "/include/light/specular.glsl"
+#include "/include/light/specular_lighting.glsl"
 #include "/include/misc/edge_highlight.glsl"
 #include "/include/misc/material.glsl"
 #include "/include/misc/rain_puddles.glsl"
@@ -262,6 +265,10 @@ uniform float time_midnight;
 
 #if defined WORLD_OVERWORLD && defined BLOCKY_CLOUDS
 #include "/include/sky/blocky_clouds.glsl"
+#endif
+
+#if defined CLOUD_SHADOWS
+#include "/include/light/cloud_shadows.glsl"
 #endif
 
 /*
@@ -434,6 +441,11 @@ void main() {
 		shadows *= float(!parallax_shadow);
 #endif
 
+#ifdef CLOUD_SHADOWS
+		float cloud_shadows = get_cloud_shadows(colortex8, scene_pos);
+		shadows *= cloud_shadows;
+#endif
+
 		// Diffuse lighting
 
 		scene_color = get_diffuse_lighting(
@@ -445,6 +457,9 @@ void main() {
 			light_levels,
 			ao,
 			sss_depth,
+#ifdef CLOUD_SHADOWS
+			cloud_shadows,
+#endif
 			shadow_distance_fade,
 			NoL,
 			NoV,
