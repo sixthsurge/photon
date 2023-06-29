@@ -105,6 +105,11 @@ void main() {
 	#endif
 #endif
 
+#if defined PROGRAM_GBUFFERS_ENTITIES
+	// Fix fire entity not glowing with Colored Lights
+	if (light_levels.x > 0.99) material_mask = 40;
+#endif
+
 #if defined PROGRAM_GBUFFERS_PARTICLES
 	// Make enderman/nether portal particles glow
 	if (gl_Color.r > gl_Color.g && gl_Color.g < 0.6 && gl_Color.b > 0.4) material_mask = 47;
