@@ -1,5 +1,5 @@
-#version 430 compatibility
+#version 400 compatibility
 #define WORLD_NETHER
 #define PROGRAM_GBUFFERS_DAMAGEDBLOCK
 #define vsh
-#include "/program/gbuffers/damage_overlay.glsl"
+#include "/program/gbuffer/damage_overlay.glsl"

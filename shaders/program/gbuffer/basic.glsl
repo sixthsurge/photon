@@ -3,7 +3,7 @@
 
   Photon Shaders by SixthSurge
 
-  program/gbuffers/basic.glsl:
+  program/gbuffer/basic.glsl:
   Handle lines
 
 --------------------------------------------------------------------------------

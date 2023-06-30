@@ -180,19 +180,29 @@ uniform sampler2D depthtex1;
 uniform sampler2D depthtex2; // minecraft cloud texture
 #endif
 
-#ifdef WORLD_OVERWORLD
+#ifdef COLORED_LIGHTS
+uniform sampler3D light_sampler_a;
+uniform sampler3D light_sampler_b;
+#endif
+
 #ifdef SHADOW
+#ifdef WORLD_OVERWORLD
 uniform sampler2D shadowtex0;
 uniform sampler2DShadow shadowtex1;
+
 #ifdef SHADOW_COLOR
 uniform sampler2D shadowcolor0;
 #endif
 #endif
-#endif
 
-#ifdef COLORED_LIGHTS
-uniform sampler3D light_sampler_a;
-uniform sampler3D light_sampler_b;
+#ifdef WORLD_END
+uniform sampler2D shadowtex0;
+uniform sampler2DShadow shadowtex1;
+
+#ifdef SHADOW_COLOR
+uniform sampler2D shadowcolor0;
+#endif
+#endif
 #endif
 
 uniform mat4 gbufferModelView;

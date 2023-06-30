@@ -1,4 +1,4 @@
-#version 430 compatibility
+#version 400 compatibility
 #define WORLD_NETHER
 #define PROGRAM_COMPOSITE1
 #define fsh

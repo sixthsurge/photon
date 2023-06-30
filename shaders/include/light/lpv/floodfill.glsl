@@ -27,7 +27,7 @@ bool is_transparent(uint block_id) {
 
 vec3 get_emitted_light(uint block_id) {
 	if (is_emitter(block_id)) {
-		return light_data.light_color[int(block_id) - 32].rgb;
+		return texelFetch(light_data_sampler, ivec2(int(block_id) - 32, 0), 0).rgb;
 	} else {
 		return vec3(0.0);
 	}
@@ -35,7 +35,7 @@ vec3 get_emitted_light(uint block_id) {
 
 vec3 get_tint(uint block_id) {
 	if (is_translucent(block_id)) {
-		return light_data.tint_color[int(block_id) - 64].rgb;
+		return texelFetch(light_data_sampler, ivec2(int(block_id) - 64, 1), 0).rgb;
 	} else {
 		return vec3(is_transparent(block_id));
 	}

@@ -3,7 +3,7 @@
 
   Photon Shaders by SixthSurge
 
-  program/gbuffers/skytextured.glsl:
+  program/gbuffer/skytextured.glsl:
   Handle vanilla sun and moon and custom skies
 
 --------------------------------------------------------------------------------

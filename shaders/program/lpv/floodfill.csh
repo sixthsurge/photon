@@ -23,11 +23,6 @@ const ivec3 workGroups = ivec3(8, 64, 256);
 const ivec3 workGroups = ivec3(16, 64, 512);
 #endif
 
-layout (std430, binding = 0) buffer LightData {
-	vec4[32] light_color;
-	vec4[16] tint_color;
-} light_data;
-
 writeonly uniform image3D light_img_a;
 writeonly uniform image3D light_img_b;
 
@@ -35,6 +30,7 @@ uniform sampler3D light_sampler_a;
 uniform sampler3D light_sampler_b;
 
 uniform usampler3D voxel_sampler;
+uniform sampler2D light_data_sampler;
 
 uniform vec3 cameraPosition;
 uniform vec3 previousCameraPosition;

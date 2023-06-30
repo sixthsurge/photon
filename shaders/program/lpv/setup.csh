@@ -14,20 +14,15 @@
 layout (local_size_x = 32) in;
 const ivec3 workGroups = ivec3(1, 1, 1);
 
-layout (std430, binding = 0) buffer LightData {
-	vec4[32] light_color;
-	vec4[16] tint_color;
-} light_data;
+writeonly uniform image2D light_data_img;
 
 #include "/include/light/colors/blocklight_colors.glsl"
 
 void main() {
 	int index = int(gl_LocalInvocationID.x);
 
-	light_data.light_color[index] = vec4(light_color[index], 0.0);
-
-	if (index >= 16) return;
-	light_data.tint_color[index] = vec4(tint_color[index], 0.0);
+	imageStore(light_data_img, ivec2(index, 0), vec4(light_color[clamp(index, 0u, 31u)], 0.0));
+	imageStore(light_data_img, ivec2(index, 1), vec4(tint_color [clamp(index, 0u, 15u)], 0.0));
 }
 
 #ifndef COLORED_LIGHTS

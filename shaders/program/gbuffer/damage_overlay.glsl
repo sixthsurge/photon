@@ -3,7 +3,7 @@
 
   Photon Shaders by SixthSurge
 
-  program/gbuffers/damage_overlay.glsl:
+  program/gbuffer/damage_overlay.glsl:
   Handle block breaking overlay
 
 --------------------------------------------------------------------------------

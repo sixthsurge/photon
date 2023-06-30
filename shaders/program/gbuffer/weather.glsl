@@ -3,7 +3,7 @@
 
   Photon Shaders by SixthSurge
 
-  program/gbuffers/weather.glsl:
+  program/gbuffer/weather.glsl:
   Handle rain and snow particles
 
 --------------------------------------------------------------------------------

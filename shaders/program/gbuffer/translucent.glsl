@@ -3,7 +3,7 @@
 
   Photon Shaders by SixthSurge
 
-  program/gbuffers/translucent.glsl:
+  program/gbuffer/translucent.glsl:
   Handle translucent terrain, translucent entities (Iris), translucent handheld
   items and gbuffers_textured
 
@@ -131,6 +131,11 @@ void main() {
 	if (gl_Color.r > gl_Color.g && gl_Color.g < 0.6 && gl_Color.b > 0.4) material_mask = 47;
 #endif
 
+#if defined PROGRAM_GBUFFERS_WATER
+	// Fix issue where the normal of the bottom of the water surface is flipped
+	if (dot(scene_pos, tbn[2]) > 0.0) tbn[2] = -tbn[2];
+#endif
+
 	vec3 view_pos = scene_to_view_space(scene_pos);
 	vec4 clip_pos = project(gl_ProjectionMatrix, view_pos);
 
@@ -199,16 +204,21 @@ uniform sampler2D colortex8; // cloud shadow map
 
 uniform sampler2D depthtex1;
 
-#ifdef WORLD_OVERWORLD
-#ifdef SHADOW
-uniform sampler2D shadowtex0;
-uniform sampler2DShadow shadowtex1;
-#endif
-#endif
-
 #ifdef COLORED_LIGHTS
 uniform sampler3D light_sampler_a;
 uniform sampler3D light_sampler_b;
+#endif
+
+#ifdef SHADOW
+#ifdef WORLD_OVERWORLD
+uniform sampler2D shadowtex0;
+uniform sampler2DShadow shadowtex1;
+#endif
+
+#ifdef WORLD_END
+uniform sampler2D shadowtex0;
+uniform sampler2DShadow shadowtex1;
+#endif
 #endif
 
 uniform mat4 gbufferModelView;

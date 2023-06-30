@@ -1,28 +1,25 @@
 #ifndef INCLUDE_LIGHT_HANDHELD_LIGHTING
 #define INCLUDE_LIGHT_HANDHELD_LIGHTING
 
-uniform int heldItemId;
-uniform int heldItemId2;
-uniform int heldBlockLightValue;
-uniform int heldBlockLightValue2;
+#ifdef COLORED_LIGHTS
+uniform sampler2D light_data_sampler;
+#endif
 
 #ifdef IS_IRIS
 uniform vec3 eyePosition;
 #endif
 
-#ifdef COLORED_LIGHTS
-layout (std430, binding = 0) buffer LightData {
-	vec4[32] light_color;
-	vec4[16] tint_color;
-} light_data;
-#endif
+uniform int heldItemId;
+uniform int heldItemId2;
+uniform int heldBlockLightValue;
+uniform int heldBlockLightValue2;
 
 vec3 get_handheld_light_color(int held_item_id, int held_item_light_value) {
 #ifdef COLORED_LIGHTS
 	bool is_emitter = 10032 <= held_item_id && held_item_id < 10064;
 
 	if (is_emitter) {
-		return light_data.light_color[held_item_id - 10032].rgb;
+		return texelFetch(light_data_sampler, ivec2(int(held_item_id) - 10032, 0), 0).rgb;
 	} else {
 		return vec3(0.0);
 	}
@@ -42,10 +39,12 @@ vec3 get_handheld_lighting(vec3 scene_pos, float ao) {
 	scene_pos += cameraPosition - eyePosition;
 #endif
 
-	float falloff = get_handheld_light_falloff(scene_pos, ao);
+	vec3 light_color = max(
+		get_handheld_light_color(heldItemId, heldBlockLightValue),
+	    get_handheld_light_color(heldItemId2, heldBlockLightValue2)
+	);
 
-	vec3 light_color = get_handheld_light_color(heldItemId, heldBlockLightValue)
-	                 + get_handheld_light_color(heldItemId2, heldBlockLightValue2);
+	float falloff = get_handheld_light_falloff(scene_pos, ao);
 
 	return light_color * falloff;
 }

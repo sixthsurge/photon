@@ -3,7 +3,7 @@
 
   Photon Shaders by SixthSurge
 
-  program/gbuffers/solid.glsl:
+  program/gbuffer/solid.glsl:
   Handle terrain, entities, the hand, beacon beams and spider eyes
 
 --------------------------------------------------------------------------------

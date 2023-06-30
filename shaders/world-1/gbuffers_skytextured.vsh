@@ -1,3 +1,3 @@
 #version 410 compatibility
 #define vsh
-#include "/program/gbuffers/skytextured.glsl"
+#include "/program/gbuffer/skytextured.glsl"

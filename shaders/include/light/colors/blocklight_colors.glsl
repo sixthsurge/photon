@@ -42,7 +42,7 @@ const vec3[16] tint_color = vec3[16](
 	vec3(1.0, 1.0, 0.1), // Yellow
 	vec3(0.7, 0.7, 0.0), // Brown
 	vec3(0.1, 1.0, 0.1), // Green
-	vec3(0.1, 0.7, 1.0), // Lime
+	vec3(0.5, 1.0, 0.5), // Lime
 	vec3(0.1, 0.1, 1.0), // Blue
 	vec3(0.5, 0.5, 1.0), // Light blue
 	vec3(0.1, 1.0, 1.0), // Cyan

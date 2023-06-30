@@ -3,7 +3,7 @@
 
   Photon Shaders by SixthSurge
 
-  program/gbuffers/armor_glint.glsl:
+  program/gbuffer/armor_glint.glsl:
   Handle enchantment glint
 
 --------------------------------------------------------------------------------
