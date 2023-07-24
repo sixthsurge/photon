@@ -29,6 +29,10 @@ flat out vec3 sky_sh[9];
 #else
 flat out mat3 sky_samples;
 #endif
+
+#if defined OVERCAST_SKY_AFFECTS_LIGHTING
+flat out float overcastness;
+#endif
 #endif
 
 // ------------
@@ -94,6 +98,10 @@ void main() {
 	sun_color    = get_sun_exposure() * get_sun_tint();
 	moon_color   = get_moon_exposure() * get_moon_tint();
 
+#if defined OVERCAST_SKY_AFFECTS_LIGHTING
+	overcastness = texelFetch(colortex4, ivec2(191, 2), 0).x;
+#endif
+
 	float skylight_boost = get_skylight_boost();
 
 	#ifdef SH_SKYLIGHT
@@ -121,6 +129,12 @@ void main() {
 	sky_samples[0] = atmosphere_scattering(dir0, sun_color, sun_dir, moon_color, moon_dir) * skylight_boost;
 	sky_samples[1] = atmosphere_scattering(dir1, sun_color, sun_dir, moon_color, moon_dir) * skylight_boost;
 	sky_samples[2] = atmosphere_scattering(dir2, sun_color, sun_dir, moon_color, moon_dir) * skylight_boost;
+
+	#ifdef OVERCAST_SKY_AFFECTS_LIGHTING
+	sky_samples[0] = mix(sky_samples[0], sky_samples[0] * 1.5 + 0.015 * light_color, overcastness);
+	sky_samples[1] = mix(sky_samples[1], sky_samples[1] * 1.25, overcastness);
+	sky_samples[2] = mix(sky_samples[2], sky_samples[2] * 1.25, overcastness);
+	#endif
 	#endif
 #endif
 
@@ -153,6 +167,10 @@ flat in vec3 moon_color;
 flat in vec3 sky_sh[9];
 #else
 flat in mat3 sky_samples;
+#endif
+
+#if defined OVERCAST_SKY_AFFECTS_LIGHTING
+flat in float overcastness;
 #endif
 #endif
 

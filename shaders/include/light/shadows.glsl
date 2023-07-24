@@ -232,7 +232,11 @@ vec3 calculate_shadows(
 
 	if (distance_fade >= 1.0) return vec3(distant_shadow);
 
-	distant_shadow = (1.0 - distance_fade) + distance_fade * distant_shadow;
+	distant_shadow = ((1.0 - distance_fade) + distance_fade * distant_shadow);
+
+#if defined WORLD_OVERWORLD && defined OVERCAST_SKY_AFFECTS_LIGHTING
+	distant_shadow *= 1.0 - 0.5 * overcastness;
+#endif
 
 	float dither = interleaved_gradient_noise(gl_FragCoord.xy, frameCounter);
 
@@ -246,6 +250,9 @@ vec3 calculate_shadows(
 	if (blocker_search_result.x < eps) return vec3(distant_shadow); // blocker search empty handed => no occluders
 
 	float penumbra_size  = 16.0 * SHADOW_PENUMBRA_SCALE * (shadow_screen_pos.z - blocker_search_result.x) / blocker_search_result.x;
+#if defined WORLD_OVERWORLD && defined OVERCAST_SKY_AFFECTS_LIGHTING
+	      penumbra_size *= 1.0 + 5.0 * overcastness;
+#endif
 	      penumbra_size  = min(penumbra_size, SHADOW_BLOCKER_SEARCH_RADIUS);
 	      penumbra_size *= shadowProjection[0].x;
 #else

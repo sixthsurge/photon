@@ -15,9 +15,11 @@
 
 out vec2 uv;
 
-flat out vec2 clouds_coverage_cu;
-flat out vec2 clouds_coverage_ac;
-flat out vec2 clouds_coverage_ci;
+flat out vec2 clouds_cumulus_coverage;
+flat out vec2 clouds_altocumulus_coverage;
+flat out vec2 clouds_cirrus_coverage;
+flat out float clouds_cumulus_congestus_amount;
+flat out float clouds_stratus_amount;
 
 // ------------
 //   Uniforms
@@ -66,9 +68,11 @@ void main() {
 	uv = gl_MultiTexCoord0.xy;
 
 	clouds_weather_variation(
-		clouds_coverage_cu,
-		clouds_coverage_ac,
-		clouds_coverage_ci
+		clouds_cumulus_coverage,
+		clouds_altocumulus_coverage,
+		clouds_cirrus_coverage,
+		clouds_cumulus_congestus_amount,
+		clouds_stratus_amount
 	);
 
 	gl_Position = vec4(gl_Vertex.xy * 2.0 - 1.0, 0.0, 1.0);

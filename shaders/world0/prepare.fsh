@@ -18,9 +18,11 @@ layout (location = 0) out float cloud_shadow_map;
 
 in vec2 uv;
 
-flat in vec2 clouds_coverage_cu;
-flat in vec2 clouds_coverage_ac;
-flat in vec2 clouds_coverage_ci;
+flat in vec2 clouds_cumulus_coverage;
+flat in vec2 clouds_altocumulus_coverage;
+flat in vec2 clouds_cirrus_coverage;
+flat in float clouds_cumulus_congestus_amount;
+flat in float clouds_stratus_amount;
 
 // ------------
 //   Uniforms

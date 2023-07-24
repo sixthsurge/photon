@@ -109,6 +109,11 @@ vec3 get_diffuse_lighting(
 	diffuse *= sqr(ao);
 	#endif
 
+	#ifdef OVERCAST_SKY_AFFECTS_LIGHTING
+	bounced *= 1.0 - overcastness;
+	sss     *= 1.0 - 0.5 * overcastness;
+	#endif
+
 	#ifdef CLOUD_SHADOWS
 	bounced *= cloud_shadows;
 	sss     *= cloud_shadows;
@@ -131,6 +136,10 @@ vec3 get_diffuse_lighting(
 	     diffuse *= ao * pow4(light_levels.y) * (dampen(light_dir.y) * 0.5 + 0.5);
 
 	lighting += light_color * diffuse;
+
+	#ifdef OVERCAST_SKY_AFFECTS_LIGHTING
+	lighting *= 1.0 - 0.5 * overcastness;
+	#endif
 
 	#ifdef CLOUD_SHADOWS
 	lighting *= cloud_shadows;
@@ -156,7 +165,7 @@ vec3 get_diffuse_lighting(
 	     skylight *= 1.0 - 0.75 * clamp01(-normal.y);
 	     skylight *= 1.0 + 0.33 * clamp01(flat_normal.y) * (1.0 - shadows.x * (1.0 - rainStrength)) * (time_noon + time_midnight);
 		 skylight  = mix(skylight, rain_skylight, rainStrength);
-		 skylight *= ao * pi;
+		 skylight *= pow1d5(ao) * pi;
 	#endif
 #else
 	vec3 skylight  = ambient_color * ao;

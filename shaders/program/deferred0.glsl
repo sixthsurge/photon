@@ -54,9 +54,14 @@ flat out vec3 sun_color;
 flat out vec3 moon_color;
 flat out vec3 sky_color;
 
-flat out vec2 clouds_coverage_cu;
-flat out vec2 clouds_coverage_ac;
-flat out vec2 clouds_coverage_ci;
+flat out vec2 clouds_cumulus_coverage;
+flat out vec2 clouds_altocumulus_coverage;
+flat out vec2 clouds_cirrus_coverage;
+
+flat out float clouds_cumulus_congestus_amount;
+flat out float clouds_stratus_amount;
+
+flat out float overcastness;
 #endif
 
 // ------------
@@ -138,10 +143,16 @@ void main() {
 	ambient_color = sky_color;
 
 	clouds_weather_variation(
-		clouds_coverage_cu,
-		clouds_coverage_ac,
-		clouds_coverage_ci
+		clouds_cumulus_coverage,
+		clouds_altocumulus_coverage,
+		clouds_cirrus_coverage,
+		clouds_cumulus_congestus_amount,
+		clouds_stratus_amount
 	);
+
+	#ifdef OVERCAST_SKY_AFFECTS_LIGHTING
+	overcastness = daily_weather_blend(daily_weather_overcastness);
+	#endif
 #endif
 
 #if defined WORLD_NETHER
@@ -174,9 +185,14 @@ flat in vec3 sun_color;
 flat in vec3 moon_color;
 flat in vec3 sky_color;
 
-flat in vec2 clouds_coverage_cu;
-flat in vec2 clouds_coverage_ac;
-flat in vec2 clouds_coverage_ci;
+flat in vec2 clouds_cumulus_coverage;
+flat in vec2 clouds_altocumulus_coverage;
+flat in vec2 clouds_cirrus_coverage;
+
+flat in float clouds_cumulus_congestus_amount;
+flat in float clouds_stratus_amount;
+
+flat in float overcastness;
 #endif
 
 // ------------
@@ -262,6 +278,10 @@ void main() {
 
 		case 1:
 			sky_map = ambient_color;
+			break;
+
+		case 2:
+			sky_map = vec3(overcastness);
 			break;
 		}
 	} else { // Draw sky map

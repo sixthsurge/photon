@@ -1,6 +1,8 @@
 #if !defined INCLUDE_UTILITY_GEOMETRY
 #define INCLUDE_UTILITY_GEOMETRY
 
+#include "/include/utility/fast_math.glsl"
+
 // Sphere/AABB intersection methods from https://www.scratchapixel.com
 
 // Returns +-1
@@ -79,6 +81,16 @@ vec2 intersect_spherical_shell(vec3 ray_origin, vec3 ray_dir, float inner_sphere
 	dists.y = inner_sphere_intersected && inner_sphere_dists.x > 0.0 ? inner_sphere_dists.x : outer_sphere_dists.y;
 
 	return dists;
+}
+
+vec2 intersect_cylindrical_shell(vec3 ray_origin, vec3 ray_dir, float inner_cylinder_radius, float outer_cylinder_radius) {
+	float len_o  = length(ray_origin.xz);
+	float rlen_d = rcp_length(ray_dir.xz);
+
+	float t1 = (inner_cylinder_radius - len_o) * rlen_d;
+	float t2 = (outer_cylinder_radius - len_o) * rlen_d;
+
+	return vec2(t1, t2);
 }
 
 #endif // INCLUDE_UTILITY_GEOMETRY

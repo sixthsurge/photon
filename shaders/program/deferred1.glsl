@@ -22,9 +22,14 @@ flat out vec3 sun_color;
 flat out vec3 moon_color;
 flat out vec3 sky_color;
 
-flat out vec2 clouds_coverage_cu;
-flat out vec2 clouds_coverage_ac;
-flat out vec2 clouds_coverage_ci;
+flat out vec2 clouds_cumulus_coverage;
+flat out vec2 clouds_altocumulus_coverage;
+flat out vec2 clouds_cirrus_coverage;
+
+flat out float clouds_cumulus_congestus_amount;
+flat out float clouds_stratus_amount;
+
+flat out float overcastness;
 #endif
 
 // ------------
@@ -89,15 +94,19 @@ void main() {
 	sun_color = get_sun_exposure() * get_sun_tint();
 	moon_color = get_moon_exposure() * get_moon_tint();
 
+	overcastness = daily_weather_blend(daily_weather_overcastness);
+
 	const vec3 sky_dir = normalize(vec3(0.0, 1.0, -0.8)); // don't point direcly upwards to avoid the sun halo when the sun path rotation is 0
 	sky_color = atmosphere_scattering(sky_dir, sun_dir) * sun_color + atmosphere_scattering(sky_dir, moon_dir) * moon_color;
 	sky_color = tau * mix(sky_color, vec3(sky_color.b) * sqrt(2.0), rcp_pi);
 	sky_color = mix(sky_color, tau * get_weather_color(), rainStrength);
 
 	clouds_weather_variation(
-		clouds_coverage_cu,
-		clouds_coverage_ac,
-		clouds_coverage_ci
+		clouds_cumulus_coverage,
+		clouds_altocumulus_coverage,
+		clouds_cirrus_coverage,
+		clouds_cumulus_congestus_amount,
+		clouds_stratus_amount
 	);
 #endif
 
@@ -124,9 +133,14 @@ flat in vec3 sun_color;
 flat in vec3 moon_color;
 flat in vec3 sky_color;
 
-flat in vec2 clouds_coverage_cu;
-flat in vec2 clouds_coverage_ac;
-flat in vec2 clouds_coverage_ci;
+flat in vec2 clouds_cumulus_coverage;
+flat in vec2 clouds_altocumulus_coverage;
+flat in vec2 clouds_cirrus_coverage;
+
+flat in float clouds_cumulus_congestus_amount;
+flat in float clouds_stratus_amount;
+
+flat in float overcastness;
 #endif
 
 // ------------
@@ -236,6 +250,7 @@ void main() {
 	vec3 ray_dir = mat3(gbufferModelViewInverse) * normalize(view_pos);
 
 	vec3 clear_sky = atmosphere_scattering(ray_dir, sun_color, sun_dir, moon_color, moon_dir);
+	     clear_sky = mix(clear_sky, 1.1 * vec3(dot(clear_sky, luminance_weights_rec2020)), 0.75 * overcastness * time_noon * linear_step(0.0, 0.05, ray_dir.y));
 
 	float dither = texelFetch(noisetex, ivec2(checkerboard_pos & 511), 0).b;
 	      dither = r1(frameCounter / checkerboard_area, dither);
