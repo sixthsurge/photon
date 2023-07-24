@@ -1,8 +1,10 @@
 <br><br>
 
-<h1 align = "center">Photon Shaders</h1>
+<h1 align = "center">photon</h1>
 
 <p align = "center">A gameplay-focused shader pack for Minecraft</p>
+
+![Screenshot](docs/images/a.png)
 
 ## acknowledgments
 
@@ -15,7 +17,7 @@
 ## features
 * Custom shading with variable penumbra shadows and ambient occlusion
 * [Colored lighting](https://media.discordapp.net/attachments/945403130277924914/1123585019307364394/2023-06-28_13.02.33.png?width=1058&height=584) using flood-fill algorithm (enabled with Ultra profile, requires Iris)
-* Custom sky with multiple volumetric cloud layers
+* Custom sky with multiple volumetric cloud layers and different weather each day
 * Camera effects - bloom, depth-of-field, motion-blur
 * Full labPBR resource pack support
 * Revamped water
