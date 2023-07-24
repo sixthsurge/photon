@@ -1,7 +1,7 @@
 #if !defined INCLUDE_LIGHT_LPV_VOXELIZATION
 #define INCLUDE_LIGHT_LPV_VOXELIZATION
 
-const ivec3 voxel_volume_size = ivec3(VOXEL_VOLUME_SIZE, 64, VOXEL_VOLUME_SIZE);
+const ivec3 voxel_volume_size = ivec3(VOXEL_VOLUME_SIZE);
 
 vec3 scene_to_voxel_space(vec3 scene_pos) {
 	return scene_pos + fract(cameraPosition) + (0.5 * vec3(voxel_volume_size));
