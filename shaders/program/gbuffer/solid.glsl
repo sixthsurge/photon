@@ -361,7 +361,7 @@ void main() {
 	float view_distance = length(tangent_pos);
 
 	bool has_pom = view_distance < POM_DISTANCE; // Only calculate POM for close terrain
-	     has_pom = has_pom && material_mask != 1 && material_mask != 8; // Do not calculate POM for water or lava
+	     has_pom = has_pom && material_mask != 1 && material_mask != 39; // Do not calculate POM for water or lava
 
 	vec3 tangent_dir = -normalize(tangent_pos);
 	mat2 uv_gradient = mat2(dFdx(uv), dFdy(uv));
