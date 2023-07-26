@@ -280,9 +280,11 @@ void main() {
 			sky_map = ambient_color;
 			break;
 
+#if defined WORLD_OVERWORLD
 		case 2:
 			sky_map = vec3(overcastness);
 			break;
+#endif
 		}
 	} else { // Draw sky map
 		vec3 ray_dir = unproject_sky(uv);
