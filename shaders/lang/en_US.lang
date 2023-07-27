@@ -24,9 +24,11 @@ screen.shadows                         = Shadows
 screen.color_grading                   = Color Grading
 screen.exposure                        = Exposure
 
+screen.aurora                          = Aurora Borealis
 screen.clouds                          = Clouds
 screen.clouds_cumulus                  = Cumulus Clouds Settings
 screen.clouds_altocumulus              = Altocumulus Clouds Settings
+screen.clouds_cumulus_congestus        = Cumulus Congestus Clouds Settings
 screen.clouds_cirrus                   = Planar Clouds Settings
 screen.clouds_minecrafty               = Blocky Clouds Settings
 
@@ -227,6 +229,24 @@ suffix.CLOUDS_ALTOCUMULUS_ALTITUDE              = m/s
 option.CLOUDS_ALTOCUMULUS_WIND_ANGLE            = Wind Angle
 suffix.CLOUDS_ALTOCUMULUS_ALTITUDE              = °
 
+option.CLOUDS_CUMULUS_CONGESTUS                       = Cumulus Congestus Clouds
+option.CLOUDS_CUMULUS_CONGESTUS_PRIMARY_STEPS_H       = Primary Steps - Horizon
+option.CLOUDS_CUMULUS_CONGESTUS_PRIMARY_STEPS_Z       = Primary Steps - Zenith
+option.CLOUDS_CUMULUS_CONGESTUS_LIGHTING_STEPS        = Lighting Steps
+option.CLOUDS_CUMULUS_CONGESTUS_AMBIENT_STEPS         = Ambient Steps
+option.CLOUDS_CUMULUS_CONGESTUS_ALTITUDE              = Altitude
+suffix.CLOUDS_CUMULUS_CONGESTUS_ALTITUDE              = m
+option.CLOUDS_CUMULUS_CONGESTUS_THICKNESS             = Thickness
+option.CLOUDS_CUMULUS_CONGESTUS_DENSITY               = Density
+option.CLOUDS_CUMULUS_CONGESTUS_COVERAGE              = Coverage
+option.CLOUDS_CUMULUS_CONGESTUS_SIZE                  = Size
+option.CLOUDS_CUMULUS_CONGESTUS_DETAIL_STRENGTH       = Detail Strength
+option.CLOUDS_CUMULUS_CONGESTUS_CURL_STRENGTH         = Curl Strength
+option.CLOUDS_CUMULUS_CONGESTUS_WIND_SPEED            = Wind Speed
+suffix.CLOUDS_CUMULUS_CONGESTUS_ALTITUDE              = m/s
+option.CLOUDS_CUMULUS_CONGESTUS_WIND_ANGLE            = Wind Angle
+suffix.CLOUDS_CUMULUS_CONGESTUS_ALTITUDE              = °
+
 option.BLOCKY_CLOUDS                   = Blocky Clouds
 option.BLOCKY_CLOUDS_LAYER_2           = Second Layer
 option.BLOCKY_CLOUDS_THICKNESS         = Tallness
@@ -268,6 +288,19 @@ suffix.CLOUDS_CIRRUS_ALTITUDE              = °
 
 option.CLOUDS_ALTOCUMULUS                       = Altocumulus Clouds
 option.CLOUDS_CIRRUS                       = Planar Clouds
+
+option.AURORA_NORMAL                   = Aurora in Any Biome
+option.AURORA_SNOW                     = Aurora in Snow Biome
+option.AURORA_CLOUD_LIGHTING           = Cloud Light Contribution
+option.AURORA_GROUND_LIGHTING          = Ground Light Contribution
+
+value.AURORA_NORMAL.AURORA_NEVER       = Never
+value.AURORA_NORMAL.AURORA_RARELY      = Rarely
+value.AURORA_NORMAL.AURORA_ALWAYS      = Always
+
+value.AURORA_SNOW.AURORA_NEVER         = Never
+value.AURORA_SNOW.AURORA_RARELY        = Rarely
+value.AURORA_SNOW.AURORA_ALWAYS        = Always
 
 # Fog settings
 

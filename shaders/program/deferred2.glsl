@@ -261,7 +261,7 @@ vec4 upscale_clouds() {
 }
 
 void main() {
-#if defined WORLD_OVERWORLD && !defined MINECRAFTY_CLOUDS
+#if defined WORLD_OVERWORLD
 	clouds = upscale_clouds();
 #endif
 

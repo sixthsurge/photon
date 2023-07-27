@@ -65,6 +65,7 @@ uniform vec3 moon_dir;
 uniform float biome_cave;
 uniform float biome_may_rain;
 uniform float biome_may_snow;
+uniform float biome_snowy;
 
 uniform float time_sunrise;
 uniform float time_noon;
@@ -76,6 +77,7 @@ uniform float time_midnight;
 // ------------
 
 #define ATMOSPHERE_SCATTERING_LUT depthtex0
+#define WEATHER_AURORA
 
 #if defined WORLD_OVERWORLD
 #include "/include/light/colors/light_color.glsl"
@@ -100,6 +102,8 @@ void main() {
 
 #if defined OVERCAST_SKY_AFFECTS_LIGHTING
 	overcastness = texelFetch(colortex4, ivec2(191, 2), 0).x;
+#else
+	float overcastness = 0.0;
 #endif
 
 	float skylight_boost = get_skylight_boost();
@@ -135,6 +139,12 @@ void main() {
 	sky_samples[1] = mix(sky_samples[1], sky_samples[1] * 1.25, overcastness);
 	sky_samples[2] = mix(sky_samples[2], sky_samples[2] * 1.25, overcastness);
 	#endif
+
+	// Aurorae
+	float aurora_amount = get_aurora_amount();
+	mat2x3 aurora_colors = get_aurora_colors();
+
+	sky_samples[0] += aurora_amount * AURORA_GROUND_LIGHTING * mix(aurora_colors[0], aurora_colors[1], 0.25) * (1.0 - overcastness);
 	#endif
 #endif
 

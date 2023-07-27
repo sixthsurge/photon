@@ -29,6 +29,9 @@ flat out vec2 clouds_cirrus_coverage;
 flat out float clouds_cumulus_congestus_amount;
 flat out float clouds_stratus_amount;
 
+flat out float aurora_amount;
+flat out mat2x3 aurora_colors;
+
 flat out float overcastness;
 #endif
 
@@ -78,6 +81,7 @@ uniform float biome_humidity;
 // ------------
 
 #define ATMOSPHERE_SCATTERING_LUT depthtex0
+#define WEATHER_AURORA
 #define WEATHER_CLOUDS
 
 #if defined WORLD_OVERWORLD
@@ -108,6 +112,11 @@ void main() {
 		clouds_cumulus_congestus_amount,
 		clouds_stratus_amount
 	);
+
+	aurora_amount = get_aurora_amount();
+	aurora_colors = get_aurora_colors();
+
+	sky_color += aurora_amount * AURORA_CLOUD_LIGHTING * mix(aurora_colors[0], aurora_colors[1], 0.25);
 #endif
 
 	vec2 vertex_pos = gl_Vertex.xy * taau_render_scale * rcp(float(CLOUDS_TEMPORAL_UPSCALING));
@@ -139,6 +148,9 @@ flat in vec2 clouds_cirrus_coverage;
 
 flat in float clouds_cumulus_congestus_amount;
 flat in float clouds_stratus_amount;
+
+flat in float aurora_amount;
+flat in mat2x3 aurora_colors;
 
 flat in float overcastness;
 #endif
@@ -213,6 +225,7 @@ uniform float biome_humidity;
 
 #if defined WORLD_OVERWORLD
 #include "/include/sky/atmosphere.glsl"
+#include "/include/sky/aurora.glsl"
 #include "/include/sky/clouds.glsl"
 #endif
 
@@ -237,14 +250,18 @@ float depth_max_4x4(sampler2D depth_sampler) {
 void main() {
 	ivec2 texel = ivec2(gl_FragCoord.xy);
 
-#if defined WORLD_OVERWORLD && !defined BLOCKY_CLOUDS
+	clouds = vec4(0.0, 0.0, 0.0, 1.0);
+
+#if defined WORLD_OVERWORLD
 	ivec2 checkerboard_pos = CLOUDS_TEMPORAL_UPSCALING * texel + clouds_checkerboard_offsets[frameCounter % checkerboard_area];
 
 	vec2 new_uv = vec2(checkerboard_pos) / vec2(view_res) * rcp(float(taau_render_scale));
 
-	// Skip rendering clouds if they are occluded by terrain
+	// Skip rendering if occluded by terrain
 	float depth_max = depth_max_4x4(depthtex1);
 	if (depth_max < 1.0) { clouds = vec4(0.0, 0.0, 0.0, 1.0); return; }
+
+	// Clouds
 
 	vec3 view_pos = screen_to_view_space(vec3(new_uv, 1.0), false);
 	vec3 ray_dir = mat3(gbufferModelViewInverse) * normalize(view_pos);
@@ -255,7 +272,13 @@ void main() {
 	float dither = texelFetch(noisetex, ivec2(checkerboard_pos & 511), 0).b;
 	      dither = r1(frameCounter / checkerboard_area, dither);
 
+#ifndef BLOCKY_CLOUDS
 	clouds = draw_clouds(ray_dir, clear_sky, dither);
+#endif
+
+	// Aurora
+
+	clouds.xyz += draw_aurora(ray_dir, dither) * clouds.w;
 #endif
 }
 

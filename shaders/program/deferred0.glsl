@@ -61,6 +61,9 @@ flat out vec2 clouds_cirrus_coverage;
 flat out float clouds_cumulus_congestus_amount;
 flat out float clouds_stratus_amount;
 
+flat out float aurora_amount;
+flat out mat2x3 aurora_colors;
+
 flat out float overcastness;
 #endif
 
@@ -115,6 +118,7 @@ uniform float biome_humidity;
 // ------------
 
 #define ATMOSPHERE_SCATTERING_LUT depthtex0
+#define WEATHER_AURORA
 #define WEATHER_CLOUDS
 
 #if defined WORLD_OVERWORLD
@@ -161,6 +165,11 @@ void main() {
 	);
 
 	overcastness = daily_weather_blend(daily_weather_overcastness);
+
+	aurora_amount = get_aurora_amount();
+	aurora_colors = get_aurora_colors();
+
+	sky_color += aurora_amount * AURORA_CLOUD_LIGHTING * mix(aurora_colors[0], aurora_colors[1], 0.25);
 #endif
 
 	gl_Position = vec4(gl_Vertex.xy * 2.0 - 1.0, 0.0, 1.0);
@@ -194,6 +203,9 @@ flat in vec2 clouds_cirrus_coverage;
 
 flat in float clouds_cumulus_congestus_amount;
 flat in float clouds_stratus_amount;
+
+flat in float aurora_amount;
+flat in mat2x3 aurora_colors;
 
 flat in float overcastness;
 #endif
@@ -263,6 +275,7 @@ uniform float biome_may_snow;
 #define ATMOSPHERE_SCATTERING_LUT depthtex0
 
 #if defined WORLD_OVERWORLD
+#include "/include/sky/aurora.glsl"
 #include "/include/sky/clouds.glsl"
 #endif
 

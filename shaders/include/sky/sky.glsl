@@ -91,14 +91,21 @@ vec3 draw_sun(vec3 ray_dir) {
 	return sun_luminance * sun_color * step(0.0, center_to_edge) * limb_darkening;
 }
 
-vec4 get_clouds(vec3 ray_dir, vec3 clear_sky) {
+vec4 get_clouds_and_aurora(vec3 ray_dir, vec3 clear_sky) {
 #if   defined PROGRAM_DEFERRED0
 	ivec2 texel   = ivec2(gl_FragCoord.xy);
 	      texel.x = texel.x % (sky_map_res.x - 4);
 
 	float dither = interleaved_gradient_noise(vec2(texel));
 
-	return draw_clouds(ray_dir, clear_sky, dither);
+	// Render clouds
+	vec4 clouds = draw_clouds(ray_dir, clear_sky, dither);
+
+	// Render aurora
+	vec3 aurora = draw_aurora(ray_dir, dither);
+	clouds.xyz += aurora * clouds.w;
+
+	return clouds;
 #elif defined PROGRAM_DEFERRED3
 	// Soften clouds for new pixels
 	float pixel_age = texelFetch(colortex6, ivec2(gl_FragCoord.xy), 0).w;
@@ -157,11 +164,9 @@ vec3 draw_sky(vec3 ray_dir, vec3 atmosphere) {
 
 	// Clouds
 
-#ifndef BLOCKY_CLOUDS
-	vec4 clouds = get_clouds(ray_dir, sky);
+	vec4 clouds = get_clouds_and_aurora(ray_dir, sky);
 	sky *= clouds.a;   // transmittance
 	sky += clouds.rgb; // scattering
-#endif
 
 	// Fade lower part of sky into cave fog color when underground so that the sky isn't visible
 	// beyond the render distance
