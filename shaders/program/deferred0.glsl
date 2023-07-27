@@ -13,7 +13,7 @@
   const int colortex0Format = R11F_G11F_B10F; // scene color (deferred3 -> temporal), bloom tiles (composite5 -> composite14), final color (composite14 -> final)
   const int colortex1Format = RGBA16;         // gbuffer data 0 (solid -> composite1)
   const int colortex2Format = RGBA16;         // gbuffer data 1 (solid -> composite1)
-  const int colortex3Format = RGBA8;          // animated overlays/vanilla sky (solid -> deferred3), blended translucent color (translucent -> composite1)
+  const int colortex3Format = RGBA8;          // animated overlays/vanilla sky (solid -> deferred3), blended translucent color (translucent -> composite1), bloomy fog amount (composite1 -> composite14)
   const int colortex4Format = R11F_G11F_B10F; // sky map (deferred -> composite1)
   const int colortex5Format = RGBA16F;        // scene history (always), low-res clouds (deferred1 -> deferred2 +flip),
   const int colortex6Format = RGBA16F;        // ambient occlusion history & clouds pixel age (always), fog scattering (composite -> composite1 +flip), TAAU min color (composite2 -> composite3 +flip)
@@ -127,11 +127,13 @@ uniform float biome_humidity;
 #include "/include/light/colors/nether_color.glsl"
 #endif
 
-void main() {
-	uv = gl_MultiTexCoord0.xy;
+#if defined WORLD_END
+#include "/include/light/colors/end_color.glsl"
+#endif
 
 #if defined WORLD_OVERWORLD
-	sun_color = get_sun_exposure() * get_sun_tint();
+vec3 get_ambient_color() {
+	sun_color  = get_sun_exposure() * get_sun_tint();
 	moon_color = get_moon_exposure() * get_moon_tint();
 
 	const vec3 sky_dir = normalize(vec3(0.0, 1.0, -0.8)); // don't point direcly upwards to avoid the sun halo when the sun path rotation is 0
@@ -139,9 +141,17 @@ void main() {
 	sky_color = tau * mix(sky_color, vec3(sky_color.b) * sqrt(2.0), rcp_pi);
 	sky_color = mix(sky_color, tau * get_weather_color(), rainStrength);
 
-	light_color   = get_light_color();
-	ambient_color = sky_color;
+	return sky_color;
+}
+#endif
 
+void main() {
+	uv = gl_MultiTexCoord0.xy;
+
+	light_color   = get_light_color();
+	ambient_color = get_ambient_color();
+
+#if defined WORLD_OVERWORLD
 	clouds_weather_variation(
 		clouds_cumulus_coverage,
 		clouds_altocumulus_coverage,
@@ -150,14 +160,7 @@ void main() {
 		clouds_stratus_amount
 	);
 
-	#ifdef OVERCAST_SKY_AFFECTS_LIGHTING
 	overcastness = daily_weather_blend(daily_weather_overcastness);
-	#endif
-#endif
-
-#if defined WORLD_NETHER
-	light_color   = vec3(0.0);
-	ambient_color = get_nether_color();
 #endif
 
 	gl_Position = vec4(gl_Vertex.xy * 2.0 - 1.0, 0.0, 1.0);

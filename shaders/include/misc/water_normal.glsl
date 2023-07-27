@@ -62,7 +62,11 @@ vec3 get_water_normal(vec3 world_pos, vec3 flat_normal, vec2 coord, vec2 flow_di
 	float wave1 = get_water_height(coord + vec2(h, 0.0), flow_dir, flowing_water);
 	float wave2 = get_water_height(coord + vec2(0.0, h), flow_dir, flowing_water);
 
+#if defined WORLD_OVERWORLD
 	float normal_influence  = mix(0.01, 0.04 + 0.15 * rainStrength, dampen(skylight));
+#else
+	float normal_influence  = 0.04;
+#endif
 	      normal_influence *= smoothstep(0.0, 0.05, abs(flat_normal.y));
 	      normal_influence *= smoothstep(0.0, 0.15, abs(dot(flat_normal, normalize(world_pos - cameraPosition)))); // prevent noise when looking horizontally
 	      normal_influence *= WATER_WAVE_STRENGTH;

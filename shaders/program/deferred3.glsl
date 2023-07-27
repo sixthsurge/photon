@@ -203,17 +203,8 @@ uniform sampler3D light_sampler_a;
 uniform sampler3D light_sampler_b;
 #endif
 
+#ifndef WORLD_NETHER
 #ifdef SHADOW
-#ifdef WORLD_OVERWORLD
-uniform sampler2D shadowtex0;
-uniform sampler2DShadow shadowtex1;
-
-#ifdef SHADOW_COLOR
-uniform sampler2D shadowcolor0;
-#endif
-#endif
-
-#ifdef WORLD_END
 uniform sampler2D shadowtex0;
 uniform sampler2DShadow shadowtex1;
 
@@ -519,7 +510,7 @@ void main() {
 
 		vec3 border_fog_color = mix(atmosphere, horizon_color, sqr(horizon_factor)) * (1.0 - biome_cave);
 	#else
-		vec3 border_fog_color = ambient_color;
+		vec3 border_fog_color = texture(colortex4, project_sky(world_dir)).rgb;
 	#endif
 
 		float border_fog = border_fog(scene_pos, world_dir);

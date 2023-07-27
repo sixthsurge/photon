@@ -1,32 +1,10 @@
 #if !defined INCLUDE_SKY_SKY
 #define INCLUDE_SKY_SKY
 
-//----------------------------------------------------------------------------//
-#if   defined WORLD_OVERWORLD
-
-#include "/include/light/colors/light_color.glsl"
-#include "/include/light/colors/weather_color.glsl"
-#include "/include/light/bsdf.glsl"
-#include "/include/sky/atmosphere.glsl"
-#include "/include/sky/projection.glsl"
+#include "/include/utility/color.glsl"
 #include "/include/utility/dithering.glsl"
 #include "/include/utility/fast_math.glsl"
-#include "/include/utility/geometry.glsl"
 #include "/include/utility/random.glsl"
-
-const float sun_luminance  = 40.0; // luminance of sun disk
-const float moon_luminance = 4.0; // luminance of moon disk
-
-vec3 draw_sun(vec3 ray_dir) {
-	float nu = dot(ray_dir, sun_dir);
-
-	// Limb darkening model from http://www.physics.hmc.edu/faculty/esin/a101/limbdarkening.pdf
-	const vec3 alpha = vec3(0.429, 0.522, 0.614);
-	float center_to_edge = max0(sun_angular_radius - fast_acos(nu));
-	vec3 limb_darkening = pow(vec3(1.0 - sqr(1.0 - center_to_edge)), 0.5 * alpha);
-
-	return sun_luminance * sun_color * step(0.0, center_to_edge) * limb_darkening;
-}
 
 // Stars based on https://www.shadertoy.com/view/Md2SR3
 
@@ -66,7 +44,7 @@ vec3 stable_star_field(vec2 coord, float star_threshold) {
 }
 
 vec3 draw_stars(vec3 ray_dir) {
-#ifdef SHADOW
+#if defined WORLD_OVERWORLD && defined SHADOW
 	// Trick to make stars rotate with sun and moon
 	mat3 rot = (sunAngle < 0.5)
 		? mat3(shadowModelViewInverse)
@@ -76,13 +54,41 @@ vec3 draw_stars(vec3 ray_dir) {
 #endif
 
 	// Adjust star threshold so that brightest stars appear first
+#if defined WORLD_OVERWORLD
 	float star_threshold = 1.0 - 0.008 * STARS_COVERAGE * smoothstep(-0.2, 0.05, -sun_dir.y);
+#else
+	float star_threshold = 1.0 - 0.008 * STARS_COVERAGE;
+#endif
 
 	// Project ray direction onto the plane
 	vec2 coord  = ray_dir.xy * rcp(abs(ray_dir.z) + length(ray_dir.xy)) + 41.21 * sign(ray_dir.z);
 	     coord *= 600.0;
 
 	return stable_star_field(coord, star_threshold);
+}
+
+//----------------------------------------------------------------------------//
+#if   defined WORLD_OVERWORLD
+
+#include "/include/light/colors/light_color.glsl"
+#include "/include/light/colors/weather_color.glsl"
+#include "/include/light/bsdf.glsl"
+#include "/include/sky/atmosphere.glsl"
+#include "/include/sky/projection.glsl"
+#include "/include/utility/geometry.glsl"
+
+const float sun_luminance  = 40.0; // luminance of sun disk
+const float moon_luminance = 4.0; // luminance of moon disk
+
+vec3 draw_sun(vec3 ray_dir) {
+	float nu = dot(ray_dir, sun_dir);
+
+	// Limb darkening model from http://www.physics.hmc.edu/faculty/esin/a101/limbdarkening.pdf
+	const vec3 alpha = vec3(0.429, 0.522, 0.614);
+	float center_to_edge = max0(sun_angular_radius - fast_acos(nu));
+	vec3 limb_darkening = pow(vec3(1.0 - sqr(1.0 - center_to_edge)), 0.5 * alpha);
+
+	return sun_luminance * sun_color * step(0.0, center_to_edge) * limb_darkening;
 }
 
 vec4 get_clouds(vec3 ray_dir, vec3 clear_sky) {
@@ -179,6 +185,64 @@ vec3 draw_sky(vec3 ray_dir) {
 
 //----------------------------------------------------------------------------//
 #elif defined WORLD_END
+
+#include "/include/misc/end_lighting_fix.glsl"
+#include "/include/sky/atmosphere.glsl"
+
+const float sun_solid_angle = cone_angle_to_solid_angle(sun_angular_radius);
+const vec3 end_sun_color = vec3(1.0, 0.5, 0.25);
+
+vec3 draw_sun(vec3 ray_dir) {
+	float nu = dot(ray_dir, sun_dir);
+	float r = fast_acos(nu);
+
+	// Sun disk
+
+	const vec3 alpha = vec3(0.6, 0.5, 0.4);
+	float center_to_edge = max0(sun_angular_radius - r);
+	vec3 limb_darkening = pow(vec3(1.0 - sqr(1.0 - center_to_edge)), 0.5 * alpha);
+	vec3 sun_disk = vec3(r < sun_angular_radius);
+
+	// Solar flare effect
+
+	// Transform the coordinate space such that z is parallel to sun_dir
+	vec3 tangent = sun_dir.y == 1.0 ? vec3(1.0, 0.0, 0.0) : normalize(cross(vec3(0.0, 1.0, 0.0), sun_dir));
+	vec3 bitangent = normalize(cross(tangent, sun_dir));
+	mat3 rot = mat3(tangent, bitangent, sun_dir);
+
+	// Vector from ray dir to sun dir
+	vec2 q = ((ray_dir - sun_dir) * rot).xy;
+
+	float theta = fract(linear_step(-pi, pi, atan(q.y, q.x)) + 0.015 * frameTimeCounter - 0.33 * r);
+
+	float flare = texture(noisetex, vec2(theta, r - 0.025 * frameTimeCounter)).x;
+	      flare = pow5(flare) * exp(-25.0 * (r - sun_angular_radius));
+		  flare = r < sun_angular_radius ? 0.0 : flare;
+
+	return end_sun_color * rcp(sun_solid_angle) * max0(sun_disk + 0.1 * flare);
+}
+
+vec3 draw_sky(vec3 ray_dir) {
+	// Sky gradient
+
+	float up_gradient = linear_step(0.0, 0.4, ray_dir.y) + linear_step(0.1, 0.8, -ray_dir.y);
+	vec3 sky = ambient_color * mix(0.1, 0.04, up_gradient);
+	float mie_phase = cornette_shanks_phase(dot(ray_dir, sun_dir), 0.6);
+	sky += 0.1 * (ambient_color + 0.5 * end_sun_color) * mie_phase;
+
+#if defined PROGRAM_DEFERRED3
+	// Sun
+
+	sky += draw_sun(ray_dir);
+
+	// Stars
+
+	vec3 stars_fade = exp2(-0.1 * max0(1.0 - ray_dir.y) / max(ambient_color, eps)) * linear_step(-0.2, 0.0, ray_dir.y);
+	sky += draw_stars(ray_dir).xzy * stars_fade;
+#endif
+
+	return sky;
+}
 
 #endif
 

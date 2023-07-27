@@ -59,7 +59,7 @@ vec4 common_fog(float view_dist, const bool sky) {
 	fog.rgb *= blindness_fog;
 	fog.a   *= blindness_fog;
 
-#if defined WORLD_OVERWORLD
+#if defined WORLD_OVERWORLD && defined CAVE_FOG
 	// Cave fog
 	float cave_fog = spherical_fog(view_dist, cave_fog_start, cave_fog_density * biome_cave * float(!sky));
 	fog.rgb += cave_fog_color - cave_fog_color * cave_fog;
@@ -89,7 +89,7 @@ float common_fog_alpha(float view_dist, bool sky) {
 	// Blindness fog
 	fog *= spherical_fog(view_dist, blindness_fog_start, blindness * blindness_fog_density);
 
-#if defined WORLD_OVERWORLD
+#if defined WORLD_OVERWORLD && defined CAVE_FOG
 	// Cave fog
 	fog *= spherical_fog(view_dist, cave_fog_start, cave_fog_density * biome_cave * float(!sky)); // Cave fog
 #endif

@@ -77,7 +77,7 @@ vec3 get_specular_highlight(
 	// No specular highlight on a new moon
 	if (sunAngle > 0.5 && moonPhase == 4) return vec3(0.0);
 #else
-	const float light_radius = 1.0 * degree;
+	const float light_radius = SUN_ANGULAR_RADIUS * degree;
 #endif
 
 	vec3 fresnel;

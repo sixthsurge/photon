@@ -188,7 +188,7 @@ void main() {
 	vec4 gbuffer_data_1 = texelFetch(colortex2, texel, 0);
 #endif
 
-#if defined WORLD_OVERWORLD && defined VL
+#ifdef VL
 	vec2 fog_uv = clamp(uv * VL_RENDER_SCALE, vec2(0.0), floor(view_res * VL_RENDER_SCALE - 1.0) * view_pixel_size);
 	vec3 fog_scattering    = smooth_filter(colortex6, fog_uv).rgb;
 	vec3 fog_transmittance = smooth_filter(colortex7, fog_uv).rgb;
@@ -198,7 +198,7 @@ void main() {
 
 	if (depth0 == 1.0) {
 		// Apply volumetric fog
-#if defined WORLD_OVERWORLD && defined VL
+#if (defined WORLD_OVERWORLD || defined WORLD_END) && defined VL
 		scene_color = scene_color * fog_transmittance + fog_scattering;
 		bloomy_fog = clamp01(dot(fog_transmittance, vec3(luminance_weights_rec2020)));
 #endif
@@ -206,7 +206,6 @@ void main() {
 #if defined WORLD_NETHER
 		bloomy_fog = spherical_fog(far, nether_fog_start, nether_bloomy_fog_density * (1.0 - blindness)) * 0.5 + 0.5;
 #endif
-
 		// Apply purkinje shift
 		scene_color = purkinje_shift(scene_color, vec2(0.0, 1.0));
 
@@ -386,7 +385,7 @@ void main() {
 
 	// Apply atmospheric fog
 
-#if defined WORLD_OVERWORLD && defined VL
+#if (defined WORLD_OVERWORLD || defined WORLD_END) && defined VL
 	scene_color = scene_color * fog_transmittance + fog_scattering;
 	bloomy_fog = clamp01(dot(fog_transmittance, vec3(luminance_weights_rec2020)));
 	bloomy_fog = isEyeInWater == 1.0 ? sqrt(bloomy_fog) : bloomy_fog;

@@ -38,6 +38,8 @@ screen.blocklight_color                = Blocklight Color
 screen.sunlight_morning                = Morning
 screen.sunlight_noon                   = Noon
 screen.sunlight_evening                = Evening
+screen.light_nether                    = Nether
+screen.light_end                       = End
 screen.fog_rlh_normal                  = Normal Color
 screen.fog_rlh_rain                    = Rain Color
 screen.fog_rlh_arid                    = Arid/Desert Color
@@ -62,6 +64,10 @@ screen.weather_d9                      = Day 9
 screen.weather_d10                     = Day 10
 screen.weather_d11                     = Day 11
 
+screen.end_light_color                 = Light Color
+screen.end_ambient_color               = Ambient Color
+screen.nether_color                    = Static Color
+
 option.INFO                            = Photon Shaders
 value.INFO.0                           = §eby SixthSurge
 value.INFO.1                           = §aby SixthSurge
@@ -78,8 +84,9 @@ option.SEA_LEVEL                       = Sea Level
 option.EDGE_HIGHLIGHT                  = Edge Highlight
 option.EDGE_HIGHLIGHT_SCALE            = Edge Highlight Scale
 option.OVERCAST_SKY_AFFECTS_LIGHTING   = Overcast Sky Affects Lighting
-option.MOON_PHASE_AFFECTS_BRIGHTNESS   = Moon Phase Affects Brightness
+option.MOON_PHASE_AFFECTS_BRIGHTNESS   = Moon Phase Affects Lighting
 option.DESERT_SANDSTORM                = Desert Sandstorm
+option.END_GLOW                        = End Glow
 
 # Lighting settings
 
@@ -126,8 +133,21 @@ option.MOON_I                          = Moonlight Intensity
 option.SKYLIGHT_I                      = Skylight Intensity
 option.BOUNCED_LIGHT_I                 = Bounced Sunlight Intensity
 option.CAVE_LIGHTING_I                 = Cave Brightness
-option.NETHER_I                        = Nether Brightness
-
+option.LIGHTNING_FLASH                 = Lightning Flash
+option.NETHER_USE_BIOME_COLOR          = Use Biome Color
+option.NETHER_I                        = Ambient Intensity
+option.NETHER_S                        = Ambient Saturation
+option.NETHER_R                        = Red
+option.NETHER_G                        = Green
+option.NETHER_B                        = Blue
+option.END_LIGHT_R                     = Red
+option.END_LIGHT_G                     = Green
+option.END_LIGHT_B                     = Blue
+option.END_LIGHT_I                     = Light Intensity
+option.END_AMBIENT_R                   = Red
+option.END_AMBIENT_G                   = Green
+option.END_AMBIENT_B                   = Blue
+option.END_AMBIENT_I                   = Ambient Intensity
 option.BLOCKLIGHT_R                    = Red
 option.BLOCKLIGHT_G                    = Green
 option.BLOCKLIGHT_B                    = Blue

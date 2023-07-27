@@ -254,12 +254,14 @@ Material material_from(vec3 albedo_srgb, uint material_mask, vec3 world_pos, ino
 				}
 			}
 		} else { // 16-32
-			/* Currently unused
 			if (material_mask < 24u) { // 16-24
 				if (material_mask < 20u) { // 16-20
 					if (material_mask < 18u) { // 16-18
 						if (material_mask == 16u) { // 16
-
+							#ifdef HARDCODED_EMISSION
+							// Chorus plant
+							material.emission  = 0.25 * albedo_sqrt * pow4(hsl.z);
+							#endif
 						} else { // 17
 
 						}
@@ -315,7 +317,6 @@ Material material_from(vec3 albedo_srgb, uint material_mask, vec3 world_pos, ino
 					}
 				}
 			}
-			*/
 		}
 	} else if (material_mask < 64u) { // 32-64
 		if (material_mask < 48u) { // 32-48

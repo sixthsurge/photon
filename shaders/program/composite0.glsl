@@ -118,7 +118,7 @@ uniform sampler2D colortex4; // sky map
 uniform sampler2D depthtex0;
 uniform sampler2D depthtex1;
 
-#ifdef WORLD_OVERWORLD
+#ifndef WORLD_NETHER
 #ifdef SHADOW
 uniform sampler2D shadowtex0;
 uniform sampler2D shadowtex1;
@@ -181,6 +181,10 @@ uniform float time_midnight;
 #include "/include/fog/air_fog_vl.glsl"
 #endif
 
+#if defined WORLD_END
+#include "/include/fog/end_fog_vl.glsl"
+#endif
+
 #include "/include/fog/water_fog_vl.glsl"
 
 #include "/include/utility/encoding.glsl"
@@ -215,15 +219,19 @@ void main() {
 
 #if defined VL
 	switch (isEyeInWater) {
-#if defined WORLD_OVERWORLD
 		case 0:
-			mat2x3 air_fog = raymarch_air_fog(world_start_pos, world_end_pos, depth0 == 1.0, skylight, dither);
+			#if defined WORLD_OVERWORLD
+			mat2x3 fog = raymarch_air_fog(world_start_pos, world_end_pos, depth0 == 1.0, skylight, dither);
+			#elif defined WORLD_NETHER
+			mat2x3 fog = mat2x3(vec3(0.0), vec3(1.0));
+			#elif defined WORLD_END
+			mat2x3 fog = raymarch_end_fog(world_start_pos, world_end_pos, depth0 == 1.0, dither);
+			#endif
 
-			fog_scattering    = air_fog[0];
-			fog_transmittance = air_fog[1];
+			fog_scattering    = fog[0];
+			fog_transmittance = fog[1];
 
 			break;
-#endif
 
 		case 1:
 			mat2x3 water_fog = raymarch_water_fog(world_start_pos, world_end_pos, depth0 == 1.0, dither);
