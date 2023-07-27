@@ -148,8 +148,10 @@ mat2x3 raymarch_end_fog(
 			scattering_amount *= 0.5;
 		}
 
+#ifdef END_GLOW
 		// Emission
 		scattering += 4.0 * end_fog_emission(world_pos) * step_length * transmittance;
+#endif
 
 		transmittance *= step_transmittance;
 	}
