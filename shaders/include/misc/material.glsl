@@ -263,7 +263,13 @@ Material material_from(vec3 albedo_srgb, uint material_mask, vec3 world_pos, ino
 							material.emission  = 0.25 * albedo_sqrt * pow4(hsl.z);
 							#endif
 						} else { // 17
-
+							#ifdef HARDCODED_SPECULAR
+							// End stone
+							float smoothness = 0.4 * linear_step(0.61, 0.85, hsl.z);
+							material.roughness = sqr(1.0 - smoothness);
+							material.f0 = vec3(0.02);
+							material.ssr_multiplier = 1.0;
+							#endif
 						}
 					} else { // 18-20
 						if (material_mask == 18u) { // 18

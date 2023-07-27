@@ -34,11 +34,12 @@ vec3 end_fog_emission(vec3 world_pos) {
 	float density = max0(linear_step(0.6, 0.9, base_noise) + detail_nose);
 	float color_mix = linear_step(0.5, 0.7, color_noise);
 
-	float view_dist = distance(world_pos, cameraPosition);
-	float fade_near = 1.0 - exp2(-0.1 * view_dist);
-	float fade_far  = exp2(-0.05 * view_dist);
+	float view_dist   = distance(world_pos, cameraPosition);
+	float fade_near   = 1.0 - exp2(-0.1 * view_dist);
+	float fade_far    = exp2(-0.05 * view_dist);
+	float fade_height = exp2(-0.05 * (max0(cameraPosition.y - 120.0))) * linear_step(0.0, 64.0, world_pos.y);
 
-	return mix(main_col, alt_col, color_mix) * (density * fade_near * fade_far);
+	return mix(main_col, alt_col, color_mix) * (density * fade_near * fade_far * fade_height);
 }
 
 mat2x3 raymarch_end_fog(

@@ -201,6 +201,9 @@ void main() {
 #if (defined WORLD_OVERWORLD || defined WORLD_END) && defined VL
 		scene_color = scene_color * fog_transmittance + fog_scattering;
 		bloomy_fog = clamp01(dot(fog_transmittance, vec3(luminance_weights_rec2020)));
+		#if defined WORLD_END
+		bloomy_fog = bloomy_fog * 0.5 + 0.5;
+		#endif
 #endif
 
 #if defined WORLD_NETHER
@@ -389,6 +392,9 @@ void main() {
 	scene_color = scene_color * fog_transmittance + fog_scattering;
 	bloomy_fog = clamp01(dot(fog_transmittance, vec3(luminance_weights_rec2020)));
 	bloomy_fog = isEyeInWater == 1.0 ? sqrt(bloomy_fog) : bloomy_fog;
+	#if defined WORLD_END
+	bloomy_fog = bloomy_fog * 0.5 + 0.5;
+	#endif
 #else
 	if (isEyeInWater == 1) {
 		// Simple underwater fog

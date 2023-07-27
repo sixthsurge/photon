@@ -164,7 +164,7 @@ vec3 get_sky_reflection(vec3 ray_dir, float skylight) {
 #if defined WORLD_OVERWORLD
 	return bicubic_filter(colortex4, project_sky(ray_dir)).rgb * pow12(linear_step(0.0, 0.75, skylight));
 #else
-	return 0.25 * texture(colortex4, project_sky(ray_dir)).rgb;
+	return texture(colortex4, project_sky(ray_dir)).rgb;
 #endif
 }
 
