@@ -288,7 +288,7 @@ float get_aurora_amount() {
 	float aurora_snow = 1.0;
 #endif
 
-	return night * mix(aurora_normal, aurora_snow, biome_snowy);
+	return night * mix(aurora_normal, aurora_snow, biome_may_snow);
 }
 
 // [0] - bottom color
