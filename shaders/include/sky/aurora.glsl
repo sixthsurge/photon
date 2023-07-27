@@ -7,28 +7,28 @@
 #include "/include/utility/phase_functions.glsl"
 
 float aurora_shape(vec3 pos, float altitude_fraction) {
-	const vec2 wind_0 = 0.001 * vec2(0.7, 0.1);
-	const vec2 wind_1 = 0.0013 * vec2(-0.1, -0.7);
+	const vec2 wind_0     = 0.001 * vec2(0.7, 0.1);
+	const vec2 wind_1     = 0.0013 * vec2(-0.1, -0.7);
+	const float frequency = 0.00003 * AURORA_FREQUENCY;
 
-	float height_fade = sqr(1.0 - altitude_fraction) * linear_step(0.0, 0.025, altitude_fraction);
+	float height_fade = cube(1.0 - altitude_fraction) * linear_step(0.0, 0.025, altitude_fraction);
 
-	float worley_1 = texture(noisetex, pos.xz * 0.0001 + wind_1 * frameTimeCounter).y;
-	float worley_0 = texture(noisetex, pos.xz * 0.00005 + wind_0 * frameTimeCounter + 0.0 * worley_1).y;
+	float worley_0 = texture(noisetex, pos.xz * frequency + wind_0 * frameTimeCounter).y;
+	float worley_1 = texture(noisetex, pos.xz * frequency + wind_1 * frameTimeCounter).y;
 
 	return linear_step(1.0, 2.0, worley_0 + worley_1) * height_fade;
 }
 
 vec3 aurora_color(vec3 pos, float altitude_fraction) {
-	float perlin = linear_step(0.3, 0.7, texture(noisetex, pos.xz * 0.0002).x);
-	return mix(aurora_colors[0], aurora_colors[1], clamp01(dampen(altitude_fraction) * (1.0 - 0.1 * perlin)));
+	return mix(aurora_colors[0], aurora_colors[1], clamp01(dampen(altitude_fraction)));
 }
 
 vec3 draw_aurora(vec3 ray_dir, float dither) {
 	const uint step_count      = 64u;
 	const float rcp_steps      = rcp(float(step_count));
 	const float volume_bottom  = 1000.0;
-	const float volume_top     = 2000.0;
-	const float volume_radius  = 12000.0;
+	const float volume_top     = 3000.0;
+	const float volume_radius  = 20000.0;
 
 	if (aurora_amount < 0.01) return vec3(0.0);
 
@@ -68,7 +68,7 @@ vec3 draw_aurora(vec3 ray_dir, float dither) {
 		emission += color * (shape * distance_fade * step_length);
 	}
 
-	return 0.0025 * emission * aurora_amount;
+	return (0.001 * AURORA_BRIGHTNESS) * emission * aurora_amount;
 }
 
 #endif // INCLUDE_SKY_AURORA

@@ -24,7 +24,7 @@ screen.shadows                         = Shadows
 screen.color_grading                   = Color Grading
 screen.exposure                        = Exposure
 
-screen.aurora                          = Aurora Borealis
+screen.aurora                          = Aurora
 screen.clouds                          = Clouds
 screen.clouds_cumulus                  = Cumulus Clouds Settings
 screen.clouds_altocumulus              = Altocumulus Clouds Settings
@@ -291,6 +291,8 @@ option.CLOUDS_CIRRUS                       = Planar Clouds
 
 option.AURORA_NORMAL                   = Aurora in Any Biome
 option.AURORA_SNOW                     = Aurora in Snow Biome
+option.AURORA_BRIGHTNESS               = Aurora Brightness
+option.AURORA_FREQUENCY                = Aurora Frequency
 option.AURORA_CLOUD_LIGHTING           = Cloud Light Contribution
 option.AURORA_GROUND_LIGHTING          = Ground Light Contribution
 
