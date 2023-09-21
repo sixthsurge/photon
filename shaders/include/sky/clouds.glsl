@@ -336,7 +336,7 @@ vec4 draw_cumulus_clouds(vec3 ray_dir, vec3 clear_sky, float dither) {
 	// Get main light color for this layer
 	vec3 light_color  = moonlit ? moon_color : sun_color;
 	     light_color *= sunlight_color * atmosphere_transmittance(ray_origin, light_dir);
-		 light_color *= 1.0 - rainStrength;
+		 light_color *= 1.0 - 0.7 * rainStrength;
 
 	// Remap the transmittance so that min_transmittance is 0
 	float clouds_transmittance = linear_step(min_transmittance, 1.0, transmittance);

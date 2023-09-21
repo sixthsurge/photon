@@ -55,7 +55,7 @@ vec3 get_light_color() {
 	     light_color *= sunlight_color * atmosphere_transmittance(light_dir.y, planet_radius);
 	     light_color *= clamp01(rcp(0.02) * light_dir.y); // fade away during day/night transition
 		 light_color *= 1.0 - 0.25 * pulse(abs(light_dir.y), 0.15, 0.11);
-		 light_color *= 1.0 - rainStrength;
+		 light_color *= 1.0 - 0.78 * rainStrength;
 
 	return light_color;
 }
@@ -64,7 +64,7 @@ float get_skylight_boost() {
 	float night_skylight_boost = 4.0 * (1.0 - smoothstep(-0.16, 0.0, sun_dir.y))
 	                           - 3.0 * linear_step(0.1, 1.0, exp(-2.42 * sqr(sun_dir.y + 0.81)));
 
-	return 1.0 + max0(night_skylight_boost);
+	return 0.75 + 0.1 * max0(night_skylight_boost);
 }
 
 #endif // INCLUDE_LIGHT_COLORS_LIGHT_COLOR

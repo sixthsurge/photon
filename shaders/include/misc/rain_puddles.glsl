@@ -2,8 +2,8 @@
 #define INCLUDE_MISC_RAIN_PUDDLES
 
 float get_ripple_height(vec2 coord) {
-	const float ripple_frequency = 0.3;
-	const float ripple_speed     = 0.1;
+	const float ripple_frequency = 0.16;
+	const float ripple_speed     = 0.05;
 	const vec2 ripple_dir_0       = vec2( 3.0,   4.0) / 5.0;
 	const vec2 ripple_dir_1       = vec2(-5.0, -12.0) / 13.0;
 
@@ -14,7 +14,7 @@ float get_ripple_height(vec2 coord) {
 }
 
 float get_puddle_noise(vec3 world_pos, vec3 flat_normal, vec2 light_levels) {
-	const float puddle_frequency = 0.025;
+	const float puddle_frequency = 0.02;
 
 	float puddle = texture(noisetex, world_pos.xz * puddle_frequency).w;
 	      puddle = linear_step(0.45, 0.55, puddle) * wetness * biome_may_rain * max0(flat_normal.y);
@@ -36,9 +36,9 @@ bool get_rain_puddles(
 	inout float ssr_multiplier
 ) {
 	const float puddle_f0                      = 0.02;
-	const float puddle_roughness               = 0.002;
-	const float puddle_darkening_factor        = 0.25;
-	const float puddle_darkening_factor_porous = 0.4;
+	const float puddle_roughness               = 0.0;
+	const float puddle_darkening_factor        = 0.5;
+	const float puddle_darkening_factor_porous = 0.7;
 
 	if (wetness < 0.0 || biome_may_rain < 0.0) return false;
 
@@ -57,7 +57,7 @@ bool get_rain_puddles(
 	ssr_multiplier = max(ssr_multiplier, puddle);
 
 	// Ripple animation
-	const float h = 0.1;
+	const float h = 0.03;
 	float ripple0 = get_ripple_height(world_pos.xz);
 	float ripple1 = get_ripple_height(world_pos.xz + vec2(h, 0.0));
 	float ripple2 = get_ripple_height(world_pos.xz + vec2(0.0, h));
