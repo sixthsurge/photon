@@ -19,6 +19,9 @@ bool is_transparent(uint block_id) {
 	       block_id == 5u  || // Leaves
 	       block_id == 14u || // Strong SSS
 	       block_id == 15u || // Weak SSS
+	       block_id == 18u || // Carpets
+	       block_id == 19u || // Stairs
+	       block_id == 20u || // Slabs
 	       block_id == 41u || // Brewing stand
 	       block_id == 48u || // Sea pickle
 	       block_id == 49u || // Nether mushrooms
