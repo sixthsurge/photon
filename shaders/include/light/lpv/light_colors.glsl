@@ -12,18 +12,18 @@ const vec3[32] light_color = vec3[32](
 	vec3(1.00, 0.30, 0.10) * 16.0, // Lava
 	vec3(1.00, 0.45, 0.10) *  2.25, // Medium orange light
 	vec3(1.00, 0.63, 0.15) *  1.0, // Brewing stand
-	vec3(1.00, 0.57, 0.30) * 3.0, // Medium golden light
+	vec3(1.00, 0.57, 0.30) * 0.6, // Medium golden light
 	vec3(0.45, 0.73, 1.00) *  1.5, // Soul lights
 	vec3(0.45, 0.73, 1.00) * 4.5, // Beacon
 	vec3(0.75, 1.00, 0.83) *  0.75, // Sculk
 	vec3(0.75, 1.00, 0.83) *  0.25, // End portal frame
-	vec3(0.60, 0.10, 1.00) *  1.0, // Pink glow
+	vec3(0.60, 0.10, 1.00) *  0.6, // Pink glow
 	vec3(0.75, 1.00, 0.50) *  0.25, // Sea pickle
 	vec3(1.00, 0.50, 0.25) *  1.0, // Nether plants
-	vec3(1.00, 0.57, 0.30) *  2.0, // Medium golden light
-	vec3(1.00, 0.65, 0.30) *  2.0, // Ochre froglight
-	vec3(0.86, 1.00, 0.44) *  2.0, // Verdant froglight
-	vec3(0.75, 0.44, 1.00) *  2.0, // Pearlescent froglight
+	vec3(1.00, 0.57, 0.30) *  0.6, // Medium golden light
+	vec3(1.00, 0.65, 0.30) *  0.8, // Ochre froglight
+	vec3(0.76, 1.00, 0.34) *  0.8, // Verdant froglight
+	vec3(0.75, 0.44, 1.00) *  0.8, // Pearlescent froglight
 	vec3(0.60, 0.10, 1.00) *  0.5, // Enchanting table
 	vec3(0.75, 0.44, 1.00) *  1.0, // Amethyst cluster
 	vec3(0.75, 0.44, 1.00) *  1.0, // Calibrated sculk sensor
