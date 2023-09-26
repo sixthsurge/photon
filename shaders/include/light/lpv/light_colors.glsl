@@ -2,7 +2,7 @@
 #define INCLUDE_LIGHT_LPV_LIGHT_COLORS
 
 const vec3[32] light_color = vec3[32](
-	vec3(1.00, 1.00, 1.00) * 2.0, // Strong white light
+	vec3(1.00, 1.00, 1.00) * 1.25, // Strong white light
 	vec3(1.00, 1.00, 1.00) *  1.0, // Medium white light
 	vec3(1.00, 1.00, 1.00) *  0.25, // Weak white light
 	vec3(1.00, 0.55, 0.27) * 1.0, // Strong golden light
