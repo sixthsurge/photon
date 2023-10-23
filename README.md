@@ -42,6 +42,6 @@
 
 <div align = "center">
 	<a href="http://www.youtube.com/watch?feature=player_embedded&v=_aSmM7jg9Nw" target="_blank"><img src="http://img.youtube.com/vi/_aSmM7jg9Nw/0.jpg" border="0"/></a>
-	<p> by VIPUL:
+	<p> by VIPUL
 	<br><br>
 </div>
