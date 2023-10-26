@@ -28,6 +28,10 @@ in ivec2 vaUV2;
 
 uniform mat4 projectionMatrix;
 uniform mat4 modelViewMatrix;
+
+#if BOX_LINE_WIDTH != 2.0
+uniform int renderStage;
+#endif
 #endif
 
 uniform vec2 taa_offset;
@@ -49,8 +53,6 @@ void main() {
 		0.0, 0.0, 0.0, 1.0
 	);
 
-	const float line_width = 2.0;
-
 	vec4 line_pos_start = vec4(vaPosition, 1.0);
 	     line_pos_start = projectionMatrix * view_scale * modelViewMatrix * line_pos_start;
 	vec4 line_pos_end = vec4(vaPosition + vaNormal, 1.0);
@@ -60,7 +62,13 @@ void main() {
 	vec3 ndc2 = line_pos_end.xyz / line_pos_end.w;
 
 	vec2 line_screen_dir = normalize((ndc2.xy - ndc1.xy) * view_res);
-	vec2 line_offset = vec2(-line_screen_dir.y, line_screen_dir.x) * line_width * view_pixel_size;
+
+	vec2 line_offset =
+#if BOX_LINE_WIDTH != 2.0
+		vec2(-line_screen_dir.y, line_screen_dir.x) * view_pixel_size * ((renderStage == MC_RENDER_STAGE_OUTLINE) ? BOX_LINE_WIDTH : 2.0);
+#else
+		vec2(-line_screen_dir.y, line_screen_dir.x) * view_pixel_size * 2.0;
+#endif
 
 	if (line_offset.x < 0.0) line_offset *= -1.0;
 
@@ -109,6 +117,13 @@ flat in vec3 tint;
 uniform vec2 view_res;
 uniform vec2 view_pixel_size;
 
+#if BOX_MODE != BOX_MODE_NONE
+uniform int renderStage;
+#if BOX_MODE == BOX_MODE_RAINBOW
+uniform float frameTimeCounter;
+#endif
+#endif
+
 #include "/include/utility/color.glsl"
 #include "/include/utility/encoding.glsl"
 
@@ -120,6 +135,17 @@ void main() {
 	if (clamp01(coord) != coord) discard;
 #endif
 
+#if defined PROGRAM_GBUFFERS_LINE && BOX_MODE != BOX_MODE_NONE
+	if (renderStage == MC_RENDER_STAGE_OUTLINE) {
+#if BOX_MODE == BOX_MODE_COLOR
+		vec3  col      = vec3(BOX_COLOR_R, BOX_COLOR_G, BOX_COLOR_B);
+#else // BOX_MODE_RAINBOW
+		vec2  uv       = gl_FragCoord.xy * view_pixel_size;
+		vec3  col      = hsl_to_rgb(vec3(fract(uv.y + uv.x * uv.y + frameTimeCounter * 0.1), 1.0, 1.0));
+#endif
+		scene_color    = srgb_eotf_inv(col * vec3(1.0 + BOX_EMISSION)) * rec709_to_working_color;
+	} else // careful editing scene_color below
+#endif
 	scene_color = srgb_eotf_inv(tint) * rec709_to_working_color;
 
 	vec2 encoded_normal = encode_unit_vector(normal);
