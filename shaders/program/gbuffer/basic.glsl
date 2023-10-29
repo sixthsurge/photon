@@ -54,7 +54,7 @@ void main() {
 	vec4 line_pos_start = vec4(vaPosition, 1.0);
 	     line_pos_start = projectionMatrix * view_scale * modelViewMatrix * line_pos_start;
 	vec4 line_pos_end = vec4(vaPosition + vaNormal, 1.0);
-	     line_pos_end = projectionMatrix * view_scale * modelViewMatrix * line_pos_start;
+	     line_pos_end = projectionMatrix * view_scale * modelViewMatrix * line_pos_end;
 
 	vec3 ndc1 = line_pos_start.xyz / line_pos_start.w;
 	vec3 ndc2 = line_pos_end.xyz / line_pos_end.w;
