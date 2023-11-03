@@ -15,6 +15,7 @@ screen.materials                       = Materials
 screen.water                           = Water
 screen.post                            = Post-Processing
 screen.misc                            = Misc
+screen.box                             = Box
 
 screen.colored_lights                  = Colored Lights Settings
 screen.rp_settings                     = Resource Pack Settings
@@ -533,6 +534,18 @@ value.tonemap_right.tonemap_tech           = Tech
 value.tonemap_right.tonemap_ozius          = Ozius
 value.tonemap_right.tonemap_reinhard       = Reinhard
 value.tonemap_right.tonemap_reinhard_jodie = Reinhard-Jodie
+
+# Box
+
+option.BOX_MODE = Box Mode
+value.BOX_MODE.BOX_MODE_NONE = None
+value.BOX_MODE.BOX_MODE_COLOR = Color
+value.BOX_MODE.BOX_MODE_RAINBOW = Rainbow
+option.BOX_COLOR_R = Red Component
+option.BOX_COLOR_G = Green Component
+option.BOX_COLOR_B = Blue Component
+option.BOX_EMISSION = Emission
+option.BOX_LINE_WIDTH = Line Width
 
 # Daily Weather System
 
