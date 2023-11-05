@@ -80,43 +80,73 @@ value.INFO.3                           = §dby SixthSurge
 # World settings
 
 option.WAVING_PLANTS                   = Waving Plants
+option.WAVING_PLANTS.comment           = Ground plants wave in the wind.\n\nTo add a block to the list of waving plants, open shaders/block.properties and add it to the relevant category (10016, 10017 or 10018)
 option.WAVING_LEAVES                   = Waving Leaves
+option.WAVING_LEAVES.comment           = Leaf blocks wave in the wind.\n\nTo add a block to the list of waving leaf blocks, open shaders/block.properties and add it to the relevant category (10019)
 option.SLANTED_RAIN                    = Slanted Rain
+option.SLANTED_RAIN.comment            = Slanted rain particles. Makes rainy weather a little more atmospheric
 option.RAIN_OPACITY                    = Rain Opacity
+option.RAIN_OPACITY.comment            = Adjust the opacity of rain particles
 option.SEA_LEVEL                       = Sea Level
+option.SEA_LEVEL.comment               = The y coordinate of the sea/ground.\n\n-60.0: Superflat post-1.18.\n4.0: Superflat pre-1.18.\n63.0: Normal.
+option.SNOW_OPACITY                    = Snow Opacity
+option.SNOW_OPACITY.comment            = Adjust the opacity of snow particles
 option.EDGE_HIGHLIGHT                  = Edge Highlight
+option.EDGE_HIGHLIGHT.comment          = Edge highlighting effect inspired by Minecraft Dungeons
 option.EDGE_HIGHLIGHT_SCALE            = Edge Highlight Scale
+option.EDGE_HIGHLIGHT_SCALE.comment    = Controls the thickness of the edge highlight; change this to match your resource pack resolution
 option.OVERCAST_SKY_AFFECTS_LIGHTING   = Overcast Sky Affects Lighting
+option.OVERCAST_SKY_AFFECTS_LIGHTING.comment = Overcast weather reduces the intensity of sunlight
 option.MOON_PHASE_AFFECTS_BRIGHTNESS   = Moon Phase Affects Lighting
+option.MOON_PHASE_AFFECTS_BRIGHTNESS.comment = Night time brightness is affected by the moon phase
 option.DESERT_SANDSTORM                = Desert Sandstorm
+option.DESERT_SANDSTORM.comment        = Sandstorm during rain in desert biome
 option.END_GLOW                        = End Glow
+option.END_GLOW.comment                = Wavery glowing effect in the End. Requires Volumetric Lighting
 
 # Lighting settings
 
 option.COLORED_LIGHTS                  = Colored Lights
+option.COLORED_LIGHTS.comment          = Variable-color block lighting using flood fill algorithm. Requires Iris 1.6 or above
 option.HANDHELD_LIGHTING               = Handheld Lighting
+option.HANDHELD_LIGHTING.comment       = Handheld items cast light on the world. If coloured lighting is enabled the handheld lighting will be coloured like the lights themselves
 option.HANDHELD_LIGHTING_INTENSITY     = Handheld Lighting Intensity
+option.HANDHELD_LIGHTING_INTENSITY.comment = Adjusts the brightness of handheld light sources
 option.GTAO                            = Shader AO
+option.GTAO.comment                    = Ground-truth based ambient occlusion (GTAO). Adds soft shadows in corners
 option.VANILLA_AO                      = Vanilla AO
+option.VANILLA_AO.comment              = Minecraft's built-in ambient occlusion
 option.AO_IN_SUNLIGHT                  = AO in Sunlight
+option.AO_IN_SUNLIGHT.comment          = Whether to apply shader ambient occlusion in direct sunlight/moonlight
 option.CLOUD_SHADOWS                   = Cloud Shadows
+option.CLOUD_SHADOWS.comment           = Shadows cast by clouds on the ground
 option.CLOUD_SHADOWS_INTENSITY         = Cloud Shadows Intensity
+option.CLOUD_SHADOWS_INTENSITY.comment = Adjusts the intensity of cloud shadows
 option.SH_SKYLIGHT                     = SH Skylight
+option.SH_SKYLIGHT.comment             = Uses spherical harmonics encoding for directional skylight in the Overworld, which provides a very natural result.\nThis works well with GTAO
 option.SSS_SHEEN                       = SSS Sheen
+option.SSS_SHEEN.comment               = Specular "sheen" effect on plants and leaves, helps tall grass and stuff to blend better with the grass specular
 option.SSS_INTENSITY                   = SSS Intensity
+option.SSS_INTENSITY.comment           = Adjusts the brightness of subsurface scattering (SSS)
 option.SHADING_STRENGTH                = Shading Strength
+option.SHADING_STRENGTH.comment        = Adjusts the contrast of direct light shading. Reducing this option makes faces facing away from the sun that aren't in shadow brighter; increasing it makes them darker
 
 option.SHADOW                          = Shadow Mapping
 option.SHADOW_PCF                      = Shadow Filtering
 option.SHADOW_COLOR                    = Colored Shadows
+option.SHADOW_COLOR.comment            = Translucent blocks cast tinted shadows
 option.SHADOW_VPS                      = Variable Penumbra Shadows
+option.SHADOW_VPS.comment              = Shadows grow softer further from their caster
 option.shadowMapResolution             = Shadow Resolution
 option.shadowDistance                  = Shadow Distance
 option.sunPathRotation                 = Sun Path Rotation
 option.SHADOW_PENUMBRA_SCALE           = Shadow Softness
+option.SHADOW_PENUMBRA_SCALE.comment   = Adjust the softness of shadows
 option.ENTITY_SHADOWS                  = Entity Shadows
+option.ENTITY_SHADOWS.comment          = Whether entities can cast shadows.\nDisable this to improve performance in survival bases with large farms
 option.BLOCK_ENTITY_SHADOWS            = Block Entity Shadows
 option.PIXELATED_SHADOWS               = Pixelated Shadows
+option.PIXELATED_SHADOWS.comment       = Shadows snap to block texels, creating a pixelated look
 option.PIXELATED_SHADOWS_RESOLUTION    = Pixelated Shadows Resolution
 
 option.SUN_NR                          = Red
@@ -157,6 +187,7 @@ option.BLOCKLIGHT_B                    = Blue
 option.BLOCKLIGHT_I                    = Blocklight Intensity
 
 option.VOXEL_VOLUME_SIZE               = Voxel Volume Size
+option.VOXEL_VOLUME_SIZE.comment       = High performance impact, also affected by shadow distance
 suffix.VOXEL_VOLUME_SIZE               = m
 
 suffix.shadowMapResolution             = ²
@@ -189,12 +220,17 @@ option.VANILLA_MOON                    = Vanilla Moon
 option.SUN_ANGULAR_RADIUS              = Sun Angular Radius
 option.MOON_ANGULAR_RADIUS             = Moon Angular Radius
 option.SKY_GROUND                      = Sky Ground
+option.SKY_GROUND.comment              = Visible planet surface below the horizon
 option.STARS                           = Stars
+option.STARS.comment                   = Stars in the night sky. Low performance impact
 option.STARS_INTENSITY                 = Stars Intensity
+option.STARS_INTENSITY.comment         = Controls the brightness of stars in the night sky
 option.STARS_COVERAGE                  = Stars Coverage
+option.STARS_COVERAGE.comment          = Controls the number of stars in the night sky
 
 # Clouds
-option.CLOUDS_CUMULUS                      = Cumulus Clouds
+option.CLOUDS_CUMULUS                       = Cumulus Clouds
+option.CLOUDS_CUMULUS.comment               = Low-altitude volumetric clouds made to resemble cumulus clouds
 option.CLOUDS_CUMULUS_PRIMARY_STEPS_H       = Primary Steps - Horizon
 option.CLOUDS_CUMULUS_PRIMARY_STEPS_Z       = Primary Steps - Zenith
 option.CLOUDS_CUMULUS_LIGHTING_STEPS        = Lighting Steps
@@ -213,6 +249,7 @@ option.CLOUDS_CUMULUS_WIND_ANGLE            = Wind Angle
 suffix.CLOUDS_CUMULUS_ALTITUDE              = °
 
 option.CLOUDS_ALTOCUMULUS                       = Cumulus Clouds
+option.CLOUDS_ALTOCUMULUS.comment               = Mid-altitude volumetric clouds made to resemble altocumulus clouds
 option.CLOUDS_ALTOCUMULUS_PRIMARY_STEPS_H       = Primary Steps - Horizon
 option.CLOUDS_ALTOCUMULUS_PRIMARY_STEPS_Z       = Primary Steps - Zenith
 option.CLOUDS_ALTOCUMULUS_LIGHTING_STEPS        = Lighting Steps
@@ -231,6 +268,7 @@ option.CLOUDS_ALTOCUMULUS_WIND_ANGLE            = Wind Angle
 suffix.CLOUDS_ALTOCUMULUS_ALTITUDE              = °
 
 option.CLOUDS_CUMULUS_CONGESTUS                       = Cumulus Congestus Clouds
+option.CLOUDS_CUMULUS_CONGESTUS.comment               = Massive, distant volumetric clouds
 option.CLOUDS_CUMULUS_CONGESTUS_PRIMARY_STEPS_H       = Primary Steps - Horizon
 option.CLOUDS_CUMULUS_CONGESTUS_PRIMARY_STEPS_Z       = Primary Steps - Zenith
 option.CLOUDS_CUMULUS_CONGESTUS_LIGHTING_STEPS        = Lighting Steps
@@ -249,15 +287,23 @@ option.CLOUDS_CUMULUS_CONGESTUS_WIND_ANGLE            = Wind Angle
 suffix.CLOUDS_CUMULUS_CONGESTUS_ALTITUDE              = °
 
 option.BLOCKY_CLOUDS                   = Blocky Clouds
+option.BLOCKY_CLOUDS.comment           = Vanilla-styled volumetric clouds. Enabling this option disables all other cloud types
 option.BLOCKY_CLOUDS_LAYER_2           = Second Layer
+option.BLOCKY_CLOUDS_LAYER_2.comment   = A second layer of Minecrafty volumetric clouds! Beware that enabling this option doubles the performance impact of the clouds
 option.BLOCKY_CLOUDS_THICKNESS         = Tallness
+option.BLOCKY_CLOUDS_THICKNESS.comment = Adjust the thickness of the clouds
 option.BLOCKY_CLOUDS_ALTITUDE          = Altitude
+option.BLOCKY_CLOUDS_ALTITUTE.comment  = Adjust the height of the clouds
 option.BLOCKY_CLOUDS_ALTITUDE_2        = Second Layer Altitude
+option.BLOCKY_CLOUDS_ALTITUDE_2.comment = Adjust the height of the second layer of clouds
 option.BLOCKY_CLOUDS_ROUNDNESS         = Roundness
+option.BLOCKY_CLOUDS_ROUNDNESS.comment = Cloud edge roundness
 option.BLOCKY_CLOUDS_SHARPNESS         = Sharpness
+option.BLOCKY_CLOUDS_SHARPNESS.comment = Cloud edge sharpness
 
 option.CLOUDS_TEMPORAL_UPSCALING       = Temporal Upscaling
 option.CLOUDS_DAILY_WEATHER            = Daily Weather Variation
+option.CLOUDS_DAILY_WEATHER.comment    = Clouds are affected by the daily weather system
 option.CLOUDS_AERIAL_PERSPECTIVE_BOOST = Aerial Perspective Boost
 value.CLOUDS_TEMPORAL_UPSCALING.1      = Off
 value.CLOUDS_TEMPORAL_UPSCALING.2      = 4×
@@ -265,6 +311,7 @@ value.CLOUDS_TEMPORAL_UPSCALING.3      = 9×
 value.CLOUDS_TEMPORAL_UPSCALING.4      = 16×
 
 option.CLOUDS_CIRRUS                       = Cumulus Clouds
+option.CLOUDS_CIRRUS.comment               = High-altitude planar clouds made to resemble cirrus/cirrocumulus clouds
 option.CLOUDS_CIRRUS_PRIMARY_STEPS_H       = Primary Steps - Horizon
 option.CLOUDS_CIRRUS_PRIMARY_STEPS_Z       = Primary Steps - Zenith
 option.CLOUDS_CIRRUS_LIGHTING_STEPS        = Lighting Steps
@@ -308,14 +355,30 @@ value.AURORA_SNOW.AURORA_ALWAYS        = Always
 # Fog settings
 
 option.BORDER_FOG                      = Border Fog
+option.BORDER_FOG.comment              = Thick fog hugging the edges of the render distance to hide the chunk borders
 option.CAVE_FOG                        = Cave Fog
+option.CAVE_FOG.comment                = Light, slightly glowing fog applied underground. This makes large caverns feel a lot more atmospheric, and helps you to see the shape of the cave
 option.BLOOMY_FOG                      = Bloomy Fog
+option.BLOOMY_FOG.comment              = Intense bloom in fog. This gives the appearance of light from bright objects scattering within the fog, and illuminates the area behind them. Almost no performance cost
 option.BLOOMY_FOG_INTENSITY            = Bloomy Fog Intensity
+option.BLOOMY_FOG_INTENSITY.comment    = Adjusts the intensity of "bloomy fog"
 option.NETHER_FOG_INTENSITY            = Nether Fog Intensity
 option.VL                              = Volumetric Lighting
+option.VL.comment                      = Adds light shafts and variable fog density
 option.VL_RENDER_SCALE                 = VL Render Scale
 option.AIR_FOG_CLOUDY_NOISE            = Cloudy Fog
+option.AIR_FOG_CLOUDY_NOISE.comment    = Subtle cloudy shapes in the fog, best visible in the morning.\nRequires volumetric fog!
 option.AIR_FOG_COLORED_LIGHT_SHAFTS    = Colored Light Shafts
+option.AIR_FOG_COLORED_LIGHT_SHAFTS.comment = Light shafts passing through translucent objects are tinted by their color
+
+option.AIR_FOG_RAYLEIGH_FALLOFF_START     = Rayleigh Falloff Start
+option.AIR_FOG_RAYLEIGH_FALLOFF_START.comment = Altitude above sea level at which the rayleigh fog begins to decrease
+option.AIR_FOG_RAYLEIGH_FALLOFF_HALF_LIFE = Rayleigh Falloff Half-Life
+option.AIR_FOG_RAYLEIGH_FALLOFF_HALF_LIFE.comment = Altitude above the Rayleigh Falloff Start where the rayleigh fog density is halved
+option.AIR_FOG_MIE_FALLOFF_START          = Mie Falloff Start
+option.AIR_FOG_MIE_FALLOFF_START.comment  = Altitude above sea level at which the mie fog begins to decrease
+option.AIR_FOG_MIE_FALLOFF_HALF_LIFE      = Mie Falloff Half-Life
+option.AIR_FOG_MIE_FALLOFF_HALF_LIFE.comment = Altitude above the Mie Falloff Start where the mie fog density is halved
 
 option.AIR_FOG_RAYLEIGH_DENSITY        = Normal Density
 option.AIR_FOG_RAYLEIGH_R              = §4Red
@@ -362,20 +425,33 @@ option.AIR_FOG_MIE_DENSITY_BLUE_HOUR   = Dawn/Dusk Density
 # Materials settings
 
 option.NORMAL_MAPPING                  = Normal Mapping
+option.NORMAL_MAPPING.comment          = Whether to use the normal maps provided by the resource pack. Enable this if you are using a "PBR" resource pack
 option.SPECULAR_MAPPING                = Specular Mapping
+option.SPECULAR_MAPPING.comment        = Whether to use the specular maps provided by the resource pack. Enable this if you are using a "PBR" resource pack
 option.POM                             = Parallax Occlusion Mapping
 option.TEXTURE_FORMAT                  = Texture Format
+option.TEXTURE_FORMAT.comment          = The texture format used by the resource pack. Most modern resource packs use lab_p_b_r, while packs that are designed to work with SEUS may use OldPBR.
 option.HARDCODED_SPECULAR              = Hardcoded Specular
+option.HARDCODED_SPECULAR.comment      = Hardcoded specular reflections for some blocks (eg metals)
 option.HARDCODED_EMISSION              = Hardcoded Emission
+option.HARDCODED_EMISSION.comment      = Hardcoded emission for some blocks (eg torches)
 option.HARDCODED_SSS                   = Hardcoded SSS
+option.HARDCODED_SSS.comment           = Hardcoded subsurface scattering for some blocks (eg leaves)
 option.RAIN_PUDDLES                    = Rain Puddles
 option.EMISSION_STRENGTH               = Emission Strength
+option.EMISSION_STRENGTH.comment       = Adjusts the brightness of emissive objects like torches. This does not affect the brightness of the light casted, only the brightness of the light source itself. This also effects the hardcoded emissives
 option.DIRECTIONAL_LIGHTMAPS           = Directional Lightmaps
+option.DIRECTIONAL_LIGHTMAPS.comment   = Caused blocklight and skylight to be affected by normal maps. Can cause some visual issues due to limitations of the method
 option.DIRECTIONAL_LIGHTMAPS_INTENSITY = Directional Lightmaps Strength
+option.DIRECTIONAL_LIGHTMAPS_INTENSITY.comment = Adjusts the intensity of Directional Lightmaps
 option.POM_DEPTH                       = Parallax Depth
+option.POM_DEPTH.comment               = How far POM can recess into a block
 option.POM_SAMPLES                     = Parallax Samples
+option.POM_SAMPLES.comment             = Adjusts the quality of POM, at the expense of performance
 option.POM_SHADOW                      = POM Self-Shadowing
+option.POM_SHADOW.comment              = Self-shadowing for POM. Requires Specular Mapping!
 option.POM_SHADOW_SAMPLES              = POM Self-Shadow Samples
+option.POM_SHADOW_SAMPLES.comment      = Adjusts the quality of Parallax Shadows, at the expense of performance
 option.POM_SLOPE_NORMALS               = POM Slope Normals
 option.POM_DISTANCE                    = POM Distance
 
@@ -386,23 +462,39 @@ value.TEXTURE_FORMAT.TEXTURE_FORMAT_LAB = labPBR
 value.TEXTURE_FORMAT.TEXTURE_FORMAT_OLD = Old PBR
 
 option.ENVIRONMENT_REFLECTIONS         = Environment Reflections
+option.ENVIRONMENT_REFLECTIONS.comment = Screen-space reflections. Makes water and shiny blocks reflect their environment. Big performance impact
 option.SKY_REFLECTIONS                 = Sky Reflections
+option.SKY_REFLECTIONS.comment         = Makes water and shiny blocks reflect the sky
 option.SSR_ROUGHNESS_SUPPORT           = Roughness Support
+option.SSR_ROUGHNESS_SUPPORT.comment   = Makes reflections on rough surfaces actually appear rough. Big performance impact
 option.SSR_RAY_COUNT                   = Ray Count
+option.SSR_RAY_COUNT.comment           = Number of rays traced for rough reflections. More rays mean less noise but worse performance
 option.SSR_INTERSECTION_STEPS_SMOOTH   = Intersection Steps - Smooth
+option.SSR_INTERSECTION_STEPS_SMOOTH.comment = Adjusts the accuracy of smooth reflections, at the expense of performance
 option.SSR_INTERSECTION_STEPS_ROUGH    = Intersection Steps - Rough
+option.SSR_INTERSECTION_STEPS_ROUGH.comment = Adjusts the accuracy of rough reflections, at the expense of performance
 option.SSR_REFINEMENT_STEPS            = Refinement Steps
+option.SSR_REFINEMENT_STEPS.comment    = Adjusts the accuracy of all reflections, at the expense of performance
 option.SSR_ROUGHNESS_THRESHOLD         = Roughness Threshold
+option.SSR_ROUGHNESS_THRESHOLD.comment = Adjusts how smooth a surface must be for reflections to appear
+option.SSR_PREVIOUS_FRAME.comment      = Use previous frame data for reflections, so that translucents and reflections appear in reflections
 
 # Water settings
 
 option.WATER_CAUSTICS                  = Water Caustics
+option.WATER_CAUSTICS.comment          = Dancing light patterns beneath water
 option.WATER_FOAM                      = Water Foam
+option.WATER_FOAM.comment              = White highlights where water meets terrain. Helps to make water more easily visible in some cases
 option.SNELLS_WINDOW                   = Snell's Window
+option.SNELLS_WINDOW.comment           = Total internal reflection underwater
 option.WATER_TEXTURE                   = Water Texture
+option.WATER_TEXTURE.comment           = How to use the vanilla water texture.\n\nOff - no water texture.\nHighlights: water texture adds highlights to the water, like how it works in Bedrock RTX.\nVanilla: water texture is used like any other texture
 option.BIOME_WATER_COLOR               = Biome-Colored Water
+option.BIOME_WATER_COLOR.comment       = Water absorption takes the biome water colour into account
 option.WATER_REFRACTION                = Water Refraction
+option.WATER_REFRECTION.comment        = Refraction behind water. Very small performance impact
 option.WATER_REFRACTION_INTENSITY      = Water Refraction Intensity
+option.WATER_REFRACTION_INTENSITY.comment = Adjusts the intensity of refractions on water
 
 value.WATER_TEXTURE.WATER_TEXTURE_OFF       = Off
 value.WATER_TEXTURE.WATER_TEXTURE_HIGHLIGHT = Highlights
@@ -417,7 +509,9 @@ option.WATER_WAVE_SPEED_FLOWING        = Speed (Flowing)
 option.WATER_WAVE_PERSISTENCE          = Persistence
 option.WATER_WAVE_LACUNARITY           = Lacunarity
 option.WATER_PARALLAX                  = Water Parallax
+option.WATER_PARALLAX.comment          = Makes water waves appear 3D
 option.WATER_DISPLACEMENT              = Water Displacement
+option.WATER_DISPLACEMENT.comment      = Similar to how waving leaves work, it makes the water geometry itself wave slightly, so the shore line appears less flat
 
 option.WATER_ABSORPTION_R              = Red Absorption
 option.WATER_ABSORPTION_G              = Green Absorption
@@ -432,21 +526,37 @@ option.WATER_SCATTERING_UNDERWATER     = Scattering - Underwater
 # Post-processing settings
 
 option.BLOOM                           = Bloom
+option.BLOOM.comment                   = Soft "glow" effect around bright areas and light sources
 option.BLOOM_INTENSITY                 = Bloom Intensity
+option.BLOOM_INTENSITY.comment         = Adjusts how much the bloom affects the final image
 option.DOF                             = Depth of Field
+option.DOG.comment                     = Camera focus effect - blurs out-of-focus areas
 option.DOF_INTENSITY                   = DoF Intensity
+option.DOF_INTENSITY.comment           = Adjusts the intensity of Depth of Field
 option.DOF_SAMPLES                     = DoF Samples
+option.DOF_SAMPLES.comment             = Number of samples taken for Depth of Field. Higher sample counts result in a higher quality blur but take more performance
 option.DOF_FOCUS                       = DoF Focus
+option.DOF_FOCUS.comment               = Focal distance for Depth of Field
 option.MOTION_BLUR                     = Motion Blur
+option.MOTION_BLUR.comment             = Cinematic blur in motion, also useful to smoothen low framerates but can cause motion sickness
 option.MOTION_BLUR_INTENSITY           = Motion Blur Intensity
+option.MOTION_BLUR_INTENSITY.comment   = Adjusts the intensity of Motion Blur
 option.TAA                             = TAA
+option.TAA.comment                     = Temporal anti-aliasing. Massively improves image quality and noise levels, but can also introduce temporal artifacts like flickering and ghosting. Required by TAA Upscaling!
 option.FXAA                            = FXAA
+option.FXAA.comment                    = Softens edges. Works in conjunction with TAA, especially helping in motion. Very helpful with TAAU
 option.TAAU                            = TAA Upscaling
+option.TAAU.comment                    = Renders the scene_color at a reduced resolution and uses TAA to upscale it. Massively improves performance, but can reduce image quality and increase temporal artifacts
 option.TAAU_RENDER_SCALE               = TAAU Render Scale
+option.TAAU_RENDER_SCALE.comment       = Resolution scale at which the scene_color is rendered if TAA Upscaling is enabled. If the original resolution is 1920x1080 and TAAU Render Scale is 0.75 (the default), then the scene_color would be rendered at 1440x810
 option.CAS                             = Image Sharpening
+option.CAS.comment                     = Sharpens the final image (contrast-adaptive sharpening)
 option.CAS_INTENSITY                   = Image Sharpening Intensity
+option.CAS_INTENSITY.comment           = Adjusts the effect of Image Sharpening on the image
 option.VIGNETTE                        = Vignette
+option.VIGNETTE.comment                = Darkens the edges of the screen
 option.VIGNETTE_INTENSITY              = Vignette Intensity
+option.VIGNETTE_INTENSITY.comment      = Adjusts the intensity of Vignette
 
 value.DOF_FOCUS.-1.0                   = Automatic
 
@@ -477,6 +587,7 @@ suffix.GRADE_WHITE_BALANCE             = K
 suffix.GRADE_GREEN_HUE_SHIFT           = °
 
 option.PURKINJE_SHIFT                  = Purkinje Shift
+option.PURKINJE_SHIFT.option           = Simulates the effect of low lighting on human vision; desaturating all colors and darkening red hues
 option.PURKINJE_SHIFT_INTENSITY        = Purkinje Shift Intensity
 
 # Exposure
@@ -489,6 +600,7 @@ option.AUTO_EXPOSURE_RATE_DIM_TO_BRIGHT      = Exposure Rate - Increasing
 option.AUTO_EXPOSURE_RATE_BRIGHT_TO_DIM      = Exposure Rate - Decreasing
 option.MANUAL_EXPOSURE_VALUE                 = Manual Exposure Value
 option.MANUAL_EXPOSURE_USE_SCREEN_BRIGHTNESS = Use Brightness Slider
+option.MANUAL_EXPOSURE_USE_SCREEN_BRIGHTNESS.comment = Exposure value interpolates between Minimum Exposure and Maximum Exposure based on the Brightness slider in the Video Settings menu
 option.HISTOGRAM_BINS                        = Histogram Bins
 option.HISTOGRAM_TARGET                      = Histogram Target CDF Value
 
@@ -501,12 +613,17 @@ value.AUTO_EXPOSURE.AUTO_EXPOSURE_OFF       = Off
 option.DEBUG_VIEW                      = Debug View
 option.DEBUG_SAMPLER                   = Debug Sampler
 option.WHITE_WORLD                     = White World
+option.WHITE_WORLD.comment             = Set every albedo texture to white
 option.TONEMAP_COMPARISON              = Tonemap Comparison
+option.TONEMAP_COMPARISON.comment      = Compare two tonemapping functions on the left and right halves of your screen
 option.tonemap_left                    = Left Tonemap
 option.tonemap_right                   = Right Tonemap
 option.FANCY_NETHER_PORTAL             = Fancy Nether Portal
+option.FANCY_NETHER_PORTAL.comment     = Fancy nether portal effect inspired by Complementary Reimagined Shaders by EminGT, thanks to Emin for letting me use his idea! May not work as well with some resource packs
 option.CUSTOM_SKY                      = Custom Sky
+option.CUSTOM_SKY.comment              = Enable custom skies from resource packs
 option.CUSTOM_SKY_BRIGHTNESS           = Custom Sky Brightness
+option.CUSTOM_SKY_BRIGHTNESS.comment   = Adjust custom sky brightness
 
 value.DEBUG_VIEW.DEBUG_VIEW_NONE       = OFF
 value.DEBUG_VIEW.DEBUG_VIEW_SAMPLER    = Sampler
@@ -537,15 +654,17 @@ value.tonemap_right.tonemap_reinhard_jodie = Reinhard-Jodie
 
 # Box
 
-option.BOX_MODE = Box Mode
-value.BOX_MODE.BOX_MODE_NONE = None
-value.BOX_MODE.BOX_MODE_COLOR = Color
+option.BOX_MODE                 = Box Mode
+option.BOX_MODE.comment         = Selection Outline Box Mode\n\nNone: Default\nColor: User Color\nRainbow: Fancy RGB Effect
+value.BOX_MODE.BOX_MODE_NONE    = None
+value.BOX_MODE.BOX_MODE_COLOR   = Color
 value.BOX_MODE.BOX_MODE_RAINBOW = Rainbow
-option.BOX_COLOR_R = Red Component
-option.BOX_COLOR_G = Green Component
-option.BOX_COLOR_B = Blue Component
-option.BOX_EMISSION = Emission
-option.BOX_LINE_WIDTH = Line Width
+option.BOX_COLOR_R              = Red
+option.BOX_COLOR_G              = Green
+option.BOX_COLOR_B              = Blue
+option.BOX_EMISSION             = Emission
+option.BOX_EMISSION.comment     = Scales color past 1. Requires bloom.
+option.BOX_LINE_WIDTH           = Line Width
 
 # Daily Weather System
 
