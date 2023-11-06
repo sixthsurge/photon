@@ -1,0 +1,70 @@
+name: Bug Report
+description: File a bug report
+title: "Describe your issue"
+labels: ["bug", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this bug report! Make sure you are using the latest version of the shaderpack.
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: Also tell us, what did you expect to happen?
+      placeholder: Tell us what you see! Include steps on how you reproduce this issue as well.
+    validations:
+      required: true
+  - type: dropdown
+    id: version
+    attributes:
+      label: Minecraft Version
+      description: Which version of Minecraft do you have?
+      options:
+        - 1.20.2
+        - 1.20.1
+        - 1.20
+        - 1.19.4
+        - 1.19.3
+        - 1.19.2
+        - 1.19.1
+        - 1.19
+        - 1.18.2
+        - 1.18.1
+        - 1.18
+        - 1.17.1
+        - 1.17
+        - Other
+    validations:
+      required: true
+  - type: dropdown
+    id: shader-mod
+    attributes:
+      label: Which shader mod are you using?
+      options:
+        - Iris
+        - Optifine
+      default: 0
+    validations:
+      required: true
+  - type: input
+    id: shader-mod-version
+    attributes:
+      label: Shader mod version
+      description: For Iris you can find this in shaderpack selection screen, for Optifine you can find this in the video settings.
+    validations:
+      required: true
+  - type: textarea
+    id: settings
+    attributes:
+      label: Shader settings
+      description: Please share your shader config file. You can find this in your shaderpacks folder, it should be called something like photon-main.zip.txt
+      render: conf
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant log output
+      description: Please copy and paste any relevant log output.
+      render: text
