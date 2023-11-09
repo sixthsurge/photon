@@ -45,3 +45,7 @@
 	<p> by VIPUL
 	<br><br>
 </div>
+
+## community
+
+Want to discuss the shaderpack? Questions? Head over to our discord channel `#photon-sixthsurge` in the [ShaderLABS Discord](https://discord.gg/Jhr5PF7hhp).
