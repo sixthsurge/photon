@@ -332,12 +332,12 @@ Material material_from(vec3 albedo_srgb, uint material_mask, vec3 world_pos, ino
 						if (material_mask == 32u) { // 32
 							#ifdef HARDCODED_EMISSION
 							// Strong white light
-							material.emission = 1.00 * albedo_sqrt * (0.1 + 0.9 * cube(hsl.z));
+							material.emission = 25.00 * albedo_sqrt * (0.1 + 0.9 * cube(hsl.z));
 							#endif
 						} else { // 33
 							#ifdef HARDCODED_EMISSION
 							// Medium white light
-							material.emission = 0.66 * albedo_sqrt * linear_step(0.75, 0.9, hsl.z);
+							material.emission = 1.66 * albedo_sqrt * linear_step(0.75, 0.9, hsl.z);
 							#endif
 						}
 					} else { // 34-36
@@ -349,7 +349,7 @@ Material material_from(vec3 albedo_srgb, uint material_mask, vec3 world_pos, ino
 						} else { // 35
 							#ifdef HARDCODED_EMISSION
 							// Strong golden light
-							material.emission  = 0.85 * albedo_sqrt * linear_step(0.4, 0.6, 0.2 * hsl.y + 0.55 * hsl.z);
+							material.emission  = 24.00 * albedo_sqrt * linear_step(0.4, 0.6, 0.2 * hsl.y + 0.55 * hsl.z);
 							#endif
 						}
 					}
@@ -358,7 +358,7 @@ Material material_from(vec3 albedo_srgb, uint material_mask, vec3 world_pos, ino
 						if (material_mask == 36u) { // 36
 							#ifdef HARDCODED_EMISSION
 							// Medium golden light
-							material.emission  = 0.85 * albedo_sqrt * linear_step(0.77, 0.85, hsl.z);
+							material.emission  = 2.85 * albedo_sqrt * linear_step(0.77, 0.85, hsl.z);
 							#endif
 						} else { // 37
 							#ifdef HARDCODED_EMISSION
@@ -379,7 +379,7 @@ Material material_from(vec3 albedo_srgb, uint material_mask, vec3 world_pos, ino
 						} else { // 39
 							#ifdef HARDCODED_EMISSION
 							// Lava
-							material.emission = 4.0 * albedo_sqrt * (0.2 + 0.8 * isolate_hue(hsl, 30.0, 15.0)) * step(0.4, hsl.y);
+							material.emission = 45.0 * albedo_sqrt * (0.2 + 0.8 * isolate_hue(hsl, 30.0, 15.0)) * step(0.4, hsl.y);
 							#endif
 						}
 					}
@@ -461,7 +461,7 @@ Material material_from(vec3 albedo_srgb, uint material_mask, vec3 world_pos, ino
 						} else { // 51
 							#ifdef HARDCODED_EMISSION
 							// Ochre froglight
-							material.emission = 0.40 * albedo_sqrt * (0.1 + 0.9 * cube(hsl.z));
+							material.emission = 1.40 * albedo_sqrt * (0.1 + 0.9 * cube(hsl.z));
 							#endif
 						}
 					}
@@ -470,12 +470,12 @@ Material material_from(vec3 albedo_srgb, uint material_mask, vec3 world_pos, ino
 						if (material_mask == 52u) { // 52
 							#ifdef HARDCODED_EMISSION
 							// Verdant froglight
-							material.emission = 0.40 * albedo_sqrt * (0.1 + 0.9 * cube(hsl.z));
+							material.emission = 1.40 * albedo_sqrt * (0.1 + 0.9 * cube(hsl.z));
 							#endif
 						} else { // 53
 							#ifdef HARDCODED_EMISSION
 							// Pearlescent froglight
-							material.emission = 0.40 * albedo_sqrt * (0.1 + 0.9 * cube(hsl.z));
+							material.emission = 1.40 * albedo_sqrt * (0.1 + 0.9 * cube(hsl.z));
 							#endif
 						}
 					} else { // 54-56
@@ -524,7 +524,7 @@ Material material_from(vec3 albedo_srgb, uint material_mask, vec3 world_pos, ino
 					} else { // 62-64
 						if (material_mask == 62u) { // 62
 							// Nether portal
-							material.emission = vec3(1.0);
+							material.emission = vec3(1.0) * 24;
 						} else {  // 63
 							// End portal
 							material.emission = vec3(1.0);
