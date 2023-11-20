@@ -349,7 +349,7 @@ Material material_from(vec3 albedo_srgb, uint material_mask, vec3 world_pos, ino
 						} else { // 35
 							#ifdef HARDCODED_EMISSION
 							// Strong golden light
-							material.emission  = 24.00 * albedo_sqrt * linear_step(0.4, 0.6, 0.2 * hsl.y + 0.55 * hsl.z);
+							material.emission  = 8.00 * albedo_sqrt * linear_step(0.4, 0.6, 0.2 * hsl.y + 0.55 * hsl.z);
 							#endif
 						}
 					}
@@ -358,7 +358,7 @@ Material material_from(vec3 albedo_srgb, uint material_mask, vec3 world_pos, ino
 						if (material_mask == 36u) { // 36
 							#ifdef HARDCODED_EMISSION
 							// Medium golden light
-							material.emission  = 2.85 * albedo_sqrt * linear_step(0.77, 0.85, hsl.z);
+							material.emission  = 1.85 * albedo_sqrt * linear_step(0.77, 0.85, hsl.z);
 							#endif
 						} else { // 37
 							#ifdef HARDCODED_EMISSION
@@ -417,7 +417,7 @@ Material material_from(vec3 albedo_srgb, uint material_mask, vec3 world_pos, ino
 						if (material_mask == 44u) { // 44
 							#ifdef HARDCODED_EMISSION
 							// Beacon
-							material.emission = step(0.2, hsl.z) * albedo_sqrt * step(max_of(abs(block_pos - 0.5)), 0.4);
+							material.emission = 0.33 * step(0.2, hsl.z) * albedo_sqrt * step(max_of(abs(block_pos - 0.5)), 0.4);
 							#endif
 						} else { // 45
 							#ifdef HARDCODED_EMISSION
