@@ -216,7 +216,7 @@ vec3 trace_specular_ray(
 	#ifdef VL
 		// Un-apply volumetric fog scattering using fog from the current frame
 		vec2 fog_uv = clamp(hit_pos.xy * VL_RENDER_SCALE, vec2(0.0), floor(view_res * VL_RENDER_SCALE - 1.0) * view_pixel_size);
-		vec3 fog_scattering = texture(colortex6, fog_uv).rgb;
+		vec3 fog_scattering = texture(colortex6, fog_uv).rgb * 128;
 	#else
 		vec3 fog_scattering = vec3(0.0);
 	#endif
@@ -230,7 +230,7 @@ vec3 trace_specular_ray(
 		vec3 reflection = textureLod(colortex0, hit_pos.xy * taau_render_scale, mip_level).rgb;
 #endif
 
-		return mix(sky_reflection, reflection, border_attenuation);
+		return mix(sky_reflection, reflection, border_attenuation) * 1.4;
 	} else {
 		return sky_reflection;
 	}
@@ -254,7 +254,7 @@ vec3 get_specular_reflections(
 	float dither = r1(frameCounter, texelFetch(noisetex, ivec2(gl_FragCoord.xy) & 511, 0).b);
 
 #if defined SSR_ROUGHNESS_SUPPORT && defined SPECULAR_MAPPING
-	if (material.roughness > 5e-2) { // Rough reflection
+	if (material.roughness > 1.2e-2) { // Rough reflection
 	 	float mip_level = 8.0 * dampen(material.roughness);
 
 		vec3 reflection = vec3(0.0);
@@ -287,7 +287,7 @@ vec3 get_specular_reflections(
 			float v1 = v1_smith_ggx(NoV, alpha_squared);
 			float v2 = v2_smith_ggx(NoL, NoV, alpha_squared);
 
-			reflection += radiance * fresnel * (2.0 * NoL * v2 / v1);
+			reflection += radiance * 0.83 * fresnel * (2.0 * NoL * v2 / v1);
 		}
 
 		reflection *= albedo_tint * rcp(float(SSR_RAY_COUNT));
