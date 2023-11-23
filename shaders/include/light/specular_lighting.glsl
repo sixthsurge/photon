@@ -216,7 +216,7 @@ vec3 trace_specular_ray(
 	#ifdef VL
 		// Un-apply volumetric fog scattering using fog from the current frame
 		vec2 fog_uv = clamp(hit_pos.xy * VL_RENDER_SCALE, vec2(0.0), floor(view_res * VL_RENDER_SCALE - 1.0) * view_pixel_size);
-		vec3 fog_scattering = texture(colortex6, fog_uv).rgb * 128;
+		vec3 fog_scattering = texture(colortex6, fog_uv).rgb * 4;
 	#else
 		vec3 fog_scattering = vec3(0.0);
 	#endif
@@ -227,7 +227,7 @@ vec3 trace_specular_ray(
 		vec3 reflection = textureLod(colortex5, hit_pos_prev.xy, mip_level).rgb;
 		     reflection = max0(reflection - fog_scattering);
 #else
-		vec3 reflection = textureLod(colortex0, hit_pos.xy * taau_render_scale, mip_level).rgb;
+		vec3 reflection = textureLod(colortex0, hit_pos.xy * taau_render_scale, mip_level).rgb * 1.4;
 #endif
 
 		return mix(sky_reflection, reflection, border_attenuation) * 1.4;
@@ -254,8 +254,8 @@ vec3 get_specular_reflections(
 	float dither = r1(frameCounter, texelFetch(noisetex, ivec2(gl_FragCoord.xy) & 511, 0).b);
 
 #if defined SSR_ROUGHNESS_SUPPORT && defined SPECULAR_MAPPING
-	if (material.roughness > 1.2e-2) { // Rough reflection
-	 	float mip_level = 8.0 * dampen(material.roughness);
+	if (material.roughness > 1.25e-2) { // Rough reflection
+	 	float mip_level = 16.0 * dampen(material.roughness);
 
 		vec3 reflection = vec3(0.0);
 
@@ -270,7 +270,7 @@ vec3 get_specular_reflections(
 			float NoL = dot(normal, ray_dir);
 			if (NoL < eps) continue;
 
-			vec3 radiance = trace_specular_ray(screen_pos, view_pos, ray_dir, dither, skylight, SSR_INTERSECTION_STEPS_ROUGH, SSR_REFINEMENT_STEPS, int(mip_level));
+			vec3 radiance =  trace_specular_ray(screen_pos, view_pos, ray_dir, dither, skylight, SSR_INTERSECTION_STEPS_ROUGH, SSR_REFINEMENT_STEPS, int(mip_level));
 
 			float NoV = max(1e-2, dot(flat_normal, -world_dir));
 			float MoV = max(1e-2, dot(microfacet_normal, -world_dir));
@@ -287,7 +287,7 @@ vec3 get_specular_reflections(
 			float v1 = v1_smith_ggx(NoV, alpha_squared);
 			float v2 = v2_smith_ggx(NoL, NoV, alpha_squared);
 
-			reflection += radiance * 0.83 * fresnel * (2.0 * NoL * v2 / v1);
+			reflection += radiance * 0.85 * fresnel * (2.0 * NoL * v2 / v1);
 		}
 
 		reflection *= albedo_tint * rcp(float(SSR_RAY_COUNT));
