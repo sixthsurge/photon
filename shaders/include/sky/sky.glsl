@@ -77,8 +77,8 @@ vec3 draw_stars(vec3 ray_dir) {
 #include "/include/sky/projection.glsl"
 #include "/include/utility/geometry.glsl"
 
-const float sun_luminance  = 40.0; // luminance of sun disk
-const float moon_luminance = 4.0; // luminance of moon disk
+const float sun_luminance  = 800.0; // luminance of sun disk
+const float moon_luminance = 0.8; // luminance of moon disk
 
 vec3 draw_sun(vec3 ray_dir) {
 	float nu = dot(ray_dir, sun_dir);
