@@ -390,7 +390,7 @@ Material material_from(vec3 albedo_srgb, uint material_mask, vec3 world_pos, ino
 						if (material_mask == 40u) { // 40
 							#ifdef HARDCODED_EMISSION
 							// Medium orange emissives
-							material.emission = 0.60 * albedo_sqrt * (0.1 + 0.9 * cube(hsl.z));
+							material.emission = 2.60 * albedo_sqrt * (0.1 + 0.9 * cube(hsl.z));
 							#endif
 						} else { // 41
 							#ifdef HARDCODED_EMISSION
@@ -407,8 +407,8 @@ Material material_from(vec3 albedo_srgb, uint material_mask, vec3 world_pos, ino
 						} else { // 43
 							#ifdef HARDCODED_EMISSION
 							// Soul lights
-							float blue = isolate_hue(hsl, 200.0, 30.0);
-							material.emission = 0.66 * albedo_sqrt * linear_step(0.8, 1.0, blue + hsl.z);
+							float blue = isolate_hue(hsl, 200.0, 50.0);
+							material.emission = 2.3 * albedo_sqrt * linear_step(0.8, 1.0, blue + hsl.z);
 							#endif
 						}
 					}
@@ -470,7 +470,7 @@ Material material_from(vec3 albedo_srgb, uint material_mask, vec3 world_pos, ino
 						if (material_mask == 52u) { // 52
 							#ifdef HARDCODED_EMISSION
 							// Verdant froglight
-							material.emission = 1.40 * albedo_sqrt * (0.1 + 0.9 * cube(hsl.z));
+							material.emission = 2.40 * albedo_sqrt * (0.1 + 0.9 * cube(hsl.z));
 							#endif
 						} else { // 53
 							#ifdef HARDCODED_EMISSION
@@ -539,8 +539,9 @@ Material material_from(vec3 albedo_srgb, uint material_mask, vec3 world_pos, ino
 		// Stained glass, honey and slime
 		#ifdef HARDCODED_SPECULAR
 		material.f0 = vec3(0.04);
-		material.roughness = 0.1;
-		material.ssr_multiplier = 1.0;
+		material.roughness = 0.0;
+		material.ssr_multiplier = 3.0;
+		material.emission = 0.12 * albedo_sqrt;
 		#endif
 
 		#ifdef HARDCODED_SSS
