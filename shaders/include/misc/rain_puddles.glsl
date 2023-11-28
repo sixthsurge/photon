@@ -35,9 +35,9 @@ bool get_rain_puddles(
 	inout float roughness,
 	inout float ssr_multiplier
 ) {
-	const float puddle_f0                      = 0.02;
+	const float puddle_f0                      = 0.25;
 	const float puddle_roughness               = 0.0;
-	const float puddle_darkening_factor        = 0.5;
+	const float puddle_darkening_factor        = 0.6;
 	const float puddle_darkening_factor_porous = 0.7;
 
 	if (wetness < 0.0 || biome_may_rain < 0.0) return false;
@@ -54,16 +54,16 @@ bool get_rain_puddles(
 	// Replace material with puddle material
 	f0             = max(f0, mix(f0, vec3(puddle_f0), puddle));
 	roughness      = puddle_roughness;
-	ssr_multiplier = max(ssr_multiplier, puddle);
+	ssr_multiplier = max(ssr_multiplier, puddle) * 1.25;
 
 	// Ripple animation
-	const float h = 0.03;
+	const float h = 0.23;
 	float ripple0 = get_ripple_height(world_pos.xz);
 	float ripple1 = get_ripple_height(world_pos.xz + vec2(h, 0.0));
 	float ripple2 = get_ripple_height(world_pos.xz + vec2(0.0, h));
 
 	vec3 ripple_normal     = vec3(ripple1 - ripple0, ripple2 - ripple0, h);
-	     ripple_normal.xy *= 0.05 * smoothstep(0.0, 0.1, abs(dot(flat_normal, normalize(world_pos - cameraPosition))));
+	     ripple_normal.xy *= 0.01 * smoothstep(0.0, 0.1, abs(dot(flat_normal, normalize(world_pos - cameraPosition))));
 	     ripple_normal     = normalize(ripple_normal);
 		 ripple_normal     = ripple_normal.xzy; // convert to world space
 
