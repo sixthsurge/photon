@@ -332,12 +332,12 @@ Material material_from(vec3 albedo_srgb, uint material_mask, vec3 world_pos, ino
 						if (material_mask == 32u) { // 32
 							#ifdef HARDCODED_EMISSION
 							// Strong white light
-							material.emission = 25.00 * albedo_sqrt * (0.1 + 0.9 * cube(hsl.z));
+							material.emission = 14.00 * albedo_sqrt * (0.1 + 0.9 * cube(hsl.z));
 							#endif
 						} else { // 33
 							#ifdef HARDCODED_EMISSION
 							// Medium white light
-							material.emission = 1.66 * albedo_sqrt * linear_step(0.75, 0.9, hsl.z);
+							material.emission = 0.66 * albedo_sqrt * linear_step(0.75, 0.9, hsl.z);
 							#endif
 						}
 					} else { // 34-36
@@ -390,7 +390,7 @@ Material material_from(vec3 albedo_srgb, uint material_mask, vec3 world_pos, ino
 						if (material_mask == 40u) { // 40
 							#ifdef HARDCODED_EMISSION
 							// Medium orange emissives
-							material.emission = 2.60 * albedo_sqrt * (0.1 + 0.9 * cube(hsl.z));
+							material.emission = 8.60 * albedo_sqrt * (0.1 + 0.9 * cube(hsl.z)) * isolate_hue(hsl, 30.0, 30.0);
 							#endif
 						} else { // 41
 							#ifdef HARDCODED_EMISSION
