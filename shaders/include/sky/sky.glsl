@@ -78,7 +78,7 @@ vec3 draw_stars(vec3 ray_dir) {
 #include "/include/utility/geometry.glsl"
 
 const float sun_luminance  = 800.0; // luminance of sun disk
-const float moon_luminance = 0.8; // luminance of moon disk
+const float moon_luminance = 30.0; // luminance of moon disk
 
 vec3 draw_sun(vec3 ray_dir) {
 	float nu = dot(ray_dir, sun_dir);
@@ -159,7 +159,7 @@ vec3 draw_sky(vec3 ray_dir, vec3 atmosphere) {
 	sky += atmosphere;
 
 	// Rain
-	vec3 rain_sky = get_weather_color() * (1.0 - exp2(-0.8 / clamp01(ray_dir.y)));
+	vec3 rain_sky = get_weather_color() * (1.0 - exp2(-0.8 / clamp01(ray_dir.y))) * 0.7;
 	sky = mix(sky, rain_sky, rainStrength * mix(1.0, 0.9, time_sunrise + time_sunset));
 
 	// Clouds
