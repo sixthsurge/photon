@@ -59,6 +59,7 @@ flat out vec2 clouds_altocumulus_coverage;
 flat out vec2 clouds_cirrus_coverage;
 
 flat out float clouds_cumulus_congestus_amount;
+flat out float clouds_cumulonimbus_amount;
 flat out float clouds_stratus_amount;
 
 flat out float aurora_amount;
@@ -161,6 +162,7 @@ void main() {
 		clouds_altocumulus_coverage,
 		clouds_cirrus_coverage,
 		clouds_cumulus_congestus_amount,
+		clouds_cumulonimbus_amount,
 		clouds_stratus_amount
 	);
 
@@ -202,6 +204,7 @@ flat in vec2 clouds_altocumulus_coverage;
 flat in vec2 clouds_cirrus_coverage;
 
 flat in float clouds_cumulus_congestus_amount;
+flat in float clouds_cumulonimbus_amount;
 flat in float clouds_stratus_amount;
 
 flat in float aurora_amount;

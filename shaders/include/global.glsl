@@ -32,6 +32,7 @@ const float taau_render_scale = 1.0;
 #define rcp(x) (1.0 / (x))
 #define clamp01(x) clamp(x, 0.0, 1.0) // free on operation output
 #define max0(x) max(x, 0.0)
+#define max1(x) max(x, 1.0)
 #define min1(x) min(x, 1.0)
 
 float sqr(float x) { return x * x; }

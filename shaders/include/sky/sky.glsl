@@ -76,6 +76,7 @@ vec3 draw_stars(vec3 ray_dir) {
 #include "/include/sky/atmosphere.glsl"
 #include "/include/sky/projection.glsl"
 #include "/include/utility/geometry.glsl"
+//#include "/include/sky/moon.glsl"
 
 const float sun_luminance  = 100.0; // luminance of sun disk
 const float moon_luminance = 30.0; // luminance of moon disk
@@ -92,6 +93,10 @@ vec3 draw_sun(vec3 ray_dir) {
 
 	return sun_luminance * sun_color * step(0.0, center_to_edge) * limb_darkening * max0(sun_disk);
 }
+
+/*vec3 draw_moon(vec3 ray_dir) {
+	float nu = dot(ray_dir, moon_dir);
+}*/
 
 vec4 get_clouds_and_aurora(vec3 ray_dir, vec3 clear_sky) {
 #if   defined PROGRAM_DEFERRED0
@@ -142,11 +147,15 @@ vec3 draw_sky(vec3 ray_dir, vec3 atmosphere) {
 	sky += draw_sun(ray_dir);
 #endif
 
+#if MOON_TYPE == MOON_FANCY
+	//sky += draw_sun(ray_dir); //TODO
+#else
 	if (vanilla_sky_id == 3) {
 		const vec3 brightness_scale = sunlight_color * moon_luminance;
 		sky *= 0.0; // Hide stars behind moon
 		sky += vanilla_sky_color * brightness_scale;
 	}
+#endif
 
 #ifdef CUSTOM_SKY
 	if (vanilla_sky_id == 4) {
@@ -225,7 +234,7 @@ vec3 draw_sun(vec3 ray_dir) {
 	float flare = texture(noisetex, vec2(theta, r - 0.025 * frameTimeCounter)).x * (END_AMBIENT_I * 2);
 	      flare = pow5(flare) * exp(-25.0 * (r - sun_angular_radius));
 		  flare = r < sun_angular_radius ? 0.0 : flare;
-	      
+
 	return end_sun_color * rcp(sun_solid_angle) * max0(sun_disk + 0.1 * flare);
 }
 

@@ -87,7 +87,7 @@ void main() {
 		break;
 #endif
 
-#ifdef VANILLA_MOON
+#if MOON_TYPE == MOON_VANILLA
 	case MC_RENDER_STAGE_MOON:
 	 	// Alpha of 3 <=> moon
 		scene_color.a = 3.0 / 255.0;
@@ -104,7 +104,7 @@ void main() {
 		scene_color.rgb = texture(gtexture, new_uv).rgb;
 
 		break;
-#else
+#elif MOON_TYPE == MOON_PHOTON
 	case MC_RENDER_STAGE_MOON:
 	 	// Alpha of 3 <=> moon
 		scene_color.a = 3.0 / 255.0;
