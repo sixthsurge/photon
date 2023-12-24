@@ -47,7 +47,7 @@ const float calibration = exp2(AUTO_EXPOSURE_BIAS) * K / sensitivity / 1.2;
 
 const float min_luminance = get_luminance_from_exposure(get_exposure_from_ev_100(AUTO_EXPOSURE_MIN));
 const float max_luminance = get_luminance_from_exposure(get_exposure_from_ev_100(AUTO_EXPOSURE_MAX));
-const float min_log_luminance = log2(min_luminance);
+const float min_log_luminance = log2(min_luminance) * 1.85;
 const float max_log_luminance = log2(max_luminance);
 
 #ifdef MANUAL_EXPOSURE_USE_SCREEN_BRIGHTNESS
