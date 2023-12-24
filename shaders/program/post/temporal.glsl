@@ -45,7 +45,7 @@ const float K = 12.5; // Light-meter calibration constant
 const float sensitivity = 100.0; // ISO
 const float calibration = exp2(AUTO_EXPOSURE_BIAS) * K / sensitivity / 1.2;
 
-const float min_luminance = get_luminance_from_exposure(get_exposure_from_ev_100(AUTO_EXPOSURE_MIN));
+const float min_luminance = get_luminance_from_exposure(get_exposure_from_ev_100(AUTO_EXPOSURE_MIN)) / 800;
 const float max_luminance = get_luminance_from_exposure(get_exposure_from_ev_100(AUTO_EXPOSURE_MAX));
 const float min_log_luminance = log2(min_luminance);
 const float max_log_luminance = log2(max_luminance);
@@ -135,7 +135,7 @@ void main() {
 #if   AUTO_EXPOSURE == AUTO_EXPOSURE_SIMPLE
 	float lod = ceil(log2(max_of(view_res)));
 	vec3 rgb = textureLod(colortex0, vec2(0.5 * taau_render_scale), int(lod)).rgb;
-	float luminance = clamp(dot(rgb, luminance_weights), min_luminance, max_luminance);
+	float luminance = clamp(dot(rgb, luminance_weights), min_luminance / 750, max_luminance);
 #elif AUTO_EXPOSURE == AUTO_EXPOSURE_HISTOGRAM
 	float[HISTOGRAM_BINS] pdf;
 	build_histogram(pdf);
