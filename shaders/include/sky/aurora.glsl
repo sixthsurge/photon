@@ -1,8 +1,8 @@
 #if !defined INCLUDE_SKY_AURORA
 #define INCLUDE_SKY_AURORA
 
-#define AURORA_SPEED 40.0
-#define AURORA_SPEED2 80.0
+#define AURORA_SPEED 1.0
+#define AURORA_SPEED2 0.3
 #define AURORA_SAMPLES 50
 #define AURORA_INTENSITY 1.8
 
@@ -106,7 +106,7 @@ float triNoise2d(in vec2 p, float spd) {
 	vec2 bp = p;
 	for (float i = 0.0; i < 5.0; i++ ) {
 		vec2 dg = tri2(bp * 1.85) * 0.75;
-		dg *= mm2(world_age * pi * spd);
+		dg *= mm2(world_age * 0.02 * pi * spd);
 		p -= dg / z2;
 
 		bp *= 1.3;
