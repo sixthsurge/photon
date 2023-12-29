@@ -209,7 +209,7 @@ void clouds_weather_variation(
 	clouds_altocumulus_coverage = mix(clouds_altocumulus_coverage, vec2(0.4, 0.9), wetness * 0.75);
 	clouds_cirrus_coverage = mix(clouds_cirrus_coverage, vec2(0.7, 0.0), wetness * 0.50);
 	clouds_cumulus_congestus_amount *= 1.0 - wetness;
-	clouds_cumulonimbus_amount *= mix(clouds_cumulonimbus_amount, 1.5 * wetness, wetness); // mix(clamp01(1.0 - 1.75 * wetness) ...
+	clouds_cumulonimbus_amount *= mix(1.0, 1.5 * wetness, wetness); // mix(clamp01(1.0 - 1.75 * wetness) ...
 	clouds_stratus_amount = clamp01(clouds_stratus_amount + 0.7 * wetness);
 
 	// User config values
@@ -316,64 +316,75 @@ float get_aurora_amount() {
 // [1] - top color
 mat2x3 get_aurora_colors() {
 	const mat2x3[] aurora_colors = mat2x3[](
-		mat2x3( // 0 [D]
-			vec3(0.00, 1.00, 0.25), // green
-			vec3(0.50, 0.70, 1.00)  // blue
+		mat2x3( // 0
+			vec3(AURORA_COLOR_0_BTM_R, AURORA_COLOR_0_BTM_G, AURORA_COLOR_0_BTM_B) * AURORA_COLOR_0_BTM_I,
+			vec3(AURORA_COLOR_0_TOP_R, AURORA_COLOR_0_TOP_G, AURORA_COLOR_0_TOP_B) * AURORA_COLOR_0_TOP_I
 		)
 		, mat2x3( // 1
-			vec3(0.00, 1.00, 0.25), // green
-			vec3(0.50, 0.70, 1.00)  // blue
+			vec3(AURORA_COLOR_1_BTM_R, AURORA_COLOR_1_BTM_G, AURORA_COLOR_1_BTM_B) * AURORA_COLOR_1_BTM_I,
+			vec3(AURORA_COLOR_1_TOP_R, AURORA_COLOR_1_TOP_G, AURORA_COLOR_1_TOP_B) * AURORA_COLOR_1_TOP_I
 		)
 		, mat2x3( // 2
-			vec3(1.00, 0.00, 0.00), // red
-			vec3(1.00, 0.50, 0.70)  // purple
+			vec3(AURORA_COLOR_2_BTM_R, AURORA_COLOR_2_BTM_G, AURORA_COLOR_2_BTM_B) * AURORA_COLOR_2_BTM_I,
+			vec3(AURORA_COLOR_2_TOP_R, AURORA_COLOR_2_TOP_G, AURORA_COLOR_2_TOP_B) * AURORA_COLOR_2_TOP_I
 		)
 		, mat2x3( // 3
-			vec3(1.00, 0.25, 1.00), // magenta
-			vec3(0.25, 0.25, 1.00)  // deep blue
+			vec3(AURORA_COLOR_3_BTM_R, AURORA_COLOR_3_BTM_G, AURORA_COLOR_3_BTM_B) * AURORA_COLOR_3_BTM_I,
+			vec3(AURORA_COLOR_3_TOP_R, AURORA_COLOR_3_TOP_G, AURORA_COLOR_3_TOP_B) * AURORA_COLOR_3_TOP_I
 		)
 		, mat2x3( // 4
-			vec3(1.00, 0.50, 1.00), // purple
-			vec3(0.50, 0.70, 1.00)  // blue
+			vec3(AURORA_COLOR_4_BTM_R, AURORA_COLOR_4_BTM_G, AURORA_COLOR_4_BTM_B) * AURORA_COLOR_4_BTM_I,
+			vec3(AURORA_COLOR_4_TOP_R, AURORA_COLOR_4_TOP_G, AURORA_COLOR_4_TOP_B) * AURORA_COLOR_4_TOP_I
 		)
-		, mat2x3( // 5 [D]
-			vec3(1.00, 0.50, 1.00), // purple
-			vec3(0.50, 0.70, 1.00)  // blue
+		, mat2x3( // 5
+			vec3(AURORA_COLOR_5_BTM_R, AURORA_COLOR_5_BTM_G, AURORA_COLOR_5_BTM_B) * AURORA_COLOR_5_BTM_I,
+			vec3(AURORA_COLOR_5_TOP_R, AURORA_COLOR_5_TOP_G, AURORA_COLOR_5_TOP_B) * AURORA_COLOR_5_TOP_I
 		)
 		, mat2x3( // 6
-			vec3(1.00, 0.10, 0.00), // red
-			vec3(1.00, 1.00, 0.25)  // yellow
+			vec3(AURORA_COLOR_6_BTM_R, AURORA_COLOR_6_BTM_G, AURORA_COLOR_6_BTM_B) * AURORA_COLOR_6_BTM_I,
+			vec3(AURORA_COLOR_6_TOP_R, AURORA_COLOR_6_TOP_G, AURORA_COLOR_6_TOP_B) * AURORA_COLOR_6_TOP_I
 		)
 		, mat2x3( // 7
-			vec3(1.00, 1.00, 1.00), // white
-			vec3(1.00, 0.00, 0.00)  // red
+			vec3(AURORA_COLOR_7_BTM_R, AURORA_COLOR_7_BTM_G, AURORA_COLOR_7_BTM_B) * AURORA_COLOR_7_BTM_I,
+			vec3(AURORA_COLOR_7_TOP_R, AURORA_COLOR_7_TOP_G, AURORA_COLOR_7_TOP_B) * AURORA_COLOR_7_TOP_I
 		)
 		, mat2x3( // 8
-			vec3(1.00, 1.00, 0.00), // yellow
-			vec3(0.10, 0.50, 1.00)  // blue
+			vec3(AURORA_COLOR_8_BTM_R, AURORA_COLOR_8_BTM_G, AURORA_COLOR_8_BTM_B) * AURORA_COLOR_8_BTM_I,
+			vec3(AURORA_COLOR_8_TOP_R, AURORA_COLOR_8_TOP_G, AURORA_COLOR_8_TOP_B) * AURORA_COLOR_8_TOP_I
 		)
 		, mat2x3( // 9
-			vec3(1.00, 0.25, 1.00), // magenta
-			vec3(0.00, 1.00, 0.25)  // green
+			vec3(AURORA_COLOR_9_BTM_R, AURORA_COLOR_9_BTM_G, AURORA_COLOR_9_BTM_B) * AURORA_COLOR_9_BTM_I,
+			vec3(AURORA_COLOR_9_TOP_R, AURORA_COLOR_9_TOP_G, AURORA_COLOR_9_TOP_B) * AURORA_COLOR_9_TOP_I
 		)
 		, mat2x3( // 10
-			vec3(1.00, 0.70, 1.00) * 1.2, // pink
-			vec3(0.90, 0.30, 0.90)  // purple
+			vec3(AURORA_COLOR_10_BTM_R, AURORA_COLOR_10_BTM_G, AURORA_COLOR_10_BTM_B) * AURORA_COLOR_10_BTM_I,
+			vec3(AURORA_COLOR_10_TOP_R, AURORA_COLOR_10_TOP_G, AURORA_COLOR_10_TOP_B) * AURORA_COLOR_10_TOP_I
 		)
 		, mat2x3( // 11
-			vec3(0.00, 1.00, 0.25), // green
-			vec3(0.90, 0.30, 0.90)  // purple
-		)
-		, mat2x3( // 12
-			vec3(2.00, 0.80, 0.00), // orange
-			vec3(1.00, 0.50, 0.00)  // orange
+			vec3(AURORA_COLOR_11_BTM_R, AURORA_COLOR_11_BTM_G, AURORA_COLOR_11_BTM_B) * AURORA_COLOR_11_BTM_I,
+			vec3(AURORA_COLOR_11_TOP_R, AURORA_COLOR_11_TOP_G, AURORA_COLOR_11_TOP_B) * AURORA_COLOR_11_TOP_I
 		)
 	);
 
-	if(AURORA_COLOR == 0) {
+	if(AURORA_COLOR == -1) {
+		const uint[] weights = uint[](
+			AURORA_COLOR_0_WEIGHT, AURORA_COLOR_1_WEIGHT, AURORA_COLOR_2_WEIGHT, AURORA_COLOR_3_WEIGHT, AURORA_COLOR_4_WEIGHT,
+			AURORA_COLOR_5_WEIGHT, AURORA_COLOR_6_WEIGHT, AURORA_COLOR_7_WEIGHT, AURORA_COLOR_8_WEIGHT, AURORA_COLOR_9_WEIGHT,
+			AURORA_COLOR_10_WEIGHT, AURORA_COLOR_11_WEIGHT
+		);
+		const uint total_weight = AURORA_COLOR_0_WEIGHT + AURORA_COLOR_1_WEIGHT + AURORA_COLOR_2_WEIGHT + AURORA_COLOR_3_WEIGHT + AURORA_COLOR_4_WEIGHT +
+			AURORA_COLOR_5_WEIGHT + AURORA_COLOR_6_WEIGHT + AURORA_COLOR_7_WEIGHT + AURORA_COLOR_8_WEIGHT + AURORA_COLOR_9_WEIGHT +
+			AURORA_COLOR_10_WEIGHT + AURORA_COLOR_11_WEIGHT;
+		mat2x3[total_weight] aurora_colors_weighted;
+		for(uint i = 0u, index = 0u; i < weights.length(); i++) {
+			for(uint j = 0u; j < weights[i]; j++, index++) {
+				aurora_colors_weighted[index] = aurora_colors[i];
+			}
+		}
+
 		uint day_index = uint(worldDay);
-			 day_index = lowbias32(day_index) % aurora_colors.length();
-		return aurora_colors[day_index];
+			 day_index = lowbias32(day_index) % aurora_colors_weighted.length();
+		return aurora_colors_weighted[day_index];
 	} else {
 		return aurora_colors[uint(AURORA_COLOR)];
 	}

@@ -26,6 +26,20 @@ screen.color_grading                   = Color Grading
 screen.exposure                        = Exposure
 
 screen.aurora                          = Aurora
+screen.aurora_color                    = Aurora Color Settings
+screen.aurora_c0                       = Color 0
+screen.aurora_c1                       = Color 1
+screen.aurora_c2                       = Color 2
+screen.aurora_c3                       = Color 3
+screen.aurora_c4                       = Color 4
+screen.aurora_c5                       = Color 5
+screen.aurora_c6                       = Color 6
+screen.aurora_c7                       = Color 7
+screen.aurora_c8                       = Color 8
+screen.aurora_c9                       = Color 9
+screen.aurora_c10                      = Color 10
+screen.aurora_c11                      = Color 11
+
 screen.clouds                          = Clouds
 screen.clouds_cumulus                  = Cumulus Clouds Settings
 screen.clouds_altocumulus              = Altocumulus Clouds Settings
@@ -149,6 +163,8 @@ option.BLOCK_ENTITY_SHADOWS            = Block Entity Shadows
 option.PIXELATED_SHADOWS               = Pixelated Shadows
 option.PIXELATED_SHADOWS.comment       = Shadows snap to block texels, creating a pixelated look
 option.PIXELATED_SHADOWS_RESOLUTION    = Pixelated Shadows Resolution
+option.SHADOW_DEPTH_SCALE              = Shadow Depth Scale
+option.SHADOW_DISTORTION               = Shadow Distortion
 
 option.SUN_NR                          = Red
 option.SUN_NG                          = Green
@@ -341,6 +357,7 @@ option.CLOUDS_DAILY_WEATHER.comment    = Clouds are affected by the daily weathe
 option.CLOUDS_AERIAL_PERSPECTIVE_BOOST = Aerial Perspective Boost
 option.CLOUDS_SINGLE_LAYER             = Single Cloud Layer
 option.CLOUDS_SINGLE_LAYER.comment     = Clouds are rendered in a single layer
+option.CLOUDS_ACCUMULATION_LIMIT       = Accumulation Limit
 value.CLOUDS_TEMPORAL_UPSCALING.1      = Off
 value.CLOUDS_TEMPORAL_UPSCALING.2      = 4×
 value.CLOUDS_TEMPORAL_UPSCALING.3      = 9×
@@ -395,19 +412,141 @@ value.AURORA_SNOW.AURORA_NEVER         = Never
 value.AURORA_SNOW.AURORA_RARELY        = Rarely
 value.AURORA_SNOW.AURORA_ALWAYS        = Always
 
-value.AURORA_COLOR.0                   = Random Color
-value.AURORA_COLOR.1                   = Green - Blue
-value.AURORA_COLOR.2                   = Red - Purple
-value.AURORA_COLOR.3                   = Magenta - Deep Blue
-value.AURORA_COLOR.4                   = Purple - Blue
-value.AURORA_COLOR.5                   = Purple - Blue
-value.AURORA_COLOR.6                   = Red - Yellow
-value.AURORA_COLOR.7                   = White - Red
-value.AURORA_COLOR.8                   = Yellow - Blue
-value.AURORA_COLOR.9                   = Magenta - Green
-value.AURORA_COLOR.10                  = Pink - Purple
-value.AURORA_COLOR.11                  = Green - Purple
-value.AURORA_COLOR.12                  = Orange - Orange
+value.AURORA_COLOR.-1                  = Random Color
+value.AURORA_COLOR.0                   = Color 0
+value.AURORA_COLOR.1                   = Color 1
+value.AURORA_COLOR.2                   = Color 2
+value.AURORA_COLOR.3                   = Color 3
+value.AURORA_COLOR.4                   = Color 4
+value.AURORA_COLOR.5                   = Color 5
+value.AURORA_COLOR.6                   = Color 6
+value.AURORA_COLOR.7                   = Color 7
+value.AURORA_COLOR.8                   = Color 8
+value.AURORA_COLOR.9                   = Color 9
+value.AURORA_COLOR.10                  = Color 10
+value.AURORA_COLOR.11                  = Color 11
+
+
+option.AURORA_COLOR_0_TOP_R  = Top Red
+option.AURORA_COLOR_0_TOP_G  = Top Green
+option.AURORA_COLOR_0_TOP_B  = Top Blue
+option.AURORA_COLOR_0_TOP_I  = Top Intensity
+option.AURORA_COLOR_0_BTM_R  = Bottom Red
+option.AURORA_COLOR_0_BTM_G  = Bottom Green
+option.AURORA_COLOR_0_BTM_B  = Bottom Blue
+option.AURORA_COLOR_0_BTM_I  = Bottom Intensity
+option.AURORA_COLOR_0_WEIGHT = Weight
+
+option.AURORA_COLOR_1_TOP_R  = Top Red
+option.AURORA_COLOR_1_TOP_G  = Top Green
+option.AURORA_COLOR_1_TOP_B  = Top Blue
+option.AURORA_COLOR_1_TOP_I  = Top Intensity
+option.AURORA_COLOR_1_BTM_R  = Bottom Red
+option.AURORA_COLOR_1_BTM_G  = Bottom Green
+option.AURORA_COLOR_1_BTM_B  = Bottom Blue
+option.AURORA_COLOR_1_BTM_I  = Bottom Intensity
+option.AURORA_COLOR_1_WEIGHT = Weight
+
+option.AURORA_COLOR_2_TOP_R  = Top Red
+option.AURORA_COLOR_2_TOP_G  = Top Green
+option.AURORA_COLOR_2_TOP_B  = Top Blue
+option.AURORA_COLOR_2_TOP_I  = Top Intensity
+option.AURORA_COLOR_2_BTM_R  = Bottom Red
+option.AURORA_COLOR_2_BTM_G  = Bottom Green
+option.AURORA_COLOR_2_BTM_B  = Bottom Blue
+option.AURORA_COLOR_2_BTM_I  = Bottom Intensity
+option.AURORA_COLOR_2_WEIGHT = Weight
+
+option.AURORA_COLOR_3_TOP_R  = Top Red
+option.AURORA_COLOR_3_TOP_G  = Top Green
+option.AURORA_COLOR_3_TOP_B  = Top Blue
+option.AURORA_COLOR_3_TOP_I  = Top Intensity
+option.AURORA_COLOR_3_BTM_R  = Bottom Red
+option.AURORA_COLOR_3_BTM_G  = Bottom Green
+option.AURORA_COLOR_3_BTM_B  = Bottom Blue
+option.AURORA_COLOR_3_BTM_I  = Bottom Intensity
+option.AURORA_COLOR_3_WEIGHT = Weight
+
+option.AURORA_COLOR_4_TOP_R  = Top Red
+option.AURORA_COLOR_4_TOP_G  = Top Green
+option.AURORA_COLOR_4_TOP_B  = Top Blue
+option.AURORA_COLOR_4_TOP_I  = Top Intensity
+option.AURORA_COLOR_4_BTM_R  = Bottom Red
+option.AURORA_COLOR_4_BTM_G  = Bottom Green
+option.AURORA_COLOR_4_BTM_B  = Bottom Blue
+option.AURORA_COLOR_4_BTM_I  = Bottom Intensity
+option.AURORA_COLOR_4_WEIGHT = Weight
+
+option.AURORA_COLOR_5_TOP_R  = Top Red
+option.AURORA_COLOR_5_TOP_G  = Top Green
+option.AURORA_COLOR_5_TOP_B  = Top Blue
+option.AURORA_COLOR_5_TOP_I  = Top Intensity
+option.AURORA_COLOR_5_BTM_R  = Bottom Red
+option.AURORA_COLOR_5_BTM_G  = Bottom Green
+option.AURORA_COLOR_5_BTM_B  = Bottom Blue
+option.AURORA_COLOR_5_BTM_I  = Bottom Intensity
+option.AURORA_COLOR_5_WEIGHT = Weight
+
+option.AURORA_COLOR_6_TOP_R  = Top Red
+option.AURORA_COLOR_6_TOP_G  = Top Green
+option.AURORA_COLOR_6_TOP_B  = Top Blue
+option.AURORA_COLOR_6_TOP_I  = Top Intensity
+option.AURORA_COLOR_6_BTM_R  = Bottom Red
+option.AURORA_COLOR_6_BTM_G  = Bottom Green
+option.AURORA_COLOR_6_BTM_B  = Bottom Blue
+option.AURORA_COLOR_6_BTM_I  = Bottom Intensity
+option.AURORA_COLOR_6_WEIGHT = Weight
+
+option.AURORA_COLOR_7_TOP_R  = Top Red
+option.AURORA_COLOR_7_TOP_G  = Top Green
+option.AURORA_COLOR_7_TOP_B  = Top Blue
+option.AURORA_COLOR_7_TOP_I  = Top Intensity
+option.AURORA_COLOR_7_BTM_R  = Bottom Red
+option.AURORA_COLOR_7_BTM_G  = Bottom Green
+option.AURORA_COLOR_7_BTM_B  = Bottom Blue
+option.AURORA_COLOR_7_BTM_I  = Bottom Intensity
+option.AURORA_COLOR_7_WEIGHT = Weight
+
+option.AURORA_COLOR_8_TOP_R  = Top Red
+option.AURORA_COLOR_8_TOP_G  = Top Green
+option.AURORA_COLOR_8_TOP_B  = Top Blue
+option.AURORA_COLOR_8_TOP_I  = Top Intensity
+option.AURORA_COLOR_8_BTM_R  = Bottom Red
+option.AURORA_COLOR_8_BTM_G  = Bottom Green
+option.AURORA_COLOR_8_BTM_B  = Bottom Blue
+option.AURORA_COLOR_8_BTM_I  = Bottom Intensity
+option.AURORA_COLOR_8_WEIGHT = Weight
+
+option.AURORA_COLOR_9_TOP_R  = Top Red
+option.AURORA_COLOR_9_TOP_G  = Top Green
+option.AURORA_COLOR_9_TOP_B  = Top Blue
+option.AURORA_COLOR_9_TOP_I  = Top Intensity
+option.AURORA_COLOR_9_BTM_R  = Bottom Red
+option.AURORA_COLOR_9_BTM_G  = Bottom Green
+option.AURORA_COLOR_9_BTM_B  = Bottom Blue
+option.AURORA_COLOR_9_BTM_I  = Bottom Intensity
+option.AURORA_COLOR_9_WEIGHT = Weight
+
+option.AURORA_COLOR_10_TOP_R  = Top Red
+option.AURORA_COLOR_10_TOP_G  = Top Green
+option.AURORA_COLOR_10_TOP_B  = Top Blue
+option.AURORA_COLOR_10_TOP_I  = Top Intensity
+option.AURORA_COLOR_10_BTM_R  = Bottom Red
+option.AURORA_COLOR_10_BTM_G  = Bottom Green
+option.AURORA_COLOR_10_BTM_B  = Bottom Blue
+option.AURORA_COLOR_10_BTM_I  = Bottom Intensity
+option.AURORA_COLOR_10_WEIGHT = Weight
+
+option.AURORA_COLOR_11_TOP_R  = Top Red
+option.AURORA_COLOR_11_TOP_G  = Top Green
+option.AURORA_COLOR_11_TOP_B  = Top Blue
+option.AURORA_COLOR_11_TOP_I  = Top Intensity
+option.AURORA_COLOR_11_BTM_R  = Bottom Red
+option.AURORA_COLOR_11_BTM_G  = Bottom Green
+option.AURORA_COLOR_11_BTM_B  = Bottom Blue
+option.AURORA_COLOR_11_BTM_I  = Bottom Intensity
+option.AURORA_COLOR_11_WEIGHT = Weight
+
 
 # Fog settings
 
