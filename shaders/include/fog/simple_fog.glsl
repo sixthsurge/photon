@@ -25,7 +25,7 @@ const float nether_fog_density = 0.02 * NETHER_FOG_INTENSITY;
 const float blindness_fog_start   = 2.0;
 const float blindness_fog_density = 1.0;
 
-const float nether_bloomy_fog_density = 0.1 * nether_fog_density;
+const float nether_bloomy_fog_density = 0.35 * nether_fog_density;
 
 float spherical_fog(float view_dist, float fog_start_distance, float fog_density) {
 	return exp2(-fog_density * max0(view_dist - fog_start_distance));
