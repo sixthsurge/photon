@@ -379,7 +379,7 @@ Material material_from(vec3 albedo_srgb, uint material_mask, vec3 world_pos, ino
 						} else { // 39
 							#ifdef HARDCODED_EMISSION
 							// Lava
-							material.emission = 45.0 * albedo_sqrt * (0.2 + 0.8 * isolate_hue(hsl, 30.0, 15.0)) * step(0.4, hsl.y);
+							material.emission = 24.0 * albedo_sqrt * (0.2 + 0.8 * isolate_hue(hsl, 30.0, 15.0)) * step(0.4, hsl.y);
 							#endif
 						}
 					}
@@ -390,12 +390,12 @@ Material material_from(vec3 albedo_srgb, uint material_mask, vec3 world_pos, ino
 						if (material_mask == 40u) { // 40
 							#ifdef HARDCODED_EMISSION
 							// Medium orange emissives
-							material.emission = 8.60 * albedo_sqrt * (0.1 + 0.9 * cube(hsl.z)) * isolate_hue(hsl, 30.0, 30.0);
+							material.emission = 14.60 * albedo_sqrt * (0.1 + 0.9 * cube(hsl.z));
 							#endif
 						} else { // 41
 							#ifdef HARDCODED_EMISSION
-							// Brewing stand
-							material.emission  = 0.85 * albedo_sqrt * linear_step(0.77, 0.85, hsl.z);
+							// Brewing stand and Magma block
+							material.emission  = 4.85 * albedo_sqrt * linear_step(0.77, 0.85, hsl.z);
 							#endif
 						}
 					} else { // 42-44
@@ -448,8 +448,8 @@ Material material_from(vec3 albedo_srgb, uint material_mask, vec3 world_pos, ino
 							material.emission = 0.5 * albedo_sqrt * linear_step(0.5, 0.6, hsl.z);
 						} else { // 49
 							#ifdef HARDCODED_EMISSION
-							// Jack o' Lantern + nether mushrooms
-							material.emission = 0.80 * albedo_sqrt * step(0.73, 0.1 * hsl.y + 0.7 * hsl.z);
+							// Nether mushrooms
+							material.emission = 0.80 * albedo_sqrt;
 							#endif
 						}
 					} else { // 50-52
@@ -511,13 +511,19 @@ Material material_from(vec3 albedo_srgb, uint material_mask, vec3 world_pos, ino
 							material.emission = 0.33 * albedo_sqrt;
 							#endif
 						} else { // 59
-
+							#ifdef HARDCODED_EMISSION
+							// Crimson
+							material.emission = 2.60 * albedo_sqrt * isolate_hue(hsl, 360.0, 4.3) * step(0.1, hsl.y);
+							#endif
 						}
 					}
 				} else { // 60-64
 					if (material_mask < 62u) { // 60-62
 						if (material_mask == 60u) { // 60
-
+							#ifdef HARDCODED_EMISSION
+							// Warped
+							material.emission = 2.60 * albedo_sqrt * isolate_hue(hsl, 170.0, 16.3) * step(0.1, hsl.y);
+							#endif
 						} else { // 61
 
 						}

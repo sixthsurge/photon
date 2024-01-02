@@ -69,8 +69,7 @@ vec4 common_fog(float view_dist, const bool sky) {
 #if defined WORLD_NETHER
 	// Nether fog
 	float nether_fog = spherical_fog(view_dist, nether_fog_start, nether_fog_density);
-	fog.rgb += ambient_color - ambient_color * nether_fog;
-	fog.a   *= nether_fog;
+	fog.rgb += ambient_color - ambient_color * nether_fog * nether_fog_density;
 #endif
 
 	return fog;
