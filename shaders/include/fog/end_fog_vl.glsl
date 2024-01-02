@@ -8,7 +8,7 @@
 
 float end_fog_density(vec3 world_pos) {
 	const float falloff_start     = 64.0;
-	const float falloff_half_life = 7.0;
+	const float falloff_half_life = 7.0 * (10 * END_AMBIENT_I);
 
 	const float mul = -rcp(falloff_half_life);
 	const float add = -mul * falloff_start;
@@ -55,7 +55,7 @@ mat2x3 raymarch_end_fog(
 	const float step_count_growth = 0.5;
 
 	const vec3 end_color        = from_srgb(vec3(END_AMBIENT_R, END_AMBIENT_G, END_AMBIENT_B));
-	const float density_scale   = 0.01;
+	const float density_scale   = .01;
 	const vec3 absorption_coeff = exp2(-end_color) * density_scale;
 	const vec3 scattering_coeff = vec3(1.0) * density_scale;
 	const vec3 extinction_coeff = absorption_coeff + scattering_coeff;

@@ -337,7 +337,7 @@ Material material_from(vec3 albedo_srgb, uint material_mask, vec3 world_pos, ino
 						} else { // 33
 							#ifdef HARDCODED_EMISSION
 							// Medium white light
-							material.emission = 0.66 * albedo_sqrt * linear_step(0.75, 0.9, hsl.z);
+							material.emission = 1.66 * albedo_sqrt * linear_step(0.75, 0.9, hsl.z);
 							#endif
 						}
 					} else { // 34-36

@@ -195,7 +195,7 @@ vec3 draw_sky(vec3 ray_dir) {
 #include "/include/sky/atmosphere.glsl"
 
 const float sun_solid_angle = cone_angle_to_solid_angle(sun_angular_radius);
-const vec3 end_sun_color = vec3(1.0, 0.5, 0.25);
+const vec3 end_sun_color = vec3(0.24, 0.25, 0.38);
 
 vec3 draw_sun(vec3 ray_dir) {
 	float nu = dot(ray_dir, sun_dir);
@@ -220,10 +220,10 @@ vec3 draw_sun(vec3 ray_dir) {
 
 	float theta = fract(linear_step(-pi, pi, atan(q.y, q.x)) + 0.015 * frameTimeCounter - 0.33 * r);
 
-	float flare = texture(noisetex, vec2(theta, r - 0.025 * frameTimeCounter)).x;
+	float flare = texture(noisetex, vec2(theta, r - 0.025 * frameTimeCounter)).x * (END_AMBIENT_I * 2);
 	      flare = pow5(flare) * exp(-25.0 * (r - sun_angular_radius));
 		  flare = r < sun_angular_radius ? 0.0 : flare;
-
+	      
 	return end_sun_color * rcp(sun_solid_angle) * max0(sun_disk + 0.1 * flare);
 }
 
@@ -231,7 +231,7 @@ vec3 draw_sky(vec3 ray_dir) {
 	// Sky gradient
 
 	float up_gradient = linear_step(0.0, 0.4, ray_dir.y) + linear_step(0.1, 0.8, -ray_dir.y);
-	vec3 sky = ambient_color * mix(0.1, 0.04, up_gradient);
+	vec3 sky = ambient_color * (1 - mix(0.1, 0.04, up_gradient)) * END_AMBIENT_I;
 	float mie_phase = cornette_shanks_phase(dot(ray_dir, sun_dir), 0.6);
 	sky += 0.1 * (ambient_color + 0.5 * end_sun_color) * mie_phase;
 
@@ -243,7 +243,7 @@ vec3 draw_sky(vec3 ray_dir) {
 	// Stars
 
 	vec3 stars_fade = exp2(-0.1 * max0(1.0 - ray_dir.y) / max(ambient_color, eps)) * linear_step(-0.2, 0.0, ray_dir.y);
-	sky += draw_stars(ray_dir).xzy * stars_fade;
+	sky += draw_stars(ray_dir).xzy * 64;
 #endif
 
 	return sky;
