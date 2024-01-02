@@ -15,9 +15,9 @@ const float snow_fog_start   = 0.5;
 const float snow_fog_density = 1.0;
 const vec3  snow_fog_color   = from_srgb(vec3(0.957, 0.988, 0.988)) * 0.3;
 
-const float cave_fog_start   = 1.0;
-const float cave_fog_density = 0.0033;
-const vec3  cave_fog_color   = vec3(0.033);
+const float cave_fog_start   = 18.0;
+const float cave_fog_density = 0.0001;
+const vec3  cave_fog_color   = from_srgb(vec3(0.859, 0.793, 0.935));
 
 const float nether_fog_start   = 0.0;
 const float nether_fog_density = 0.02 * NETHER_FOG_INTENSITY;

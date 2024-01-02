@@ -13,9 +13,9 @@ const vec3[32] light_color = vec3[32](
 	vec3(1.00, 0.45, 0.10) *  2.45, // Medium orange light
 	vec3(1.00, 0.63, 0.15) *  1.0, // Brewing stand and Magma block
 	vec3(1.00, 0.70, 0.35) *  1.3, // Jack o' Lantern
-	vec3(0.05, 0.23, 1.00) *  1.1, // Soul lights
+	vec3(0.05, 0.23, 1.00) *  3.1, // Soul lights
 	vec3(0.45, 0.53, 1.00) * 4.5, // Beacon
-	vec3(0.75, 1.00, 0.83) *  0.75, // Sculk
+	vec3(0.15, 0.83, 1.00) *  8.75, // Sculk
 	vec3(0.75, 1.00, 0.83) *  0.25, // End portal frame
 	vec3(0.60, 0.10, 1.00) *  0.6, // Pink glow
 	vec3(0.75, 1.00, 0.50) *  0.25, // Sea pickle
