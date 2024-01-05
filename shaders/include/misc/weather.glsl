@@ -1,4 +1,4 @@
-#if !defined INCLUDE_MISC_WEATHER
+#ifndef INCLUDE_MISC_WEATHER
 #define INCLUDE_MISC_WEATHER
 
 #include "/include/utility/color.glsl"

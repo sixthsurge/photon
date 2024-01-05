@@ -144,7 +144,7 @@ void main() {
 	float aurora_amount = get_aurora_amount();
 	mat2x3 aurora_colors = get_aurora_colors();
 
-	sky_samples[0] += aurora_amount * AURORA_GROUND_LIGHTING * mix(aurora_colors[0], aurora_colors[1], 0.25) * (1.0 - overcastness);
+	sky_samples[0] += aurora_amount * AURORA_GROUND_LIGHTING * mix(aurora_colors[0], aurora_colors[1], 0.25) * (1.0 - overcastness) * mix(AURORA_BRIGHTNESS, AURORA_BRIGHTNESS_SNOW, biome_may_snow);
 	#endif
 #endif
 

@@ -1,4 +1,4 @@
-#if !defined INCLUDE_SKY_AURORA
+#ifndef INCLUDE_SKY_AURORA
 #define INCLUDE_SKY_AURORA
 
 #define AURORA_SPEED 1.0

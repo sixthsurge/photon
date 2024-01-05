@@ -210,6 +210,9 @@ suffix.VOXEL_VOLUME_SIZE               = m
 suffix.shadowMapResolution             = ²
 suffix.sunPathRotation                 = °
 
+value.shadowDistance.8.0               = 8 blocks
+value.shadowDistance.16.0              = 1 chunk
+value.shadowDistance.32.0              = 2 chunks
 value.shadowDistance.48.0              = 3 chunks
 value.shadowDistance.64.0              = 4 chunks
 value.shadowDistance.80.0              = 5 chunks
@@ -229,6 +232,8 @@ value.shadowDistance.384.0             = 24 chunks
 value.shadowDistance.512.0             = 32 chunks
 value.shadowDistance.768.0             = 48 chunks
 value.shadowDistance.1024.0            = 64 chunks
+value.shadowDistance.1280.0            = 80 chunks
+value.shadowDistance.1536.0            = 96 chunks
 
 # Sky settings
 
