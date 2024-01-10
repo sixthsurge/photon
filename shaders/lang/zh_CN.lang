@@ -1,0 +1,795 @@
+# Profiles
+
+profile.low                            = §e低
+profile.medium                         = §a中
+profile.high                           = §b高
+profile.ultra                          = §d超高
+
+# Screens
+
+screen.world                           = 世界
+screen.lighting                        = 光照
+screen.sky                             = 天空
+screen.fog                             = 雾
+screen.materials                       = 材质
+screen.water                           = 水
+screen.post                            = 后处理
+screen.misc                            = 杂项
+screen.box                             = 选择框
+
+screen.colored_lights                  = 彩色光设置
+screen.rp_settings                     = 资源包设置
+screen.reflections                     = 反射
+screen.light_sources                   = 光源
+screen.shadows                         = 阴影
+screen.color_grading                   = 调色
+screen.exposure                        = 曝光
+
+screen.aurora                          = 极光
+screen.clouds                          = 云
+screen.clouds_cumulus                  = 积云设置
+screen.clouds_altocumulus              = 高积云设置
+screen.clouds_cumulus_congestus        = 积雨云设置
+screen.clouds_cirrus                   = 平面云设置
+screen.clouds_minecrafty               = 方块云设置
+
+screen.fog_rlh                         = Rayleigh 系数 (大气散射)
+screen.fog_mie                         = Mie 系数 (大气散射)
+screen.sunlight_color                  = 阳光颜色
+screen.moonlight_color                 = 月光颜色
+screen.blocklight_color                = 方块光颜色
+screen.sunlight_morning                = 早晨
+screen.sunlight_noon                   = 中文
+screen.sunlight_evening                = 傍晚
+screen.light_nether                    = 下界
+screen.light_end                       = 末地
+screen.fog_rlh_normal                  = 正常颜色
+screen.fog_rlh_rain                    = 雨天颜色
+screen.fog_rlh_arid                    = 旱地/沙漠 颜色
+screen.fog_rlh_snowy                   = 下雪颜色
+screen.fog_rlh_taiga                   = 针叶林颜色
+screen.fog_rlh_jungle                  = 丛林颜色
+screen.fog_rlh_swamp                   = 沼泽颜色
+screen.water_waves                     = 水波
+screen.water_fog_coeff                 = 水雾系数
+
+screen.weather                         = 日常天气系统
+screen.weather_d0                      = 第一天
+screen.weather_d1                      = 第二天
+screen.weather_d2                      = 第三天
+screen.weather_d3                      = 第四天
+screen.weather_d4                      = 第五天
+screen.weather_d5                      = 第六天
+screen.weather_d6                      = 第七天
+screen.weather_d7                      = 第八天
+screen.weather_d8                      = 第九天
+screen.weather_d9                      = 第十天
+screen.weather_d10                     = 第十一天
+screen.weather_d11                     = 第十二天
+
+screen.end_light_color                 = 光颜色
+screen.end_ambient_color               = 环境色
+screen.nether_color                    = 静态颜色
+
+option.INFO                            = Photon Shaders
+value.INFO.0                           = §eby SixthSurge
+value.INFO.1                           = §aby SixthSurge
+value.INFO.2                           = §bby SixthSurge
+value.INFO.3                           = §dby SixthSurge
+
+# World settings
+
+option.WAVING_PLANTS                   = 植物摇晃
+option.WAVING_PLANTS.comment           = 地面植物在会风中摇曳。\n\n要将方块添加到摇晃的植物方块列表中，请打开 shaders/block.properties 并将其添加到相关类别（10002、10003 或 10004）
+option.WAVING_LEAVES                   = 树叶摇晃
+option.WAVING_LEAVES.comment           = 树叶块在风中摇曳。\n\n要将一个块添加到摇晃的树叶方块列表中，请打开 shaders/block.properties 并将其添加到相关类别 （10005）
+option.SLANTED_RAIN                    = 倾斜雨
+option.SLANTED_RAIN.comment            = 倾斜的雨粒子。让雨天大气一点
+option.RAIN_OPACITY                    = 雨不透明度
+option.RAIN_OPACITY.comment            = 调整雨粒子的不透明度
+option.SEA_LEVEL                       = 海平面
+option.SEA_LEVEL.comment               = 海平面的 y 坐标。\n\n1.18 之后的超平坦 : -60.0。\n1.18 之前的超平坦 : 4.0。\n正常 : 63。
+option.SNOW_OPACITY                    = 雪不透明度
+option.SNOW_OPACITY.comment            = 调整雪粒子的不透明度
+option.EDGE_HIGHLIGHT                  = 边缘高光
+option.EDGE_HIGHLIGHT.comment          = 受《Minecraft Dungeons》启发的边缘高亮效果
+option.EDGE_HIGHLIGHT_SCALE            = 边缘高光缩放
+option.EDGE_HIGHLIGHT_SCALE.comment    = 控制边缘高光的粗细;修改此设置以匹配资源包分辨率
+option.OVERCAST_SKY_AFFECTS_LIGHTING   = 阴天光照影响
+option.OVERCAST_SKY_AFFECTS_LIGHTING.comment = 阴天会降低阳光的强度
+option.MOON_PHASE_AFFECTS_BRIGHTNESS   = 月相光照影响
+option.MOON_PHASE_AFFECTS_BRIGHTNESS.comment = 月相会影响夜间的光照强度
+option.DESERT_SANDSTORM                = 沙漠沙尘暴
+option.DESERT_SANDSTORM.comment        = 下雨时沙漠群系会挂起沙尘暴
+option.END_GLOW                        = 末地发光
+option.END_GLOW.comment                = 末地的波光效果。需要启用体积光照
+
+
+# Lighting settings
+
+option.COLORED_LIGHTS                  = 彩色光照
+option.COLORED_LIGHTS.comment          = 使用泛光填充(flood fill)算法的可变色方块照明。需要 Iris 1.6 或更高版本
+option.HANDHELD_LIGHTING               = 手持光照
+option.HANDHELD_LIGHTING.comment       = 手持物品照亮了世界。如果启用了彩色光照，手持光照将发出物品颜色的光
+option.HANDHELD_LIGHTING_INTENSITY     = 手持光照强度
+option.HANDHELD_LIGHTING_INTENSITY.comment = 调整手持光照的强度
+option.GTAO                            = 着色AO(环境光遮蔽)
+option.GTAO.comment                    = 基于地面实况的环境光遮蔽(GTAO)。在角落添加柔和的阴影
+option.VANILLA_AO                      = 原版AO(环境光遮蔽)
+option.VANILLA_AO.comment              = Minecraft 内置的环境光遮蔽
+option.AO_IN_SUNLIGHT                  = 阳光下的AO
+option.AO_IN_SUNLIGHT.comment          = 是否在阳光直射下应用着色器环境光遮蔽
+option.CLOUD_SHADOWS                   = 云影
+option.CLOUD_SHADOWS.comment           = 云在地面的投缘
+option.CLOUD_SHADOWS_INTENSITY         = 云影强度
+option.CLOUD_SHADOWS_INTENSITY.comment = 调整云影强度
+option.SH_SKYLIGHT                     = 球谐光照
+option.SH_SKYLIGHT.comment             = 在主世界中使用球谐波编码(spherical harmonics encoding)进行定向天空光，这提供了非常自然的结果。\n这在GTAO(着色AO)中非常有效
+option.SSS_SHEEN                       = 次表面散射(SSS)光泽
+option.SSS_SHEEN.comment               = 植物和树叶上的高光效果，有助于高草和东西更好地与草镜面融合
+option.SSS_INTENSITY                   = 次表面散射(SSS)强度
+option.SSS_INTENSITY.comment           = 调整次表面散射(SSS)的亮度
+option.SHADING_STRENGTH                = 遮阳强度
+option.SHADING_STRENGTH.comment        = 调整直接光照阴影的对比度。减少此选项会使面向太阳的面（不在阴影中）变得更亮；增加它会使它们变得更暗"
+
+option.SHADOW                          = 阴影映射
+option.SHADOW_PCF                      = 阴影过滤
+option.SHADOW_COLOR                    = 彩色阴影
+option.SHADOW_COLOR.comment            = 半透明方块投射有色阴影
+option.SHADOW_VPS                      = 可变边缘阴影
+option.SHADOW_VPS.comment              = 阴影离投射物越远越柔和
+option.shadowMapResolution             = 阴影分辨率
+option.shadowDistance                  = 阴影距离
+option.sunPathRotation                 = 太阳斜角
+option.SHADOW_PENUMBRA_SCALE           = 阴影柔和度
+option.SHADOW_PENUMBRA_SCALE.comment   = 调整阴影的柔和度
+option.ENTITY_SHADOWS                  = 实体投影
+option.ENTITY_SHADOWS.comment          = 实体是否可以投影。\n禁用此功能可提高大型生电基地的渲染性能
+option.BLOCK_ENTITY_SHADOWS            = 方块实体投影
+option.PIXELATED_SHADOWS               = 像素化阴影
+option.PIXELATED_SHADOWS.comment       = 阴影吸附到方块纹素，创建像素化的外观
+option.PIXELATED_SHADOWS_RESOLUTION    = 像素化阴影分辨率
+
+option.SUN_NR                          = 红
+option.SUN_NG                          = 绿
+option.SUN_NB                          = 蓝
+option.SUN_MR                          = 红
+option.SUN_MG                          = 绿
+option.SUN_MB                          = 蓝
+option.SUN_ER                          = 红
+option.SUN_EG                          = 绿
+option.SUN_EB                          = 蓝
+option.SUN_I                           = 阳光强度
+option.MOON_R                          = 红
+option.MOON_G                          = 绿
+option.MOON_B                          = 蓝
+option.MOON_I                          = 月光强度
+option.SKYLIGHT_I                      = 天空光强度
+option.BOUNCED_LIGHT_I                 = 反射的阳光强度
+option.CAVE_LIGHTING_I                 = 洞穴亮度
+option.LIGHTNING_FLASH                 = 闪电
+option.NETHER_USE_BIOME_COLOR          = 使用生物群系颜色
+option.NETHER_I                        = 环境亮度
+option.NETHER_S                        = 环境饱和度
+option.NETHER_R                        = 红
+option.NETHER_G                        = 绿
+option.NETHER_B                        = 蓝
+option.END_LIGHT_R                     = 红
+option.END_LIGHT_G                     = 绿
+option.END_LIGHT_B                     = 蓝
+option.END_LIGHT_I                     = 光照强度
+option.END_AMBIENT_R                   = 红
+option.END_AMBIENT_G                   = 绿
+option.END_AMBIENT_B                   = 蓝
+option.END_AMBIENT_I                   = 环境亮度
+option.BLOCKLIGHT_R                    = 红
+option.BLOCKLIGHT_G                    = 绿
+option.BLOCKLIGHT_B                    = 蓝
+option.BLOCKLIGHT_I                    = 方块光强度
+
+option.VOXEL_VOLUME_SIZE               = 体素体积大小
+option.VOXEL_VOLUME_SIZE.comment       = 高性能影响，也受阴影距离影响
+suffix.VOXEL_VOLUME_SIZE               = m
+
+
+suffix.shadowMapResolution             = ²
+suffix.sunPathRotation                 = °
+
+value.shadowDistance.48.0              = 3 区块
+value.shadowDistance.64.0              = 4 区块
+value.shadowDistance.80.0              = 5 区块
+value.shadowDistance.96.0              = 6 区块
+value.shadowDistance.112.0             = 7 区块
+value.shadowDistance.128.0             = 8 区块
+value.shadowDistance.144.0             = 9 区块
+value.shadowDistance.160.0             = 10 区块
+value.shadowDistance.176.0             = 11 区块
+value.shadowDistance.192.0             = 12 区块
+value.shadowDistance.208.0             = 13 区块
+value.shadowDistance.224.0             = 14 区块
+value.shadowDistance.240.0             = 15 区块
+value.shadowDistance.256.0             = 16 区块
+value.shadowDistance.320.0             = 20 区块
+value.shadowDistance.384.0             = 24 区块
+value.shadowDistance.512.0             = 32 区块
+value.shadowDistance.768.0             = 48 区块
+value.shadowDistance.1024.0            = 64 区块
+
+# Sky settings
+
+option.VANILLA_SUN                     = 原版太阳
+option.VANILLA_MOON                    = 原版月亮
+option.SUN_ANGULAR_RADIUS              = 太阳角半径
+option.MOON_ANGULAR_RADIUS             = 月亮角半径
+option.SKY_GROUND                      = 天空地面
+option.SKY_GROUND.comment              = 地平线以下可见的地球表面
+option.STARS                           = 星星
+option.STARS.comment                   = 夜空中的星星。对性能影响小
+option.STARS_INTENSITY                 = 星星亮度
+option.STARS_INTENSITY.comment         = 控制夜空中星星的亮度
+option.STARS_COVERAGE                  = 星星覆盖率
+option.STARS_COVERAGE.comment          = 控制夜空中的星星数量
+
+# Clouds
+option.CLOUDS_CUMULUS                       = 积云
+option.CLOUDS_CUMULUS.comment               = 低空体积云，类似于积云
+option.CLOUDS_CUMULUS_PRIMARY_STEPS_H       = 初期步进次数 - 地平线
+option.CLOUDS_CUMULUS_PRIMARY_STEPS_Z       = 初期步进次数 - 天顶
+option.CLOUDS_CUMULUS_LIGHTING_STEPS        = 光照步进次数
+option.CLOUDS_CUMULUS_AMBIENT_STEPS         = 环境步进次数
+option.CLOUDS_CUMULUS_ALTITUDE              = 高度
+suffix.CLOUDS_CUMULUS_ALTITUDE              = m
+option.CLOUDS_CUMULUS_THICKNESS             = 厚度
+option.CLOUDS_CUMULUS_DENSITY               = 密度
+option.CLOUDS_CUMULUS_COVERAGE              = 覆盖率
+option.CLOUDS_CUMULUS_SIZE                  = 大小
+option.CLOUDS_CUMULUS_DETAIL_STRENGTH       = 细节强度
+option.CLOUDS_CUMULUS_CURL_STRENGTH         = 卷曲强度
+option.CLOUDS_CUMULUS_WIND_SPEED            = 风速
+suffix.CLOUDS_CUMULUS_ALTITUDE              = m/s
+option.CLOUDS_CUMULUS_WIND_ANGLE            = 风向
+suffix.CLOUDS_CUMULUS_ALTITUDE              = °
+
+option.CLOUDS_ALTOCUMULUS                       = 积云
+option.CLOUDS_ALTOCUMULUS.comment               = 中高度的体积云
+option.CLOUDS_ALTOCUMULUS_PRIMARY_STEPS_H       = 初期步进次数 - 地平线
+option.CLOUDS_ALTOCUMULUS_PRIMARY_STEPS_Z       = 初期步进次数 - 天顶
+option.CLOUDS_ALTOCUMULUS_LIGHTING_STEPS        = 光照步进次数
+option.CLOUDS_ALTOCUMULUS_AMBIENT_STEPS         = 环境步进次数
+option.CLOUDS_ALTOCUMULUS_ALTITUDE              = 高度
+suffix.CLOUDS_ALTOCUMULUS_ALTITUDE              = m
+option.CLOUDS_ALTOCUMULUS_THICKNESS             = 厚度
+option.CLOUDS_ALTOCUMULUS_DENSITY               = 密度
+option.CLOUDS_ALTOCUMULUS_COVERAGE              = 覆盖率
+option.CLOUDS_ALTOCUMULUS_SIZE                  = 大小
+option.CLOUDS_ALTOCUMULUS_DETAIL_STRENGTH       = 细节强度
+option.CLOUDS_ALTOCUMULUS_CURL_STRENGTH         = 卷曲强度
+option.CLOUDS_ALTOCUMULUS_WIND_SPEED            = 风速
+suffix.CLOUDS_ALTOCUMULUS_ALTITUDE              = m/s
+option.CLOUDS_ALTOCUMULUS_WIND_ANGLE            = 风向
+suffix.CLOUDS_ALTOCUMULUS_ALTITUDE              = °
+
+option.CLOUDS_CUMULUS_CONGESTUS                       = 浓积云
+option.CLOUDS_CUMULUS_CONGESTUS.comment               = 巨大而遥远的体积云
+option.CLOUDS_CUMULUS_CONGESTUS_PRIMARY_STEPS_H       = 初期步进次数 - 地平线
+option.CLOUDS_CUMULUS_CONGESTUS_PRIMARY_STEPS_Z       = 初期步进次数 - 天顶
+option.CLOUDS_CUMULUS_CONGESTUS_LIGHTING_STEPS        = 光照步进次数
+option.CLOUDS_CUMULUS_CONGESTUS_AMBIENT_STEPS         = 环境步进次数
+option.CLOUDS_CUMULUS_CONGESTUS_ALTITUDE              = 高度
+suffix.CLOUDS_CUMULUS_CONGESTUS_ALTITUDE              = m
+option.CLOUDS_CUMULUS_CONGESTUS_THICKNESS             = 厚度
+option.CLOUDS_CUMULUS_CONGESTUS_DENSITY               = 密度
+option.CLOUDS_CUMULUS_CONGESTUS_COVERAGE              = 覆盖率
+option.CLOUDS_CUMULUS_CONGESTUS_SIZE                  = 大小
+option.CLOUDS_CUMULUS_CONGESTUS_DETAIL_STRENGTH       = 细节强度
+option.CLOUDS_CUMULUS_CONGESTUS_CURL_STRENGTH         = 卷曲强度
+option.CLOUDS_CUMULUS_CONGESTUS_WIND_SPEED            = 风速
+suffix.CLOUDS_CUMULUS_CONGESTUS_ALTITUDE              = m/s
+option.CLOUDS_CUMULUS_CONGESTUS_WIND_ANGLE            = 风向
+suffix.CLOUDS_CUMULUS_CONGESTUS_ALTITUDE              = °
+
+option.BLOCKY_CLOUDS                   = 方块云
+option.BLOCKY_CLOUDS.comment           = 原版风格的体积云。启用此选项将禁用所有其他类型的云
+option.BLOCKY_CLOUDS_LAYER_2           = 第二层
+option.BLOCKY_CLOUDS_LAYER_2.comment   = 第二层原本风格的体积云！注意，启用此选项会使云的性能影响加倍
+option.BLOCKY_CLOUDS_THICKNESS         = 厚度
+option.BLOCKY_CLOUDS_THICKNESS.comment = 调整云的厚度
+option.BLOCKY_CLOUDS_ALTITUDE          = 高度
+option.BLOCKY_CLOUDS_ALTITUTE.comment  = 调整云的高度
+option.BLOCKY_CLOUDS_ALTITUDE_2        = 第二层云高度
+option.BLOCKY_CLOUDS_ALTITUDE_2.comment = 调整第二层云的高度
+option.BLOCKY_CLOUDS_ROUNDNESS         = 圆角
+option.BLOCKY_CLOUDS_ROUNDNESS.comment = 云的边缘圆角
+option.BLOCKY_CLOUDS_SHARPNESS         = 清晰度
+option.BLOCKY_CLOUDS_SHARPNESS.comment = 云的边缘清晰度
+
+option.CLOUDS_TEMPORAL_UPSCALING       = 时间升采样
+option.CLOUDS_DAILY_WEATHER            = 日常天气变化
+option.CLOUDS_DAILY_WEATHER.comment    = 云层受日常天气变化影响
+option.CLOUDS_AERIAL_PERSPECTIVE_BOOST = 空中透视提高
+value.CLOUDS_TEMPORAL_UPSCALING.1      = 关闭
+value.CLOUDS_TEMPORAL_UPSCALING.2      = 4×
+value.CLOUDS_TEMPORAL_UPSCALING.3      = 9×
+value.CLOUDS_TEMPORAL_UPSCALING.4      = 16×
+
+option.CLOUDS_CIRRUS                       = 积云
+option.CLOUDS_CIRRUS.comment               = 高空的平面云，类似于卷云/卷积云
+option.CLOUDS_CIRRUS_PRIMARY_STEPS_H       = 初期步进次数 - 地平线
+option.CLOUDS_CIRRUS_PRIMARY_STEPS_Z       = 初期步进次数 - 天顶
+option.CLOUDS_CIRRUS_LIGHTING_STEPS        = 光照步进次数
+option.CLOUDS_CIRRUS_AMBIENT_STEPS         = 环境步进次数
+option.CLOUDS_CIRRUS_ALTITUDE              = 高度
+suffix.CLOUDS_CIRRUS_ALTITUDE              = m
+option.CLOUDS_CIRRUS_THICKNESS             = 厚度
+option.CLOUDS_CIRRUS_DENSITY               = 卷云密度
+option.CLOUDS_CIRRUS_COVERAGE              = 卷云覆盖率
+option.CLOUDS_CIRRUS_SIZE                  = 卷云大小
+option.CLOUDS_CIRRUS_DETAIL_STRENGTH       = 卷云细节强度
+option.CLOUDS_CIRRUS_CURL_STRENGTH         = 卷云曲率
+option.CLOUDS_CC_DENSITY               = 卷积云密度
+option.CLOUDS_CC_COVERAGE              = 卷积云覆盖率
+option.CLOUDS_CC_SIZE                  = 卷积云大小
+option.CLOUDS_CC_DETAIL_STRENGTH       = 卷积云细节强度
+option.CLOUDS_CC_CURL_STRENGTH         = 卷积云曲率
+option.CLOUDS_CIRRUS_WIND_SPEED            = 风速
+suffix.CLOUDS_CIRRUS_ALTITUDE              = m/s
+option.CLOUDS_CIRRUS_WIND_ANGLE            = 风向
+suffix.CLOUDS_CIRRUS_ALTITUDE              = °
+
+option.CLOUDS_ALTOCUMULUS                       = 高级云
+option.CLOUDS_CIRRUS                       = 平面云
+
+option.AURORA_NORMAL                   = 所有生物群系极光
+option.AURORA_SNOW                     = 雪地生物群系极光
+option.AURORA_BRIGHTNESS               = 极光亮度
+option.AURORA_FREQUENCY                = 极光频率
+option.AURORA_CLOUD_LIGHTING           = 云层照明贡献
+option.AURORA_GROUND_LIGHTING          = 地面照明贡献
+
+value.AURORA_NORMAL.AURORA_NEVER       = 关闭
+value.AURORA_NORMAL.AURORA_RARELY      = 很少
+value.AURORA_NORMAL.AURORA_ALWAYS      = 总是
+
+value.AURORA_SNOW.AURORA_NEVER         = 关闭
+value.AURORA_SNOW.AURORA_RARELY        = 很少
+value.AURORA_SNOW.AURORA_ALWAYS        = 总是
+
+# Fog settings
+
+option.BORDER_FOG                      = 边缘雾
+option.BORDER_FOG.comment              = 浓雾包裹着渲染距离的边缘，以隐藏区块边框
+option.CAVE_FOG                        = 洞穴雾
+option.CAVE_FOG.comment                = 在地下添加了轻微的发光雾。这使大型洞穴感觉更有氛围，并帮助您看到洞穴的形状
+option.BLOOMY_FOG                      = 泛光雾
+option.BLOOMY_FOG.comment              = 在雾中泛光。这给人一种散射在雾中的明亮物体的光的外观，并照亮后面的区域。几乎没有性能消耗
+option.BLOOMY_FOG_INTENSITY            = 泛光雾强度
+option.BLOOMY_FOG_INTENSITY.comment    = 调整"泛光雾"的强度
+option.NETHER_FOG_INTENSITY            = 下界雾强度
+option.VL                              = 体积光照
+option.VL.comment                      = 添加光束和可用的雾密度
+option.VL_RENDER_SCALE                 = 体积光照渲染缩放
+option.AIR_FOG_CLOUDY_NOISE            = 云雾
+option.AIR_FOG_CLOUDY_NOISE.comment    = 雾中有微妙的多云形状，早上最明显。\n需要体积雾！
+option.AIR_FOG_COLORED_LIGHT_SHAFTS    = 彩色光束
+option.AIR_FOG_COLORED_LIGHT_SHAFTS.comment = 穿过半透明物体的光束按其颜色着色
+
+option.AIR_FOG_RAYLEIGH_FALLOFF_START     = Rayleigh衰减起点
+option.AIR_FOG_RAYLEIGH_FALLOFF_START.comment = Rayleigh雾开始衰减的高度
+option.AIR_FOG_RAYLEIGH_FALLOFF_HALF_LIFE = Rayleigh衰减半衰期
+option.AIR_FOG_RAYLEIGH_FALLOFF_HALF_LIFE.comment = Rayleigh衰减起点以上的高度，Rayleigh雾密度减半
+option.AIR_FOG_MIE_FALLOFF_START          = Mie衰减起点
+option.AIR_FOG_MIE_FALLOFF_START.comment  = Mie雾开始衰减的高度
+option.AIR_FOG_MIE_FALLOFF_HALF_LIFE      = Mie衰减半衰期
+option.AIR_FOG_MIE_FALLOFF_HALF_LIFE.comment = Mie衰减起点以上的高度，Mie雾密度减半
+
+option.AIR_FOG_RAYLEIGH_DENSITY        = 正常密度
+option.AIR_FOG_RAYLEIGH_R              = §4红
+option.AIR_FOG_RAYLEIGH_G              = §2绿
+option.AIR_FOG_RAYLEIGH_B              = §1蓝
+
+option.AIR_FOG_RAYLEIGH_DENSITY_RAIN   = 雨天密度
+option.AIR_FOG_RAYLEIGH_R_RAIN         = §4红
+option.AIR_FOG_RAYLEIGH_G_RAIN         = §2绿
+option.AIR_FOG_RAYLEIGH_B_RAIN         = §1蓝
+
+option.AIR_FOG_RAYLEIGH_DENSITY_ARID   = 旱地/沙漠密度
+option.AIR_FOG_RAYLEIGH_R_ARID         = §4红
+option.AIR_FOG_RAYLEIGH_G_ARID         = §2绿
+option.AIR_FOG_RAYLEIGH_B_ARID         = §1蓝
+
+option.AIR_FOG_RAYLEIGH_DENSITY_SNOWY  = 雪天密度
+option.AIR_FOG_RAYLEIGH_R_SNOWY        = §4红
+option.AIR_FOG_RAYLEIGH_G_SNOWY        = §2绿
+option.AIR_FOG_RAYLEIGH_B_SNOWY        = §1蓝
+
+option.AIR_FOG_RAYLEIGH_DENSITY_TAIGA  = 针叶林密度
+option.AIR_FOG_RAYLEIGH_R_TAIGA        = §4红
+option.AIR_FOG_RAYLEIGH_G_TAIGA        = §2绿
+option.AIR_FOG_RAYLEIGH_B_TAIGA        = §1蓝
+
+option.AIR_FOG_RAYLEIGH_DENSITY_JUNGLE = 丛林密度
+option.AIR_FOG_RAYLEIGH_R_JUNGLE       = §4红
+option.AIR_FOG_RAYLEIGH_G_JUNGLE       = §2绿
+option.AIR_FOG_RAYLEIGH_B_JUNGLE       = §1蓝
+
+option.AIR_FOG_RAYLEIGH_DENSITY_SWAMP  = 沼泽密度
+option.AIR_FOG_RAYLEIGH_R_SWAMP        = §4红
+option.AIR_FOG_RAYLEIGH_G_SWAMP        = §2绿
+option.AIR_FOG_RAYLEIGH_B_SWAMP        = §1蓝
+
+option.AIR_FOG_MIE_DENSITY_MORNING     = 早晨密度
+option.AIR_FOG_MIE_DENSITY_NOON        = 中午密度
+option.AIR_FOG_MIE_DENSITY_EVENING     = 傍晚密度
+option.AIR_FOG_MIE_DENSITY_MIDNIGHT    = 午夜密度
+option.AIR_FOG_MIE_DENSITY_RAIN        = 雨天密度
+option.AIR_FOG_MIE_DENSITY_BLUE_HOUR   = 黎明/黄昏密度
+
+# Materials settings
+
+option.NORMAL_MAPPING                  = 法线贴图
+option.NORMAL_MAPPING.comment          = 是否使用资源包提供的法线贴图。如果您正在使用“PBR”资源包，请启用此选项
+option.SPECULAR_MAPPING                = 镜面反射贴图
+option.SPECULAR_MAPPING.comment        = 是否使用资源包提供的镜面反射贴图。如果您正在使用“PBR”资源包，请启用此选项
+option.POM                             = 视差遮蔽贴图技术
+option.TEXTURE_FORMAT                  = 纹理格式
+option.TEXTURE_FORMAT.comment          = 资源包使用的纹理格式。大多数现代资源包使用lab_p_b_r，而设计用于SEUS的包可能使用OldPBR。
+option.HARDCODED_SPECULAR              = 硬编码镜面反射
+option.HARDCODED_SPECULAR.comment      = 某些方块(如金属)的硬编码镜面反射
+option.HARDCODED_EMISSION              = 硬编码发光
+option.HARDCODED_EMISSION.comment      = 某些方块的硬编码发光(如火把)
+option.HARDCODED_SSS                   = 硬编码次表明散射
+option.HARDCODED_SSS.comment           = 某些方块(如树叶)的硬编码次表面散射
+option.RAIN_PUDDLES                    = 水洼
+option.EMISSION_STRENGTH               = 发光强度
+option.EMISSION_STRENGTH.comment       = 调整火把等发光对象的亮度。这不会影响投射光的亮度，只会影响光源本身的亮度。这也会影响硬编码的发光
+option.DIRECTIONAL_LIGHTMAPS           = 平行光照贴图
+option.DIRECTIONAL_LIGHTMAPS.comment   = 方块光和天空光受将到法线贴图的影响。由于方法的限制，可能会导致一些视觉问题
+option.DIRECTIONAL_LIGHTMAPS_INTENSITY = 平行光照贴图强度
+option.DIRECTIONAL_LIGHTMAPS_INTENSITY.comment = 调整平行光照贴图的强度
+option.POM_DEPTH                       = 视差深度
+option.POM_DEPTH.comment               = 视差遮蔽贴图(POM)可以在块中凹陷多远
+option.POM_SAMPLES                     = 视差采样
+option.POM_SAMPLES.comment             = 以牺牲性能为代价调整视差遮蔽贴图(POM)的质量
+option.POM_SHADOW                      = 视差遮蔽贴图自投影
+option.POM_SHADOW.comment              = 视差遮蔽贴图(POM)的自阴影。需要镜面反射贴图！
+option.POM_SHADOW_SAMPLES              = 视差遮蔽贴图自投影采样
+option.POM_SHADOW_SAMPLES.comment      = 以牺牲性能为代价调整视差遮蔽贴图自投影的质量
+option.POM_SLOPE_NORMALS               = 视差遮蔽贴图(POM)坡度法线
+option.POM_DISTANCE                    = 视差遮蔽贴图(POM)距离
+
+suffix.POM_DEPTH                       = m
+suffix.POM_DISTANCE                    = m
+
+value.TEXTURE_FORMAT.TEXTURE_FORMAT_LAB = 实验PBR
+value.TEXTURE_FORMAT.TEXTURE_FORMAT_OLD = 旧的PBR
+
+option.ENVIRONMENT_REFLECTIONS         = 环境反射
+option.ENVIRONMENT_REFLECTIONS.comment = 屏幕空间反射。使水和有光泽的方块反射环境。性能影响巨大
+option.SKY_REFLECTIONS                 = 天空反射
+option.SKY_REFLECTIONS.comment         = 让水和闪亮的方块反射天空
+option.SSR_ROUGHNESS_SUPPORT           = 粗糙度支持
+option.SSR_ROUGHNESS_SUPPORT.comment   = 使粗糙表面上的反射看起来粗糙。性能影响巨大
+option.SSR_RAY_COUNT                   = 射线数量
+option.SSR_RAY_COUNT.comment           = 为粗略反射追踪的射线数。射线越多，噪点越小，但性能消耗越大
+option.SSR_INTERSECTION_STEPS_SMOOTH   = 交点步进次数 - 平滑
+option.SSR_INTERSECTION_STEPS_SMOOTH.comment = 以牺牲性能为代价提升平滑反射的精度
+option.SSR_INTERSECTION_STEPS_ROUGH    = 交点步进次数 - 粗糙
+option.SSR_INTERSECTION_STEPS_ROUGH.comment = 以牺牲性能为代价调整粗糙反射的精度
+option.SSR_REFINEMENT_STEPS            = 细化步进次数
+option.SSR_REFINEMENT_STEPS.comment    = 以牺牲性能为代价调整所有反射的精度
+option.SSR_ROUGHNESS_THRESHOLD         = 粗糙度阈值
+option.SSR_ROUGHNESS_THRESHOLD.comment = 调整曲面的平滑程度以使反射显示
+option.SSR_PREVIOUS_FRAME.comment      = 将上一帧数据用于反射，以便半透明和反射应用在反射中
+
+# Water settings
+
+option.WATER_CAUSTICS                  = 水焦散
+option.WATER_CAUSTICS.comment          = 使水下波光粼粼
+option.WATER_FOAM                      = 水白沫
+option.WATER_FOAM.comment              = 类似海浪中的白沫。在某些情况下，让水更容易被看到
+option.SNELLS_WINDOW                   = 斯内尔窗
+option.SNELLS_WINDOW.comment           = 水下内部全反射
+option.WATER_TEXTURE                   = 水纹理
+option.WATER_TEXTURE.comment           = 如何使用原版水纹理。\\n\n关闭-无纹理。\n高光:水纹理将高光添加到水中，就像它在基岩版RTX中的效果一样。\n原版：像其他纹理一样使用水纹理
+option.BIOME_WATER_COLOR               = 生物群系颜色的水
+option.BIOME_WATER_COLOR.comment       = 生物群系的颜色将会影响水的吸收
+option.WATER_REFRACTION                = 水体折射
+option.WATER_REFRECTION.comment        = 水体折射。性能影响非常小
+option.WATER_REFRACTION_INTENSITY      = 水体折射强度
+option.WATER_REFRACTION_INTENSITY.comment = 调整水折射的强度
+
+value.WATER_TEXTURE.WATER_TEXTURE_OFF       = 关闭
+value.WATER_TEXTURE.WATER_TEXTURE_HIGHLIGHT = 高光
+value.WATER_TEXTURE.WATER_TEXTURE_VANILLA   = 原版
+
+option.WATER_WAVES                     = 水波
+option.WATER_WAVE_ITERATIONS           = 迭代次数
+option.WATER_WAVE_STRENGTH             = 强烈
+option.WATER_WAVE_FREQUENCY            = 频率
+option.WATER_WAVE_SPEED_STILL          = 速度(平静)
+option.WATER_WAVE_SPEED_FLOWING        = 速度(流动)
+option.WATER_WAVE_PERSISTENCE          = 持续
+option.WATER_WAVE_LACUNARITY           = 间隙
+option.WATER_PARALLAX                  = 水面视差
+option.WATER_PARALLAX.comment          = 是水波纹看起来有立体感
+option.WATER_DISPLACEMENT              = 水面置换
+option.WATER_DISPLACEMENT.comment      = 与摇晃树叶的方式类似，它会使水的几何形状轻微波动，使海岸线看起来不那么平整
+
+option.WATER_ABSORPTION_R              = 红色吸收
+option.WATER_ABSORPTION_G              = 绿色吸收
+option.WATER_ABSORPTION_B              = 蓝色吸收
+option.WATER_SCATTERING                = 散射
+
+option.WATER_ABSORPTION_R_UNDERWATER   = 红色吸收 - 水下
+option.WATER_ABSORPTION_G_UNDERWATER   = 绿色吸收 - 水下
+option.WATER_ABSORPTION_B_UNDERWATER   = 蓝色吸收 - 水下
+option.WATER_SCATTERING_UNDERWATER     = 散射 - 水下
+
+# Post-processing settings
+
+option.BLOOM                           = 泛光
+option.BLOOM.comment                   = 明亮的区域和光源周围的柔和“辉光”效果
+option.BLOOM_INTENSITY                 = 泛光强度
+option.BLOOM_INTENSITY.comment         = 调整泛光对最终图像的影响程度
+option.DOF                             = 景深
+option.DOG.comment                     = 相机聚焦效果-模糊失焦区域
+option.DOF_INTENSITY                   = 景深强度
+option.DOF_INTENSITY.comment           = 调整景深的强度
+option.DOF_SAMPLES                     = 景深采样
+option.DOF_SAMPLES.comment             = 景深采样值。值越高，模糊质量越高，性能消耗越高
+option.DOF_FOCUS                       = 景深焦点
+option.DOF_FOCUS.comment               = 景深的焦距
+option.MOTION_BLUR                     = 运动模糊
+option.MOTION_BLUR.comment             = 运动模糊，使低帧率画面看起来更流畅，但是可能会导致眩晕
+option.MOTION_BLUR_INTENSITY           = 运动模糊强度
+option.MOTION_BLUR_INTENSITY.comment   = 调整运动模糊强度
+option.TAA                             = TAA - 时间抗锯齿
+option.TAA.comment                     = 时间抗锯齿。大大提高了图像质量和噪声水平，但也可能导致闪烁和重影等时间伪影。TAAU所需！
+option.FXAA                            = FXAA - 快速近似抗锯齿
+option.FXAA.comment                    = 软化边缘。与TAA配合使用，特别是在运动中提供帮助。对TAAU很有帮助
+option.TAAU                            = TAAU - 时间性升采样
+option.TAAU.comment                    = 以较低的分辨率渲染场景颜色，并使用TAA提升其采样。大大提高了性能，但可能会降低图像质量并增加时间伪影
+option.TAAU_RENDER_SCALE               = TAAU - 时间性升采样渲染比率
+option.TAAU_RENDER_SCALE.comment       = 如果启用了TAAU，则渲染场景颜色的分辨率缩放。如果原始分辨率为1920x1080，TAA升级渲染比例为0.75（默认值），则场景颜色将以1440x810渲染
+option.CAS                             = 图像锐化
+option.CAS.comment                     = 锐化最终图像(对比度自适应锐化)
+option.CAS_INTENSITY                   = 图像锐化强度
+option.CAS_INTENSITY.comment           = 调整图像锐化效果
+option.VIGNETTE                        = 暗角
+option.VIGNETTE.comment                = 使屏幕边缘变暗
+option.VIGNETTE_INTENSITY              = 暗角强度
+option.VIGNETTE_INTENSITY.comment      = 调整暗角强度
+
+value.DOF_FOCUS.-1.0                   = 自动
+
+option.tonemap                         = 色调调整器
+
+value.tonemap.academy_fit              = Academy Fit
+value.tonemap.academy_rrt              = Academy RRT
+value.tonemap.tonemap_hejl_2015        = Hejl 2015
+value.tonemap.tonemap_hejl_burgess     = Hejl-Burgess
+value.tonemap.tonemap_lottes           = Lottes
+value.tonemap.tonemap_uncharted_2      = Uncharted 2
+value.tonemap.tonemap_tech             = Tech
+value.tonemap.tonemap_ozius            = Ozius
+value.tonemap.tonemap_reinhard         = Reinhard
+value.tonemap.tonemap_reinhard_jodie   = Reinhard-Jodie
+
+# Color Grading
+
+option.GRADE_BRIGHTNESS                = 亮度
+option.GRADE_CONTRAST                  = 对比度
+option.GRADE_SATURATION                = 饱和度
+option.GRADE_WHITE_BALANCE             = 白平衡
+option.GRADE_ORANGE_SAT_BOOST          = 橙色饱和度提升
+option.GRADE_TEAL_SAT_BOOST            = 青色饱和度提升
+option.GRADE_GREEN_SAT_BOOST           = 绿色饱和度提升
+option.GRADE_GREEN_HUE_SHIFT           = 绿色色相偏移
+suffix.GRADE_WHITE_BALANCE             = K
+suffix.GRADE_GREEN_HUE_SHIFT           = °
+
+option.PURKINJE_SHIFT                  = 普肯耶偏移
+option.PURKINJE_SHIFT.option           = 模拟低光照对人类视觉的影响；使所有颜色去饱和并使红色变暗
+option.PURKINJE_SHIFT_INTENSITY        = 普肯耶偏移强度
+
+# Exposure
+
+option.AUTO_EXPOSURE                         = 自动曝光
+option.AUTO_EXPOSURE_BIAS                    = 曝光偏差
+option.AUTO_EXPOSURE_MIN                     = 最小曝光
+option.AUTO_EXPOSURE_MAX                     = 最大曝光
+option.AUTO_EXPOSURE_RATE_DIM_TO_BRIGHT      = 曝光率 - 递增
+option.AUTO_EXPOSURE_RATE_BRIGHT_TO_DIM      = 曝光率 - 递减
+option.MANUAL_EXPOSURE_VALUE                 = 手动曝光值
+option.MANUAL_EXPOSURE_USE_SCREEN_BRIGHTNESS = 基于亮度滑块
+option.MANUAL_EXPOSURE_USE_SCREEN_BRIGHTNESS.comment = 曝光值基于"视频设置"菜单中的"亮度"滑块在"最小曝光"和"最大曝光"之间值
+option.HISTOGRAM_BINS                        = 柱状图栏
+option.HISTOGRAM_TARGET                      = 柱状图目标CDF(累积分布函数)值
+
+value.AUTO_EXPOSURE.AUTO_EXPOSURE_SIMPLE    = 简易
+value.AUTO_EXPOSURE.AUTO_EXPOSURE_HISTOGRAM = 柱状图
+value.AUTO_EXPOSURE.AUTO_EXPOSURE_OFF       = 关闭
+
+# Misc settings
+
+option.DEBUG_VIEW                      = 调试视图
+option.DEBUG_SAMPLER                   = 调试采样器
+option.WHITE_WORLD                     = 白色世界
+option.WHITE_WORLD.comment             = 将所有纹理设置为白色
+option.TONEMAP_COMPARISON              = 色调映射对比
+option.TONEMAP_COMPARISON.comment      = 比较屏幕左右两侧的两个色调映射函数
+option.tonemap_left                    = 左侧色调
+option.tonemap_right                   = 右侧色调
+option.FANCY_NETHER_PORTAL             = 奇幻的下界传送门
+option.FANCY_NETHER_PORTAL.comment     = 奇幻的幽冥门效果,灵感来自EminGT的互补重塑阴影，感谢Emin让我使用他的想法！可能无法与某些资源包配合使用
+option.CUSTOM_SKY                      = 自定义天空
+option.CUSTOM_SKY.comment              = 启用资源包的自定义天空
+option.CUSTOM_SKY_BRIGHTNESS           = 自定义天空亮度
+option.CUSTOM_SKY_BRIGHTNESS.comment   = 调整自定义天空亮度
+
+value.DEBUG_VIEW.DEBUG_VIEW_NONE       = 关闭
+value.DEBUG_VIEW.DEBUG_VIEW_SAMPLER    = 采样器
+value.DEBUG_VIEW.DEBUG_VIEW_WEATHER    = 天气
+value.DEBUG_VIEW.DEBUG_VIEW_HISTOGRAM  = 柱状图
+
+value.tonemap_left.academy_fit            = Academy Fit
+value.tonemap_left.academy_rrt            = Academy RRT
+value.tonemap_left.tonemap_lottes         = Lottes
+value.tonemap_left.tonemap_hejl_2015      = Hejl 2015
+value.tonemap_left.tonemap_hejl_burgess   = Hejl-Burgess
+value.tonemap_left.tonemap_uncharted_2    = Uncharted 2
+value.tonemap_left.tonemap_tech           = Tech
+value.tonemap_left.tonemap_ozius          = Ozius
+value.tonemap_left.tonemap_reinhard       = Reinhard
+value.tonemap_left.tonemap_reinhard_jodie = Reinhard-Jodie
+
+value.tonemap_right.academy_fit            = Academy Fit
+value.tonemap_right.academy_rrt            = Academy RRT
+value.tonemap_right.tonemap_lottes         = Lottes
+value.tonemap_right.tonemap_hejl_burgess   = Hejl-Burgess
+value.tonemap_right.tonemap_hejl_2015      = Hejl 2015
+value.tonemap_right.tonemap_uncharted_2    = Uncharted 2
+value.tonemap_right.tonemap_tech           = Tech
+value.tonemap_right.tonemap_ozius          = Ozius
+value.tonemap_right.tonemap_reinhard       = Reinhard
+value.tonemap_right.tonemap_reinhard_jodie = Reinhard-Jodie
+
+# Box
+
+option.BOX_MODE                 = 选择框模式
+option.BOX_MODE.comment         = 选择框模式\n\n无：默认\n颜色：用户颜色\n彩虹：梦幻RGB效果
+value.BOX_MODE.BOX_MODE_NONE    = 无
+value.BOX_MODE.BOX_MODE_COLOR   = 颜色
+value.BOX_MODE.BOX_MODE_RAINBOW = 彩虹
+option.BOX_COLOR_R              = 红
+option.BOX_COLOR_G              = 绿
+option.BOX_COLOR_B              = 蓝
+option.BOX_EMISSION             = 发光
+option.BOX_EMISSION.comment     = 将颜色缩放到1以上。需要泛光。
+option.BOX_LINE_WIDTH           = 边框宽度
+
+# Daily Weather System
+
+option.WEATHER_DAY                         = 指定日期
+value.WEATHER_DAY.-1                       = 随机
+
+option.WEATHER_D0_CLOUDS_CUMULUS_MIN       = 最小积云覆盖率
+option.WEATHER_D0_CLOUDS_CUMULUS_MAX       = 最大积云覆盖率
+option.WEATHER_D0_CLOUDS_ALTOCUMULUS_MIN   = 最小高积云覆盖率
+option.WEATHER_D0_CLOUDS_ALTOCUMULUS_MAX   = 最大高积云覆盖率
+option.WEATHER_D0_CLOUDS_CIRRUS            = 卷云覆盖率
+option.WEATHER_D0_CLOUDS_CC                = 卷积云覆盖率
+option.WEATHER_D0_FOGGINESS                = 雾浓度
+option.WEATHER_D0_CLOUDS_CUMULUS_CONGESTUS_AMOUNT = 浓积云
+option.WEATHER_D0_CLOUDS_STRATUS_AMOUNT    = 层云
+option.WEATHER_D0_OVERCASTNESS             = 阴天
+option.WEATHER_D1_CLOUDS_CUMULUS_MIN       = 最小积云覆盖率
+option.WEATHER_D1_CLOUDS_CUMULUS_MAX       = 最大积云覆盖率
+option.WEATHER_D1_CLOUDS_ALTOCUMULUS_MIN   = 最小高积云覆盖率
+option.WEATHER_D1_CLOUDS_ALTOCUMULUS_MAX   = 最大高积云覆盖率
+option.WEATHER_D1_CLOUDS_CIRRUS            = 卷云覆盖率
+option.WEATHER_D1_CLOUDS_CC                = 卷积云覆盖率
+option.WEATHER_D1_FOGGINESS                = 雾浓度
+option.WEATHER_D1_CLOUDS_CUMULUS_CONGESTUS_AMOUNT = 浓积云
+option.WEATHER_D1_CLOUDS_STRATUS_AMOUNT    = 层云
+option.WEATHER_D1_OVERCASTNESS             = 阴天
+option.WEATHER_D2_CLOUDS_CUMULUS_MIN       = 最小积云覆盖率
+option.WEATHER_D2_CLOUDS_CUMULUS_MAX       = 最大积云覆盖率
+option.WEATHER_D2_CLOUDS_ALTOCUMULUS_MIN   = 最小高积云覆盖率
+option.WEATHER_D2_CLOUDS_ALTOCUMULUS_MAX   = 最大高积云覆盖率
+option.WEATHER_D2_CLOUDS_CIRRUS            = 卷云覆盖率
+option.WEATHER_D2_CLOUDS_CC                = 卷积云覆盖率
+option.WEATHER_D2_FOGGINESS                = 雾浓度
+option.WEATHER_D2_CLOUDS_CUMULUS_CONGESTUS_AMOUNT = 浓积云
+option.WEATHER_D2_CLOUDS_STRATUS_AMOUNT    = 层云
+option.WEATHER_D2_OVERCASTNESS             = 阴天
+option.WEATHER_D3_CLOUDS_CUMULUS_MIN       = 最小积云覆盖率
+option.WEATHER_D3_CLOUDS_CUMULUS_MAX       = 最大积云覆盖率
+option.WEATHER_D3_CLOUDS_ALTOCUMULUS_MIN   = 最小高积云覆盖率
+option.WEATHER_D3_CLOUDS_ALTOCUMULUS_MAX   = 最大高积云覆盖率
+option.WEATHER_D3_CLOUDS_CIRRUS            = 卷云覆盖率
+option.WEATHER_D3_CLOUDS_CC                = 卷积云覆盖率
+option.WEATHER_D3_FOGGINESS                = 雾浓度
+option.WEATHER_D3_CLOUDS_CUMULUS_CONGESTUS_AMOUNT = 浓积云
+option.WEATHER_D3_CLOUDS_STRATUS_AMOUNT    = 层云
+option.WEATHER_D3_OVERCASTNESS             = 阴天
+option.WEATHER_D4_CLOUDS_CUMULUS_MIN       = 最小积云覆盖率
+option.WEATHER_D4_CLOUDS_CUMULUS_MAX       = 最大积云覆盖率
+option.WEATHER_D4_CLOUDS_ALTOCUMULUS_MIN   = 最小高积云覆盖率
+option.WEATHER_D4_CLOUDS_ALTOCUMULUS_MAX   = 最大高积云覆盖率
+option.WEATHER_D4_CLOUDS_CIRRUS            = 卷云覆盖率
+option.WEATHER_D4_CLOUDS_CC                = 卷积云覆盖率
+option.WEATHER_D4_FOGGINESS                = 雾浓度
+option.WEATHER_D4_CLOUDS_CUMULUS_CONGESTUS_AMOUNT = 浓积云
+option.WEATHER_D4_CLOUDS_STRATUS_AMOUNT    = 层云
+option.WEATHER_D4_OVERCASTNESS             = 阴天
+option.WEATHER_D5_CLOUDS_CUMULUS_MIN       = 最小积云覆盖率
+option.WEATHER_D5_CLOUDS_CUMULUS_MAX       = 最大积云覆盖率
+option.WEATHER_D5_CLOUDS_ALTOCUMULUS_MIN   = 最小高积云覆盖率
+option.WEATHER_D5_CLOUDS_ALTOCUMULUS_MAX   = 最大高积云覆盖率
+option.WEATHER_D5_CLOUDS_CIRRUS            = 卷云覆盖率
+option.WEATHER_D5_CLOUDS_CC                = 卷积云覆盖率
+option.WEATHER_D5_FOGGINESS                = 雾浓度
+option.WEATHER_D5_CLOUDS_CUMULUS_CONGESTUS_AMOUNT = 浓积云
+option.WEATHER_D5_CLOUDS_STRATUS_AMOUNT    = 层云
+option.WEATHER_D5_OVERCASTNESS             = 阴天
+option.WEATHER_D6_CLOUDS_CUMULUS_MIN       = 最小积云覆盖率
+option.WEATHER_D6_CLOUDS_CUMULUS_MAX       = 最大积云覆盖率
+option.WEATHER_D6_CLOUDS_ALTOCUMULUS_MIN   = 最小高积云覆盖率
+option.WEATHER_D6_CLOUDS_ALTOCUMULUS_MAX   = 最大高积云覆盖率
+option.WEATHER_D6_CLOUDS_CIRRUS            = 卷云覆盖率
+option.WEATHER_D6_CLOUDS_CC                = 卷积云覆盖率
+option.WEATHER_D6_FOGGINESS                = 雾浓度
+option.WEATHER_D6_CLOUDS_CUMULUS_CONGESTUS_AMOUNT = 浓积云
+option.WEATHER_D6_CLOUDS_STRATUS_AMOUNT    = 层云
+option.WEATHER_D6_OVERCASTNESS             = 阴天
+option.WEATHER_D7_CLOUDS_CUMULUS_MIN       = 最小积云覆盖率
+option.WEATHER_D7_CLOUDS_CUMULUS_MAX       = 最大积云覆盖率
+option.WEATHER_D7_CLOUDS_ALTOCUMULUS_MIN   = 最小高积云覆盖率
+option.WEATHER_D7_CLOUDS_ALTOCUMULUS_MAX   = 最大高积云覆盖率
+option.WEATHER_D7_CLOUDS_CIRRUS            = 卷云覆盖率
+option.WEATHER_D7_CLOUDS_CC                = 卷积云覆盖率
+option.WEATHER_D7_FOGGINESS                = 雾浓度
+option.WEATHER_D7_CLOUDS_CUMULUS_CONGESTUS_AMOUNT = 浓积云
+option.WEATHER_D7_CLOUDS_STRATUS_AMOUNT    = 层云
+option.WEATHER_D7_OVERCASTNESS             = 阴天
+option.WEATHER_D8_CLOUDS_CUMULUS_MIN       = 最小积云覆盖率
+option.WEATHER_D8_CLOUDS_CUMULUS_MAX       = 最大积云覆盖率
+option.WEATHER_D8_CLOUDS_ALTOCUMULUS_MIN   = 最小高积云覆盖率
+option.WEATHER_D8_CLOUDS_ALTOCUMULUS_MAX   = 最大高积云覆盖率
+option.WEATHER_D8_CLOUDS_CIRRUS            = 卷云覆盖率
+option.WEATHER_D8_CLOUDS_CC                = 卷积云覆盖率
+option.WEATHER_D8_FOGGINESS                = 雾浓度
+option.WEATHER_D8_CLOUDS_CUMULUS_CONGESTUS_AMOUNT = 浓积云
+option.WEATHER_D8_CLOUDS_STRATUS_AMOUNT    = 层云
+option.WEATHER_D8_OVERCASTNESS             = 阴天
+option.WEATHER_D9_CLOUDS_CUMULUS_MIN       = 最小积云覆盖率
+option.WEATHER_D9_CLOUDS_CUMULUS_MAX       = 最大积云覆盖率
+option.WEATHER_D9_CLOUDS_ALTOCUMULUS_MIN   = 最小高积云覆盖率
+option.WEATHER_D9_CLOUDS_ALTOCUMULUS_MAX   = 最大高积云覆盖率
+option.WEATHER_D9_CLOUDS_CIRRUS            = 卷云覆盖率
+option.WEATHER_D9_CLOUDS_CC                = 卷积云覆盖率
+option.WEATHER_D9_FOGGINESS                = 雾浓度
+option.WEATHER_D9_CLOUDS_CUMULUS_CONGESTUS_AMOUNT = 浓积云
+option.WEATHER_D9_CLOUDS_STRATUS_AMOUNT    = 层云
+option.WEATHER_D9_OVERCASTNESS             = 阴天
+option.WEATHER_D10_CLOUDS_CUMULUS_MIN      = 最小积云覆盖率
+option.WEATHER_D10_CLOUDS_CUMULUS_MAX      = 最大积云覆盖率
+option.WEATHER_D10_CLOUDS_ALTOCUMULUS_MIN  = 最小高积云覆盖率
+option.WEATHER_D10_CLOUDS_ALTOCUMULUS_MAX  = 最大高积云覆盖率
+option.WEATHER_D10_CLOUDS_CIRRUS           = 卷云覆盖率
+option.WEATHER_D10_CLOUDS_CC               = 卷积云覆盖率
+option.WEATHER_D10_FOGGINESS               = 雾浓度
+option.WEATHER_D10_CLOUDS_CUMULUS_CONGESTUS_AMOUNT = 浓积云
+option.WEATHER_D10_CLOUDS_STRATUS_AMOUNT   = 层云
+option.WEATHER_D10_OVERCASTNESS            = 阴天
+option.WEATHER_D11_CLOUDS_CUMULUS_MIN      = 最小积云覆盖率
+option.WEATHER_D11_CLOUDS_CUMULUS_MAX      = 最大积云覆盖率
+option.WEATHER_D11_CLOUDS_ALTOCUMULUS_MIN  = 最小高积云覆盖率
+option.WEATHER_D11_CLOUDS_ALTOCUMULUS_MAX  = 最大高积云覆盖率
+option.WEATHER_D11_CLOUDS_CIRRUS           = 卷云覆盖率
+option.WEATHER_D11_CLOUDS_CC               = 卷积云覆盖率
+option.WEATHER_D11_FOGGINESS               = 雾浓度
+option.WEATHER_D11_CLOUDS_CUMULUS_CONGESTUS_AMOUNT = 浓积云
+option.WEATHER_D11_CLOUDS_STRATUS_AMOUNT   = 层云
+option.WEATHER_D11_OVERCASTNESS            = 阴天
