@@ -29,7 +29,7 @@ screen.aurora                          = 极光
 screen.clouds                          = 云
 screen.clouds_cumulus                  = 积云设置
 screen.clouds_altocumulus              = 高积云设置
-screen.clouds_cumulus_congestus        = 积雨云设置
+screen.clouds_cumulus_congestus        = 浓积云设置
 screen.clouds_cirrus                   = 平面云设置
 screen.clouds_minecrafty               = 方块云设置
 
@@ -336,7 +336,7 @@ suffix.CLOUDS_CIRRUS_ALTITUDE              = m/s
 option.CLOUDS_CIRRUS_WIND_ANGLE            = 风向
 suffix.CLOUDS_CIRRUS_ALTITUDE              = °
 
-option.CLOUDS_ALTOCUMULUS                       = 高级云
+option.CLOUDS_ALTOCUMULUS                       = 高积云
 option.CLOUDS_CIRRUS                       = 平面云
 
 option.AURORA_NORMAL                   = 所有生物群系极光
