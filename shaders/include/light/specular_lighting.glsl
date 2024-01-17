@@ -224,13 +224,13 @@ vec3 trace_specular_ray(
 		vec3 hit_pos_prev = reproject(hit_pos);
 		if (clamp01(hit_pos_prev) != hit_pos_prev) return sky_reflection;
 
-		vec3 reflection = textureLod(colortex5, hit_pos_prev.xy, mip_level).rgb * 4.1;
+		vec3 reflection = textureLod(colortex5, hit_pos_prev.xy, mip_level).rgb;
 		     reflection = max0(reflection - fog_scattering);
 #else
 		vec3 reflection = textureLod(colortex0, hit_pos.xy * taau_render_scale, mip_level).rgb;
 #endif
 
-		return mix(sky_reflection, reflection, border_attenuation);
+		return mix(sky_reflection, reflection, border_attenuation) * 5.1;
 	} else {
 		return sky_reflection;
 	}
@@ -277,11 +277,9 @@ vec3 get_specular_reflections(
 
 			vec3 fresnel;
 			if (material.is_hardcoded_metal) {
-				fresnel = sqr(fresnel_lazanyi_2019(NoV, material.f0, material.f82) - 0.21);
-				radiance += fresnel * 0.32;
+				fresnel = sqr(fresnel_lazanyi_2019(NoV, material.f0, material.f82) - 0.11);
 			} else if (material.is_metal) {
-				fresnel = sqr(fresnel_schlick(NoV, material.albedo) - 0.21);
-				radiance += fresnel * 0.32;
+				fresnel = sqr(fresnel_schlick(NoV, material.albedo) - 0.11);
 			} else {
 				fresnel = fresnel_dielectric(NoV, material.f0.x);
 			}
