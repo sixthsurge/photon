@@ -546,8 +546,8 @@ Material material_from(vec3 albedo_srgb, uint material_mask, vec3 world_pos, ino
 		#ifdef HARDCODED_SPECULAR
 		material.f0 = vec3(0.04);
 		material.roughness = 0.0;
-		material.ssr_multiplier = 3.0;
-		material.emission = 0.12 * albedo_sqrt;
+		material.ssr_multiplier = 10.0;
+		material.emission = 0.14 * albedo_sqrt;
 		#endif
 
 		#ifdef HARDCODED_SSS
