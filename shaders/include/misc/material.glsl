@@ -227,7 +227,8 @@ Material material_from(vec3 albedo_srgb, uint material_mask, vec3 world_pos, ino
 							material.roughness = max(sqr(1.0 - smoothness), 0.04);
 							material.f0 = material.albedo;
 							material.is_metal = true;
-							material.ssr_multiplier = 1.0;
+							material.ssr_multiplier = 10.0;
+							material.emission  = -10.25 * albedo_sqrt;
 							#endif
 						} else { // 13
 							// Gems

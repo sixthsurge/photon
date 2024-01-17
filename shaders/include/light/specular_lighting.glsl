@@ -82,9 +82,9 @@ vec3 get_specular_highlight(
 
 	vec3 fresnel;
 	if (material.is_hardcoded_metal) {
-		fresnel = fresnel_lazanyi_2019(LoH, material.f0, material.f82);
+		fresnel = fresnel_lazanyi_2019(LoH, material.f0, material.f82) * 1.7;
 	} else if (material.is_metal) {
-		fresnel = fresnel_schlick(LoH, material.albedo);
+		fresnel = fresnel_schlick(LoH, material.albedo) * 1.7;
 	} else {
 		fresnel = fresnel_dielectric(LoH, material.f0.x);
 	}
@@ -216,7 +216,7 @@ vec3 trace_specular_ray(
 	#ifdef VL
 		// Un-apply volumetric fog scattering using fog from the current frame
 		vec2 fog_uv = clamp(hit_pos.xy * VL_RENDER_SCALE, vec2(0.0), floor(view_res * VL_RENDER_SCALE - 1.0) * view_pixel_size);
-		vec3 fog_scattering = texture(colortex6, fog_uv).rgb * 4;
+		vec3 fog_scattering = texture(colortex6, fog_uv).rgb;
 	#else
 		vec3 fog_scattering = vec3(0.0);
 	#endif
@@ -224,13 +224,13 @@ vec3 trace_specular_ray(
 		vec3 hit_pos_prev = reproject(hit_pos);
 		if (clamp01(hit_pos_prev) != hit_pos_prev) return sky_reflection;
 
-		vec3 reflection = textureLod(colortex5, hit_pos_prev.xy, mip_level).rgb;
+		vec3 reflection = textureLod(colortex5, hit_pos_prev.xy, mip_level).rgb * 1.2;
 		     reflection = max0(reflection - fog_scattering);
 #else
-		vec3 reflection = textureLod(colortex0, hit_pos.xy * taau_render_scale, mip_level).rgb * 1.4;
+		vec3 reflection = textureLod(colortex0, hit_pos.xy * taau_render_scale, mip_level).rgb;
 #endif
 
-		return mix(sky_reflection, reflection, border_attenuation) * 1.4;
+		return mix(sky_reflection, reflection, border_attenuation);
 	} else {
 		return sky_reflection;
 	}
@@ -254,7 +254,7 @@ vec3 get_specular_reflections(
 	float dither = r1(frameCounter, texelFetch(noisetex, ivec2(gl_FragCoord.xy) & 511, 0).b);
 
 #if defined SSR_ROUGHNESS_SUPPORT && defined SPECULAR_MAPPING
-	if (material.roughness > 1.25e-2) { // Rough reflection
+	if (material.roughness > sqr(material.f0.x) - 0.99) { // Rough reflection
 	 	float mip_level = 16.0 * dampen(material.roughness);
 
 		vec3 reflection = vec3(0.0);
@@ -264,22 +264,22 @@ vec3 get_specular_reflections(
 			hash.x = interleaved_gradient_noise(gl_FragCoord.xy,                    frameCounter * SSR_RAY_COUNT + i);
 			hash.y = interleaved_gradient_noise(gl_FragCoord.xy + vec2(97.0, 23.0), frameCounter * SSR_RAY_COUNT + i);
 
-			vec3 microfacet_normal = tbn_matrix * sample_ggx_vndf(-tangent_dir, vec2(material.roughness), hash);
+			vec3 microfacet_normal = tbn_matrix * sample_ggx_vndf(-tangent_dir, vec2(material.roughness) * 1.6, hash);
 			vec3 ray_dir = reflect(world_dir, microfacet_normal);
 
 			float NoL = dot(normal, ray_dir);
 			if (NoL < eps) continue;
 
-			vec3 radiance =  trace_specular_ray(screen_pos, view_pos, ray_dir, dither, skylight, SSR_INTERSECTION_STEPS_ROUGH, SSR_REFINEMENT_STEPS, int(mip_level));
+			vec3 radiance = trace_specular_ray(screen_pos, view_pos, ray_dir, dither, skylight, SSR_INTERSECTION_STEPS_ROUGH, SSR_REFINEMENT_STEPS, int(mip_level));
 
 			float NoV = max(1e-2, dot(flat_normal, -world_dir));
 			float MoV = max(1e-2, dot(microfacet_normal, -world_dir));
 
 			vec3 fresnel;
 			if (material.is_hardcoded_metal) {
-				fresnel = fresnel_lazanyi_2019(NoV, material.f0, material.f82);
+				fresnel = sqr(fresnel_lazanyi_2019(NoV, material.f0, material.f82)) * 1.15;
 			} else if (material.is_metal) {
-				fresnel = fresnel_schlick(NoV, material.albedo);
+				fresnel = sqr(fresnel_schlick(NoV, material.albedo)) * 1.15;
 			} else {
 				fresnel = fresnel_dielectric(NoV, material.f0.x);
 			}
@@ -287,7 +287,7 @@ vec3 get_specular_reflections(
 			float v1 = v1_smith_ggx(NoV, alpha_squared);
 			float v2 = v2_smith_ggx(NoL, NoV, alpha_squared);
 
-			reflection += radiance * 0.85 * fresnel * (2.0 * NoL * v2 / v1);
+			reflection += radiance * fresnel * (2.0 * NoL * v2 / v1);
 		}
 
 		reflection *= albedo_tint * rcp(float(SSR_RAY_COUNT));
