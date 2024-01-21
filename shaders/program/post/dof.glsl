@@ -57,7 +57,7 @@ uniform float centerDepthSmooth;
 
 uniform int frameCounter;
 
-uniform float view_pixel_size;
+uniform vec2 view_pixel_size;
 
 #include "/include/utility/random.glsl"
 #include "/include/utility/sampling.glsl"
