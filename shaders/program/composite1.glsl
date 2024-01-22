@@ -341,8 +341,8 @@ void main() {
 		);
 
 		if (puddle) {
-			material.is_metal = false;
-			material.is_hardcoded_metal = false;
+			material.is_metal = true;
+			material.is_hardcoded_metal = true;
 		}
 	}
 #endif

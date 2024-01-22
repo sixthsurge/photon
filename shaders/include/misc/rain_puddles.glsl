@@ -35,7 +35,7 @@ bool get_rain_puddles(
 	inout float roughness,
 	inout float ssr_multiplier
 ) {
-	const float puddle_f0                      = 0.25;
+	const float puddle_f0                      = 7.25;
 	const float puddle_roughness               = 0.0;
 	const float puddle_darkening_factor        = 0.6;
 	const float puddle_darkening_factor_porous = 0.7;
@@ -54,7 +54,7 @@ bool get_rain_puddles(
 	// Replace material with puddle material
 	f0             = max(f0, mix(f0, vec3(puddle_f0), puddle));
 	roughness      = puddle_roughness;
-	ssr_multiplier = max(ssr_multiplier, puddle) * 1.25;
+	ssr_multiplier = max(ssr_multiplier, puddle);
 
 	// Ripple animation
 	const float h = 0.23;
