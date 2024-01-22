@@ -135,7 +135,6 @@ void main() {
 		
 		tint = vec4(0.83);
 		tint.a = 1.10;
-		ambient_color = vec3(0.1);
 	}
 #endif
 
