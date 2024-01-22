@@ -6,8 +6,8 @@ const vec3[32] light_color = vec3[32](
 	vec3(0.90, 0.30, 1.00) *  1.55, // Medium white light
 	vec3(1.00, 1.00, 1.00) *  0.75, // Weak white light
 	vec3(1.00, 0.45, 0.20) * 1.50, // Strong golden light
-	vec3(1.00, 0.70, 0.35) *  1.3, // Medium golden light
-	vec3(1.00, 0.40, 0.15) *  0.75, // Weak golden light
+	vec3(1.00, 0.70, 0.35) *  0.8, // Medium golden light
+	vec3(1.00, 0.40, 0.15) *  0.65, // Weak golden light
 	vec3(1.00, 0.18, 0.10) *  1.75, // Redstone components
 	vec3(1.00, 0.15, 0.00) * 48.0, // Lava
 	vec3(1.00, 0.45, 0.10) *  2.45, // Medium orange light
