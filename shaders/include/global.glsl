@@ -34,6 +34,7 @@ const float taau_render_scale = 1.0;
 #define max0(x) max(x, 0.0)
 #define max1(x) max(x, 1.0)
 #define min1(x) min(x, 1.0)
+#define logx(x, y) (log2(x) / log2(y))
 
 float sqr(float x) { return x * x; }
 vec2  sqr(vec2  v) { return v * v; }
@@ -54,6 +55,10 @@ float length_squared(vec3 v) { return dot(v, v); }
 
 vec2 normalize_safe(vec2 v) { return v == vec2(0.0) ? v : normalize(v); }
 vec3 normalize_safe(vec3 v) { return v == vec3(0.0) ? v : normalize(v); }
+
+float sdiv(float a, float b) { return b == 0.0 ? 0.0 : a/b; }
+vec3  sdiv(vec3 a, float b)  { return b == 0.0 ? vec3(0.0) : a/b; }
+vec3  sdiv(vec3 a, vec3 b)   { return vec3(sdiv(a.x, b.x), sdiv(a.y, b.y), sdiv(a.z, b.z)); }
 
 // Remapping functions
 

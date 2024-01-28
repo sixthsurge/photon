@@ -1,5 +1,5 @@
-#if !defined INCLUDE_ACES_TONESCALES
-#define INCLUDE_ACES_TONESCALES
+#if !defined INCLUDE_TONEMAPPING_ACES_TONESCALES
+#define INCLUDE_TONEMAPPING_ACES_TONESCALES
 
 #include "utility.glsl"
 
@@ -144,4 +144,4 @@ float segmented_spline_c9_fwd(float x) {
 	return pow(10.0, log_y);
 }
 
-#endif // INCLUDE_ACES_TONESCALES
+#endif // INCLUDE_TONEMAPPING_ACES_TONESCALES

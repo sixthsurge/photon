@@ -7,12 +7,12 @@
 #define daily_weather_blend(weather_function) mix(weather_function(worldDay), weather_function(worldDay + 1), weather_mix_factor())
 
 uint weather_day_index(int world_day) {
+#if WEATHER_DAY == -1
 	// Start at noon
 	world_day -= int(worldTime < 6000);
 
 	const uint day_count = 12;
 
-#if WEATHER_DAY == -1
 	uint day_index = uint(world_day);
 	     day_index = lowbias32(day_index) % day_count;
 #else
@@ -366,7 +366,7 @@ mat2x3 get_aurora_colors() {
 		)
 	);
 
-	if(AURORA_COLOR == -1) {
+#if AURORA_COLOR == -1
 		const uint[] weights = uint[](
 			AURORA_COLOR_0_WEIGHT, AURORA_COLOR_1_WEIGHT, AURORA_COLOR_2_WEIGHT, AURORA_COLOR_3_WEIGHT, AURORA_COLOR_4_WEIGHT,
 			AURORA_COLOR_5_WEIGHT, AURORA_COLOR_6_WEIGHT, AURORA_COLOR_7_WEIGHT, AURORA_COLOR_8_WEIGHT, AURORA_COLOR_9_WEIGHT,
@@ -385,11 +385,11 @@ mat2x3 get_aurora_colors() {
 		uint day_index = uint(worldDay);
 			 day_index = lowbias32(day_index) % aurora_colors_weighted.length();
 		return aurora_colors_weighted[day_index];
-	} else {
+#else
 		return aurora_colors[uint(AURORA_COLOR)];
-	}
+#endif
 
 }
-#endif
+#endif // WEATHER_AURORA
 
 #endif // INCLUDE_MISC_WEATHER

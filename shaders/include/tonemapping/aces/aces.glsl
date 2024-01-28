@@ -1,11 +1,12 @@
-#if !defined INCLUDE_ACES_ACES
-#define INCLUDE_ACES_ACES
+#if !defined INCLUDE_TONEMAPPING_ACES_ACES
+#define INCLUDE_TONEMAPPING_ACES_ACES
 
 /*
  * Implemented following the reference implementation given by the Academy at
  * https://github.com/ampas/aces-dev (revision 1.3)
  */
 
+#include "gamut_compress.glsl"
 #include "matrices.glsl"
 #include "tonescales.glsl"
 #include "utility.glsl"
@@ -206,4 +207,11 @@ vec3 rrt_and_odt_fit(vec3 rgb) {
 	return a / b;
 }
 
-#endif // INCLUDE_ACES_ACES
+vec3 aces_lmt(vec3 ap0) {
+	#if ACES_LMT == ACES_LMT_GAMUT_COMPRESS
+		ap0 = gamut_compress(ap0);
+	#endif
+	return ap0;
+}
+
+#endif // INCLUDE_TONEMAPPING_ACES_ACES

@@ -145,7 +145,7 @@ vec4 aurora(vec3 dir) {
 		outColor += avgColor * exp2(-(amp_fraction * 24) * 0.065 - 2.5) * smoothstep(0.0, 5.0, (amp_fraction * 24)) * (rcp(AURORA_SAMPLES) * 24);
 	}
 
-	outColor *= (clamp(dir.y * 15.0 + 0.4, 0.0, 1.0));
+	outColor *= clamp01(dir.y * 15.0 + 0.4);
 
 	return outColor * mix(AURORA_BRIGHTNESS, AURORA_BRIGHTNESS_SNOW, biome_may_snow);
 }

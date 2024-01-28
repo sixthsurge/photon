@@ -24,6 +24,13 @@ screen.light_sources                   = Light Sources
 screen.shadows                         = Shadows
 screen.color_grading                   = Color Grading
 screen.exposure                        = Exposure
+screen.tonemap_settings                = Tonemap Specific Settings
+
+screen.aces_settings                   = Academy Tonemap Settings
+screen.uncharted_2_settings            = Uncharted 2 Tonemap Settings
+screen.uchimura_settings               = Uchimura Tonemap Settings
+screen.agx_settings                    = AgX Tonemap Settings
+screen.jjs_zcam_settings               = justjohn's ZCAM Tonemap Settings
 
 screen.aurora                          = Aurora
 screen.aurora_color                    = Aurora Color Settings
@@ -731,7 +738,7 @@ option.BLOOM.comment                   = Soft "glow" effect around bright areas 
 option.BLOOM_INTENSITY                 = Bloom Intensity
 option.BLOOM_INTENSITY.comment         = Adjusts how much the bloom affects the final image
 option.DOF                             = Depth of Field
-option.DOG.comment                     = Camera focus effect - blurs out-of-focus areas
+option.DOF.comment                     = Camera focus effect - blurs out-of-focus areas
 option.DOF_INTENSITY                   = DoF Intensity
 option.DOF_INTENSITY.comment           = Adjusts the intensity of Depth of Field
 option.DOF_SAMPLES                     = DoF Samples
@@ -763,16 +770,20 @@ value.DOF_FOCUS.-1.0                   = Automatic
 
 option.tonemap                         = Tonemap Operator
 
+value.tonemap.tonemap_none             = No Tonemap
 value.tonemap.academy_fit              = Academy Fit
 value.tonemap.academy_rrt              = Academy RRT
+value.tonemap.tonemap_lottes           = Lottes
 value.tonemap.tonemap_hejl_2015        = Hejl 2015
 value.tonemap.tonemap_hejl_burgess     = Hejl-Burgess
-value.tonemap.tonemap_lottes           = Lottes
 value.tonemap.tonemap_uncharted_2      = Uncharted 2
 value.tonemap.tonemap_tech             = Tech
 value.tonemap.tonemap_ozius            = Ozius
 value.tonemap.tonemap_reinhard         = Reinhard
 value.tonemap.tonemap_reinhard_jodie   = Reinhard-Jodie
+value.tonemap.tonemap_uchimura         = Uchimura
+value.tonemap.tonemap_agx              = AgX
+value.tonemap.tonemap_justjohn         = justjohn's ZCAM
 
 # Color Grading
 
@@ -790,6 +801,42 @@ suffix.GRADE_GREEN_HUE_SHIFT           = °
 option.PURKINJE_SHIFT                  = Purkinje Shift
 option.PURKINJE_SHIFT.option           = Simulates the effect of low lighting on human vision; desaturating all colors and darkening red hues
 option.PURKINJE_SHIFT_INTENSITY        = Purkinje Shift Intensity
+
+# Tonemap settings
+
+option.ACES_LMT                        = Academy LMT
+value.ACES_LMT.ACES_LMT_NONE           = None
+value.ACES_LMT.ACES_LMT_GAMUT_COMPRESS = Gamut Compress
+
+option.UNCHARTED_2_PARTIAL          = Uncharted 2 Partial Tonemap
+
+option.UCHIMURA_MAX_BRIGHTNESS        = Maximum Brightness
+option.UCHIMURA_CONTRAST              = Contrast
+option.UCHIMURA_LINEAR_SECTION_START  = Linear Section Start
+option.UCHIMURA_LINEAR_SECTION_LENGTH = Linear Section Length
+option.UCHIMURA_BLACK_TIGHTNESS       = Black Tightness
+option.UCHIMURA_BLACK_PEDESTAL        = Black Pedestal
+
+option.AGX_LOOK                     = AgX Tonemap Look
+option.AGX_LOOK.comment             = \nDefault: No change and no extra performance impact.\nGolden: Adds warm tones for a less saturated, golden feel.\nPunchy: Enhances colors and contrast for vivid visuals.\nCustom: Enables customizing Offset, Slope, Power, and Saturation\n\nEquation:\n§o luma + Saturation * [(color * Slope + Offset)^Power - luma]
+option.AGX_EOTF                     = AgX EOTF
+option.AGX_HIGHER_PRECISION         = Higher Precision Approximation
+option.AGX_HIGHER_PRECISION.comment = Difference is probably unnoticable
+option.AGX_OFFSET_R                 = Red Offset
+option.AGX_OFFSET_G                 = Green Offset
+option.AGX_OFFSET_B                 = Blue Offset
+option.AGX_SLOPE_R                  = Red Slope
+option.AGX_SLOPE_G                  = Green Slope
+option.AGX_SLOPE_B                  = Blue Slope
+option.AGX_POWER_R                  = Red Power
+option.AGX_POWER_G                  = Green Power
+option.AGX_POWER_B                  = Blue Power
+option.AGX_SATURATION               = AgX Saturation
+
+value.AGX_LOOK.AGX_LOOK_CUSTOM  = Custom
+value.AGX_LOOK.AGX_LOOK_DEFAULT = Default
+value.AGX_LOOK.AGX_LOOK_GOLDEN  = Golden
+value.AGX_LOOK.AGX_LOOK_PUNCHY  = Punchy
 
 # Exposure
 
@@ -831,6 +878,7 @@ value.DEBUG_VIEW.DEBUG_VIEW_SAMPLER    = Sampler
 value.DEBUG_VIEW.DEBUG_VIEW_WEATHER    = Weather
 value.DEBUG_VIEW.DEBUG_VIEW_HISTOGRAM  = Histogram
 
+value.tonemap_left.tonemap_none           = No Tonemap
 value.tonemap_left.academy_fit            = Academy Fit
 value.tonemap_left.academy_rrt            = Academy RRT
 value.tonemap_left.tonemap_lottes         = Lottes
@@ -841,17 +889,24 @@ value.tonemap_left.tonemap_tech           = Tech
 value.tonemap_left.tonemap_ozius          = Ozius
 value.tonemap_left.tonemap_reinhard       = Reinhard
 value.tonemap_left.tonemap_reinhard_jodie = Reinhard-Jodie
+value.tonemap_left.tonemap_uchimura       = Uchimura
+value.tonemap_left.tonemap_agx            = AgX
+value.tonemap_left.tonemap_justjohn       = justjohn's ZCAM
 
+value.tonemap_right.tonemap_none           = No Tonemap
 value.tonemap_right.academy_fit            = Academy Fit
 value.tonemap_right.academy_rrt            = Academy RRT
 value.tonemap_right.tonemap_lottes         = Lottes
-value.tonemap_right.tonemap_hejl_burgess   = Hejl-Burgess
 value.tonemap_right.tonemap_hejl_2015      = Hejl 2015
+value.tonemap_right.tonemap_hejl_burgess   = Hejl-Burgess
 value.tonemap_right.tonemap_uncharted_2    = Uncharted 2
 value.tonemap_right.tonemap_tech           = Tech
 value.tonemap_right.tonemap_ozius          = Ozius
 value.tonemap_right.tonemap_reinhard       = Reinhard
 value.tonemap_right.tonemap_reinhard_jodie = Reinhard-Jodie
+value.tonemap_right.tonemap_uchimura       = Uchimura
+value.tonemap_right.tonemap_agx            = AgX
+value.tonemap_right.tonemap_justjohn       = justjohn's ZCAM
 
 # Box
 

@@ -1,5 +1,5 @@
-#if !defined INCLUDE_ACES_UTILITY
-#define INCLUDE_ACES_UTILITY
+#if !defined INCLUDE_TONEMAPPING_ACES_UTILITY
+#define INCLUDE_TONEMAPPING_ACES_UTILITY
 
 #include "/include/utility/color.glsl"
 #include "/include/utility/fast_math.glsl"
@@ -85,4 +85,4 @@ float rgb_to_yc(vec3 rgb) {
 	return rcp(3.0) * (rgb.r + rgb.g + rgb.b + yc_radius_weight * chroma);
 }
 
-#endif // INCLUDE_ACES_UTILITY
+#endif // INCLUDE_TONEMAPPING_ACES_UTILITY
