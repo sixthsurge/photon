@@ -26,6 +26,8 @@ screen.color_grading                   = Color Grading
 screen.exposure                        = Exposure
 screen.tonemap_settings                = Tonemap Specific Settings
 
+screen.dof_settings                    = DoF Settings
+
 screen.aces_settings                   = Academy Tonemap Settings
 screen.uncharted_2_settings            = Uncharted 2 Tonemap Settings
 screen.uchimura_settings               = Uchimura Tonemap Settings
@@ -737,6 +739,7 @@ option.BLOOM                           = Bloom
 option.BLOOM.comment                   = Soft "glow" effect around bright areas and light sources
 option.BLOOM_INTENSITY                 = Bloom Intensity
 option.BLOOM_INTENSITY.comment         = Adjusts how much the bloom affects the final image
+
 option.DOF                             = Depth of Field
 option.DOF.comment                     = Camera focus effect - blurs out-of-focus areas
 option.DOF_INTENSITY                   = DoF Intensity
@@ -745,6 +748,16 @@ option.DOF_SAMPLES                     = DoF Samples
 option.DOF_SAMPLES.comment             = Number of samples taken for Depth of Field. Higher sample counts result in a higher quality blur but take more performance
 option.DOF_FOCUS                       = DoF Focus
 option.DOF_FOCUS.comment               = Focal distance for Depth of Field
+option.DOF_SIZE_X                      = Horizontal Size
+option.DOF_SIZE_Y                      = Vertical Size
+option.DOF_CA                          = Chromatic Aberration
+option.DOF_CA_INTENSITY                = Chromatic Aberration Intensity
+option.DOF_CA_R_OFFSET                 = Red Offset
+option.DOF_CA_G_OFFSET                 = Green Offset
+option.DOF_CA_B_OFFSET                 = Blue Offset
+option.DOF_CA_R_ANGLE                  = Red Angle
+option.DOF_CA_G_ANGLE                  = Green Angle
+option.DOF_CA_B_ANGLE                  = Blue Angle
 option.MOTION_BLUR                     = Motion Blur
 option.MOTION_BLUR.comment             = Cinematic blur in motion, also useful to smoothen low framerates but can cause motion sickness
 option.MOTION_BLUR_INTENSITY           = Motion Blur Intensity
@@ -767,6 +780,10 @@ option.VIGNETTE_INTENSITY              = Vignette Intensity
 option.VIGNETTE_INTENSITY.comment      = Adjusts the intensity of Vignette
 
 value.DOF_FOCUS.-1.0                   = Automatic
+
+suffix.DOF_CA_R_ANGLE                  = °
+suffix.DOF_CA_G_ANGLE                  = °
+suffix.DOF_CA_B_ANGLE                  = °
 
 option.tonemap                         = Tonemap Operator
 
