@@ -21,7 +21,7 @@ struct Material {
 	bool is_hardcoded_metal;
 };
 
-const Material water_material = Material(vec3(0.0), vec3(0.0), vec3(0.2), vec3(0.0), 0.002, 1.0, 0.0, 0.0, 0.5, false, false);
+const Material water_material = Material(vec3(0.0), vec3(0.0), vec3(0.02), vec3(0.0), 0.002, 1.0, 0.0, 0.0, 1.0, false, false);
 
 #if TEXTURE_FORMAT == TEXTURE_FORMAT_LAB
 void decode_specular_map(vec4 specular_map, inout Material material) {

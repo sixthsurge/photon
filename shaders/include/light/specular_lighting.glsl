@@ -82,9 +82,9 @@ vec3 get_specular_highlight(
 
 	vec3 fresnel;
 	if (material.is_hardcoded_metal) {
-		fresnel = fresnel_lazanyi_2019(LoH, material.f0, material.f82) * 1.7;
+		fresnel = fresnel_lazanyi_2019(LoH, material.f0, material.f82);
 	} else if (material.is_metal) {
-		fresnel = fresnel_schlick(LoH, material.albedo) * 1.7;
+		fresnel = fresnel_schlick(LoH, material.albedo);
 	} else {
 		fresnel = fresnel_dielectric(LoH, material.f0.x);
 	}
@@ -254,8 +254,8 @@ vec3 get_specular_reflections(
 	float dither = r1(frameCounter, texelFetch(noisetex, ivec2(gl_FragCoord.xy) & 511, 0).b);
 
 #if defined SSR_ROUGHNESS_SUPPORT && defined SPECULAR_MAPPING
-	if (material.roughness > (material.f0.x * 0.0213) * sqr(0.213 * material.f0.x - 1)) { // Rough reflection
-	 	float mip_level = 8.0 * dampen(material.roughness);
+	if (material.roughness > (material.f0.x * 0.0513) * sqr(0.213 * material.f0.x - 1.75)) { // Rough reflection
+	 	float mip_level = material.roughness;
 
 		vec3 reflection = vec3(0.0);
 
@@ -264,7 +264,7 @@ vec3 get_specular_reflections(
 			hash.x = interleaved_gradient_noise(gl_FragCoord.xy,                    frameCounter * SSR_RAY_COUNT + i);
 			hash.y = interleaved_gradient_noise(gl_FragCoord.xy + vec2(97.0, 23.0), frameCounter * SSR_RAY_COUNT + i);
 
-			vec3 microfacet_normal = tbn_matrix * sample_ggx_vndf(-tangent_dir, vec2(material.roughness) * 1.6, hash);
+			vec3 microfacet_normal = tbn_matrix * sample_ggx_vndf(-tangent_dir, vec2(material.roughness), hash);
 			vec3 ray_dir = reflect(world_dir, microfacet_normal);
 
 			float NoL = dot(normal, ray_dir);
@@ -277,9 +277,9 @@ vec3 get_specular_reflections(
 
 			vec3 fresnel;
 			if (material.is_hardcoded_metal) {
-				fresnel = sqr(fresnel_lazanyi_2019(NoV, material.f0, material.f82) - 0.11);
+				fresnel = sqr(fresnel_lazanyi_2019(NoV, material.f0, material.f82));
 			} else if (material.is_metal) {
-				fresnel = sqr(fresnel_schlick(NoV, material.albedo) - 0.11);
+				fresnel = sqr(fresnel_schlick(NoV, material.albedo));
 			} else {
 				fresnel = fresnel_dielectric(NoV, material.f0.x);
 			}
@@ -312,19 +312,27 @@ vec3 get_specular_reflections(
 	if (NoL < eps) return vec3(0.0);
 
 	vec3 fresnel;
+	float dither_coeff;
+	float mip_level;
 	if (material.is_hardcoded_metal) {
 		fresnel = fresnel_lazanyi_2019(NoV, material.f0, material.f82);
+		dither_coeff = 18;
+		mip_level = 5;
 	} else if (material.is_metal) {
 		fresnel = fresnel_schlick(NoV, material.albedo);
+		dither_coeff = 18;
+		mip_level = 5;
 	} else {
 		fresnel = fresnel_dielectric(NoV, material.f0.x);
+		dither_coeff = 1;
+		mip_level = 1;
 	}
 
 	float v1 = v1_smith_ggx(NoV, alpha_squared);
 	float v2 = v2_smith_ggx(NoL, NoV, alpha_squared);
 
-	vec3 reflection  = trace_specular_ray(screen_pos, view_pos, ray_dir, dither, skylight, SSR_INTERSECTION_STEPS_SMOOTH, SSR_REFINEMENT_STEPS, 0);
-	     reflection *= albedo_tint * fresnel;
+	vec3 reflection = trace_specular_ray(screen_pos, view_pos, ray_dir, dither * dither_coeff, skylight * 0.68, SSR_INTERSECTION_STEPS_SMOOTH, SSR_REFINEMENT_STEPS, int(mip_level));
+	     reflection *=  sqrt(albedo_tint) * (sqrt(fresnel / int(mip_level)) + fresnel) / 2.0;
 
 	if (any(isnan(reflection))) reflection = vec3(0.0); // don't reflect NaNs
 
