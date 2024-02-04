@@ -254,7 +254,7 @@ vec3 get_specular_reflections(
 	float dither = r1(frameCounter, texelFetch(noisetex, ivec2(gl_FragCoord.xy) & 511, 0).b);
 
 #if defined SSR_ROUGHNESS_SUPPORT && defined SPECULAR_MAPPING
-	if (material.roughness > (material.f0.x * 0.0513) * sqr(0.213 * material.f0.x - 1.75)) { // Rough reflection
+	if (material.roughness > (material.f0.x + 0.2) * (material.f0.x - 0.1) * (material.f0.x - 0.6)) { // Rough reflection
 	 	float mip_level = material.roughness;
 
 		vec3 reflection = vec3(0.0);
@@ -313,25 +313,29 @@ vec3 get_specular_reflections(
 
 	vec3 fresnel;
 	float dither_coeff;
+	float skylight_coeff;
 	float mip_level;
 	if (material.is_hardcoded_metal) {
-		fresnel = fresnel_lazanyi_2019(NoV, material.f0, material.f82);
-		dither_coeff = 18;
-		mip_level = 5;
+		fresnel = fresnel_lazanyi_2019(NoV, material.f0, material.f82) * 2.0;
+		dither_coeff = 18.0;
+		skylight_coeff = 1.01;
+		mip_level = 5.0;
 	} else if (material.is_metal) {
-		fresnel = fresnel_schlick(NoV, material.albedo);
-		dither_coeff = 18;
-		mip_level = 5;
+		fresnel = fresnel_schlick(NoV, material.albedo) * 2.0;
+		dither_coeff = 18.0;
+		skylight_coeff = 1.01;
+		mip_level = 5.0;
 	} else {
 		fresnel = fresnel_dielectric(NoV, material.f0.x);
-		dither_coeff = 1;
-		mip_level = 1;
+		dither_coeff = 1.0;
+		skylight_coeff = 1.0;
+		mip_level = 1.0;
 	}
 
 	float v1 = v1_smith_ggx(NoV, alpha_squared);
 	float v2 = v2_smith_ggx(NoL, NoV, alpha_squared);
 
-	vec3 reflection = trace_specular_ray(screen_pos, view_pos, ray_dir, dither * dither_coeff, skylight * 0.68, SSR_INTERSECTION_STEPS_SMOOTH, SSR_REFINEMENT_STEPS, int(mip_level));
+	vec3 reflection = trace_specular_ray(screen_pos, view_pos, ray_dir, dither * dither_coeff, skylight * (0.68 * skylight_coeff), SSR_INTERSECTION_STEPS_SMOOTH, SSR_REFINEMENT_STEPS, int(mip_level));
 	     reflection *=  sqrt(albedo_tint) * (sqrt(fresnel / int(mip_level)) + fresnel) / 2.0;
 
 	if (any(isnan(reflection))) reflection = vec3(0.0); // don't reflect NaNs
