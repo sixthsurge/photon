@@ -27,6 +27,7 @@ flat out vec2 clouds_altocumulus_coverage;
 flat out vec2 clouds_cirrus_coverage;
 
 flat out float clouds_cumulus_congestus_amount;
+flat out float clouds_cumulonimbus_amount;
 flat out float clouds_stratus_amount;
 
 flat out float aurora_amount;
@@ -110,13 +111,14 @@ void main() {
 		clouds_altocumulus_coverage,
 		clouds_cirrus_coverage,
 		clouds_cumulus_congestus_amount,
+		clouds_cumulonimbus_amount,
 		clouds_stratus_amount
 	);
 
 	aurora_amount = get_aurora_amount();
 	aurora_colors = get_aurora_colors();
 
-	sky_color += aurora_amount * AURORA_CLOUD_LIGHTING * mix(aurora_colors[0], aurora_colors[1], 0.25);
+	sky_color += aurora_amount * AURORA_CLOUD_LIGHTING * mix(aurora_colors[0], aurora_colors[1], 0.25) * mix(AURORA_BRIGHTNESS, AURORA_BRIGHTNESS_SNOW, biome_may_snow);
 #endif
 
 	vec2 vertex_pos = gl_Vertex.xy * taau_render_scale * rcp(float(CLOUDS_TEMPORAL_UPSCALING));
@@ -147,6 +149,7 @@ flat in vec2 clouds_altocumulus_coverage;
 flat in vec2 clouds_cirrus_coverage;
 
 flat in float clouds_cumulus_congestus_amount;
+flat in float clouds_cumulonimbus_amount;
 flat in float clouds_stratus_amount;
 
 flat in float aurora_amount;

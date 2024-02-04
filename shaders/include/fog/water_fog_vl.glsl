@@ -1,4 +1,4 @@
-#if !defined INCLUDE_FOG_WATER_FOG_VL
+#ifndef INCLUDE_FOG_WATER_FOG_VL
 #define INCLUDE_FOG_WATER_FOG_VL
 
 #include "/include/light/distortion.glsl"

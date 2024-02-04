@@ -56,7 +56,9 @@ uniform float eye_skylight;
 
 uniform vec2 view_pixel_size;
 
-#include "/include/aces/aces.glsl"
+#include "/include/tonemapping/aces/aces.glsl"
+#include "/include/tonemapping/agx.glsl"
+#include "/include/tonemapping/zcam_justjohn.glsl"
 #include "/include/utility/bicubic.glsl"
 #include "/include/utility/color.glsl"
 
@@ -166,7 +168,7 @@ vec3 grade_output(vec3 rgb) {
 	vec3 hsl = rgb_to_hsl(rgb);
 
 	// Oranges
-	float orange = isolate_hue(hsl, 30.0, 20.0);
+	float orange = isolate_hue(hsl, 30.0, 20.0); //isolate_hue(hsl, 30.0, 20.0) // custom : 20.0, 30.0
 	hsl.y *= 1.0 + orange_sat_boost * orange;
 
 	// Teals
@@ -174,7 +176,7 @@ vec3 grade_output(vec3 rgb) {
 	hsl.y *= 1.0 + teal_sat_boost * teal;
 
 	// Greens
-	float green = isolate_hue(hsl, 90.0, 44.0);
+	float green = isolate_hue(hsl, 90.0, 53.0); //isolate_hue(hsl, 90.0, 44.0) // custom : 90.0, 53.0
 	hsl.x += green_hue_shift * green;
 	hsl.y *= 1.0 + green_sat_boost * green;
 
@@ -187,12 +189,17 @@ vec3 grade_output(vec3 rgb) {
 
 // Tonemapping operators
 
+vec3 tonemap_none(vec3 rgb) { return rgb; }
+
 // ACES RRT and ODT
 vec3 academy_rrt(vec3 rgb) {
 	rgb *= 1.6; // Match the exposure to the RRT
 
 	rgb = rgb * rec709_to_ap0;
 
+#if ACES_LMT != ACES_LMT_NONE
+	rgb = aces_lmt(rgb);
+#endif
 	rgb = aces_rrt(rgb);
 	rgb = aces_odt(rgb);
 
@@ -205,6 +212,9 @@ vec3 academy_fit(vec3 rgb) {
 
 	rgb = rgb * rec709_to_ap0;
 
+#if ACES_LMT != ACES_LMT_NONE
+	rgb = aces_lmt(rgb);
+#endif
 	rgb = rrt_sweeteners(rgb);
 	rgb = rrt_and_odt_fit(rgb);
 
@@ -253,7 +263,7 @@ vec3 tonemap_lottes(vec3 rgb) {
 }
 
 // Filmic tonemapping operator made by John Hable for Uncharted 2
-vec3 tonemap_uncharted_2(vec3 rgb) {
+vec3 tonemap_uncharted_2_partial(vec3 rgb) {
 	const float a = 0.15;
 	const float b = 0.50;
 	const float c = 0.10;
@@ -263,6 +273,24 @@ vec3 tonemap_uncharted_2(vec3 rgb) {
 	const float w = 11.2;
 
 	return ((rgb * (a * rgb + (c * b)) + (d * e)) / (rgb * (a * rgb + b) + d * f)) - e / f;
+}
+
+vec3 tonemap_uncharted_2_filmic(vec3 rgb) {
+	float exposure_bias = 2.0;
+	vec3 curr = tonemap_uncharted_2_partial(rgb * exposure_bias);
+	
+	vec3 W = vec3(11.2);
+	vec3 white_scale = vec3(1.0) / tonemap_uncharted_2_partial(W);
+	return curr * white_scale;
+}
+
+vec3 tonemap_uncharted_2(vec3 rgb) {
+#ifdef UNCHARTED_2_PARTIAL
+	rgb *= 3.0;
+	return tonemap_uncharted_2_partial(rgb);
+#else
+	return tonemap_uncharted_2_filmic(rgb);
+#endif
 }
 
 // Tone mapping operator made by Tech for his shader pack Lux
@@ -294,6 +322,71 @@ vec3 tonemap_reinhard_jodie(vec3 rgb) {
 	vec3 reinhard = rgb / (rgb + 1.0);
 	return mix(rgb / (dot(rgb, luminance_weights) + 1.0), reinhard, reinhard);
 }
+
+// Uchimura 2017, "HDR theory and practice"
+// Math: https://www.desmos.com/calculator/gslcdxvipg
+// Source: https://www.slideshare.net/nikuque/hdr-theory-and-practicce-jp
+vec3 tonemap_uchimura(vec3 rgb) {
+	const float P = UCHIMURA_MAX_BRIGHTNESS;  // max display brightness
+	const float a = UCHIMURA_CONTRAST;  // contrast
+	const float m = UCHIMURA_LINEAR_SECTION_START; // linear section start
+	const float l = UCHIMURA_LINEAR_SECTION_LENGTH;  // linear section length
+	const float c = UCHIMURA_BLACK_TIGHTNESS; // black
+	const float b = UCHIMURA_BLACK_PEDESTAL;  // pedestal
+
+	float l0 = ((P - m) * l) / a;
+	float L0 = m - m / a;
+	float L1 = m + (1.0 - m) / a;
+	float S0 = m + l0;
+	float S1 = m + a * l0;
+	float C2 = (a * P) / (P - S1);
+	float CP = -C2 / P;
+
+	vec3 w0 = vec3(1.0 - smoothstep(0.0, m, rgb));
+	vec3 w2 = vec3(step(m + l0, rgb));
+	vec3 w1 = vec3(1.0 - w0 - w2);
+
+	vec3 T = vec3(m * pow(rgb / m, vec3(c)) + b);
+	vec3 S = vec3(P - (P - S1) * exp(CP * (rgb - S0)));
+	vec3 L = vec3(m + a * (rgb - m));
+
+	return T * w0 + L * w1 + S * w2;
+}
+
+vec3 tonemap_justjohn(vec3 rgb) {
+	rgb *= 1.6;
+#ifdef JJS_ZCAM_REC2020
+	rgb = zcam_tonemap_rec2020(rgb);
+#else
+	vec3 sRGB = rgb * working_to_display_color;
+	sRGB = zcam_tonemap(sRGB);
+	//sRGB = zcam_gamma_correct(sRGB);
+	rgb = sRGB * display_to_working_color;
+#endif
+	return rgb;
+}
+
+// Minimal implementation of Troy Sobotka's AgX display transform by bwrensch
+// Source: https://www.shadertoy.com/view/cd3XWr
+//         https://iolite-engine.com/blog_posts/minimal_agx_implementation
+// Original: https://github.com/sobotka/AgX
+vec3 tonemap_agx(vec3 rgb) {
+	//rgb = srgb_eotf(rgb);
+
+	rgb = agx_pre(rgb);
+
+	// Apply sigmoid function approximation
+	rgb = agx_default_contrast_approx(rgb);
+#if AGX_LOOK != 0
+	rgb = agx_look(rgb);
+#endif
+#ifdef AGX_EOTF
+	rgb = agx_eotf(rgb);
+#endif
+
+	return srgb_eotf_inv(rgb);
+}
+
 
 float vignette(vec2 uv) {
     const float vignette_size = 16.0;
@@ -335,6 +428,16 @@ void main() {
 
 	scene_color = grade_input(scene_color);
 
+/* "/include/tonemapping/zcam_justjohn.glsl" */
+#ifdef JJS_ZCAM_COLORTEST
+	vec2 position = vec2(uv.x - frameTimeCounter * 0.2, uv.y);
+	vec3 ICh = vec3(exp(position.y * 3.0) - 1.0, 0.07, position.x * 5.0);
+    vec3 sRGB = max(vec3(0.0), XYZ_to_sRGB * ICh_to_XYZ(ICh));
+	sRGB = sRGB * display_to_working_color;
+	scene_color = sRGB;
+	scene_color = uv.x < 0.5 ? tonemap_left(scene_color) : tonemap_right(scene_color);
+#endif
+
 #ifdef TONEMAP_COMPARISON
 	scene_color = uv.x < 0.5 ? tonemap_left(scene_color) : tonemap_right(scene_color);
 #else
@@ -344,7 +447,7 @@ void main() {
 	scene_color = clamp01(scene_color * working_to_display_color);
 	scene_color = grade_output(scene_color);
 
-#if 0 // Tonemap plot
+#ifdef TONEMAP_PLOT // Tonemap plot
 	const float scale = 2.0;
 	vec2 uv_scaled = uv * scale * vec2(1.0, 1.0 / aspectRatio);
 	float x = uv_scaled.x;
