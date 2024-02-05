@@ -274,7 +274,8 @@ Material material_from(vec3 albedo_srgb, uint material_mask, vec3 world_pos, ino
 						}
 					} else { // 18-20
 						if (material_mask == 18u) { // 18
-
+							// Carpets
+							material.sss_amount = 0.5;
 						} else { // 19
 
 						}
