@@ -78,8 +78,8 @@ vec3 draw_stars(vec3 ray_dir) {
 #include "/include/utility/geometry.glsl"
 //#include "/include/sky/moon.glsl"
 
-const float sun_luminance  = 100.0; // luminance of sun disk
-const float moon_luminance = 30.0; // luminance of moon disk
+const float sun_luminance  = 20.0; // luminance of sun disk
+const float moon_luminance = 3.0; // luminance of moon disk
 
 vec3 draw_sun(vec3 ray_dir) {
 	float nu = dot(ray_dir, sun_dir);
@@ -88,8 +88,8 @@ vec3 draw_sun(vec3 ray_dir) {
 	// Limb darkening model from http://www.physics.hmc.edu/faculty/esin/a101/limbdarkening.pdf
 	const vec3 alpha = vec3(0.429, 0.522, 0.614);
 	float center_to_edge = max0(sun_angular_radius - fast_acos(nu));
-	vec3 limb_darkening = pow(vec3(1.0 - sqr(1.0 - center_to_edge)), 0.5 * alpha);
-	vec3 sun_disk = vec3(r < sun_angular_radius) + 3;
+	vec3 limb_darkening = pow(vec3(1.0 - sqr(1.0 - center_to_edge)), (SUN_ANGULAR_RADIUS * 0.05) * alpha);
+	vec3 sun_disk = vec3(r < sun_angular_radius) + 5;
 
 	return sun_luminance * sun_color * step(0.0, center_to_edge) * limb_darkening * max0(sun_disk);
 }
