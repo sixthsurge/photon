@@ -48,7 +48,7 @@ void decode_specular_map(vec4 specular_map, inout Material material) {
 	);
 
 	material.roughness = sqr(1.0 - specular_map.r);
-	material.emission = max(material.emission, material.albedo * specular_map.a * float(specular_map.a != 1.0));
+	material.emission = max(material.emission, material.albedo * specular_map.a * float(specular_map.a != 1.0)) * COLORED_LIGHTS_EMISSION;
 
 	if (specular_map.g < 229.5 / 255.0) {
 		// Dielectrics
@@ -380,7 +380,7 @@ Material material_from(vec3 albedo_srgb, uint material_mask, vec3 world_pos, ino
 						} else { // 39
 							#ifdef HARDCODED_EMISSION
 							// Lava
-							material.emission = 42.0 * albedo_sqrt * (0.2 + 0.8 * isolate_hue(hsl, 30.0, 15.0)) * step(0.4, hsl.y);
+							material.emission = 12.0 * albedo_sqrt * (0.2 + 0.8 * isolate_hue(hsl, 30.0, 15.0)) * step(0.4, hsl.y);
 							#endif
 						}
 					}
@@ -391,7 +391,7 @@ Material material_from(vec3 albedo_srgb, uint material_mask, vec3 world_pos, ino
 						if (material_mask == 40u) { // 40
 							#ifdef HARDCODED_EMISSION
 							// Medium orange emissives
-							material.emission = 14.60 * albedo_sqrt * (0.1 + 0.9 * cube(hsl.z));
+							material.emission = 8.0 * albedo_sqrt * (0.1 + 0.9 * cube(hsl.z));
 							#endif
 						} else { // 41
 							#ifdef HARDCODED_EMISSION
@@ -531,7 +531,7 @@ Material material_from(vec3 albedo_srgb, uint material_mask, vec3 world_pos, ino
 					} else { // 62-64
 						if (material_mask == 62u) { // 62
 							// Nether portal
-							material.emission = vec3(1.0) * 24;
+							material.emission = vec3(1.0) * 24 * COLORED_LIGHTS_EMISSION;
 						} else {  // 63
 							// End portal
 							material.emission = vec3(1.0);

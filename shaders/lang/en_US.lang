@@ -216,6 +216,12 @@ option.VOXEL_VOLUME_SIZE               = Voxel Volume Size
 option.VOXEL_VOLUME_SIZE.comment       = High performance impact, also affected by shadow distance
 suffix.VOXEL_VOLUME_SIZE               = m
 
+option.COLORED_LIGHTS_I         = Blocklight intensity 
+option.COLORED_LIGHTS_I.comment = Multiplier for blocklight strength
+
+option.COLORED_LIGHTS_EMISSION         = Blocklight emission intensity 
+option.COLORED_LIGHTS_EMISSION.comment = Multiplier for blocklight emission
+
 suffix.shadowMapResolution             = ²
 suffix.sunPathRotation                 = °
 
