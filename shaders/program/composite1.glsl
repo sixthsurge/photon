@@ -340,16 +340,11 @@ void main() {
 			material.ssr_multiplier
 		);
 
-		if (material.is_hardcoded_metal) {
+		if (material.is_hardcoded_metal || material.is_metal) {
 			if (puddle) {
 				material.is_metal = true;
 				material.is_hardcoded_metal = true;
 			}
-		} else if (material.is_metal) {
-			if (puddle) {
-				material.is_metal = true;
-				material.is_hardcoded_metal = true;
-		}
 		} else {
 			if (puddle) {
 				material.is_metal = false;
