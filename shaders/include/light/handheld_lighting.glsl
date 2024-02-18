@@ -6,7 +6,7 @@ uniform sampler2D light_data_sampler;
 #endif
 
 #ifdef IS_IRIS
-uniform vec3 eyePosition;
+uniform vec3 relativeEyePosition;
 #endif
 
 uniform int heldItemId;
@@ -36,7 +36,7 @@ float get_handheld_light_falloff(vec3 scene_pos, float ao) {
 vec3 get_handheld_lighting(vec3 scene_pos, float ao) {
 #ifdef IS_IRIS
 	// Center light on player rather than camera
-	scene_pos += cameraPosition - eyePosition;
+	scene_pos += relativeEyePosition;
 #endif
 
 	vec3 light_color = max(
