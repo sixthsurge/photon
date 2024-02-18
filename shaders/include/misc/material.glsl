@@ -334,7 +334,7 @@ Material material_from(vec3 albedo_srgb, uint material_mask, vec3 world_pos, ino
 						if (material_mask == 32u) { // 32
 							#ifdef HARDCODED_EMISSION
 							// Strong white light
-							material.emission = 14.00 * albedo_sqrt * (0.1 + 0.9 * cube(hsl.z));
+							material.emission = 2.60 * albedo_sqrt * (0.1 + 0.9 * cube(hsl.z));
 							#endif
 						} else { // 33
 							#ifdef HARDCODED_EMISSION
