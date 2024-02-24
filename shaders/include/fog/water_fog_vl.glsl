@@ -113,7 +113,7 @@ mat2x3 raymarch_water_fog(
 	}
 
 	scattering *= (1.0 - step_transmittance) * scattering_coeff / extinction_coeff;
-	transmittance = pow(transmittance, vec3(0.75));
+	transmittance = pow(transmittance, vec3(0.3));
 
 	return mat2x3(scattering, transmittance);
 }
