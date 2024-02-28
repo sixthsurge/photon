@@ -288,6 +288,7 @@ vec3 get_specular_reflections(
 			float v2 = v2_smith_ggx(NoL, NoV, alpha_squared);
 
 			reflection += radiance * fresnel * (2.0 * NoL * v2 / v1);
+			reflection *= albedo_tint;
 		}
 
 		reflection *= albedo_tint * rcp(float(SSR_RAY_COUNT));
@@ -336,7 +337,7 @@ vec3 get_specular_reflections(
 	float v2 = v2_smith_ggx(NoL, NoV, alpha_squared);
 
 	vec3 reflection = trace_specular_ray(screen_pos, view_pos, ray_dir, dither * dither_coeff, skylight * (0.68 * skylight_coeff), SSR_INTERSECTION_STEPS_SMOOTH, SSR_REFINEMENT_STEPS, int(mip_level));
-	     reflection *=  sqrt(albedo_tint) * (sqrt(fresnel / int(mip_level)) + fresnel) / 2.0;
+	     reflection *= albedo_tint * (sqrt(fresnel / int(mip_level)) + fresnel) * 0.5;
 
 	if (any(isnan(reflection))) reflection = vec3(0.0); // don't reflect NaNs
 
