@@ -254,7 +254,7 @@ vec3 get_specular_reflections(
 	float dither = r1(frameCounter, texelFetch(noisetex, ivec2(gl_FragCoord.xy) & 511, 0).b);
 
 #if defined SSR_ROUGHNESS_SUPPORT && defined SPECULAR_MAPPING
-	if (material.roughness > 5e-2) { // Rough reflection
+	if (material.roughness > (material.f0.x + 0.2) * (material.f0.x - 0.1) * (material.f0.x - 0.6)) { // Rough reflection
 	 	float mip_level = 8.0 * dampen(material.roughness);
 
 		vec3 reflection = vec3(0.0);
