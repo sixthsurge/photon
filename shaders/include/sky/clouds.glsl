@@ -12,6 +12,8 @@
 
 uniform float day_factor;
 
+vec3 moon_color_value = from_srgb(vec3(0.01, 0.09, 0.13));
+
 float clouds_phase_single(float cos_theta) { // Single scattering phase function
 	return 0.8 * klein_nishina_phase(cos_theta, 2600.0)    // forwards lobe
 	     + 0.2 * henyey_greenstein_phase(cos_theta, -0.2); // backwards lobe
@@ -334,7 +336,7 @@ vec4 draw_cumulus_clouds(vec3 ray_dir, vec3 clear_sky, float dither) {
 	}
 
 	// Get main light color for this layer
-	vec3 light_color  = moonlit ? moon_color : sun_color;
+	vec3 light_color  = moonlit ? from_srgb(vec3(0.08, 0.09, 0.13)) : sun_color;
 	     light_color *= sunlight_color * atmosphere_transmittance(ray_origin, light_dir);
 		 light_color *= 1.0 - 0.7 * rainStrength;
 
@@ -590,7 +592,7 @@ vec4 draw_cumulus_congestus_clouds(vec3 ray_dir, vec3 clear_sky, float dither) {
 	}
 
 	// Get main light color for this layer
-	vec3 light_color  = moonlit ? moon_color : sun_color;
+	vec3 light_color  = moonlit ? from_srgb(vec3(0.08, 0.09, 0.13)) : sun_color;
 	     light_color *= sunlight_color * atmosphere_transmittance(ray_origin, light_dir);
 		 light_color *= 1.0 - rainStrength;
 
@@ -891,7 +893,7 @@ vec4 draw_cumulonimbus_clouds(vec3 ray_dir, vec3 clear_sky, float dither) {
 	}
 
 	// Get main light color for this layer
-	vec3 light_color  = moonlit ? moon_color : sun_color;
+	vec3 light_color  = moonlit ? from_srgb(vec3(0.08, 0.09, 0.13)) : sun_color;
 	light_color *= sunlight_color * atmosphere_transmittance(ray_origin, light_dir);
 	light_color *= 1.0 - rainStrength;
 
@@ -1156,7 +1158,7 @@ vec4 draw_altocumulus_clouds(vec3 ray_dir, vec3 clear_sky, float dither) {
 	}
 
 	// Get main light color for this layer
-	vec3 light_color  = moonlit ? moon_color : sun_color;
+	vec3 light_color  = moonlit ? from_srgb(vec3(0.08, 0.09, 0.13)) : sun_color;
 	     light_color *= sunlight_color * atmosphere_transmittance(ray_origin, light_dir);
 		 light_color *= 1.0 - rainStrength;
 		 light_color *= 1.0 + 0.4 * high_coverage * dampen(time_noon);
@@ -1401,7 +1403,7 @@ vec4 draw_cirrus_clouds(vec3 ray_dir, vec3 clear_sky, float dither) {
 	float mu = dot(sphere_pos, light_dir) * rcp_r;
 	float rr = r_sq * rcp_r - 1500.0 * clamp01(linear_step(0.0, 0.05, cirrocumulus) * (1.0 - linear_step(0.0, 0.1, cirrus)) + cirrocumulus);
 
-	vec3 light_color  = moonlit ? moon_color : sun_color;
+	vec3 light_color  = moonlit ? from_srgb(vec3(0.08, 0.09, 0.13)) : sun_color;
 	     light_color *= sunlight_color * atmosphere_transmittance(mu, rr);
 		 light_color *= 1.0 - rainStrength;
 
