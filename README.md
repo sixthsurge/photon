@@ -1,6 +1,6 @@
 <br><br>
 
-<h1 align = "center">Photon</h1>
+<h1 align = "center">photon</h1>
 
 <p align = "center">A gameplay-focused shader pack for Minecraft</p>
 
@@ -8,7 +8,7 @@
 
 ## Downloads
 
-* [Download for the latest commit](https://github.com/sixthsurge/photon/archive/refs/heads/main.zip)
+* [Latest commit](https://github.com/sixthsurge/photon/archive/refs/heads/main.zip)
 
 ## Acknowledgments
 
