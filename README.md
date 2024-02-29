@@ -6,9 +6,13 @@
 
 ![Screenshot](docs/images/a.png)
 
+## downloads
+
+* [Latest commit](https://github.com/sixthsurge/photon/archive/refs/heads/main.zip)
+
 ## acknowledgments
 
-* [Emin](https://github.com/EminGT) - Shadow bias method from [Complementary Reimagined](https://www.complementary.dev/reimagined/) (fully fixes peter panning and light leaking underground!)
+* [Emin](https://github.com/EminGT) - Shadow bias method from [Complementary R5](https://www.complementary.dev/shaders/) (fully fixes peter panning and light leaking underground!)
 * [DrDesten](https://github.com/DrDesten) - Depth tolerance calculation for SSR (helps to prevent false reflections)
 * [Jessie](https://github.com/Jessie-LC) - f0 and f82 values for labPBR hardcoded metals
 * [Sledgehammer Games](https://www.sledgehammergames.com/) - Bloom downsampling method used in Call of Duty Advanced Warfare (described [here](http://www.iryoku.com/next-generation-post-processing-in-call-of-duty-advanced-warfare))
@@ -16,7 +20,7 @@
 
 ## features
 * Custom shading with variable penumbra shadows and ambient occlusion
-* [Colored lighting](https://media.discordapp.net/attachments/945403130277924914/1123585019307364394/2023-06-28_13.02.33.png?width=1058&height=584) using flood-fill algorithm (enabled with Ultra profile, requires Iris)
+* [Colored lighting](https://cdn.discordapp.com/attachments/736930818835873813/1123586429902135338/2023-06-28_13.02.33.png?ex=65f197e8&is=65df22e8&hm=c7871d2d3a5af5f6c84d98ad9997e4f4e1cfff40d3d9539b03e471abf48f677c&) using flood-fill algorithm (enabled with Ultra profile, requires Iris)
 * Custom sky with multiple volumetric cloud layers and different weather each day
 * Camera effects - bloom, depth-of-field, motion-blur
 * Full labPBR resource pack support
@@ -48,4 +52,4 @@
 
 ## community
 
-Want to discuss the shaderpack? Questions? Head over to our discord channel `#photon-sixthsurge` in the [ShaderLABS Discord](https://discord.gg/Jhr5PF7hhp).
+Want to discuss the shaderpack or ask questions? Head over to our discord channel `#photon` in the [ShaderLABS Discord](https://discord.gg/RpzWN9S).
