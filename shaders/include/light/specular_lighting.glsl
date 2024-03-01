@@ -252,11 +252,12 @@ vec3 get_specular_reflections(
 	float alpha_squared = sqr(material.roughness);
 
 	float dither = r1(frameCounter, texelFetch(noisetex, ivec2(gl_FragCoord.xy) & 511, 0).b);
+
 	float roughness_threshold;
-	if (material.is_hardcoded_metal || material.is_metal) {
-		roughness_threshold = 0.0;
-	} else {
+	if (max_of(material.albedo) < eps) {
 		roughness_threshold = 5e-2;
+	} else {
+		roughness_threshold = 0.0;
 	}
 
 #if defined SSR_ROUGHNESS_SUPPORT && defined SPECULAR_MAPPING
@@ -272,7 +273,7 @@ vec3 get_specular_reflections(
 
 			vec2 smoothness_mapping;
 			if (material.roughness < 5e-2) {
-				smoothness_mapping = pow(vec2(material.roughness), vec2(1 - material.roughness));
+				smoothness_mapping = pow(vec2(material.roughness), vec2(1.1 - material.roughness));
 			} else {
 				smoothness_mapping = vec2(material.roughness);
 			}
