@@ -276,7 +276,7 @@ float get_aurora_amount() {
 	float aurora_normal = 0.0;
 #elif AURORA_NORMAL == AURORA_RARELY
 	float aurora_normal = float(lowbias32(uint(worldDay)) % 5 == 1);
-#elif AURORA_NORMAL == AURORA_ALWAY4
+#elif AURORA_NORMAL == AURORA_ALWAYS
 	float aurora_normal = 1.0;
 #endif
 
