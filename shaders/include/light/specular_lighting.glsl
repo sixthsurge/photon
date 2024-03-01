@@ -252,10 +252,16 @@ vec3 get_specular_reflections(
 	float alpha_squared = sqr(material.roughness);
 
 	float dither = r1(frameCounter, texelFetch(noisetex, ivec2(gl_FragCoord.xy) & 511, 0).b);
+	float roughness_threshold;
+	if (material.is_hardcoded_metal || material.is_metal) {
+		roughness_threshold = 0.0;
+	} else {
+		roughness_threshold = 5e-2;
+	}
 
 #if defined SSR_ROUGHNESS_SUPPORT && defined SPECULAR_MAPPING
-	if (material.roughness > 5e-2) { // Rough reflection
-	 	float mip_level = 8.0 * dampen(material.roughness);
+	if (material.roughness > roughness_threshold) { // Rough reflection
+		float mip_level = 8.0 * dampen(material.roughness);
 
 		vec3 reflection = vec3(0.0);
 
@@ -264,8 +270,16 @@ vec3 get_specular_reflections(
 			hash.x = interleaved_gradient_noise(gl_FragCoord.xy,                    frameCounter * SSR_RAY_COUNT + i);
 			hash.y = interleaved_gradient_noise(gl_FragCoord.xy + vec2(97.0, 23.0), frameCounter * SSR_RAY_COUNT + i);
 
-			vec3 microfacet_normal = tbn_matrix * sample_ggx_vndf(-tangent_dir, vec2(material.roughness), hash);
+			vec2 smoothness_mapping;
+			if (material.roughness < 5e-2) {
+				smoothness_mapping = pow(vec2(material.roughness), vec2(1 - material.roughness));
+			} else {
+				smoothness_mapping = vec2(material.roughness);
+			}
+
+			vec3 microfacet_normal = tbn_matrix * sample_ggx_vndf(-tangent_dir, smoothness_mapping, hash);
 			vec3 ray_dir = reflect(world_dir, microfacet_normal);
+				ray_dir += reflect(world_dir * 0.25, normal);
 
 			float NoL = dot(normal, ray_dir);
 			if (NoL < eps) continue;
