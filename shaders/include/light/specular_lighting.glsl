@@ -279,8 +279,8 @@ vec3 get_specular_reflections(
 			}
 
 			vec3 microfacet_normal = tbn_matrix * sample_ggx_vndf(-tangent_dir, smoothness_mapping, hash);
-			vec3 ray_dir = reflect(world_dir, microfacet_normal);
-				ray_dir += reflect(world_dir * 0.25, normal);
+			vec3 ray_dir = reflect(world_dir * 0.5, microfacet_normal);
+				ray_dir += reflect(world_dir * 0.5, normal);
 
 			float NoL = dot(normal, ray_dir);
 			if (NoL < eps) continue;
@@ -292,9 +292,9 @@ vec3 get_specular_reflections(
 
 			vec3 fresnel;
 			if (material.is_hardcoded_metal) {
-				fresnel = fresnel_lazanyi_2019(NoV, material.f0, material.f82);
+				fresnel = sqr(fresnel_lazanyi_2019(NoV, material.f0, material.f82));
 			} else if (material.is_metal) {
-				fresnel = fresnel_schlick(NoV, material.albedo);
+				fresnel = sqr(fresnel_schlick(NoV, material.albedo));
 			} else {
 				fresnel = fresnel_dielectric(NoV, material.f0.x);
 			}
@@ -302,7 +302,7 @@ vec3 get_specular_reflections(
 			float v1 = v1_smith_ggx(NoV, alpha_squared);
 			float v2 = v2_smith_ggx(NoL, NoV, alpha_squared);
 
-			reflection += radiance * fresnel * (2.0 * NoL * v2 / v1);
+			reflection += radiance * albedo_tint * fresnel * (2.0 * NoL * v2 / v1);
 		}
 
 		reflection *= albedo_tint * rcp(float(SSR_RAY_COUNT));
