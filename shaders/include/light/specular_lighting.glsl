@@ -292,9 +292,9 @@ vec3 get_specular_reflections(
 
 			vec3 fresnel;
 			if (material.is_hardcoded_metal) {
-				fresnel = sqr(fresnel_lazanyi_2019(NoV, material.f0, material.f82));
+				fresnel = fresnel_lazanyi_2019(NoV, material.f0, material.f82);
 			} else if (material.is_metal) {
-				fresnel = sqr(fresnel_schlick(NoV, material.albedo));
+				fresnel = fresnel_schlick(NoV, material.albedo);
 			} else {
 				fresnel = fresnel_dielectric(NoV, material.f0.x);
 			}
