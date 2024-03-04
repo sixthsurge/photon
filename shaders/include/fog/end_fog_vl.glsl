@@ -7,7 +7,7 @@
 #include "/include/utility/phase_functions.glsl"
 
 float end_fog_density(vec3 world_pos) {
-	const float falloff_start     = 64.0;
+	const float falloff_start     = 48.0;
 	const float falloff_half_life = 7.0 * (10 * END_AMBIENT_I);
 
 	const float mul = -rcp(falloff_half_life);
@@ -151,7 +151,8 @@ mat2x3 raymarch_end_fog(
 
 #ifdef END_GLOW
 		// Emission
-		scattering += 4.0 * end_fog_emission(world_pos) * step_length * transmittance;
+		vec3 glow_fog_color = from_srgb(vec3(0.35, 0.00, 0.47));
+		scattering += 10.0 * end_fog_emission(world_pos) * step_length * transmittance * glow_fog_color;
 #endif
 
 		transmittance *= step_transmittance;
