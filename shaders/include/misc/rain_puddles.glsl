@@ -22,6 +22,9 @@ float get_puddle_noise(vec3 world_pos, vec3 flat_normal, vec2 light_levels) {
 	// Prevent puddles from appearing indoors
 	puddle *= (1.0 - cube(light_levels.x)) * pow5(light_levels.y);
 
+	// Remove puddles when it's no longer raining
+	puddle *= rainStrength;
+
 	return puddle;
 }
 
@@ -63,7 +66,7 @@ bool get_rain_puddles(
 	float ripple2 = get_ripple_height(world_pos.xz + vec2(0.0, h));
 
 	vec3 ripple_normal     = vec3(ripple1 - ripple0, ripple2 - ripple0, h);
-	     ripple_normal.xy *= 0.01 * smoothstep(0.0, 0.1, abs(dot(flat_normal, normalize(world_pos - cameraPosition))));
+	     ripple_normal.xy *= 0.02 * smoothstep(0.0, 0.1, abs(dot(flat_normal, normalize(world_pos - cameraPosition))));
 	     ripple_normal     = normalize(ripple_normal);
 		 ripple_normal     = ripple_normal.xzy; // convert to world space
 
