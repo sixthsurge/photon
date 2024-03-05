@@ -110,7 +110,7 @@ float clouds_cumulus_density(vec3 pos, vec2 detail_weights, vec2 edge_sharpening
 		texture(noisetex, (0.000027 / CLOUDS_CUMULUS_SIZE) * pos.xz).w  // cloud shape
 	);
 
-	float density_cu = mix(clouds_cumulus_coverage.x, clouds_cumulus_coverage.y, noise.x);
+	float density_cu = mix(clouds_cumulus_coverage.x, clouds_cumulus_coverage.y, noise.x) * (1 + rainStrength);
 	      density_cu = linear_step(1.0 - density_cu, 1.0, noise.y);
 
 	float density_st = linear_step(0.30, 0.70, noise.x) * linear_step(0.10, 0.90, noise.y);
@@ -300,7 +300,7 @@ vec4 draw_cumulus_clouds(vec3 ray_dir, vec3 clear_sky, float dither) {
 		float distance_to_sample = distance(ray_origin, ray_pos);
 		float distance_fade = smoothstep(0.95, 1.0, distance_to_sample * rcp(max_ray_length));
 
-		density *= 1.0 - distance_fade;
+		density *= 1.0 - distance_fade * (1 - rainStrength);
 
 		float step_optical_depth = density * extinction_coeff * step_length;
 		float step_transmittance = exp(-step_optical_depth);
@@ -539,10 +539,10 @@ vec4 draw_cumulus_congestus_clouds(vec3 ray_dir, vec3 clear_sky, float dither) {
 	//   Lighting Setup
 	// ------------------
 
-	bool moonlit = sun_dir.y < -0.04;
-	vec3 light_dir = moonlit ? moon_dir : sun_dir;
-	float cos_theta = dot(ray_dir, light_dir);
-	float bounced_light = planet_albedo * light_dir.y * rcp_pi;
+	bool  moonlit            = sun_dir.y < -0.04;
+	vec3  light_dir          = moonlit ? moon_dir : sun_dir;
+	float cos_theta          = dot(ray_dir, light_dir);
+	float bounced_light      = planet_albedo * light_dir.y * rcp_pi;
 
 	// --------------------
 	//   Raymarching Loop
@@ -1096,7 +1096,7 @@ vec4 draw_altocumulus_clouds(vec3 ray_dir, vec3 clear_sky, float dither) {
 
 	float high_coverage = linear_step(0.5, 0.6, clouds_altocumulus_coverage.x);
 
-	float extinction_coeff = mix(0.05, 0.1, day_factor) * CLOUDS_ALTOCUMULUS_DENSITY * (1.0 - 0.85 * high_coverage * (dampen(time_noon + time_midnight) * 0.75 + 0.25)) * (1.0 - 0.33 * rainStrength);
+	float extinction_coeff = mix(0.05 + rainStrength, 0.1, day_factor) * CLOUDS_ALTOCUMULUS_DENSITY * (1.0 - 0.85 * high_coverage * (dampen(time_noon + time_midnight) * 0.75 + 0.25)) * (1.0 - 0.33 * rainStrength);
 	float scattering_coeff = extinction_coeff * mix(1.00, 0.66, rainStrength);
 
 	bool moonlit = sun_dir.y < -0.045;
