@@ -20,7 +20,7 @@ float get_puddle_noise(vec3 world_pos, vec3 flat_normal, vec2 light_levels) {
 	      puddle = linear_step(0.45, 0.55, puddle) * wetness * biome_may_rain * max0(flat_normal.y);
 
 	// Prevent puddles from appearing indoors
-	puddle *= (1.0 - cube(light_levels.x)) * pow5(light_levels.y);
+	puddle *= (1.0 - cube(light_levels.x)) * pow5(light_levels.y) * 0.5;
 
 	// Remove puddles when it's no longer raining
 	puddle *= rainStrength;
