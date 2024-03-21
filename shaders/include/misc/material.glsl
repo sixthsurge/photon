@@ -338,8 +338,8 @@ Material material_from(vec3 albedo_srgb, uint material_mask, vec3 world_pos, ino
 							#endif
 						} else { // 33
 							#ifdef HARDCODED_EMISSION
-							// Medium white light
-							material.emission = 1.66 * albedo_sqrt * linear_step(0.75, 0.9, hsl.z);
+							// Redstone wire
+							material.emission = 2.30 * albedo_sqrt;
 							#endif
 						}
 					} else { // 34-36
