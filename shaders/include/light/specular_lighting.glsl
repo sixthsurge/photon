@@ -260,11 +260,11 @@ float roughness_threshold;
 		roughness_threshold = 0.0;
 	}
 
-float skylight_coeff;
+float ssr_limiter;
 	if (material.is_hardcoded_metal || material.is_metal || max_of(material.albedo) < eps) {
-		skylight_coeff = 1;
+		ssr_limiter = 1;
 	} else {
-		skylight_coeff = material.roughness;
+		ssr_limiter = material.roughness;
 	}
 
 #if defined SSR_ROUGHNESS_SUPPORT && defined SPECULAR_MAPPING
@@ -292,7 +292,7 @@ float skylight_coeff;
 			float NoL = dot(normal, ray_dir);
 			if (NoL < eps) continue;
 
-			vec3 radiance = trace_specular_ray(screen_pos, view_pos, ray_dir, dither, skylight * skylight_coeff, SSR_INTERSECTION_STEPS_ROUGH, SSR_REFINEMENT_STEPS, int(mip_level));
+			vec3 radiance = trace_specular_ray(screen_pos, view_pos, ray_dir, dither, skylight * ssr_limiter, SSR_INTERSECTION_STEPS_ROUGH, SSR_REFINEMENT_STEPS, int(mip_level));
 
 			float NoV = max(1e-2, dot(flat_normal, -world_dir));
 			float MoV = max(1e-2, dot(microfacet_normal, -world_dir));
