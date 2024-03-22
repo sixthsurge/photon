@@ -270,18 +270,17 @@ vec3 tonemap_uncharted_2_partial(vec3 rgb) {
 	const float d = 0.20;
 	const float e = 0.02;
 	const float f = 0.30;
-	const float w = 11.2;
 
 	return ((rgb * (a * rgb + (c * b)) + (d * e)) / (rgb * (a * rgb + b) + d * f)) - e / f;
 }
 
 vec3 tonemap_uncharted_2_filmic(vec3 rgb) {
-	float exposure_bias = 2.0;
-	vec3 curr = tonemap_uncharted_2_partial(rgb * exposure_bias);
-	
-	vec3 W = vec3(11.2);
-	vec3 white_scale = vec3(1.0) / tonemap_uncharted_2_partial(W);
-	return curr * white_scale;
+	const float exposure_bias = 2.0;
+    	const vec3 w = vec3(11.2);
+
+    	vec3 curr = tonemap_uncharted_2_partial(rgb * exposure_bias);
+    	vec3 white_scale = vec3(1.0) / tonemap_uncharted_2_partial(w);
+    	return curr * white_scale;
 }
 
 vec3 tonemap_uncharted_2(vec3 rgb) {
