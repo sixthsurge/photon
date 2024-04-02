@@ -575,7 +575,7 @@ void main() {
 
 	// Specular highlight
 
-#if defined WORLD_OVERWORLD || defined WORLD_END
+#if (defined WORLD_OVERWORLD || defined WORLD_END) && !defined NO_NORMAL
 	#ifdef WATER_WAVES
 	if (!is_water) // Specular highlight on water must be applied in composite, after waves are calculated
 	#endif
@@ -623,9 +623,15 @@ void main() {
 
 	vec3 color_to_store = is_water ? shadows : base_color.rgb;
 
+#ifdef NO_NORMAL
+	#define flat_normal normal
+#else
+	#define flat_normal tbn[2]
+#endif
+
 	gbuffer_data_0.x  = pack_unorm_2x8(color_to_store.rg);
 	gbuffer_data_0.y  = pack_unorm_2x8(color_to_store.b, clamp01(float(material_mask) * rcp(255.0)));
-	gbuffer_data_0.z  = pack_unorm_2x8(encode_unit_vector(tbn[2]));
+	gbuffer_data_0.z  = pack_unorm_2x8(encode_unit_vector(flat_normal));
 	gbuffer_data_0.w  = pack_unorm_2x8(dither_8bit(adjusted_light_levels, 0.5));
 }
 

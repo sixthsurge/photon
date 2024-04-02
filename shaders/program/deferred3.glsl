@@ -474,8 +474,6 @@ void main() {
 		#define ao 1.0
 #endif
 
-        light_levels.y = 1.0;
-
 		// Shadows
 
 		float NoL = dot(normal, light_dir);
