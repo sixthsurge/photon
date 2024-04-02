@@ -392,7 +392,8 @@ void main() {
 			flat_normal,
 			world_dir,
 			world_dir * tbn,
-			light_levels.y
+			light_levels.y,
+			is_water
 		);
 
 #ifdef WATER_WAVES

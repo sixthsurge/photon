@@ -269,7 +269,8 @@ vec3 get_specular_reflections(
 	vec3 flat_normal,
 	vec3 world_dir,
 	vec3 tangent_dir,
-	float skylight
+	float skylight,
+	bool is_water
 ) {
 	vec3 albedo_tint = material.is_hardcoded_metal ? material.albedo : vec3(1.0);
 
@@ -278,7 +279,7 @@ vec3 get_specular_reflections(
 	float dither = r1(frameCounter, texelFetch(noisetex, ivec2(gl_FragCoord.xy) & 511, 0).b);
 
 #if defined SSR_ROUGHNESS_SUPPORT && defined SPECULAR_MAPPING
-	if (material.roughness > 5e-2) { // Rough reflection
+	if (!is_water) { // Rough reflection
 	 	float mip_level = 8.0 * dampen(material.roughness);
 
 		vec3 reflection = vec3(0.0);
