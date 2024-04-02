@@ -12,11 +12,12 @@ bool raymarch_depth_buffer(
 	float dither,
 	uint intersection_step_count,
 	uint refinement_step_count,
-	out vec3 hit_pos
+	out vec3 hit_pos,
+    bool is_distant_horizons_terrain
 ) {
 	if (view_dir.z > 0.0 && view_dir.z >= -view_pos.z) return false;
 
-	vec3 screen_dir = normalize(view_to_screen_space(view_pos + view_dir, true) - screen_pos);
+	vec3 screen_dir = normalize(view_to_screen_space(view_pos + view_dir, true, is_distant_horizons_terrain) - screen_pos);
 
 	float ray_length = min_of(abs(sign(screen_dir) - screen_pos) / max(abs(screen_dir), eps));
 
@@ -32,6 +33,9 @@ bool raymarch_depth_buffer(
 	// Intersection loop
 
 	for (int i = 0; i < intersection_step_count; ++i, ray_pos += ray_step) {
+#ifdef DISTANT_HORIZONS
+		if (ray_pos.z < 0.0) continue;
+#endif
 		if (clamp01(ray_pos) != ray_pos) return false;
 
 		float depth = texelFetch(depth_sampler, ivec2(ray_pos.xy * view_res * taau_render_scale), 0).x;

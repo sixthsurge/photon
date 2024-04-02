@@ -27,13 +27,23 @@ const float blindness_fog_density = 1.0;
 
 const float nether_bloomy_fog_density = 0.25 * nether_fog_density;
 
+#ifdef DISTANT_HORIZONS
+uniform int dhRenderDistance;
+#endif
+
 float spherical_fog(float view_dist, float fog_start_distance, float fog_density) {
 	return exp2(-fog_density * max0(view_dist - fog_start_distance));
 }
 
 float border_fog(vec3 scene_pos, vec3 world_dir) {
+#ifndef DISTANT_HORIZONS
 	float fog = cubic_length(scene_pos.xz) / far;
 	      fog = exp2(-8.0 * pow8(fog));
+#else
+    float fog = length(scene_pos.xz) / float(dhRenderDistance);
+          fog = exp2(-2.4 * sqr(fog));
+#endif
+
 #if defined WORLD_OVERWORLD || defined WORLD_END
 	      fog = mix(fog, 1.0, 0.75 * dampen(linear_step(0.0, 0.2, world_dir.y)));
 #endif

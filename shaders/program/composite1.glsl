@@ -122,6 +122,7 @@ uniform float time_midnight;
 
 #include "/include/fog/simple_fog.glsl"
 #include "/include/light/specular_lighting.glsl"
+#include "/include/misc/distant_horizons.glsl"
 #include "/include/misc/material.glsl"
 #include "/include/misc/rain_puddles.glsl"
 #include "/include/misc/water_normal.glsl"
@@ -183,6 +184,10 @@ void main() {
 	scene_color         = texelFetch(colortex0, texel, 0).rgb;
 	float depth0        = texelFetch(depthtex0, texel, 0).x;
 	float depth1        = texelFetch(depthtex1, texel, 0).x;
+#ifdef DISTANT_HORIZONS
+    float depth0_dh     = texelFetch(dhDepthTex, texel, 0).x;
+    float depth1_dh     = texelFetch(dhDepthTex1, texel, 0).x;
+#endif
 	vec4 gbuffer_data_0 = texelFetch(colortex1, texel, 0);
 #if defined NORMAL_MAPPING || defined SPECULAR_MAPPING
 	vec4 gbuffer_data_1 = texelFetch(colortex2, texel, 0);
@@ -194,9 +199,18 @@ void main() {
 	vec3 fog_transmittance = smooth_filter(colortex7, fog_uv).rgb;
 #endif
 
+	// Distant Horizons support
+
+#ifdef DISTANT_HORIZONS
+    bool front_is_dh_terrain = is_distant_horizons_terrain(depth0, depth0_dh);
+    bool back_is_dh_terrain = is_distant_horizons_terrain(depth1, depth1_dh);
+#else
+    const bool is_dh_terrain = false;
+#endif
+
 	// Sky early exit
 
-	if (depth0 == 1.0) {
+	if (depth0 == 1.0 && !front_is_dh_terrain) {
 		// Apply volumetric fog
 #if (defined WORLD_OVERWORLD || defined WORLD_END) && defined VL
 		scene_color = scene_color * fog_transmittance + fog_scattering;
@@ -220,11 +234,20 @@ void main() {
 	depth0 += 0.38 * float(depth0 < hand_depth); // Hand lighting fix from Capt Tatsu
 
 	vec3 screen_pos = vec3(uv, depth0);
-	vec3 view_pos   = screen_to_view_space(screen_pos, true);
-	vec3 scene_pos  = view_to_scene_space(view_pos);
-	vec3 world_pos  = scene_pos + cameraPosition;
-
+	vec3 view_pos = screen_to_view_space(screen_pos, true);
 	vec3 view_back_pos = screen_to_view_space(vec3(uv, depth1), true);
+
+#ifdef DISTANT_HORIZONS
+    if (front_is_dh_terrain) {
+        view_pos = screen_to_view_space(dhProjectionInverse, vec3(uv, depth0_dh), true);
+    }
+    if (back_is_dh_terrain) {
+        view_back_pos = screen_to_view_space(dhProjectionInverse, vec3(uv, depth1_dh), true);
+    }
+#endif
+
+	vec3 scene_pos = view_to_scene_space(view_pos);
+	vec3 world_pos = scene_pos + cameraPosition;
 
 	vec3 world_dir; float view_dist;
 	length_normalize(scene_pos - gbufferModelViewInverse[3].xyz, world_dir, view_dist);
@@ -350,7 +373,7 @@ void main() {
 	// Specular reflections
 
 #if defined ENVIRONMENT_REFLECTIONS || defined SKY_REFLECTIONS
-	if (material.ssr_multiplier > eps && depth0 < 1.0) {
+	if (material.ssr_multiplier > eps && (depth0 < 1.0 || front_is_dh_terrain)) {
 		vec3 reflections = get_specular_reflections(
 			material,
 			tbn,

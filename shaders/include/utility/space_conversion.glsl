@@ -1,21 +1,70 @@
 #if !defined INCLUDE_UTILITY_SPACE_CONVERSION
 #define INCLUDE_UTILITY_SPACE_CONVERSION
 
+#ifdef DISTANT_HORIZONS
+uniform mat4 dhProjection;
+uniform mat4 dhProjectionInverse;
+uniform mat4 dhPreviousProjection;
+uniform mat4 dhPreviousProjectionInverse;
+
+uniform float dhNearPlane;
+uniform float dhFarPlane;
+#endif
+
 // https://wiki.shaderlabs.org/wiki/Shader_tricks#Linearizing_depth
-float linearize_depth(float depth) {
+float linearize_depth(float near, float far, float depth) {
 	return (near * far) / (depth * (near - far) + far);
+}
+float linearize_depth(float depth) {
+    return linearize_depth(near, far, depth);
+}
+float linearize_depth(float depth, bool is_dh_terrain) {
+#ifdef DISTANT_HORIZONS
+    float near = is_dh_terrain
+        ? dhNearPlane
+        : near;
+    float far = is_dh_terrain
+        ? dhFarPlane
+        : far;
+#endif
+    return linearize_depth(near, far, depth);
+}
+
+float reverse_linear_depth(float near, float far, float linear_z) {
+	return (far + near) / (far - near) + (2.0 * far * near) / (linear_z * (far - near));
+}
+float reverse_linear_depth(float linear_z) {
+    return reverse_linear_depth(near, far, linear_z);
+}
+float reverse_linear_depth(float linear_z, bool is_dh_terrain) {
+#ifdef DISTANT_HORIZONS
+    float near = is_dh_terrain
+        ? dhNearPlane
+        : near;
+    float far = is_dh_terrain
+        ? dhFarPlane
+        : far;
+#endif
+    return reverse_linear_depth(near, far, linear_z);
 }
 
 // Approximate linear depth function by DrDesten
-float linearize_depth_fast(float depth) {
+float linearize_depth_fast(float near, float depth) {
 	return near / (1.0 - depth);
 }
-
-float reverse_linear_depth(float linear_z) {
-	return (far + near) / (far - near) + (2.0 * far * near) / (linear_z * (far - near));
+float linearize_depth_fast(float depth) {
+    return linearize_depth_fast(near, depth);
+}
+float linearize_depth_fast(float depth, bool is_dh_terrain) {
+#ifdef DISTANT_HORIZONS
+    float near = is_dh_terrain
+        ? dhNearPlane
+        : near;
+#endif
+    return linearize_depth_fast(near, depth);
 }
 
-vec3 screen_to_view_space(vec3 screen_pos, bool handle_jitter) {
+vec3 screen_to_view_space(mat4 inverse_projection_matrix, vec3 screen_pos, bool handle_jitter) {
 	vec3 ndc_pos = 2.0 * screen_pos - 1.0;
 
 #ifdef TAA
@@ -28,11 +77,11 @@ vec3 screen_to_view_space(vec3 screen_pos, bool handle_jitter) {
 	if (handle_jitter) ndc_pos.xy -= jitter_offset;
 #endif
 
-	return project_and_divide(gbufferProjectionInverse, ndc_pos);
+	return project_and_divide(inverse_projection_matrix, ndc_pos);
 }
 
-vec3 view_to_screen_space(vec3 view_pos, bool handle_jitter) {
-	vec3 ndc_pos = project_and_divide(gbufferProjection, view_pos);
+vec3 view_to_screen_space(mat4 projection_matrix, vec3 view_pos, bool handle_jitter) {
+	vec3 ndc_pos = project_and_divide(projection_matrix, view_pos);
 
 #ifdef TAA
 #ifdef TAAU
@@ -45,6 +94,38 @@ vec3 view_to_screen_space(vec3 view_pos, bool handle_jitter) {
 #endif
 
 	return ndc_pos * 0.5 + 0.5;
+}
+
+vec3 screen_to_view_space(vec3 screen_pos, bool handle_jitter) {
+    return screen_to_view_space(gbufferProjectionInverse, screen_pos, handle_jitter);
+}
+
+vec3 view_to_screen_space(vec3 view_pos, bool handle_jitter) {
+    return view_to_screen_space(gbufferProjection, view_pos, handle_jitter);
+}
+
+vec3 screen_to_view_space(vec3 screen_pos, bool handle_jitter, bool is_dh_terrain) {
+#ifdef DISTANT_HORIZONS
+    mat4 inverse_projection_matrix = is_dh_terrain
+        ? dhProjectionInverse
+        : gbufferProjectionInverse;
+
+    return screen_to_view_space(inverse_projection_matrix, screen_pos, handle_jitter);
+#else
+    return screen_to_view_space(gbufferProjectionInverse, screen_pos, handle_jitter);
+#endif
+}
+
+vec3 view_to_screen_space(vec3 view_pos, bool handle_jitter, bool is_dh_terrain) {
+#ifdef DISTANT_HORIZONS
+    mat4 projection_matrix = is_dh_terrain
+        ? dhProjection
+        : gbufferProjection;
+
+    return view_to_screen_space(projection_matrix, view_pos, handle_jitter);
+#else
+    return view_to_screen_space(gbufferProjection, view_pos, handle_jitter);
+#endif
 }
 
 vec3 view_to_scene_space(vec3 view_pos) {
@@ -62,26 +143,36 @@ mat3 get_tbn_matrix(vec3 normal) {
 }
 
 #if defined TEMPORAL_REPROJECTION
-vec3 reproject_scene_space(vec3 scene_pos, bool hand) {
+vec3 reproject_scene_space(vec3 scene_pos, bool hand, bool is_dh_terrain) {
+#ifdef DISTANT_HORIZONS
+    mat4 previous_projection_matrix = is_dh_terrain
+        ? dhPreviousProjection
+        : gbufferPreviousProjection;
+#else
+    mat4 projection_matrix = gbufferPreviousProjection;
+#endif
+
 	vec3 camera_offset = hand
 		? vec3(0.0)
 		: cameraPosition - previousCameraPosition;
 
 	vec3 previous_pos = transform(gbufferPreviousModelView, scene_pos + camera_offset);
-	     previous_pos = project_and_divide(gbufferPreviousProjection, previous_pos);
+	     previous_pos = project_and_divide(previous_projection_matrix, previous_pos);
 
 	return previous_pos * 0.5 + 0.5;
 }
 
-vec3 reproject(vec3 screen_pos) {
-	vec3 pos = screen_to_view_space(screen_pos, false);
+vec3 reproject(vec3 screen_pos, bool is_dh_terrain) {
+	vec3 pos = screen_to_view_space(screen_pos, false, is_dh_terrain);
 	     pos = view_to_scene_space(pos);
 
 	bool hand = screen_pos.z < hand_depth;
 
-	return reproject_scene_space(pos, hand);
+	return reproject_scene_space(pos, hand, is_dh_terrain);
 }
-
+vec3 reproject(vec3 screen_pos) {
+    return reproject(screen_pos, false);
+}
 vec3 reproject(vec3 screen_pos, sampler2D velocity_sampler) {
 	vec3 velocity = texelFetch(velocity_sampler, ivec2(screen_pos.xy * view_res), 0).xyz;
 

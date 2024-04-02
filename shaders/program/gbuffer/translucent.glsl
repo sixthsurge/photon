@@ -548,8 +548,8 @@ void main() {
 #endif
 
 #ifdef CLOUD_SHADOWS
-		float cloud_shadows = get_cloud_shadows(colortex8, scene_pos);
-		shadows *= cloud_shadows;
+	float cloud_shadows = get_cloud_shadows(colortex8, scene_pos);
+	shadows *= cloud_shadows;
 #endif
 
 	// Diffuse lighting

@@ -2,6 +2,7 @@
 #define INCLUDE_LIGHT_SPECULAR_LIGHTING
 
 #include "/include/light/bsdf.glsl"
+#include "/include/misc/distant_horizons.glsl"
 #include "/include/misc/material.glsl"
 #include "/include/misc/raytracer.glsl"
 #include "/include/sky/projection.glsl"
@@ -194,8 +195,31 @@ vec3 trace_specular_ray(
 		dither,
 		intersection_step_count,
 		refinement_step_count,
-		hit_pos
+		hit_pos,
+        false
 	);
+
+    #ifdef DISTANT_HORIZONS
+    // Intersect against DH terrain too
+	bool hit_dh_terrain = false;
+    if (!hit) {
+        hit = raymarch_depth_buffer(
+            dhDepthTex,
+            view_to_screen_space(view_pos, true, true),
+            view_pos,
+            view_dir,
+            dither,
+            intersection_step_count,
+            refinement_step_count,
+            hit_pos,
+            true
+        );
+
+		hit_dh_terrain = hit;
+    }
+    #else
+	const bool hit_dh_terrain = false;
+	#endif
 #else
 	const bool hit = false;
 	const vec3 hit_pos = vec3(0.0);
@@ -221,7 +245,7 @@ vec3 trace_specular_ray(
 		vec3 fog_scattering = vec3(0.0);
 	#endif
 
-		vec3 hit_pos_prev = reproject(hit_pos);
+		vec3 hit_pos_prev = reproject(hit_pos, hit_dh_terrain);
 		if (clamp01(hit_pos_prev) != hit_pos_prev) return sky_reflection;
 
 		vec3 reflection = textureLod(colortex5, hit_pos_prev.xy, mip_level).rgb;

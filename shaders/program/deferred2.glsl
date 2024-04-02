@@ -84,6 +84,7 @@ uniform bool world_age_changed;
 
 #define TEMPORAL_REPROJECTION
 
+#include "/include/misc/distant_horizons.glsl"
 #include "/include/utility/bicubic.glsl"
 #include "/include/utility/checkerboard.glsl"
 #include "/include/utility/dithering.glsl"
@@ -128,21 +129,34 @@ float calculate_maximum_horizon_angle(
 	vec3 screen_pos,
 	vec3 view_pos,
 	float radius,
-	float dither
+	float dither,
+    bool is_dh_terrain
 ) {
 	float step_size = (GTAO_RADIUS * rcp(float(GTAO_HORIZON_STEPS))) * radius;
 
 	float max_cos_theta = -1.0;
 
-	vec2 ray_step = (view_to_screen_space(view_pos + view_slice_dir * step_size, true) - screen_pos).xy;
+	vec2 ray_step = (view_to_screen_space(view_pos + view_slice_dir * step_size, true, is_dh_terrain) - screen_pos).xy;
 	vec2 ray_pos = screen_pos.xy + ray_step * (dither + max_of(view_pixel_size) * rcp_length(ray_step));
 
 	for (int i = 0; i < GTAO_HORIZON_STEPS; ++i, ray_pos += ray_step) {
-		float depth = texelFetch(depthtex1, ivec2(clamp01(ray_pos) * view_res * taau_render_scale - 0.5), 0).x;
+        ivec2 texel = ivec2(clamp01(ray_pos) * view_res * taau_render_scale - 0.5);
+		float depth = texelFetch(depthtex1, texel, 0).x;
+
+#ifdef DISTANT_HORIZONS
+        float depth_dh = texelFetch(dhDepthTex, texel, 0).x;
+        bool is_dh_terrain = is_distant_horizons_terrain(depth, depth_dh);
+
+        if (is_dh_terrain) {
+            depth = depth_dh;
+        }
+#else
+        const bool is_dh_terrain = false;
+#endif
 
 		if (depth == 1.0 || depth < hand_depth || depth == screen_pos.z) continue;
 
-		vec3 offset = screen_to_view_space(vec3(ray_pos, depth), true) - view_pos;
+		vec3 offset = screen_to_view_space(vec3(ray_pos, depth), true, is_dh_terrain) - view_pos;
 
 		float len_sq = length_squared(offset);
 		float norm = inversesqrt(len_sq);
@@ -158,7 +172,7 @@ float calculate_maximum_horizon_angle(
 	return fast_acos(clamp(max_cos_theta, -1.0, 1.0));
 }
 
-float ambient_occlusion(vec3 screen_pos, vec3 view_pos, vec3 view_normal, vec2 dither) {
+float ambient_occlusion(vec3 screen_pos, vec3 view_pos, vec3 view_normal, vec2 dither, bool is_dh_terrain) {
 	float ao = 0.0;
 	// vec3 bent_normal = vec3(0.0);
 
@@ -170,6 +184,13 @@ float ambient_occlusion(vec3 screen_pos, vec3 view_pos, vec3 view_normal, vec2 d
 
 	// Reduce AO radius very close up, makes some screen-space artifacts less obvious
 	float ao_radius = max(0.25 + 0.75 * smoothstep(0.0, 81.0, length_squared(view_pos)), 0.5);
+
+    // Increase AO radius for DH terrain (looks really good)
+#ifdef DISTANT_HORIZONS
+    if (is_dh_terrain) {
+        ao_radius *= 3.0;
+    }
+#endif
 
 	for (int i = 0; i < GTAO_SLICES; ++i) {
 		float slice_angle = (i + dither.x) * (pi / float(GTAO_SLICES));
@@ -189,8 +210,8 @@ float ambient_occlusion(vec3 screen_pos, vec3 view_pos, vec3 view_normal, vec2 d
 		float gamma = sgn_gamma * fast_acos(cos_gamma);
 
 		vec2 max_horizon_angles;
-		max_horizon_angles.x = calculate_maximum_horizon_angle(-view_slice_dir, viewer_dir, screen_pos, view_pos, ao_radius, dither.y);
-		max_horizon_angles.y = calculate_maximum_horizon_angle( view_slice_dir, viewer_dir, screen_pos, view_pos, ao_radius, dither.y);
+		max_horizon_angles.x = calculate_maximum_horizon_angle(-view_slice_dir, viewer_dir, screen_pos, view_pos, ao_radius, dither.y, is_dh_terrain);
+		max_horizon_angles.y = calculate_maximum_horizon_angle( view_slice_dir, viewer_dir, screen_pos, view_pos, ao_radius, dither.y, is_dh_terrain);
 
 		max_horizon_angles = gamma + clamp(vec2(-1.0, 1.0) * max_horizon_angles - gamma, -half_pi, half_pi);
 		ao += integrate_arc(max_horizon_angles, gamma, cos_gamma) * len_sq * norm;
@@ -280,13 +301,26 @@ void main() {
 
 	vec2 dither = vec2(texelFetch(noisetex, texel & 511, 0).b, texelFetch(noisetex, (texel + 249) & 511, 0).b);
 
+    // Distant Horizons support
+
+#ifdef DISTANT_HORIZONS
+    float depth_dh = texelFetch(dhDepthTex, view_texel, 0).x;
+    bool is_dh_terrain = is_distant_horizons_terrain(depth, depth_dh);
+
+    if (is_dh_terrain) {
+        depth = depth_dh;
+    }
+#else
+    const bool is_dh_terrain = false;
+#endif
+
 	depth += 0.38 * float(depth < hand_depth); // Hand lighting fix from Capt Tatsu
 
 	vec3 screen_pos = vec3(uv * (taau_render_scale / gtao_render_scale), depth);
-	vec3 view_pos = screen_to_view_space(screen_pos, true);
+	vec3 view_pos = screen_to_view_space(screen_pos, true, is_dh_terrain);
 	vec3 scene_pos = view_to_scene_space(view_pos);
 
-	vec3 previous_screen_pos = reproject(screen_pos);
+	vec3 previous_screen_pos = reproject(screen_pos, is_dh_terrain);
 
 	if (depth == 1.0) { ao.xyz = vec3(1.0, 0.0, 0.0); return; }
 
@@ -303,7 +337,7 @@ void main() {
 	dither = r2(frameCounter, dither);
 
 #ifdef GTAO
-	ao.x = ambient_occlusion(screen_pos, view_pos, view_normal, dither);
+	ao.x = ambient_occlusion(screen_pos, view_pos, view_normal, dither, is_dh_terrain);
 #else
 	ao.x = 1.0;
 #endif
