@@ -489,16 +489,16 @@ void main() {
 		vec3 shadows;
 
         shadows = calculate_shadows(scene_pos, flat_normal, light_levels.y, material.sss_amount, shadow_distance_fade, sss_depth);
+
+	#ifdef DISTANT_HORIZONS
+		if (is_dh_terrain) {
+			shadow_distance_fade = 1.0;
+		}
+	#endif
 #else
 		vec3 shadows = vec3(sqrt(ao) * pow8(light_levels.y));
 		#define sss_depth 0.0
 		#define shadow_distance_fade 0.0
-#endif
-
-#ifdef DISTANT_HORIZONS
-		if (is_dh_terrain) {
-			shadow_distance_fade = 1.0;
-		}
 #endif
 
 #if defined POM && defined POM_SHADOW && (defined SPECULAR_MAPPING || defined NORMAL_MAPPING)
