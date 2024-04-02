@@ -30,10 +30,6 @@ flat out vec2 atlas_tile_offset;
 flat out vec2 atlas_tile_scale;
 #endif
 
-#if defined DIRECTIONAL_LIGHTMAPS
-out vec3 scene_pos;
-#endif
-
 #if defined PROGRAM_GBUFFERS_TERRAIN
 out float vanilla_ao;
 #endif
