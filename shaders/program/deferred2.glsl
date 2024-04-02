@@ -66,6 +66,7 @@ uniform vec3 previousCameraPosition;
 
 uniform float near;
 uniform float far;
+uniform float eyeAltitude;
 
 uniform int frameCounter;
 
@@ -246,11 +247,11 @@ vec3 reproject_clouds(vec3 screen_pos) {
 	vec3 ray_dir = normalize(pos);
 
 	// Get viewer position in cloud space
-	vec3 viewer_pos = vec3(0.0, planet_radius, 0.0) + cameraPosition;
+	vec3 viewer_pos = vec3(0.0, planet_radius + eyeAltitude, 0.0);
 
 	// Intersect middle of cumulus layer
 	vec2 dists = intersect_sphere(viewer_pos, ray_dir, clouds_cumulus_radius + 0.5 * clouds_cumulus_thickness);
-	vec3 hit_pos = (viewer_pos + ray_dir * dists.x) - vec3(0.0, planet_radius, 0.0) - cameraPosition;
+	vec3 hit_pos = (viewer_pos + ray_dir * dists.x) - viewer_pos;
 
 	return reproject_scene_space(hit_pos, false, false);
 }
