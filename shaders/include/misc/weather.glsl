@@ -205,8 +205,8 @@ void clouds_weather_variation(
 
 	// Weather influence
 
-	clouds_cumulus_coverage = mix(clouds_cumulus_coverage, vec2(0.6, 0.8), wetness);
-	clouds_altocumulus_coverage = mix(clouds_altocumulus_coverage, vec2(0.4, 0.9), wetness * 0.75);
+	clouds_cumulus_coverage = mix(clouds_cumulus_coverage, vec2(0.6, 0.8), wetness) + rainStrength;
+	clouds_altocumulus_coverage = mix(clouds_altocumulus_coverage, vec2(0.4, 0.9), wetness * 0.75) + rainStrength;
 	clouds_cirrus_coverage = mix(clouds_cirrus_coverage, vec2(0.7, 0.0), wetness * 0.50);
 	clouds_cumulus_congestus_amount *= 1.0 - wetness;
 	clouds_cumulonimbus_amount *= mix(1.0, 1.5 * wetness, wetness); // mix(clamp01(1.0 - 1.75 * wetness) ...
