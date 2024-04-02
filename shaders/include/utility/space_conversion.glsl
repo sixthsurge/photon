@@ -149,7 +149,7 @@ vec3 reproject_scene_space(vec3 scene_pos, bool hand, bool is_dh_terrain) {
         ? dhPreviousProjection
         : gbufferPreviousProjection;
 #else
-    mat4 projection_matrix = gbufferPreviousProjection;
+    mat4 previous_projection_matrix = gbufferPreviousProjection;
 #endif
 
 	vec3 camera_offset = hand

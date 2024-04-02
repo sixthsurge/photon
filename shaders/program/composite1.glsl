@@ -205,7 +205,8 @@ void main() {
     bool front_is_dh_terrain = is_distant_horizons_terrain(depth0, depth0_dh);
     bool back_is_dh_terrain = is_distant_horizons_terrain(depth1, depth1_dh);
 #else
-    const bool is_dh_terrain = false;
+    const bool front_is_dh_terrain = false;
+	const bool back_is_dh_terrain = false;
 #endif
 
 	// Sky early exit
