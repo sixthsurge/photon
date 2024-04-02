@@ -90,6 +90,7 @@ uniform bool world_age_changed;
 #include "/include/utility/dithering.glsl"
 #include "/include/utility/encoding.glsl"
 #include "/include/utility/fast_math.glsl"
+#include "/include/utility/geometry.glsl"
 #include "/include/utility/random.glsl"
 #include "/include/utility/space_conversion.glsl"
 
@@ -234,13 +235,33 @@ float ambient_occlusion(vec3 screen_pos, vec3 view_pos, vec3 view_normal, vec2 d
 //   clouds upscaling
 // --------------------
 
+vec3 reproject_clouds(vec3 screen_pos) {
+	const float planet_radius            = 6371e3;
+	const float clouds_cumulus_radius    = planet_radius + CLOUDS_CUMULUS_ALTITUDE;
+	const float clouds_cumulus_thickness = CLOUDS_CUMULUS_ALTITUDE * CLOUDS_CUMULUS_THICKNESS;
+
+	// Get ray direction
+	vec3 pos = screen_to_view_space(screen_pos, false, false);
+	     pos = view_to_scene_space(pos);
+	vec3 ray_dir = normalize(pos);
+
+	// Get viewer position in cloud space
+	vec3 viewer_pos = vec3(0.0, planet_radius, 0.0) + cameraPosition + gbufferModelViewInverse[3].xyz;
+
+	// Intersect middle of cumulus layer
+	vec2 dists = intersect_sphere(viewer_pos, ray_dir, clouds_cumulus_radius + 0.5 * clouds_cumulus_thickness);
+	vec3 hit_pos = (viewer_pos + ray_dir * dists.x) - vec3(0.0, planet_radius, 0.0);
+
+	return reproject_scene_space(hit_pos, false, false);
+}
+
 vec4 upscale_clouds() {
 	const int checkerboard_area = CLOUDS_TEMPORAL_UPSCALING * CLOUDS_TEMPORAL_UPSCALING;
 
 	ivec2 dst_texel = ivec2(gl_FragCoord.xy);
 	ivec2 src_texel = clamp(dst_texel / CLOUDS_TEMPORAL_UPSCALING, ivec2(0), ivec2(view_res * taau_render_scale) / CLOUDS_TEMPORAL_UPSCALING - 1);
 
-	vec2 previous_uv = reproject(vec3(uv, 1.0)).xy;
+	vec2 previous_uv = reproject_clouds(vec3(uv, 1.0)).xy;
 
 	vec4 current = texelFetch(colortex5, src_texel, 0);
 	vec4 history = smooth_filter(colortex7, previous_uv * taau_render_scale);
