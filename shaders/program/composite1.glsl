@@ -357,6 +357,16 @@ void main() {
 #endif
 	}
 
+#ifdef DISTANT_HORIZONS
+		// Water tint for DH water
+
+		if (is_water && front_is_dh_terrain) {
+			const vec3 absorption_coeff = vec3(WATER_ABSORPTION_R_UNDERWATER, WATER_ABSORPTION_G_UNDERWATER, WATER_ABSORPTION_B_UNDERWATER) * rec709_to_working_color;
+			const vec3 water_tint = exp(-5.0 * absorption_coeff);
+			scene_color *= water_tint;
+		}
+#endif
+
 	// Rain puddles
 
 #ifdef RAIN_PUDDLES

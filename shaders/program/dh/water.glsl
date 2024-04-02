@@ -286,20 +286,18 @@ void main() {
 	// Prevent water behind terrain from rendering on top of it
 	float dh_depth_linear = linearize_depth(gl_FragCoord.z, true);
 	float mc_depth_linear = linearize_depth(back_depth_mc, false);
-	if (mc_depth_linear < dh_depth_linear && back_depth_mc != 1.0) {
-		discard;
-		return;
-	}
+
+	if (mc_depth_linear < dh_depth_linear && back_depth_mc != 1.0) { discard; return; }
 
 	vec3 world_pos = scene_pos + cameraPosition;
 	vec3 world_dir = normalize(scene_pos - gbufferModelViewInverse[3].xyz);
 
 	vec3 view_back_pos = back_is_dh_terrain
-		? screen_to_view_space(dhProjectionInverse, vec3(coord, back_depth_dh), true)
-		: screen_to_view_space(vec3(coord, back_depth_mc), true);
+		? screen_to_view_space(vec3(coord, back_depth_dh), true, true)
+		: screen_to_view_space(vec3(coord, back_depth_mc), true, false);
 	vec3 scene_back_pos = view_to_scene_space(view_back_pos);
 
-	float layer_dist = distance(scene_pos, scene_back_pos); // distance to solid layer along view ray
+	float layer_dist = length(scene_pos - scene_back_pos); // distance to solid layer along view ray
 
 	// Get material and normal
 
