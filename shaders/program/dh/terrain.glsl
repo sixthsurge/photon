@@ -80,7 +80,6 @@ void main() {
 #if defined fsh
 
 layout (location = 0) out vec4 gbuffer_data_0; // albedo, block ID, flat normal, light levels
-layout (location = 1) out vec4 gbuffer_data_1; // detailed normal, specular map (optional)
 
 /* DRAWBUFFERS:1 */
 

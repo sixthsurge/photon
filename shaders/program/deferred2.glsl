@@ -349,6 +349,13 @@ void main() {
 
 #ifdef NORMAL_MAPPING
 	vec3 world_normal = decode_unit_vector(gbuffer_data.xy);
+
+	#ifdef DISTANT_HORIZONS
+	if (is_dh_terrain) {
+		vec4 gbuffer_data_0 = texelFetch(colortex1, view_texel, 0);
+		world_normal = decode_unit_vector(unpack_unorm_2x8(gbuffer_data_0.z));
+	}
+	#endif
 #else
 	vec3 world_normal = decode_unit_vector(unpack_unorm_2x8(gbuffer_data.z));
 #endif

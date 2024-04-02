@@ -303,6 +303,10 @@ void main() {
 	} else {
 		material = material_from(albedo, material_mask, world_pos, light_levels);
 
+#ifdef DISTANT_HORIZONS
+		if (!front_is_dh_terrain) {
+#endif
+
 #ifdef NORMAL_MAPPING
 		normal = decode_unit_vector(gbuffer_data_1.xy);
 #endif
@@ -318,6 +322,10 @@ void main() {
 #endif
 
 		decode_specular_map(specular_map, material);
+#endif
+
+#ifdef DISTANT_HORIZONS
+		}
 #endif
 	}
 

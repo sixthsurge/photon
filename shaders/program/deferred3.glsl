@@ -415,19 +415,27 @@ void main() {
 		// Get material and normal
 
 		Material material = material_from(albedo, material_mask, world_pos, light_levels);
+	
+		vec3 normal = flat_normal;
 
-#ifdef NORMAL_MAPPING
-		vec3 normal = decode_unit_vector(gbuffer_data_1.xy);
-#else
-		#define normal flat_normal
+#ifdef DISTANT_HORIZONS
+		if (!is_dh_terrain) {
 #endif
 
-#ifdef SPECULAR_MAPPING
+	#ifdef NORMAL_MAPPING
+		normal = decode_unit_vector(gbuffer_data_1.xy);
+	#endif
+
+	#ifdef SPECULAR_MAPPING
 		bool parallax_shadow;
 		vec4 specular_map = vec4(unpack_unorm_2x8(gbuffer_data_1.z), unpack_unorm_2x8(gbuffer_data_1.w));
 		decode_specular_map(specular_map, material, parallax_shadow);
-#elif defined NORMAL_MAPPING
+	#elif defined NORMAL_MAPPING
 		bool parallax_shadow = gbuffer_data_1.z >= 0.5;
+	#endif
+	
+#ifdef DISTANT_HORIZONS
+		}
 #endif
 
 		// Rain puddles
