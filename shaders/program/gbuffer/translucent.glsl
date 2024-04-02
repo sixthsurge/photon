@@ -326,6 +326,10 @@ uniform vec4 entityColor;
 #include "/include/light/cloud_shadows.glsl"
 #endif
 
+#ifdef DISTANT_HORIZONS
+#include "/include/misc/distant_horizons.glsl"
+#endif
+
 const float lod_bias = log2(taau_render_scale);
 
 #if   TEXTURE_FORMAT == TEXTURE_FORMAT_LAB
@@ -408,6 +412,15 @@ void main() {
 	vec3 world_dir = normalize(scene_pos - gbufferModelViewInverse[3].xyz);
 
 	vec3 view_back_pos = screen_to_view_space(vec3(coord, depth1), true);
+
+#ifdef DISTANT_HORIZONS
+	float depth1_dh = texelFetch(dhDepthTex1, ivec2(gl_FragCoord.xy), 0).x;
+
+	if (is_distant_horizons_terrain(depth1, depth1_dh)) {
+		view_back_pos = screen_to_view_space(vec3(coord, depth1_dh), true, true);
+	}
+#endif
+
 	vec3 scene_back_pos = view_to_scene_space(view_back_pos);
 
 	float layer_dist = distance(scene_pos, scene_back_pos); // distance to solid layer along view ray

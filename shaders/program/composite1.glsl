@@ -358,13 +358,27 @@ void main() {
 	}
 
 #ifdef DISTANT_HORIZONS
-		// Water tint for DH water
+		// Distant Horizons water scattering
 
 		if (is_water && front_is_dh_terrain) {
-			const vec3 absorption_coeff = vec3(WATER_ABSORPTION_R_UNDERWATER, WATER_ABSORPTION_G_UNDERWATER, WATER_ABSORPTION_B_UNDERWATER) * rec709_to_working_color;
-			const vec3 water_tint = exp(-5.0 * absorption_coeff);
+			float LoV = dot(light_dir, world_dir);
+
+			vec3 water_tint = exp(-5.0 * water_absorption_coeff);
+
+			mat2x3 water_fog = water_fog_simple(
+				light_color,
+				ambient_color,
+				water_absorption_coeff,
+				layer_dist * float(isEyeInWater != 1),
+				LoV,
+				light_levels.y,
+				0.0
+			);
+
 			scene_color *= water_tint;
+			scene_color += water_fog[0] * (1.0 + 6.0 * sqr(water_fog[1])) * (1.0 - exp(-0.33 * layer_dist));
 		}
+
 #endif
 
 	// Rain puddles
@@ -416,7 +430,13 @@ void main() {
 			float NoH = (NoL + NoV) * halfway_norm;
 			float LoH = LoV * halfway_norm + halfway_norm;
 
+	#ifndef DISTANT_HORIZONS
 			vec3 shadows = vec3(data[0].xy, data[1].x);
+	#else
+			vec3 shadows = front_is_dh_terrain
+				? vec3(1.0)
+				: vec3(data[0].xy, data[1].x);
+	#endif
 
 			reflections += get_specular_highlight(material, NoL, NoV, NoH, LoV, LoH) * light_color * shadows;
 		}

@@ -379,23 +379,10 @@ void main() {
 	if (is_water == 1) {
 		// Water absorption
 
-		vec3 biome_water_color = srgb_eotf_inv(tint.rgb) * rec709_to_working_color;
-		vec3 absorption_coeff = biome_water_coeff(biome_water_color);
-
-		mat2x3 water_fog = water_fog_simple(
-			light_color,
-			ambient_color,
-			absorption_coeff,
-			layer_dist * float(isEyeInWater != 1),
-			-LoV,
-			light_levels.y,
-			sss_depth
-		);
-
-		radiance += water_fog[0] * (1.0 + 6.0 * sqr(water_fog[1])) * (1.0 - exp(-0.33 * layer_dist));
-		alpha     = 1.0 - water_fog[1].x;
+		vec3 transmittance = exp(-water_absorption_coeff * max(1.0, layer_dist));
+		alpha = 1.0 - transmittance.x;
 	} else {
-		alpha     = base_color.a;
+		alpha = base_color.a;
 	}
 
 	scene_color = vec4(radiance / max(alpha, eps), alpha);
@@ -409,10 +396,8 @@ void main() {
 
 	// Encode gbuffer data
 
-	vec3 color_to_store = (is_water == 1) ? shadows : base_color.rgb;
-
-	gbuffer_data_0.x  = pack_unorm_2x8(color_to_store.rg);
-	gbuffer_data_0.y  = pack_unorm_2x8(color_to_store.b, clamp01(((is_water == 1) ? rcp(255.0) : 0.0)));
+	gbuffer_data_0.x  = pack_unorm_2x8(tint.rg);
+	gbuffer_data_0.y  = pack_unorm_2x8(tint.b, clamp01(((is_water == 1) ? rcp(255.0) : 0.0)));
 	gbuffer_data_0.z  = pack_unorm_2x8(encode_unit_vector(normal));
 	gbuffer_data_0.w  = pack_unorm_2x8(dither_8bit(light_levels, 0.5));
 }
