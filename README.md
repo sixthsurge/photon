@@ -6,10 +6,6 @@
 
 ![Screenshot](docs/images/a.png)
 
-## downloads
-
-* [Latest commit](https://github.com/sixthsurge/photon/archive/refs/heads/main.zip)
-
 ## acknowledgments
 
 * [Emin](https://github.com/EminGT) - Shadow bias method from [Complementary R5](https://www.complementary.dev/shaders/) (fully fixes peter panning and light leaking underground!)
@@ -18,17 +14,33 @@
 * [Sledgehammer Games](https://www.sledgehammergames.com/) - Bloom downsampling method used in Call of Duty Advanced Warfare (described [here](http://www.iryoku.com/next-generation-post-processing-in-call-of-duty-advanced-warfare))
 * http://momentsingraphics.de/ - Blue noise texture
 
+## installation
+
+* [Download latest commit](https://github.com/sixthsurge/photon/archive/refs/heads/main.zip)
+
+* Photon can be used with [Iris](https://irisshaders.dev/download) (recommended) or [OptiFine](https://optifine.net/home)
+* Iris is a modern shader loader with far better performance, mod compatibility and developer features than OptiFine. Some features (Colored Lighting) will only work on Iris
+* Once you have your preferred shader loader installed, simply place the downloaded zip file in your `.minecraft/shaderpacks` folder
+
 ## features
-* Custom shading with variable penumbra shadows and ambient occlusion
-* [Colored lighting](https://cdn.discordapp.com/attachments/736930818835873813/1123586429902135338/2023-06-28_13.02.33.png?ex=65f197e8&is=65df22e8&hm=c7871d2d3a5af5f6c84d98ad9997e4f4e1cfff40d3d9539b03e471abf48f677c&) using flood-fill algorithm (enabled with Ultra profile, requires Iris)
-* Custom sky with multiple volumetric cloud layers and different weather each day
-* Camera effects - bloom, depth-of-field, motion-blur
+* Fully revamped sky, lighting and water with a cohesive visual style
+* Immersive weather system with different skies each day, featuring multiple volumetric cloud layers
+* [Colored lighting](https://cdn.discordapp.com/attachments/736930818835873813/1123586429902135338/2023-06-28_13.02.33.png?ex=65f197e8&is=65df22e8&hm=c7871d2d3a5af5f6c84d98ad9997e4f4e1cfff40d3d9539b03e471abf48f677c&) using a voxel flood-fill algorithm (enabled with Ultra profile, requires Iris)
 * Full labPBR resource pack support
-* Revamped water
+* Extensive settings menu allowing you to customize every aspect of the shader
 * Screen-space reflections
 * Volumetric lighting
-* Much improved image quality thanks to TAA, FXAA and CAS
+* Soft shadows with variable penumbra size
+* High quality ambient occlusion (GTAO)
+* Camera effects - bloom, depth-of-field, motion-blur
+* Much improved image quality with TAA, FXAA and CAS
 * Advanced temporal upscaling (disabled by default) for low end devices
+
+## compatibility
+* Nvidia, AMD and Intel GPUs
+* Iris - version 1.5 and above
+* OptiFine - on Minecraft 1.16.5 and above
+* Photon is also compatible with [Distant Horizons](https://www.curseforge.com/minecraft/mc-mods/distant-horizons) (as of writing this requires a special version of Iris and Distant Horizons which is available in the Iris installer)
 
 ## showcase videos
 
@@ -52,4 +64,5 @@
 
 ## community
 
-Want to discuss the shaderpack or ask questions? Head over to our discord channel `#photon` in the [ShaderLABS Discord](https://discord.gg/RpzWN9S).
+For questions, suggestions and news regarding this shader pack, head to my channel `#photon-sixthsurge` in the [shaderLABS discord server](https://discord.gg/RpzWN9S).
+
