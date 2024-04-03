@@ -17,6 +17,7 @@
 
 out vec2 uv;
 out vec2 light_levels;
+out vec3 scene_pos;
 out vec4 tint;
 
 flat out uint material_mask;
@@ -27,10 +28,6 @@ out vec2 atlas_tile_coord;
 out vec3 tangent_pos;
 flat out vec2 atlas_tile_offset;
 flat out vec2 atlas_tile_scale;
-#endif
-
-#if defined DIRECTIONAL_LIGHTMAPS
-out vec3 scene_pos;
 #endif
 
 #if defined PROGRAM_GBUFFERS_TERRAIN
@@ -129,9 +126,7 @@ void main() {
 	     pos = animate_vertex(pos, is_top_vertex, light_levels.y, material_mask);
 	     pos = pos - cameraPosition;
 
-#if defined DIRECTIONAL_LIGHTMAPS
 	scene_pos = pos;
-#endif
 
 #if defined POM && defined PROGRAM_GBUFFERS_TERRAIN
 	tangent_pos = (pos - gbufferModelViewInverse[3].xyz) * tbn;
@@ -173,6 +168,7 @@ layout (location = 1) out vec4 gbuffer_data_1; // detailed normal, specular map 
 
 in vec2 uv;
 in vec2 light_levels;
+in vec3 scene_pos;
 in vec4 tint;
 
 flat in uint material_mask;
@@ -183,10 +179,6 @@ in vec2 atlas_tile_coord;
 in vec3 tangent_pos;
 flat in vec2 atlas_tile_offset;
 flat in vec2 atlas_tile_scale;
-#endif
-
-#if defined DIRECTIONAL_LIGHTMAPS
-in vec3 scene_pos;
 #endif
 
 #if defined PROGRAM_GBUFFERS_TERRAIN
@@ -230,6 +222,10 @@ uniform vec3 light_dir;
 
 #if defined PROGRAM_GBUFFERS_ENTITIES
 uniform vec4 entityColor;
+#endif
+
+#if defined PROGRAM_GBUFFERS_PARTICLES
+	#define NO_NORMAL
 #endif
 
 #if defined PROGRAM_GBUFFERS_TERRAIN && defined POM
@@ -448,13 +444,23 @@ void main() {
 	#endif
 #endif
 
+#ifdef NO_NORMAL
+	// No normal vector => make one from screen-space partial derivatives
+	vec3 particle_normal = normalize(cross(dFdx(scene_pos), dFdy(scene_pos)));
+	#define flat_normal particle_normal
+	#define detailed_normal particle_normal
+#else
+	#define flat_normal tbn[2]
+	#define detailed_normal normal
+#endif
+
 	gbuffer_data_0.x  = pack_unorm_2x8(base_color.rg);
 	gbuffer_data_0.y  = pack_unorm_2x8(base_color.b, clamp01(float(material_mask) * rcp(255.0)));
-	gbuffer_data_0.z  = pack_unorm_2x8(encode_unit_vector(tbn[2]));
+	gbuffer_data_0.z  = pack_unorm_2x8(encode_unit_vector(flat_normal));
 	gbuffer_data_0.w  = pack_unorm_2x8(dither_8bit(adjusted_light_levels, dither));
 
 #ifdef NORMAL_MAPPING
-	gbuffer_data_1.xy = encode_unit_vector(normal);
+	gbuffer_data_1.xy = encode_unit_vector(detailed_normal);
 #endif
 
 #ifdef SPECULAR_MAPPING

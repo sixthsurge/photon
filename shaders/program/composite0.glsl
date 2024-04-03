@@ -128,6 +128,10 @@ uniform sampler2D shadowcolor0;
 #endif
 #endif
 
+#ifdef DISTANT_HORIZONS
+uniform sampler2D dhDepthTex;
+#endif
+
 uniform mat4 gbufferModelView;
 uniform mat4 gbufferModelViewInverse;
 uniform mat4 gbufferProjection;
@@ -137,6 +141,10 @@ uniform mat4 shadowModelView;
 uniform mat4 shadowModelViewInverse;
 uniform mat4 shadowProjection;
 uniform mat4 shadowProjectionInverse;
+
+#ifdef DISTANT_HORIZONS
+uniform int dhRenderDistance;
+#endif
 
 uniform vec3 cameraPosition;
 
@@ -199,9 +207,31 @@ void main() {
 	float depth1        = texelFetch(depthtex1, view_texel, 0).x;
 	vec4 gbuffer_data_0 = texelFetch(colortex1, view_texel, 0);
 
+#ifdef DISTANT_HORIZONS
+    mat4 projection_matrix, inverse_projection_matrix;
+    bool is_dh_terrain;
+	float dh_depth = texelFetch(dhDepthTex, view_texel, 0).x;
+
+    if (depth0 == 1.0) {
+        is_dh_terrain = true;
+        depth0 = dh_depth;
+        depth1 = dh_depth;
+        projection_matrix = dhProjection;
+        inverse_projection_matrix = dhProjectionInverse;
+    } else {
+        is_dh_terrain = false;
+        projection_matrix = gbufferProjection;
+        inverse_projection_matrix = gbufferProjectionInverse;
+    }
+#else
+    #define is_dh_terrain             false
+    #define projection_matrix         gbufferProjection
+    #define inverse_projection_matrix gbufferProjectionInverse
+#endif
+
 	float skylight = unpack_unorm_2x8(gbuffer_data_0.w).y;
 
-	vec3 view_pos  = screen_to_view_space(vec3(uv, depth0), true);
+	vec3 view_pos  = screen_to_view_space(inverse_projection_matrix, vec3(uv, depth0), true);
 	vec3 scene_pos = view_to_scene_space(view_pos);
 	vec3 world_pos = scene_pos + cameraPosition;
 

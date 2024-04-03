@@ -283,6 +283,7 @@ uniform float time_midnight;
 #include "/include/light/diffuse_lighting.glsl"
 #include "/include/light/shadows.glsl"
 #include "/include/light/specular_lighting.glsl"
+#include "/include/misc/distant_horizons.glsl"
 #include "/include/misc/edge_highlight.glsl"
 #include "/include/misc/material.glsl"
 #include "/include/misc/rain_puddles.glsl"
@@ -310,17 +311,35 @@ void main() {
 	// Sample textures
 
 	float depth         = texelFetch(depthtex1, texel, 0).x;
+#ifdef DISTANT_HORIZONS
+    float depth_dh      = texelFetch(dhDepthTex, texel, 0).x;
+#endif
 	vec4 gbuffer_data_0 = texelFetch(colortex1, texel, 0);
 #if defined NORMAL_MAPPING || defined SPECULAR_MAPPING
 	vec4 gbuffer_data_1 = texelFetch(colortex2, texel, 0);
 #endif
 	vec4 overlays       = texelFetch(colortex3, texel, 0);
 
+    // Distant Horizons support
+
+#ifdef DISTANT_HORIZONS
+    bool is_dh_terrain = is_distant_horizons_terrain(depth, depth_dh);
+#else
+    const bool is_dh_terrain = false;
+#endif
+
 	// Space conversions
 
 	depth += 0.38 * float(depth < hand_depth); // Hand lighting fix from Capt Tatsu
 
 	vec3 view_pos = screen_to_view_space(vec3(uv, depth), true);
+
+#ifdef DISTANT_HORIZONS
+    if (is_dh_terrain) {
+        view_pos = screen_to_view_space(dhProjectionInverse, vec3(uv, depth_dh), true);
+    }
+#endif
+
 	vec3 scene_pos = view_to_scene_space(view_pos);
 	vec3 world_pos = scene_pos + cameraPosition;
 	vec3 world_dir = normalize(scene_pos - gbufferModelViewInverse[3].xyz);
@@ -348,7 +367,7 @@ void main() {
 #endif
 #endif
 
-	if (depth == 1.0) { // Sky
+	if (depth == 1.0 && !is_dh_terrain) { // Sky
 #if defined WORLD_OVERWORLD
 		scene_color = draw_sky(world_dir, atmosphere);
 
@@ -396,19 +415,27 @@ void main() {
 		// Get material and normal
 
 		Material material = material_from(albedo, material_mask, world_pos, light_levels);
+	
+		vec3 normal = flat_normal;
 
-#ifdef NORMAL_MAPPING
-		vec3 normal = decode_unit_vector(gbuffer_data_1.xy);
-#else
-		#define normal flat_normal
+#ifdef DISTANT_HORIZONS
+		if (!is_dh_terrain) {
 #endif
 
-#ifdef SPECULAR_MAPPING
+	#ifdef NORMAL_MAPPING
+		normal = decode_unit_vector(gbuffer_data_1.xy);
+	#endif
+
+	#ifdef SPECULAR_MAPPING
 		bool parallax_shadow;
 		vec4 specular_map = vec4(unpack_unorm_2x8(gbuffer_data_1.z), unpack_unorm_2x8(gbuffer_data_1.w));
 		decode_specular_map(specular_map, material, parallax_shadow);
-#elif defined NORMAL_MAPPING
+	#elif defined NORMAL_MAPPING
 		bool parallax_shadow = gbuffer_data_1.z >= 0.5;
+	#endif
+	
+#ifdef DISTANT_HORIZONS
+		}
 #endif
 
 		// Rain puddles
@@ -429,9 +456,9 @@ void main() {
 		// Upscale ambient occlusion
 
 #ifdef GTAO
-		float lin_z = linearize_depth_fast(depth);
+		float lin_z = linearize_depth(depth, is_dh_terrain);
 
-		#define depth_weight(reversed_depth) exp2(-10.0 * abs(linearize_depth_fast(1.0 - reversed_depth) - lin_z))
+		#define depth_weight(reversed_depth) exp2(-10.0 * abs(linearize_depth(1.0 - reversed_depth, is_dh_terrain) - lin_z))
 
 		vec4 gtao = vec4(half_res_00, 1.0) * depth_weight(half_res_00.z) * (1.0 - f.x) * (1.0 - f.y)
 		          + vec4(half_res_10, 1.0) * depth_weight(half_res_10.z) * (f.x - f.x * f.y)
@@ -442,7 +469,7 @@ void main() {
 
 		gtao = (gtao.w == 0.0) ? vec4(0.0) : gtao / gtao.w;
 
-		float ao = gtao.x;
+		float ao = half_res_00.x;
 #else
 		#define ao 1.0
 #endif
@@ -459,7 +486,15 @@ void main() {
 #if defined SHADOW && (defined WORLD_OVERWORLD || defined WORLD_END)
 		float sss_depth;
 		float shadow_distance_fade;
-		vec3 shadows = calculate_shadows(scene_pos, flat_normal, light_levels.y, material.sss_amount, shadow_distance_fade, sss_depth);
+		vec3 shadows;
+
+        shadows = calculate_shadows(scene_pos, flat_normal, light_levels.y, material.sss_amount, shadow_distance_fade, sss_depth);
+
+	#ifdef DISTANT_HORIZONS
+		if (is_dh_terrain) {
+			shadow_distance_fade = 1.0;
+		}
+	#endif
 #else
 		vec3 shadows = vec3(sqrt(ao) * pow8(light_levels.y));
 		#define sss_depth 0.0

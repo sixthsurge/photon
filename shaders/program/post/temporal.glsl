@@ -215,6 +215,7 @@ uniform vec2 taa_offset;
 
 #define TEMPORAL_REPROJECTION
 
+#include "/include/misc/distant_horizons.glsl"
 #include "/include/utility/bicubic.glsl"
 #include "/include/utility/color.glsl"
 #include "/include/utility/space_conversion.glsl"
@@ -250,17 +251,17 @@ vec3 reinhard_inverse(vec3 rgb) {
 
 // Estimates the closest fragment in a 5x5 radius with 5 samples in a cross pattern
 // Improves reprojection for objects in motion
-vec3 get_closest_fragment(ivec2 texel0) {
+vec3 get_closest_fragment(sampler2D depth_sampler, ivec2 texel0) {
 	ivec2 texel1 = texel0 + ivec2(-2, -2);
 	ivec2 texel2 = texel0 + ivec2( 2, -2);
 	ivec2 texel3 = texel0 + ivec2(-2,  2);
 	ivec2 texel4 = texel0 + ivec2( 2,  2);
 
-	float depth0 = texelFetch(depthtex0, texel0, 0).x;
-	float depth1 = texelFetch(depthtex0, texel1, 0).x;
-	float depth2 = texelFetch(depthtex0, texel2, 0).x;
-	float depth3 = texelFetch(depthtex0, texel3, 0).x;
-	float depth4 = texelFetch(depthtex0, texel4, 0).x;
+	float depth0 = texelFetch(depth_sampler, texel0, 0).x;
+	float depth1 = texelFetch(depth_sampler, texel1, 0).x;
+	float depth2 = texelFetch(depth_sampler, texel2, 0).x;
+	float depth3 = texelFetch(depth_sampler, texel3, 0).x;
+	float depth4 = texelFetch(depth_sampler, texel4, 0).x;
 
 	vec3 pos  = depth0 < depth1 ? vec3(texel0, depth0) : vec3(texel1, depth1);
 	vec3 pos1 = depth2 < depth3 ? vec3(texel2, depth2) : vec3(texel3, depth3);
@@ -393,8 +394,21 @@ void main() {
 	ivec2 texel = ivec2(gl_FragCoord.xy * taau_render_scale);
 
 #ifdef TAA
-	vec3 closest = get_closest_fragment(texel);
+	#ifndef DISTANT_HORIZONS
+	vec3 closest = get_closest_fragment(depthtex0, texel);
 	vec2 velocity = closest.xy - reproject(closest).xy;
+	#else
+	vec3 closest    = get_closest_fragment(depthtex0, texel);
+	vec3 closest_dh = get_closest_fragment(dhDepthTex, texel);
+
+	bool is_dh_terrain = is_distant_horizons_terrain(closest.z, closest_dh.z);
+
+	closest = is_dh_terrain
+		? closest_dh
+		: closest;
+	
+	vec2 velocity = closest.xy - reproject(closest, is_dh_terrain).xy;
+	#endif
 	vec2 previous_uv = uv - velocity;
 
 	vec3 history_color = catmull_rom_filter_fast_rgb(colortex5, previous_uv, 0.6);

@@ -232,6 +232,7 @@ uniform float biome_humidity;
 #include "/include/sky/clouds.glsl"
 #endif
 
+#include "/include/misc/distant_horizons.glsl"
 #include "/include/utility/checkerboard.glsl"
 #include "/include/utility/random.glsl"
 #include "/include/utility/space_conversion.glsl"

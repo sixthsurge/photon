@@ -48,7 +48,10 @@ uniform sampler2D colortex0;
 
 uniform sampler2D depthtex0;
 
+uniform mat4 gbufferModelView;
+uniform mat4 gbufferModelViewInverse;
 uniform mat4 gbufferProjection;
+uniform mat4 gbufferProjectionInverse;
 
 uniform float near, far;
 
@@ -58,14 +61,15 @@ uniform float centerDepthSmooth;
 uniform int frameCounter;
 
 uniform vec2 view_pixel_size;
+uniform vec2 taa_offset;
 
 #include "/include/utility/random.glsl"
 #include "/include/utility/sampling.glsl"
 #include "/include/utility/fast_math.glsl"
 
-float reverse_linear_depth(float linear_z) {
-	return (far + near) / (far - near) + (2.0 * far * near) / (linear_z * (far - near));
-}
+#ifdef DISTANT_HORIZONS
+#include "/include/misc/distant_horizons.glsl"
+#endif
 
 vec2 polar_to_cartesian(vec2 polar) {
 	return vec2(polar.x * cos(polar.y), polar.x * sin(polar.y));
@@ -75,6 +79,14 @@ void main() {
 	ivec2 texel = ivec2(gl_FragCoord.xy);
 
 	float depth = texelFetch(depthtex0, texel, 0).x;
+
+#ifdef DISTANT_HORIZONS
+	float depth_dh = texelFetch(dhDepthTex, texel, 0).x;
+
+	if (is_distant_horizons_terrain(depth, depth_dh)) {
+		depth = reverse_linear_depth(linearize_depth(depth_dh, true));
+	}
+#endif
 
 	if (depth < hand_depth) {
 		scene_color = texelFetch(colortex0, texel, 0).rgb;

@@ -122,6 +122,7 @@ uniform float time_midnight;
 
 #include "/include/fog/simple_fog.glsl"
 #include "/include/light/specular_lighting.glsl"
+#include "/include/misc/distant_horizons.glsl"
 #include "/include/misc/material.glsl"
 #include "/include/misc/rain_puddles.glsl"
 #include "/include/misc/water_normal.glsl"
@@ -183,6 +184,10 @@ void main() {
 	scene_color         = texelFetch(colortex0, texel, 0).rgb;
 	float depth0        = texelFetch(depthtex0, texel, 0).x;
 	float depth1        = texelFetch(depthtex1, texel, 0).x;
+#ifdef DISTANT_HORIZONS
+    float depth0_dh     = texelFetch(dhDepthTex, texel, 0).x;
+    float depth1_dh     = texelFetch(dhDepthTex1, texel, 0).x;
+#endif
 	vec4 gbuffer_data_0 = texelFetch(colortex1, texel, 0);
 #if defined NORMAL_MAPPING || defined SPECULAR_MAPPING
 	vec4 gbuffer_data_1 = texelFetch(colortex2, texel, 0);
@@ -194,9 +199,19 @@ void main() {
 	vec3 fog_transmittance = smooth_filter(colortex7, fog_uv).rgb;
 #endif
 
+	// Distant Horizons support
+
+#ifdef DISTANT_HORIZONS
+    bool front_is_dh_terrain = is_distant_horizons_terrain(depth0, depth0_dh);
+    bool back_is_dh_terrain = is_distant_horizons_terrain(depth1, depth1_dh);
+#else
+    const bool front_is_dh_terrain = false;
+	const bool back_is_dh_terrain = false;
+#endif
+
 	// Sky early exit
 
-	if (depth0 == 1.0) {
+	if (depth0 == 1.0 && !front_is_dh_terrain) {
 		// Apply volumetric fog
 #if (defined WORLD_OVERWORLD || defined WORLD_END) && defined VL
 		scene_color = scene_color * fog_transmittance + fog_scattering;
@@ -220,11 +235,20 @@ void main() {
 	depth0 += 0.38 * float(depth0 < hand_depth); // Hand lighting fix from Capt Tatsu
 
 	vec3 screen_pos = vec3(uv, depth0);
-	vec3 view_pos   = screen_to_view_space(screen_pos, true);
-	vec3 scene_pos  = view_to_scene_space(view_pos);
-	vec3 world_pos  = scene_pos + cameraPosition;
-
+	vec3 view_pos = screen_to_view_space(screen_pos, true);
 	vec3 view_back_pos = screen_to_view_space(vec3(uv, depth1), true);
+
+#ifdef DISTANT_HORIZONS
+    if (front_is_dh_terrain) {
+        view_pos = screen_to_view_space(dhProjectionInverse, vec3(uv, depth0_dh), true);
+    }
+    if (back_is_dh_terrain) {
+        view_back_pos = screen_to_view_space(dhProjectionInverse, vec3(uv, depth1_dh), true);
+    }
+#endif
+
+	vec3 scene_pos = view_to_scene_space(view_pos);
+	vec3 world_pos = scene_pos + cameraPosition;
 
 	vec3 world_dir; float view_dist;
 	length_normalize(scene_pos - gbufferModelViewInverse[3].xyz, world_dir, view_dist);
@@ -279,6 +303,10 @@ void main() {
 	} else {
 		material = material_from(albedo, material_mask, world_pos, light_levels);
 
+#ifdef DISTANT_HORIZONS
+		if (!front_is_dh_terrain) {
+#endif
+
 #ifdef NORMAL_MAPPING
 		normal = decode_unit_vector(gbuffer_data_1.xy);
 #endif
@@ -294,6 +322,10 @@ void main() {
 #endif
 
 		decode_specular_map(specular_map, material);
+#endif
+
+#ifdef DISTANT_HORIZONS
+		}
 #endif
 	}
 
@@ -325,6 +357,30 @@ void main() {
 #endif
 	}
 
+#ifdef DISTANT_HORIZONS
+		// Distant Horizons water scattering
+
+		if (is_water && front_is_dh_terrain) {
+			float LoV = dot(light_dir, world_dir);
+
+			vec3 water_tint = exp(-5.0 * water_absorption_coeff);
+
+			mat2x3 water_fog = water_fog_simple(
+				light_color,
+				ambient_color,
+				water_absorption_coeff,
+				layer_dist * float(isEyeInWater != 1),
+				LoV,
+				light_levels.y,
+				0.0
+			);
+
+			scene_color *= water_tint;
+			scene_color += water_fog[0] * (1.0 + 6.0 * sqr(water_fog[1])) * (1.0 - exp(-0.33 * layer_dist));
+		}
+
+#endif
+
 	// Rain puddles
 
 #ifdef RAIN_PUDDLES
@@ -349,7 +405,7 @@ void main() {
 	// Specular reflections
 
 #if defined ENVIRONMENT_REFLECTIONS || defined SKY_REFLECTIONS
-	if (material.ssr_multiplier > eps && depth0 < 1.0) {
+	if (material.ssr_multiplier > eps && (depth0 < 1.0 || front_is_dh_terrain)) {
 		vec3 reflections = get_specular_reflections(
 			material,
 			tbn,
@@ -359,7 +415,8 @@ void main() {
 			flat_normal,
 			world_dir,
 			world_dir * tbn,
-			light_levels.y
+			light_levels.y,
+			is_water
 		);
 
 #ifdef WATER_WAVES
@@ -372,7 +429,13 @@ void main() {
 			float NoH = (NoL + NoV) * halfway_norm;
 			float LoH = LoV * halfway_norm + halfway_norm;
 
+	#ifndef DISTANT_HORIZONS
 			vec3 shadows = vec3(data[0].xy, data[1].x);
+	#else
+			vec3 shadows = front_is_dh_terrain
+				? vec3(1.0)
+				: vec3(data[0].xy, data[1].x);
+	#endif
 
 			reflections += get_specular_highlight(material, NoL, NoV, NoH, LoV, LoH) * light_color * shadows;
 		}
