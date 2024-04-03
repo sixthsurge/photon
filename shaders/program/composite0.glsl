@@ -78,7 +78,7 @@ void main() {
 	#endif
 #endif
 
-	vec2 vertex_pos = gl_Vertex.xy * VL_RENDER_SCALE;
+	vec2 vertex_pos = gl_Vertex.xy;
 	gl_Position = vec4(vertex_pos * 2.0 - 1.0, 0.0, 1.0);
 }
 
@@ -93,7 +93,7 @@ void main() {
 layout (location = 0) out vec3 fog_scattering;
 layout (location = 1) out vec3 fog_transmittance;
 
-/* DRAWBUFFERS:67 */
+/* RENDERTARGETS: 6,7 */
 
 in vec2 uv;
 

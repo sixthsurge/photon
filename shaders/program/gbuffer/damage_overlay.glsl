@@ -47,9 +47,9 @@ void main() {
 layout (location = 0) out vec4 damage_overlay;
 
 #ifdef IS_IRIS
-/* DRAWBUFFERS:0 */
+/* RENDERTARGETS: 0 */
 #else
-/* DRAWBUFFERS:3 */
+/* RENDERTARGETS: 3 */
 #endif
 
 in vec2 uv;

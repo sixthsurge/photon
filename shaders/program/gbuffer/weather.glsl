@@ -77,7 +77,7 @@ void main() {
 layout (location = 0) out vec4 scene_color;
 layout (location = 1) out vec4 gbuffer_data;
 
-/* DRAWBUFFERS:01 */
+/* RENDERTARGETS: 0,1 */
 
 in vec2 uv;
 

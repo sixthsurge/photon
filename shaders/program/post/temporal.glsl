@@ -172,7 +172,7 @@ void main() {
 layout (location = 0) out vec3 bloom_input;
 layout (location = 1) out vec4 result;
 
-/* DRAWBUFFERS:05 */
+/* RENDERTARGETS: 0,5 */
 
 in vec2 uv;
 

@@ -99,19 +99,16 @@ vec4 get_clouds_and_aurora(vec3 ray_dir, vec3 clear_sky) {
 	float dither = interleaved_gradient_noise(vec2(texel));
 
 	// Render clouds
-	vec4 clouds = draw_clouds(ray_dir, clear_sky, dither);
+	const vec3 air_viewer_pos = vec3(0.0, planet_radius, 0.0);
+	CloudsResult result = draw_clouds(air_viewer_pos, ray_dir, clear_sky, -1.0, dither);
 
 	// Render aurora
 	vec3 aurora = draw_aurora(ray_dir, dither);
-	clouds.xyz += aurora * clouds.w;
 
-	return clouds;
-#elif defined PROGRAM_DEFERRED3
-	// Soften clouds for new pixels
-	float pixel_age = texelFetch(colortex6, ivec2(gl_FragCoord.xy), 0).w;
-	int ld = int(3.0 * dampen(max0(1.0 - 0.1 * pixel_age)));
-
-	return bicubic_filter_lod(colortex7, uv * taau_render_scale, ld);
+	return vec4(
+		result.scattering + aurora * result.transmittance,
+		result.transmittance
+	);
 #else
 	return vec4(0.0, 0.0, 0.0, 1.0);
 #endif
@@ -122,7 +119,7 @@ vec3 draw_sky(vec3 ray_dir, vec3 atmosphere) {
 
 	// Sun, moon and stars
 
-#if defined PROGRAM_DEFERRED3
+#if defined PROGRAM_DEFERRED4
 	vec4 vanilla_sky = texelFetch(colortex3, ivec2(gl_FragCoord.xy), 0);
 	vec3 vanilla_sky_color = from_srgb(vanilla_sky.rgb);
 	uint vanilla_sky_id = uint(255.0 * vanilla_sky.a);
@@ -235,7 +232,7 @@ vec3 draw_sky(vec3 ray_dir) {
 	float mie_phase = cornette_shanks_phase(dot(ray_dir, sun_dir), 0.6);
 	sky += 0.1 * (ambient_color + 0.5 * end_sun_color) * mie_phase;
 
-#if defined PROGRAM_DEFERRED3
+#if defined PROGRAM_DEFERRED4
 	// Sun
 
 	sky += draw_sun(ray_dir);

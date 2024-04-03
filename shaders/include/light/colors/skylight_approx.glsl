@@ -1,7 +1,7 @@
 #if !defined INCLUDE_LIGHT_COLORS_SKYLIGHT_APPROX
 #define INCLUDE_LIGHT_COLORS_SKYLIGHT_APPROX
 
-#if defined WORLD_OVERWORLD && defined PROGRAM_DEFERRED3 && !defined SH_SKYLIGHT
+#if defined WORLD_OVERWORLD && defined PROGRAM_DEFERRED4 && !defined SH_SKYLIGHT
 #include "/include/light/colors/weather_color.glsl"
 
 vec3 skylight_approx(vec3 normal, vec3 flat_normal, vec3 shadows, float directional_lighting, float ao) {

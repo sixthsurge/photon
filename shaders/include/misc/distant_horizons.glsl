@@ -1,6 +1,10 @@
 #if !defined INCLUDE_MISC_DISTANT_HORIZONS
 #define INCLUDE_MISC_DISTANT_HORIZONS
 
+/*
+ * Utility include for Distant Horizons support
+ */
+
 #ifdef DISTANT_HORIZONS
 uniform sampler2D dhDepthTex;
 uniform sampler2D dhDepthTex1;

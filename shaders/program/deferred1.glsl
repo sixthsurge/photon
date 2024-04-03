@@ -4,7 +4,7 @@
   Photon Shaders by SixthSurge
 
   program/deferred1.glsl:
-  Render volumetric clouds
+  Render clouds and aurora
 
 --------------------------------------------------------------------------------
 */
@@ -119,7 +119,7 @@ void main() {
 	sky_color += aurora_amount * AURORA_CLOUD_LIGHTING * mix(aurora_colors[0], aurora_colors[1], 0.25);
 #endif
 
-	vec2 vertex_pos = gl_Vertex.xy * taau_render_scale * rcp(float(CLOUDS_TEMPORAL_UPSCALING));
+	vec2 vertex_pos = gl_Vertex.xy * taau_render_scale;
 	gl_Position = vec4(vertex_pos * 2.0 - 1.0, 0.0, 1.0);
 }
 
@@ -132,8 +132,9 @@ void main() {
 #if defined fsh
 
 layout (location = 0) out vec4 clouds;
+layout (location = 1) out float apparent_distance;
 
-/* DRAWBUFFERS:5 */
+/* RENDERTARGETS: 9,10 */
 
 in vec2 uv;
 
@@ -258,14 +259,29 @@ void main() {
 
 	vec2 new_uv = vec2(checkerboard_pos) / vec2(view_res) * rcp(float(taau_render_scale));
 
-	// Skip rendering if occluded by terrain
+	// Get maximum depth from area covered by this fragment
 	float depth_max = depth_max_4x4(depthtex1);
-	if (depth_max < 1.0) { clouds = vec4(0.0, 0.0, 0.0, 1.0); return; }
 
-	// Clouds
+	vec3 screen_pos = vec3(new_uv, depth_max);
+	vec3 view_pos = screen_to_view_space(vec3(new_uv, depth_max), false);
 
-	vec3 view_pos = screen_to_view_space(vec3(new_uv, 1.0), false);
-	vec3 ray_dir = mat3(gbufferModelViewInverse) * normalize(view_pos);
+	// Distant Horizons support
+#ifdef DISTANT_HORIZONS
+	float depth_dh = depth_max_4x4(dhDepthTex1);
+	bool is_dh_terrain = is_distant_horizons_terrain(depth_max, depth_dh);
+
+	if (is_dh_terrain) {
+		screen_pos = vec3(new_uv, depth_dh);
+		view_pos = screen_to_view_space(vec3(new_uv, depth_dh), false, true);
+	}
+#endif
+
+	vec3 ray_origin = vec3(0.0, CLOUDS_SCALE * (eyeAltitude - SEA_LEVEL) + planet_radius, 0.0) + CLOUDS_SCALE * gbufferModelViewInverse[3].xyz;
+	vec3 ray_dir    = mat3(gbufferModelViewInverse) * normalize(view_pos);
+
+	float distance_to_terrain = (depth_max == 1.0)
+		? -1.0
+		: length(view_pos) * CLOUDS_SCALE;
 
 	vec3 clear_sky = atmosphere_scattering(ray_dir, sun_color, sun_dir, moon_color, moon_dir);
 	     clear_sky = mix(clear_sky, 1.1 * vec3(dot(clear_sky, luminance_weights_rec2020)), 0.75 * overcastness * time_noon * linear_step(0.0, 0.05, ray_dir.y));
@@ -274,7 +290,17 @@ void main() {
 	      dither = r1(frameCounter / checkerboard_area, dither);
 
 #ifndef BLOCKY_CLOUDS
-	clouds = draw_clouds(ray_dir, clear_sky, dither);
+	CloudsResult result = draw_clouds(
+		ray_origin,
+		ray_dir,
+		clear_sky,
+		distance_to_terrain,
+		dither
+	);
+
+	clouds.xyz        = result.scattering;
+	clouds.w          = result.transmittance;
+	apparent_distance = result.apparent_distance * rcp(CLOUDS_SCALE);
 #endif
 
 	// Aurora
