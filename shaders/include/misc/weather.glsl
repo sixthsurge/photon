@@ -9,7 +9,7 @@
 uint weather_day_index(int world_day) {
 #if WEATHER_DAY == -1
 	// Start at noon
-	world_day -= int(worldTime < 6000);
+	world_day -= int(worldTime <= 6000);
 
 	const uint day_count = 12;
 

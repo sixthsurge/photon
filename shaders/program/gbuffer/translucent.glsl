@@ -132,7 +132,7 @@ void main() {
 
 	if (64u <= material_mask && material_mask < 79u) {
 		// Stained glass
-		
+
 		tint = vec4(0.83);
 		tint.a = 1.10;
 	}
@@ -335,6 +335,10 @@ uniform vec4 entityColor;
 #include "/include/light/cloud_shadows.glsl"
 #endif
 
+#ifdef DISTANT_HORIZONS
+#include "/include/misc/distant_horizons.glsl"
+#endif
+
 const float lod_bias = log2(taau_render_scale);
 
 #if   TEXTURE_FORMAT == TEXTURE_FORMAT_LAB
@@ -417,6 +421,15 @@ void main() {
 	vec3 world_dir = normalize(scene_pos - gbufferModelViewInverse[3].xyz);
 
 	vec3 view_back_pos = screen_to_view_space(vec3(coord, depth1), true);
+
+#ifdef DISTANT_HORIZONS
+	float depth1_dh = texelFetch(dhDepthTex1, ivec2(gl_FragCoord.xy), 0).x;
+
+	if (is_distant_horizons_terrain(depth1, depth1_dh)) {
+		view_back_pos = screen_to_view_space(vec3(coord, depth1_dh), true, true);
+	}
+#endif
+
 	vec3 scene_back_pos = view_to_scene_space(view_back_pos);
 
 	float layer_dist = distance(scene_pos, scene_back_pos); // distance to solid layer along view ray
@@ -432,8 +445,6 @@ void main() {
 	vec2 adjusted_light_levels = light_levels;
 
 	//------------------------------------------------------------------------//
-	
-
 	if (is_water) {
 		material = water_material;
 
@@ -559,8 +570,8 @@ void main() {
 #endif
 
 #ifdef CLOUD_SHADOWS
-		float cloud_shadows = get_cloud_shadows(colortex8, scene_pos);
-		shadows *= cloud_shadows;
+	float cloud_shadows = get_cloud_shadows(colortex8, scene_pos);
+	shadows *= cloud_shadows;
 #endif
 
 	// Diffuse lighting
@@ -586,7 +597,7 @@ void main() {
 
 	// Specular highlight
 
-#if defined WORLD_OVERWORLD || defined WORLD_END
+#if (defined WORLD_OVERWORLD || defined WORLD_END) && !defined NO_NORMAL
 	#ifdef WATER_WAVES
 	if (!is_water) // Specular highlight on water must be applied in composite, after waves are calculated
 	#endif
@@ -634,9 +645,15 @@ void main() {
 
 	vec3 color_to_store = is_water ? shadows : base_color.rgb;
 
+#ifdef NO_NORMAL
+	#define flat_normal normal
+#else
+	#define flat_normal tbn[2]
+#endif
+
 	gbuffer_data_0.x  = pack_unorm_2x8(color_to_store.rg);
 	gbuffer_data_0.y  = pack_unorm_2x8(color_to_store.b, clamp01(float(material_mask) * rcp(255.0)));
-	gbuffer_data_0.z  = pack_unorm_2x8(encode_unit_vector(tbn[2]));
+	gbuffer_data_0.z  = pack_unorm_2x8(encode_unit_vector(flat_normal));
 	gbuffer_data_0.w  = pack_unorm_2x8(dither_8bit(adjusted_light_levels, 0.5));
 }
 

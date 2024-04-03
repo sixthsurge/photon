@@ -74,10 +74,16 @@ mat2x3 raymarch_air_fog(vec3 world_start_pos, vec3 world_end_pos, bool sky, floa
 		distance_to_volume_end = world_dir.y < 0.0 ? distance_to_upper_plane : -1.0;
 	}
 
+#ifdef DISTANT_HORIZONS
+    float fog_end = float(dhRenderDistance);
+#else
+    float fog_end = far;
+#endif
+
 	if (distance_to_volume_end < 0.0) return mat2x3(vec3(0.0), vec3(1.0));
 
 	ray_length = sky ? distance_to_volume_end : ray_length;
-	ray_length = clamp(ray_length - distance_to_volume_start, 0.0, far);
+	ray_length = clamp(ray_length - distance_to_volume_start, 0.0, fog_end);
 
 	uint step_count = uint(float(air_fog_min_step_count) + air_fog_step_count_growth * ray_length);
 	     step_count = min(step_count, air_fog_max_step_count);

@@ -178,3 +178,6 @@ vec3 project_and_divide(mat4 m, vec3 pos) {
 vec3 project_ortho(mat4 m, vec3 pos) {
     return diagonal(m).xyz * pos + m[3].xyz;
 }
+
+// DH support
+
