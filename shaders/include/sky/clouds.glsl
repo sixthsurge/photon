@@ -764,7 +764,13 @@ vec2 clouds_altocumulus_scattering(
 	return scattering * scattering_integral_times_density;
 }
 
-vec4 draw_altocumulus_clouds(vec3 ray_dir, vec3 clear_sky, float dither) {
+CloudsResult draw_altocumulus_clouds(
+	vec3 air_viewer_pos,
+	vec3 ray_dir,
+	vec3 clear_sky,
+	float distance_to_terrain,
+	float dither
+) {
 	// ---------------------
 	//   Raymarching Setup
 	// ---------------------
@@ -785,24 +791,22 @@ vec4 draw_altocumulus_clouds(vec3 ray_dir, vec3 clear_sky, float dither) {
 
 	uint primary_steps = uint(mix(primary_steps_horizon, primary_steps_zenith, abs(ray_dir.y)));
 
-#if defined PROGRAM_DEFERRED0
-	vec3 air_viewer_pos = vec3(0.0, planet_radius, 0.0);
-#else
-	vec3 air_viewer_pos = vec3(0.0, planet_radius + eyeAltitude, 0.0);
-#endif
+	float r = length(air_viewer_pos);
 
 	vec2 dists = intersect_spherical_shell(air_viewer_pos, ray_dir, clouds_altocumulus_radius, clouds_altocumulus_top_radius);
-	bool planet_intersected = intersect_sphere(air_viewer_pos, ray_dir, min(length(air_viewer_pos) - 10.0, planet_radius)).y >= 0.0;
+	bool planet_intersected = intersect_sphere(air_viewer_pos, ray_dir, min(r - 10.0, planet_radius)).y >= 0.0;
+	bool terrain_intersected = distance_to_terrain >= 0.0 && r < clouds_altocumulus_radius && distance_to_terrain * CLOUDS_SCALE < dists.y;
 
-	if (dists.y < 0.0
-	 || planet_intersected && length(air_viewer_pos) < clouds_altocumulus_radius
-	) { return vec4(0.0, 0.0, 0.0, 1.0); }
+	if (dists.y < 0.0                                   // volume not intersected
+	 || planet_intersected && r < clouds_altocumulus_radius // planet blocking clouds
+	 || terrain_intersected                             // terrain blocking clouds
+	) { return clouds_not_hit; }
 
-	float ray_length = min(dists.y - dists.x, max_ray_length);
+	float ray_length = (distance_to_terrain >= 0.0) ? distance_to_terrain : dists.y;
+	      ray_length = clamp(ray_length - dists.x, 0.0, max_ray_length);
 	float step_length = ray_length * rcp(float(primary_steps));
 
 	vec3 ray_step = ray_dir * step_length;
-
 	vec3 ray_origin = air_viewer_pos + ray_dir * (dists.x + step_length * dither);
 
 	vec2 scattering = vec2(0.0); // x: direct light, y: skylight
@@ -890,7 +894,15 @@ vec4 draw_altocumulus_clouds(vec3 ray_dir, vec3 clear_sky, float dither) {
 	vec3 clouds_scattering = scattering.x * light_color + scattering.y * sky_color;
 	     clouds_scattering = clouds_aerial_perspective(clouds_scattering, clouds_transmittance, air_viewer_pos, ray_origin, ray_dir, clear_sky);
 
-	return vec4(clouds_scattering, clouds_transmittance);
+	float apparent_distance = (distance_weight_sum == 0.0)
+		? 1e6
+		: (distance_sum / distance_weight_sum) + distance(air_viewer_pos, ray_origin);
+
+	return CloudsResult(
+		clouds_scattering,
+		clouds_transmittance,
+		apparent_distance
+	);
 }
 #endif
 
@@ -1158,14 +1170,15 @@ CloudsResult draw_clouds(
 
 	if (result.transmittance < 1e-3) return result;
 
-/*
 #ifdef CLOUDS_ALTOCUMULUS
-	vec4 clouds_ac = draw_altocumulus_clouds(ray_dir, clear_sky, dither);
-	clouds.rgb += clouds_ac.rgb * clouds.a;
-	clouds.a   *= clouds_ac.a;
-	if (clouds.a < 1e-3) return clouds;
+	CloudsResult result_ac = draw_altocumulus_clouds(air_viewer_pos, ray_dir, clear_sky, distance_to_terrain, dither);
+	result.scattering += result_ac.scattering * result.transmittance;
+	result.transmittance *= result_ac.transmittance;
+	result.apparent_distance = min(result.apparent_distance, result_ac.apparent_distance);
+	if (result.transmittance < 1e-3) return result;
 #endif
 
+/*
 #ifdef CLOUDS_CIRRUS
 	vec4 clouds_ci = draw_cirrus_clouds(ray_dir, clear_sky, dither);
 	clouds.rgb += clouds_ci.rgb * clouds.a;

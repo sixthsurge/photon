@@ -78,6 +78,7 @@ uniform vec2 view_pixel_size;
 uniform vec2 taa_offset;
 uniform vec2 clouds_offset;
 
+uniform bool daylight_cycle_enabled;
 uniform bool world_age_changed;
 
 // ------------
@@ -163,7 +164,7 @@ vec3 reproject_clouds(vec2 uv, float distance_to_cloud) {
 		velocity = clouds_cirrus_velocity;
 	}
 
-	cloud_pos += velocity * frameTime * rcp(CLOUDS_SCALE);
+	cloud_pos += velocity * frameTime * rcp(CLOUDS_SCALE) * float(daylight_cycle_enabled);
 
 	return reproject_scene_space(cloud_pos, false, false);
 }
@@ -171,13 +172,11 @@ vec3 reproject_clouds(vec2 uv, float distance_to_cloud) {
 void main() {
 	const int checkerboard_area = CLOUDS_TEMPORAL_UPSCALING * CLOUDS_TEMPORAL_UPSCALING;
 
-	// Position of the output pixel
 	ivec2 dst_texel = ivec2(gl_FragCoord.xy);
-	// Position of the newly rendered pixel in the low-res image
 	ivec2 src_texel = clamp(dst_texel / CLOUDS_TEMPORAL_UPSCALING, ivec2(0), ivec2(view_res * taau_render_scale) / CLOUDS_TEMPORAL_UPSCALING - 1);
 
 #ifdef DISTANT_HORIZONS
-	// Distant Horizons support
+	// Check for DH terrain
 	float depth    = texelFetch(depthtex1, dst_texel, 0).x;
 	float depth_dh = texelFetch(dhDepthTex1, dst_texel, 0).x;
 	bool is_dh_terrain = is_distant_horizons_terrain(depth, depth_dh);
