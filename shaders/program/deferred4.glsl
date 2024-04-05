@@ -399,8 +399,9 @@ void main() {
 		// Get material and normal
 
 		Material material = material_from(albedo, material_mask, world_pos, light_levels);
-	
+
 		vec3 normal = flat_normal;
+        bool parallax_shadow = false;
 
 #ifdef DISTANT_HORIZONS
 		if (!is_dh_terrain) {
@@ -411,13 +412,12 @@ void main() {
 	#endif
 
 	#ifdef SPECULAR_MAPPING
-		bool parallax_shadow;
 		vec4 specular_map = vec4(unpack_unorm_2x8(gbuffer_data_1.z), unpack_unorm_2x8(gbuffer_data_1.w));
 		decode_specular_map(specular_map, material, parallax_shadow);
 	#elif defined NORMAL_MAPPING
-		bool parallax_shadow = gbuffer_data_1.z >= 0.5;
+		parallax_shadow = gbuffer_data_1.z >= 0.5;
 	#endif
-	
+
 #ifdef DISTANT_HORIZONS
 		}
 #endif
