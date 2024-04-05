@@ -33,7 +33,7 @@ void main() {
 #if defined fsh
 
 layout (location = 0) out vec4 clouds_history;
-layout (location = 1) out vec4 clouds_data;
+layout (location = 1) out vec2 clouds_data;
 
 /* RENDERTARGETS: 11,12 */
 
@@ -119,13 +119,13 @@ vec4 smooth_filter(sampler2D sampler, vec2 coord) {
 	return texture(sampler, coord);
 }
 
-float texture_min_4x4(sampler2D s, vec2 uv) {
+float texture_min_4x4(sampler2D s, vec2 coord) {
 	vec2 pixel_size = rcp(textureSize(s, 0).xy);
 
-	vec4 samples_0 = textureGather(s, uv + vec2( 2.0 * pixel_size.x,  2.0 * pixel_size.y));
-	vec4 samples_1 = textureGather(s, uv + vec2(-2.0 * pixel_size.x,  2.0 * pixel_size.y));
-	vec4 samples_2 = textureGather(s, uv + vec2( 2.0 * pixel_size.x, -2.0 * pixel_size.y));
-	vec4 samples_3 = textureGather(s, uv + vec2(-2.0 * pixel_size.x, -2.0 * pixel_size.y));
+	vec4 samples_0 = textureGather(s, coord + vec2( 2.0 * pixel_size.x,  2.0 * pixel_size.y));
+	vec4 samples_1 = textureGather(s, coord + vec2(-2.0 * pixel_size.x,  2.0 * pixel_size.y));
+	vec4 samples_2 = textureGather(s, coord + vec2( 2.0 * pixel_size.x, -2.0 * pixel_size.y));
+	vec4 samples_3 = textureGather(s, coord + vec2(-2.0 * pixel_size.x, -2.0 * pixel_size.y));
 
 	return min(
 		min(min_of(samples_0), min_of(samples_1)),
@@ -202,27 +202,42 @@ void main() {
 	vec4 aabb_min  = min_of(b, d, e, f, h);
 	     aabb_min += min_of(aabb_min, a, c, g, i);
 	     aabb_min *= 0.5;
+		 aabb_min  = max0(aabb_min);
 
 	vec4 aabb_max  = max_of(b, d, e, f, h);
 	     aabb_max += max_of(aabb_max, a, c, g, i);
 	     aabb_max *= 0.5;
+		 aabb_max  = max0(aabb_max);
 
 	float apparent_distance = texelFetch(colortex10, src_texel, 0).x;
 
 	// Find closest cloud distance in a 4x4 area, accross current and previous frame
+#ifdef TAAU
+	// Fix issue at the top and left side of the screen with TAAU
+	vec2 uv_clamped = clamp(uv, 0.0, 0.95);
+#else
+	#define uv_clamped uv
+#endif
+
 	float closest_distance = min(
-		texture_min_4x4(colortex10, uv),
-		texture_min_4x4(colortex12, uv)
+		texture_min_4x4(colortex10, uv_clamped * taau_render_scale),
+		texture_min_4x4(colortex12, uv_clamped * taau_render_scale)
 	);
 
 	// Reproject
 	vec2 previous_uv = reproject_clouds(uv, closest_distance).xy;
 
+#ifdef TAAU
+	vec2 previous_uv_clamped = clamp(previous_uv, vec2(0.0), 1.0 - 2.0 * view_pixel_size / taau_render_scale);
+#else
+	#define previous_uv_clamped previous_uv
+#endif
+
 	vec4 current = e;
-	vec4 history = smooth_filter(colortex11, previous_uv * taau_render_scale);
+	vec4 history = smooth_filter(colortex11, previous_uv_clamped * taau_render_scale);
 
 	// Depth at the previous position
-	float history_depth = 1.0 - min_of(textureGather(colortex6, previous_uv * taau_render_scale, 2));
+	float history_depth = 1.0 - min_of(textureGather(colortex6, previous_uv_clamped, 2));
 
 	// Get distance to terrain in the previous frame
 	vec3 screen_pos = vec3(previous_uv, history_depth);
@@ -240,7 +255,7 @@ void main() {
 
 	// Perform neighbourhood clamping when moving quickly relative to the clouds
 	float velocity = rcp(sqr(frameTime)) * length_squared(cameraPosition - previousCameraPosition);
-	float velocity_factor = 75.0 * velocity / sqr(closest_distance);
+	float velocity_factor = 75.0 * velocity / max(sqr(closest_distance), eps);
 	      velocity_factor = velocity_factor / (velocity_factor + 1.0);
 
 	history = mix(
@@ -250,7 +265,7 @@ void main() {
 	);
 
 	// Get previous pixel age and apparent distance
-	vec2 history_data = texture(colortex12, previous_uv * taau_render_scale).xy;
+	vec2 history_data = texture(colortex12, previous_uv_clamped * taau_render_scale).xy;
 	float apparent_distance_history = history_data.x;
 	      apparent_distance_history = disocclusion ? apparent_distance : apparent_distance_history;
 
@@ -273,13 +288,15 @@ void main() {
 	      history_weight *= mix(1.0, movement_rejection, history_weight);
 
 	// Offcenter rejection
+#ifndef TAAU
 	vec2 pixel_center_offset = 1.0 - abs(fract(previous_uv * view_res) * 2.0 - 1.0);
 	float offcenter_rejection = sqrt(pixel_center_offset.x * pixel_center_offset.y);
           offcenter_rejection = mix(1.0, offcenter_rejection, history_weight);
 
 	history_weight *= offcenter_rejection;
-
-	clouds_history = mix(current, history, history_weight);
+#endif
+	
+	clouds_history = max0(mix(current, history, history_weight));
 	clouds_data.x = mix(apparent_distance, apparent_distance_history, history_weight);
 	clouds_data.y = min(++pixel_age, CLOUDS_ACCUMULATION_LIMIT);
 }
