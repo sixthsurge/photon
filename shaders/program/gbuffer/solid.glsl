@@ -156,14 +156,14 @@ void main() {
 layout (location = 0) out vec4 gbuffer_data_0; // albedo, block ID, flat normal, light levels
 layout (location = 1) out vec4 gbuffer_data_1; // detailed normal, specular map (optional)
 
-/* DRAWBUFFERS:1 */
+/* RENDERTARGETS: 1 */
 
 #ifdef NORMAL_MAPPING
-/* DRAWBUFFERS:12 */
+/* RENDERTARGETS: 1,2 */
 #endif
 
 #ifdef SPECULAR_MAPPING
-/* DRAWBUFFERS:12 */
+/* RENDERTARGETS: 1,2 */
 #endif
 
 in vec2 uv;

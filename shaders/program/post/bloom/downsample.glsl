@@ -47,7 +47,7 @@ void main() {
 
 layout (location = 0) out vec3 bloom_tile;
 
-/* DRAWBUFFERS:0 */
+/* RENDERTARGETS: 0 */
 
 in vec2 uv;
 

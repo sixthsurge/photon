@@ -1,5 +1,5 @@
 #version 400 compatibility
-#define WORLD_END
+#define WORLD_OVERWORLD
 #define PROGRAM_DEFERRED4
-#define vsh
+#define fsh
 #include "/program/deferred4.glsl"

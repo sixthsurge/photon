@@ -3,8 +3,8 @@
 
   Photon Shaders by SixthSurge
 
-  program/dh/water.glsl:
-  Distant horizons water
+  program/gbuffer/distant_horizons/water.glsl:
+  Translucent Distant Horizons terrain
 
 --------------------------------------------------------------------------------
 */
@@ -109,14 +109,14 @@ layout (location = 0) out vec4 scene_color;
 layout (location = 1) out vec4 gbuffer_data_0; // albedo, block ID, flat normal, light levels
 layout (location = 2) out vec4 gbuffer_data_1; // detailed normal, specular map (optional)
 
-/* DRAWBUFFERS:01 */
+/* RENDERTARGETS: 0,1 */
 
 #ifdef NORMAL_MAPPING
-/* DRAWBUFFERS:012 */
+/* RENDERTARGETS: 0,1,2 */
 #endif
 
 #ifdef SPECULAR_MAPPING
-/* DRAWBUFFERS:012 */
+/* RENDERTARGETS: 0,1,2 */
 #endif
 
 in vec2 light_levels;

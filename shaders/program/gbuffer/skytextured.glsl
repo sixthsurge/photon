@@ -53,7 +53,7 @@ void main() {
 
 layout (location = 0) out vec4 scene_color;
 
-/* DRAWBUFFERS:3 */
+/* RENDERTARGETS: 3 */
 
 in vec2 uv;
 

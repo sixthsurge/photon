@@ -159,7 +159,7 @@ vec3 get_diffuse_lighting(
 
 	// Skylight
 
-#if defined WORLD_OVERWORLD && defined PROGRAM_DEFERRED3
+#if defined WORLD_OVERWORLD && defined PROGRAM_DEFERRED4
 	#ifdef SH_SKYLIGHT
 	vec3 skylight = sh_evaluate_irradiance(sky_sh, normal, ao);
 	#else

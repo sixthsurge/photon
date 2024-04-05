@@ -3,8 +3,8 @@
 
   Photon Shaders by SixthSurge
 
-  program/dh/terrain.glsl:
-  Distant horizons terrain
+  program/gbuffer/distant_horizons/terrain.glsl:
+  Distant Horizons terrain
 
 --------------------------------------------------------------------------------
 */
@@ -16,9 +16,9 @@
 #if defined vsh
 
 out vec2 light_levels;
+out vec3 scene_pos;
 out vec3 normal;
 out vec3 color;
-out vec3 scene_pos;
 
 flat out uint material_mask;
 
@@ -110,20 +110,20 @@ void main() {
 
 layout (location = 0) out vec4 gbuffer_data_0; // albedo, block ID, flat normal, light levels
 
-/* DRAWBUFFERS:1 */
+/* RENDERTARGETS: 1 */
 
 #ifdef NORMAL_MAPPING
-/* DRAWBUFFERS:12 */
+/* RENDERTARGETS: 1,2 */
 #endif
 
 #ifdef SPECULAR_MAPPING
-/* DRAWBUFFERS:12 */
+/* RENDERTARGETS: 1,2 */
 #endif
 
 in vec2 light_levels;
+in vec3 scene_pos;
 in vec3 normal;
 in vec3 color;
-in vec3 scene_pos;
 
 flat in uint material_mask;
 

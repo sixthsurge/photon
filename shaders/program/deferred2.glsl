@@ -4,7 +4,7 @@
   Photon Shaders by SixthSurge
 
   program/deferred2.glsl:
-  Ambient occlusion, temporal upscaling for clouds
+  Temporal upscaling for clouds
 
 --------------------------------------------------------------------------------
 */
@@ -32,10 +32,10 @@ void main() {
 //----------------------------------------------------------------------------//
 #if defined fsh
 
-layout (location = 0) out vec4 ao;
-layout (location = 1) out vec4 clouds;
+layout (location = 0) out vec4 clouds_history;
+layout (location = 1) out vec4 clouds_data;
 
-/* DRAWBUFFERS:67 */
+/* RENDERTARGETS: 11,12 */
 
 in vec2 uv;
 
@@ -45,11 +45,11 @@ in vec2 uv;
 
 uniform sampler2D noisetex;
 
-uniform sampler2D colortex1; // gbuffer 0
-uniform sampler2D colortex2; // gbuffer 1
-uniform sampler2D colortex5; // clouds
-uniform sampler2D colortex6; // ambient occlusion history
-uniform sampler2D colortex7; // clouds history
+uniform sampler2D colortex6;  // previous frame depth
+uniform sampler2D colortex9;  // low-res clouds
+uniform sampler2D colortex10; // low-res clouds apparent distance
+uniform sampler2D colortex11; // clouds history
+uniform sampler2D colortex12; // clouds data
 
 uniform sampler2D depthtex1;
 
@@ -69,6 +69,7 @@ uniform float far;
 uniform float eyeAltitude;
 
 uniform int frameCounter;
+uniform float frameTime;
 
 uniform vec3 light_dir;
 
@@ -77,6 +78,7 @@ uniform vec2 view_pixel_size;
 uniform vec2 taa_offset;
 uniform vec2 clouds_offset;
 
+uniform bool daylight_cycle_enabled;
 uniform bool world_age_changed;
 
 // ------------
@@ -95,7 +97,13 @@ uniform bool world_age_changed;
 #include "/include/utility/random.glsl"
 #include "/include/utility/space_conversion.glsl"
 
-const float gtao_render_scale = 0.5;
+vec4 min_of(vec4 a, vec4 b, vec4 c, vec4 d, vec4 e) {
+	return min(a, min(b, min(c, min(d, e))));
+}
+
+vec4 max_of(vec4 a, vec4 b, vec4 c, vec4 d, vec4 e) {
+	return max(a, max(b, max(c, max(d, e))));
+}
 
 vec4 smooth_filter(sampler2D sampler, vec2 coord) {
 	// from https://iquilezles.org/www/articles/texture/texture.htm
@@ -111,177 +119,151 @@ vec4 smooth_filter(sampler2D sampler, vec2 coord) {
 	return texture(sampler, coord);
 }
 
-// ---------------------
-//   ambient occlusion
-// ---------------------
+float texture_min_4x4(sampler2D s, vec2 uv) {
+	vec2 pixel_size = rcp(textureSize(s, 0).xy);
 
-#define GTAO_SLICES        2
-#define GTAO_HORIZON_STEPS 3
-#define GTAO_RADIUS        2.0
-#define GTAO_FALLOFF_START 0.75
+	vec4 samples_0 = textureGather(s, uv + vec2( 2.0 * pixel_size.x,  2.0 * pixel_size.y));
+	vec4 samples_1 = textureGather(s, uv + vec2(-2.0 * pixel_size.x,  2.0 * pixel_size.y));
+	vec4 samples_2 = textureGather(s, uv + vec2( 2.0 * pixel_size.x, -2.0 * pixel_size.y));
+	vec4 samples_3 = textureGather(s, uv + vec2(-2.0 * pixel_size.x, -2.0 * pixel_size.y));
 
-float integrate_arc(vec2 h, float n, float cos_n) {
-	vec2 tmp = cos_n + 2.0 * h * sin(n) - cos(2.0 * h - n);
-	return 0.25 * (tmp.x + tmp.y);
+	return min(
+		min(min_of(samples_0), min_of(samples_1)),
+		min(min_of(samples_2), min_of(samples_3))
+	);
 }
 
-float calculate_maximum_horizon_angle(
-	vec3 view_slice_dir,
-	vec3 viewer_dir,
-	vec3 screen_pos,
-	vec3 view_pos,
-	float radius,
-	float dither,
-    bool is_dh_terrain
-) {
-	float step_size = (GTAO_RADIUS * rcp(float(GTAO_HORIZON_STEPS))) * radius;
+vec3 reproject_clouds(vec2 uv, float distance_to_cloud) {
+	const float planet_radius                 = 6371e3;
+	const float clouds_cumulus_radius         = planet_radius + CLOUDS_CUMULUS_ALTITUDE;
+	const float clouds_altocumulus_radius     = planet_radius + CLOUDS_ALTOCUMULUS_ALTITUDE;
+	const float clouds_cirrus_radius          = planet_radius + CLOUDS_CIRRUS_ALTITUDE;
+	const float clouds_cumulus_wind_angle     = CLOUDS_CUMULUS_WIND_ANGLE * degree;
+	const float clouds_altocumulus_wind_angle = CLOUDS_ALTOCUMULUS_WIND_ANGLE * degree;
+	const float clouds_cirrus_wind_angle      = CLOUDS_CIRRUS_WIND_ANGLE * degree;
+	const vec3  clouds_cumulus_velocity       = CLOUDS_CUMULUS_WIND_SPEED * vec3(cos(clouds_cumulus_wind_angle), 0.0, sin(clouds_cumulus_wind_angle));
+	const vec3  clouds_altocumulus_velocity   = CLOUDS_ALTOCUMULUS_WIND_SPEED * vec3(cos(clouds_altocumulus_wind_angle), 0.0, sin(clouds_altocumulus_wind_angle));
+	const vec3  clouds_cirrus_velocity        = CLOUDS_CIRRUS_WIND_SPEED * vec3(cos(clouds_cirrus_wind_angle), 0.0, sin(clouds_cirrus_wind_angle));
 
-	float max_cos_theta = -1.0;
+	vec3 view_pos = screen_to_view_space(vec3(uv, 1.0), false, false);
+	vec3 scene_pos = view_to_scene_space(view_pos);
+	vec3 world_dir = normalize(scene_pos - gbufferModelViewInverse[3].xyz);
 
-	vec2 ray_step = (view_to_screen_space(view_pos + view_slice_dir * step_size, true, is_dh_terrain) - screen_pos).xy;
-	vec2 ray_pos = screen_pos.xy + ray_step * (dither + max_of(view_pixel_size) * rcp_length(ray_step));
+	vec3 cloud_pos = world_dir * distance_to_cloud;
 
-	for (int i = 0; i < GTAO_HORIZON_STEPS; ++i, ray_pos += ray_step) {
-        ivec2 texel = ivec2(clamp01(ray_pos) * view_res * taau_render_scale - 0.5);
-		float depth = texelFetch(depthtex1, texel, 0).x;
+	// Work out which layer this cloud belongs to
+	vec3 velocity;
+	vec3 air_cloud_pos = vec3(0.0, CLOUDS_SCALE * (eyeAltitude - SEA_LEVEL) + planet_radius, 0.0) + CLOUDS_SCALE * cloud_pos;
+	float r = length(air_cloud_pos);
 
-#ifdef DISTANT_HORIZONS
-        float depth_dh = texelFetch(dhDepthTex, texel, 0).x;
-        bool is_dh_terrain = is_distant_horizons_terrain(depth, depth_dh);
-
-        if (is_dh_terrain) {
-            depth = depth_dh;
-        }
-#else
-        const bool is_dh_terrain = false;
-#endif
-
-		if (depth == 1.0 || depth < hand_depth || depth == screen_pos.z) continue;
-
-		vec3 offset = screen_to_view_space(vec3(ray_pos, depth), true, is_dh_terrain) - view_pos;
-
-		float len_sq = length_squared(offset);
-		float norm = inversesqrt(len_sq);
-
-		float distance_falloff = linear_step(GTAO_FALLOFF_START * GTAO_RADIUS, GTAO_RADIUS, len_sq * norm * rcp(radius));
-
-		float cos_theta = dot(viewer_dir, offset) * norm;
-		      cos_theta = mix(cos_theta, -1.0, distance_falloff);
-
-		max_cos_theta = max(cos_theta, max_cos_theta);
+	if (r < clouds_altocumulus_radius) {
+		velocity = clouds_cumulus_velocity;
+	} else if (r < clouds_cirrus_radius) {
+		velocity = clouds_altocumulus_velocity;
+	} else {
+		velocity = clouds_cirrus_velocity;
 	}
 
-	return fast_acos(clamp(max_cos_theta, -1.0, 1.0));
+	cloud_pos += velocity * frameTime * rcp(CLOUDS_SCALE) * float(daylight_cycle_enabled);
+
+	return reproject_scene_space(cloud_pos, false, false);
 }
 
-float ambient_occlusion(vec3 screen_pos, vec3 view_pos, vec3 view_normal, vec2 dither, bool is_dh_terrain) {
-	float ao = 0.0;
-	// vec3 bent_normal = vec3(0.0);
-
-	// Construct local working space
-	vec3 viewer_dir   = normalize(-view_pos);
-	vec3 viewer_right = normalize(cross(vec3(0.0, 1.0, 0.0), viewer_dir));
-	vec3 viewer_up    = cross(viewer_dir, viewer_right);
-	mat3 local_to_view = mat3(viewer_right, viewer_up, viewer_dir);
-
-	// Reduce AO radius very close up, makes some screen-space artifacts less obvious
-	float ao_radius = max(0.25 + 0.75 * smoothstep(0.0, 81.0, length_squared(view_pos)), 0.5);
-
-    // Increase AO radius for DH terrain (looks really good)
-#ifdef DISTANT_HORIZONS
-    if (is_dh_terrain) {
-        ao_radius *= 3.0;
-    }
-#endif
-
-	for (int i = 0; i < GTAO_SLICES; ++i) {
-		float slice_angle = (i + dither.x) * (pi / float(GTAO_SLICES));
-
-		vec3 slice_dir = vec3(cos(slice_angle), sin(slice_angle), 0.0);
-		vec3 view_slice_dir = local_to_view * slice_dir;
-
-		vec3 ortho_dir = slice_dir - dot(slice_dir, viewer_dir) * viewer_dir;
-		vec3 axis = cross(slice_dir, viewer_dir);
-		vec3 projected_normal = view_normal - axis * dot(view_normal, axis);
-
-		float len_sq = dot(projected_normal, projected_normal);
-		float norm = inversesqrt(len_sq);
-
-		float sgn_gamma = sign(dot(ortho_dir, projected_normal));
-		float cos_gamma = clamp01(dot(projected_normal, viewer_dir) * norm);
-		float gamma = sgn_gamma * fast_acos(cos_gamma);
-
-		vec2 max_horizon_angles;
-		max_horizon_angles.x = calculate_maximum_horizon_angle(-view_slice_dir, viewer_dir, screen_pos, view_pos, ao_radius, dither.y, is_dh_terrain);
-		max_horizon_angles.y = calculate_maximum_horizon_angle( view_slice_dir, viewer_dir, screen_pos, view_pos, ao_radius, dither.y, is_dh_terrain);
-
-		max_horizon_angles = gamma + clamp(vec2(-1.0, 1.0) * max_horizon_angles - gamma, -half_pi, half_pi);
-		ao += integrate_arc(max_horizon_angles, gamma, cos_gamma) * len_sq * norm;
-
-		// float bent_angle = dot(max_horizon_angles, vec2(0.5));
-		// bent_normal += viewer_dir * cos(bent_angle) + ortho_dir * sin(bent_angle);
-	}
-
-	const float albedo = 0.2; // albedo of surroundings (for multibounce approx)
-
-	ao *= rcp(float(GTAO_SLICES));
-	ao /= albedo * ao + (1.0 - albedo);
-
-	// bent_normal = normalize(normalize(bent_normal) - 0.5 * viewer_dir);
-
-	return ao;
-}
-
-// --------------------
-//   clouds upscaling
-// --------------------
-
-vec3 reproject_clouds(vec3 screen_pos) {
-	const float planet_radius            = 6371e3;
-	const float clouds_cumulus_radius    = planet_radius + CLOUDS_CUMULUS_ALTITUDE;
-	const float clouds_cumulus_thickness = CLOUDS_CUMULUS_ALTITUDE * CLOUDS_CUMULUS_THICKNESS;
-
-	// Get ray direction
-	vec3 pos = screen_to_view_space(screen_pos, false, false);
-	     pos = view_to_scene_space(pos);
-	vec3 ray_dir = normalize(pos);
-
-	// Get viewer position in cloud space
-	vec3 viewer_pos = vec3(0.0, planet_radius + eyeAltitude, 0.0);
-
-	// Intersect middle of cumulus layer
-	vec2 dists = intersect_sphere(viewer_pos, ray_dir, clouds_cumulus_radius + 0.5 * clouds_cumulus_thickness);
-	vec3 hit_pos = (viewer_pos + ray_dir * dists.x) - viewer_pos;
-
-	return reproject_scene_space(hit_pos, false, false);
-}
-
-vec4 upscale_clouds() {
+void main() {
 	const int checkerboard_area = CLOUDS_TEMPORAL_UPSCALING * CLOUDS_TEMPORAL_UPSCALING;
 
 	ivec2 dst_texel = ivec2(gl_FragCoord.xy);
 	ivec2 src_texel = clamp(dst_texel / CLOUDS_TEMPORAL_UPSCALING, ivec2(0), ivec2(view_res * taau_render_scale) / CLOUDS_TEMPORAL_UPSCALING - 1);
 
-	vec2 previous_uv = reproject_clouds(vec3(uv, 1.0)).xy;
+#ifdef DISTANT_HORIZONS
+	// Check for DH terrain
+	float depth    = texelFetch(depthtex1, dst_texel, 0).x;
+	float depth_dh = texelFetch(dhDepthTex1, dst_texel, 0).x;
+	bool is_dh_terrain = is_distant_horizons_terrain(depth, depth_dh);
+#else
+	const bool is_dh_terrain = false;
+#endif
 
-	vec4 current = texelFetch(colortex5, src_texel, 0);
-	vec4 history = smooth_filter(colortex7, previous_uv * taau_render_scale);
+	// Fetch 3x3 neighborhood
+	vec4 a = texelFetch(colortex9, src_texel + ivec2(-1, -1), 0);
+	vec4 b = texelFetch(colortex9, src_texel + ivec2( 0, -1), 0);
+	vec4 c = texelFetch(colortex9, src_texel + ivec2( 1, -1), 0);
+	vec4 d = texelFetch(colortex9, src_texel + ivec2(-1,  0), 0);
+	vec4 e = texelFetch(colortex9, src_texel, 0);
+	vec4 f = texelFetch(colortex9, src_texel + ivec2( 1,  0), 0);
+	vec4 g = texelFetch(colortex9, src_texel + ivec2(-1,  1), 0);
+	vec4 h = texelFetch(colortex9, src_texel + ivec2( 0,  1), 0);
+	vec4 i = texelFetch(colortex9, src_texel + ivec2( 1,  1), 0);
 
-	float history_depth = min_of(textureGather(colortex6, previous_uv * gtao_render_scale, 2));
+	// Soft minimum and maximum ("Hybrid Reconstruction Antialiasing")
+	//        b         a b c
+	// (min d e f + min d e f) / 2
+	//        h         g h i
+	vec4 aabb_min  = min_of(b, d, e, f, h);
+	     aabb_min += min_of(aabb_min, a, c, g, i);
+	     aabb_min *= 0.5;
 
+	vec4 aabb_max  = max_of(b, d, e, f, h);
+	     aabb_max += max_of(aabb_max, a, c, g, i);
+	     aabb_max *= 0.5;
+
+	float apparent_distance = texelFetch(colortex10, src_texel, 0).x;
+
+	// Find closest cloud distance in a 4x4 area, accross current and previous frame
+	float closest_distance = min(
+		texture_min_4x4(colortex10, uv),
+		texture_min_4x4(colortex12, uv)
+	);
+
+	// Reproject
+	vec2 previous_uv = reproject_clouds(uv, closest_distance).xy;
+
+	vec4 current = e;
+	vec4 history = smooth_filter(colortex11, previous_uv * taau_render_scale);
+
+	// Depth at the previous position
+	float history_depth = 1.0 - min_of(textureGather(colortex6, previous_uv * taau_render_scale, 2));
+
+	// Get distance to terrain in the previous frame
+	vec3 screen_pos = vec3(previous_uv, history_depth);
+	vec3 view_pos = screen_to_view_space(screen_pos, true, is_dh_terrain);
+	float distance_to_terrain = length(view_pos);
+
+	// Work out whether the history should be invalidated
 	bool disocclusion = clamp01(previous_uv) != previous_uv;
+		 disocclusion = disocclusion || (history_depth < 1.0 && distance_to_terrain < closest_distance);
 		 disocclusion = disocclusion || any(isnan(history));
 	     disocclusion = disocclusion || world_age_changed;
-		 disocclusion = disocclusion || history_depth > eps;
 
+	// Replace history if a disocclusion was detected
 	if (disocclusion) history = current;
 
-	float pixel_age = max0(texture(colortex6, previous_uv * taau_render_scale).w) * float(!disocclusion);
+	// Perform neighbourhood clamping when moving quickly relative to the clouds
+	float velocity = rcp(sqr(frameTime)) * length_squared(cameraPosition - previousCameraPosition);
+	float velocity_factor = 75.0 * velocity / sqr(closest_distance);
+	      velocity_factor = velocity_factor / (velocity_factor + 1.0);
+
+	history = mix(
+		history,
+		clamp(history, aabb_min, aabb_max),
+		velocity_factor
+	);
+
+	// Get previous pixel age and apparent distance
+	vec2 history_data = texture(colortex12, previous_uv * taau_render_scale).xy;
+	float apparent_distance_history = history_data.x;
+	      apparent_distance_history = disocclusion ? apparent_distance : apparent_distance_history;
+
+	// Reset pixel age on disocclusion
+	float pixel_age = max0(history_data.y) * float(!disocclusion);
 
 	// Checkerboard upscaling
 	ivec2 offset_0 = dst_texel % CLOUDS_TEMPORAL_UPSCALING;
 	ivec2 offset_1 = clouds_checkerboard_offsets[frameCounter % checkerboard_area];
-	if (offset_0 != offset_1 && !disocclusion) current = history;
+	if (offset_0 != offset_1 && !disocclusion) {
+		current = history;
+		apparent_distance = min(apparent_distance, apparent_distance_history);
+	}
 
 	// Reduce history weight when player is moving quickly
 	float movement_rejection = exp(-16.0 * length(cameraPosition - previousCameraPosition));
@@ -297,112 +279,9 @@ vec4 upscale_clouds() {
 
 	history_weight *= offcenter_rejection;
 
-	// Store pixel age for next frame
-	ao.w = min(++pixel_age, CLOUDS_ACCUMULATION_LIMIT);
-
-	return mix(current, history, history_weight);
-}
-
-void main() {
-#if defined WORLD_OVERWORLD
-	clouds = upscale_clouds();
-#endif
-
-	ivec2 texel      = ivec2(gl_FragCoord.xy);
-	ivec2 view_texel = ivec2(gl_FragCoord.xy * (taau_render_scale / gtao_render_scale));
-
-	if (clamp(view_texel, ivec2(0), ivec2(view_res)) != view_texel) { return; }
-
-	float depth = texelFetch(depthtex1, view_texel, 0).x;
-
-#ifndef NORMAL_MAPPING
-	vec4 gbuffer_data = texelFetch(colortex1, view_texel, 0);
-#else
-	vec4 gbuffer_data = texelFetch(colortex2, view_texel, 0);
-#endif
-
-	vec2 dither = vec2(texelFetch(noisetex, texel & 511, 0).b, texelFetch(noisetex, (texel + 249) & 511, 0).b);
-
-    // Distant Horizons support
-
-#ifdef DISTANT_HORIZONS
-    float depth_dh = texelFetch(dhDepthTex, view_texel, 0).x;
-    bool is_dh_terrain = is_distant_horizons_terrain(depth, depth_dh);
-
-    if (is_dh_terrain) {
-        depth = depth_dh;
-    }
-#else
-    const bool is_dh_terrain = false;
-#endif
-
-	depth += 0.38 * float(depth < hand_depth); // Hand lighting fix from Capt Tatsu
-
-	vec3 screen_pos = vec3(uv * (taau_render_scale / gtao_render_scale), depth);
-	vec3 view_pos = screen_to_view_space(screen_pos, true, is_dh_terrain);
-	vec3 scene_pos = view_to_scene_space(view_pos);
-
-	vec3 previous_screen_pos = reproject(screen_pos, is_dh_terrain);
-
-	if (depth == 1.0) { ao.xyz = vec3(1.0, 0.0, 0.0); return; }
-
-	// GTAO
-
-#ifdef NORMAL_MAPPING
-	vec3 world_normal = decode_unit_vector(gbuffer_data.xy);
-
-	#ifdef DISTANT_HORIZONS
-	if (is_dh_terrain) {
-		vec4 gbuffer_data_0 = texelFetch(colortex1, view_texel, 0);
-		world_normal = decode_unit_vector(unpack_unorm_2x8(gbuffer_data_0.z));
-	}
-	#endif
-#else
-	vec3 world_normal = decode_unit_vector(unpack_unorm_2x8(gbuffer_data.z));
-#endif
-
-	vec3 view_normal = mat3(gbufferModelView) * world_normal;
-
-	dither = r2(frameCounter, dither);
-
-#ifdef GTAO
-	ao.x = ambient_occlusion(screen_pos, view_pos, view_normal, dither, is_dh_terrain);
-#else
-	ao.x = 1.0;
-#endif
-
-	// Temporal accumulation
-
-	const float max_accumulated_frames       = 10.0;
-	const float depth_rejection_strength     = 16.0;
-	const float offcenter_rejection_strength = 0.25;
-
-	vec3 history_ao = catmull_rom_filter_fast_rgb(colortex6, previous_screen_pos.xy * gtao_render_scale, 0.65);
-	     history_ao = (clamp01(previous_screen_pos.xy) == previous_screen_pos.xy) ? history_ao : vec3(ao.x, vec2(0.0));
-	     history_ao = max0(history_ao);
-
-	float pixel_age = history_ao.y;
-	      pixel_age = min(pixel_age, max_accumulated_frames);
-
-	// Offcenter rejection from Jessie, which is originally by Zombye
-	// Reduces blur in motion
-	vec2 pixel_offset = 1.0 - abs(2.0 * fract(view_res * gtao_render_scale * previous_screen_pos.xy) - 1.0);
-	float offcenter_rejection = sqrt(pixel_offset.x * pixel_offset.y) * offcenter_rejection_strength + (1.0 - offcenter_rejection_strength);
-
-	// Depth rejection
-	float view_norm = rcp_length(view_pos);
-	float NoV = abs(dot(view_normal, view_pos)) * view_norm; // NoV / sqrt(length(view_pos))
-	float z0 = linearize_depth_fast(depth);
-	float z1 = linearize_depth_fast(1.0 - history_ao.z);
-	float depth_weight = exp2(-abs(z0 - z1) * depth_rejection_strength * NoV * view_norm);
-
-	pixel_age *= depth_weight * offcenter_rejection * float(history_ao.z != 1.0);
-
-	float history_weight = pixel_age / (pixel_age + 1.0);
-
-	ao.x = mix(ao.x, history_ao.x, history_weight);
-	ao.y = pixel_age + 1.0;
-	ao.z = 1.0 - depth; // Storing reversed depth improves precision for fp buffers
+	clouds_history = mix(current, history, history_weight);
+	clouds_data.x = mix(apparent_distance, apparent_distance_history, history_weight);
+	clouds_data.y = min(++pixel_age, CLOUDS_ACCUMULATION_LIMIT);
 }
 
 #endif

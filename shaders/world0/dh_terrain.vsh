@@ -2,4 +2,4 @@
 #define WORLD_OVERWORLD
 #define PROGRAM_DH_TERRAIN
 #define vsh
-#include "/program/dh/terrain.glsl"
+#include "/program/gbuffer/distant_horizons/terrain.glsl"

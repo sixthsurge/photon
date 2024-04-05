@@ -10,23 +10,37 @@
 
   Magic constants, please don't remove these!
 
-  const int colortex0Format = R11F_G11F_B10F; // scene color (deferred3 -> temporal), bloom tiles (composite5 -> composite14), final color (composite14 -> final)
-  const int colortex1Format = RGBA16;         // gbuffer data 0 (solid -> composite1)
-  const int colortex2Format = RGBA16;         // gbuffer data 1 (solid -> composite1)
-  const int colortex3Format = RGBA8;          // animated overlays/vanilla sky (solid -> deferred3), blended translucent color (translucent -> composite1), bloomy fog amount (composite1 -> composite14)
-  const int colortex4Format = R11F_G11F_B10F; // sky map (deferred -> composite1)
-  const int colortex5Format = RGBA16F;        // scene history (always), low-res clouds (deferred1 -> deferred2 +flip),
-  const int colortex6Format = RGBA16F;        // ambient occlusion history & clouds pixel age (always), fog scattering (composite -> composite1 +flip), TAAU min color (composite2 -> composite3 +flip)
-  const int colortex7Format = RGBA16F;        // clouds history (always), fog transmittance (composite -> composite1), TAAU max color (composite2 -> composite3 +flip)
+  const int colortex0Format  = R11F_G11F_B10F; // full res    | scene color (deferred3 -> temporal), bloom tiles (composite5 -> composite14), final color (composite14 -> final)
+  const int colortex1Format  = RGBA16;         // full res    | gbuffer data 0 (solid -> composite1)
+  const int colortex2Format  = RGBA16;         // full res    | gbuffer data 1 (solid -> composite1)
+  const int colortex3Format  = RGBA8;          // full res    | animated overlays/vanilla sky (solid -> deferred3), blended translucent color (translucent -> composite1), bloomy fog amount (composite1 -> composite14)
+  const int colortex4Format  = R11F_G11F_B10F; // 192x108     | sky map (deferred -> composite1)
+  const int colortex5Format  = RGBA16F;        // full res    | scene history (always)
+  const int colortex6Format  = RGB16F;         // quarter res | ambient occlusion history (always), fog scattering (composite -> composite1 +flip) 
+  const int colortex7Format  = RGB8;           // quarter res | fog transmittance
+  const int colortex9Format  = RGBA16F;        // clouds res  | low-res clouds  
+  const int colortex10Format = R16F;           // clouds res  | low-res clouds apparent distance
+  const int colortex11Format = RGBA16F;        // full res    | clouds history
+  const int colortex12Format = RG16F;          // full res    | clouds pixel age and apparent distance
+  // colortex13 - clouds shadow map
+  const int colortex14Format = RGB16F;         // full res    | TAAU min color for AABB clipping
+  const int colortex15Format = RGB16F;         // full res    | TAAU max color for AABB clipping
 
-  const bool colortex0Clear = false;
-  const bool colortex1Clear = true;
-  const bool colortex2Clear = false;
-  const bool colortex3Clear = true;
-  const bool colortex4Clear = false;
-  const bool colortex5Clear = false;
-  const bool colortex6Clear = false;
-  const bool colortex7Clear = false;
+  const bool colortex0Clear  = false;
+  const bool colortex1Clear  = true;
+  const bool colortex2Clear  = false;
+  const bool colortex3Clear  = true;
+  const bool colortex4Clear  = false;
+  const bool colortex5Clear  = false;
+  const bool colortex6Clear  = false;
+  const bool colortex7Clear  = false;
+  const bool colortex8Clear  = false;
+  const bool colortex9Clear  = false;
+  const bool colortex10Clear = false;
+  const bool colortex11Clear = false;
+  const bool colortex12Clear = false;
+  const bool colortex14Clear = false;
+  const bool colortex15Clear = false;
 
   const vec4 colortex3ClearColor = vec4(0.0, 0.0, 0.0, 0.0);
 
@@ -56,7 +70,7 @@ flat out vec3 sky_color;
 
 flat out vec2 clouds_cumulus_coverage;
 flat out vec2 clouds_altocumulus_coverage;
-flat out vec2 clouds_cirrus_coverage;
+flat out float clouds_cirrus_coverage;
 
 flat out float clouds_cumulus_congestus_amount;
 flat out float clouds_cumulonimbus_amount;
@@ -187,7 +201,7 @@ void main() {
 
 layout (location = 0) out vec3 sky_map;
 
-/* DRAWBUFFERS:4 */
+/* RENDERTARGETS: 4 */
 
 in vec2 uv;
 
@@ -201,7 +215,7 @@ flat in vec3 sky_color;
 
 flat in vec2 clouds_cumulus_coverage;
 flat in vec2 clouds_altocumulus_coverage;
-flat in vec2 clouds_cirrus_coverage;
+flat in float clouds_cirrus_coverage;
 
 flat in float clouds_cumulus_congestus_amount;
 flat in float clouds_cumulonimbus_amount;
