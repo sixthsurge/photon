@@ -9,8 +9,8 @@
 // Stars based on https://www.shadertoy.com/view/Md2SR3
 
 vec3 unstable_star_field(vec2 coord, float star_threshold) {
-	const float min_temp = 3500.0;
-	const float max_temp = 9500.0;
+	const float min_temp = 4200.0;
+	const float max_temp = 48000.0;
 
 	vec4 noise = hash4(coord);
 
