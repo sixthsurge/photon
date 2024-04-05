@@ -473,12 +473,16 @@ void main() {
 		float NoH = (NoL + NoV) * halfway_norm;
 		float LoH = LoV * halfway_norm + halfway_norm;
 
+#ifdef CLOUD_SHADOWS
+		float cloud_shadows = get_cloud_shadows(colortex8, scene_pos);
+#endif
+
 #if defined SHADOW && (defined WORLD_OVERWORLD || defined WORLD_END)
 		float sss_depth;
 		float shadow_distance_fade;
 		vec3 shadows;
 
-        shadows = calculate_shadows(scene_pos, flat_normal, light_levels.y, material.sss_amount, shadow_distance_fade, sss_depth);
+        shadows = calculate_shadows(scene_pos, flat_normal, light_levels.y, cloud_shadows, material.sss_amount, shadow_distance_fade, sss_depth);
 
 	#ifdef DISTANT_HORIZONS
 		if (is_dh_terrain) {
@@ -493,11 +497,6 @@ void main() {
 
 #if defined POM && defined POM_SHADOW && (defined SPECULAR_MAPPING || defined NORMAL_MAPPING)
 		shadows *= float(!parallax_shadow);
-#endif
-
-#ifdef CLOUD_SHADOWS
-		float cloud_shadows = get_cloud_shadows(colortex8, scene_pos);
-		shadows *= cloud_shadows;
 #endif
 
 		// Diffuse lighting

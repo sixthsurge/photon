@@ -81,12 +81,10 @@ const vec3 moon_color = vec3(0.0);
 const vec3 sky_color  = vec3(0.0);
 
 #define PROGRAM_PREPARE
-#include "/include/light/cloud_shadows.glsl"
 #include "/include/sky/clouds.glsl"
 
 void main() {
-	vec3 scene_pos = unproject_cloud_shadow_map(uv);
-	cloud_shadow_map = render_cloud_shadow_map(scene_pos);
+	cloud_shadow_map = render_cloud_shadow_map(uv);
 }
 
 #ifndef CLOUD_SHADOWS

@@ -195,6 +195,7 @@ vec3 calculate_shadows(
 	vec3 scene_pos,
 	vec3 flat_normal,
 	float skylight,
+	float cloud_shadows,
 	inout float sss_amount,
 	out float distance_fade,
 	out float sss_depth
@@ -234,8 +235,12 @@ vec3 calculate_shadows(
 
 	distant_shadow = ((1.0 - distance_fade) + distance_fade * distant_shadow);
 
-#if defined WORLD_OVERWORLD && defined OVERCAST_SKY_AFFECTS_LIGHTING
+#if defined WORLD_OVERWORLD 
+	distant_shadow *= cloud_shadows;
+
+	#ifdef OVERCAST_SKY_AFFECTS_LIGHTING
 	distant_shadow *= 1.0 - 0.5 * overcastness;
+	#endif
 #endif
 
 	float dither = interleaved_gradient_noise(gl_FragCoord.xy, frameCounter);
@@ -250,6 +255,7 @@ vec3 calculate_shadows(
 	if (blocker_search_result.x < eps) return vec3(distant_shadow); // blocker search empty handed => no occluders
 
 	float penumbra_size  = 16.0 * SHADOW_PENUMBRA_SCALE * (shadow_screen_pos.z - blocker_search_result.x) / blocker_search_result.x;
+	      penumbra_size *= 5.0 - 4.0 * cloud_shadows; // Increase penumbra radius inside cloud shadows, nice overcast look
 #if defined WORLD_OVERWORLD && defined OVERCAST_SKY_AFFECTS_LIGHTING
 	      penumbra_size *= 1.0 + 5.0 * overcastness;
 #endif

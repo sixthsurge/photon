@@ -1184,11 +1184,12 @@ CloudsResult draw_clouds(
 }
 
 #ifdef CLOUD_SHADOWS
-float render_cloud_shadow_map(vec3 scene_pos) {
+#include "/include/light/cloud_shadows.glsl"
+
+float render_cloud_shadow_map(vec2 uv) {
 	// Transform position from scene-space to clouds-space
-	vec3 ray_origin = scene_pos;
-	vec3 air_viewer_pos = vec3(0.0, planet_radius + eyeAltitude, 0.0);
-	ray_origin.y += eyeAltitude + (planet_radius);
+	vec3 ray_origin = unproject_cloud_shadow_map(uv);
+	     ray_origin = vec3(ray_origin.xz, ray_origin.y + eyeAltitude - SEA_LEVEL).xzy * CLOUDS_SCALE + vec3(0.0, planet_radius, 0.0);
 
 	vec3 pos; float t, density, extinction_coeff;
 	float shadow = 1.0;
@@ -1199,7 +1200,7 @@ float render_cloud_shadow_map(vec3 scene_pos) {
 	vec2  edge_sharpening    = mix(vec2(3.0, 8.0), vec2(1.0, 2.0), clouds_stratus_amount);
 
 	extinction_coeff = mix(0.05, 0.1, smoothstep(0.0, 0.3, abs(sun_dir.y))) * (1.0 - 0.33 * rainStrength) * CLOUDS_CUMULUS_DENSITY;
-	t = intersect_sphere(ray_origin, light_dir,	clouds_cumulus_radius + 0.5 * clouds_cumulus_thickness).y;
+	t = intersect_sphere(ray_origin, light_dir,	clouds_cumulus_radius + 0.25 * clouds_cumulus_thickness).y;
 	pos = ray_origin + light_dir * t;
 	density = clouds_cumulus_density(pos, detail_weights, edge_sharpening, dynamic_thickness);
 	shadow *= exp(-0.50 * extinction_coeff * clouds_cumulus_thickness * rcp(abs(light_dir.y) + eps) * density);
