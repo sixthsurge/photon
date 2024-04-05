@@ -66,6 +66,7 @@ uniform vec2 taa_offset;
 #include "/include/utility/random.glsl"
 #include "/include/utility/sampling.glsl"
 #include "/include/utility/fast_math.glsl"
+#include "/include/utility/space_conversion.glsl"
 
 #ifdef DISTANT_HORIZONS
 #include "/include/misc/distant_horizons.glsl"
