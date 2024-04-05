@@ -22,6 +22,9 @@
   const int colortex10Format = R16F;           // clouds res  | low-res clouds apparent distance
   const int colortex11Format = RGBA16F;        // full res    | clouds history
   const int colortex12Format = RG16F;          // full res    | clouds pixel age and apparent distance
+  // colortex13 - clouds shadow map
+  const int colortex14Format = RGB16F;         // full res    | TAAU min color for AABB clipping
+  const int colortex15Format = RGB16F;         // full res    | TAAU max color for AABB clipping
 
   const bool colortex0Clear  = false;
   const bool colortex1Clear  = true;
@@ -36,6 +39,8 @@
   const bool colortex10Clear = false;
   const bool colortex11Clear = false;
   const bool colortex12Clear = false;
+  const bool colortex14Clear = false;
+  const bool colortex15Clear = false;
 
   const vec4 colortex3ClearColor = vec4(0.0, 0.0, 0.0, 0.0);
 
@@ -65,7 +70,7 @@ flat out vec3 sky_color;
 
 flat out vec2 clouds_cumulus_coverage;
 flat out vec2 clouds_altocumulus_coverage;
-flat out vec2 clouds_cirrus_coverage;
+flat out float clouds_cirrus_coverage;
 
 flat out float clouds_cumulus_congestus_amount;
 flat out float clouds_stratus_amount;
@@ -208,7 +213,7 @@ flat in vec3 sky_color;
 
 flat in vec2 clouds_cumulus_coverage;
 flat in vec2 clouds_altocumulus_coverage;
-flat in vec2 clouds_cirrus_coverage;
+flat in float clouds_cirrus_coverage;
 
 flat in float clouds_cumulus_congestus_amount;
 flat in float clouds_stratus_amount;

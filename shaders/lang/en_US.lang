@@ -30,7 +30,7 @@ screen.clouds                          = Clouds
 screen.clouds_cumulus                  = Cumulus Clouds Settings
 screen.clouds_altocumulus              = Altocumulus Clouds Settings
 screen.clouds_cumulus_congestus        = Cumulus Congestus Clouds Settings
-screen.clouds_cirrus                   = Planar Clouds Settings
+screen.clouds_cirrus                   = Cirrus Clouds Settings
 screen.clouds_minecrafty               = Blocky Clouds Settings
 
 screen.fog_rlh                         = Rayleigh Coefficient
@@ -248,7 +248,7 @@ suffix.CLOUDS_CUMULUS_ALTITUDE              = m/s
 option.CLOUDS_CUMULUS_WIND_ANGLE            = Wind Angle
 suffix.CLOUDS_CUMULUS_ALTITUDE              = °
 
-option.CLOUDS_ALTOCUMULUS                       = Cumulus Clouds
+option.CLOUDS_ALTOCUMULUS                       = Altocumulus Clouds
 option.CLOUDS_ALTOCUMULUS.comment               = Mid-altitude volumetric clouds made to resemble altocumulus clouds
 option.CLOUDS_ALTOCUMULUS_PRIMARY_STEPS_H       = Primary Steps - Horizon
 option.CLOUDS_ALTOCUMULUS_PRIMARY_STEPS_Z       = Primary Steps - Zenith
@@ -313,32 +313,22 @@ value.CLOUDS_TEMPORAL_UPSCALING.2      = 4×
 value.CLOUDS_TEMPORAL_UPSCALING.3      = 9×
 value.CLOUDS_TEMPORAL_UPSCALING.4      = 16×
 
-option.CLOUDS_CIRRUS                       = Cumulus Clouds
-option.CLOUDS_CIRRUS.comment               = High-altitude planar clouds made to resemble cirrus/cirrocumulus clouds
-option.CLOUDS_CIRRUS_PRIMARY_STEPS_H       = Primary Steps - Horizon
-option.CLOUDS_CIRRUS_PRIMARY_STEPS_Z       = Primary Steps - Zenith
+option.CLOUDS_CIRRUS                       = Cirrus Clouds
+option.CLOUDS_CIRRUS.comment               = Planar cirrus clouds
 option.CLOUDS_CIRRUS_LIGHTING_STEPS        = Lighting Steps
 option.CLOUDS_CIRRUS_AMBIENT_STEPS         = Ambient Steps
 option.CLOUDS_CIRRUS_ALTITUDE              = Altitude
 suffix.CLOUDS_CIRRUS_ALTITUDE              = m
 option.CLOUDS_CIRRUS_THICKNESS             = Thickness
-option.CLOUDS_CIRRUS_DENSITY               = Cirrus Density
-option.CLOUDS_CIRRUS_COVERAGE              = Cirrus Coverage
-option.CLOUDS_CIRRUS_SIZE                  = Cirrus Size
-option.CLOUDS_CIRRUS_DETAIL_STRENGTH       = Cirrus Detail Strength
-option.CLOUDS_CIRRUS_CURL_STRENGTH         = Cirrus Curl Strength
-option.CLOUDS_CC_DENSITY               = Cirrocumulus Density
-option.CLOUDS_CC_COVERAGE              = Cirrocumulus Coverage
-option.CLOUDS_CC_SIZE                  = Cirrocumulus Size
-option.CLOUDS_CC_DETAIL_STRENGTH       = Cirrocumulus Detail Strength
-option.CLOUDS_CC_CURL_STRENGTH         = Cirrocumulus Curl Strength
+option.CLOUDS_CIRRUS_DENSITY               = Density
+option.CLOUDS_CIRRUS_COVERAGE              = Coverage
+option.CLOUDS_CIRRUS_SIZE                  = Size
+option.CLOUDS_CIRRUS_DETAIL_STRENGTH       = Detail Strength
+option.CLOUDS_CIRRUS_CURL_STRENGTH         = Curl Strength
 option.CLOUDS_CIRRUS_WIND_SPEED            = Wind Speed
 suffix.CLOUDS_CIRRUS_ALTITUDE              = m/s
 option.CLOUDS_CIRRUS_WIND_ANGLE            = Wind Angle
 suffix.CLOUDS_CIRRUS_ALTITUDE              = °
-
-option.CLOUDS_ALTOCUMULUS                       = Altocumulus Clouds
-option.CLOUDS_CIRRUS                       = Planar Clouds
 
 option.AURORA_NORMAL                   = Aurora in Any Biome
 option.AURORA_SNOW                     = Aurora in Snow Biome

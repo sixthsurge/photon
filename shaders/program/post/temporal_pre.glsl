@@ -35,7 +35,7 @@ void main() {
 layout (location = 0) out vec3 min_color;
 layout (location = 1) out vec3 max_color;
 
-/* RENDERTARGETS: 67 */
+/* RENDERTARGETS: 14,15 */
 
 in vec2 uv;
 

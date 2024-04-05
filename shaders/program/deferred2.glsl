@@ -222,7 +222,7 @@ void main() {
 	vec4 history = smooth_filter(colortex11, previous_uv * taau_render_scale);
 
 	// Depth at the previous position
-	float history_depth = 1.0 - min_of(textureGather(colortex6, previous_uv, 2));
+	float history_depth = 1.0 - min_of(textureGather(colortex6, previous_uv * taau_render_scale, 2));
 
 	// Get distance to terrain in the previous frame
 	vec3 screen_pos = vec3(previous_uv, history_depth);

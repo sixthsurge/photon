@@ -46,6 +46,35 @@ void main() {
     case DH_BLOCK_LEAVES:
         material_mask = 5; // Leaves
         break;
+
+    case DH_BLOCK_DIRT:
+    case DH_BLOCK_STONE:
+    case DH_BLOCK_DEEPSLATE:
+    case DH_BLOCK_NETHER_STONE:
+        material_mask = 6; // Dirts, stones, deepslate and netherrack
+        break;
+
+    case DH_BLOCK_SAND:
+        if (color.r > color.b * 2.0) material_mask = 9; // Red sand
+        else material_mask = 7; // Sand
+        break;
+
+    case DH_BLOCK_WOOD:
+        material_mask = 10; // Woods
+        break;
+
+    case DH_BLOCK_METAL:
+        material_mask = 12; // Metals
+        break;
+
+    case DH_BLOCK_LAVA:
+        material_mask = 39; // Lava
+        break;
+
+    case DH_BLOCK_ILLUMINATED:
+        material_mask = 36; // Other light sources
+        break;
+
     default:
         material_mask = 0;
         break;
