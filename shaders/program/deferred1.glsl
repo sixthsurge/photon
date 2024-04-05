@@ -173,6 +173,11 @@ uniform mat4 gbufferModelViewInverse;
 uniform mat4 gbufferProjection;
 uniform mat4 gbufferProjectionInverse;
 
+#ifdef SHADOW
+uniform mat4 shadowModelView;
+uniform mat4 shadowModelViewInverse;
+#endif
+
 uniform vec3 cameraPosition;
 uniform vec3 previousCameraPosition;
 

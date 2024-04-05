@@ -274,6 +274,7 @@ uniform int isEyeInWater;
 uniform float blindness;
 uniform float nightVision;
 uniform float darknessFactor;
+uniform float eyeAltitude;
 
 uniform vec3 light_dir;
 uniform vec3 sun_dir;
@@ -559,19 +560,18 @@ void main() {
 	float NoH = (NoL + NoV) * halfway_norm;
 	float LoH = LoV * halfway_norm + halfway_norm;
 
+#ifdef CLOUD_SHADOWS
+	float cloud_shadows = get_cloud_shadows(colortex8, scene_pos);
+#endif
+
 #if defined SHADOW && (defined WORLD_OVERWORLD || defined WORLD_END)
 	float sss_depth;
 	float shadow_distance_fade;
-	vec3 shadows = calculate_shadows(scene_pos, tbn[2], adjusted_light_levels.y, material.sss_amount, shadow_distance_fade, sss_depth);
+	vec3 shadows = calculate_shadows(scene_pos, tbn[2], adjusted_light_levels.y, cloud_shadows, material.sss_amount, shadow_distance_fade, sss_depth);
 #else
 	vec3 shadows = vec3(pow8(adjusted_light_levels.y));
 	#define sss_depth 0.0
 	#define shadow_distance_fade 0.0
-#endif
-
-#ifdef CLOUD_SHADOWS
-	float cloud_shadows = get_cloud_shadows(colortex8, scene_pos);
-	shadows *= cloud_shadows;
 #endif
 
 	// Diffuse lighting
