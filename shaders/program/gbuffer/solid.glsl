@@ -354,6 +354,10 @@ void main() {
 	float dither = interleaved_gradient_noise(gl_FragCoord.xy, frameCounter);
 
 #if defined PROGRAM_GBUFFERS_TERRAIN && defined POM
+	// Alpha test at original UV
+	float alpha = texture(gtexture, uv).a;
+	if (alpha < 0.1) { discard; return; }
+
 	float view_distance = length(tangent_pos);
 
 	bool has_pom = view_distance < POM_DISTANCE; // Only calculate POM for close terrain
@@ -394,7 +398,7 @@ void main() {
 
 #if defined PROGRAM_GBUFFERS_ENTITIES
 	if (material_mask == 102) base_color = vec4(1.0);
-	if (base_color.a < 0.1 && material_mask != 101) { discard; return; } // Save transparent quad in boats, which material_masks out water
+	if (base_color.a < 0.1 && material_mask != 101) { discard; return; } // Save transparent quad in boats, which masks out water
 #else
 	if (base_color.a < 0.1) { discard; return; }
 #endif

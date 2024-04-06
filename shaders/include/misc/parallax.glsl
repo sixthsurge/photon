@@ -43,7 +43,7 @@ vec2 get_parallax_uv(
 
 	pom_depth = depth_value;
 
-	return get_uv_from_local_coord(pos.xy);
+	return get_uv_from_local_coord(fract(pos.xy));
 }
 
 bool get_parallax_shadow(vec3 pos, mat2 uv_gradient, float view_distance, float dither) {
