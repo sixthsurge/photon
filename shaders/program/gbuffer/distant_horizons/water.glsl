@@ -200,6 +200,7 @@ uniform int isEyeInWater;
 uniform float blindness;
 uniform float nightVision;
 uniform float darknessFactor;
+uniform float eyeAltitude;
 
 uniform vec3 light_dir;
 uniform vec3 sun_dir;
