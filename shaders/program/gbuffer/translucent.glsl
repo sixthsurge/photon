@@ -548,8 +548,10 @@ void main() {
 	float NoH = (NoL + NoV) * halfway_norm;
 	float LoH = LoV * halfway_norm + halfway_norm;
 
-#ifdef CLOUD_SHADOWS
+#if defined WORLD_OVERWORLD && defined CLOUD_SHADOWS
 	float cloud_shadows = get_cloud_shadows(colortex8, scene_pos);
+#else
+	const float cloud_shadows = 1.0;
 #endif
 
 #if defined SHADOW && (defined WORLD_OVERWORLD || defined WORLD_END)
