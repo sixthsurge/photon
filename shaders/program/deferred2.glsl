@@ -156,7 +156,7 @@ vec3 reproject_clouds(vec2 uv, float distance_to_cloud) {
 	vec3 scene_pos = view_to_scene_space(view_pos);
 	vec3 world_dir = normalize(scene_pos - gbufferModelViewInverse[3].xyz);
 
-	vec3 cloud_pos = world_dir * distance_to_cloud;
+	vec3 cloud_pos = world_dir * distance_to_cloud + gbufferModelViewInverse[3].xyz;
 
 	// Work out which layer this cloud belongs to
 	vec3 velocity;
