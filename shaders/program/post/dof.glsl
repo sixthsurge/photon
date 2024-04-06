@@ -77,7 +77,10 @@ void main() {
 	float depth_dh = texelFetch(dhDepthTex, texel, 0).x;
 
 	if (is_distant_horizons_terrain(depth, depth_dh)) {
-		depth = reverse_linear_depth(linearize_depth(depth_dh, true));
+		depth = view_to_screen_space_depth(
+			gbufferProjection,
+			screen_to_view_space_depth(dhProjectionInverse, depth_dh)
+		);
 	}
 #endif
 
