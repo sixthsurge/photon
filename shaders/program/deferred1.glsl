@@ -31,8 +31,6 @@ flat out float clouds_stratus_amount;
 
 flat out float aurora_amount;
 flat out mat2x3 aurora_colors;
-
-flat out float overcastness;
 #endif
 
 // ------------
@@ -98,8 +96,6 @@ void main() {
 	sun_color = get_sun_exposure() * get_sun_tint();
 	moon_color = get_moon_exposure() * get_moon_tint();
 
-	overcastness = daily_weather_blend(daily_weather_overcastness);
-
 	const vec3 sky_dir = normalize(vec3(0.0, 1.0, -0.8)); // don't point direcly upwards to avoid the sun halo when the sun path rotation is 0
 	sky_color = atmosphere_scattering(sky_dir, sun_dir) * sun_color + atmosphere_scattering(sky_dir, moon_dir) * moon_color;
 	sky_color = tau * mix(sky_color, vec3(sky_color.b) * sqrt(2.0), rcp_pi);
@@ -152,8 +148,6 @@ flat in float clouds_stratus_amount;
 
 flat in float aurora_amount;
 flat in mat2x3 aurora_colors;
-
-flat in float overcastness;
 #endif
 
 // ------------
@@ -289,7 +283,6 @@ void main() {
 		: length(view_pos) * CLOUDS_SCALE;
 
 	vec3 clear_sky = atmosphere_scattering(ray_dir, sun_color, sun_dir, moon_color, moon_dir);
-	     clear_sky = mix(clear_sky, 1.1 * vec3(dot(clear_sky, luminance_weights_rec2020)), 0.75 * overcastness * time_noon * linear_step(0.0, 0.05, ray_dir.y));
 
 	float dither = texelFetch(noisetex, ivec2(checkerboard_pos & 511), 0).b;
 	      dither = r1(frameCounter / checkerboard_area, dither);

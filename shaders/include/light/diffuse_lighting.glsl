@@ -19,7 +19,6 @@
 #endif
 
 #ifndef WORLD_OVERWORLD
-	#undef OVERCAST_SKY_AFFECTS_LIGHTING
 	#undef CLOUD_SHADOWS
 #endif
 
@@ -119,11 +118,6 @@ vec3 get_diffuse_lighting(
 	diffuse *= sqr(ao);
 	#endif
 
-	#ifdef OVERCAST_SKY_AFFECTS_LIGHTING
-	bounced *= 1.0 - overcastness;
-	sss     *= 1.0 - 0.5 * overcastness;
-	#endif
-
 	#ifdef CLOUD_SHADOWS
 	bounced *= cloud_shadows;
 	sss     *= cloud_shadows;
@@ -146,10 +140,6 @@ vec3 get_diffuse_lighting(
 	     diffuse *= ao * pow4(light_levels.y) * (dampen(light_dir.y) * 0.5 + 0.5);
 
 	lighting += light_color * diffuse;
-
-	#ifdef OVERCAST_SKY_AFFECTS_LIGHTING
-	lighting *= 1.0 - 0.5 * overcastness;
-	#endif
 
 	#ifdef CLOUD_SHADOWS
 	lighting *= cloud_shadows;

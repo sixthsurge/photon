@@ -74,8 +74,6 @@ flat out float clouds_stratus_amount;
 
 flat out float aurora_amount;
 flat out mat2x3 aurora_colors;
-
-flat out float overcastness;
 #endif
 
 // ------------
@@ -175,8 +173,6 @@ void main() {
 		clouds_stratus_amount
 	);
 
-	overcastness = daily_weather_blend(daily_weather_overcastness);
-
 	aurora_amount = get_aurora_amount();
 	aurora_colors = get_aurora_colors();
 
@@ -217,8 +213,6 @@ flat in float clouds_stratus_amount;
 
 flat in float aurora_amount;
 flat in mat2x3 aurora_colors;
-
-flat in float overcastness;
 #endif
 
 // ------------
@@ -306,12 +300,6 @@ void main() {
 		case 1:
 			sky_map = ambient_color;
 			break;
-
-#if defined WORLD_OVERWORLD
-		case 2:
-			sky_map = vec3(overcastness);
-			break;
-#endif
 		}
 	} else { // Draw sky map
 		vec3 ray_dir = unproject_sky(uv);

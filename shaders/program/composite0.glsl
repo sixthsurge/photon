@@ -71,11 +71,6 @@ void main() {
 	mat2x3 rayleigh_coeff = air_fog_rayleigh_coeff(), mie_coeff = air_fog_mie_coeff();
 	air_fog_coeff[0] = mat2x3(rayleigh_coeff[0], mie_coeff[0]);
 	air_fog_coeff[1] = mat2x3(rayleigh_coeff[1], mie_coeff[1]);
-
-	#if defined OVERCAST_SKY_AFFECTS_LIGHTING
-	float overcastness = daily_weather_blend(daily_weather_overcastness);
-	light_color *= 1.0 - 0.5 * overcastness;
-	#endif
 #endif
 
 	vec2 vertex_pos = gl_Vertex.xy;

@@ -24,10 +24,6 @@ flat out uint is_water;
 flat out vec3 light_color;
 flat out vec3 ambient_color;
 
-#if defined WORLD_OVERWORLD && defined OVERCAST_SKY_AFFECTS_LIGHTING
-flat out float overcastness;
-#endif
-
 // ------------
 //   Uniforms
 // ------------
@@ -72,10 +68,6 @@ void main() {
 	ambient_color = texelFetch(colortex4, ivec2(191, 1), 0).rgb;
 
 	is_water = uint(dhMaterialId == DH_BLOCK_WATER);
-
-#if defined WORLD_OVERWORLD && defined OVERCAST_SKY_AFFECTS_LIGHTING
-	overcastness  = texelFetch(colortex4, ivec2(191, 2), 0).x;
-#endif
 
     vec3 camera_offset = fract(cameraPosition);
 
@@ -133,10 +125,6 @@ in vec2 atlas_tile_coord;
 in vec3 tangent_pos;
 flat in vec2 atlas_tile_offset;
 flat in vec2 atlas_tile_scale;
-#endif
-
-#if defined WORLD_OVERWORLD && defined OVERCAST_SKY_AFFECTS_LIGHTING
-flat in float overcastness;
 #endif
 
 // ------------

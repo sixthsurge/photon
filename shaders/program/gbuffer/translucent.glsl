@@ -33,10 +33,6 @@ flat out vec2 atlas_tile_offset;
 flat out vec2 atlas_tile_scale;
 #endif
 
-#if defined WORLD_OVERWORLD && defined OVERCAST_SKY_AFFECTS_LIGHTING
-flat out float overcastness;
-#endif
-
 // --------------
 //   Attributes
 // --------------
@@ -101,10 +97,6 @@ void main() {
 
 	light_color   = texelFetch(colortex4, ivec2(191, 0), 0).rgb;
 	ambient_color = texelFetch(colortex4, ivec2(191, 1), 0).rgb;
-
-#if defined WORLD_OVERWORLD && defined OVERCAST_SKY_AFFECTS_LIGHTING
-	overcastness  = texelFetch(colortex4, ivec2(191, 2), 0).x;
-#endif
 
 	bool is_top_vertex = uv.y < mc_midTexCoord.y;
 
@@ -194,10 +186,6 @@ in vec2 atlas_tile_coord;
 in vec3 tangent_pos;
 flat in vec2 atlas_tile_offset;
 flat in vec2 atlas_tile_scale;
-#endif
-
-#if defined WORLD_OVERWORLD && defined OVERCAST_SKY_AFFECTS_LIGHTING
-flat in float overcastness;
 #endif
 
 // ------------
