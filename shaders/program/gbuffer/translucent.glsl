@@ -316,6 +316,7 @@ uniform vec4 entityColor;
 #include "/include/light/diffuse_lighting.glsl"
 #include "/include/light/shadows.glsl"
 #include "/include/light/specular_lighting.glsl"
+#include "/include/misc/distant_horizons.glsl"
 #include "/include/misc/material.glsl"
 #include "/include/misc/water_normal.glsl"
 #include "/include/utility/color.glsl"
@@ -325,10 +326,6 @@ uniform vec4 entityColor;
 
 #ifdef CLOUD_SHADOWS
 #include "/include/light/cloud_shadows.glsl"
-#endif
-
-#ifdef DISTANT_HORIZONS
-#include "/include/misc/distant_horizons.glsl"
 #endif
 
 const float lod_bias = log2(taau_render_scale);

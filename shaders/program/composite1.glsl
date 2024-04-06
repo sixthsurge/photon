@@ -124,6 +124,7 @@ uniform float time_midnight;
 
 #include "/include/fog/simple_fog.glsl"
 #include "/include/light/specular_lighting.glsl"
+#include "/include/misc/distant_horizons.glsl"
 #include "/include/misc/material.glsl"
 #include "/include/misc/rain_puddles.glsl"
 #include "/include/misc/water_normal.glsl"
@@ -131,10 +132,6 @@ uniform float time_midnight;
 #include "/include/utility/encoding.glsl"
 #include "/include/utility/fast_math.glsl"
 #include "/include/utility/space_conversion.glsl"
-
-#ifdef DISTANT_HORIZONS
-#include "/include/misc/distant_horizons.glsl"
-#endif
 
 /*
 const bool colortex5MipmapEnabled = true;

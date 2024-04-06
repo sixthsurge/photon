@@ -5,6 +5,7 @@
 
   program/deferred2.glsl:
   Temporal upscaling for clouds
+  Create combined depth buffer (DH)
 
 --------------------------------------------------------------------------------
 */
@@ -36,6 +37,12 @@ layout (location = 0) out vec4 clouds_history;
 layout (location = 1) out vec2 clouds_data;
 
 /* RENDERTARGETS: 11,12 */
+
+#ifdef DISTANT_HORIZONS
+layout (location = 2) out float combined_depth;
+
+/* RENDERTARGETS: 11,12,15 */
+#endif
 
 in vec2 uv;
 
@@ -170,6 +177,10 @@ vec3 reproject_clouds(vec2 uv, float distance_to_cloud) {
 }
 
 void main() {
+	// --------------------
+	//   clouds upscaling
+	// --------------------
+
 	const int checkerboard_area = CLOUDS_TEMPORAL_UPSCALING * CLOUDS_TEMPORAL_UPSCALING;
 
 	ivec2 dst_texel = ivec2(gl_FragCoord.xy);
@@ -299,6 +310,23 @@ void main() {
 	clouds_history = max0(mix(current, history, history_weight));
 	clouds_data.x = mix(apparent_distance, apparent_distance_history, history_weight);
 	clouds_data.y = min(++pixel_age, CLOUDS_ACCUMULATION_LIMIT);
+
+	// --------------------------------
+	//   combined depth buffer for DH
+	// --------------------------------
+
+#ifdef DISTANT_HORIZONS
+	float depth_linear    = linearize_depth(depth);
+	float depth_linear_dh = linearize_depth(depth_dh, true);
+
+	combined_depth = is_dh_terrain
+		? reverse_linear_depth(combined_near, combined_far, depth_linear_dh)
+		: reverse_linear_depth(combined_near, combined_far, depth_linear);
+
+	if (depth == 1.0 && depth_dh == 1.0) {
+		combined_depth = 1.0;
+	}
+#endif
 }
 
 #endif

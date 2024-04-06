@@ -284,6 +284,7 @@ uniform float time_midnight;
 #include "/include/light/diffuse_lighting.glsl"
 #include "/include/light/shadows.glsl"
 #include "/include/light/specular_lighting.glsl"
+#include "/include/misc/distant_horizons.glsl"
 #include "/include/misc/edge_highlight.glsl"
 #include "/include/misc/material.glsl"
 #include "/include/misc/rain_puddles.glsl"
@@ -292,10 +293,6 @@ uniform float time_midnight;
 #include "/include/utility/color.glsl"
 #include "/include/utility/encoding.glsl"
 #include "/include/utility/space_conversion.glsl"
-
-#if defined DISTANT_HORIZONS
-#include "/include/misc/distant_horizons.glsl"
-#endif
 
 #if defined CLOUD_SHADOWS
 #include "/include/light/cloud_shadows.glsl"

@@ -25,6 +25,7 @@
   const int colortex12Format = RG16F;          // full res    | clouds pixel age and apparent distance
   const int colortex13Format = RGB16F;         // full res    | TAAU min color for AABB clipping
   const int colortex14Format = RGB16F;         // full res    | TAAU max color for AABB clipping
+  const int colortex15Format = R32F;           // full res    | DH combined depth buffer
 
   const bool colortex0Clear  = false;
   const bool colortex1Clear  = true;
@@ -41,6 +42,7 @@
   const bool colortex12Clear = false;
   const bool colortex13Clear = false;
   const bool colortex14Clear = false;
+  const bool colortex15Clear = false;
 
   const vec4 colortex3ClearColor = vec4(0.0, 0.0, 0.0, 0.0);
 

@@ -63,13 +63,10 @@ uniform int frameCounter;
 uniform vec2 view_pixel_size;
 uniform vec2 taa_offset;
 
+#include "/include/misc/distant_horizons.glsl"
 #include "/include/utility/random.glsl"
 #include "/include/utility/sampling.glsl"
 #include "/include/utility/space_conversion.glsl"
-
-#ifdef DISTANT_HORIZONS
-#include "/include/misc/distant_horizons.glsl"
-#endif
 
 void main() {
 	ivec2 texel = ivec2(gl_FragCoord.xy);
