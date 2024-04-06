@@ -149,7 +149,7 @@ uniform sampler2D noisetex;
 uniform sampler2D colortex8; // Cloud shadow map
 #endif
 
-uniform sampler2D depthtex1;
+uniform sampler2D depthtex0;
 
 #ifdef COLORED_LIGHTS
 uniform sampler3D light_sampler_a;
@@ -280,7 +280,7 @@ void main() {
 
 	// Space conversions
 
-	float back_depth_mc = texelFetch(depthtex1, ivec2(gl_FragCoord.xy), 0).x;
+	float back_depth_mc = texelFetch(depthtex0, ivec2(gl_FragCoord.xy), 0).x;
 	float back_depth_dh = texelFetch(dhDepthTex1, ivec2(gl_FragCoord.xy), 0).x;
 	bool back_is_dh_terrain = is_distant_horizons_terrain(back_depth_mc, back_depth_dh);
 
