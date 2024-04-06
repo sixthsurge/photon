@@ -194,6 +194,8 @@ vec3 purkinje_shift(vec3 rgb, vec2 light_levels) {
 }
 
 void main() {
+	bloomy_fog = 1.0;
+
 	ivec2 texel = ivec2(gl_FragCoord.xy);
 
 	// Sample textures
