@@ -1183,7 +1183,7 @@ CloudsResult draw_clouds(
 	return result;
 }
 
-#ifdef CLOUD_SHADOWS
+#if defined PROGRAM_PREPARE && defined CLOUD_SHADOWS
 #include "/include/light/cloud_shadows.glsl"
 
 float render_cloud_shadow_map(vec2 uv) {

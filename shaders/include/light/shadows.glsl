@@ -231,7 +231,7 @@ vec3 calculate_shadows(
 	float distant_shadow = lightmap_shadows(skylight, NoL);
 #endif
 
-	if (distance_fade >= 1.0) return vec3(distant_shadow);
+	if (distance_fade >= 1.0) return vec3(distant_shadow * cloud_shadows);
 
 	distant_shadow = ((1.0 - distance_fade) + distance_fade * distant_shadow);
 
@@ -279,13 +279,14 @@ vec3 calculate_shadows(
 	vec3 scene_pos,
 	vec3 flat_normal,
 	float skylight,
+	float cloud_shadows,
 	float sss_amount,
 	out float distance_fade,
 	out float sss_depth
 ) {
 	distance_fade = 0.0;
 	sss_depth = 0.0;
-	return vec3(1.0);
+	return vec3(cloud_shadows);
 }
 #endif
 
