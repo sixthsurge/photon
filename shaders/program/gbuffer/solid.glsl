@@ -354,10 +354,6 @@ void main() {
 	float dither = interleaved_gradient_noise(gl_FragCoord.xy, frameCounter);
 
 #if defined PROGRAM_GBUFFERS_TERRAIN && defined POM
-	// Alpha test at original UV
-	float alpha = texture(gtexture, uv).a;
-	if (alpha < 0.1) { discard; return; }
-
 	float view_distance = length(tangent_pos);
 
 	bool has_pom = view_distance < POM_DISTANCE; // Only calculate POM for close terrain
