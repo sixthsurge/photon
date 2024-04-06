@@ -29,10 +29,6 @@ flat out vec3 sky_sh[9];
 #else
 flat out mat3 sky_samples;
 #endif
-
-#if defined OVERCAST_SKY_AFFECTS_LIGHTING
-flat out float overcastness;
-#endif
 #endif
 
 // ------------
@@ -99,13 +95,6 @@ void main() {
 #if defined WORLD_OVERWORLD
 	sun_color    = get_sun_exposure() * get_sun_tint();
 	moon_color   = get_moon_exposure() * get_moon_tint();
-
-#if defined OVERCAST_SKY_AFFECTS_LIGHTING
-	overcastness = texelFetch(colortex4, ivec2(191, 2), 0).x;
-#else
-	float overcastness = 0.0;
-#endif
-
 	float skylight_boost = get_skylight_boost();
 
 	#ifdef SH_SKYLIGHT
@@ -134,17 +123,11 @@ void main() {
 	sky_samples[1] = atmosphere_scattering(dir1, sun_color, sun_dir, moon_color, moon_dir) * skylight_boost;
 	sky_samples[2] = atmosphere_scattering(dir2, sun_color, sun_dir, moon_color, moon_dir) * skylight_boost;
 
-	#ifdef OVERCAST_SKY_AFFECTS_LIGHTING
-	sky_samples[0] = mix(sky_samples[0], sky_samples[0] * 1.5 + 0.015 * light_color, overcastness);
-	sky_samples[1] = mix(sky_samples[1], sky_samples[1] * 1.25, overcastness);
-	sky_samples[2] = mix(sky_samples[2], sky_samples[2] * 1.25, overcastness);
-	#endif
-
 	// Aurorae
 	float aurora_amount = get_aurora_amount();
 	mat2x3 aurora_colors = get_aurora_colors();
 
-	sky_samples[0] += aurora_amount * AURORA_GROUND_LIGHTING * mix(aurora_colors[0], aurora_colors[1], 0.25) * (1.0 - overcastness);
+	sky_samples[0] += aurora_amount * AURORA_GROUND_LIGHTING * mix(aurora_colors[0], aurora_colors[1], 0.25);
 	#endif
 #endif
 
@@ -178,10 +161,6 @@ flat in vec3 sky_sh[9];
 #else
 flat in mat3 sky_samples;
 #endif
-
-#if defined OVERCAST_SKY_AFFECTS_LIGHTING
-flat in float overcastness;
-#endif
 #endif
 
 // ------------
@@ -205,13 +184,13 @@ uniform sampler2D colortex8; // cloud shadow map
 uniform sampler3D depthtex0; // atmosphere scattering LUT
 uniform sampler2D depthtex1;
 
-#ifdef BLOCKY_CLOUDS
-uniform sampler2D depthtex2; // minecraft cloud texture
-#endif
-
 #ifdef COLORED_LIGHTS
 uniform sampler3D light_sampler_a;
 uniform sampler3D light_sampler_b;
+#endif
+
+#ifdef BLOCKY_CLOUDS
+uniform sampler2D depthtex2; // minecraft cloud texture
 #endif
 
 #ifndef WORLD_NETHER
@@ -284,6 +263,7 @@ uniform float time_midnight;
 #include "/include/light/diffuse_lighting.glsl"
 #include "/include/light/shadows.glsl"
 #include "/include/light/specular_lighting.glsl"
+#include "/include/misc/distant_horizons.glsl"
 #include "/include/misc/edge_highlight.glsl"
 #include "/include/misc/material.glsl"
 #include "/include/misc/rain_puddles.glsl"
@@ -293,8 +273,8 @@ uniform float time_midnight;
 #include "/include/utility/encoding.glsl"
 #include "/include/utility/space_conversion.glsl"
 
-#if defined DISTANT_HORIZONS
-#include "/include/misc/distant_horizons.glsl"
+#if defined WORLD_OVERWORLD && defined BLOCKY_CLOUDS
+#include "/include/sky/blocky_clouds.glsl"
 #endif
 
 #if defined CLOUD_SHADOWS
@@ -302,6 +282,7 @@ uniform float time_midnight;
 #endif
 
 vec4 read_clouds(out float apparent_distance) {
+#if defined WORLD_OVERWORLD
 	// Soften clouds for new pixels
 	float pixel_age = texelFetch(colortex12, ivec2(gl_FragCoord.xy), 0).y;
 	int ld = int(3.0 * dampen(max0(1.0 - 0.1 * pixel_age)));
@@ -309,6 +290,9 @@ vec4 read_clouds(out float apparent_distance) {
 	apparent_distance = min_of(textureGather(colortex12, uv * taau_render_scale, 0));
 
 	return bicubic_filter_lod(colortex11, uv * taau_render_scale, ld);
+#else
+	return vec4(0.0, 0.0, 0.0, 1.0);
+#endif
 }
 
 void main() {
@@ -316,7 +300,7 @@ void main() {
 
 	// Sample textures
 
-	float depth         = texelFetch(depthtex1, texel, 0).x;
+	float depth         = texelFetch(combined_depth_buffer, texel, 0).x;
 	vec4 gbuffer_data_0 = texelFetch(colortex1, texel, 0);
 #if defined NORMAL_MAPPING || defined SPECULAR_MAPPING
 	vec4 gbuffer_data_1 = texelFetch(colortex2, texel, 0);
@@ -329,8 +313,9 @@ void main() {
     // Check for Distant Horizons terrain
 
 #ifdef DISTANT_HORIZONS
-    float depth_dh     = texelFetch(dhDepthTex, texel, 0).x;
-    bool is_dh_terrain = is_distant_horizons_terrain(depth, depth_dh);
+    float depth_mc = texelFetch(depthtex1, texel, 0).x;
+    float depth_dh = texelFetch(dhDepthTex, texel, 0).x;
+	bool is_dh_terrain = is_distant_horizons_terrain(depth_mc, depth_dh);
 #else
     const bool is_dh_terrain = false;
 #endif
@@ -339,21 +324,50 @@ void main() {
 
 	depth += 0.38 * float(depth < hand_depth); // Hand lighting fix from Capt Tatsu
 
-#ifdef DISTANT_HORIZONS
-    vec3 view_pos = is_dh_terrain
-		? screen_to_view_space(vec3(uv, depth_dh), true, true)
-		: screen_to_view_space(vec3(uv, depth), true, false);
-#else
-	vec3 view_pos = screen_to_view_space(vec3(uv, depth), true);
-#endif
-
+	vec3 view_pos = screen_to_view_space(combined_projection_matrix_inverse, vec3(uv, depth), true);
 	vec3 scene_pos = view_to_scene_space(view_pos);
 	vec3 world_pos = scene_pos + cameraPosition;
 	vec3 world_dir = normalize(scene_pos - gbufferModelViewInverse[3].xyz);
 
-	if (depth == 1.0 && !is_dh_terrain) { // Sky
 #if defined WORLD_OVERWORLD
-		vec3 atmosphere = atmosphere_scattering(world_dir, sun_color, sun_dir, moon_color, moon_dir);
+	vec3 atmosphere = atmosphere_scattering(world_dir, sun_color, sun_dir, moon_color, moon_dir);
+
+#ifdef BLOCKY_CLOUDS
+	vec3 world_start_pos = gbufferModelViewInverse[3].xyz + cameraPosition;
+	vec3 world_end_pos   = world_pos;
+
+	float dither = texelFetch(noisetex, texel & 511, 0).b;
+	      dither = r1(frameCounter, dither);
+
+	clouds = raymarch_blocky_clouds(
+		world_start_pos,
+		world_end_pos,
+		depth == 1.0,
+		blocky_clouds_altitude_l0,
+		dither
+	);
+
+#ifdef BLOCKY_CLOUDS_LAYER_2
+	float visibility = pow4(clouds.a);
+	vec4 clouds_l2 = raymarch_blocky_clouds(
+		world_start_pos,
+		world_end_pos,
+		depth == 1.0,
+		blocky_clouds_altitude_l1,
+		dither
+	);
+	clouds.rgb += clouds_l2.xyz * visibility;
+	clouds.a   *= mix(1.0, clouds_l2.a, visibility);
+#endif
+
+	float new_alpha = sqr(sqr(clouds.a));
+	clouds.rgb += atmosphere * (1.0 - new_alpha) * (clouds.a - new_alpha);
+	clouds.a = new_alpha;
+#endif
+#endif
+
+	if (depth == 1.0) { // Sky
+#if defined WORLD_OVERWORLD
 		scene_color = draw_sky(world_dir, atmosphere);
 #else
 		scene_color = draw_sky(world_dir);
@@ -440,15 +454,9 @@ void main() {
 		// Upscale ambient occlusion
 
 #ifdef GTAO
-		#ifdef DISTANT_HORIZONS
-		float lin_z = is_dh_terrain
-			? linearize_depth(depth_dh, true)
-			: linearize_depth(depth, false);
-		#else
-		float lin_z = linearize_depth(depth, false);
-		#endif
+		float lin_z = screen_to_view_space_depth(combined_projection_matrix_inverse, depth);
 
-		#define depth_weight(reversed_depth) exp2(-10.0 * abs(linearize_depth(1.0 - reversed_depth, is_dh_terrain) - lin_z))
+		#define depth_weight(reversed_depth) exp2(-10.0 * abs(screen_to_view_space_depth(combined_projection_matrix_inverse, 1.0 - reversed_depth) - lin_z))
 
 		vec4 gtao = vec4(half_res_00, 1.0) * depth_weight(half_res_00.z) * (1.0 - f.x) * (1.0 - f.y)
 		          + vec4(half_res_10, 1.0) * depth_weight(half_res_10.z) * (f.x - f.x * f.y)
@@ -473,8 +481,10 @@ void main() {
 		float NoH = (NoL + NoV) * halfway_norm;
 		float LoH = LoV * halfway_norm + halfway_norm;
 
-#ifdef CLOUD_SHADOWS
+#if defined WORLD_OVERWORLD && defined CLOUD_SHADOWS
 		float cloud_shadows = get_cloud_shadows(colortex8, scene_pos);
+#else
+		const float cloud_shadows = 1.0;
 #endif
 
 #if defined SHADOW && (defined WORLD_OVERWORLD || defined WORLD_END)
@@ -538,8 +548,6 @@ void main() {
 
 #ifdef BORDER_FOG
 	#ifdef WORLD_OVERWORLD
-		vec3 atmosphere = atmosphere_scattering(world_dir, sun_color, sun_dir, moon_color, moon_dir);
-
 		vec3 horizon_dir = normalize(vec3(world_dir.xz, min(world_dir.y, -0.1)).xzy);
 		vec3 horizon_color = texture(colortex4, project_sky(horizon_dir)).rgb;
 
@@ -558,14 +566,14 @@ void main() {
 		vec4 fog = common_fog(view_distance, false);
 		scene_color = scene_color * fog.a + fog.rgb;
 
-#if defined WORLD_OVERWORLD && defined BLOCKY_CLOUDS
-		scene_color = scene_color * blocky_clouds.a + blocky_clouds.rgb * fog.a;
-#endif
-
 		// Apply clouds
+#ifndef BLOCKY_CLOUDS
 		if (clouds_distance < view_distance) {
 			scene_color = scene_color * clouds.w + clouds.xyz;
 		}
+#else
+		scene_color = scene_color * clouds.w + clouds.xyz;
+#endif
 	}
 }
 

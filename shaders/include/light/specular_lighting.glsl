@@ -184,42 +184,24 @@ vec3 trace_specular_ray(
 #ifdef ENVIRONMENT_REFLECTIONS
 	vec3 hit_pos;
 	bool hit = raymarch_depth_buffer(
-#ifdef SSR_PREVIOUS_FRAME
+	#ifdef DISTANT_HORIZONS
+		combined_depth_buffer,
+	#else
+		#ifdef SSR_PREVIOUS_FRAME
 		depthtex0,
-#else
+		#else
 		depthtex1,
-#endif
+		#endif
+	#endif
+		combined_projection_matrix,
 		screen_pos,
 		view_pos,
 		view_dir,
 		dither,
 		intersection_step_count,
 		refinement_step_count,
-		hit_pos,
-        false
+		hit_pos
 	);
-
-    #ifdef DISTANT_HORIZONS
-    // Intersect against DH terrain too
-	bool hit_dh_terrain = false;
-    if (!hit) {
-        hit = raymarch_depth_buffer(
-            dhDepthTex,
-            view_to_screen_space(view_pos, true, true),
-            view_pos,
-            view_dir,
-            dither,
-            intersection_step_count,
-            refinement_step_count,
-            hit_pos,
-            true
-        );
-
-		hit_dh_terrain = hit;
-    }
-    #else
-	const bool hit_dh_terrain = false;
-	#endif
 #else
 	const bool hit = false;
 	const vec3 hit_pos = vec3(0.0);
@@ -236,7 +218,7 @@ vec3 trace_specular_ray(
 		float border_attenuation = (hit_pos.x * hit_pos.y - hit_pos.x) * (hit_pos.x * hit_pos.y - hit_pos.y);
 		      border_attenuation = dampen(linear_step(0.0, border_attenuation_factor, border_attenuation));
 
-#ifdef SSR_PREVIOUS_FRAME
+#if defined SSR_PREVIOUS_FRAME && !defined DISTANT_HORIZONS
 	#ifdef VL
 		// Un-apply volumetric fog scattering using fog from the current frame
 		vec2 fog_uv = clamp(hit_pos.xy * VL_RENDER_SCALE, vec2(0.0), floor(view_res * VL_RENDER_SCALE - 1.0) * view_pixel_size);
@@ -245,7 +227,7 @@ vec3 trace_specular_ray(
 		vec3 fog_scattering = vec3(0.0);
 	#endif
 
-		vec3 hit_pos_prev = reproject(hit_pos, hit_dh_terrain);
+		vec3 hit_pos_prev = reproject(hit_pos);
 		if (clamp01(hit_pos_prev) != hit_pos_prev) return sky_reflection;
 
 		vec3 reflection = textureLod(colortex5, hit_pos_prev.xy, mip_level).rgb;
@@ -277,6 +259,11 @@ vec3 get_specular_reflections(
 	float alpha_squared = sqr(material.roughness);
 
 	float dither = r1(frameCounter, texelFetch(noisetex, ivec2(gl_FragCoord.xy) & 511, 0).b);
+
+#ifdef DISTANT_HORIZONS
+	// Convert screen depth to combined depth
+	screen_pos = view_to_screen_space(combined_projection_matrix, view_pos, true);
+#endif
 
 float roughness_threshold;
 	if (max_of(material.albedo) < eps) {

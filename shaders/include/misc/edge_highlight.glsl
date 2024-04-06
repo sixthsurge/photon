@@ -21,11 +21,11 @@ float edge_highlight_check(
 ) {
 	// Calculate sample position in screen space
 	vec3 sample_pos = scene_to_view_space(center_pos + offset);
-	     sample_pos = view_to_screen_space(sample_pos, true);
+	     sample_pos = view_to_screen_space(combined_projection_matrix, sample_pos, true);
 
 	// Sample depth and gbuffer data
 	ivec2 texel = ivec2(sample_pos.xy * view_res * taau_render_scale);
-	float sample_depth = texelFetch(depthtex1, texel, 0).x;
+	float sample_depth = texelFetch(combined_depth_buffer, texel, 0).x;
 	float sample_data  = texelFetch(colortex1, texel, 0).z;
 
 	// Test for depth discontinuity

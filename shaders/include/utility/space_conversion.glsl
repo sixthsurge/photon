@@ -18,33 +18,11 @@ float linearize_depth(float near, float far, float depth) {
 float linearize_depth(float depth) {
     return linearize_depth(near, far, depth);
 }
-float linearize_depth(float depth, bool is_dh_terrain) {
-#ifdef DISTANT_HORIZONS
-    float near = is_dh_terrain
-        ? dhNearPlane
-        : near;
-    float far = is_dh_terrain
-        ? dhFarPlane
-        : far;
-#endif
-    return linearize_depth(near, far, depth);
-}
 
 float reverse_linear_depth(float near, float far, float linear_z) {
 	return (far + near) / (far - near) + (2.0 * far * near) / (linear_z * (far - near));
 }
 float reverse_linear_depth(float linear_z) {
-    return reverse_linear_depth(near, far, linear_z);
-}
-float reverse_linear_depth(float linear_z, bool is_dh_terrain) {
-#ifdef DISTANT_HORIZONS
-    float near = is_dh_terrain
-        ? dhNearPlane
-        : near;
-    float far = is_dh_terrain
-        ? dhFarPlane
-        : far;
-#endif
     return reverse_linear_depth(near, far, linear_z);
 }
 
@@ -55,16 +33,8 @@ float linearize_depth_fast(float near, float depth) {
 float linearize_depth_fast(float depth) {
     return linearize_depth_fast(near, depth);
 }
-float linearize_depth_fast(float depth, bool is_dh_terrain) {
-#ifdef DISTANT_HORIZONS
-    float near = is_dh_terrain
-        ? dhNearPlane
-        : near;
-#endif
-    return linearize_depth_fast(near, depth);
-}
 
-vec3 screen_to_view_space(mat4 inverse_projection_matrix, vec3 screen_pos, bool handle_jitter) {
+vec3 screen_to_view_space(mat4 projection_matrix_inverse, vec3 screen_pos, bool handle_jitter) {
 	vec3 ndc_pos = 2.0 * screen_pos - 1.0;
 
 #ifdef TAA
@@ -77,7 +47,7 @@ vec3 screen_to_view_space(mat4 inverse_projection_matrix, vec3 screen_pos, bool 
 	if (handle_jitter) ndc_pos.xy -= jitter_offset;
 #endif
 
-	return project_and_divide(inverse_projection_matrix, ndc_pos);
+	return project_and_divide(projection_matrix_inverse, ndc_pos);
 }
 
 vec3 view_to_screen_space(mat4 projection_matrix, vec3 view_pos, bool handle_jitter) {
@@ -106,11 +76,11 @@ vec3 view_to_screen_space(vec3 view_pos, bool handle_jitter) {
 
 vec3 screen_to_view_space(vec3 screen_pos, bool handle_jitter, bool is_dh_terrain) {
 #ifdef DISTANT_HORIZONS
-    mat4 inverse_projection_matrix = is_dh_terrain
+    mat4 projection_matrix_inverse = is_dh_terrain
         ? dhProjectionInverse
         : gbufferProjectionInverse;
 
-    return screen_to_view_space(inverse_projection_matrix, screen_pos, handle_jitter);
+    return screen_to_view_space(projection_matrix_inverse, screen_pos, handle_jitter);
 #else
     return screen_to_view_space(gbufferProjectionInverse, screen_pos, handle_jitter);
 #endif
@@ -126,6 +96,17 @@ vec3 view_to_screen_space(vec3 view_pos, bool handle_jitter, bool is_dh_terrain)
 #else
     return view_to_screen_space(gbufferProjection, view_pos, handle_jitter);
 #endif
+}
+
+float screen_to_view_space_depth(mat4 projection_matrix_inverse, float depth) {
+    depth = depth * 2.0 - 1.0;
+    vec2 zw = depth * projection_matrix_inverse[2].zw + projection_matrix_inverse[3].zw;
+    return -zw.x / zw.y;
+}
+
+float view_to_screen_space_depth(mat4 projection_matrix, float depth) {
+    vec2 zw = -depth * projection_matrix[2].zw + projection_matrix[3].zw;
+    return (zw.x / zw.y) * 0.5 + 0.5;
 }
 
 vec3 view_to_scene_space(vec3 view_pos) {

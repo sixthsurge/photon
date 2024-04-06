@@ -24,10 +24,6 @@ flat out uint is_water;
 flat out vec3 light_color;
 flat out vec3 ambient_color;
 
-#if defined WORLD_OVERWORLD && defined OVERCAST_SKY_AFFECTS_LIGHTING
-flat out float overcastness;
-#endif
-
 // ------------
 //   Uniforms
 // ------------
@@ -72,10 +68,6 @@ void main() {
 	ambient_color = texelFetch(colortex4, ivec2(191, 1), 0).rgb;
 
 	is_water = uint(dhMaterialId == DH_BLOCK_WATER);
-
-#if defined WORLD_OVERWORLD && defined OVERCAST_SKY_AFFECTS_LIGHTING
-	overcastness  = texelFetch(colortex4, ivec2(191, 2), 0).x;
-#endif
 
     vec3 camera_offset = fract(cameraPosition);
 
@@ -135,10 +127,6 @@ flat in vec2 atlas_tile_offset;
 flat in vec2 atlas_tile_scale;
 #endif
 
-#if defined WORLD_OVERWORLD && defined OVERCAST_SKY_AFFECTS_LIGHTING
-flat in float overcastness;
-#endif
-
 // ------------
 //   Uniforms
 // ------------
@@ -149,7 +137,7 @@ uniform sampler2D noisetex;
 uniform sampler2D colortex8; // Cloud shadow map
 #endif
 
-uniform sampler2D depthtex1;
+uniform sampler2D depthtex0;
 
 #ifdef COLORED_LIGHTS
 uniform sampler3D light_sampler_a;
@@ -280,13 +268,13 @@ void main() {
 
 	// Space conversions
 
-	float back_depth_mc = texelFetch(depthtex1, ivec2(gl_FragCoord.xy), 0).x;
+	float back_depth_mc = texelFetch(depthtex0, ivec2(gl_FragCoord.xy), 0).x;
 	float back_depth_dh = texelFetch(dhDepthTex1, ivec2(gl_FragCoord.xy), 0).x;
 	bool back_is_dh_terrain = is_distant_horizons_terrain(back_depth_mc, back_depth_dh);
 
 	// Prevent water behind terrain from rendering on top of it
-	float dh_depth_linear = linearize_depth(gl_FragCoord.z, true);
-	float mc_depth_linear = linearize_depth(back_depth_mc, false);
+	float dh_depth_linear = screen_to_view_space_depth(dhProjectionInverse, gl_FragCoord.z);
+	float mc_depth_linear = screen_to_view_space_depth(gbufferProjectionInverse, back_depth_mc);
 
 	if (mc_depth_linear < dh_depth_linear && back_depth_mc != 1.0) { discard; return; }
 

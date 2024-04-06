@@ -5,6 +5,7 @@
 
   program/deferred2.glsl:
   Temporal upscaling for clouds
+  Create combined depth buffer (DH)
 
 --------------------------------------------------------------------------------
 */
@@ -36,6 +37,12 @@ layout (location = 0) out vec4 clouds_history;
 layout (location = 1) out vec2 clouds_data;
 
 /* RENDERTARGETS: 11,12 */
+
+#ifdef DISTANT_HORIZONS
+layout (location = 2) out float combined_depth;
+
+/* RENDERTARGETS: 11,12,15 */
+#endif
 
 in vec2 uv;
 
@@ -170,6 +177,10 @@ vec3 reproject_clouds(vec2 uv, float distance_to_cloud) {
 }
 
 void main() {
+	// --------------------
+	//   clouds upscaling
+	// --------------------
+
 	const int checkerboard_area = CLOUDS_TEMPORAL_UPSCALING * CLOUDS_TEMPORAL_UPSCALING;
 
 	ivec2 dst_texel = ivec2(gl_FragCoord.xy);
@@ -178,12 +189,13 @@ void main() {
 #ifdef DISTANT_HORIZONS
 	// Check for DH terrain
 	float depth    = texelFetch(depthtex1, dst_texel, 0).x;
-	float depth_dh = texelFetch(dhDepthTex1, dst_texel, 0).x;
+	float depth_dh = texelFetch(dhDepthTex, dst_texel, 0).x;
 	bool is_dh_terrain = is_distant_horizons_terrain(depth, depth_dh);
 #else
 	const bool is_dh_terrain = false;
 #endif
 
+#if defined WORLD_OVERWORLD
 	// Fetch 3x3 neighborhood
 	vec4 a = texelFetch(colortex9, src_texel + ivec2(-1, -1), 0);
 	vec4 b = texelFetch(colortex9, src_texel + ivec2( 0, -1), 0);
@@ -241,7 +253,7 @@ void main() {
 
 	// Get distance to terrain in the previous frame
 	vec3 screen_pos = vec3(previous_uv, history_depth);
-	vec3 view_pos = screen_to_view_space(screen_pos, true, is_dh_terrain);
+	vec3 view_pos = screen_to_view_space(combined_projection_matrix_inverse, screen_pos, true);
 	float distance_to_terrain = length(view_pos);
 
 	// Work out whether the history should be invalidated
@@ -299,6 +311,24 @@ void main() {
 	clouds_history = max0(mix(current, history, history_weight));
 	clouds_data.x = mix(apparent_distance, apparent_distance_history, history_weight);
 	clouds_data.y = min(++pixel_age, CLOUDS_ACCUMULATION_LIMIT);
+#endif
+
+	// --------------------------------
+	//   combined depth buffer for DH
+	// --------------------------------
+
+#ifdef DISTANT_HORIZONS
+	float depth_linear    = screen_to_view_space_depth(gbufferProjectionInverse, depth);
+	float depth_linear_dh = screen_to_view_space_depth(dhProjectionInverse, depth_dh);
+
+	combined_depth = is_dh_terrain
+		? view_to_screen_space_depth(combined_projection_matrix, depth_linear_dh)
+		: view_to_screen_space_depth(combined_projection_matrix, depth_linear);
+
+	if (depth >= 1.0 && !is_dh_terrain) {
+		combined_depth = 1.0;
+	}
+#endif
 }
 
 #endif

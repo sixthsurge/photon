@@ -394,7 +394,7 @@ void main() {
 
 #if defined PROGRAM_GBUFFERS_ENTITIES
 	if (material_mask == 102) base_color = vec4(1.0);
-	if (base_color.a < 0.1 && material_mask != 101) { discard; return; } // Save transparent quad in boats, which material_masks out water
+	if (base_color.a < 0.1 && material_mask != 101) { discard; return; } // Save transparent quad in boats, which masks out water
 #else
 	if (base_color.a < 0.1) { discard; return; }
 #endif

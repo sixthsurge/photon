@@ -33,10 +33,6 @@ flat out vec2 atlas_tile_offset;
 flat out vec2 atlas_tile_scale;
 #endif
 
-#if defined WORLD_OVERWORLD && defined OVERCAST_SKY_AFFECTS_LIGHTING
-flat out float overcastness;
-#endif
-
 // --------------
 //   Attributes
 // --------------
@@ -101,10 +97,6 @@ void main() {
 
 	light_color   = texelFetch(colortex4, ivec2(191, 0), 0).rgb;
 	ambient_color = texelFetch(colortex4, ivec2(191, 1), 0).rgb;
-
-#if defined WORLD_OVERWORLD && defined OVERCAST_SKY_AFFECTS_LIGHTING
-	overcastness  = texelFetch(colortex4, ivec2(191, 2), 0).x;
-#endif
 
 	bool is_top_vertex = uv.y < mc_midTexCoord.y;
 
@@ -203,10 +195,6 @@ in vec2 atlas_tile_coord;
 in vec3 tangent_pos;
 flat in vec2 atlas_tile_offset;
 flat in vec2 atlas_tile_scale;
-#endif
-
-#if defined WORLD_OVERWORLD && defined OVERCAST_SKY_AFFECTS_LIGHTING
-flat in float overcastness;
 #endif
 
 // ------------
@@ -325,6 +313,7 @@ uniform vec4 entityColor;
 #include "/include/light/diffuse_lighting.glsl"
 #include "/include/light/shadows.glsl"
 #include "/include/light/specular_lighting.glsl"
+#include "/include/misc/distant_horizons.glsl"
 #include "/include/misc/material.glsl"
 #include "/include/misc/water_normal.glsl"
 #include "/include/utility/color.glsl"
@@ -334,10 +323,6 @@ uniform vec4 entityColor;
 
 #ifdef CLOUD_SHADOWS
 #include "/include/light/cloud_shadows.glsl"
-#endif
-
-#ifdef DISTANT_HORIZONS
-#include "/include/misc/distant_horizons.glsl"
 #endif
 
 const float lod_bias = log2(taau_render_scale);
@@ -560,8 +545,10 @@ void main() {
 	float NoH = (NoL + NoV) * halfway_norm;
 	float LoH = LoV * halfway_norm + halfway_norm;
 
-#ifdef CLOUD_SHADOWS
+#if defined WORLD_OVERWORLD && defined CLOUD_SHADOWS
 	float cloud_shadows = get_cloud_shadows(colortex8, scene_pos);
+#else
+	const float cloud_shadows = 1.0;
 #endif
 
 #if defined SHADOW && (defined WORLD_OVERWORLD || defined WORLD_END)

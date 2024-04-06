@@ -168,6 +168,11 @@ void end_text(inout vec3 scene_color) {
 	scene_color = mix(scene_color.rgb, text.result.rgb, text.result.a);
 }
 
+void print_line() {
+	text.char_pos.x = 0;
+	++text.char_pos.y;
+}
+
 void print_char(uint character) {
 	ivec2 pos = text.frag_pos - text.text_pos - space_size * text.char_pos * ivec2(1, -1) + ivec2(0, space_size.y);
 
@@ -320,7 +325,6 @@ void print_uvec4(uvec4 value) {
 	print_unsigned_int(value.w);
 }
 
-
 void print_bvec2(bvec2 value) {
 	print_bool(value.x);
 	print((_comma, _space));
@@ -343,10 +347,26 @@ void print_bvec4(bvec4 value) {
 	print_bool(value.w);
 }
 
-
-void print_line() {
-	text.char_pos.x = 0;
-	++text.char_pos.y;
+void print_mat2(mat2 m) {
+	print_vec2(m[0]);
+	print_line();
+	print_vec2(m[1]);
+}
+void print_mat3(mat3 m) {
+	print_vec3(m[0]);
+	print_line();
+	print_vec3(m[1]);
+	print_line();
+	print_vec3(m[2]);
+}
+void print_mat4(mat4 m) {
+	print_vec4(m[0]);
+	print_line();
+	print_vec4(m[1]);
+	print_line();
+	print_vec4(m[2]);
+	print_line();
+	print_vec4(m[3]);
 }
 
 #endif // INCLUDE_UTILITY_TEXT_RENDERING

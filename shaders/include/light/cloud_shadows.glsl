@@ -5,8 +5,14 @@
 
 const ivec2 cloud_shadow_res = ivec2(256);
 
+#ifdef DISTANT_HORIZONS
+#define cloud_shadow_extent float(dhRenderDistance)
+#else
+#define cloud_shadow_extent far
+#endif
+
 vec2 project_cloud_shadow_map(vec3 scene_pos) {
-	vec2 cloud_shadow_pos  = transform(shadowModelView, scene_pos).xy / far;
+	vec2 cloud_shadow_pos  = transform(shadowModelView, scene_pos).xy / cloud_shadow_extent;
 	     cloud_shadow_pos /= 1.0 + length(cloud_shadow_pos);
 		 cloud_shadow_pos  = cloud_shadow_pos * 0.5 + 0.5;
 
@@ -17,7 +23,7 @@ vec3 unproject_cloud_shadow_map(vec2 cloud_shadow_pos) {
 	cloud_shadow_pos  = cloud_shadow_pos * 2.0 - 1.0;
 	cloud_shadow_pos /= 1.0 - length(cloud_shadow_pos);
 
-	vec3 shadow_view_pos = vec3(cloud_shadow_pos * far, 1.0);
+	vec3 shadow_view_pos = vec3(cloud_shadow_pos * cloud_shadow_extent, 1.0);
 
 	return transform(shadowModelViewInverse, shadow_view_pos);
 }

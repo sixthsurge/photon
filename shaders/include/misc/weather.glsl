@@ -26,12 +26,6 @@ float weather_mix_factor() {
 	return cubic_smooth(fract(float(worldTime) * rcp(24000.0) - 0.25));
 }
 
-float daily_weather_overcastness(int world_day) {
-	const float[] overcastness = float[12](WEATHER_D0_OVERCASTNESS, WEATHER_D1_OVERCASTNESS, WEATHER_D2_OVERCASTNESS, WEATHER_D3_OVERCASTNESS, WEATHER_D4_OVERCASTNESS, WEATHER_D5_OVERCASTNESS, WEATHER_D6_OVERCASTNESS, WEATHER_D7_OVERCASTNESS, WEATHER_D8_OVERCASTNESS, WEATHER_D9_OVERCASTNESS, WEATHER_D10_OVERCASTNESS, WEATHER_D11_OVERCASTNESS);
-
-	return overcastness[weather_day_index(world_day)];
-}
-
 float daily_weather_fogginess(int world_day) {
 	const float[] fogginess = float[12](WEATHER_D0_FOGGINESS, WEATHER_D1_FOGGINESS, WEATHER_D2_FOGGINESS, WEATHER_D3_FOGGINESS, WEATHER_D4_FOGGINESS, WEATHER_D5_FOGGINESS, WEATHER_D6_FOGGINESS, WEATHER_D7_FOGGINESS, WEATHER_D8_FOGGINESS, WEATHER_D9_FOGGINESS, WEATHER_D10_FOGGINESS, WEATHER_D11_FOGGINESS);
 
@@ -181,7 +175,7 @@ void clouds_weather_variation(
 #else
 	clouds_cumulus_coverage         = vec2(0.4, 0.55);
 	clouds_altocumulus_coverage     = vec2(0.3, 0.5);
-	clouds_cirrus_coverage          = vec2(0.4, 0.5);
+	clouds_cirrus_coverage          = 0.4;
 	clouds_cumulus_congestus_amount = 0.0;
 	clouds_stratus_amount           = 0.0;
 #endif

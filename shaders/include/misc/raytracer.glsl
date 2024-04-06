@@ -6,18 +6,18 @@
 
 bool raymarch_depth_buffer(
 	sampler2D depth_sampler,
+	mat4 projection_matrix,
 	vec3 screen_pos,
 	vec3 view_pos,
 	vec3 view_dir,
 	float dither,
 	uint intersection_step_count,
 	uint refinement_step_count,
-	out vec3 hit_pos,
-    bool is_distant_horizons_terrain
+	out vec3 hit_pos
 ) {
 	if (view_dir.z > 0.0 && view_dir.z >= -view_pos.z) return false;
 
-	vec3 screen_dir = normalize(view_to_screen_space(view_pos + view_dir, true, is_distant_horizons_terrain) - screen_pos);
+	vec3 screen_dir = normalize(view_to_screen_space(projection_matrix, view_pos + view_dir, true) - screen_pos);
 
 	float ray_length = min_of(abs(sign(screen_dir) - screen_pos) / max(abs(screen_dir), eps));
 

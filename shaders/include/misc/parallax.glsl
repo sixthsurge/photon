@@ -28,12 +28,19 @@ vec2 get_parallax_uv(
 ) {
 	const float depth_step = rcp(float(POM_SAMPLES));
 
+	// Perform one POM step at the original position, fixes POM tiling
+	// Thanks to Null for teaching me this
+	float depth_value = get_depth_value(atlas_tile_coord, uv_gradient);
+	if (depth_value < rcp(255.0)) {
+		previous_ray_pos = vec3(atlas_tile_coord, 0.0);
+		pom_depth = 0.0;
+		return uv;
+	}
+
 	float parallax_fade = linear_step(0.75 * POM_DISTANCE, POM_DISTANCE, view_distance);
 
 	vec3 ray_step = vec3(tangent_dir.xy * rcp(-tangent_dir.z) * POM_DEPTH * (1.0 - parallax_fade), 1.0) * depth_step;
 	vec3 pos = vec3(atlas_tile_coord + ray_step.xy * dither, 0.0);
-
-	float depth_value = 1.0;
 
 	while (depth_value - pos.z >= rcp(255.0)) {
 		previous_ray_pos = vec3(pos);

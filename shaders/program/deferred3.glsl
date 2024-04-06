@@ -118,22 +118,11 @@ float calculate_maximum_horizon_angle(
 
 	for (int i = 0; i < GTAO_HORIZON_STEPS; ++i, ray_pos += ray_step) {
         ivec2 texel = ivec2(clamp01(ray_pos) * view_res * taau_render_scale - 0.5);
-		float depth = texelFetch(depthtex1, texel, 0).x;
-
-#ifdef DISTANT_HORIZONS
-        float depth_dh = texelFetch(dhDepthTex, texel, 0).x;
-        bool is_dh_terrain = is_distant_horizons_terrain(depth, depth_dh);
-
-        if (is_dh_terrain) {
-            depth = depth_dh;
-        }
-#else
-        const bool is_dh_terrain = false;
-#endif
+		float depth = texelFetch(combined_depth_buffer, texel, 0).x;
 
 		if (depth == 1.0 || depth < hand_depth || depth == screen_pos.z) continue;
 
-		vec3 offset = screen_to_view_space(vec3(ray_pos, depth), true, is_dh_terrain) - view_pos;
+		vec3 offset = screen_to_view_space(combined_projection_matrix_inverse, vec3(ray_pos, depth), true) - view_pos;
 
 		float len_sq = length_squared(offset);
 		float norm = inversesqrt(len_sq);
@@ -213,7 +202,7 @@ void main() {
 
 	if (clamp(view_texel, ivec2(0), ivec2(view_res)) != view_texel) { return; }
 
-	float depth = texelFetch(depthtex1, view_texel, 0).x;
+	float depth = texelFetch(combined_depth_buffer, view_texel, 0).x;
 
 #ifndef NORMAL_MAPPING
 	vec4 gbuffer_data = texelFetch(colortex1, view_texel, 0);
@@ -226,12 +215,9 @@ void main() {
     // Distant Horizons support
 
 #ifdef DISTANT_HORIZONS
+    float depth_mc = texelFetch(depthtex1, view_texel, 0).x;
     float depth_dh = texelFetch(dhDepthTex, view_texel, 0).x;
-    bool is_dh_terrain = is_distant_horizons_terrain(depth, depth_dh);
-
-    if (is_dh_terrain) {
-        depth = depth_dh;
-    }
+	bool is_dh_terrain = is_distant_horizons_terrain(depth_mc, depth_dh);
 #else
     const bool is_dh_terrain = false;
 #endif
@@ -239,10 +225,10 @@ void main() {
 	depth += 0.38 * float(depth < hand_depth); // Hand lighting fix from Capt Tatsu
 
 	vec3 screen_pos = vec3(uv, depth);
-	vec3 view_pos = screen_to_view_space(screen_pos, true, is_dh_terrain);
+	vec3 view_pos = screen_to_view_space(combined_projection_matrix_inverse, screen_pos, true);
 	vec3 scene_pos = view_to_scene_space(view_pos);
 
-	vec3 previous_screen_pos = reproject(screen_pos, is_dh_terrain);
+	vec3 previous_screen_pos = reproject_scene_space(scene_pos, false, false);
 
 	if (depth == 1.0) { ao.xyz = vec3(1.0, 0.0, 0.0); return; }
 
@@ -292,8 +278,8 @@ void main() {
 	// Depth rejection
 	float view_norm = rcp_length(view_pos);
 	float NoV = abs(dot(view_normal, view_pos)) * view_norm; // NoV / sqrt(length(view_pos))
-	float z0 = linearize_depth_fast(depth);
-	float z1 = linearize_depth_fast(1.0 - history_ao.z);
+	float z0 = screen_to_view_space_depth(combined_projection_matrix_inverse, depth);
+	float z1 = screen_to_view_space_depth(combined_projection_matrix_inverse, 1.0 - history_ao.z);
 	float depth_weight = exp2(-abs(z0 - z1) * depth_rejection_strength * NoV * view_norm);
 
 	pixel_age *= depth_weight * offcenter_rejection * float(history_ao.z != 1.0);

@@ -63,14 +63,11 @@ uniform int frameCounter;
 uniform vec2 view_pixel_size;
 uniform vec2 taa_offset;
 
+#include "/include/misc/distant_horizons.glsl"
 #include "/include/utility/random.glsl"
 #include "/include/utility/sampling.glsl"
 #include "/include/utility/fast_math.glsl"
 #include "/include/utility/space_conversion.glsl"
-
-#ifdef DISTANT_HORIZONS
-#include "/include/misc/distant_horizons.glsl"
-#endif
 
 vec2 polar_to_cartesian(vec2 polar) {
 	return vec2(polar.x * cos(polar.y), polar.x * sin(polar.y));
@@ -85,7 +82,10 @@ void main() {
 	float depth_dh = texelFetch(dhDepthTex, texel, 0).x;
 
 	if (is_distant_horizons_terrain(depth, depth_dh)) {
-		depth = reverse_linear_depth(linearize_depth(depth_dh, true));
+		depth = view_to_screen_space_depth(
+			gbufferProjection,
+			screen_to_view_space_depth(dhProjectionInverse, depth_dh)
+		);
 	}
 #endif
 
@@ -100,7 +100,7 @@ void main() {
 	      theta *= tau;
 
 	// Calculate circle of confusion
-	float focus = DOF_FOCUS < 0.0 ? centerDepthSmooth : reverse_linear_depth(DOF_FOCUS);
+	float focus = DOF_FOCUS < 0.0 ? centerDepthSmooth : view_to_screen_space_depth(gbufferProjection, DOF_FOCUS);
 	vec2 CoC = min(abs(depth - focus), 0.1) * (DOF_INTENSITY * 0.2 / 1.37) * vec2(DOF_SIZE_X, aspectRatio * DOF_SIZE_Y) * gbufferProjection[1][1];
 
 	scene_color = vec3(0.0);

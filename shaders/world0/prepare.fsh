@@ -80,11 +80,19 @@ const vec3 sun_color  = vec3(0.0);
 const vec3 moon_color = vec3(0.0);
 const vec3 sky_color  = vec3(0.0);
 
+#ifdef DISTANT_HORIZONS
+uniform int dhRenderDistance;
+#endif
+
 #define PROGRAM_PREPARE
 #include "/include/sky/clouds.glsl"
 
 void main() {
-	cloud_shadow_map = render_cloud_shadow_map(uv);
+#ifndef BLOCKY_CLOUDS
+    cloud_shadow_map = render_cloud_shadow_map(uv);
+#else
+    cloud_shadow_map = 1.0;
+#endif
 }
 
 #ifndef CLOUD_SHADOWS
