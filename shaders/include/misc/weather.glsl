@@ -181,7 +181,7 @@ void clouds_weather_variation(
 #else
 	clouds_cumulus_coverage         = vec2(0.4, 0.55);
 	clouds_altocumulus_coverage     = vec2(0.3, 0.5);
-	clouds_cirrus_coverage          = vec2(0.4, 0.5);
+	clouds_cirrus_coverage          = 0.4;
 	clouds_cumulus_congestus_amount = 0.0;
 	clouds_stratus_amount           = 0.0;
 #endif

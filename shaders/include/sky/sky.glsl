@@ -99,8 +99,12 @@ vec4 get_clouds_and_aurora(vec3 ray_dir, vec3 clear_sky) {
 	float dither = interleaved_gradient_noise(vec2(texel));
 
 	// Render clouds
+	#ifndef BLOCKY_CLOUDS
 	const vec3 air_viewer_pos = vec3(0.0, planet_radius, 0.0);
 	CloudsResult result = draw_clouds(air_viewer_pos, ray_dir, clear_sky, -1.0, dither);
+	#else
+	CloudsResult result = clouds_not_hit;
+	#endif
 
 	// Render aurora
 	vec3 aurora = draw_aurora(ray_dir, dither);
