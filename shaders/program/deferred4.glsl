@@ -313,7 +313,7 @@ void main() {
 
 	// Sample textures
 
-	float depth         = texelFetch(depthtex1, texel, 0).x;
+	float depth         = texelFetch(combined_depth_buffer, texel, 0).x;
 	vec4 gbuffer_data_0 = texelFetch(colortex1, texel, 0);
 #if defined NORMAL_MAPPING || defined SPECULAR_MAPPING
 	vec4 gbuffer_data_1 = texelFetch(colortex2, texel, 0);
@@ -326,8 +326,9 @@ void main() {
     // Check for Distant Horizons terrain
 
 #ifdef DISTANT_HORIZONS
-    float depth_dh     = texelFetch(dhDepthTex, texel, 0).x;
-    bool is_dh_terrain = is_distant_horizons_terrain(depth, depth_dh);
+    float depth_mc = texelFetch(depthtex1, texel, 0).x;
+    float depth_dh = texelFetch(dhDepthTex, texel, 0).x;
+	bool is_dh_terrain = is_distant_horizons_terrain(depth_mc, depth_dh);
 #else
     const bool is_dh_terrain = false;
 #endif
@@ -336,19 +337,12 @@ void main() {
 
 	depth += 0.38 * float(depth < hand_depth); // Hand lighting fix from Capt Tatsu
 
-#ifdef DISTANT_HORIZONS
-    vec3 view_pos = is_dh_terrain
-		? screen_to_view_space(vec3(uv, depth_dh), true, true)
-		: screen_to_view_space(vec3(uv, depth), true, false);
-#else
-	vec3 view_pos = screen_to_view_space(vec3(uv, depth), true);
-#endif
-
+	vec3 view_pos = screen_to_view_space(combined_projection_matrix_inverse, vec3(uv, depth), true);
 	vec3 scene_pos = view_to_scene_space(view_pos);
 	vec3 world_pos = scene_pos + cameraPosition;
 	vec3 world_dir = normalize(scene_pos - gbufferModelViewInverse[3].xyz);
 
-	if (depth == 1.0 && !is_dh_terrain) { // Sky
+	if (depth == 1.0) { // Sky
 #if defined WORLD_OVERWORLD
 		vec3 atmosphere = atmosphere_scattering(world_dir, sun_color, sun_dir, moon_color, moon_dir);
 		scene_color = draw_sky(world_dir, atmosphere);
@@ -437,15 +431,9 @@ void main() {
 		// Upscale ambient occlusion
 
 #ifdef GTAO
-		#ifdef DISTANT_HORIZONS
-		float lin_z = is_dh_terrain
-			? linearize_depth(depth_dh, true)
-			: linearize_depth(depth, false);
-		#else
-		float lin_z = linearize_depth(depth, false);
-		#endif
+		float lin_z = screen_to_view_space_depth(combined_projection_matrix_inverse, depth);
 
-		#define depth_weight(reversed_depth) exp2(-10.0 * abs(linearize_depth(1.0 - reversed_depth, is_dh_terrain) - lin_z))
+		#define depth_weight(reversed_depth) exp2(-10.0 * abs(screen_to_view_space_depth(combined_projection_matrix_inverse, 1.0 - reversed_depth) - lin_z))
 
 		vec4 gtao = vec4(half_res_00, 1.0) * depth_weight(half_res_00.z) * (1.0 - f.x) * (1.0 - f.y)
 		          + vec4(half_res_10, 1.0) * depth_weight(half_res_10.z) * (f.x - f.x * f.y)
@@ -526,7 +514,7 @@ void main() {
 		// Edge highlight
 
 #ifdef EDGE_HIGHLIGHT
-		scene_color *= 1.0 + 0.5 * get_edge_highlight(scene_pos, flat_normal, depth, material_mask);
+		scene_color *= 1.0 + 0.5 * get_edge_highlight(scene_pos, flat_normal, mc_depth, material_mask);
 #endif
 
 		// Apply fog

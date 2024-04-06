@@ -92,7 +92,7 @@ void main() {
 	      theta *= tau;
 
 	// Calculate circle of confusion
-	float focus = DOF_FOCUS < 0.0 ? centerDepthSmooth : reverse_linear_depth(DOF_FOCUS);
+	float focus = DOF_FOCUS < 0.0 ? centerDepthSmooth : view_to_screen_space_depth(gbufferProjection, DOF_FOCUS);
 	vec2 CoC = min(abs(depth - focus), 0.1) * (DOF_INTENSITY * 0.2 / 1.37) * vec2(1.0, aspectRatio) * gbufferProjection[1][1];
 
 	scene_color = vec3(0.0);

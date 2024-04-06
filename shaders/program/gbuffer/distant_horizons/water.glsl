@@ -285,8 +285,8 @@ void main() {
 	bool back_is_dh_terrain = is_distant_horizons_terrain(back_depth_mc, back_depth_dh);
 
 	// Prevent water behind terrain from rendering on top of it
-	float dh_depth_linear = linearize_depth(gl_FragCoord.z, true);
-	float mc_depth_linear = linearize_depth(back_depth_mc, false);
+	float dh_depth_linear = screen_to_view_space_depth(dhProjectionInverse, gl_FragCoord.z);
+	float mc_depth_linear = screen_to_view_space_depth(gbufferProjectionInverse, back_depth_mc);
 
 	if (mc_depth_linear < dh_depth_linear && back_depth_mc != 1.0) { discard; return; }
 

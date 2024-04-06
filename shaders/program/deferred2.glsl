@@ -189,7 +189,7 @@ void main() {
 #ifdef DISTANT_HORIZONS
 	// Check for DH terrain
 	float depth    = texelFetch(depthtex1, dst_texel, 0).x;
-	float depth_dh = texelFetch(dhDepthTex1, dst_texel, 0).x;
+	float depth_dh = texelFetch(dhDepthTex, dst_texel, 0).x;
 	bool is_dh_terrain = is_distant_horizons_terrain(depth, depth_dh);
 #else
 	const bool is_dh_terrain = false;
@@ -252,7 +252,7 @@ void main() {
 
 	// Get distance to terrain in the previous frame
 	vec3 screen_pos = vec3(previous_uv, history_depth);
-	vec3 view_pos = screen_to_view_space(screen_pos, true, is_dh_terrain);
+	vec3 view_pos = screen_to_view_space(combined_projection_matrix_inverse, screen_pos, true);
 	float distance_to_terrain = length(view_pos);
 
 	// Work out whether the history should be invalidated
@@ -316,14 +316,14 @@ void main() {
 	// --------------------------------
 
 #ifdef DISTANT_HORIZONS
-	float depth_linear    = linearize_depth(depth);
-	float depth_linear_dh = linearize_depth(depth_dh, true);
+	float depth_linear    = screen_to_view_space_depth(gbufferProjectionInverse, depth);
+	float depth_linear_dh = screen_to_view_space_depth(dhProjectionInverse, depth_dh);
 
 	combined_depth = is_dh_terrain
-		? reverse_linear_depth(combined_near, combined_far, depth_linear_dh)
-		: reverse_linear_depth(combined_near, combined_far, depth_linear);
+		? view_to_screen_space_depth(combined_projection_matrix, depth_linear_dh)
+		: view_to_screen_space_depth(combined_projection_matrix, depth_linear);
 
-	if (depth == 1.0 && depth_dh == 1.0) {
+	if (depth >= 1.0 && !is_dh_terrain) {
 		combined_depth = 1.0;
 	}
 #endif
