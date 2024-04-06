@@ -539,7 +539,7 @@ void main() {
 		// Edge highlight
 
 #ifdef EDGE_HIGHLIGHT
-		scene_color *= 1.0 + 0.5 * get_edge_highlight(scene_pos, flat_normal, mc_depth, material_mask);
+		scene_color *= 1.0 + 0.5 * get_edge_highlight(scene_pos, flat_normal, depth, material_mask);
 #endif
 
 		// Apply fog
