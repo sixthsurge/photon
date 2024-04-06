@@ -425,6 +425,7 @@ void main() {
 
 #if defined ENVIRONMENT_REFLECTIONS || defined SKY_REFLECTIONS
 	if (material.ssr_multiplier > eps && (depth0 < 1.0 || front_is_dh_terrain)) {
+		mat3 tbn = get_tbn_matrix(normal);
 		vec3 reflections = get_specular_reflections(
 			material,
 			tbn,

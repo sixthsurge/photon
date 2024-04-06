@@ -276,7 +276,7 @@ vec3 get_specular_reflections(
 			hash.x = interleaved_gradient_noise(gl_FragCoord.xy,                    frameCounter * SSR_RAY_COUNT + i);
 			hash.y = interleaved_gradient_noise(gl_FragCoord.xy + vec2(97.0, 23.0), frameCounter * SSR_RAY_COUNT + i);
 
-			vec3 microfacet_normal = tbn_matrix * sample_ggx_vndf(-tangent_dir, vec2(material.roughness), hash);
+			vec3 microfacet_normal = tbn_matrix * sample_ggx_vndf(-tangent_dir, vec2(alpha_squared), hash);
 			vec3 ray_dir = reflect(world_dir, microfacet_normal);
 
 			float NoL = dot(normal, ray_dir);
