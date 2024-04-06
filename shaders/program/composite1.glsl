@@ -153,6 +153,7 @@ vec4 smooth_filter(sampler2D sampler, vec2 coord) {
 }
 
 vec4 read_clouds(out float apparent_distance) {
+#if defined WORLD_OVERWORLD
 	// Soften clouds for new pixels
 	float pixel_age = texelFetch(colortex12, ivec2(gl_FragCoord.xy), 0).y;
 	int ld = int(3.0 * dampen(max0(1.0 - 0.1 * pixel_age)));
@@ -160,6 +161,9 @@ vec4 read_clouds(out float apparent_distance) {
 	apparent_distance = min_of(textureGather(colortex12, uv * taau_render_scale, 0));
 
 	return bicubic_filter_lod(colortex11, uv * taau_render_scale, ld);
+#else
+	return vec4(0.0, 0.0, 0.0, 1.0);
+#endif
 }
 
 // http://www.diva-portal.org/smash/get/diva2:24136/FULLTEXT01.pdf

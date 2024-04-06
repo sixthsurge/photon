@@ -195,6 +195,7 @@ void main() {
 	const bool is_dh_terrain = false;
 #endif
 
+#if defined WORLD_OVERWORLD
 	// Fetch 3x3 neighborhood
 	vec4 a = texelFetch(colortex9, src_texel + ivec2(-1, -1), 0);
 	vec4 b = texelFetch(colortex9, src_texel + ivec2( 0, -1), 0);
@@ -310,6 +311,7 @@ void main() {
 	clouds_history = max0(mix(current, history, history_weight));
 	clouds_data.x = mix(apparent_distance, apparent_distance_history, history_weight);
 	clouds_data.y = min(++pixel_age, CLOUDS_ACCUMULATION_LIMIT);
+#endif
 
 	// --------------------------------
 	//   combined depth buffer for DH
