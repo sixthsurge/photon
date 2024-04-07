@@ -283,7 +283,7 @@ float ssr_limiter;
 			hash.x = interleaved_gradient_noise(gl_FragCoord.xy,                    frameCounter * SSR_RAY_COUNT + i);
 			hash.y = interleaved_gradient_noise(gl_FragCoord.xy + vec2(97.0, 23.0), frameCounter * SSR_RAY_COUNT + i);
 
-			vec3 microfacet_normal = tbn_matrix * sample_ggx_vndf(-tangent_dir, vec2(alpha_squared), hash);
+			vec3 microfacet_normal = tbn_matrix * sample_ggx_vndf(-tangent_dir, vec2(material.roughness), hash);
 			vec3 ray_dir = reflect(world_dir, microfacet_normal);
 
 			float NoL = dot(normal, ray_dir);
@@ -342,8 +342,8 @@ float ssr_limiter;
 	float v1 = v1_smith_ggx(NoV, alpha_squared);
 	float v2 = v2_smith_ggx(NoL, NoV, alpha_squared);
 
-	vec3 reflection = trace_specular_ray(screen_pos, view_pos, ray_dir, dither, skylight, SSR_INTERSECTION_STEPS_SMOOTH, SSR_REFINEMENT_STEPS, 0);
-	     reflection *= albedo_tint * pow(fresnel, vec3(0.8));
+	vec3 reflection  = trace_specular_ray(screen_pos, view_pos, ray_dir, dither, skylight, SSR_INTERSECTION_STEPS_SMOOTH, SSR_REFINEMENT_STEPS, 0);
+	     reflection *= albedo_tint * fresnel;
 
 	if (any(isnan(reflection))) reflection = vec3(0.0); // don't reflect NaNs
 
