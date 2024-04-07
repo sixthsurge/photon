@@ -488,7 +488,7 @@ void main() {
 		base_color.rgb = mix(base_color.rgb, entityColor.rgb, entityColor.a);
 #endif
 
-		material = material_from(base_color.rgb * base_color.a, material_mask, world_pos, adjusted_light_levels);
+		material = material_from(base_color.rgb * base_color.a, material_mask, world_pos, tbn[2], adjusted_light_levels);
 
 		//--//
 

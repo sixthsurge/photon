@@ -319,7 +319,7 @@ void main() {
 #endif
 	//------------------------------------------------------------------------//
 	} else {
-		material = material_from(albedo, material_mask, world_pos, light_levels);
+		material = material_from(albedo, material_mask, world_pos, flat_normal, light_levels);
 
 #ifdef DISTANT_HORIZONS
 		if (!front_is_dh_terrain) {

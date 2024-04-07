@@ -412,7 +412,7 @@ void main() {
 
 		// Get material and normal
 
-		Material material = material_from(albedo, material_mask, world_pos, light_levels);
+		Material material = material_from(albedo, material_mask, world_pos, flat_normal, light_levels);
 
 		vec3 normal = flat_normal;
         bool parallax_shadow = false;
