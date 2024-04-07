@@ -292,8 +292,8 @@ Material material_from(vec3 albedo_srgb, uint material_mask, vec3 world_pos, vec
 								))),
 								step(0.5, abs(normal.x))
 							);
-							float blue = isolate_hue(hsl, 200.0, 60.0);
-							material.emission = albedo_sqrt * hsl.y * blue * emission_amount;
+							float blue = isolate_hue(hsl, 170.0, 16.3);
+							material.emission = 2.60 * albedo_sqrt * hsl.y * blue * emission_amount;
 							#endif
 						}
 					}
@@ -310,8 +310,8 @@ Material material_from(vec3 albedo_srgb, uint material_mask, vec3 world_pos, vec
 								))),
 								step(0.5, abs(normal.y))
 							);
-							float blue = isolate_hue(hsl, 200.0, 60.0);
-							material.emission = albedo_sqrt * hsl.y * blue * emission_amount;
+							float blue = isolate_hue(hsl, 170.0, 16.3);
+							material.emission = 2.60 * albedo_sqrt * hsl.y * blue * emission_amount;
 							#endif
 						} else { // 21
 							// Warped stem
@@ -324,16 +324,16 @@ Material material_from(vec3 albedo_srgb, uint material_mask, vec3 world_pos, vec
 								))),
 								step(0.5, abs(normal.z))
 							);
-							float blue = isolate_hue(hsl, 200.0, 60.0);
-							material.emission = albedo_sqrt * hsl.y * blue * emission_amount;
+							float blue = isolate_hue(hsl, 170.0, 16.3);
+							material.emission = 2.60 * albedo_sqrt * hsl.y * blue * emission_amount;
 							#endif
 						}
 					} else { // 22-24
 						if (material_mask == 22u) { // 22
 							// Warped hyphae
 							#ifdef HARDCODED_EMISSION
-							float blue = isolate_hue(hsl, 200.0, 60.0);
-							material.emission = albedo_sqrt * hsl.y * blue;
+							float blue = isolate_hue(hsl, 170.0, 16.3);
+							material.emission = 2.60 * albedo_sqrt * hsl.y * blue;
 							#endif
 						} else { // 23
 							// Crimson stem
