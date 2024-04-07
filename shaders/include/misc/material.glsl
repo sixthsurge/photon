@@ -273,7 +273,14 @@ Material material_from(vec3 albedo_srgb, uint material_mask, vec3 world_pos, ino
 						}
 					} else { // 18-20
 						if (material_mask == 18u) { // 18
-
+							// Metals
+							#ifdef HARDCODED_SPECULAR
+							float smoothness = sqrt(linear_step(0.1, 0.9, hsl.z));
+							material.roughness = max(sqr(1.0 - smoothness), 0.04);
+							material.f0 = material.albedo;
+							material.is_metal = true;
+							material.ssr_multiplier = 1.0;
+							#endif
 						} else { // 19
 
 						}
