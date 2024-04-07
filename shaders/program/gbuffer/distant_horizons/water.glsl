@@ -316,6 +316,7 @@ void main() {
 			base_color.rgb,
 			0u,
 			world_pos,
+			normal,
 			adjusted_light_levels
 		);
 	}
