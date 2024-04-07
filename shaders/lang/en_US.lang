@@ -106,6 +106,7 @@ option.END_GLOW.comment                = Wavery glowing effect in the End. Requi
 
 option.COLORED_LIGHTS                  = Colored Lights
 option.COLORED_LIGHTS.comment          = Variable-color block lighting using flood fill algorithm. Requires Iris 1.6 or above
+option.COLORED_LIGHTS_VANILLA_LIGHTMAP_CONTRIBUTION = Vanilla Lightmap Contribution
 option.HANDHELD_LIGHTING               = Handheld Lighting
 option.HANDHELD_LIGHTING.comment       = Handheld items cast light on the world. If coloured lighting is enabled the handheld lighting will be coloured like the lights themselves
 option.HANDHELD_LIGHTING_INTENSITY     = Handheld Lighting Intensity
