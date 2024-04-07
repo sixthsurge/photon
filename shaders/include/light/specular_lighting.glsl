@@ -265,13 +265,6 @@ vec3 get_specular_reflections(
 	screen_pos = view_to_screen_space(combined_projection_matrix, view_pos, true);
 #endif
 
-float roughness_threshold;
-	if (max_of(material.albedo) < eps) {
-		roughness_threshold = 5e-2;
-	} else {
-		roughness_threshold = 0.0;
-	}
-
 float ssr_limiter;
 	if (material.is_hardcoded_metal || material.is_metal || max_of(material.albedo) < eps) {
 		ssr_limiter = 1;
@@ -280,8 +273,8 @@ float ssr_limiter;
 	}
 
 #if defined SSR_ROUGHNESS_SUPPORT && defined SPECULAR_MAPPING
-	if (material.roughness > roughness_threshold) { // Rough reflection
-		float mip_level = 8.0 * dampen(material.roughness);
+	if (!is_water) { // Rough reflection
+	 	float mip_level = 8.0 * dampen(material.roughness);
 
 		vec3 reflection = vec3(0.0);
 
@@ -290,16 +283,8 @@ float ssr_limiter;
 			hash.x = interleaved_gradient_noise(gl_FragCoord.xy,                    frameCounter * SSR_RAY_COUNT + i);
 			hash.y = interleaved_gradient_noise(gl_FragCoord.xy + vec2(97.0, 23.0), frameCounter * SSR_RAY_COUNT + i);
 
-			vec2 smoothness_mapping;
-			if (material.roughness < 5e-2) {
-				smoothness_mapping = pow(vec2(material.roughness), vec2(1.1 - material.roughness));
-			} else {
-				smoothness_mapping = vec2(material.roughness);
-			}
-
-			vec3 microfacet_normal = tbn_matrix * sample_ggx_vndf(-tangent_dir, smoothness_mapping, hash);
-			vec3 ray_dir = reflect(world_dir * 0.5, microfacet_normal);
-				ray_dir += reflect(world_dir * 0.5, normal);
+			vec3 microfacet_normal = tbn_matrix * sample_ggx_vndf(-tangent_dir, vec2(alpha_squared), hash);
+			vec3 ray_dir = reflect(world_dir, microfacet_normal);
 
 			float NoL = dot(normal, ray_dir);
 			if (NoL < eps) continue;
@@ -321,7 +306,7 @@ float ssr_limiter;
 			float v1 = v1_smith_ggx(NoV, alpha_squared);
 			float v2 = v2_smith_ggx(NoL, NoV, alpha_squared);
 
-			reflection += radiance * albedo_tint * pow(fresnel, vec3(0.8)) * (2.0 * NoL * v2 / v1);
+			reflection += radiance * pow(fresnel, vec3(0.8)) * (2.0 * NoL * v2 / v1);
 		}
 
 		reflection *= albedo_tint * rcp(float(SSR_RAY_COUNT));
