@@ -33,7 +33,7 @@ void update_voxel_map(uint block_id) {
 	uint is_warped_stem  = uint(19 <= block_id && block_id < 23);
 	uint is_crimson_stem = uint(23 <= block_id && block_id < 27);
 	block_id = block_id * (1u - is_warped_stem) + 46 * is_warped_stem;
-	block_id = block_id * (1u - is_crimson_stem) + 38 * is_crimson_stem;
+	block_id = block_id * (1u - is_crimson_stem) + 58 * is_crimson_stem;
 
 	if (is_terrain && is_inside_voxel_volume(voxel_pos) && !is_water) {
 		imageStore(voxel_img, ivec3(voxel_pos), uvec4(block_id, 0u, 0u, 0u));

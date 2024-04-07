@@ -34,6 +34,10 @@ flat out vec2 atlas_tile_scale;
 out float vanilla_ao;
 #endif
 
+#if defined PROGRAM_GBUFFERS_ENTITIES || defined PROGRAM_GBUFFERS_HAND
+out vec2 uv_local;
+#endif
+
 // --------------
 //   Attributes
 // --------------
@@ -118,6 +122,11 @@ void main() {
 	material_mask = 32;
 #endif
 
+#if defined PROGRAM_GBUFFERS_ENTITIES || defined PROGRAM_GBUFFERS_HAND
+	// Calculate local uv used to fix hardcoded emission on some handheld/dropped items
+	uv_local = sign(uv - mc_midTexCoord) * 0.5 + 0.5;
+#endif
+
 	bool is_top_vertex = uv.y < mc_midTexCoord.y;
 
 	vec3 pos = transform(gl_ModelViewMatrix, gl_Vertex.xyz);
@@ -185,6 +194,10 @@ flat in vec2 atlas_tile_scale;
 in float vanilla_ao;
 #endif
 
+#if defined PROGRAM_GBUFFERS_ENTITIES || defined PROGRAM_GBUFFERS_HAND
+in vec2 uv_local;
+#endif
+
 // ------------
 //   Uniforms
 // ------------
@@ -221,6 +234,7 @@ uniform vec2 taa_offset;
 uniform vec3 light_dir;
 
 #if defined PROGRAM_GBUFFERS_ENTITIES
+uniform int entityId;
 uniform vec4 entityColor;
 #endif
 
@@ -236,6 +250,7 @@ uniform vec4 entityColor;
 #include "/include/light/directional_lightmaps.glsl"
 #endif
 
+#include "/include/misc/material_fix.glsl"
 #include "/include/utility/dithering.glsl"
 #include "/include/utility/encoding.glsl"
 #include "/include/utility/fast_math.glsl"
@@ -444,7 +459,7 @@ void main() {
 	#endif
 #endif
 
-#ifdef NO_NORMAL
+#if defined NO_NORMAL
 	// No normal vector => make one from screen-space partial derivatives
 	vec3 particle_normal = normalize(cross(dFdx(scene_pos), dFdy(scene_pos)));
 	#define flat_normal particle_normal
@@ -452,6 +467,11 @@ void main() {
 #else
 	#define flat_normal tbn[2]
 	#define detailed_normal normal
+#endif
+
+#if defined PROGRAM_GBUFFERS_ENTITIES || defined PROGRAM_GBUFFERS_HAND
+	uint new_material_mask = fix_material_mask();
+	#define material_mask new_material_mask
 #endif
 
 	gbuffer_data_0.x  = pack_unorm_2x8(base_color.rg);
