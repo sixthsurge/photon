@@ -23,9 +23,6 @@ bool is_voxelized(uint block_id, bool vertex_at_grid_corner) {
 	bool is_transparent_block =
 	    block_id == 0u  || // Air
 		block_id == 1u  || // Water
-	    block_id == 5u  || // Leaves
-	    block_id == 14u || // Strong SSS
-	    block_id == 15u || // Weak SSS
 	    block_id == 18u || // Transparent metal objects
 	    block_id == 80u;   // Miscellaneous transparent
 	
@@ -61,6 +58,14 @@ void update_voxel_map(uint block_id) {
 	uint is_crimson_stem = uint(23 <= block_id && block_id < 27);
 	block_id = block_id * (1u - is_warped_stem) + 46 * is_warped_stem;
 	block_id = block_id * (1u - is_crimson_stem) + 58 * is_crimson_stem;
+
+	// SSS blocks
+	if (block_id == 5u  || // Leaves
+	    block_id == 14u || // Strong SSS
+	    block_id == 15u    // Weak SSS
+	) {
+		block_id = 79; // light gray tint
+	}
 
 	// Mark transparent light sources
 	block_id = (vertex_at_grid_corner)
