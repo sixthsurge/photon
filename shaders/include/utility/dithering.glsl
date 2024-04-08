@@ -21,17 +21,17 @@ float interleaved_gradient_noise(vec2 pos, int t) {
 
 float dither_8bit(float x, float pattern) {
 	const vec2 mul_add = vec2(1.0, -0.5) / 255.0;
-	return x + (pattern * mul_add.x + mul_add.y);
+	return clamp01(x + (pattern * mul_add.x + mul_add.y));
 }
 
 vec2 dither_8bit(vec2 x, float pattern) {
 	const vec2 mul_add = vec2(1.0, -0.5) / 255.0;
-	return x + (pattern * mul_add.x + mul_add.y);
+	return clamp01(x + (pattern * mul_add.x + mul_add.y));
 }
 
 vec3 dither_8bit(vec3 rgb, float pattern) {
 	const vec2 mul_add = vec2(1.0, -0.5) / 255.0;
-	return rgb + (pattern * mul_add.x + mul_add.y);
+	return clamp01(rgb + (pattern * mul_add.x + mul_add.y));
 }
 
 #endif // INCLUDE_UTILITY_DITHERING

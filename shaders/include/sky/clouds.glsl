@@ -1100,6 +1100,7 @@ CloudsResult draw_cirrus_clouds(
 
 	if (dists.y < 0.0                              // sphere not intersected
 	 || planet_intersected && r < clouds_cirrus_radius // planet blocking clouds
+	 || terrain_intersected
 	) { return clouds_not_hit; }
 
 	float distance_to_sphere = (r < clouds_cirrus_radius) ? dists.y : dists.x;
