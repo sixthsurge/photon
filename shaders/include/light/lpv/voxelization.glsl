@@ -30,9 +30,18 @@ bool is_voxelized(uint block_id, bool vertex_at_grid_corner) {
 	return (vertex_at_grid_corner || is_light_emitting_block) && is_terrain && !is_transparent_block;
 }
 
+bvec3 disjunction(bvec3 a, bvec3 b) {
+	// a || b compiles on Nvidia but apparently not with other vendors
+	return vec3(
+		a.x || b.x,
+		a.y || b.y,
+		a.z || b.z
+	);
+}
+
 // Returns true if pos is within `tolerance` of a corner of the unit cube
 bool is_corner(vec3 pos, float tolerance) {
-	return all(lessThan(pos, vec3(tolerance)) || greaterThan(pos, vec3(1.0 - tolerance)));
+	return all(disjunction(lessThan(pos, vec3(tolerance)), greaterThan(pos, vec3(1.0 - tolerance))));
 }
 
 void update_voxel_map(uint block_id) {
