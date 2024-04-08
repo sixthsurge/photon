@@ -21,7 +21,6 @@ bool is_voxelized(uint block_id, bool vertex_at_grid_corner) {
 	bool is_terrain = any(equal(ivec4(renderStage), ivec4(MC_RENDER_STAGE_TERRAIN_SOLID, MC_RENDER_STAGE_TERRAIN_TRANSLUCENT, MC_RENDER_STAGE_TERRAIN_CUTOUT, MC_RENDER_STAGE_TERRAIN_CUTOUT_MIPPED)));
 
 	bool is_transparent_block =
-	    block_id == 0u  || // Air
 		block_id == 1u  || // Water
 	    block_id == 18u || // Transparent metal objects
 	    block_id == 80u;   // Miscellaneous transparent

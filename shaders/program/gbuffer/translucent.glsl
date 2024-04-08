@@ -1,7 +1,7 @@
 /*
 --------------------------------------------------------------------------------
 
-  Photon Shaders by SixthSurge
+  Photon Shader by SixthSurge
 
   program/gbuffer/translucent.glsl:
   Handle translucent terrain, translucent entities (Iris), translucent handheld

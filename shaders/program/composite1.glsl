@@ -1,7 +1,7 @@
 /*
 --------------------------------------------------------------------------------
 
-  Photon Shaders by SixthSurge
+  Photon Shader by SixthSurge
 
   program/composite1.glsl
   Apply volumetric fog, reflections and refraction
@@ -201,6 +201,7 @@ void main() {
 	// Sample textures
 
 	scene_color         = texelFetch(colortex0, texel, 0).rgb;
+	vec3 original_color = scene_color;
 	float depth0        = texelFetch(depthtex0, texel, 0).x;
 	float depth1        = texelFetch(depthtex1, texel, 0).x;
 #ifdef DISTANT_HORIZONS
@@ -462,11 +463,14 @@ void main() {
 #endif
 
 		reflections *= common_fog_alpha(length(scene_pos), false);
-		reflections *= border_fog(scene_pos, world_dir);
 
 		scene_color += reflections;
 	}
 #endif
+
+	// Apply border fog
+	float border_fog = border_fog(scene_pos, world_dir);
+	scene_color = mix(original_color, scene_color, border_fog);
 
 	// Apply clouds in front of translucents
 

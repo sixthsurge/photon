@@ -1,7 +1,7 @@
 /*
 --------------------------------------------------------------------------------
 
-  Photon Shaders by SixthSurge
+  Photon Shader by SixthSurge
 
   program/deferred0.glsl:
   Render omnidirectional sky map for reflections and SH lighting
