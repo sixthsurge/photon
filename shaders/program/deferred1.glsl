@@ -262,23 +262,25 @@ void main() {
 	float depth_max = depth_max_4x4(depthtex1);
 
 	vec3 screen_pos = vec3(new_uv, depth_max);
-	vec3 view_pos = screen_to_view_space(vec3(new_uv, depth_max), false);
+	vec3 view_pos = screen_to_view_space(screen_pos, false);
 
 	// Distant Horizons support
 #ifdef DISTANT_HORIZONS
-	float depth_dh = depth_max_4x4(dhDepthTex1);
+	float depth_dh = depth_max_4x4(dhDepthTex);
 	bool is_dh_terrain = is_distant_horizons_terrain(depth_max, depth_dh);
 
 	if (is_dh_terrain) {
 		screen_pos = vec3(new_uv, depth_dh);
-		view_pos = screen_to_view_space(vec3(new_uv, depth_dh), false, true);
+		view_pos = screen_to_view_space(screen_pos, false, true);
 	}
+#else
+	const bool is_dh_terrain = false;
 #endif
 
 	vec3 ray_origin = vec3(0.0, CLOUDS_SCALE * (eyeAltitude - SEA_LEVEL) + planet_radius, 0.0) + CLOUDS_SCALE * gbufferModelViewInverse[3].xyz;
 	vec3 ray_dir    = mat3(gbufferModelViewInverse) * normalize(view_pos);
 
-	float distance_to_terrain = (depth_max == 1.0)
+	float distance_to_terrain = (depth_max == 1.0 && !is_dh_terrain)
 		? -1.0
 		: length(view_pos) * CLOUDS_SCALE;
 
