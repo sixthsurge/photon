@@ -1,7 +1,7 @@
 /*
 --------------------------------------------------------------------------------
 
-  Photon Shaders by SixthSurge
+  Photon Shader by SixthSurge
 
   program/gbuffer/distant_horizons/water.glsl:
   Translucent Distant Horizons terrain

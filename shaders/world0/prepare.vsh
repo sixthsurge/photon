@@ -3,7 +3,7 @@
 /*
 --------------------------------------------------------------------------------
 
-  Photon Shaders by SixthSurge
+  Photon Shader by SixthSurge
 
   world0/prepare.vsh:
   Render cloud shadow map
