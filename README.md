@@ -64,5 +64,5 @@
 
 ## community
 
-For questions, suggestions and news regarding this shader pack, head to my channel `#photon-sixthsurge` in the [shaderLABS discord server](https://discord.gg/RpzWN9S).
+For questions, suggestions and news regarding this shader pack, head to my [discord server](https://discord.gg/ngEW66HScd)
 
