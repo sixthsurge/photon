@@ -32,7 +32,7 @@ bool is_voxelized(uint block_id, bool vertex_at_grid_corner) {
 
 bvec3 disjunction(bvec3 a, bvec3 b) {
 	// a || b compiles on Nvidia but apparently not with other vendors
-	return vec3(
+	return bvec3(
 		a.x || b.x,
 		a.y || b.y,
 		a.z || b.z
