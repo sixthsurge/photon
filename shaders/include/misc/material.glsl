@@ -534,7 +534,7 @@ Material material_from(vec3 albedo_srgb, uint material_mask, vec3 world_pos, vec
 						} else { // 49
 							#ifdef HARDCODED_EMISSION
 							// Nether mushrooms
-							material.emission = 0.80 * albedo_sqrt;
+							material.emission = 0.80 * albedo_sqrt * step(0.73, 0.1 * hsl.y + 0.7 * hsl.z);
 							#endif
 						}
 					} else { // 50-52
