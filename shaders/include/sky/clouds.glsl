@@ -1144,6 +1144,20 @@ CloudsResult draw_cirrus_clouds(
 }
 #endif
 
+CloudsResult blend_layers(CloudsResult old, CloudsResult new) {
+	bool new_in_front = new.apparent_distance < old.apparent_distance;
+
+	vec3 scattering_behind       = new_in_front ? old.scattering : new.scattering;
+	vec3 scattering_in_front     = new_in_front ? new.scattering : old.scattering;
+	float transmittance_in_front = new_in_front ? new.transmittance : old.transmittance;
+	
+	return CloudsResult(
+		scattering_in_front + transmittance_in_front * scattering_behind,
+		old.transmittance * new.transmittance,
+		min(old.apparent_distance, new.apparent_distance)
+	);
+}
+
 CloudsResult draw_clouds(
 	vec3 air_viewer_pos,
 	vec3 ray_dir,
@@ -1152,33 +1166,29 @@ CloudsResult draw_clouds(
 	float dither
 ) {
 	CloudsResult result = clouds_not_hit;
+	float r = length(air_viewer_pos);
 
 	if (clouds_cumulus_congestus_amount < 0.5) {
 		#ifdef CLOUDS_CUMULUS
 		result = draw_cumulus_clouds(air_viewer_pos, ray_dir, clear_sky, distance_to_terrain, dither);
+		if (result.transmittance < 1e-3 && r < clouds_cumulus_radius) return result;
 		#endif
 	} else {
 		#ifdef CLOUDS_CUMULUS_CONGESTUS
 		result = draw_cumulus_congestus_clouds(air_viewer_pos, ray_dir, clear_sky, distance_to_terrain, dither);
+		if (result.transmittance < 1e-3) return result; // Always show cumulus congestus on top
 		#endif
 	}
 
-	if (result.transmittance < 1e-3) return result;
-
 #ifdef CLOUDS_ALTOCUMULUS
 	CloudsResult result_ac = draw_altocumulus_clouds(air_viewer_pos, ray_dir, clear_sky, distance_to_terrain, dither);
-	result.scattering += result_ac.scattering * result.transmittance;
-	result.transmittance *= result_ac.transmittance;
-	result.apparent_distance = min(result.apparent_distance, result_ac.apparent_distance);
-	if (result.transmittance < 1e-3) return result;
+	result = blend_layers(result, result_ac);
+	if (result.transmittance < 1e-3 && r < clouds_altocumulus_radius) return result;
 #endif
 
 #ifdef CLOUDS_CIRRUS
 	CloudsResult result_ci = draw_cirrus_clouds(air_viewer_pos, ray_dir, clear_sky, distance_to_terrain, dither);
-	result.scattering += result_ci.scattering * result.transmittance;
-	result.transmittance *= result_ci.transmittance;
-	result.apparent_distance = min(result.apparent_distance, result_ci.apparent_distance);
-	if (result.transmittance < 1e-3) return result;
+	result = blend_layers(result, result_ci);
 #endif
 
 	return result;
