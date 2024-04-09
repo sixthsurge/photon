@@ -16,6 +16,7 @@
 
 ## installation
 
+* [Download on Modrinth](https://modrinth.com/shader/photon-shader/versions) (recommended)
 * [Download latest commit](https://github.com/sixthsurge/photon/archive/refs/heads/main.zip)
 
 * Photon can be used with [Iris](https://irisshaders.dev/download) (recommended) or [OptiFine](https://optifine.net/home)
