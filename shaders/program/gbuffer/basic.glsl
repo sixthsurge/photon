@@ -29,7 +29,7 @@ in ivec2 vaUV2;
 uniform mat4 projectionMatrix;
 uniform mat4 modelViewMatrix;
 
-#if BOX_LINE_WIDTH != 2.0
+#if BOX_LINE_WIDTH != 2
 uniform int renderStage;
 #endif
 #endif
@@ -63,8 +63,8 @@ void main() {
 	vec2 line_screen_dir = normalize((ndc2.xy - ndc1.xy) * view_res);
 
 	vec2 line_offset =
-#if BOX_LINE_WIDTH != 2.0
-		vec2(-line_screen_dir.y, line_screen_dir.x) * view_pixel_size * ((renderStage == MC_RENDER_STAGE_OUTLINE) ? BOX_LINE_WIDTH : 2.0);
+#if BOX_LINE_WIDTH != 2
+		vec2(-line_screen_dir.y, line_screen_dir.x) * view_pixel_size * ((renderStage == MC_RENDER_STAGE_OUTLINE) ? float(BOX_LINE_WIDTH) : 2.0);
 #else
 		vec2(-line_screen_dir.y, line_screen_dir.x) * view_pixel_size * 2.0;
 #endif
