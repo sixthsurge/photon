@@ -40,13 +40,19 @@ void main() {
     );
     color        = gl_Color.rgb;
     normal       = mat3(gbufferModelViewInverse) * (mat3(gl_ModelViewMatrix) * gl_Normal);
-    
+
+// Prevent compile error on older versions of Iris
+#ifndef DH_BLOCK_GRASS
+#define DH_BLOCK_GRASS 13
+#endif
+
     // Set material mask based on dhMaterialId
     switch (dhMaterialId) {
     case DH_BLOCK_LEAVES:
         material_mask = 5; // Leaves
         break;
 
+    case DH_BLOCK_GRASS:
     case DH_BLOCK_DIRT:
     case DH_BLOCK_STONE:
     case DH_BLOCK_DEEPSLATE:
