@@ -308,7 +308,7 @@ void main() {
 
 	// Aurora
 
-	clouds.xyz += draw_aurora(ray_dir, dither) * clouds.w;
+	if (distance_to_terrain < 0.0) clouds.xyz += draw_aurora(ray_dir, dither) * clouds.w;
 #endif
 }
 
