@@ -269,7 +269,7 @@ float ssr_limiter;
 	if (material.is_hardcoded_metal || material.is_metal || max_of(material.albedo) < eps) {
 		ssr_limiter = 1;
 	} else {
-		ssr_limiter = material.roughness;
+		ssr_limiter = material.roughness * SSR_ROUGHNESS_THRESHOLD;
 	}
 
 #if defined SSR_ROUGHNESS_SUPPORT && defined SPECULAR_MAPPING
