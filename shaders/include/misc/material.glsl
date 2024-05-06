@@ -615,7 +615,7 @@ Material material_from(vec3 albedo_srgb, uint material_mask, vec3 world_pos, vec
 					} else { // 62-64
 						if (material_mask == 62u) { // 62
 							// Nether portal
-							material.emission = vec3(1.0) * 24 * COLORED_LIGHTS_EMISSION;
+							material.emission = vec3(1.0) * 24.0 * sqrt(COLORED_LIGHTS_EMISSION);
 						} else {  // 63
 							// End portal
 							material.emission = vec3(1.0);
