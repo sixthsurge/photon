@@ -52,7 +52,7 @@ void decode_specular_map(vec4 specular_map, inout Material material) {
 
 	if (specular_map.g < 229.5 / 255.0) {
 		// Dielectrics
-		material.f0 = max(material.f0, specular_map.g);
+		material.f0 = vec3(0.04);
 
 		float has_sss = step(64.5 / 255.0, specular_map.b);
 		material.sss_amount = max(material.sss_amount, linear_step(64.0 / 255.0, 1.0, specular_map.b * has_sss));
