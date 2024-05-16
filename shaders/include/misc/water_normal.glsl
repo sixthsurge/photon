@@ -22,11 +22,11 @@ float get_water_height(vec2 coord, vec2 flow_dir, bool flowing_water) {
 	const float wave_speed_still   = 0.5 * WATER_WAVE_SPEED_STILL;
 	const float wave_speed_flowing = 0.50 * WATER_WAVE_SPEED_FLOWING;
 	const float wave_angle         = 30.0 * degree;
-	const float noise_frequency    = 0.01;
-	const float noise_strength     = 2.0;
 	const float noise_fade         = 1.33;
 	const float persistence        = 0.5 * WATER_WAVE_PERSISTENCE;
 	const float lacunarity         = 2.3 * WATER_WAVE_LACUNARITY;
+	float noise_frequency          = 0.01;
+	float noise_strength           = 2.0;
 
 	float t = (flowing_water ? wave_speed_flowing : wave_speed_still) * frameTimeCounter;
 	float noise = texture(noisetex, (coord + vec2(0.0, 0.25 * t)) * noise_frequency).y * noise_strength;
@@ -46,6 +46,12 @@ float get_water_height(vec2 coord, vec2 flow_dir, bool flowing_water) {
 		amplitude_sum += amplitude;
 
 		noise *= noise_fade;
+		noise += texture(noisetex, (coord + vec2(0.0, 0.25 * t)) * noise_frequency).y * noise_strength;
+
+    	   	noise *= noise_fade;
+      		noise_frequency *= 0.97;
+    		noise_strength *= 0.85;
+
 		amplitude *= persistence;
 		frequency *= lacunarity;
 		wave_length *= 1.25;

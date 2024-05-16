@@ -111,6 +111,7 @@ layout (location = 2) out vec4 gbuffer_data_1; // detailed normal, specular map 
 /* RENDERTARGETS: 0,1,2 */
 #endif
 
+out vec2 uv;
 in vec2 light_levels;
 in vec3 scene_pos;
 in vec3 normal;
@@ -132,6 +133,10 @@ flat in vec2 atlas_tile_scale;
 // ------------
 
 uniform sampler2D noisetex;
+
+uniform sampler2D gtexture;
+uniform sampler2D normals;
+uniform sampler2D specular;
 
 #ifdef CLOUD_SHADOWS
 uniform sampler2D colortex8; // Cloud shadow map
@@ -251,9 +256,11 @@ uniform vec4 entityColor;
 #include "/include/light/cloud_shadows.glsl"
 #endif
 
+const float lod_bias = log2(taau_render_scale);
+
 void main() {
     // Clip close-by DH terrain
-    if (length(scene_pos) < 0.8 * far) {
+    if (length(scene_pos) < far) {
         discard;
         return;
     }
@@ -296,6 +303,21 @@ void main() {
 		material = water_material;
 
 		base_color = vec4(0.0);
+
+#if   WATER_TEXTURE == WATER_TEXTURE_OFF
+		base_color = vec4(0.0);
+#elif WATER_TEXTURE == WATER_TEXTURE_HIGHLIGHT
+		base_color  = tint;
+		base_color += 0.61 * texture(gtexture, uv, lod_bias);
+		float texture_highlight = 0.5 * sqr(linear_step(0.61, 1.0, base_color.r)) + 0.03 * base_color.r;
+
+		material.albedo     = clamp01(0.33 * exp(-2.0 * water_absorption_coeff) * texture_highlight);
+		material.roughness += 0.3 * texture_highlight;
+#elif WATER_TEXTURE == WATER_TEXTURE_VANILLA
+		base_color  = tint;
+		base_color *= texture(gtexture, uv, lod_bias);
+		material.albedo = srgb_eotf_inv(base_color.rgb * base_color.a) * rec709_to_working_color;
+#endif
 
 #ifdef WATER_FOAM
 		float dist = layer_dist * max(abs(world_dir.y), eps);

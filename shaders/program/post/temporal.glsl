@@ -135,7 +135,7 @@ void main() {
 #if   AUTO_EXPOSURE == AUTO_EXPOSURE_SIMPLE
 	float lod = ceil(log2(max_of(view_res)));
 	vec3 rgb = textureLod(colortex0, vec2(0.5 * taau_render_scale), int(lod)).rgb;
-	float luminance = clamp(dot(rgb, luminance_weights), min_luminance / 2.0, max_luminance);
+	float luminance = clamp(dot(rgb, luminance_weights), min_luminance / 3.5, max_luminance);
 #elif AUTO_EXPOSURE == AUTO_EXPOSURE_HISTOGRAM
 	float[HISTOGRAM_BINS] pdf;
 	build_histogram(pdf);
