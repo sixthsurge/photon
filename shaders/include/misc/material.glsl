@@ -631,9 +631,14 @@ Material material_from(vec3 albedo_srgb, uint material_mask, vec3 world_pos, vec
 		// Stained glass, honey and slime
 		#ifdef HARDCODED_SPECULAR
 		material.f0 = vec3(0.04);
-		material.roughness = 0.0;
-		material.ssr_multiplier = 10.0;
-		material.emission = 0.14 * albedo_sqrt;
+		material.roughness = 0.1;
+		material.ssr_multiplier = 1.0;
+		material.emission = 0.10 * albedo_sqrt;
+
+		#ifdef GLASS_REFRACTION
+			material.is_metal = true;
+		#endif
+
 		#endif
 
 		#ifdef HARDCODED_SSS

@@ -631,6 +631,9 @@ option.POM_DISTANCE                    = POM Distance
 suffix.POM_DEPTH                       = m
 suffix.POM_DISTANCE                    = m
 
+option.GLASS_REFRACTION                = Glass Refraction
+option.GLASS_REFRECTION.comment        = Refraction behind glass.
+
 value.TEXTURE_FORMAT.TEXTURE_FORMAT_LAB = labPBR
 value.TEXTURE_FORMAT.TEXTURE_FORMAT_OLD = Old PBR
 
@@ -838,21 +841,23 @@ value.AUTO_EXPOSURE.AUTO_EXPOSURE_OFF       = Off
 
 # Misc settings
 
-option.DEBUG_VIEW                      = Debug View
-option.DEBUG_SAMPLER                   = Debug Sampler
-option.WHITE_WORLD                     = White World
-option.WHITE_WORLD.comment             = Set every albedo texture to white
-option.TONEMAP_COMPARISON              = Tonemap Comparison
-option.TONEMAP_COMPARISON.comment      = Compare two tonemapping functions on the left and right halves of your screen
-option.tonemap_left                    = Left Tonemap
-option.tonemap_right                   = Right Tonemap
-option.FANCY_NETHER_PORTAL             = Fancy Nether Portal
-option.FANCY_NETHER_PORTAL.comment     = Fancy nether portal effect inspired by Complementary Reimagined Shaders by EminGT, thanks to Emin for letting me use his idea! May not work as well with some resource packs
-option.CUSTOM_SKY                      = Custom Sky
-option.CUSTOM_SKY.comment              = Enable custom skies from resource packs
-option.CUSTOM_SKY_BRIGHTNESS           = Custom Sky Brightness
-option.CUSTOM_SKY_BRIGHTNESS.comment   = Adjust custom sky brightness
-option.NOISE_ON_DH_TERRAIN             = Noise on DH terrain
+option.DEBUG_VIEW                       = Debug View
+option.DEBUG_SAMPLER                    = Debug Sampler
+option.WHITE_WORLD                      = White World
+option.WHITE_WORLD.comment              = Set every albedo texture to white
+option.TONEMAP_COMPARISON               = Tonemap Comparison
+option.TONEMAP_COMPARISON.comment       = Compare two tonemapping functions on the left and right halves of your screen
+option.tonemap_left                     = Left Tonemap
+option.tonemap_right                    = Right Tonemap
+option.FANCY_NETHER_PORTAL              = Fancy Nether Portal
+option.FANCY_NETHER_PORTAL.comment      = Fancy nether portal effect inspired by Complementary Reimagined Shaders by EminGT, thanks to Emin for letting me use his idea! May not work as well with some resource packs
+option.NETHER_PORTAL_REFRACTION         = Nether Portal Refraction
+option.NETHER_PORTAL_REFRACTION.comment = Adds refraction effect to nether portals
+option.CUSTOM_SKY                       = Custom Sky
+option.CUSTOM_SKY.comment               = Enable custom skies from resource packs
+option.CUSTOM_SKY_BRIGHTNESS            = Custom Sky Brightness
+option.CUSTOM_SKY_BRIGHTNESS.comment    = Adjust custom sky brightness
+option.NOISE_ON_DH_TERRAIN              = Noise on DH terrain
 
 value.DEBUG_VIEW.DEBUG_VIEW_NONE       = OFF
 value.DEBUG_VIEW.DEBUG_VIEW_SAMPLER    = Sampler

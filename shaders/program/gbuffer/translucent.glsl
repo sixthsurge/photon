@@ -119,15 +119,6 @@ void main() {
 		atlas_tile_scale = abs(uv_minus_mid) * 2.0;
 		atlas_tile_coord = sign(uv_minus_mid) * 0.5 + 0.5;
 	}
-
-	// CREPE EDIT
-
-	if (64u <= material_mask && material_mask < 79u) {
-		// Stained glass
-
-		tint = vec4(0.83);
-		tint.a = 1.10;
-	}
 #endif
 
 #if defined PROGRAM_GBUFFERS_TEXTURED
