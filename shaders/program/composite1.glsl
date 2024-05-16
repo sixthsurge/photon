@@ -386,7 +386,7 @@ void main() {
 #ifdef GLASS_REFRACTION
 	vec3 tangent_normal = normal * tbn;
 
-	vec2 refracted_uv = uv + tangent_normal.xy * rcp(max(view_dist, 1.0)) * min(layer_dist, 8.0);
+	vec2 refracted_uv = uv + tangent_normal.xy * tangent_normal.yz * rcp(max(view_dist, 1.0)) * min(layer_dist, 8.0);
 
 	vec3  refracted_color = texture(colortex0, refracted_uv * taau_render_scale).rgb;
 
