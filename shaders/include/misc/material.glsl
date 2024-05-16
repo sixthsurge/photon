@@ -235,6 +235,7 @@ Material material_from(vec3 albedo_srgb, uint material_mask, vec3 world_pos, vec
 							float smoothness = sqrt(linear_step(0.1, 0.9, hsl.z));
 							material.roughness = max(sqr(1.0 - smoothness), 0.04);
 							material.f0 = vec3(0.25);
+							material.is_metal = true;
 							material.ssr_multiplier = 1.0;
 							#endif
 						}
