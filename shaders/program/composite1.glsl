@@ -390,10 +390,6 @@ void main() {
 
 	vec3  refracted_color = texture(colortex0, refracted_uv * taau_render_scale).rgb;
 
-	// Make sure the refracted object is behind water
-	float refracted_data  = texelFetch(colortex1, ivec2(refracted_uv * taau_render_scale * view_res), 0).y;
-	uint  refracted_mask  = uint(unpack_unorm_2x8(refracted_data).y * 255.0);
-
 	scene_color = refracted_color;
 	scene_color *= albedo_tint;
 #endif
@@ -406,10 +402,6 @@ void main() {
 	vec2 refracted_uv = uv + tangent_normal.xy * rcp(max(view_dist, 1.0));
 
 	vec3  refracted_color = texture(colortex0, refracted_uv * taau_render_scale).rgb;
-
-	// Make sure the refracted object is behind water
-	float refracted_data  = texelFetch(colortex1, ivec2(refracted_uv * taau_render_scale * view_res), 0).y;
-	uint  refracted_mask  = uint(unpack_unorm_2x8(refracted_data).y * 255.0);
 
 	scene_color = refracted_color * material.albedo;
 #endif
