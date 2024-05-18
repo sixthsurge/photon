@@ -633,10 +633,11 @@ Material material_from(vec3 albedo_srgb, uint material_mask, vec3 world_pos, vec
 		material.f0 = vec3(0.04);
 		material.roughness = 0.1;
 		material.ssr_multiplier = 1.0;
-		material.emission = 0.10 * albedo_sqrt;
 
 		#ifdef GLASS_REFRACTION
-			material.is_metal = true;
+			material.f0 = material.albedo;
+			material.roughness = 0.1;
+			material.ssr_multiplier = 1.0;
 		#endif
 
 		#endif
