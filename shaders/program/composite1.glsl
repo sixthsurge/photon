@@ -390,7 +390,7 @@ void main() {
 
 	vec3  refracted_color = texture(colortex0, refracted_uv * taau_render_scale).rgb;
 
-	scene_color = refracted_color * sqrt(material.albedo);
+	scene_color = refracted_color * sqr(albedo_tint);
 #endif
 	}
 
