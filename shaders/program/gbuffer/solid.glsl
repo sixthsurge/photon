@@ -500,8 +500,10 @@ void main() {
 #endif
 
 #if defined PROGRAM_GBUFFERS_PARTICLES
+	#ifndef RAIN_SPLASH
 	// Kill the little rain splash particles
 	if (base_color.r < 0.29 && base_color.g < 0.45 && base_color.b > 0.75) discard;
+	#endif
 #endif
 }
 
