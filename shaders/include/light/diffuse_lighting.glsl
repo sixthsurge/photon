@@ -190,7 +190,7 @@ vec3 get_diffuse_lighting(
 	lighting += nightVision * night_vision_scale * directional_lighting * ao;
 #endif
 
-	if (material.roughness >= 0.25) {
+	if (material.roughness >= 0.28) {
 		metal_diffuse_amount = material.roughness;
 	}
 
