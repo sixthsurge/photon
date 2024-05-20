@@ -15,7 +15,7 @@ vec2 get_directional_lightmaps(vec3 normal) {
 	lightmap_dir = pos_gradient * lightmap_gradient;
 
 	if (length_squared(lightmap_gradient) > 1e-12) {
-		lightmap_mul.x = (clamp01(dot(normalize(lightmap_dir), normal) + 0.8) * DIRECTIONAL_LIGHTMAPS_INTENSITY + (1.0 - DIRECTIONAL_LIGHTMAPS_INTENSITY)) * inversesqrt(sqrt(light_levels.x) + eps);
+		lightmap_mul.x = (clamp01(dot(normalize(lightmap_dir), normal) + sqrt(light_levels.x)) * DIRECTIONAL_LIGHTMAPS_INTENSITY + (1.0 - DIRECTIONAL_LIGHTMAPS_INTENSITY)) * inversesqrt(sqrt(light_levels.x) + eps);
 	}
 
 	// Skylight
@@ -24,7 +24,7 @@ vec2 get_directional_lightmaps(vec3 normal) {
 	lightmap_dir = pos_gradient * lightmap_gradient;
 
 	if (length_squared(lightmap_gradient) > 1e-12) {
-		lightmap_mul.y = (clamp01(dot(normalize(lightmap_dir), normal) + 0.8) * DIRECTIONAL_LIGHTMAPS_INTENSITY + (1.0 - DIRECTIONAL_LIGHTMAPS_INTENSITY)) * inversesqrt(sqrt(light_levels.y) + eps);
+		lightmap_mul.y = (clamp01(dot(normalize(lightmap_dir), normal) + sqrt(light_levels.y)) * DIRECTIONAL_LIGHTMAPS_INTENSITY + (1.0 - DIRECTIONAL_LIGHTMAPS_INTENSITY)) * inversesqrt(sqrt(light_levels.y) + eps);
 	}
 
 	return lightmap_mul;
