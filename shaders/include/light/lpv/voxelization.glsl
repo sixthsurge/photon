@@ -26,8 +26,9 @@ bool is_voxelized(uint block_id, bool vertex_at_grid_corner) {
 	    block_id == 80u;   // Miscellaneous transparent
 	
 	bool is_light_emitting_block = 32u <= block_id && block_id < 64u;
+	bool is_light_tinting_block  = 64u <= block_id && block_id < 80u;
 
-	return (vertex_at_grid_corner || is_light_emitting_block) && is_terrain && !is_transparent_block;
+	return (vertex_at_grid_corner || is_light_emitting_block || is_light_tinting_block) && is_terrain && !is_transparent_block;
 }
 
 bvec3 disjunction(bvec3 a, bvec3 b) {
