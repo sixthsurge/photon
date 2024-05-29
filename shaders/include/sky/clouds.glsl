@@ -1229,7 +1229,7 @@ float render_cloud_shadow_map(vec2 uv) {
 	float cirrus, cirrocumulus;
 	t = intersect_sphere(ray_origin, light_dir,	clouds_cirrus_radius).y;
 	pos = ray_origin + light_dir * t;
-	density = clouds_cirrus_density(pos.xy, 0.5, cirrus, cirrocumulus);
+	density = clouds_cirrus_density(pos.xz, 0.5, cirrus, cirrocumulus);
 	shadow *= exp(-0.25 * clouds_cirrus_extinction_coeff * clouds_cirrus_thickness * rcp(abs(light_dir.y) + eps) * density) * 0.5 + 0.5;
 #endif
 
