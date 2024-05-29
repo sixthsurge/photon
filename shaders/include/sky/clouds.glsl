@@ -1152,7 +1152,7 @@ CloudsResult blend_layers(CloudsResult old, CloudsResult new) {
 	vec3 scattering_behind       = new_in_front ? old.scattering : new.scattering;
 	vec3 scattering_in_front     = new_in_front ? new.scattering : old.scattering;
 	float transmittance_in_front = new_in_front ? new.transmittance : old.transmittance;
-
+	
 	return CloudsResult(
 		scattering_in_front + transmittance_in_front * scattering_behind,
 		old.transmittance * new.transmittance,
@@ -1231,7 +1231,7 @@ float render_cloud_shadow_map(vec2 uv) {
 	float cirrus, cirrocumulus;
 	t = intersect_sphere(ray_origin, light_dir,	clouds_cirrus_radius).y;
 	pos = ray_origin + light_dir * t;
-	density = clouds_cirrus_density(pos.xy, 0.5, cirrus, cirrocumulus);
+	density = clouds_cirrus_density(pos.xz, 0.5, cirrus, cirrocumulus);
 	shadow *= exp(-0.25 * clouds_cirrus_extinction_coeff * clouds_cirrus_thickness * rcp(abs(light_dir.y) + eps) * density) * 0.5 + 0.5;
 #endif
 
