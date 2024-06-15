@@ -211,7 +211,7 @@ float get_water_caustics() {
 	vec3 world_pos = scene_pos + cameraPosition;
 
 	vec2 coord = world_pos.xz;
-	vec3 normal = tbn * get_water_normal(world_pos, tbn[2], coord, flow_dir, 1.0, flowing_water);
+	vec3 normal = tbn * get_water_normal(world_pos, tbn[2], coord, flow_dir, 1.0, flowing_water) * (1 - rainStrength);
 
 	vec3 old_pos = world_pos;
 	vec3 new_pos = world_pos + refract_safe(light_dir, normal, air_n / water_n) * distance_through_water;
