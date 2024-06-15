@@ -151,7 +151,7 @@ vec3 shadow_pcf(
 		float depth = texelFetch(shadowtex0, texel, 0).x;
 
 		vec3 color = texelFetch(shadowcolor0, texel, 0).rgb;
-		     color = mix(vec3(1.0), 4.0 * color, step(depth, shadow_screen_pos.z));
+		     color = mix(vec3(1.0), 6.0 * color, step(depth, shadow_screen_pos.z));
 
 		float weight = step(eps, max_of(color));
 
