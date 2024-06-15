@@ -28,7 +28,9 @@ bool is_voxelized(uint block_id, bool vertex_at_grid_corner) {
 
 	bool is_light_emitting_block = 32u <= block_id && block_id < 64u;
 
-	return (vertex_at_grid_corner || is_light_emitting_block) && is_terrain && !is_transparent_block;
+	bool is_light_tinting_block  = 64u <= block_id && block_id < 80u;
+
+	return (vertex_at_grid_corner || is_light_emitting_block || is_light_tinting_block) && is_terrain && !is_transparent_block;
 }
 
 bvec3 disjunction(bvec3 a, bvec3 b) {
@@ -55,7 +57,7 @@ void update_voxel_map(uint block_id) {
 	vec3 block_pos = transform(gl_ModelViewMatrix, gl_Vertex.xyz);
 	     block_pos = transform(shadowModelViewInverse, block_pos);
 		 block_pos = fract(block_pos + cameraPosition);
-	bool vertex_at_grid_corner = is_corner(block_pos, rcp(16.0) - 1e-3);
+	bool vertex_at_grid_corner = true;
 
 	bool is_voxelized = is_voxelized(block_id, vertex_at_grid_corner);
 
