@@ -37,7 +37,7 @@ vec3 get_lpv_blocklight(vec3 scene_pos, vec3 normal, vec3 mc_blocklight, float a
 
 		float distance_fade = lpv_distance_fade(scene_pos);
 
-		return mix(lpv_blocklight, mc_blocklight, distance_fade);
+		return mix(lpv_blocklight, mc_blocklight, distance_fade) * COLORED_LIGHTS_I;
 	} else {
 		return mc_blocklight;
 	}
