@@ -57,7 +57,7 @@ void update_voxel_map(uint block_id) {
 	vec3 block_pos = transform(gl_ModelViewMatrix, gl_Vertex.xyz);
 	     block_pos = transform(shadowModelViewInverse, block_pos);
 		 block_pos = fract(block_pos + cameraPosition);
-	bool vertex_at_grid_corner = true;
+	bool vertex_at_grid_corner = is_corner(block_pos, rcp(16.0) - 1e-3);
 
 	bool is_voxelized = is_voxelized(block_id, vertex_at_grid_corner);
 
