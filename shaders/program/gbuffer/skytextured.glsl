@@ -101,7 +101,7 @@ void main() {
 		if (max_of(abs(offset)) > 0.25) discard;
 		*/
 
-		scene_color.rgb = texture(gtexture, new_uv).rgb;
+		scene_color.rgb = texture(gtexture, new_uv).rgb * vec3(MOON_R, MOON_G, MOON_B);
 
 		break;
 #elif MOON_TYPE == MOON_PHOTON
