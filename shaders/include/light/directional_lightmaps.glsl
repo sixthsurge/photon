@@ -11,7 +11,7 @@ vec2 get_directional_lightmaps(vec3 normal) {
 
 	// Blocklight
 
-	lightmap_gradient = vec2(dFdx(light_levels.x) + 1, dFdy(light_levels.x) + 1);
+	lightmap_gradient = vec2(dFdx(light_levels.x), dFdy(light_levels.x)) + 1;
 	lightmap_dir = pos_gradient * lightmap_gradient;
 
 	if (length_squared(lightmap_gradient) > 1e-12) {
