@@ -41,7 +41,7 @@ vec3 get_shadow_bias(vec3 scene_pos, vec3 normal, float NoL, float skylight) {
 	vec3 bias = 0.25 * normal * clamp01(0.12 + 0.01 * length(scene_pos)) * (2.0 - clamp01(NoL));
 
 	// Fix light leaking in caves
-	vec3 edge_factor = 0.1 - 0.2 * fract(scene_pos + cameraPosition + normal * 0.01);
+	vec3 edge_factor = 0.1 - 0.2 * fract(scene_pos + cameraPosition + normal * 0.01) * 0;
 
 	return bias + edge_factor * clamp01(1.0 - skylight);
 }
