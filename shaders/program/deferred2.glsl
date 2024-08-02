@@ -246,7 +246,7 @@ void main() {
 #endif
 
 	vec4 current = e;
-	vec4 history = smooth_filter(colortex11, previous_uv_clamped * taau_render_scale);
+	vec4 history = texture(colortex11, previous_uv_clamped * taau_render_scale);
 
 	// Depth at the previous position
 	float history_depth = 1.0 - min_of(textureGather(colortex6, previous_uv_clamped, 2));
@@ -307,7 +307,7 @@ void main() {
 
 	history_weight *= offcenter_rejection;
 #endif
-	
+
 	clouds_history = max0(mix(current, history, history_weight));
 	clouds_data.x = mix(apparent_distance, apparent_distance_history, history_weight);
 	clouds_data.y = min(++pixel_age, CLOUDS_ACCUMULATION_LIMIT);
