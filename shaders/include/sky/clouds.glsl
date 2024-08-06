@@ -359,7 +359,7 @@ CloudsResult draw_cumulus_clouds(
 
 	vec3 clouds_scattering = scattering.x * light_color + scattering.y * sky_color;
 	     clouds_scattering = clouds_aerial_perspective(clouds_scattering, clouds_transmittance, air_viewer_pos, ray_origin, ray_dir, clear_sky);
-	
+
 	float apparent_distance = (distance_weight_sum == 0.0)
 		? 1e6
 		: (distance_sum / distance_weight_sum) + distance(air_viewer_pos, ray_origin);
@@ -624,11 +624,11 @@ CloudsResult draw_cumulus_congestus_clouds(
 	// Aerial perspective
 	vec3 clouds_scattering = scattering.x * light_color + scattering.y * sky_color;
 	     clouds_scattering = clouds_aerial_perspective(clouds_scattering, clouds_transmittance, air_viewer_pos, ray_origin, ray_dir, clear_sky);
-		
+
 	// Fade away at the horizon
 	float horizon_fade = mix(dampen(linear_step(0.0, 0.08, ray_dir.y)), 1.0, smoothstep(sqr(clouds_cumulus_congestus_radius), sqr(clouds_cumulus_congestus_radius + 0.1 * clouds_cumulus_congestus_thickness), length_squared(air_viewer_pos)));
 	clouds_scattering = mix(clear_sky * (1.0 - clouds_transmittance), clouds_scattering, horizon_fade);
-	
+
 	float apparent_distance = (distance_weight_sum == 0.0)
 		? 1e6
 		: (distance_sum / distance_weight_sum) + distance(air_viewer_pos, ray_origin);
@@ -1150,7 +1150,7 @@ CloudsResult blend_layers(CloudsResult old, CloudsResult new) {
 	vec3 scattering_behind       = new_in_front ? old.scattering : new.scattering;
 	vec3 scattering_in_front     = new_in_front ? new.scattering : old.scattering;
 	float transmittance_in_front = new_in_front ? new.transmittance : old.transmittance;
-	
+
 	return CloudsResult(
 		scattering_in_front + transmittance_in_front * scattering_behind,
 		old.transmittance * new.transmittance,
