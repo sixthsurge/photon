@@ -153,13 +153,6 @@ void main() {
 	    scene_color = display_eotf(scene_color);
 	}
 
-	begin_text(ivec2(gl_FragCoord.xy) / 3, ivec2(0, viewHeight / 3));
-	print_float(sun_dir.y);
-	float scattering_boost = 8.0 * linear_step(0.05, 1.0, exp(-190.0 * sqr(sun_dir.y + 0.03)));
-	print_line();
-	print_float(scattering_boost);
-	end_text(scene_color);
-
 	scene_color = dither_8bit(scene_color, bayer16(vec2(texel)));
 
 #if   DEBUG_VIEW == DEBUG_VIEW_SAMPLER
