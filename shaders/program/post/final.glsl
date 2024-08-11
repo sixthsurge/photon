@@ -57,6 +57,8 @@ uniform sampler2D shadowtex0;
 #include "/include/utility/dithering.glsl"
 #include "/include/utility/text_rendering.glsl"
 
+uniform vec3 sun_dir;
+
 const int debug_text_scale = 2;
 ivec2 debug_text_position = ivec2(0, int(viewHeight) / debug_text_scale);
 
@@ -150,6 +152,13 @@ void main() {
 		scene_color = catmull_rom_filter_fast_rgb(colortex0, uv, 0.6);
 	    scene_color = display_eotf(scene_color);
 	}
+
+	begin_text(ivec2(gl_FragCoord.xy) / 3, ivec2(0, viewHeight / 3));
+	print_float(sun_dir.y);
+	float scattering_boost = 8.0 * linear_step(0.05, 1.0, exp(-190.0 * sqr(sun_dir.y + 0.03)));
+	print_line();
+	print_float(scattering_boost);
+	end_text(scene_color);
 
 	scene_color = dither_8bit(scene_color, bayer16(vec2(texel)));
 

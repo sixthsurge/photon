@@ -20,11 +20,8 @@ float get_sun_exposure() {
 vec3 get_sun_tint() {
 	float blue_hour = linear_step(0.05, 1.0, exp(-190.0 * sqr(sun_dir.y + 0.09604)));
 
-	vec3 morning_evening_tint = vec3(1.05, 0.84, 0.93) * 1.2;
+	vec3 morning_evening_tint = vec3(1.05, 0.95, 0.93) * 1.2;
 	     morning_evening_tint = mix(vec3(1.0), morning_evening_tint, sqr(pulse(sun_dir.y, 0.17, 0.40)));
-
-	vec3 blue_hour_tint = vec3(1.0, 0.85, 0.95);
-	     blue_hour_tint = mix(vec3(1.0), blue_hour_tint, blue_hour);
 
 	// User tint
 
@@ -35,7 +32,7 @@ vec3 get_sun_tint() {
 	vec3 user_tint = mix(tint_noon, tint_morning, time_sunrise);
 	     user_tint = mix(user_tint, tint_evening, time_sunset);
 
-	return morning_evening_tint * blue_hour_tint * user_tint;
+	return morning_evening_tint * user_tint;
 }
 
 float get_moon_exposure() {
