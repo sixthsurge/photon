@@ -218,7 +218,7 @@ mat2x3 air_fog_rayleigh_coeff() {
 		          + rayleigh_swamp  * biome_swamp;
 
 	// Increased rayleigh scattering during late sunset and the blue hour
-	float scattering_boost = 8.0 * linear_step(0.05, 1.0, exp(-300.0 * sqr(sun_dir.y + 0.04)));
+	float scattering_boost = 4.0 * linear_step(0.05, 1.0, exp(-300.0 * sqr(sun_dir.y + 0.04)));
 
 	// Rain
 	rayleigh = mix(rayleigh, rayleigh_rain, rainStrength * biome_may_rain);
@@ -241,7 +241,7 @@ mat2x3 air_fog_mie_coeff() {
 	                + AIR_FOG_MIE_DENSITY_BLUE_HOUR * blue_hour;
 
 	// Increased mie scattering during sunrise and sunset
-	float scattering_boost = 6.0 * linear_step(0.05, 1.0, exp(-190.0 * sqr(sun_dir.y - 0.01)));
+	float scattering_boost = 4.0 * linear_step(0.05, 1.0, exp(-190.0 * sqr(sun_dir.y - 0.01)));
 
 	mie_coeff = mix(mie_coeff, AIR_FOG_MIE_DENSITY_RAIN, rainStrength * biome_may_rain);
 	mie_coeff = mix(mie_coeff, AIR_FOG_MIE_DENSITY_SNOW, rainStrength * biome_may_snow);

@@ -350,8 +350,9 @@ CloudsResult draw_cumulus_clouds(
 	}
 
 	// Get main light color for this layer
-	vec3 light_color  = moonlit ? moon_color : sun_color;
-	     light_color *= sunlight_color * atmosphere_transmittance(ray_origin, light_dir);
+	vec3 light_color  = sunlight_color * atmosphere_transmittance(ray_origin, light_dir);
+		 light_color  = atmosphere_post_processing(light_color);
+	     light_color *= moonlit ? moon_color : sun_color;
 		 light_color *= 1.0 - rainStrength;
 
 	// Remap the transmittance so that min_transmittance is 0
@@ -614,8 +615,9 @@ CloudsResult draw_cumulus_congestus_clouds(
 	}
 
 	// Get main light color for this layer
-	vec3 light_color  = moonlit ? moon_color : sun_color;
-	     light_color *= sunlight_color * atmosphere_transmittance(ray_origin, light_dir);
+	vec3 light_color  = sunlight_color * atmosphere_transmittance(ray_origin, light_dir);
+		 light_color  = atmosphere_post_processing(light_color);
+	     light_color *= moonlit ? moon_color : sun_color;
 		 light_color *= 1.0 - rainStrength;
 
 	// Remap the transmittance so that min_transmittance is 0
@@ -897,10 +899,12 @@ CloudsResult draw_altocumulus_clouds(
 	}
 
 	// Get main light color for this layer
-	vec3 light_color  = moonlit ? moon_color : sun_color;
-	     light_color *= sunlight_color * atmosphere_transmittance(ray_origin, light_dir);
+	vec3 light_color  = sunlight_color * atmosphere_transmittance(ray_origin, light_dir);
+		 light_color  = atmosphere_post_processing(light_color);
+	     light_color *= moonlit ? moon_color : sun_color;
 		 light_color *= 1.0 - rainStrength;
 		 light_color *= 1.0 + 0.4 * high_coverage * dampen(time_noon);
+
 
 	// Remap the transmittance so that min_transmittance is 0
 	float clouds_transmittance = linear_step(min_transmittance, 1.0, transmittance);
@@ -1128,8 +1132,9 @@ CloudsResult draw_cirrus_clouds(
 	float mu = dot(sphere_pos, light_dir) * rcp_r;
 	float rr = r_sq * rcp_r - 1500.0 * clamp01(linear_step(0.0, 0.05, cirrocumulus) * (1.0 - linear_step(0.0, 0.1, cirrus)) + cirrocumulus);
 
-	vec3 light_color  = moonlit ? moon_color : sun_color;
-	     light_color *= sunlight_color * atmosphere_transmittance(mu, rr);
+	vec3 light_color  = sunlight_color * atmosphere_transmittance(mu, rr);
+		 light_color  = atmosphere_post_processing(light_color);
+	     light_color *= moonlit ? moon_color : sun_color;
 		 light_color *= 1.0 - rainStrength;
 
 	// Remap the transmittance so that min_transmittance is 0
