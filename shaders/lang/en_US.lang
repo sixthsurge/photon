@@ -379,6 +379,8 @@ option.STARS_INTENSITY                 = Stars Intensity
 option.STARS_INTENSITY.comment         = Controls the brightness of stars in the night sky
 option.STARS_COVERAGE                  = Stars Coverage
 option.STARS_COVERAGE.comment          = Controls the number of stars in the night sky
+option.GALAXY                          = Galaxy
+option.GALAXY.comment                  = Shows a galaxy in the sky
 
 value.MOON_TYPE.MOON_VANILLA           = Vanilla Moon
 value.MOON_TYPE.MOON_PHOTON            = Photon Moon

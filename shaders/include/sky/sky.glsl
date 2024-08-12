@@ -128,22 +128,24 @@ vec4 get_clouds_and_aurora(vec3 ray_dir, vec3 clear_sky) {
 #endif
 }
 
-vec3 draw_galaxy(vec3 ray_dir) {
-	const float galaxy_intensity = 8.0;
+#ifdef GALAXY
+    vec3 draw_galaxy(vec3 ray_dir) {
+	    const float galaxy_intensity = 8.0 * MOON_I;
 
-	mat3 rot = (sunAngle < 0.5)
-		? mat3(shadowModelViewInverse)
-		: mat3(-shadowModelViewInverse[0].xyz, shadowModelViewInverse[1].xyz, -shadowModelViewInverse[2].xyz);
+	    mat3 rot = (sunAngle < 0.5)
+		    ? mat3(shadowModelViewInverse)
+		    : mat3(-shadowModelViewInverse[0].xyz, shadowModelViewInverse[1].xyz, -shadowModelViewInverse[2].xyz);
 
-	ray_dir *= rot;
+	    ray_dir *= rot;
 
-	float lon = fast_acos(ray_dir.z);
-	float lat = sign(ray_dir.y) * fast_acos(ray_dir.x * rcp_length(ray_dir.xy));
+	    float lon = fast_acos(ray_dir.z);
+	    float lat = sign(ray_dir.y) * fast_acos(ray_dir.x * rcp_length(ray_dir.xy));
 
-	vec3 galaxy = from_srgb(texture(colortex14, vec2(lat / tau + 0.5, lon / tau + 0.5)).rgb);
+	    vec3 galaxy = from_srgb(texture(colortex14, vec2(lat / tau + 0.5, lon / tau + 0.5)).rgb);
 
-	return galaxy * galaxy_intensity * (0.1 + 0.9 * linear_step(-0.1, 0.2, -sun_dir.y));
-}
+	    return galaxy * galaxy_intensity * (0.1 + 0.9 * linear_step(-0.1, 0.2, -sun_dir.y));
+    }
+#endif
 
 vec3 draw_sky(vec3 ray_dir, vec3 atmosphere) {
 	vec3 sky = vec3(0.0);
@@ -185,7 +187,9 @@ vec3 draw_sky(vec3 ray_dir, vec3 atmosphere) {
 #endif
 #endif
 
-	sky += draw_galaxy(ray_dir);
+    #ifdef GALAXY
+	    sky += draw_galaxy(ray_dir);
+    #endif
 
 	// Sky gradient
 
