@@ -246,7 +246,7 @@ void main() {
 #endif
 
 	vec4 current = e;
-	vec4 history = smooth_filter(colortex11, previous_uv_clamped * taau_render_scale);
+	vec4 history = catmull_rom_filter(colortex11, previous_uv_clamped * taau_render_scale);
 
 	// Depth at the previous position
 	float history_depth = 1.0 - min_of(textureGather(colortex6, previous_uv_clamped, 2));
