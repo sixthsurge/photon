@@ -217,9 +217,6 @@ mat2x3 air_fog_rayleigh_coeff() {
 		          + rayleigh_jungle * biome_jungle
 		          + rayleigh_swamp  * biome_swamp;
 
-	// Increased rayleigh scattering during late sunset and the blue hour
-	float scattering_boost = 4.0 * linear_step(0.05, 1.0, exp(-300.0 * sqr(sun_dir.y + 0.04)));
-
 	// Rain
 	rayleigh = mix(rayleigh, rayleigh_rain, rainStrength * biome_may_rain);
 
@@ -227,7 +224,7 @@ mat2x3 air_fog_rayleigh_coeff() {
 	float fogginess = daily_weather_blend(daily_weather_fogginess);
 	rayleigh *= 1.0 + 2.0 * fogginess;
 
-	return mat2x3(rayleigh + rayleigh * scattering_boost, rayleigh);
+	return mat2x3(rayleigh, rayleigh);
 }
 
 mat2x3 air_fog_mie_coeff() {
@@ -240,16 +237,13 @@ mat2x3 air_fog_mie_coeff() {
 	                + AIR_FOG_MIE_DENSITY_MIDNIGHT * time_midnight
 	                + AIR_FOG_MIE_DENSITY_BLUE_HOUR * blue_hour;
 
-	// Increased mie scattering during sunrise and sunset
-	float scattering_boost = 4.0 * linear_step(0.05, 1.0, exp(-190.0 * sqr(sun_dir.y - 0.01)));
-
 	mie_coeff = mix(mie_coeff, AIR_FOG_MIE_DENSITY_RAIN, rainStrength * biome_may_rain);
 	mie_coeff = mix(mie_coeff, AIR_FOG_MIE_DENSITY_SNOW, rainStrength * biome_may_snow);
 
-	float mie_albedo = mix(0.9, 0.5, rainStrength * biome_may_rain) + scattering_boost;
+	float mie_albedo = mix(0.9, 0.5, rainStrength * biome_may_rain);
 
-	vec3 scattering_coeff = vec3(mie_coeff * mie_albedo);
 	vec3 extinction_coeff = vec3(mie_coeff);
+	vec3 scattering_coeff = vec3(mie_coeff * mie_albedo);
 
 #ifdef DESERT_SANDSTORM
 	const float desert_sandstorm_density    = 0.2;

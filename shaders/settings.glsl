@@ -246,7 +246,7 @@ const float wetnessHalflife         = 70.0;
   #define AIR_FOG_RAYLEIGH_FALLOFF_START     30.0
   #define AIR_FOG_RAYLEIGH_FALLOFF_HALF_LIFE 30.0
   #define AIR_FOG_MIE_FALLOFF_START          7.0 
-  #define AIR_FOG_MIE_FALLOFF_HALF_LIFE      5.0 
+  #define AIR_FOG_MIE_FALLOFF_HALF_LIFE      7.0 
 
 // Rayleigh Coefficient
 
