@@ -50,6 +50,24 @@ const vec3 air_ozone_coefficient    = vec3(8.304280072e-07, 1.314911970e-06, 5.4
 const mat2x3 air_scattering_coefficients = mat2x3(air_rayleigh_coefficient, air_mie_albedo * air_mie_coefficient);
 const mat3x3 air_extinction_coefficients = mat3x3(air_rayleigh_coefficient, air_mie_coefficient, air_ozone_coefficient);
 
+uniform float atmosphere_saturation_boost_amount;
+
+float atmosphere_mie_phase(float nu) {
+	return klein_nishina_phase(nu, air_mie_energy_parameter);
+}
+
+// Post-processing applied to the atmosphere color
+vec3 atmosphere_post_processing(vec3 atmosphere) {
+	// Atmosphere saturation boost
+	atmosphere = mix(
+		vec3(dot(atmosphere, luminance_weights_rec2020)), 
+		atmosphere,
+		ATMOSPHERE_SATURATION_BOOST_INTENSITY * atmosphere_saturation_boost_amount
+	);
+
+	return atmosphere;
+}
+
 /*
  * Mapping functions from Eric Bruneton's 2020 atmosphere implementation
  * https://ebruneton.github.io/precomputed_atmospheric_scattering/atmosphere/functions.glsl.html
@@ -153,7 +171,7 @@ vec3 atmosphere_scattering(float nu, float mu, float mu_s) {
 
 	vec3 uv = atmosphere_scattering_uv(nu, mu, mu_s);
 
-	float mie_phase = henyey_greenstein_phase(nu, air_mie_g);
+	float mie_phase = atmosphere_mie_phase(nu);
 
 	vec3 scattering;
 
@@ -165,7 +183,7 @@ vec3 atmosphere_scattering(float nu, float mu, float mu_s) {
 	uv.x += 0.5;
 	scattering += texture(ATMOSPHERE_SCATTERING_LUT, uv).rgb * mie_phase;
 
-	return scattering;
+	return atmosphere_post_processing(scattering);
 }
 
 vec3 atmosphere_scattering(vec3 ray_dir, vec3 light_dir) {
@@ -286,11 +304,13 @@ vec3 atmosphere_scattering(vec3 ray_dir, vec3 sun_color, vec3 sun_dir, vec3 moon
 	vec3 scattering_mc = texture(ATMOSPHERE_SCATTERING_LUT, uv_mc).rgb;
 	vec3 scattering_mm = texture(ATMOSPHERE_SCATTERING_LUT, uv_mm).rgb;
 
-	float mie_phase_sun  = henyey_greenstein_phase(nu_sun,  air_mie_g);
-	float mie_phase_moon = henyey_greenstein_phase(nu_moon, air_mie_g);
+	float mie_phase_sun  = atmosphere_mie_phase(nu_sun);
+	float mie_phase_moon = atmosphere_mie_phase(nu_moon);
 
-	return (scattering_sc + scattering_sm * mie_phase_sun)  * sun_color
+	vec3 atmosphere = (scattering_sc + scattering_sm * mie_phase_sun)  * sun_color
 	     + (scattering_mc + scattering_mm * mie_phase_moon) * moon_color;
+
+	return atmosphere_post_processing(atmosphere);
 }
 #else
 vec3 atmosphere_scattering(vec3 ray_dir, vec3 light_dir) {

@@ -22,11 +22,11 @@ float get_water_height(vec2 coord, vec2 flow_dir, bool flowing_water) {
 	const float wave_speed_still   = 0.5 * WATER_WAVE_SPEED_STILL;
 	const float wave_speed_flowing = 0.50 * WATER_WAVE_SPEED_FLOWING;
 	const float wave_angle         = 30.0 * degree;
-	const float noise_fade         = 1.33;
+	const float noise_fade         = 1.7;
 	const float persistence        = 0.5 * WATER_WAVE_PERSISTENCE;
 	const float lacunarity         = 2.3 * WATER_WAVE_LACUNARITY;
-	float noise_frequency          = 0.01;
-	float noise_strength           = 2.0;
+	float noise_frequency    = 0.005;
+	float noise_strength     = 1.0;
 
 	float t = (flowing_water ? wave_speed_flowing : wave_speed_still) * frameTimeCounter;
 	float noise = texture(noisetex, (coord + vec2(0.0, 0.25 * t)) * noise_frequency).y * noise_strength;
@@ -59,7 +59,20 @@ float get_water_height(vec2 coord, vec2 flow_dir, bool flowing_water) {
 		wave_dir *= wave_rot;
 	}
 
-	return height / amplitude_sum;
+#ifdef WATER_WAVES_HEIGHT_VARIATION
+	const float height_variation_frequency    = 0.001;
+	const float min_height                    = 0.1;
+	const float height_variation_scale        = 4.0;
+	const float height_variation_offset       = -0.5;
+	const float height_variation_scroll_speed = 0.1;
+
+	float height_variation = texture(noisetex, (coord + vec2(0.0, height_variation_scroll_speed * t)) * height_variation_frequency).y;
+	      height_variation = max(min_height, height_variation * height_variation_scale + height_variation_offset);
+
+	height *= height_variation;
+#endif
+
+	return (height / amplitude_sum);
 }
 
 vec3 get_water_normal(vec3 world_pos, vec3 flat_normal, vec2 coord, vec2 flow_dir, float skylight, bool flowing_water) {

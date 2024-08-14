@@ -8,12 +8,6 @@
 #include "/include/utility/random.glsl"
 #include "/include/utility/space_conversion.glsl"
 
-#if defined PROGRAM_DEFERRED0
-	#define NOISE_3D colortex6
-#else
-	#define NOISE_3D colortex0
-#endif
-
 const uint  air_fog_min_step_count    = 8;
 const uint  air_fog_max_step_count    = 25;
 const float air_fog_step_count_growth = 0.1;
@@ -32,11 +26,11 @@ vec2 air_fog_density(vec3 world_pos) {
 	density *= linear_step(air_fog_volume_bottom, SEA_LEVEL, world_pos.y);
 
 #ifdef AIR_FOG_CLOUDY_NOISE
-	const vec3 wind = 0.03 * vec3(1.0, 0.0, 0.7);
+	const vec3 wind = 0.0003 * vec3(1.0, 0.0, 0.7);
 
-	float noise = texture(NOISE_3D, 0.015 * world_pos + wind * frameTimeCounter).x;
+	float noise = texture(noisetex, 0.001 * world_pos.xz + wind.xz * frameTimeCounter).w;
 
-	density.y *= 2.0 * sqr(1.0 - noise);
+	density.y *= 2.0 * sqr(noise);
 #endif
 
 	return density;
@@ -163,22 +157,30 @@ mat2x3 raymarch_air_fog(vec3 world_start_pos, vec3 world_end_pos, bool sky, floa
 	// Multiple scattering
 	vec3 scattering = vec3(0.0);
 	float scatter_amount = 1.0;
+	float anisotropy = 1.0;
 
 #if defined PROGRAM_DEFERRED0
 	vec3 ambient_color = ambient_color_fog;
 #endif
 
-	scattering += light_sky * vec2(isotropic_phase) * ambient_color;
+	scattering += 2.0 * light_sky * vec2(isotropic_phase) * ambient_color;
 
 	for (int i = 0; i < 4; ++i) {
+		float mie_phase = 0.7 * henyey_greenstein_phase(LoV, 0.5 * anisotropy) + 0.3 * henyey_greenstein_phase(LoV, -0.2 * anisotropy);
+
 		scattering += scatter_amount * (light_sun * vec2(isotropic_phase, mie_phase)) * light_color;
 
 		scatter_amount *= 0.5;
-		mie_phase = mix(mie_phase, isotropic_phase, 0.3);
+		mie_phase = 0.7 * henyey_greenstein_phase(LoV, 0.5) + 0.3 * isotropic_phase;
+		anisotropy *= 0.7;
 	}
 	//*/
 
 	scattering *= 1.0 - blindness;
+
+	// Artifically brighten fog in the early morning and evening (looks nice)
+	float evening_glow = 1.0 + 2.0 * linear_step(0.05, 1.0, exp(-300.0 * sqr(sun_dir.y + 0.02)));
+	scattering *= evening_glow;
 
 	return mat2x3(scattering, transmittance);
 }

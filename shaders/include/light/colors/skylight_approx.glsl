@@ -22,7 +22,7 @@ vec3 skylight_approx(vec3 normal, vec3 flat_normal, vec3 shadows, float directio
 		 skylight  = mix(skylight, rain_skylight, rainStrength);
 	}
 
-	return skylight * (pow1d5(ao) * pi);
+	return skylight * (ao * pi);
 }
 #endif
 

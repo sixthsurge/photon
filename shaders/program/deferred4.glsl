@@ -289,7 +289,7 @@ vec4 read_clouds(out float apparent_distance) {
 #if defined WORLD_OVERWORLD
 	// Soften clouds for new pixels
 	float pixel_age = texelFetch(colortex12, ivec2(gl_FragCoord.xy), 0).y;
-	int ld = int(2.0 * dampen(max0(1.0 - 0.05 * pixel_age)));
+	float ld = 2.0 * dampen(max0(1.0 - 0.1 * pixel_age));
 
 	apparent_distance = min_of(textureGather(colortex12, uv * taau_render_scale, 0));
 

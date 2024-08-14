@@ -57,6 +57,8 @@ uniform sampler2D shadowtex0;
 #include "/include/utility/dithering.glsl"
 #include "/include/utility/text_rendering.glsl"
 
+uniform vec3 sun_dir;
+
 const int debug_text_scale = 2;
 ivec2 debug_text_position = ivec2(0, int(viewHeight) / debug_text_scale);
 

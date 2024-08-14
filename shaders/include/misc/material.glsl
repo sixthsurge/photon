@@ -122,7 +122,18 @@ Material material_from(vec3 albedo_srgb, uint material_mask, vec3 world_pos, vec
 		if (material_mask < 16u) { // 0-16
 			if (material_mask < 8u) { // 0-8
 				if (material_mask < 4u) { // 0-4
-					if (material_mask >= 2u) { // 2-4
+					if (material_mask < 2u) { // 0-2
+						if (material_mask == 0u) { // 2
+							#ifdef HARDCODED_SPECULAR
+							// Default
+							float smoothness = 0.33 * smoothstep(0.2, 0.6, hsl.z);
+							material.roughness = sqr(1.0 - smoothness);
+							material.f0 = vec3(0.02);
+							#endif
+						} else { // 3
+							// Water
+						}
+					} else { // 2-4
 						if (material_mask == 2u) { // 2
 							#ifdef HARDCODED_SSS
 							// Small plants
@@ -160,12 +171,6 @@ Material material_from(vec3 albedo_srgb, uint material_mask, vec3 world_pos, vec
 						}
 					} else { // 6-8
 						if (material_mask == 6u) { // 6
-							#ifdef HARDCODED_SPECULAR
-							// Grass, stone, spruce and dark oak planks	#ifdef HARDCODED_SPECULAR
-							float smoothness = 0.33 * smoothstep(0.2, 0.6, hsl.z);
-							material.roughness = sqr(1.0 - smoothness);
-							material.f0 = vec3(0.02);
-							#endif
 						} else { // 7
 							// Sand
 							#ifdef HARDCODED_SPECULAR
@@ -436,6 +441,7 @@ Material material_from(vec3 albedo_srgb, uint material_mask, vec3 world_pos, vec
 							#ifdef HARDCODED_EMISSION
 							// Strong golden light
 							material.emission  = 8.00 * albedo_sqrt * linear_step(0.4, 0.6, 0.2 * hsl.y + 0.55 * hsl.z);
+							light_levels.x *= 0.85;
 							#endif
 						}
 					}
@@ -445,6 +451,7 @@ Material material_from(vec3 albedo_srgb, uint material_mask, vec3 world_pos, vec
 							#ifdef HARDCODED_EMISSION
 							// Medium golden light
 							material.emission  = 1.85 * albedo_sqrt * linear_step(0.78, 0.85, hsl.z);
+							light_levels.x *= 0.85;
 							#endif
 						} else { // 37
 							#ifdef HARDCODED_EMISSION
@@ -488,7 +495,8 @@ Material material_from(vec3 albedo_srgb, uint material_mask, vec3 world_pos, vec
 						if (material_mask == 42u) { // 42
 							#ifdef HARDCODED_EMISSION
 							// Jack o' Lantern
-							material.emission = 0.80 * albedo_sqrt * step(0.73, 0.1 * hsl.y + 0.7 * hsl.z);
+							material.emission = 0.80 * albedo_sqrt * step(0.73, 0.8 * hsl.z);
+							light_levels.x *= 0.85;
 							#endif
 						} else { // 43
 							#ifdef HARDCODED_EMISSION
