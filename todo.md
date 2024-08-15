@@ -9,3 +9,4 @@
 - noctilucent clouds
 - bring back cirrocumulus clouds?
 - improve aurora
+- crepuscular rays
