@@ -537,7 +537,7 @@ void main() {
 		// Specular highlight
 
 #if defined WORLD_OVERWORLD || defined WORLD_END
-		scene_color += get_specular_highlight(material, NoL, NoV, NoH, LoV, LoH) * light_color * shadows * ao;
+		scene_color += get_specular_highlight(material, NoL, NoV, NoH, LoV, LoH) * light_color * shadows * cloud_shadows * ao;
 #endif
 
 		// Edge highlight
@@ -578,6 +578,8 @@ void main() {
 #else
 		scene_color = scene_color * clouds.w + clouds.xyz;
 #endif
+
+		//scene_color = shadows;
 	}
 }
 
