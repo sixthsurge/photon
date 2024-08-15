@@ -580,7 +580,7 @@ void main() {
 	if (!is_water) // Specular highlight on water must be applied in composite, after waves are calculated
 	#endif
 	{
-		radiance += get_specular_highlight(material, NoL, NoV, NoH, LoV, LoH) * light_color * shadows;
+		radiance += get_specular_highlight(material, NoL, NoV, NoH, LoV, LoH) * light_color * shadows * cloud_shadows;
 	}
 #endif
 
@@ -621,7 +621,7 @@ void main() {
 
 	// Encode gbuffer data
 
-	vec3 color_to_store = is_water ? shadows : base_color.rgb;
+	vec3 color_to_store = is_water ? shadows * cloud_shadows : base_color.rgb;
 
 #ifdef NO_NORMAL
 	#define flat_normal normal
