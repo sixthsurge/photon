@@ -413,7 +413,6 @@ void main() {
 #ifdef TAA
 	#ifndef DISTANT_HORIZONS
 	vec3 closest = get_closest_fragment(depthtex0, texel);
-	vec2 velocity = closest.xy - reproject(closest).xy;
 
 	const bool is_dh_terrain = false;
 	#else
