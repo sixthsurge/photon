@@ -231,7 +231,9 @@ uniform vec2 taa_offset;
 
 /*
 (needed by vertex stage for auto exposure)
+#if AUTO_EXPOSURE != AUTO_EXPOSURE_OFF
 const bool colortex0MipmapEnabled = true;
+#endif
  */
 
 vec3 min_of(vec3 a, vec3 b, vec3 c, vec3 d, vec3 f) {
