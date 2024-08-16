@@ -472,6 +472,9 @@ void main() {
 		current_color = texture(colortex0, pos).rgb;
 	}
 
+	current_color = reinhard(current_color);
+	history_color = reinhard(history_color);
+
 	// Interpolate AABB bounds across pixels
 	vec3 min_color = texture(colortex13, pos).rgb;
 	vec3 max_color = texture(colortex14, pos).rgb;
