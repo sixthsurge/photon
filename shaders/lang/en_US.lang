@@ -479,8 +479,9 @@ option.SSR_PREVIOUS_FRAME.comment      = Use previous frame data for reflections
 
 option.WATER_CAUSTICS                  = Water Caustics
 option.WATER_CAUSTICS.comment          = Dancing light patterns beneath water
-option.WATER_FOAM                      = Water Foam
-option.WATER_FOAM.comment              = White highlights where water meets terrain. Helps to make water more easily visible in some cases
+option.WATER_EDGE_HIGHLIGHT            = Water Edge Highlight
+option.WATER_EDGE_HIGHLIGHT.comment    = White highlights where water meets terrain. Helps to make water more easily visible in some cases
+option.WATER_EDGE_HIGHLIGHT_INTENSITY  = Water Edge Highlight Intensity
 option.SNELLS_WINDOW                   = Snell's Window
 option.SNELLS_WINDOW.comment           = Total internal reflection underwater
 option.WATER_TEXTURE                   = Water Texture
@@ -492,9 +493,10 @@ option.WATER_REFRECTION.comment        = Refraction behind water. Very small per
 option.WATER_REFRACTION_INTENSITY      = Water Refraction Intensity
 option.WATER_REFRACTION_INTENSITY.comment = Adjusts the intensity of refractions on water
 
-value.WATER_TEXTURE.WATER_TEXTURE_OFF       = Off
-value.WATER_TEXTURE.WATER_TEXTURE_HIGHLIGHT = Highlights
-value.WATER_TEXTURE.WATER_TEXTURE_VANILLA   = Vanilla
+value.WATER_TEXTURE.WATER_TEXTURE_OFF                   = Off
+value.WATER_TEXTURE.WATER_TEXTURE_HIGHLIGHT             = Highlights
+value.WATER_TEXTURE.WATER_TEXTURE_VANILLA               = Vanilla
+value.WATER_TEXTURE.WATER_TEXTURE_HIGHLIGHT_UNDERGROUND = Highlights (Underground only)
 
 option.WATER_WAVES                     = Enabled
 option.WATER_WAVE_ITERATIONS           = Iterations

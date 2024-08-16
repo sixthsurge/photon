@@ -578,8 +578,6 @@ void main() {
 #else
 		scene_color = scene_color * clouds.w + clouds.xyz;
 #endif
-
-		//scene_color = shadows;
 	}
 }
 
