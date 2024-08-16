@@ -449,9 +449,9 @@ void main() {
 	#else
 		float edge_highlight = cube(max0(1.0 - 2.0 * dist));
 	#endif
-		edge_highlight *= WATER_EDGE_HIGHLIGHT_INTENSITY * max0(normal.y);
+		edge_highlight *= WATER_EDGE_HIGHLIGHT_INTENSITY * max0(normal.y) * (1.0 - 0.5 * sqr(light_levels.y));;
 
-		material.albedo += 0.1 * edge_highlight / mix(1.0, max(dot(ambient_color, luminance_weights_rec2020), 0.5), light_levels.y) * (1.0 - sqr(light_levels.y));
+		material.albedo += 0.1 * edge_highlight / mix(1.0, max(dot(ambient_color, luminance_weights_rec2020), 0.5), light_levels.y);
 		material.albedo  = clamp01(material.albedo);
 #endif
 
