@@ -62,13 +62,13 @@ float get_water_height(vec2 coord, vec2 flow_dir, bool flowing_water) {
 #ifdef WATER_WAVES_HEIGHT_VARIATION
 	const float height_variation_frequency    = 0.001;
 	const float min_height                    = 0.1;
-	const float height_variation_scale        = 4.0;
+	const float height_variation_scale        = 3.0;
 	const float height_variation_offset       = -0.5;
 	const float height_variation_scroll_speed = 0.1;
 
 	float height_variation = texture(noisetex, (coord + vec2(0.0, height_variation_scroll_speed * t)) * height_variation_frequency).y;
 	      height_variation = max(min_height, height_variation * height_variation_scale + height_variation_offset);
-
+	
 	height *= height_variation;
 #endif
 
@@ -82,13 +82,16 @@ vec3 get_water_normal(vec3 world_pos, vec3 flat_normal, vec2 coord, vec2 flow_di
 	float wave2 = get_water_height(coord + vec2(0.0, h), flow_dir, flowing_water);
 
 #if defined WORLD_OVERWORLD
-	float normal_influence  = mix(0.01, 0.04 + 0.15 * 0, dampen(skylight));
+	float normal_influence  = flowing_water
+		? 0.05
+		: mix(0.01, 0.04 + 0.15 * 0, dampen(skylight));
 #else
 	float normal_influence  = 0.04;
 #endif
 	      normal_influence *= smoothstep(0.0, 0.05, abs(flat_normal.y));
 	      normal_influence *= smoothstep(0.0, 0.15, abs(dot(flat_normal, normalize(world_pos - cameraPosition)))); // prevent noise when looking horizontally
 	      normal_influence *= WATER_WAVE_STRENGTH;
+
 
 	vec3 normal     = vec3(wave1 - wave0, wave2 - wave0, h);
 	     normal.xy *= normal_influence;

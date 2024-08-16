@@ -427,27 +427,31 @@ void main() {
 
 #if   WATER_TEXTURE == WATER_TEXTURE_OFF
 		base_color = vec4(0.0);
-#elif WATER_TEXTURE == WATER_TEXTURE_HIGHLIGHT
+#elif WATER_TEXTURE == WATER_TEXTURE_HIGHLIGHT || WATER_TEXTURE == WATER_TEXTURE_HIGHLIGHT_UNDERGROUND
 		base_color = texture(gtexture, uv, lod_bias);
-		float texture_highlight = 0.5 * sqr(linear_step(0.63, 1.0, base_color.r)) + 0.03 * base_color.r;
+		float texture_highlight  = 0.5 * sqr(linear_step(0.63, 1.0, base_color.r)) + 0.03 * base_color.r;
+	#if WATER_TEXTURE == WATER_TEXTURE_HIGHLIGHT_UNDERGROUND
+		      texture_highlight *= 1.0 - cube(light_levels.y);
+	#endif
 
-		material.albedo     = clamp01(0.33 * exp(-2.0 * water_absorption_coeff) * texture_highlight);
+		material.albedo     = clamp01(0.5 * exp(-2.0 * water_absorption_coeff) * texture_highlight);
 		material.roughness += 0.3 * texture_highlight;
 #elif WATER_TEXTURE == WATER_TEXTURE_VANILLA
 		base_color = texture(gtexture, uv, lod_bias) * tint;
 		material.albedo = srgb_eotf_inv(base_color.rgb * base_color.a) * rec709_to_working_color;
 #endif
 
-#ifdef WATER_FOAM
+#ifdef WATER_EDGE_HIGHLIGHT
 		float dist = layer_dist * max(abs(world_dir.y), eps);
 
-	#if WATER_TEXTURE == WATER_TEXTURE_HIGHLIGHT
-		float foam = cube(max0(1.0 - 2.0 * dist)) * (1.0 + 8.0 * texture_highlight);
+	#if WATER_TEXTURE == WATER_TEXTURE_HIGHLIGHT || WATER_TEXTURE == WATER_TEXTURE_HIGHLIGHT_UNDERGROUND
+		float edge_highlight = cube(max0(1.0 - 2.0 * dist)) * (1.0 + 8.0 * texture_highlight);
 	#else
-		float foam = cube(max0(1.0 - 2.0 * dist));
+		float edge_highlight = cube(max0(1.0 - 2.0 * dist));
 	#endif
+		edge_highlight *= WATER_EDGE_HIGHLIGHT_INTENSITY * max0(normal.y) * (1.0 - 0.5 * sqr(light_levels.y));;
 
-		material.albedo += 0.05 * foam / mix(1.0, max(dot(ambient_color, luminance_weights_rec2020), 0.5), light_levels.y);
+		material.albedo += 0.1 * edge_highlight / mix(1.0, max(dot(ambient_color, luminance_weights_rec2020), 0.5), light_levels.y);
 		material.albedo  = clamp01(material.albedo);
 #endif
 
@@ -598,13 +602,15 @@ void main() {
 			light_color,
 			ambient_color,
 			absorption_coeff,
+			adjusted_light_levels,
 			layer_dist * float(isEyeInWater != 1),
 			-LoV,
-			adjusted_light_levels.y,
 			sss_depth
 		);
 
-		radiance += water_fog[0] * (1.0 + 6.0 * sqr(water_fog[1])) * (1.0 - exp(-0.33 * layer_dist));
+		float brightness_control = 1.0 - exp(-0.33 * layer_dist);
+		      brightness_control = (1.0 - light_levels.y) + brightness_control * light_levels.y;
+		radiance += water_fog[0] * (1.0 + 6.0 * sqr(water_fog[1])) * brightness_control;
 		alpha     = 1.0 - water_fog[1].x;
 	} else {
 		alpha     = base_color.a;

@@ -1,6 +1,7 @@
 #if !defined INCLUDE_FOG_SIMPLE_FOG
 #define INCLUDE_FOG_SIMPLE_FOG
 
+#include "/include/light/colors/blocklight_color.glsl"
 #include "/include/sky/projection.glsl"
 #include "/include/utility/bicubic.glsl"
 #include "/include/utility/color.glsl"
@@ -136,11 +137,13 @@ mat2x3 water_fog_simple(
 	vec3 light_color,
 	vec3 ambient_color,
 	vec3 absorption_coeff,
+	vec2 light_levels,
 	float dist,
 	float LoV,
-	float skylight,
 	float sss_depth
 ) {
+	float skylight_factor = cube(light_levels.y);
+
 	vec3 scattering_coeff = vec3(WATER_SCATTERING);
 	vec3 extinction_coeff = scattering_coeff + absorption_coeff;
 
@@ -150,13 +153,16 @@ mat2x3 water_fog_simple(
 	vec3 multiple_scattering_energy = multiple_scattering_factor / (1.0 - multiple_scattering_factor);
 
 	// Minimum distance so that water is always easily visible
-	dist = max(dist, 1.0);
+	dist = max(dist, 2.0 - 1.0 * skylight_factor);
+
+	vec3 light_ambient  = ambient_color * light_levels.y;
+	     light_ambient += 1.41 * blocklight_color * blocklight_scale * sqr(light_levels.x);
 
 	vec3 transmittance = exp(-extinction_coeff * dist);
 
-	vec3 scattering  = light_color * exp(-extinction_coeff * sss_depth) * smoothstep(0.0, 0.25, skylight); // direct lighting
+	vec3 scattering  = light_color * exp(-extinction_coeff * sss_depth) * smoothstep(0.0, 0.25, light_levels.y); // direct lighting
 		 scattering *= 0.7 * henyey_greenstein_phase(LoV, 0.4) + 0.3 * isotropic_phase;                          // phase function for direct lighting
-	     scattering += ambient_color * skylight * isotropic_phase;                                               // ambient lighting
+	     scattering += light_ambient * isotropic_phase;                                               // ambient lighting
 	     scattering *= (1.0 - transmittance) * scattering_coeff / extinction_coeff;                  // scattering integral
 		 scattering *= 1.0 + multiple_scattering_energy;                                                         // multiple scattering
 

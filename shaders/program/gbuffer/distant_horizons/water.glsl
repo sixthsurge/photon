@@ -303,34 +303,6 @@ void main() {
 		material = water_material;
 
 		base_color = vec4(0.0);
-
-#if   WATER_TEXTURE == WATER_TEXTURE_OFF
-		base_color = vec4(0.0);
-#elif WATER_TEXTURE == WATER_TEXTURE_HIGHLIGHT
-		base_color  = tint;
-		base_color += 0.61 * texture(gtexture, uv, lod_bias);
-		float texture_highlight = 0.5 * sqr(linear_step(0.61, 1.0, base_color.r)) + 0.03 * base_color.r;
-
-		material.albedo     = clamp01(0.33 * exp(-2.0 * water_absorption_coeff) * texture_highlight);
-		material.roughness += 0.3 * texture_highlight;
-#elif WATER_TEXTURE == WATER_TEXTURE_VANILLA
-		base_color  = tint;
-		base_color *= texture(gtexture, uv, lod_bias);
-		material.albedo = srgb_eotf_inv(base_color.rgb * base_color.a) * rec709_to_working_color;
-#endif
-
-#ifdef WATER_FOAM
-		float dist = layer_dist * max(abs(world_dir.y), eps);
-
-	#if WATER_TEXTURE == WATER_TEXTURE_HIGHLIGHT
-		float foam = cube(max0(1.0 - 2.0 * dist)) * (1.0 + 8.0 * texture_highlight);
-	#else
-		float foam = cube(max0(1.0 - 2.0 * dist));
-	#endif
-
-		material.albedo += 0.05 * foam / mix(1.0, max(dot(ambient_color, luminance_weights_rec2020), 0.5), light_levels.y);
-		material.albedo  = clamp01(material.albedo);
-#endif
 	} else {
 		base_color = tint;
 		vec2 adjusted_light_levels = light_levels;
