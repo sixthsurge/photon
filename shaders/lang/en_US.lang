@@ -230,6 +230,10 @@ option.STARS_INTENSITY                 = Stars Intensity
 option.STARS_INTENSITY.comment         = Controls the brightness of stars in the night sky
 option.STARS_COVERAGE                  = Stars Coverage
 option.STARS_COVERAGE.comment          = Controls the number of stars in the night sky
+option.GALAXY                          = Galaxy
+option.GALAXY.comment                  = Galaxy image in the night sky
+option.GALAXY_INTENSITY                = Galaxy Intensity
+option.GALAXY_INTENSITY.comment        = Controls the brightness of the galaxy in the night sky
 
 # Clouds
 option.CLOUDS_CUMULUS                       = Cumulus Clouds

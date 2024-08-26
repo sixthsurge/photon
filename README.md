@@ -14,6 +14,8 @@
 * [Sledgehammer Games](https://www.sledgehammergames.com/) - Bloom downsampling method used in Call of Duty Advanced Warfare (described [here](http://www.iryoku.com/next-generation-post-processing-in-call-of-duty-advanced-warfare))
 * http://momentsingraphics.de/ - Blue noise texture
 * [NakiriRuri](https://github.com/NakiriRuri) and [OrzMiku](https://github.com/Orzmiku) - Chinese settings translation 
+* [NASA Scientific Visualization Studio](https://svs.gsfc.nasa.gov/4851) - Galaxy image
+
 
 ## installation
 
