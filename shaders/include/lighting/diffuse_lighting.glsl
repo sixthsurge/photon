@@ -1,9 +1,9 @@
-#if !defined INCLUDE_LIGHT_DIFFUSE_LIGHTING
-#define INCLUDE_LIGHT_DIFFUSE_LIGHTING
+#if !defined INCLUDE_LIGHTING_DIFFUSE_LIGHTING
+#define INCLUDE_LIGHTING_DIFFUSE_LIGHTING
 
-#include "/include/light/colors/blocklight_color.glsl"
-#include "/include/light/colors/skylight_approx.glsl"
-#include "/include/light/bsdf.glsl"
+#include "/include/lighting/colors/blocklight_color.glsl"
+#include "/include/lighting/colors/skylight_approx.glsl"
+#include "/include/lighting/bsdf.glsl"
 #include "/include/misc/end_lighting_fix.glsl"
 #include "/include/misc/material.glsl"
 #include "/include/utility/phase_functions.glsl"
@@ -11,11 +11,11 @@
 #include "/include/utility/spherical_harmonics.glsl"
 
 #ifdef COLORED_LIGHTS
-#include "/include/light/lpv/blocklight.glsl"
+#include "/include/lighting/lpv/blocklight.glsl"
 #endif
 
 #ifdef HANDHELD_LIGHTING
-#include "/include/light/handheld_lighting.glsl"
+#include "/include/lighting/handheld_lighting.glsl"
 #endif
 
 #ifndef WORLD_OVERWORLD
@@ -190,4 +190,4 @@ vec3 get_diffuse_lighting(
 	return max0(lighting) * material.albedo * rcp_pi * mix(1.0, metal_diffuse_amount, float(material.is_metal));
 }
 
-#endif // INCLUDE_LIGHT_DIFFUSE_LIGHTING
+#endif // INCLUDE_LIGHTING_DIFFUSE_LIGHTING

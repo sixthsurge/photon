@@ -1,9 +1,9 @@
-#if !defined INCLUDE_LIGHT_SHADOWS
-#define INCLUDE_LIGHT_SHADOWS
+#if !defined INCLUDE_LIGHTING_SHADOWS
+#define INCLUDE_LIGHTING_SHADOWS
 
 #if defined WORLD_OVERWORLD || defined WORLD_END
 
-#include "/include/light/distortion.glsl"
+#include "/include/lighting/distortion.glsl"
 #include "/include/utility/color.glsl"
 #include "/include/utility/dithering.glsl"
 #include "/include/utility/random.glsl"
@@ -276,4 +276,4 @@ vec3 calculate_shadows(
 
 #endif
 
-#endif // INCLUDE_LIGHT_SHADOWS
+#endif // INCLUDE_LIGHTING_SHADOWS

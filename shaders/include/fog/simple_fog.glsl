@@ -1,7 +1,7 @@
 #if !defined INCLUDE_FOG_SIMPLE_FOG
 #define INCLUDE_FOG_SIMPLE_FOG
 
-#include "/include/light/colors/blocklight_color.glsl"
+#include "/include/lighting/colors/blocklight_color.glsl"
 #include "/include/sky/projection.glsl"
 #include "/include/utility/bicubic.glsl"
 #include "/include/utility/color.glsl"

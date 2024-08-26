@@ -297,13 +297,13 @@ uniform vec4 entityColor;
 #endif
 
 #ifdef DIRECTIONAL_LIGHTMAPS
-#include "/include/light/directional_lightmaps.glsl"
+#include "/include/lighting/directional_lightmaps.glsl"
 #endif
 
 #include "/include/fog/simple_fog.glsl"
-#include "/include/light/diffuse_lighting.glsl"
-#include "/include/light/shadows.glsl"
-#include "/include/light/specular_lighting.glsl"
+#include "/include/lighting/diffuse_lighting.glsl"
+#include "/include/lighting/shadows.glsl"
+#include "/include/lighting/specular_lighting.glsl"
 #include "/include/misc/distant_horizons.glsl"
 #include "/include/misc/material.glsl"
 #include "/include/misc/water_normal.glsl"
@@ -313,7 +313,7 @@ uniform vec4 entityColor;
 #include "/include/utility/space_conversion.glsl"
 
 #ifdef CLOUD_SHADOWS
-#include "/include/light/cloud_shadows.glsl"
+#include "/include/lighting/cloud_shadows.glsl"
 #endif
 
 const float lod_bias = log2(taau_render_scale);

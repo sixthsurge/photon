@@ -1,5 +1,5 @@
-#if !defined INCLUDE_LIGHT_COLORS_LIGHT_COLOR
-#define INCLUDE_LIGHT_COLORS_LIGHT_COLOR
+#if !defined INCLUDE_LIGHTING_COLORS_LIGHT_COLOR
+#define INCLUDE_LIGHTING_COLORS_LIGHT_COLOR
 
 #include "/include/sky/atmosphere.glsl"
 #include "/include/utility/color.glsl"
@@ -68,4 +68,4 @@ float get_skylight_boost() {
 	return 1.0 + max0(night_skylight_boost);
 }
 
-#endif // INCLUDE_LIGHT_COLORS_LIGHT_COLOR
+#endif // INCLUDE_LIGHTING_COLORS_LIGHT_COLOR

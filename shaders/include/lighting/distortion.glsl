@@ -1,5 +1,5 @@
-#if !defined INCLUDE_LIGHT_DISTORTION
-#define INCLUDE_LIGHT_DISTORTION
+#if !defined INCLUDE_LIGHTING_DISTORTION
+#define INCLUDE_LIGHTING_DISTORTION
 
 #include "/include/utility/fast_math.glsl"
 
@@ -46,4 +46,4 @@ vec3 get_shadow_bias(vec3 scene_pos, vec3 normal, float NoL, float skylight) {
 	return bias + edge_factor * clamp01(1.0 - skylight);
 }
 
-#endif // INCLUDE_LIGHT_DISTORTION
+#endif // INCLUDE_LIGHTING_DISTORTION

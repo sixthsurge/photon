@@ -16,7 +16,7 @@ const ivec3 workGroups = ivec3(1, 1, 1);
 
 writeonly uniform image2D light_data_img;
 
-#include "/include/light/lpv/light_colors.glsl"
+#include "/include/lighting/lpv/light_colors.glsl"
 
 void main() {
 	int index = int(gl_LocalInvocationID.x);

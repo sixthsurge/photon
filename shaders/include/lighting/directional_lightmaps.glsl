@@ -1,5 +1,5 @@
-#if !defined INCLUDE_LIGHT_DIRECTIONAL_LIGHTMAPS
-#define INCLUDE_LIGHT_DIRECTIONAL_LIGHTMAPS
+#if !defined INCLUDE_LIGHTING_DIRECTIONAL_LIGHTMAPS
+#define INCLUDE_LIGHTING_DIRECTIONAL_LIGHTMAPS
 
 // Based on Ninjamike's implementation in shaderLABS #snippets
 
@@ -30,4 +30,4 @@ vec2 get_directional_lightmaps(vec3 normal) {
 	return lightmap_mul;
 }
 
-#endif // INCLUDE_LIGHT_DIRECTIONAL_LIGHTMAPS
+#endif // INCLUDE_LIGHTING_DIRECTIONAL_LIGHTMAPS

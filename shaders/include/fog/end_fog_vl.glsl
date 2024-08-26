@@ -1,7 +1,7 @@
 #if !defined INCLUDE_FOG_END_FOG_VL
 #define INCLUDE_FOG_END_FOG_VL
 
-#include "/include/light/distortion.glsl"
+#include "/include/lighting/distortion.glsl"
 #include "/include/utility/color.glsl"
 #include "/include/utility/fast_math.glsl"
 #include "/include/utility/phase_functions.glsl"

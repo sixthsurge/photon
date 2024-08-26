@@ -97,7 +97,7 @@ uniform vec2 view_pixel_size;
 
 uniform float biome_may_snow;
 
-#include "/include/light/colors/weather_color.glsl"
+#include "/include/lighting/colors/weather_color.glsl"
 #include "/include/utility/encoding.glsl"
 
 const uint rain_flag = 253u;

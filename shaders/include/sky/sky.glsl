@@ -90,9 +90,9 @@ vec3 draw_galaxy(vec3 ray_dir, out float galaxy_luminance) {
 //----------------------------------------------------------------------------//
 #if   defined WORLD_OVERWORLD
 
-#include "/include/light/colors/light_color.glsl"
-#include "/include/light/colors/weather_color.glsl"
-#include "/include/light/bsdf.glsl"
+#include "/include/lighting/colors/light_color.glsl"
+#include "/include/lighting/colors/weather_color.glsl"
+#include "/include/lighting/bsdf.glsl"
 #include "/include/sky/atmosphere.glsl"
 #include "/include/sky/projection.glsl"
 #include "/include/utility/geometry.glsl"

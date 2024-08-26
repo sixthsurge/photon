@@ -1,5 +1,5 @@
-#if !defined INCLUDE_LIGHT_LPV_BLOCKLIGHT
-#define INCLUDE_LIGHT_LPV_BLOCKLIGHT
+#if !defined INCLUDE_LIGHTING_LPV_BLOCKLIGHT
+#define INCLUDE_LIGHTING_LPV_BLOCKLIGHT
 
 #include "voxelization.glsl"
 
@@ -43,4 +43,4 @@ vec3 get_lpv_blocklight(vec3 scene_pos, vec3 normal, vec3 mc_blocklight, float a
 	}
 }
 
-#endif // INCLUDE_LIGHT_LPV_BLOCKLIGHT
+#endif // INCLUDE_LIGHTING_LPV_BLOCKLIGHT

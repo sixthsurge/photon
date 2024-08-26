@@ -1,5 +1,5 @@
-#if !defined INCLUDE_LIGHT_COLORS_NETHER_COLOR
-#define INCLUDE_LIGHT_COLORS_NETHER_COLOR
+#if !defined INCLUDE_LIGHTING_COLORS_NETHER_COLOR
+#define INCLUDE_LIGHTING_COLORS_NETHER_COLOR
 
 #include "/include/utility/color.glsl"
 
@@ -20,4 +20,4 @@ vec3 get_ambient_color() {
 	return nether_color;
 }
 
-#endif // INCLUDE_LIGHT_COLORS_NETHER_COLOR
+#endif // INCLUDE_LIGHTING_COLORS_NETHER_COLOR

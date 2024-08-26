@@ -1,7 +1,7 @@
 #if !defined INCLUDE_FOG_AIR_FOG_VL
 #define INCLUDE_FOG_AIR_FOG_VL
 
-#include "/include/light/distortion.glsl"
+#include "/include/lighting/distortion.glsl"
 #include "/include/sky/atmosphere.glsl"
 #include "/include/utility/encoding.glsl"
 #include "/include/utility/phase_functions.glsl"

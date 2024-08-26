@@ -76,7 +76,7 @@ uniform float time_midnight;
 #define WEATHER_AURORA
 
 #if defined WORLD_OVERWORLD
-#include "/include/light/colors/light_color.glsl"
+#include "/include/lighting/colors/light_color.glsl"
 #include "/include/misc/weather.glsl"
 #include "/include/sky/atmosphere.glsl"
 #include "/include/sky/projection.glsl"
@@ -264,9 +264,9 @@ const bool colortex11MipmapEnabled = true;
 #define ATMOSPHERE_SCATTERING_LUT depthtex0
 
 #include "/include/fog/simple_fog.glsl"
-#include "/include/light/diffuse_lighting.glsl"
-#include "/include/light/shadows.glsl"
-#include "/include/light/specular_lighting.glsl"
+#include "/include/lighting/diffuse_lighting.glsl"
+#include "/include/lighting/shadows.glsl"
+#include "/include/lighting/specular_lighting.glsl"
 #include "/include/misc/distant_horizons.glsl"
 #include "/include/misc/edge_highlight.glsl"
 #include "/include/misc/material.glsl"
@@ -282,7 +282,7 @@ const bool colortex11MipmapEnabled = true;
 #endif
 
 #if defined CLOUD_SHADOWS
-#include "/include/light/cloud_shadows.glsl"
+#include "/include/lighting/cloud_shadows.glsl"
 #endif
 
 vec4 read_clouds_and_aurora(out float apparent_distance) {

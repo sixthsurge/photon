@@ -1,5 +1,5 @@
-#if !defined INCLUDE_LIGHT_LPV_VOXELIZATION
-#define INCLUDE_LIGHT_LPV_VOXELIZATION
+#if !defined INCLUDE_LIGHTING_LPV_VOXELIZATION
+#define INCLUDE_LIGHTING_LPV_VOXELIZATION
 
 const ivec3 voxel_volume_size = ivec3(VOXEL_VOLUME_SIZE);
 
@@ -86,4 +86,4 @@ void update_voxel_map(uint block_id) {
 }
 #endif
 
-#endif // INCLUDE_LIGHT_LPV_VOXELIZATION
+#endif // INCLUDE_LIGHTING_LPV_VOXELIZATION

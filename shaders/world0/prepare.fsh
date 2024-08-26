@@ -85,7 +85,7 @@ uniform int dhRenderDistance;
 #endif
 
 #define PROGRAM_PREPARE
-#include "/include/sky/clouds.glsl"
+#include "/include/lighting/cloud_shadows.glsl"
 
 void main() {
 #ifndef BLOCKY_CLOUDS

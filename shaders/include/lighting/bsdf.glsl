@@ -1,5 +1,5 @@
-#if !defined INCLUDE_LIGHT_BSDF
-#define INCLUDE_LIGHT_BSDF
+#if !defined INCLUDE_LIGHTING_BSDF
+#define INCLUDE_LIGHTING_BSDF
 
 #include "/include/utility/fast_math.glsl"
 
@@ -78,4 +78,4 @@ vec3 diffuse_hammon(
 	return albedo * multi + single;
 }
 
-#endif // INCLUDE_LIGHT_BSDF
+#endif // INCLUDE_LIGHTING_BSDF

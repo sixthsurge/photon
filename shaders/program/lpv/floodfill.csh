@@ -37,7 +37,7 @@ uniform vec3 previousCameraPosition;
 
 uniform int frameCounter;
 
-#include "/include/light/lpv/floodfill.glsl"
+#include "/include/lighting/lpv/floodfill.glsl"
 
 void main() {
 	if ((frameCounter & 1) == 0) {

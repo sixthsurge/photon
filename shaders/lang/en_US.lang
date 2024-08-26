@@ -483,6 +483,8 @@ option.SSR_PREVIOUS_FRAME.comment      = Use previous frame data for reflections
 
 option.WATER_CAUSTICS                  = Water Caustics
 option.WATER_CAUSTICS.comment          = Dancing light patterns beneath water
+option.WATER_CAUSTICS_INTENSITY        = Water Caustics Intensity
+option.WATER_CAUSTICS.comment          = Adjust the brightness of water caustics
 option.WATER_EDGE_HIGHLIGHT            = Water Edge Highlight
 option.WATER_EDGE_HIGHLIGHT.comment    = White highlights where water meets terrain. Helps to make water more easily visible in some cases
 option.WATER_EDGE_HIGHLIGHT_INTENSITY  = Water Edge Highlight Intensity
@@ -534,7 +536,7 @@ option.BLOOM.comment                   = Soft "glow" effect around bright areas 
 option.BLOOM_INTENSITY                 = Bloom Intensity
 option.BLOOM_INTENSITY.comment         = Adjusts how much the bloom affects the final image
 option.DOF                             = Depth of Field
-option.DOG.comment                     = Camera focus effect - blurs out-of-focus areas
+option.DOF.comment                     = Camera focus effect - blurs out-of-focus areas
 option.DOF_INTENSITY                   = DoF Intensity
 option.DOF_INTENSITY.comment           = Adjusts the intensity of Depth of Field
 option.DOF_SAMPLES                     = DoF Samples

@@ -1,5 +1,5 @@
-#if !defined INCLUDE_LIGHT_COLORS_END_COLOR
-#define INCLUDE_LIGHT_COLORS_END_COLOR
+#if !defined INCLUDE_LIGHTING_COLORS_END_COLOR
+#define INCLUDE_LIGHTING_COLORS_END_COLOR
 
 #include "/include/utility/color.glsl"
 

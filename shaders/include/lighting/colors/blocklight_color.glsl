@@ -1,5 +1,5 @@
-#if !defined INCLUDE_LIGHT_COLORS_BLOCKLIGHT_COLOR
-#define INCLUDE_LIGHT_COLORS_BLOCKLIGHT_COLOR
+#if !defined INCLUDE_LIGHTING_COLORS_BLOCKLIGHT_COLOR
+#define INCLUDE_LIGHTING_COLORS_BLOCKLIGHT_COLOR
 
 #include "/include/utility/color.glsl"
 
@@ -7,4 +7,4 @@ const vec3  blocklight_color = from_srgb(vec3(BLOCKLIGHT_R, BLOCKLIGHT_G, BLOCKL
 const float blocklight_scale = 6.0;
 const float emission_scale   = 40.0 * EMISSION_STRENGTH;
 
-#endif // INCLUDE_LIGHT_COLORS_BLOCKLIGHT_COLOR
+#endif // INCLUDE_LIGHTING_COLORS_BLOCKLIGHT_COLOR

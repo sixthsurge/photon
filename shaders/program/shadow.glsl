@@ -69,11 +69,11 @@ uniform int renderStage;
 //   Includes
 // ------------
 
-#include "/include/light/distortion.glsl"
+#include "/include/lighting/distortion.glsl"
 #include "/include/vertex/displacement.glsl"
 
 #ifdef COLORED_LIGHTS
-#include "/include/light/lpv/voxelization.glsl"
+#include "/include/lighting/lpv/voxelization.glsl"
 #endif
 
 void main() {
@@ -214,7 +214,7 @@ float get_water_caustics() {
 	vec3 normal = tbn * get_water_normal(world_pos, tbn[2], coord, flow_dir, 1.0, flowing_water);
 
 	vec3 old_pos = world_pos;
-	vec3 new_pos = world_pos + refract_safe(light_dir, normal, air_n / water_n) * distance_through_water;
+	vec3 new_pos = world_pos + refract_safe(light_dir, normal, air_n / water_n) * (distance_through_water * WATER_CAUSTICS_INTENSITY);
 
 	float old_area = length_squared(dFdx(old_pos)) * length_squared(dFdy(old_pos));
 	float new_area = length_squared(dFdx(new_pos)) * length_squared(dFdy(new_pos));

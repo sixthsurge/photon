@@ -1,5 +1,5 @@
-#ifndef INCLUDE_LIGHT_HANDHELD_LIGHTING
-#define INCLUDE_LIGHT_HANDHELD_LIGHTING
+#ifndef INCLUDE_LIGHTING_HANDHELD_LIGHTING
+#define INCLUDE_LIGHTING_HANDHELD_LIGHTING
 
 #ifdef COLORED_LIGHTS
 uniform sampler2D light_data_sampler;
@@ -49,4 +49,4 @@ vec3 get_handheld_lighting(vec3 scene_pos, float ao) {
 	return light_color * falloff;
 }
 
-#endif // INCLUDE_LIGHT_HANDHELD_LIGHTING
+#endif // INCLUDE_LIGHTING_HANDHELD_LIGHTING

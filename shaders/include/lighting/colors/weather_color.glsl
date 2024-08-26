@@ -1,5 +1,5 @@
-#if !defined INCLUDE_LIGHT_COLORS_WEATHER_COLOR
-#define INCLUDE_LIGHT_COLORS_WEATHER_COLOR
+#if !defined INCLUDE_LIGHTING_COLORS_WEATHER_COLOR
+#define INCLUDE_LIGHTING_COLORS_WEATHER_COLOR
 
 #include "/include/sky/atmosphere.glsl"
 
@@ -28,4 +28,4 @@ vec3 get_weather_color() {
 	return weather_color;
 }
 
-#endif // INCLUDE_LIGHT_COLORS_WEATHER_COLOR
+#endif // INCLUDE_LIGHTING_COLORS_WEATHER_COLOR

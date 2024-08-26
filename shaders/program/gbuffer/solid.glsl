@@ -247,7 +247,7 @@ uniform vec4 entityColor;
 #endif
 
 #ifdef DIRECTIONAL_LIGHTMAPS
-#include "/include/light/directional_lightmaps.glsl"
+#include "/include/lighting/directional_lightmaps.glsl"
 #endif
 
 #include "/include/misc/material_fix.glsl"

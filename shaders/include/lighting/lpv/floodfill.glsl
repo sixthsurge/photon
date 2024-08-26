@@ -1,5 +1,5 @@
-#if !defined INCLUDE_LIGHT_LPV_FLOODFILL
-#define INCLUDE_LIGHT_LPV_FLOODFILL
+#if !defined INCLUDE_LIGHTING_LPV_FLOODFILL
+#define INCLUDE_LIGHTING_LPV_FLOODFILL
 
 #include "voxelization.glsl"
 
@@ -66,4 +66,4 @@ void update_lpv(writeonly image3D light_img, sampler3D light_sampler) {
 	imageStore(light_img, pos, vec4(light, 0.0));
 }
 
-#endif // INCLUDE_LIGHT_LPV_FLOODFILL
+#endif // INCLUDE_LIGHTING_LPV_FLOODFILL
