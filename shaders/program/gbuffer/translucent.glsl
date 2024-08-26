@@ -467,6 +467,7 @@ void main() {
 		vec4 specular_map = texture(specular, uv, lod_bias);
 #endif
 
+		// Lightning (old Iris)
 #if defined PROGRAM_GBUFFERS_ENTITIES_TRANSLUCENT
 		if (material_mask == 102) base_color = vec4(1.0);
 #endif
@@ -484,6 +485,12 @@ void main() {
 #endif
 
 		material = material_from(base_color.rgb * base_color.a, material_mask, world_pos, tbn[2], adjusted_light_levels);
+
+#if defined PROGRAM_GBUFFERS_LIGHTNING
+		// Lightning (new Iris)
+		material.albedo   = vec3(1.0);
+		material.emission = vec3(1.0);
+#endif
 
 		//--//
 
