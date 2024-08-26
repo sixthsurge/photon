@@ -65,6 +65,7 @@ uniform sampler2D colortex6; // volumetric fog scattering
 uniform sampler2D colortex7; // volumetric fog transmittance
 uniform sampler2D colortex11; // clouds history
 uniform sampler2D colortex12; // clouds data
+uniform sampler2D colortex13; // rain and snow particles
 
 uniform sampler2D depthtex0;
 uniform sampler2D depthtex1;
@@ -212,6 +213,7 @@ void main() {
 #if defined NORMAL_MAPPING || defined SPECULAR_MAPPING
 	vec4 gbuffer_data_1 = texelFetch(colortex2, texel, 0);
 #endif
+	vec4 weather_particles  = texelFetch(colortex13, texel, 0);
 
 #ifdef VL
 	vec3 fog_scattering    = smooth_filter(colortex6, uv).rgb;
@@ -231,6 +233,9 @@ void main() {
 	// Sky early exit
 
 	if (depth0 == 1.0 && !front_is_dh_terrain) {
+		// weather particles
+		scene_color = mix(scene_color, weather_particles.rgb, weather_particles.a);
+
 		// fog
 #if (defined WORLD_OVERWORLD || defined WORLD_END) && defined VL
 		scene_color = scene_color * fog_transmittance + fog_scattering;
@@ -243,6 +248,7 @@ void main() {
 #if defined WORLD_NETHER
 		bloomy_fog = spherical_fog(far, nether_fog_start, nether_bloomy_fog_density * (1.0 - blindness)) * 0.5 + 0.5;
 #endif
+
 		// purkinje shift
 		scene_color = purkinje_shift(scene_color, vec2(0.0, 1.0));
 
@@ -399,6 +405,10 @@ void main() {
 		}
 
 #endif
+
+	// Weather particles
+	scene_color = mix(scene_color, weather_particles.rgb, weather_particles.a);
+
 
 	// Rain puddles
 

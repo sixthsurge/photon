@@ -76,7 +76,7 @@ void main() {
 
 layout (location = 0) out vec4 scene_color;
 
-/* RENDERTARGETS: 0 */
+/* RENDERTARGETS: 13 */
 
 in vec2 uv;
 
