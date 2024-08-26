@@ -10,6 +10,12 @@
 	#undef WATER_DISPLACEMENT
 #endif
 
+#ifdef IS_IRIS 
+uniform vec3 eyePosition;
+#else 
+#define eyePosition cameraPosition
+#endif
+
 #if defined WATER_DISPLACEMENT
 float gerstner_wave(vec2 coord, vec2 wave_dir, float t, float noise, float wavelength) {
 	// Gerstner wave function from Belmu in #snippets, modified
@@ -62,6 +68,13 @@ vec3 animate_vertex(vec3 world_pos, bool is_top_vertex, float skylight, uint mat
 	float wind_speed = 0.3;
 	float wind_strength = sqr(skylight) * (0.25 + 0.66 * rainStrength);
 
+	// Displace plants close to the player
+	vec3 to_player = eyePosition - world_pos;
+	vec3 player_displacement = vec3(
+		-6.0 * to_player.xz * exp2(-length(to_player * vec3(6.0, 2.0, 6.0))),
+		0.0
+	).xzy;
+
 	switch (material_mask) {
 #ifdef WATER_DISPLACEMENT
 	case 1:
@@ -71,13 +84,13 @@ vec3 animate_vertex(vec3 world_pos, bool is_top_vertex, float skylight, uint mat
 
 #ifdef WAVING_PLANTS
 	case 2:
-		return world_pos + get_wind_displacement(world_pos, wind_speed, wind_strength, false) * float(is_top_vertex);
+		return world_pos + (get_wind_displacement(world_pos, wind_speed, wind_strength, false) + player_displacement) * float(is_top_vertex);
 
 	case 3:
-		return world_pos + get_wind_displacement(world_pos, wind_speed, wind_strength, false) * float(is_top_vertex);
+		return world_pos + (get_wind_displacement(world_pos, wind_speed, wind_strength, false) + player_displacement) * float(is_top_vertex);
 
 	case 4:
-		return world_pos + get_wind_displacement(world_pos, wind_speed, wind_strength, is_top_vertex);
+		return world_pos + (get_wind_displacement(world_pos, wind_speed, wind_strength, is_top_vertex) + player_displacement);
 #endif
 
 #ifdef WAVING_LEAVES
