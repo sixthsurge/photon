@@ -236,7 +236,7 @@ void main() {
 		// weather particles
 		scene_color = mix(scene_color, weather_particles.rgb, weather_particles.a);
 
-		// fog
+		// Fog
 #if (defined WORLD_OVERWORLD || defined WORLD_END) && defined VL
 		scene_color = scene_color * fog_transmittance + fog_scattering;
 		bloomy_fog = clamp01(dot(fog_transmittance, vec3(luminance_weights_rec2020)));
@@ -249,7 +249,10 @@ void main() {
 		bloomy_fog = spherical_fog(far, nether_fog_start, nether_bloomy_fog_density * (1.0 - blindness)) * 0.5 + 0.5;
 #endif
 
-		// purkinje shift
+		// Bloomy rain
+		bloomy_fog = min(bloomy_fog, step(weather_particles.a, 0.05));
+
+		// Purkinje shift
 		scene_color = purkinje_shift(scene_color, vec2(0.0, 1.0));
 
 		return;
@@ -533,6 +536,9 @@ void main() {
 #if defined WORLD_NETHER
 	bloomy_fog = spherical_fog(view_dist, nether_fog_start, nether_bloomy_fog_density) * 0.33 + 0.67;
 #endif
+
+	// Bloomy rain
+	bloomy_fog = min(bloomy_fog, step(weather_particles.a, 0.05));
 
 	// Apply purkinje shift
 	scene_color = purkinje_shift(scene_color, light_levels);
