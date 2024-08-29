@@ -5,6 +5,7 @@
 #include "clouds/cumulus.glsl"
 #include "clouds/cumulus_congestus.glsl"
 #include "clouds/cirrus.glsl"
+#include "clouds/noctilucent.glsl"
 
 CloudsResult draw_clouds(
 	vec3 air_viewer_pos,
@@ -38,6 +39,10 @@ CloudsResult draw_clouds(
 	CloudsResult result_ci = draw_cirrus_clouds(air_viewer_pos, ray_dir, clear_sky, distance_to_terrain, dither);
 	result = blend_layers(result, result_ci);
 #endif
+	
+	vec4 noctilucent = draw_noctilucent_clouds(air_viewer_pos, ray_dir, clear_sky, dither);
+	result.scattering += noctilucent.xyz * result.transmittance;
+	result.transmittance *= noctilucent.w;
 
 	return result;
 }

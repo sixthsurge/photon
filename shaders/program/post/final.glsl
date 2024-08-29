@@ -155,6 +155,10 @@ void main() {
 
 	scene_color = dither_8bit(scene_color, bayer16(vec2(texel)));
 
+	begin_text(ivec2(gl_FragCoord.xy) / 3, ivec2(0, viewHeight / 3));
+	print_float(sun_dir.y);
+	end_text(scene_color);
+
 #if   DEBUG_VIEW == DEBUG_VIEW_SAMPLER
 	if (clamp(texel, ivec2(0), ivec2(textureSize(DEBUG_SAMPLER, 0))) == texel) {
 		scene_color = texelFetch(DEBUG_SAMPLER, texel, 0).rgb;
