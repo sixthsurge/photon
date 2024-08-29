@@ -24,7 +24,7 @@ flat out vec3 sky_color;
 
 flat out vec2 clouds_cumulus_coverage;
 flat out vec2 clouds_altocumulus_coverage;
-flat out float clouds_cirrus_coverage;
+flat out vec2 clouds_cirrus_coverage;
 
 flat out float clouds_cumulus_congestus_amount;
 flat out float clouds_stratus_amount;
@@ -141,7 +141,7 @@ flat in vec3 sky_color;
 
 flat in vec2 clouds_cumulus_coverage;
 flat in vec2 clouds_altocumulus_coverage;
-flat in float clouds_cirrus_coverage;
+flat in vec2 clouds_cirrus_coverage;
 
 flat in float clouds_cumulus_congestus_amount;
 flat in float clouds_stratus_amount;
@@ -302,7 +302,7 @@ void main() {
 	clouds.w          = result.transmittance;
 	apparent_distance = result.apparent_distance * rcp(CLOUDS_SCALE);
 #else
-	clouds = vec4(0.0, 0.0, 0.0, 1.0);
+	clouds            = vec4(0.0, 0.0, 0.0, 1.0);
 	apparent_distance = 1e6;
 #endif
 

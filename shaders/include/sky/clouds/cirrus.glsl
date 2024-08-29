@@ -1,7 +1,7 @@
 #if !defined INCLUDE_SKY_CLOUDS_CIRRUS
 #define INCLUDE_SKY_CLOUDS_CIRRUS
 
-// 3rd layer: planar cirrus clouds
+// 3rd layer: planar cirrus/cirrocumulus clouds
 
 #include "common.glsl"
 
@@ -40,7 +40,10 @@ vec2 curl2D(vec2 coord) {
 	return vec2(gradient.y, -gradient.x);
 }
 
-float clouds_cirrus_density(vec2 coord, float altitude_fraction, out float cirrus, out float cirrocumulus) {
+float clouds_cirrus_density(
+	vec2 coord,
+	float altitude_fraction
+) {
 	const float wind_angle = CLOUDS_CIRRUS_WIND_ANGLE * degree;
 	const vec2 wind_velocity = CLOUDS_CIRRUS_WIND_SPEED * vec2(cos(wind_angle), sin(wind_angle));
 
@@ -51,9 +54,13 @@ float clouds_cirrus_density(vec2 coord, float altitude_fraction, out float cirru
 	          + curl2D(0.00004 * coord) * 0.25
 			  + curl2D(0.00008 * coord) * 0.125;
 
-	float density = 0.7 * texture(noisetex, (0.000001 / CLOUDS_CIRRUS_SIZE) * coord + (0.004 * CLOUDS_CIRRUS_CURL_STRENGTH) * curl).x
-	              + 0.3 * texture(noisetex, (0.000008 / CLOUDS_CIRRUS_SIZE) * coord + (0.008 * CLOUDS_CIRRUS_CURL_STRENGTH) * curl).x;
-	      density = linear_step(0.7 - clouds_cirrus_coverage, 1.0, density);
+	float height_shaping = 1.0 - abs(1.0 - 2.0 * altitude_fraction);
+
+	// Cirrus 
+
+	float density_cirrus = 0.7 * texture(noisetex, (0.000001 / CLOUDS_CIRRUS_SIZE) * coord + (0.004 * CLOUDS_CIRRUS_CURL_STRENGTH) * curl).x
+	                     + 0.3 * texture(noisetex, (0.000008 / CLOUDS_CIRRUS_SIZE) * coord + (0.008 * CLOUDS_CIRRUS_CURL_STRENGTH) * curl).x;
+	density_cirrus = linear_step(0.7 - clouds_cirrus_coverage.x, 1.0, density_cirrus);
 
 	float detail_amplitude = 0.2;
 	float detail_frequency = 0.00002;
@@ -62,7 +69,7 @@ float clouds_cirrus_density(vec2 coord, float altitude_fraction, out float cirru
 	for (int i = 0; i < 4; ++i) {
 		float detail = texture(noisetex, coord * detail_frequency + curl * curl_strength).x;
 
-		density -= detail * detail_amplitude;
+		density_cirrus -= detail * detail_amplitude;
 
 		detail_amplitude *= 0.6;
 		detail_frequency *= 2.0;
@@ -71,10 +78,27 @@ float clouds_cirrus_density(vec2 coord, float altitude_fraction, out float cirru
 		coord += 0.3 * wind_velocity * world_age;
 	}
 
-	float height_shaping = 1.0 - abs(1.0 - 2.0 * altitude_fraction);
-	density = mix(1.0, 0.75, day_factor) * cube(max0(density)) * sqr(height_shaping) * CLOUDS_CIRRUS_DENSITY;
+	density_cirrus = mix(1.0, 0.75, day_factor) * cube(max0(density_cirrus)) * sqr(height_shaping) * CLOUDS_CIRRUS_DENSITY;
 
-	return density;
+	// Cirrocumulus 
+
+	float coverage = texture(noisetex, (0.0000026 / CLOUDS_CIRROCUMULUS_SIZE) * coord + 0.25).w;
+		  coverage = 5.0 * linear_step(0.25, 0.9, clouds_cirrus_coverage.y * coverage);
+
+	float density_cirrocumulus = dampen(texture(noisetex, (0.000025 * rcp(CLOUDS_CIRROCUMULUS_SIZE)) * coord + (0.033 * CLOUDS_CIRROCUMULUS_CURL_STRENGTH) * curl).w);
+	density_cirrocumulus = linear_step(1.0 - coverage, 1.0, density_cirrocumulus);
+
+	vec2 curl_cc = curl2D(0.001 * coord);
+
+	density_cirrocumulus -= sqr(texture(noisetex, coord * 0.00005 + (0.003 * CLOUDS_CIRROCUMULUS_CURL_STRENGTH) * curl_cc).y) * (CLOUDS_CIRROCUMULUS_DETAIL_STRENGTH * 1.0);
+	density_cirrocumulus -= sqr(texture(noisetex, coord * 0.0002 + (0.007 * CLOUDS_CIRROCUMULUS_CURL_STRENGTH) * curl_cc).y) * (CLOUDS_CIRROCUMULUS_DETAIL_STRENGTH * 0.5);
+	density_cirrocumulus -= sqr(texture(noisetex, coord * 0.0008 + (0.03 * CLOUDS_CIRROCUMULUS_CURL_STRENGTH) * curl_cc).y) * (CLOUDS_CIRROCUMULUS_DETAIL_STRENGTH * 0.1);
+
+	density_cirrocumulus  = max0(density_cirrocumulus);
+
+	density_cirrocumulus = 0.25 * pow4(max0(density_cirrocumulus)) * height_shaping * CLOUDS_CIRROCUMULUS_DENSITY;
+
+	return density_cirrus + density_cirrocumulus;
 }
 
 float clouds_cirrus_optical_depth(
@@ -90,6 +114,7 @@ float clouds_cirrus_optical_depth(
 	// boundary
 	vec2 inner_sphere = intersect_sphere(ray_origin, ray_dir, clouds_cirrus_radius - 0.5 * CLOUDS_CIRRUS_THICKNESS);
 	vec2 outer_sphere = intersect_sphere(ray_origin, ray_dir, clouds_cirrus_radius + 0.5 * CLOUDS_CIRRUS_THICKNESS);
+
 	float ray_length = (inner_sphere.y >= 0.0) ? inner_sphere.x : outer_sphere.y;
 	      ray_length = min(ray_length, max_ray_length);
 
@@ -109,11 +134,11 @@ float clouds_cirrus_optical_depth(
 
 		float r = length(dithered_pos);
 		float altitude_fraction = (r - clouds_cirrus_radius) * rcp(CLOUDS_CIRRUS_THICKNESS) + 0.5;
+		if (clamp01(altitude_fraction) != altitude_fraction) continue;
 
 		vec3 sphere_pos = dithered_pos * (clouds_cirrus_radius / r);
 
-		float cirrus, cirrocumulus;
-		optical_depth += clouds_cirrus_density(sphere_pos.xz, altitude_fraction, cirrus, cirrocumulus) * ray_step.w;
+		optical_depth += clouds_cirrus_density(sphere_pos.xz, altitude_fraction) * ray_step.w;
 	}
 
 	return optical_depth;
@@ -128,21 +153,23 @@ vec2 clouds_cirrus_scattering(
 	vec2 scattering = vec2(0.0);
 
 	float phase = clouds_phase_single(cos_theta);
-	vec3 phase_g = vec3(0.7, 0.9, 0.3);
+	vec3 phase_g = vec3(0.6, 0.9, 0.3);
 
 	float powder_effect = 4.0 * (1.0 - exp(-40.0 * density));
 	      powder_effect = mix(powder_effect, 1.0, pow1d5(cos_theta * 0.5 + 0.5));
 
 	float scatter_amount = clouds_cirrus_scattering_coeff;
-	float extinct_amount = clouds_cirrus_extinction_coeff * (1.0 + 0.5 * max0(smoothstep(0.0, 0.15, abs(sun_dir.y)) - smoothstep(0.5, 0.7, clouds_cirrus_coverage)));
+	float extinct_amount = clouds_cirrus_extinction_coeff * (1.0 + 0.5 * max0(smoothstep(0.0, 0.15, abs(sun_dir.y)) - smoothstep(0.5, 0.7, clouds_cirrus_coverage.x)));
 
 	for (uint i = 0u; i < 4u; ++i) {
 		scattering.x += scatter_amount * exp(-extinct_amount * light_optical_depth) * phase * powder_effect; // direct light
 		scattering.y += scatter_amount * exp(-0.33 * CLOUDS_CIRRUS_THICKNESS * extinct_amount * density) * isotropic_phase; // sky light
 
 		scatter_amount *= 0.5;
-		extinct_amount *= 0.5;
-		phase_g *= 0.8;
+		extinct_amount *= 0.25;
+		phase_g *= 0.5;
+
+		powder_effect = mix(powder_effect, sqrt(powder_effect), 0.5);
 
 		phase = clouds_phase_multi(cos_theta, phase_g);
 	}
@@ -184,12 +211,11 @@ CloudsResult draw_cirrus_clouds(
 	vec3 light_dir = moonlit ? moon_dir : sun_dir;
 	float cos_theta = dot(ray_dir, light_dir);
 
-	float cirrus, cirrocumulus;
-	float density = clouds_cirrus_density(sphere_pos.xz, 0.5, cirrus, cirrocumulus);
+	float density = clouds_cirrus_density(sphere_pos.xz, 0.5);
 	if (density < eps) return clouds_not_hit;
 
 	float light_optical_depth = clouds_cirrus_optical_depth(sphere_pos, light_dir, dither);
-	float view_optical_depth  = density * clouds_cirrus_extinction_coeff * CLOUDS_CIRRUS_THICKNESS * rcp(abs(ray_dir.y) + eps);
+	float view_optical_depth  = 0.5 * density * clouds_cirrus_extinction_coeff * CLOUDS_CIRRUS_THICKNESS * rcp(abs(ray_dir.y) + eps);
 	float view_transmittance  = exp(-view_optical_depth);
 
 	vec2 scattering = clouds_cirrus_scattering(density, view_transmittance, light_optical_depth, cos_theta);
@@ -198,9 +224,8 @@ CloudsResult draw_cirrus_clouds(
 	float r_sq = dot(sphere_pos, sphere_pos);
 	float rcp_r = inversesqrt(r_sq);
 	float mu = dot(sphere_pos, light_dir) * rcp_r;
-	float rr = r_sq * rcp_r - 1500.0 * clamp01(linear_step(0.0, 0.05, cirrocumulus) * (1.0 - linear_step(0.0, 0.1, cirrus)) + cirrocumulus);
 
-	vec3 light_color  = sunlight_color * atmosphere_transmittance(mu, rr);
+	vec3 light_color  = sunlight_color * atmosphere_transmittance(sphere_pos, light_dir);
 		 light_color  = atmosphere_post_processing(light_color);
 	     light_color *= moonlit ? moon_color : sun_color;
 		 light_color *= 1.0 - rainStrength;

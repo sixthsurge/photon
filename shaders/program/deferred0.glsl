@@ -68,7 +68,7 @@ flat out vec3 sky_color;
 
 flat out vec2 clouds_cumulus_coverage;
 flat out vec2 clouds_altocumulus_coverage;
-flat out float clouds_cirrus_coverage;
+flat out vec2 clouds_cirrus_coverage;
 
 flat out float clouds_cumulus_congestus_amount;
 flat out float clouds_stratus_amount;
@@ -207,7 +207,7 @@ flat in vec3 sky_color;
 
 flat in vec2 clouds_cumulus_coverage;
 flat in vec2 clouds_altocumulus_coverage;
-flat in float clouds_cirrus_coverage;
+flat in vec2 clouds_cirrus_coverage;
 
 flat in float clouds_cumulus_congestus_amount;
 flat in float clouds_stratus_amount;

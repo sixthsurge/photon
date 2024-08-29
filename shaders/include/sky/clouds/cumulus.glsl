@@ -1,7 +1,7 @@
 #if !defined INCLUDE_SKY_CLOUDS_CUMULUS
 #define INCLUDE_SKY_CLOUDS_CUMULUS
 
-// 1st layer: volumetric cumulus/stratocumulus clouds
+// 1st layer: volumetric cumulus/stratocumulus/stratus clouds
 
 #include "common.glsl"
 

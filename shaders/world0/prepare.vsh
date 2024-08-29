@@ -17,7 +17,7 @@ out vec2 uv;
 
 flat out vec2 clouds_cumulus_coverage;
 flat out vec2 clouds_altocumulus_coverage;
-flat out float clouds_cirrus_coverage;
+flat out vec2 clouds_cirrus_coverage;
 flat out float clouds_cumulus_congestus_amount;
 flat out float clouds_stratus_amount;
 
