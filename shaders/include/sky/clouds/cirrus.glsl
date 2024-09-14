@@ -62,12 +62,14 @@ float clouds_cirrus_density(
 	                     + 0.3 * texture(noisetex, (0.000008 / CLOUDS_CIRRUS_SIZE) * coord + (0.008 * CLOUDS_CIRRUS_CURL_STRENGTH) * curl).x;
 	density_cirrus = linear_step(0.7 - clouds_cirrus_coverage.x, 1.0, density_cirrus);
 
+	vec2 detail_coord = coord;
+
 	float detail_amplitude = 0.2;
 	float detail_frequency = 0.00002;
 	float curl_strength    = 0.1 * CLOUDS_CIRRUS_CURL_STRENGTH;
 
 	for (int i = 0; i < 4; ++i) {
-		float detail = texture(noisetex, coord * detail_frequency + curl * curl_strength).x;
+		float detail = texture(noisetex, detail_coord * detail_frequency + curl * curl_strength).x;
 
 		density_cirrus -= detail * detail_amplitude;
 
@@ -75,7 +77,7 @@ float clouds_cirrus_density(
 		detail_frequency *= 2.0;
 		curl_strength *= 4.0;
 
-		coord += 0.3 * wind_velocity * world_age;
+		detail_coord += 0.3 * wind_velocity * world_age;
 	}
 
 	density_cirrus = mix(1.0, 0.75, day_factor) * cube(max0(density_cirrus)) * sqr(height_shaping) * CLOUDS_CIRRUS_DENSITY;
