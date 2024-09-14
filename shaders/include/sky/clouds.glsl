@@ -40,9 +40,11 @@ CloudsResult draw_clouds(
 	result = blend_layers(result, result_ci);
 #endif
 	
-	vec4 noctilucent = draw_noctilucent_clouds(air_viewer_pos, ray_dir, clear_sky, dither);
-	result.scattering += noctilucent.xyz * result.transmittance;
-	result.transmittance *= noctilucent.w;
+#ifdef CLOUDS_NOCTILUCENT
+	vec4 result_nlc = draw_noctilucent_clouds(air_viewer_pos, ray_dir, clear_sky);
+	result.scattering += result_nlc.xyz * result.transmittance;
+	result.transmittance *= result_nlc.w;
+#endif
 
 	return result;
 }

@@ -293,6 +293,8 @@ suffix.CLOUDS_CUMULUS_CONGESTUS_ALTITUDE              = m/s
 option.CLOUDS_CUMULUS_CONGESTUS_WIND_ANGLE            = Wind Angle
 suffix.CLOUDS_CUMULUS_CONGESTUS_ALTITUDE              = °
 
+option.CLOUDS_NOCTILUCENT              = Noctilucent Clouds
+
 option.BLOCKY_CLOUDS                   = Blocky Clouds
 option.BLOCKY_CLOUDS.comment           = Vanilla-styled volumetric clouds. Enabling this option disables all other cloud types
 option.BLOCKY_CLOUDS_LAYER_2           = Second Layer
