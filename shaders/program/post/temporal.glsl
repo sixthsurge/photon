@@ -224,14 +224,15 @@ uniform vec2 taa_offset;
 #include "/include/utility/space_conversion.glsl"
 
 #define TAA_VARIANCE_CLIPPING // More aggressive neighborhood clipping method which further reduces ghosting but can introduce flickering artifacts
-#define TAA_BLEND_WEIGHT 0.1 // The maximum weight given to the current frame by the TAA. Higher values result in reduced ghosting and blur but jittering is more obvious
 #define TAA_OFFCENTER_REJECTION 0.25 // Reduces blur when moving quickly. Too much offcenter rejection results in aliasing and jittering in motion
 #define TAAU_CONFIDENCE_REJECTION 5.0 // Controls the impact of the "confidence-of-quality" factor on temporal upscaling. Tradeoff between image clarity and time taken to converge
 #define TAAU_FLICKER_REDUCTION 1.0 // Increases ghosting but reduces flickering caused by aggressive clipping
 
 /*
 (needed by vertex stage for auto exposure)
+#if AUTO_EXPOSURE != AUTO_EXPOSURE_OFF
 const bool colortex0MipmapEnabled = true;
+#endif
  */
 
 vec3 min_of(vec3 a, vec3 b, vec3 c, vec3 d, vec3 f) {
@@ -305,7 +306,12 @@ float get_flicker_reduction(vec3 history_color, vec3 min_color, vec3 max_color) 
 	return clamp01(distance_to_clip);
 }
 
-vec3 neighborhood_clipping(ivec2 texel, vec3 current_color, vec3 history_color) {
+vec3 neighborhood_clipping(
+	ivec2 texel,
+	vec3 current_color,
+	vec3 history_color,
+	float distance_factor
+) {
 	vec3 min_color, max_color;
 
 	// Fetch 3x3 neighborhood
@@ -322,16 +328,19 @@ vec3 neighborhood_clipping(ivec2 texel, vec3 current_color, vec3 history_color) 
 	vec3 h = texelFetch(colortex0, texel + ivec2( 0, -1), 0).rgb;
 	vec3 i = texelFetch(colortex0, texel + ivec2( 1, -1), 0).rgb;
 
-	// Convert to YCoCg
-	a = rgb_to_ycocg(a);
-	b = rgb_to_ycocg(b);
-	c = rgb_to_ycocg(c);
-	d = rgb_to_ycocg(d);
-	e = rgb_to_ycocg(e);
-	f = rgb_to_ycocg(f);
-	g = rgb_to_ycocg(g);
-	h = rgb_to_ycocg(h);
-	i = rgb_to_ycocg(i);
+	// Convert to YCoCg 
+	// Clipping in a luminance-chrominance color space is superior because the eyes are more 
+	// sensitive to luminance than chrominance so an AABB where luminance is one of the axes 
+	// will result in less visible ghosting than one which is not aligned to the luminance
+	a = rgb_to_ycocg(reinhard(a));
+	b = rgb_to_ycocg(reinhard(b));
+	c = rgb_to_ycocg(reinhard(c));
+	d = rgb_to_ycocg(reinhard(d));
+	e = rgb_to_ycocg(reinhard(e));
+	f = rgb_to_ycocg(reinhard(f));
+	g = rgb_to_ycocg(reinhard(g));
+	h = rgb_to_ycocg(reinhard(h));
+	i = rgb_to_ycocg(reinhard(i));
 
 	// Soft minimum and maximum ("Hybrid Reconstruction Antialiasing")
 	//        b         a b c
@@ -351,7 +360,12 @@ vec3 neighborhood_clipping(ivec2 texel, vec3 current_color, vec3 history_color) 
 	moments[0] = (1.0 / 9.0) * (a + b + c + d + e + f + g + h + i);
 	moments[1] = (1.0 / 9.0) * (a * a + b * b + c * c + d * d + e * e + f * f + g * g + h * h + i * i);
 
-	const float gamma = 1.25; // Strictness parameter, higher gamma => less ghosting but more flickering and worse image quality
+	// Strictness parameter, higher gamma => more temporally stable but more ghosting
+	float gamma = mix(
+		0.75, 1.25,
+		linear_step(0.25, 1.0, distance_factor)
+	); 
+
 	vec3 mu = moments[0];
 	vec3 sigma = sqrt(moments[1] - moments[0] * moments[0]);
 
@@ -399,7 +413,8 @@ void main() {
 #ifdef TAA
 	#ifndef DISTANT_HORIZONS
 	vec3 closest = get_closest_fragment(depthtex0, texel);
-	vec2 velocity = closest.xy - reproject(closest).xy;
+
+	const bool is_dh_terrain = false;
 	#else
 	vec3 closest    = get_closest_fragment(depthtex0, texel);
 	vec3 closest_dh = get_closest_fragment(dhDepthTex, texel);
@@ -409,9 +424,14 @@ void main() {
 	closest = is_dh_terrain
 		? closest_dh
 		: closest;
-	
-	vec2 velocity = closest.xy - reproject(closest, is_dh_terrain).xy;
 	#endif
+
+	vec3 closest_view  = screen_to_view_space(closest, false, is_dh_terrain);
+	vec3 closest_scene = view_to_scene_space(closest_view);
+
+	bool hand = closest.z < hand_depth;
+
+	vec2 velocity = closest.xy - reproject_scene_space(closest_scene, hand, is_dh_terrain).xy;
 	vec2 previous_uv = uv - velocity;
 
 	vec3 history_color = catmull_rom_filter_fast_rgb(colortex5, previous_uv, 0.6);
@@ -420,14 +440,26 @@ void main() {
 	float pixel_age = texelFetch(colortex5, ivec2(previous_uv * view_res), 0).a;
 	      pixel_age = max0(pixel_age * float(clamp01(previous_uv) == previous_uv) + 1.0);
 
+	// Distance factor to favour responsiveness closer to the camera and image stability further 
+	// away
+	float distance_factor = 1.0 - exp2(-0.025 * length(closest_view));
+
 	// Dynamic blend weight lending equal weight to all frames in the history, drastically reducing
 	// time taken to converge when upscaling
-	float alpha = max(1.0 / pixel_age, TAA_BLEND_WEIGHT);
+	float blend_weight = mix(0.35, 0.10, distance_factor);
+	float alpha = max(1.0 / pixel_age, blend_weight);
 
 #ifndef TAAU
 	// Native resolution TAA
 	vec3 current_color = texelFetch(colortex0, texel, 0).rgb;
-	history_color = neighborhood_clipping(texel, current_color, history_color);
+
+	// "Tonemapping" before applying TAA in order to perform the AA in SDR
+	// This improves the result because the differences between the luminances are closer to 
+	// how they will be in the final output
+	current_color = reinhard(current_color);
+	history_color = reinhard(history_color);
+
+	history_color = neighborhood_clipping(texel, current_color, history_color, distance_factor);
 #else
 	// Temporal upscaling
 	vec2 pos = clamp01(uv + 0.5 * taa_offset * rcp(taau_render_scale)) * taau_render_scale;
@@ -439,6 +471,9 @@ void main() {
 		// Fix negatives arising around very dark objects
 		current_color = texture(colortex0, pos).rgb;
 	}
+
+	current_color = reinhard(current_color);
+	history_color = reinhard(history_color);
 
 	// Interpolate AABB bounds across pixels
 	vec3 min_color = texture(colortex13, pos).rgb;
@@ -463,9 +498,7 @@ void main() {
 	alpha *= offcenter_rejection;
 	alpha  = 1.0 - alpha;
 
-	// Tonemap before blending and reverse it after
-	// Improves the appearance of emissive objects
-	current_color = mix(reinhard(history_color), reinhard(current_color), alpha);
+	current_color = mix(history_color, current_color, alpha);
 	current_color = reinhard_inverse(current_color);
 
 	result = vec4(current_color, pixel_age * offcenter_rejection);
