@@ -41,7 +41,7 @@ vec3 screen_to_view_space(mat4 projection_matrix_inverse, vec3 screen_pos, bool 
 #ifdef TAAU
 	vec2 jitter_offset = taa_offset * rcp(taau_render_scale);
 #else
-	vec2 jitter_offset = taa_offset * 0.75;
+	vec2 jitter_offset = taa_offset * 0.66;
 #endif
 
 	if (handle_jitter) ndc_pos.xy -= jitter_offset;
@@ -57,7 +57,7 @@ vec3 view_to_screen_space(mat4 projection_matrix, vec3 view_pos, bool handle_jit
 #ifdef TAAU
 	vec2 jitter_offset = taa_offset * rcp(taau_render_scale);
 #else
-	vec2 jitter_offset = taa_offset * 0.75;
+	vec2 jitter_offset = taa_offset * 0.66;
 #endif
 
 	if (handle_jitter) ndc_pos.xy += jitter_offset;

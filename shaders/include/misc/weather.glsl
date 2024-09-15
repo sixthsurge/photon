@@ -228,7 +228,7 @@ mat2x3 air_fog_rayleigh_coeff() {
 }
 
 mat2x3 air_fog_mie_coeff() {
-	// Increased mie density during late sunset / blue hour
+	// Increased mie density and scattering strength during late sunset / blue hour
 	float blue_hour = linear_step(0.05, 1.0, exp(-190.0 * sqr(sun_dir.y + 0.07283)));
 
 	float mie_coeff = AIR_FOG_MIE_DENSITY_MORNING  * time_sunrise
@@ -242,8 +242,8 @@ mat2x3 air_fog_mie_coeff() {
 
 	float mie_albedo = mix(0.9, 0.5, rainStrength * biome_may_rain);
 
-	vec3 scattering_coeff = vec3(mie_coeff * mie_albedo);
 	vec3 extinction_coeff = vec3(mie_coeff);
+	vec3 scattering_coeff = vec3(mie_coeff * mie_albedo);
 
 #ifdef DESERT_SANDSTORM
 	const float desert_sandstorm_density    = 0.2;

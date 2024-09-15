@@ -253,6 +253,10 @@ uniform float time_noon;
 uniform float time_sunset;
 uniform float time_midnight;
 
+/*
+const bool colortex11MipmapEnabled = true;
+*/
+
 // ------------
 //   Includes
 // ------------
@@ -281,15 +285,15 @@ uniform float time_midnight;
 #include "/include/light/cloud_shadows.glsl"
 #endif
 
-vec4 read_clouds(out float apparent_distance) {
+vec4 read_clouds_and_aurora(out float apparent_distance) {
 #if defined WORLD_OVERWORLD
 	// Soften clouds for new pixels
 	float pixel_age = texelFetch(colortex12, ivec2(gl_FragCoord.xy), 0).y;
-	int ld = int(3.0 * dampen(max0(1.0 - 0.1 * pixel_age)));
+	float ld = 2.0 * dampen(max0(1.0 - 0.1 * pixel_age));
 
 	apparent_distance = min_of(textureGather(colortex12, uv * taau_render_scale, 0));
 
-	return bicubic_filter_lod(colortex11, uv * taau_render_scale, ld);
+	return textureLod(colortex11, uv * taau_render_scale, ld);
 #else
 	return vec4(0.0, 0.0, 0.0, 1.0);
 #endif
@@ -308,7 +312,7 @@ void main() {
 	vec4 overlays       = texelFetch(colortex3, texel, 0);
 
 	float clouds_distance;
-	vec4 clouds = read_clouds(clouds_distance);
+	vec4 clouds_and_aurora = read_clouds_and_aurora(clouds_distance);
 
     // Check for Distant Horizons terrain
 
@@ -339,7 +343,7 @@ void main() {
 	float dither = texelFetch(noisetex, texel & 511, 0).b;
 	      dither = r1(frameCounter, dither);
 
-	clouds = raymarch_blocky_clouds(
+	vec4 blocky_clouds = raymarch_blocky_clouds(
 		world_start_pos,
 		world_end_pos,
 		depth == 1.0,
@@ -349,20 +353,20 @@ void main() {
 
 #ifdef BLOCKY_CLOUDS_LAYER_2
 	float visibility = pow4(clouds.a);
-	vec4 clouds_l2 = raymarch_blocky_clouds(
+	vec4 blocky_clouds_l2 = raymarch_blocky_clouds(
 		world_start_pos,
 		world_end_pos,
 		depth == 1.0,
 		blocky_clouds_altitude_l1,
 		dither
 	);
-	clouds.rgb += clouds_l2.xyz * visibility;
-	clouds.a   *= mix(1.0, clouds_l2.a, visibility);
+	blocky_clouds.rgb += blocky_clouds_l2.xyz * visibility;
+	blocky_clouds.a   *= mix(1.0, blocky_clouds_l2.a, visibility);
 #endif
 
-	float new_alpha = sqr(sqr(clouds.a));
-	clouds.rgb += atmosphere * (1.0 - new_alpha) * (clouds.a - new_alpha);
-	clouds.a = new_alpha;
+	float new_alpha = sqr(sqr(blocky_clouds.a));
+	blocky_clouds.rgb += atmosphere * (1.0 - new_alpha) * (blocky_clouds.a - new_alpha);
+	blocky_clouds.a = new_alpha;
 #endif
 #endif
 
@@ -373,8 +377,13 @@ void main() {
 		scene_color = draw_sky(world_dir);
 #endif
 
-		// Apply clouds
-		scene_color = scene_color * clouds.w + clouds.xyz;
+		// Apply clouds and aurora
+		scene_color = scene_color * clouds_and_aurora.w + clouds_and_aurora.xyz;
+
+		// Apply blocky clouds 
+#ifdef BLOCKY_CLOUDS 
+		scene_color = scene_color * blocky_clouds.w + blocky_clouds.xyz;
+#endif
 
 		// Apply common fog
 		vec4 fog = common_fog(far, true);
@@ -533,7 +542,7 @@ void main() {
 		// Specular highlight
 
 #if defined WORLD_OVERWORLD || defined WORLD_END
-		scene_color += get_specular_highlight(material, NoL, NoV, NoH, LoV, LoH) * light_color * shadows * ao;
+		scene_color += get_specular_highlight(material, NoL, NoV, NoH, LoV, LoH) * light_color * shadows * cloud_shadows * ao;
 #endif
 
 		// Edge highlight
@@ -566,13 +575,13 @@ void main() {
 		vec4 fog = common_fog(view_distance, false);
 		scene_color = scene_color * fog.a + fog.rgb;
 
-		// Apply clouds
+		// Apply clouds in front of terrain
 #ifndef BLOCKY_CLOUDS
 		if (clouds_distance < view_distance) {
-			scene_color = scene_color * clouds.w + clouds.xyz;
+			scene_color = scene_color * clouds_and_aurora.w + clouds_and_aurora.xyz;
 		}
 #else
-		scene_color = scene_color * clouds.w + clouds.xyz;
+		scene_color = scene_color * blocky_clouds.w + blocky_clouds.xyz;
 #endif
 	}
 }

@@ -25,7 +25,10 @@ const CloudsResult clouds_not_hit = CloudsResult(
 uniform float day_factor;
 
 float clouds_phase_single(float cos_theta) { // Single scattering phase function
-	return 0.8 * klein_nishina_phase(cos_theta, 2600.0)    // forwards lobe
+	float forwards_a = klein_nishina_phase(cos_theta, 2600.0); // this gives a nice glow very close to the sun
+	float forwards_b = henyey_greenstein_phase(cos_theta, 0.8); 
+
+	return 0.8 * max(forwards_a, forwards_b)               // forwards lobe (max'ing them is completely nonsensical but it looks nice)
 	     + 0.2 * henyey_greenstein_phase(cos_theta, -0.2); // backwards lobe
 }
 
@@ -350,8 +353,9 @@ CloudsResult draw_cumulus_clouds(
 	}
 
 	// Get main light color for this layer
-	vec3 light_color  = moonlit ? moon_color : sun_color;
-	     light_color *= sunlight_color * atmosphere_transmittance(ray_origin, light_dir);
+	vec3 light_color  = sunlight_color * atmosphere_transmittance(ray_origin, light_dir);
+		 light_color  = atmosphere_post_processing(light_color);
+	     light_color *= moonlit ? moon_color : sun_color;
 		 light_color *= 1.0 - rainStrength;
 
 	// Remap the transmittance so that min_transmittance is 0
@@ -359,7 +363,7 @@ CloudsResult draw_cumulus_clouds(
 
 	vec3 clouds_scattering = scattering.x * light_color + scattering.y * sky_color;
 	     clouds_scattering = clouds_aerial_perspective(clouds_scattering, clouds_transmittance, air_viewer_pos, ray_origin, ray_dir, clear_sky);
-	
+
 	float apparent_distance = (distance_weight_sum == 0.0)
 		? 1e6
 		: (distance_sum / distance_weight_sum) + distance(air_viewer_pos, ray_origin);
@@ -614,8 +618,9 @@ CloudsResult draw_cumulus_congestus_clouds(
 	}
 
 	// Get main light color for this layer
-	vec3 light_color  = moonlit ? moon_color : sun_color;
-	     light_color *= sunlight_color * atmosphere_transmittance(ray_origin, light_dir);
+	vec3 light_color  = sunlight_color * atmosphere_transmittance(ray_origin, light_dir);
+		 light_color  = atmosphere_post_processing(light_color);
+	     light_color *= moonlit ? moon_color : sun_color;
 		 light_color *= 1.0 - rainStrength;
 
 	// Remap the transmittance so that min_transmittance is 0
@@ -624,11 +629,11 @@ CloudsResult draw_cumulus_congestus_clouds(
 	// Aerial perspective
 	vec3 clouds_scattering = scattering.x * light_color + scattering.y * sky_color;
 	     clouds_scattering = clouds_aerial_perspective(clouds_scattering, clouds_transmittance, air_viewer_pos, ray_origin, ray_dir, clear_sky);
-		
+
 	// Fade away at the horizon
 	float horizon_fade = mix(dampen(linear_step(0.0, 0.08, ray_dir.y)), 1.0, smoothstep(sqr(clouds_cumulus_congestus_radius), sqr(clouds_cumulus_congestus_radius + 0.1 * clouds_cumulus_congestus_thickness), length_squared(air_viewer_pos)));
 	clouds_scattering = mix(clear_sky * (1.0 - clouds_transmittance), clouds_scattering, horizon_fade);
-	
+
 	float apparent_distance = (distance_weight_sum == 0.0)
 		? 1e6
 		: (distance_sum / distance_weight_sum) + distance(air_viewer_pos, ray_origin);
@@ -897,10 +902,12 @@ CloudsResult draw_altocumulus_clouds(
 	}
 
 	// Get main light color for this layer
-	vec3 light_color  = moonlit ? moon_color : sun_color;
-	     light_color *= sunlight_color * atmosphere_transmittance(ray_origin, light_dir);
+	vec3 light_color  = sunlight_color * atmosphere_transmittance(ray_origin, light_dir);
+		 light_color  = atmosphere_post_processing(light_color);
+	     light_color *= moonlit ? moon_color : sun_color;
 		 light_color *= 1.0 - rainStrength;
 		 light_color *= 1.0 + 0.4 * high_coverage * dampen(time_noon);
+
 
 	// Remap the transmittance so that min_transmittance is 0
 	float clouds_transmittance = linear_step(min_transmittance, 1.0, transmittance);
@@ -1128,8 +1135,9 @@ CloudsResult draw_cirrus_clouds(
 	float mu = dot(sphere_pos, light_dir) * rcp_r;
 	float rr = r_sq * rcp_r - 1500.0 * clamp01(linear_step(0.0, 0.05, cirrocumulus) * (1.0 - linear_step(0.0, 0.1, cirrus)) + cirrocumulus);
 
-	vec3 light_color  = moonlit ? moon_color : sun_color;
-	     light_color *= sunlight_color * atmosphere_transmittance(mu, rr);
+	vec3 light_color  = sunlight_color * atmosphere_transmittance(mu, rr);
+		 light_color  = atmosphere_post_processing(light_color);
+	     light_color *= moonlit ? moon_color : sun_color;
 		 light_color *= 1.0 - rainStrength;
 
 	// Remap the transmittance so that min_transmittance is 0
@@ -1150,7 +1158,7 @@ CloudsResult blend_layers(CloudsResult old, CloudsResult new) {
 	vec3 scattering_behind       = new_in_front ? old.scattering : new.scattering;
 	vec3 scattering_in_front     = new_in_front ? new.scattering : old.scattering;
 	float transmittance_in_front = new_in_front ? new.transmittance : old.transmittance;
-	
+
 	return CloudsResult(
 		scattering_in_front + transmittance_in_front * scattering_behind,
 		old.transmittance * new.transmittance,
@@ -1210,7 +1218,7 @@ float render_cloud_shadow_map(vec2 uv) {
 	vec2  detail_weights     = mix(vec2(0.33, 0.40), vec2(0.25, 0.20), sqr(clouds_stratus_amount)) * CLOUDS_CUMULUS_DETAIL_STRENGTH;
 	vec2  edge_sharpening    = mix(vec2(3.0, 8.0), vec2(1.0, 2.0), clouds_stratus_amount);
 
-	extinction_coeff = mix(0.05, 0.1, smoothstep(0.0, 0.3, abs(sun_dir.y))) * (1.0 - 0.33 * rainStrength) * CLOUDS_CUMULUS_DENSITY;
+	extinction_coeff = 0.25 * mix(0.05, 0.1, smoothstep(0.0, 0.3, abs(sun_dir.y))) * (1.0 - 0.33 * rainStrength) * CLOUDS_CUMULUS_DENSITY;
 	t = intersect_sphere(ray_origin, light_dir,	clouds_cumulus_radius + 0.25 * clouds_cumulus_thickness).y;
 	pos = ray_origin + light_dir * t;
 	density = clouds_cumulus_density(pos, detail_weights, edge_sharpening, dynamic_thickness);
@@ -1229,7 +1237,7 @@ float render_cloud_shadow_map(vec2 uv) {
 	float cirrus, cirrocumulus;
 	t = intersect_sphere(ray_origin, light_dir,	clouds_cirrus_radius).y;
 	pos = ray_origin + light_dir * t;
-	density = clouds_cirrus_density(pos.xy, 0.5, cirrus, cirrocumulus);
+	density = clouds_cirrus_density(pos.xz, 0.5, cirrus, cirrocumulus);
 	shadow *= exp(-0.25 * clouds_cirrus_extinction_coeff * clouds_cirrus_thickness * rcp(abs(light_dir.y) + eps) * density) * 0.5 + 0.5;
 #endif
 

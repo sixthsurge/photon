@@ -98,7 +98,7 @@ void main() {
 
 	const vec3 sky_dir = normalize(vec3(0.0, 1.0, -0.8)); // don't point direcly upwards to avoid the sun halo when the sun path rotation is 0
 	sky_color = atmosphere_scattering(sky_dir, sun_dir) * sun_color + atmosphere_scattering(sky_dir, moon_dir) * moon_color;
-	sky_color = tau * mix(sky_color, vec3(sky_color.b) * sqrt(2.0), rcp_pi);
+	sky_color = (tau * 1.13) * sky_color;
 	sky_color = mix(sky_color, tau * get_weather_color(), rainStrength);
 
 	clouds_weather_variation(

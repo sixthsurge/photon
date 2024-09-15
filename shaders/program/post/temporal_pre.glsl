@@ -51,6 +51,12 @@ vec3 max_of(vec3 a, vec3 b, vec3 c, vec3 d, vec3 f) {
     return max(a, max(b, max(c, max(d, f))));
 }
 
+// Invertible tonemapping operator (Reinhard) applied before blending the current and previous frames
+// Improves the appearance of emissive objects
+vec3 reinhard(vec3 rgb) {
+	return rgb / (rgb + 1.0);
+}
+
 void main() {
 	ivec2 texel = ivec2(gl_FragCoord.xy);
 
@@ -69,15 +75,15 @@ void main() {
 	vec3 i = texelFetch(colortex0, texel + ivec2( 1, -1), 0).rgb;
 
 	// Convert to YCoCg
-	a = rgb_to_ycocg(a);
-	b = rgb_to_ycocg(b);
-	c = rgb_to_ycocg(c);
-	d = rgb_to_ycocg(d);
-	e = rgb_to_ycocg(e);
-	f = rgb_to_ycocg(f);
-	g = rgb_to_ycocg(g);
-	h = rgb_to_ycocg(h);
-	i = rgb_to_ycocg(i);
+	a = rgb_to_ycocg(reinhard(a));
+	b = rgb_to_ycocg(reinhard(b));
+	c = rgb_to_ycocg(reinhard(c));
+	d = rgb_to_ycocg(reinhard(d));
+	e = rgb_to_ycocg(reinhard(e));
+	f = rgb_to_ycocg(reinhard(f));
+	g = rgb_to_ycocg(reinhard(g));
+	h = rgb_to_ycocg(reinhard(h));
+	i = rgb_to_ycocg(reinhard(i));
 
 	// Soft minimum and maximum ("Hybrid Reconstruction Antialiasing")
 	//        b         a b c

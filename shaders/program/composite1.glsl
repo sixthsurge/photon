@@ -388,9 +388,9 @@ void main() {
 				light_color,
 				ambient_color,
 				water_absorption_coeff,
+				light_levels,
 				layer_dist * float(isEyeInWater != 1),
 				LoV,
-				light_levels.y,
 				0.0
 			);
 
@@ -501,7 +501,15 @@ void main() {
 	if (isEyeInWater == 1) {
 		// Simple underwater fog
 		float LoV = dot(world_dir, light_dir);
-		mat2x3 water_fog = water_fog_simple(light_color, ambient_color, water_absorption_coeff, view_dist, LoV, eye_skylight, 15.0 - 15.0 * eye_skylight);
+		mat2x3 water_fog = water_fog_simple(
+			light_color,
+			ambient_color,
+			water_absorption_coeff,
+			vec2(0.0, eye_skylight),
+			view_dist,
+			LoV,
+			15.0 * eye_skylight
+		);
 
 		scene_color *= water_fog[1];
 		scene_color += water_fog[0];
