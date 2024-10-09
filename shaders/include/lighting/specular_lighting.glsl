@@ -96,10 +96,10 @@ vec3 get_specular_highlight(
 	vec3 albedo_tint = mix(vec3(1.0), material.albedo, float(material.is_hardcoded_metal));
 
 	float NoH_squared = get_NoH_squared(NoL, NoV, LoV, light_radius);
-	float alpha_squared = material.roughness * material.roughness;
+	float alpha = material.roughness;
 
-	float d = distribution_ggx(NoH_squared, alpha_squared);
-	float v = v2_smith_ggx(max(NoL, 1e-2), max(NoV, 1e-2), alpha_squared);
+	float d = distribution_ggx(NoH_squared, alpha);
+	float v = v2_smith_ggx(max(NoL, 1e-2), max(NoV, 1e-2), alpha);
 
 	return min((NoL * d * v) * fresnel * albedo_tint, vec3(specular_max_value));
 }
@@ -238,7 +238,7 @@ vec3 get_specular_reflections(
 ) {
 	vec3 albedo_tint = material.is_hardcoded_metal ? material.albedo : vec3(1.0);
 
-	float alpha_squared = sqr(material.roughness);
+	float alpha = material.roughness;
 
 	float dither = r1(frameCounter, texelFetch(noisetex, ivec2(gl_FragCoord.xy) & 511, 0).b);
 
@@ -258,7 +258,7 @@ vec3 get_specular_reflections(
 			hash.x = interleaved_gradient_noise(gl_FragCoord.xy,                    frameCounter * SSR_RAY_COUNT + i);
 			hash.y = interleaved_gradient_noise(gl_FragCoord.xy + vec2(97.0, 23.0), frameCounter * SSR_RAY_COUNT + i);
 
-			vec3 microfacet_normal = tbn_matrix * sample_ggx_vndf(-tangent_dir, vec2(alpha_squared), hash);
+			vec3 microfacet_normal = tbn_matrix * sample_ggx_vndf(-tangent_dir, vec2(alpha), hash);
 			vec3 ray_dir = reflect(world_dir, microfacet_normal);
 
 			float NoL = dot(normal, ray_dir);
@@ -278,8 +278,8 @@ vec3 get_specular_reflections(
 				fresnel = fresnel_dielectric(NoV, material.f0.x);
 			}
 
-			float v1 = v1_smith_ggx(NoV, alpha_squared);
-			float v2 = v2_smith_ggx(NoL, NoV, alpha_squared);
+			float v1 = v1_smith_ggx(NoV, alpha);
+			float v2 = v2_smith_ggx(NoL, NoV, alpha);
 
 			reflection += radiance * fresnel * (2.0 * NoL * v2 / v1);
 		}
@@ -314,8 +314,8 @@ vec3 get_specular_reflections(
 		fresnel = fresnel_dielectric(NoV, material.f0.x);
 	}
 
-	float v1 = v1_smith_ggx(NoV, alpha_squared);
-	float v2 = v2_smith_ggx(NoL, NoV, alpha_squared);
+	float v1 = v1_smith_ggx(NoV, alpha);
+	float v2 = v2_smith_ggx(NoL, NoV, alpha);
 
 	vec3 reflection  = trace_specular_ray(screen_pos, view_pos, ray_dir, dither, skylight, SSR_INTERSECTION_STEPS_SMOOTH, SSR_REFINEMENT_STEPS, 0);
 	     reflection *= albedo_tint * fresnel;
