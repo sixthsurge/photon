@@ -35,6 +35,10 @@ bool get_rain_puddles(
 	inout float roughness,
 	inout float ssr_multiplier
 ) {
+#ifndef RAIN_PUDDLES
+	return false;
+#endif
+
 	const float puddle_f0                      = 0.02;
 	const float puddle_roughness               = 0.002;
 	const float puddle_darkening_factor        = 0.25;

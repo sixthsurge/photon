@@ -93,4 +93,23 @@ vec4 unpack_unorm_arb(uint pack, const uvec4 bits) {
 	return vec4(unshifted) * rcp(vec4(max_value));
 }
 
+// Split one value to be encoded as 16 bit unorm into two values to be encoded as 8 bit unorm
+vec2 split_2x8(float x) {
+	uint i = uint(x * 65535.0);
+	uint lower = i & 255;
+	uint upper = i >> 8;
+
+	return vec2(
+		float(lower) * rcp(255.0),
+		float(upper) * rcp(255.0)
+	);
+}
+float unsplit_2x8(vec2 v) {
+	uint lower = uint(v.x * 255.0);
+	uint upper = uint(v.y * 255.0);
+	uint i = lower | (upper << 8);
+
+	return float(i) * rcp(65535.0);
+}
+
 #endif // INCLUDE_UTILITY_ENCODING

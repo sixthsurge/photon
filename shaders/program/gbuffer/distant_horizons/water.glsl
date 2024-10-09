@@ -97,19 +97,10 @@ void main() {
 //----------------------------------------------------------------------------//
 #if defined fsh
 
-layout (location = 0) out vec4 scene_color;
-layout (location = 1) out vec4 gbuffer_data_0; // albedo, block ID, flat normal, light levels
-layout (location = 2) out vec4 gbuffer_data_1; // detailed normal, specular map (optional)
+layout (location = 0) out vec4 fragment_color;
+layout (location = 1) out vec4 gbuffer_data; // albedo, block ID, flat normal, light levels
 
 /* RENDERTARGETS: 0,1 */
-
-#ifdef NORMAL_MAPPING
-/* RENDERTARGETS: 0,1,2 */
-#endif
-
-#ifdef SPECULAR_MAPPING
-/* RENDERTARGETS: 0,1,2 */
-#endif
 
 in vec2 light_levels;
 in vec3 scene_pos;
@@ -132,6 +123,9 @@ flat in vec2 atlas_tile_scale;
 // ------------
 
 uniform sampler2D noisetex;
+
+uniform sampler2D colortex4;
+uniform sampler2D colortex5;
 
 #ifdef CLOUD_SHADOWS
 uniform sampler2D colortex8; // Cloud shadow map
@@ -251,6 +245,30 @@ uniform vec4 entityColor;
 #include "/include/lighting/cloud_shadows.glsl"
 #endif
 
+vec4 water_absorption_approx(vec4 color, float sss_depth, float layer_dist, float LoV, float NoV) {
+	vec3 biome_water_color = 2.0 * srgb_eotf_inv(tint.rgb) * rec709_to_working_color;
+	vec3 absorption_coeff = biome_water_coeff(biome_water_color);
+	float dist = layer_dist * float(isEyeInWater != 1 || NoV >= 0.0);
+
+	mat2x3 water_fog = water_fog_simple(
+		light_color,
+		ambient_color,
+		absorption_coeff,
+		light_levels,
+		dist,
+		-LoV,
+		sss_depth
+	);
+
+	float brightness_control = 1.0 - exp(-0.33 * layer_dist);
+		  brightness_control = (1.0 - light_levels.y) + brightness_control * light_levels.y;
+
+	return vec4(
+		color.rgb + water_fog[0] * (1.0 + 6.0 * sqr(water_fog[1])) * brightness_control,
+		1.0 - water_fog[1].x
+	);
+}
+
 void main() {
     // Clip close-by DH terrain
     if (length(scene_pos) < 0.8 * far) {
@@ -330,7 +348,7 @@ void main() {
 	shadows *= cloud_shadows;
 #endif
 
-	vec3 radiance = get_diffuse_lighting(
+	fragment_color.rgb = get_diffuse_lighting(
 		material,
 		scene_pos,
 		normal,
@@ -351,32 +369,38 @@ void main() {
 
 	// Blending
 
-	float alpha;
-
 	if (is_water == 1) {
 		// Water absorption
 
-		vec3 transmittance = exp(-water_absorption_coeff * max(1.0, layer_dist));
-		alpha = 1.0 - transmittance.x;
+		fragment_color = water_absorption_approx(
+            fragment_color,
+            0.0,
+            layer_dist,
+            LoV,
+            dot(normal, world_dir)
+        );
+
+        // Reverse water shadow 
+		fragment_color.rgb *= exp(5.0 * water_absorption_coeff);
 	} else {
-		alpha = base_color.a;
+		fragment_color.a = base_color.a;
 	}
 
-	scene_color = vec4(radiance / max(alpha, eps), alpha);
+	fragment_color = vec4(fragment_color.rgb / max(fragment_color.a, eps), fragment_color.a);
 
 	// Apply fog
 
 	vec4 fog = common_fog(length(scene_pos), false);
-	scene_color.rgb = scene_color.rgb * fog.a + fog.rgb;
+	fragment_color.rgb = fragment_color.rgb * fog.a + fog.rgb;
 
-	scene_color.a *= border_fog(scene_pos, world_dir);
+	fragment_color.a *= border_fog(scene_pos, world_dir);
 
 	// Encode gbuffer data
 
-	gbuffer_data_0.x  = pack_unorm_2x8(tint.rg);
-	gbuffer_data_0.y  = pack_unorm_2x8(tint.b, clamp01(((is_water == 1) ? rcp(255.0) : 0.0)));
-	gbuffer_data_0.z  = pack_unorm_2x8(encode_unit_vector(normal));
-	gbuffer_data_0.w  = pack_unorm_2x8(dither_8bit(light_levels, 0.5));
+	gbuffer_data.x  = pack_unorm_2x8(tint.rg);
+	gbuffer_data.y  = pack_unorm_2x8(tint.b, clamp01(((is_water == 1) ? rcp(255.0) : 0.0)));
+	gbuffer_data.z  = pack_unorm_2x8(encode_unit_vector(normal));
+	gbuffer_data.w  = pack_unorm_2x8(dither_8bit(light_levels, 0.5));
 }
 
 #endif

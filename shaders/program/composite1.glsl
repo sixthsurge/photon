@@ -4,7 +4,7 @@
   Photon Shader by SixthSurge
 
   program/composite1.glsl
-  Apply volumetric fog, reflections and refraction
+  Apply volumetric fog
 
 --------------------------------------------------------------------------------
 */
@@ -40,7 +40,7 @@ void main() {
 //----------------------------------------------------------------------------//
 #if defined fsh
 
-layout (location = 0) out vec3 scene_color;
+layout (location = 0) out vec3 fragment_color;
 layout (location = 1) out float bloomy_fog;
 
 /* RENDERTARGETS: 0,3 */
@@ -56,16 +56,17 @@ flat in vec3 light_color;
 
 uniform sampler2D noisetex;
 
-uniform sampler2D colortex0; // scene color
-uniform sampler2D colortex1; // gbuffer 0
-uniform sampler2D colortex2; // gbuffer 1
-uniform sampler2D colortex4; // sky map
-uniform sampler2D colortex5; // scene history
-uniform sampler2D colortex6; // volumetric fog scattering
-uniform sampler2D colortex7; // volumetric fog transmittance
+uniform sampler2D colortex0;  // scene color
+uniform sampler2D colortex1;  // gbuffer 0
+uniform sampler2D colortex2;  // gbuffer 1
+uniform sampler2D colortex3;  // refraction data
+uniform sampler2D colortex4;  // sky map
+uniform sampler2D colortex5;  // scene history
+uniform sampler2D colortex6;  // volumetric fog scattering
+uniform sampler2D colortex7;  // volumetric fog transmittance
 uniform sampler2D colortex11; // clouds history
 uniform sampler2D colortex12; // clouds data
-uniform sampler2D colortex13; // rain and snow particles
+uniform sampler2D colortex13; // rendered translucent layer
 
 uniform sampler2D depthtex0;
 uniform sampler2D depthtex1;
@@ -126,13 +127,14 @@ uniform float time_midnight;
 #include "/include/fog/simple_fog.glsl"
 #include "/include/lighting/specular_lighting.glsl"
 #include "/include/misc/distant_horizons.glsl"
-#include "/include/misc/material.glsl"
-#include "/include/misc/rain_puddles.glsl"
-#include "/include/misc/water_normal.glsl"
 #include "/include/utility/color.glsl"
 #include "/include/utility/encoding.glsl"
 #include "/include/utility/fast_math.glsl"
 #include "/include/utility/space_conversion.glsl"
+
+#ifdef DISTANT_HORIZONS
+#include "/include/misc/water_normal.glsl"
+#endif
 
 /*
 const bool colortex5MipmapEnabled = true;
@@ -201,20 +203,12 @@ void main() {
 
 	// Sample textures
 
-	scene_color         = texelFetch(colortex0, texel, 0).rgb;
-	vec3 original_color = scene_color;
-	float depth0        = texelFetch(depthtex0, texel, 0).x;
-	float depth1        = texelFetch(depthtex1, texel, 0).x;
-#ifdef DISTANT_HORIZONS
-    float depth0_dh     = texelFetch(dhDepthTex, texel, 0).x;
-    float depth1_dh     = texelFetch(dhDepthTex1, texel, 0).x;
-#endif
-	vec4 gbuffer_data_0 = texelFetch(colortex1, texel, 0);
-#if defined NORMAL_MAPPING || defined SPECULAR_MAPPING
-	vec4 gbuffer_data_1 = texelFetch(colortex2, texel, 0);
-#endif
-	vec4 weather_particles  = texelFetch(colortex13, texel, 0);
+	float front_depth      = texelFetch(depthtex0, texel, 0).x;
+	float back_depth       = texelFetch(depthtex1, texel, 0).x;
 
+	vec4 refraction_data   = texelFetch(colortex3, texel, 0);
+	vec4 translucent_color = texelFetch(colortex13, texel, 0);
+	
 #ifdef VL
 	vec3 fog_scattering    = smooth_filter(colortex6, uv).rgb;
 	vec3 fog_transmittance = smooth_filter(colortex7, uv).rgb;
@@ -223,309 +217,174 @@ void main() {
 	// Distant Horizons support
 
 #ifdef DISTANT_HORIZONS
-    bool front_is_dh_terrain = is_distant_horizons_terrain(depth0, depth0_dh);
-    bool back_is_dh_terrain = is_distant_horizons_terrain(depth1, depth1_dh);
+    float front_depth_dh   = texelFetch(dhDepthTex, texel, 0).x;
+    float back_depth_dh    = texelFetch(dhDepthTex1, texel, 0).x;
+
+    bool front_is_dh_terrain = is_distant_horizons_terrain(front_depth, front_depth_dh);
+    bool back_is_dh_terrain = is_distant_horizons_terrain(back_depth, back_depth_dh);
 #else
-    const bool front_is_dh_terrain = false;
-	const bool back_is_dh_terrain = false;
+	#define front_depth_dh      front_depth
+	#define back_depth_dh       back_depth
+	#define front_is_dh_terrain false
+	#define back_is_dh_terrain  false
 #endif
-
-	// Sky early exit
-
-	if (depth0 == 1.0 && !front_is_dh_terrain) {
-		// weather particles
-		scene_color = mix(scene_color, weather_particles.rgb, weather_particles.a);
-
-		// Fog
-#if (defined WORLD_OVERWORLD || defined WORLD_END) && defined VL
-		scene_color = scene_color * fog_transmittance + fog_scattering;
-		bloomy_fog = clamp01(dot(fog_transmittance, vec3(luminance_weights_rec2020)));
-		#if defined WORLD_END
-		bloomy_fog = bloomy_fog * 0.5 + 0.5;
-		#endif
-#endif
-
-#if defined WORLD_NETHER
-		bloomy_fog = spherical_fog(far, nether_fog_start, nether_bloomy_fog_density * (1.0 - blindness)) * 0.5 + 0.5;
-#endif
-
-		// Bloomy rain
-		bloomy_fog = min(bloomy_fog, step(weather_particles.a, 0.05));
-
-		// Purkinje shift
-		scene_color = purkinje_shift(scene_color, vec2(0.0, 1.0));
-
-		return;
-	}
 
 	// Space conversions
 
-	depth0 += 0.38 * float(depth0 < hand_depth); // Hand lighting fix from Capt Tatsu
+	front_depth += 0.38 * float(front_depth < hand_depth); // Hand lighting fix from Capt Tatsu
 
-	vec3 screen_pos = vec3(uv, depth0);
-	vec3 view_pos = screen_to_view_space(screen_pos, true);
-	vec3 view_back_pos = screen_to_view_space(vec3(uv, depth1), true);
+	vec3 front_position_screen = vec3(uv, front_is_dh_terrain ? front_depth_dh : front_depth);
+	vec3 front_position_view   = screen_to_view_space(front_position_screen, true, front_is_dh_terrain);
+	vec3 front_position_scene  = view_to_scene_space(front_position_view);
+	vec3 front_position_world  = front_position_scene + cameraPosition;
 
-#ifdef DISTANT_HORIZONS
-    if (front_is_dh_terrain) {
-        view_pos = screen_to_view_space(dhProjectionInverse, vec3(uv, depth0_dh), true);
-    }
-    if (back_is_dh_terrain) {
-        view_back_pos = screen_to_view_space(dhProjectionInverse, vec3(uv, depth1_dh), true);
-    }
-#endif
+	vec3 back_position_screen  = vec3(uv, back_is_dh_terrain ? back_depth_dh : back_depth);
+	vec3 back_position_view    = screen_to_view_space(vec3(uv, back_depth), true, back_is_dh_terrain);
 
-	vec3 scene_pos = view_to_scene_space(view_pos);
-	vec3 world_pos = scene_pos + cameraPosition;
+	vec3 direction_world; float view_distance;
+	length_normalize(front_position_scene - gbufferModelViewInverse[3].xyz, direction_world, view_distance);
 
-	vec3 world_dir; float view_dist;
-	length_normalize(scene_pos - gbufferModelViewInverse[3].xyz, world_dir, view_dist);
+	// Refraction 
 
-	// Unpack gbuffer data
+	vec2 refracted_uv = uv;
 
-	mat4x2 data = mat4x2(
-		unpack_unorm_2x8(gbuffer_data_0.x),
-		unpack_unorm_2x8(gbuffer_data_0.y),
-		unpack_unorm_2x8(gbuffer_data_0.z),
-		unpack_unorm_2x8(gbuffer_data_0.w)
-	);
+#if REFRACTION != REFRACTION_OFF
+	if (refraction_data != vec4(0.0)) {
+		float layer_dist = abs(view_distance - length(back_position_view));
 
-	vec3 albedo        = vec3(data[0], data[1].x);
-	uint material_mask = uint(255.0 * data[1].y);
-	vec3 flat_normal   = decode_unit_vector(data[2]);
-	vec2 light_levels  = data[3];
-
-	Material material;
-	vec3 normal = flat_normal;
-
-	mat3 tbn = get_tbn_matrix(flat_normal);
-
-	// Get material and normal
-
-	bool is_water = material_mask == 1;
-
-	//------------------------------------------------------------------------//
-	if (is_water) {
-		material = water_material;
-
-		// Water waves
-
-#ifdef WATER_WAVES
-		if (flat_normal.y > 0.01 && isEyeInWater == 0
-		 || flat_normal.y < 0.01 && isEyeInWater != 0
-		) {
-			vec2 coord = world_pos.xz;
-
-			bool flowing_water = abs(flat_normal.y) < 0.99;
-			vec2 flow_dir = flowing_water ? normalize(flat_normal.xz) : vec2(0.0);
-
-#ifdef WATER_PARALLAX
-			vec3 tangent_dir = world_dir * tbn;
-			coord = get_water_parallax_coord(tangent_dir, coord, flow_dir, flowing_water);
-#endif
-
-			normal = tbn * get_water_normal(world_pos, flat_normal, coord, flow_dir, light_levels.y, flowing_water);
-		}
-#endif
-	//------------------------------------------------------------------------//
-	} else {
-		material = material_from(albedo, material_mask, world_pos, flat_normal, light_levels);
-
-#ifdef DISTANT_HORIZONS
-		if (!front_is_dh_terrain) {
-#endif
-
-#ifdef NORMAL_MAPPING
-		normal = decode_unit_vector(gbuffer_data_1.xy);
-#endif
-
-#ifdef SPECULAR_MAPPING
-		vec4 specular_map = vec4(unpack_unorm_2x8(gbuffer_data_1.z), unpack_unorm_2x8(gbuffer_data_1.w));
-
-#if defined POM && defined POM_SHADOW
-		// Specular map alpha > 0.5 => inside parallax shadow
-		bool parallax_shadow = specular_map.a > 0.5;
-		specular_map.a -= 0.5 * float(parallax_shadow);
-		specular_map.a *= 2.0;
-#endif
-
-		decode_specular_map(specular_map, material);
-#endif
-
-#ifdef DISTANT_HORIZONS
-		}
-#endif
-	}
-
-	// Refraction
-
-	float layer_dist = abs(view_dist - length(view_back_pos));
-
-	if (is_water) {
-#ifdef WATER_REFRACTION
-		vec3 tangent_normal = normal * tbn;
-
-		vec2 refracted_uv = uv + tangent_normal.xy * rcp(max(view_dist, 1.0)) * min(layer_dist, 8.0) * (0.1 * WATER_REFRACTION_INTENSITY);
-
-		vec3  refracted_color = texture(colortex0, refracted_uv * taau_render_scale).rgb;
-
-		// Make sure the refracted object is behind water
-		float refracted_data  = texelFetch(colortex1, ivec2(refracted_uv * taau_render_scale * view_res), 0).y;
-		uint  refracted_mask  = uint(unpack_unorm_2x8(refracted_data).y * 255.0);
-
-		if (refracted_mask == 1) scene_color = refracted_color;
-#endif
-
-#ifdef SNELLS_WINDOW
-		if (isEyeInWater == 1.0) {
-			float NoV = clamp01(dot(normal, -world_dir));
-			float water_n = isEyeInWater == 1 ? air_n / water_n : water_n / air_n;
-			scene_color *= 1.0 - fresnel_dielectric_n(NoV, water_n);
-		}
-#endif
-	}
-
-#ifdef DISTANT_HORIZONS
-		// Distant Horizons water scattering
-
-		if (is_water && front_is_dh_terrain) {
-			float LoV = dot(light_dir, world_dir);
-
-			vec3 water_tint = exp(-5.0 * water_absorption_coeff);
-
-			mat2x3 water_fog = water_fog_simple(
-				light_color,
-				ambient_color,
-				water_absorption_coeff,
-				light_levels,
-				layer_dist * float(isEyeInWater != 1),
-				LoV,
-				0.0
-			);
-
-			scene_color *= water_tint;
-			scene_color += water_fog[0] * (1.0 + 6.0 * sqr(water_fog[1])) * (1.0 - exp(-0.33 * layer_dist));
-		}
-
-#endif
-
-	// Weather particles
-	scene_color = mix(scene_color, weather_particles.rgb, weather_particles.a);
-
-
-	// Rain puddles
-
-#ifdef RAIN_PUDDLES
-	if (!is_water && depth1 != 1.0) {
-		bool puddle = get_rain_puddles(
-			world_pos,
-			flat_normal,
-			light_levels,
-			material.porosity,
-			normal,
-			material.f0,
-			material.roughness,
-			material.ssr_multiplier
+		vec2 normal_tangent = vec2(
+			unsplit_2x8(refraction_data.xy) * 2.0 - 1.0,
+			unsplit_2x8(refraction_data.zw) * 2.0 - 1.0
 		);
 
-		if (puddle) {
-			material.is_metal = false;
-			material.is_hardcoded_metal = false;
-		}
+		refracted_uv = uv + normal_tangent.xy * rcp(max(view_distance, 1.0)) * min(layer_dist, 8.0) * (0.1 * REFRACTION_INTENSITY);
+
+		// Make sure the refracted fragment is behind the fragment position
+		float depth_refracted = texture(depthtex1, refracted_uv).x;
+		refracted_uv = mix(refracted_uv, uv, float(depth_refracted < front_depth));
 	}
 #endif
 
-	// Specular reflections
+	fragment_color = texture(colortex0, refracted_uv * taau_render_scale).rgb;
 
-#if defined ENVIRONMENT_REFLECTIONS || defined SKY_REFLECTIONS
-	if (material.ssr_multiplier > eps && (depth0 < 1.0 || front_is_dh_terrain)) {
-		mat3 tbn = get_tbn_matrix(normal);
-		vec3 reflections = get_specular_reflections(
-			material,
-			tbn,
-			screen_pos,
-			view_pos,
-			normal,
-			flat_normal,
-			world_dir,
-			world_dir * tbn,
-			light_levels.y,
-			is_water
+	// Blend layers
+
+	fragment_color = mix(fragment_color, translucent_color.rgb, translucent_color.a);
+
+	// Draw Distant Horizons water
+
+#ifdef DISTANT_HORIZONS
+	if (front_depth_dh != back_depth_dh && front_depth == 1.0) {
+		// Unpack gbuffer data
+
+		vec4 gbuffer_data = texelFetch(colortex1, texel, 0);
+
+		mat4x2 data = mat4x2(
+			unpack_unorm_2x8(gbuffer_data.x),
+			unpack_unorm_2x8(gbuffer_data.y),
+			unpack_unorm_2x8(gbuffer_data.z),
+			unpack_unorm_2x8(gbuffer_data.w)
 		);
 
-#ifdef WATER_WAVES
-		// Specular highlight for water (must be applied after water waves)
-		if (is_water) {
+		vec3 tint          = vec3(data[0], data[1].x);
+		uint material_mask = uint(255.0 * data[1].y);
+		vec3 flat_normal   = decode_unit_vector(data[2]);
+		vec2 light_levels  = data[3];
+
+		if (material_mask == 1) { // Water
+			// Water shadow
+
+			fragment_color.rgb *= exp(-5.0 * water_absorption_coeff);
+
+			// Get water wave normal 
+
+			mat3 tbn = get_tbn_matrix(flat_normal);
+			vec2 coord = (front_position_world * tbn).xy;
+			vec3 normal = tbn * get_water_normal(
+				front_position_world,
+				flat_normal, 
+				coord, 
+				vec2(0.0), 
+				light_levels.y, 
+				false
+			) * vec3(-1.0, 1.0, -1.0);
+			
+			// Specular highlight
+
+#if (defined WORLD_OVERWORLD || defined WORLD_END) && !defined NO_NORMAL
 			float NoL = dot(normal, light_dir);
-			float NoV = clamp01(dot(normal, -world_dir));
-			float LoV = dot(light_dir, -world_dir);
+			float NoV = clamp01(dot(normal, -direction_world));
+			float LoV = dot(light_dir, -direction_world);
 			float halfway_norm = inversesqrt(2.0 * LoV + 2.0);
 			float NoH = (NoL + NoV) * halfway_norm;
 			float LoH = LoV * halfway_norm + halfway_norm;
 
-	#ifndef DISTANT_HORIZONS
-			vec3 shadows = vec3(data[0].xy, data[1].x);
-	#else
-			vec3 shadows = front_is_dh_terrain
-				? vec3(1.0)
-				: vec3(data[0].xy, data[1].x);
-	#endif
-
-			reflections += get_specular_highlight(material, NoL, NoV, NoH, LoV, LoH) * light_color * shadows;
-		}
+			fragment_color.rgb += get_specular_highlight(water_material, NoL, NoV, NoH, LoV, LoH) * light_color;
 #endif
 
-		reflections *= common_fog_alpha(length(scene_pos), false);
+			// Specular reflections
 
-		scene_color += reflections;
+#if defined ENVIRONMENT_REFLECTIONS || defined SKY_REFLECTIONS
+			mat3 new_tbn = get_tbn_matrix(normal);
+			fragment_color.rgb += get_specular_reflections(
+				water_material,
+				new_tbn,
+				front_position_screen,
+				front_position_view,
+				normal,
+				flat_normal,
+				direction_world,
+				direction_world * new_tbn,
+				light_levels.y,
+				true
+			);
+#endif
+		}
 	}
 #endif
 
-	// Apply border fog
-	float border_fog = border_fog(scene_pos, world_dir);
-	scene_color = mix(original_color, scene_color, border_fog);
+	// Blend clouds in front of translucents
 
-	// Apply clouds in front of translucents
-
-	bool is_translucent = depth0 != depth1;
+	bool is_translucent = front_depth != back_depth;
 #ifdef DISTANT_HORIZONS
-         is_translucent = is_translucent || depth0_dh != depth1_dh;
+         is_translucent = is_translucent || front_depth_dh != back_depth_dh;
 #endif
 
 	if (is_translucent) {
 		float clouds_dist;
 		vec4 clouds = read_clouds(clouds_dist);
 
-		if (clouds_dist < view_dist) {
-			scene_color = scene_color * clouds.w + clouds.xyz;
+		if (clouds_dist < view_distance) {
+			fragment_color = fragment_color * clouds.w + clouds.xyz;
 		}
 	}
 
-	// Apply atmospheric fog
+	// Blend fog
 
 #if (defined WORLD_OVERWORLD || defined WORLD_END) && defined VL
-	scene_color = scene_color * fog_transmittance + fog_scattering;
+	// Volumetric fog
+
+	fragment_color = fragment_color * fog_transmittance + fog_scattering;
+
 	bloomy_fog = clamp01(dot(fog_transmittance, vec3(luminance_weights_rec2020)));
 	bloomy_fog = isEyeInWater == 1.0 ? sqrt(bloomy_fog) : bloomy_fog;
-	#if defined WORLD_END
-	bloomy_fog = bloomy_fog * 0.5 + 0.5;
-	#endif
 #else
+	// Simple underwater fog
+
 	if (isEyeInWater == 1) {
-		// Simple underwater fog
-		float LoV = dot(world_dir, light_dir);
+		float LoV = dot(direction_world, light_dir);
 		mat2x3 water_fog = water_fog_simple(
 			light_color,
 			ambient_color,
 			water_absorption_coeff,
 			vec2(0.0, eye_skylight),
-			view_dist,
+			view_distance,
 			LoV,
 			15.0 * eye_skylight
 		);
 
-		scene_color *= water_fog[1];
-		scene_color += water_fog[0];
+		fragment_color *= water_fog[1];
+		fragment_color += water_fog[0];
 
 		bloomy_fog = sqrt(clamp01(dot(water_fog[1], vec3(0.33))));
 	} else {
@@ -533,15 +392,11 @@ void main() {
 	}
 #endif
 
-#if defined WORLD_NETHER
-	bloomy_fog = spherical_fog(view_dist, nether_fog_start, nether_bloomy_fog_density) * 0.33 + 0.67;
+#if   defined WORLD_NETHER
+	bloomy_fog = spherical_fog(view_distance, nether_fog_start, nether_bloomy_fog_density) * 0.33 + 0.67;
+#elif defined WORLD_END
+	bloomy_fog = bloomy_fog * 0.5 + 0.5;
 #endif
-
-	// Bloomy rain
-	bloomy_fog = min(bloomy_fog, step(weather_particles.a, 0.05));
-
-	// Apply purkinje shift
-	scene_color = purkinje_shift(scene_color, light_levels);
 }
 
 #endif
