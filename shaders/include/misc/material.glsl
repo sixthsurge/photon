@@ -102,7 +102,7 @@ Material material_from(vec3 albedo_srgb, uint material_mask, vec3 world_pos, vec
 	Material material;
 	material.albedo             = srgb_eotf_inv(albedo_srgb) * rec709_to_rec2020;
 	material.emission           = vec3(0.0);
-	material.f0                 = vec3(0.0);
+	material.f0                 = vec3(0.02);
 	material.f82                = vec3(0.0);
 	material.roughness          = 1.0;
 	material.sss_amount         = 0.0;
