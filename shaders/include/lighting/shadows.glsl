@@ -12,7 +12,6 @@
 #define SHADOW_PCF_STEPS_MIN           6 // [4 6 8 12 16 18 20 22 24 26 28 30 32]
 #define SHADOW_PCF_STEPS_MAX          12 // [4 6 8 12 16 18 20 22 24 26 28 30 32]
 #define SHADOW_PCF_STEPS_SCALE       1.0 // [0.0 0.2 0.4 0.6 0.8 1.0 1.2 1.4 1.6 1.8 2.0]
-#define SHADOW_BLOCKER_SEARCH_STEPS    6 // [3 6 9 12 15]
 #define SHADOW_BLOCKER_SEARCH_RADIUS 0.5 // [0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0]
 
 const int shadow_map_res = int(float(shadowMapResolution) * MC_SHADOW_QUALITY);
@@ -60,14 +59,14 @@ float lightmap_shadows(float skylight, float NoL) {
 }
 
 #ifdef SHADOW
-vec2 blocker_search(vec3 scene_pos, float dither) {
-	const uint step_count = SHADOW_BLOCKER_SEARCH_STEPS;
+vec2 blocker_search(vec3 scene_pos, float dither, bool has_sss) {
+	uint step_count = has_sss ? 12u : 3u;
 
 	vec3 shadow_view_pos = transform(shadowModelView, scene_pos);
 	vec3 shadow_clip_pos = project_ortho(shadowProjection, shadow_view_pos);
 	float ref_z = shadow_clip_pos.z * (SHADOW_DEPTH_SCALE * 0.5) + 0.5;
 
-	float radius = SHADOW_BLOCKER_SEARCH_RADIUS * shadowProjection[0].x;
+	float radius = SHADOW_BLOCKER_SEARCH_RADIUS * shadowProjection[0].x * (0.5 + 0.5 * linear_step(0.2, 0.4, light_dir.y));
 	mat2 rotate_and_scale = get_rotation_matrix(tau * dither) * radius;
 
 	float depth_sum = 0.0;
@@ -231,7 +230,7 @@ vec3 calculate_shadows(
 	float dither = interleaved_gradient_noise(gl_FragCoord.xy, frameCounter);
 
 #ifdef SHADOW_VPS
-	vec2 blocker_search_result = blocker_search(scene_pos, dither);
+	vec2 blocker_search_result = blocker_search(scene_pos, dither, sss_amount > eps);
 
 	// SSS depth computed together with blocker depth
 	sss_depth = mix(blocker_search_result.y, sss_depth, distance_fade);
