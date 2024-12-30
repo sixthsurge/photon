@@ -2,4 +2,4 @@
 #define WORLD_END
 #define PROGRAM_GBUFFERS_ARMOR_GLINT
 #define fsh
-#include "/program/gbuffer/armor_glint.glsl"
+#include "/program/gbuffers_armor_glint.fsh"

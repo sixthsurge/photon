@@ -2,4 +2,4 @@
 #define WORLD_NETHER
 #define PROGRAM_DH_WATER
 #define fsh
-#include "/program/gbuffer/distant_horizons/water.glsl"
+#include "/program/dh_water.fsh"

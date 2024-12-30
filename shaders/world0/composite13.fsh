@@ -1,4 +1,4 @@
 #version 400 compatibility
 #define WORLD_OVERWORLD
 #define fsh
-#include "/program/post/bloom/gaussian1.glsl"
+#include "/program/c13_bloom_gaussian_1.fsh"

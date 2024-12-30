@@ -1,4 +1,4 @@
 #version 400 compatibility
 #define WORLD_NETHER
 #define fsh
-#include "/program/post/motion_blur.glsl"
+#include "/program/c16_motion_blur.fsh"

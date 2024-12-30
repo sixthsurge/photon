@@ -1,4 +1,4 @@
 #version 400 compatibility
 #define WORLD_NETHER
 #define vsh
-#include "/program/post/fxaa.glsl"
+#include "/program/c15_fxaa.vsh"

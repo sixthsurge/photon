@@ -2,4 +2,4 @@
 #define WORLD_OVERWORLD
 #define PROGRAM_GBUFFERS_ENTITIES
 #define vsh
-#include "/program/gbuffer/solid.glsl"
+#include "/program/gbuffers_all_solid.vsh"

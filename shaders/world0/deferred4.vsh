@@ -2,4 +2,4 @@
 #define WORLD_OVERWORLD
 #define PROGRAM_DEFERRED4
 #define vsh
-#include "/program/deferred4.glsl"
+#include "/program/d4_deferred_shading.vsh"

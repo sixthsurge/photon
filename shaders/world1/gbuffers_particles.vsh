@@ -2,4 +2,4 @@
 #define WORLD_END
 #define PROGRAM_GBUFFERS_PARTICLES
 #define vsh
-#include "/program/gbuffer/solid.glsl"
+#include "/program/gbuffers_all_solid.vsh"

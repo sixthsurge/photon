@@ -2,4 +2,4 @@
 #define WORLD_NETHER
 #define PROGRAM_GBUFFERS_ENTITIES_TRANSLUCENT
 #define fsh
-#include "/program/gbuffer/translucent.glsl"
+#include "/program/gbuffers_all_translucent.fsh"

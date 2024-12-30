@@ -2,5 +2,5 @@
 #define WORLD_NETHER
 #define PROGRAM_DH_TERRAIN
 #define fsh
-#include "/program/gbuffer/distant_horizons/terrain.glsl"
+#include "/program/dh_terrain.fsh"
 

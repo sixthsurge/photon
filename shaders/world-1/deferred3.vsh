@@ -2,4 +2,4 @@
 #define WORLD_NETHER
 #define PROGRAM_DEFERRED3
 #define vsh
-#include "/program/deferred3.glsl"
+#include "/program/d3_ao.vsh"

@@ -2,4 +2,4 @@
 #define WORLD_END
 #define PROGRAM_COMPOSITE1
 #define fsh
-#include "/program/composite1.glsl"
+#include "/program/c1_blend_layers.fsh"

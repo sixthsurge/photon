@@ -2,4 +2,4 @@
 #define WORLD_OVERWORLD
 #define PROGRAM_GBUFFERS_LINE
 #define vsh
-#include "/program/gbuffer/basic.glsl"
+#include "/program/gbuffers_basic.vsh"

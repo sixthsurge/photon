@@ -2,4 +2,4 @@
 #define WORLD_NETHER
 #define PROGRAM_COMPOSITE1
 #define vsh
-#include "/program/composite1.glsl"
+#include "/program/c1_blend_layers.vsh"

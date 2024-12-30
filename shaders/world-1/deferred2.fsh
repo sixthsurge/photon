@@ -2,4 +2,4 @@
 #define WORLD_NETHER
 #define PROGRAM_DEFERRED2
 #define fsh
-#include "/program/deferred2.glsl"
+#include "/program/d2_clouds_upscaling.fsh"

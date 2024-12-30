@@ -1,4 +1,4 @@
 #version 400 compatibility
 #define WORLD_END
 #define vsh
-#include "/program/post/bloom/merge_buffers.glsl"
+#include "/program/c11_bloom_merge_buffers.vsh"

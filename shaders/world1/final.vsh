@@ -2,4 +2,4 @@
 #define WORLD_END
 #define PROGRAM_FINAL
 #define vsh
-#include "/program/post/final.glsl"
+#include "/program/final.vsh"

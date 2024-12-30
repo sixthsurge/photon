@@ -2,4 +2,4 @@
 #define WORLD_OVERWORLD
 #define BLOOM_TILE_INDEX 2
 #define fsh
-#include "/program/post/bloom/downsample.glsl"
+#include "/program/c5_c10_bloom_downsample.fsh"

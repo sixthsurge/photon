@@ -3,4 +3,4 @@
 #define WORLD_END
 #define PROGRAM_SHADOW
 #define vsh
-#include "/program/shadow.glsl"
+#include "/program/shadow.vsh"

@@ -2,4 +2,4 @@
 #define WORLD_NETHER
 #define PROGRAM_FINAL
 #define vsh
-#include "/program/post/final.glsl"
+#include "/program/final.vsh"

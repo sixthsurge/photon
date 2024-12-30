@@ -1,4 +1,4 @@
 #version 400 compatibility
 #define WORLD_OVERWORLD
 #define fsh
-#include "/program/post/grade.glsl"
+#include "/program/c14_color_grading.fsh"

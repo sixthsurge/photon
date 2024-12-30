@@ -2,4 +2,4 @@
 #define WORLD_NETHER
 #define PROGRAM_GBUFFERS_LINE
 #define fsh
-#include "/program/gbuffer/basic.glsl"
+#include "/program/gbuffers_basic.fsh"

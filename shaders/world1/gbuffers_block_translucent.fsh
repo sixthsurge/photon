@@ -2,4 +2,4 @@
 #define WORLD_END
 #define PROGRAM_GBUFFERS_BLOCK_TRANSLUCENT
 #define fsh
-#include "/program/gbuffer/translucent.glsl"
+#include "/program/gbuffers_all_translucent.fsh"

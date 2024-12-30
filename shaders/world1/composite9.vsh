@@ -2,4 +2,4 @@
 #define WORLD_END
 #define BLOOM_TILE_INDEX 4
 #define vsh
-#include "/program/post/bloom/downsample.glsl"
+#include "/program/c5_c10_bloom_downsample.vsh"

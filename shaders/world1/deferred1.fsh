@@ -2,4 +2,4 @@
 #define WORLD_END
 #define PROGRAM_DEFERRED1
 #define fsh
-#include "/program/deferred1.glsl"
+#include "/program/d1_clouds.fsh"

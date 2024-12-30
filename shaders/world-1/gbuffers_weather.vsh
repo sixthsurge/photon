@@ -2,4 +2,4 @@
 #define WORLD_NETHER
 #define PROGRAM_WEATHER
 #define vsh
-#include "/program/gbuffer/weather.glsl"
+#include "/program/gbuffers_weather.vsh"

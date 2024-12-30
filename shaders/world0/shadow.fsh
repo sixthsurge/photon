@@ -2,4 +2,4 @@
 #define WORLD_OVERWORLD
 #define PROGRAM_SHADOW
 #define fsh
-#include "/program/shadow.glsl"
+#include "/program/shadow.fsh"

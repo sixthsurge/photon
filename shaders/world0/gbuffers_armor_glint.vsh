@@ -2,4 +2,4 @@
 #define WORLD_OVERWORLD
 #define PROGRAM_GBUFFERS_ARMOR_GLINT
 #define vsh
-#include "/program/gbuffer/armor_glint.glsl"
+#include "/program/gbuffers_armor_glint.vsh"

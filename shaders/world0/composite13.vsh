@@ -1,4 +1,4 @@
 #version 400 compatibility
 #define WORLD_OVERWORLD
 #define vsh
-#include "/program/post/bloom/gaussian1.glsl"
+#include "/program/c13_bloom_gaussian_1.vsh"
