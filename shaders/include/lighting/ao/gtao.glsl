@@ -5,9 +5,6 @@
 #include "/include/utility/fast_math.glsl" 
 #include "/include/utility/space_conversion.glsl"
 
-#define GTAO_SLICES        2
-#define GTAO_HORIZON_STEPS 3
-#define GTAO_RADIUS        2.0
 #define GTAO_FALLOFF_START 0.75
 
 float integrate_arc(vec2 h, float n, float cos_n) {

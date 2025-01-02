@@ -36,6 +36,11 @@ flat in DailyWeatherVariation daily_weather_variation;
 uniform sampler3D colortex6; // 3D worley noise
 uniform sampler3D colortex7; // 3D curl noise
 
+#if defined WORLD_OVERWORLD && defined GALAXY
+uniform sampler2D colortex14;
+#define galaxy_sampler colortex14
+#endif
+
 uniform sampler3D depthtex0; // atmospheric scattering LUT
 uniform sampler2D depthtex1;
 

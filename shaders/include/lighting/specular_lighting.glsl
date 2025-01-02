@@ -218,6 +218,10 @@ vec3 trace_specular_ray(
 
 		vec3 reflection = textureLod(colortex5, hit_pos_prev.xy, mip_level).rgb;
 
+		// Remove fog scattering from reflection
+		vec3 fog_scattering_previous = texture(colortex7, hit_pos_prev.xy).rgb;
+		reflection = max0(reflection - fog_scattering_previous);
+
 		return mix(sky_reflection, reflection, border_attenuation);
 	} else {
 		return sky_reflection;

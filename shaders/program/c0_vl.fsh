@@ -11,8 +11,8 @@
 
 #include "/include/global.glsl"
 
-layout (location = 0) out vec3 fog_scattering;
-layout (location = 1) out vec3 fog_transmittance;
+layout (location = 0) out vec3 fog_transmittance;
+layout (location = 1) out vec3 fog_scattering;
 
 /* RENDERTARGETS: 6,7 */
 

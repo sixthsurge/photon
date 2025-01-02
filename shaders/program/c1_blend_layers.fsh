@@ -176,8 +176,8 @@ void main() {
 	vec4 translucent_color = texelFetch(colortex13, texel, 0);
 	
 #ifdef VL
-	vec3 fog_scattering    = smooth_filter(colortex6, uv).rgb;
-	vec3 fog_transmittance = smooth_filter(colortex7, uv).rgb;
+	vec3 fog_transmittance = smooth_filter(colortex6, uv).rgb;
+	vec3 fog_scattering    = smooth_filter(colortex7, uv).rgb;
 #endif
 
 	// Distant Horizons support

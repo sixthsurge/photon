@@ -44,8 +44,14 @@ uniform sampler2D colortex3; // animated overlays/vanilla sky
 uniform sampler2D colortex4; // sky map
 uniform sampler2D colortex5; // previous frame color
 uniform sampler2D colortex6; // ambient occlusion
+uniform sampler2D colortex7; // previous frame fog scattering
 uniform sampler2D colortex11; // clouds history
 uniform sampler2D colortex12; // clouds apparent distance
+
+#if defined WORLD_OVERWORLD && defined GALAXY
+uniform sampler2D colortex14;
+#define galaxy_sampler colortex14
+#endif
 
 #ifdef CLOUD_SHADOWS
 uniform sampler2D colortex8; // cloud shadow map

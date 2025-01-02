@@ -53,6 +53,7 @@ uniform sampler2D specular;
 
 uniform sampler2D colortex4; // Sky map, lighting colors
 uniform sampler2D colortex5; // Previous frame image (for reflections)
+uniform sampler2D colortex7; // Previous frame fog scattering (for reflections)
 
 #ifdef CLOUD_SHADOWS
 uniform sampler2D colortex8; // Cloud shadow map
