@@ -74,11 +74,31 @@ float rcp_length(vec2 v) { return inversesqrt(dot(v, v)); }
 float rcp_length(vec3 v) { return inversesqrt(dot(v, v)); }
 
 // Computes the length of a vector and normalizes it using one inversesqrt
+void length_normalize(vec2 v, out vec2 normalized, out float len) {
+	float len_sq = length_squared(v);
+	float rcp_len = inversesqrt(len_sq);
+	len = len_sq * rcp_len;
+	normalized = rcp_len * v;
+}
 void length_normalize(vec3 v, out vec3 normalized, out float len) {
 	float len_sq = length_squared(v);
 	float rcp_len = inversesqrt(len_sq);
 	len = len_sq * rcp_len;
 	normalized = rcp_len * v;
+}
+
+vec2 clamp_length(vec2 v, float min_len, float max_len) {
+	float len; vec2 normalized;
+	length_normalize(v, normalized, len);
+
+	return normalized * clamp(len, min_len, max_len);
+}
+
+vec3 clamp_length(vec3 v, float min_len, float max_len) {
+	float len; vec3 normalized;
+	length_normalize(v, normalized, len);
+
+	return normalized * clamp(len, min_len, max_len);
 }
 
 #endif // INCLUDE_UTILITY_FAST_MATH
