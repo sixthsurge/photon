@@ -15,11 +15,8 @@
 
 out vec2 uv;
 
-flat out vec2 clouds_cumulus_coverage;
-flat out vec2 clouds_altocumulus_coverage;
-flat out vec2 clouds_cirrus_coverage;
-flat out float clouds_cumulus_congestus_amount;
-flat out float clouds_stratus_amount;
+#include "/include/misc/weather_struct.glsl"
+flat out DailyWeatherVariation daily_weather_variation;
 
 // ------------
 //   Uniforms
@@ -67,13 +64,7 @@ uniform float biome_humidity;
 void main() {
 	uv = gl_MultiTexCoord0.xy;
 
-	clouds_weather_variation(
-		clouds_cumulus_coverage,
-		clouds_altocumulus_coverage,
-		clouds_cirrus_coverage,
-		clouds_cumulus_congestus_amount,
-		clouds_stratus_amount
-	);
+	daily_weather_variation = get_daily_weather_variation();
 
 	gl_Position = vec4(gl_Vertex.xy * 2.0 - 1.0, 0.0, 1.0);
 }

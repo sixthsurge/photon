@@ -37,14 +37,18 @@ float clouds_cumulus_density(vec3 pos, vec2 detail_weights, vec2 edge_sharpening
 		texture(noisetex, (0.000027 / CLOUDS_CUMULUS_SIZE) * pos.xz).w  // cloud shape
 	);
 
-	float density_cu = mix(clouds_cumulus_coverage.x, clouds_cumulus_coverage.y, noise.x);
-	      density_cu = linear_step(1.0 - density_cu, 1.0, noise.y);
+	float density_cu = mix(
+		daily_weather_variation.clouds_cumulus_coverage.x, 
+		daily_weather_variation.clouds_cumulus_coverage.y, 
+		noise.x
+	);
+	density_cu = linear_step(1.0 - density_cu, 1.0, noise.y);
 
 	float density_st = linear_step(0.30, 0.70, noise.x) * linear_step(0.10, 0.90, noise.y);
 
-	float density  = mix(density_cu, density_st, clouds_stratus_amount);
-	      density  = clouds_cumulus_altitude_shaping(density, altitude_fraction);
-		  density -= density * linear_step(0.0, 0.5, clouds_cumulus_congestus_amount);
+	float density = mix(density_cu, density_st, daily_weather_variation.clouds_stratus_amount);
+	density = clouds_cumulus_altitude_shaping(density, altitude_fraction);
+	density -= density * linear_step(0.0, 0.5, daily_weather_variation.clouds_cumulus_congestus_amount);
 
 	if (density < eps) return 0.0;
 
@@ -120,7 +124,7 @@ vec2 clouds_cumulus_scattering(
 
 	float scattering_integral_times_density = (1.0 - step_transmittance) / extinction_coeff;
 
-	float powder_effect = clouds_powder_effect(density + density * clouds_stratus_amount, cos_theta);
+	float powder_effect = clouds_powder_effect(density + density * daily_weather_variation.clouds_stratus_amount, cos_theta);
 
 	float phase = clouds_phase_single(cos_theta);
 	vec3 phase_g = pow(vec3(0.6, 0.9, 0.3), vec3(1.0 + light_optical_depth));
@@ -198,7 +202,11 @@ CloudsResult draw_cumulus_clouds(
 	//   Lighting Setup
 	// ------------------
 
-	float altocumulus_shadow = linear_step(0.5, 0.6, clouds_altocumulus_coverage.x) * dampen(day_factor);
+	float altocumulus_shadow = linear_step(
+		0.5, 
+		0.6, 
+		daily_weather_variation.clouds_altocumulus_coverage.x
+	) * dampen(day_factor);
 
 	bool  moonlit            = sun_dir.y < -0.04;
 	vec3  light_dir          = moonlit ? moon_dir : sun_dir;
@@ -208,9 +216,9 @@ CloudsResult draw_cumulus_clouds(
 	float extinction_coeff   = mix(0.05, 0.1, smoothstep(0.0, 0.3, abs(sun_dir.y))) * (1.0 - 0.33 * rainStrength) * (1.0 - 0.6 * altocumulus_shadow) * CLOUDS_CUMULUS_DENSITY;
 	float scattering_coeff   = extinction_coeff * mix(1.00, 0.66, rainStrength);
 
-	float dynamic_thickness  = mix(0.5, 1.0, smoothstep(0.4, 0.6, clouds_cumulus_coverage.y));
-	vec2  detail_weights     = mix(vec2(0.33, 0.40), vec2(0.25, 0.20), sqr(clouds_stratus_amount)) * CLOUDS_CUMULUS_DETAIL_STRENGTH;
-	vec2  edge_sharpening    = mix(vec2(3.0, 8.0), vec2(1.0, 2.0), clouds_stratus_amount);
+	float dynamic_thickness  = mix(0.5, 1.0, smoothstep(0.4, 0.6, daily_weather_variation.clouds_cumulus_coverage.y));
+	vec2  detail_weights     = mix(vec2(0.33, 0.40), vec2(0.25, 0.20), sqr(daily_weather_variation.clouds_stratus_amount)) * CLOUDS_CUMULUS_DETAIL_STRENGTH;
+	vec2  edge_sharpening    = mix(vec2(3.0, 8.0), vec2(1.0, 2.0), daily_weather_variation.clouds_stratus_amount);
 
 	// --------------------
 	//   Raymarching Loop

@@ -34,6 +34,7 @@ screen.clouds_altocumulus              = Altocumulus Clouds Settings
 screen.clouds_cumulus_congestus        = Cumulus Congestus Clouds Settings
 screen.clouds_cirrus                   = Cirrus/Cirrocumulus Clouds Settings
 screen.clouds_minecrafty               = Blocky Clouds Settings
+screen.clouds_noctilucent              = Noctilucent Clouds Settings
 
 screen.fog_rlh                         = Rayleigh Coefficient
 screen.fog_mie                         = Mie Coefficient
@@ -359,6 +360,9 @@ option.CLOUDS_CIRROCUMULUS_COVERAGE        = Cirrocumulus Coverage
 option.CLOUDS_CIRROCUMULUS_SIZE            = Cirrocumulus Size
 option.CLOUDS_CIRROCUMULUS_DETAIL_STRENGTH = Cirrocumulus Detail Strength
 option.CLOUDS_CIRROCUMULUS_CURL_STRENGTH   = Cirrocumulus Curl Strength
+
+option.CLOUDS_NOCTILUCENT_INTENSITY    = Intensity
+option.CLOUDS_NOCTILUCENT_RARITY       = Rarity
 
 option.AURORA_NORMAL                   = Aurora in Any Biome
 option.AURORA_SNOW                     = Aurora in Snow Biome

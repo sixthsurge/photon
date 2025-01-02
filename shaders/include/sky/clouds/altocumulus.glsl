@@ -27,7 +27,7 @@ float clouds_altocumulus_density(vec3 pos) {
 	float r = length(pos);
 	if (r < clouds_altocumulus_radius || r > clouds_altocumulus_top_radius) return 0.0;
 
-	float dynamic_thickness = mix(0.5, 1.0, smoothstep(0.4, 0.6, clouds_altocumulus_coverage.y));
+	float dynamic_thickness = mix(0.5, 1.0, smoothstep(0.4, 0.6, daily_weather_variation.clouds_altocumulus_coverage.y));
 	float altitude_fraction = 0.8 * (r - clouds_altocumulus_radius) * rcp(clouds_altocumulus_thickness * dynamic_thickness);
 
 	pos.xz += cameraPosition.xz * CLOUDS_SCALE + wind_velocity * world_age;
@@ -38,9 +38,13 @@ float clouds_altocumulus_density(vec3 pos) {
 		texture(noisetex, (0.000047 / CLOUDS_ALTOCUMULUS_SIZE) * pos.xz + 0.3).w  // cloud shape
 	);
 
-	float density = mix(clouds_altocumulus_coverage.x, clouds_altocumulus_coverage.y, cubic_smooth(noise.x));
-	      density = linear_step(1.0 - density, 1.0, noise.y);
-	      density = clouds_altocumulus_altitude_shaping(density, altitude_fraction);
+	float density = mix(
+		daily_weather_variation.clouds_altocumulus_coverage.x, 
+		daily_weather_variation.clouds_altocumulus_coverage.y, 
+		cubic_smooth(noise.x)
+	);
+	density = linear_step(1.0 - density, 1.0, noise.y);
+	density = clouds_altocumulus_altitude_shaping(density, altitude_fraction);
 
 	if (density < eps) return 0.0;
 
@@ -183,7 +187,11 @@ CloudsResult draw_altocumulus_clouds(
 	//   Lighting Setup
 	// ------------------
 
-	float high_coverage = linear_step(0.5, 0.6, clouds_altocumulus_coverage.x);
+	float high_coverage = linear_step(
+		0.5, 
+		0.6, 
+		daily_weather_variation.clouds_altocumulus_coverage.x
+	);
 
 	float extinction_coeff = mix(0.05, 0.1, day_factor) * CLOUDS_ALTOCUMULUS_DENSITY * (1.0 - 0.85 * high_coverage * (dampen(time_noon + time_midnight) * 0.75 + 0.25)) * (1.0 - 0.33 * rainStrength);
 	float scattering_coeff = extinction_coeff * mix(1.00, 0.66, rainStrength);

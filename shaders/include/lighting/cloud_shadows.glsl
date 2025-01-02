@@ -64,9 +64,13 @@ float render_cloud_shadow_map(vec2 uv) {
 	float shadow = 1.0;
 
 #ifdef CLOUDS_CUMULUS
-	float dynamic_thickness  = mix(0.5, 1.0, smoothstep(0.4, 0.6, clouds_cumulus_coverage.y));
-	vec2  detail_weights     = mix(vec2(0.33, 0.40), vec2(0.25, 0.20), sqr(clouds_stratus_amount)) * CLOUDS_CUMULUS_DETAIL_STRENGTH;
-	vec2  edge_sharpening    = mix(vec2(3.0, 8.0), vec2(1.0, 2.0), clouds_stratus_amount);
+	float dynamic_thickness  = mix(
+		0.5, 
+		1.0, 
+		smoothstep(0.4, 0.6, daily_weather_variation.clouds_cumulus_coverage.y)
+	);
+	vec2 detail_weights = mix(vec2(0.33, 0.40), vec2(0.25, 0.20), sqr(daily_weather_variation.clouds_stratus_amount)) * CLOUDS_CUMULUS_DETAIL_STRENGTH;
+	vec2 edge_sharpening = mix(vec2(3.0, 8.0), vec2(1.0, 2.0), daily_weather_variation.clouds_stratus_amount);
 
 	extinction_coeff = 0.25 * mix(0.05, 0.1, smoothstep(0.0, 0.3, abs(sun_dir.y))) * (1.0 - 0.33 * rainStrength) * CLOUDS_CUMULUS_DENSITY;
 	t = intersect_sphere(ray_origin, light_dir,	clouds_cumulus_radius + 0.25 * clouds_cumulus_thickness).y;

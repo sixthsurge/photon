@@ -60,7 +60,11 @@ float clouds_cirrus_density(
 
 	float density_cirrus = 0.7 * texture(noisetex, (0.000001 / CLOUDS_CIRRUS_SIZE) * coord + (0.004 * CLOUDS_CIRRUS_CURL_STRENGTH) * curl).x
 	                     + 0.3 * texture(noisetex, (0.000008 / CLOUDS_CIRRUS_SIZE) * coord + (0.008 * CLOUDS_CIRRUS_CURL_STRENGTH) * curl).x;
-	density_cirrus = linear_step(0.7 - clouds_cirrus_coverage.x, 1.0, density_cirrus);
+	density_cirrus = linear_step(
+		0.7 - daily_weather_variation.clouds_cirrus_coverage.x, 
+		1.0, 
+		density_cirrus
+	);
 
 	vec2 detail_coord = coord;
 
@@ -85,7 +89,11 @@ float clouds_cirrus_density(
 	// Cirrocumulus 
 
 	float coverage = texture(noisetex, (0.0000026 / CLOUDS_CIRROCUMULUS_SIZE) * coord + 0.25).w;
-		  coverage = 5.0 * linear_step(0.25, 0.9, clouds_cirrus_coverage.y * coverage);
+	coverage = 5.0 * linear_step(
+		0.25, 
+		0.9, 
+		daily_weather_variation.clouds_cirrus_coverage.y * coverage
+	);
 
 	float density_cirrocumulus = dampen(texture(noisetex, (0.000025 * rcp(CLOUDS_CIRROCUMULUS_SIZE)) * coord + (0.033 * CLOUDS_CIRROCUMULUS_CURL_STRENGTH) * curl).w);
 	density_cirrocumulus = linear_step(1.0 - coverage, 1.0, density_cirrocumulus);
@@ -161,7 +169,7 @@ vec2 clouds_cirrus_scattering(
 	      powder_effect = mix(powder_effect, 1.0, pow1d5(cos_theta * 0.5 + 0.5));
 
 	float scatter_amount = clouds_cirrus_scattering_coeff;
-	float extinct_amount = clouds_cirrus_extinction_coeff * (1.0 + 0.5 * max0(smoothstep(0.0, 0.15, abs(sun_dir.y)) - smoothstep(0.5, 0.7, clouds_cirrus_coverage.x)));
+	float extinct_amount = clouds_cirrus_extinction_coeff * (1.0 + 0.5 * max0(smoothstep(0.0, 0.15, abs(sun_dir.y)) - smoothstep(0.5, 0.7, daily_weather_variation.clouds_cirrus_coverage.x)));
 
 	for (uint i = 0u; i < 4u; ++i) {
 		scattering.x += scatter_amount * exp(-extinct_amount * light_optical_depth) * phase * powder_effect; // direct light

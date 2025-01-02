@@ -25,15 +25,8 @@ flat in vec3 sun_color;
 flat in vec3 moon_color;
 flat in vec3 sky_color;
 
-flat in vec2 clouds_cumulus_coverage;
-flat in vec2 clouds_altocumulus_coverage;
-flat in vec2 clouds_cirrus_coverage;
-
-flat in float clouds_cumulus_congestus_amount;
-flat in float clouds_stratus_amount;
-
-flat in float aurora_amount;
-flat in mat2x3 aurora_colors;
+#include "/include/misc/weather_struct.glsl"
+flat in DailyWeatherVariation daily_weather_variation;
 #endif
 
 // ------------

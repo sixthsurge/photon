@@ -18,11 +18,8 @@ layout (location = 0) out float cloud_shadow_map;
 
 in vec2 uv;
 
-flat in vec2 clouds_cumulus_coverage;
-flat in vec2 clouds_altocumulus_coverage;
-flat in vec2 clouds_cirrus_coverage;
-flat in float clouds_cumulus_congestus_amount;
-flat in float clouds_stratus_amount;
+#include "/include/misc/weather_struct.glsl"
+flat in DailyWeatherVariation daily_weather_variation;
 
 // ------------
 //   Uniforms

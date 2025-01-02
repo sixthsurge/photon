@@ -20,7 +20,11 @@ float aurora_shape(vec3 pos, float altitude_fraction) {
 }
 
 vec3 aurora_color(vec3 pos, float altitude_fraction) {
-	return mix(aurora_colors[0], aurora_colors[1], clamp01(dampen(altitude_fraction)));
+	return mix(
+		daily_weather_variation.aurora_colors[0], 
+		daily_weather_variation.aurora_colors[1], 
+		clamp01(dampen(altitude_fraction))
+	);
 }
 
 vec3 draw_aurora(vec3 ray_dir, float dither) {
@@ -30,7 +34,7 @@ vec3 draw_aurora(vec3 ray_dir, float dither) {
 	const float volume_top     = 3000.0;
 	const float volume_radius  = 20000.0;
 
-	if (aurora_amount < 0.01) return vec3(0.0);
+	if (daily_weather_variation.aurora_amount < 0.01) return vec3(0.0);
 
 	// Calculate distance to enter and exit the volume
 
@@ -68,7 +72,7 @@ vec3 draw_aurora(vec3 ray_dir, float dither) {
 		emission += color * (shape * distance_fade * step_length);
 	}
 
-	return (0.001 * AURORA_BRIGHTNESS) * emission * aurora_amount;
+	return (0.001 * AURORA_BRIGHTNESS) * emission * daily_weather_variation.aurora_amount;
 }
 
 #endif // INCLUDE_SKY_AURORA

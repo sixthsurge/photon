@@ -17,7 +17,7 @@ CloudsResult draw_clouds(
 	CloudsResult result = clouds_not_hit;
 	float r = length(air_viewer_pos);
 
-	if (clouds_cumulus_congestus_amount < 0.5) {
+	if (daily_weather_variation.clouds_cumulus_congestus_amount < 0.5) {
 #ifdef CLOUDS_CUMULUS
 		result = draw_cumulus_clouds(air_viewer_pos, ray_dir, clear_sky, distance_to_terrain, dither);
 		if (result.transmittance < 1e-3 && r < clouds_cumulus_radius) return result;

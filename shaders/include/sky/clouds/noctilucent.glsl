@@ -36,7 +36,7 @@ float clouds_noctilucent_density(vec2 coord, vec3 ray_dir) {
 
 	density += 2.0 * pow8(max0(highlight));
 
-	return sqr(max0(density));
+	return sqr(max0(density)) * daily_weather_variation.nlc_amount;
 }
 
 vec4 draw_noctilucent_clouds(

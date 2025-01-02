@@ -21,15 +21,8 @@ flat out vec3 sun_color;
 flat out vec3 moon_color;
 flat out vec3 sky_color;
 
-flat out vec2 clouds_cumulus_coverage;
-flat out vec2 clouds_altocumulus_coverage;
-flat out vec2 clouds_cirrus_coverage;
-
-flat out float clouds_cumulus_congestus_amount;
-flat out float clouds_stratus_amount;
-
-flat out float aurora_amount;
-flat out mat2x3 aurora_colors;
+#include "/include/misc/weather_struct.glsl"
+flat out DailyWeatherVariation daily_weather_variation;
 #endif
 
 // ------------
@@ -121,18 +114,13 @@ void main() {
 	ambient_color = get_ambient_color();
 
 #if defined WORLD_OVERWORLD
-	clouds_weather_variation(
-		clouds_cumulus_coverage,
-		clouds_altocumulus_coverage,
-		clouds_cirrus_coverage,
-		clouds_cumulus_congestus_amount,
-		clouds_stratus_amount
+	daily_weather_variation = get_daily_weather_variation();
+
+	sky_color += daily_weather_variation.aurora_amount * AURORA_CLOUD_LIGHTING * mix(
+		daily_weather_variation.aurora_colors[0], 
+		daily_weather_variation.aurora_colors[1], 
+		0.25
 	);
-
-	aurora_amount = get_aurora_amount();
-	aurora_colors = get_aurora_colors();
-
-	sky_color += aurora_amount * AURORA_CLOUD_LIGHTING * mix(aurora_colors[0], aurora_colors[1], 0.25);
 #endif
 
 	gl_Position = vec4(gl_Vertex.xy * 2.0 - 1.0, 0.0, 1.0);
