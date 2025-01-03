@@ -12,9 +12,8 @@
 #include "/include/global.glsl"
 
 layout (location = 0) out vec3 scene_color;
-layout (location = 1) out vec4 colortex3_clear;
 
-/* RENDERTARGETS: 0,3 */
+/* RENDERTARGETS: 0 */
 
 in vec2 uv;
 
@@ -183,8 +182,6 @@ vec4 read_clouds_and_aurora(out float apparent_distance) {
 }
 
 void main() {
-	colortex3_clear = vec4(0.0);
-
 	ivec2 texel = ivec2(gl_FragCoord.xy);
 
 	// Sample textures
