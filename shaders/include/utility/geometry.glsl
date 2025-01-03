@@ -14,39 +14,6 @@ vec3 sign_non_zero(vec3 v) {
 	);
 }
 
-vec2 intersect_box(vec3 ray_origin, vec3 ray_dir, mat2x3 bounds) {
-	float t_min, t_max, t_min_y, t_max_y, t_min_z, t_max_z;
-
-	vec3  rcp_ray_dir  = rcp(ray_dir);
-	ivec3 ray_dir_sign = ivec3(0.5 - 0.5 * sign_non_zero(ray_dir));
-
-	t_min = (bounds[    ray_dir_sign.x].x - ray_origin.x) * rcp_ray_dir.x;
-	t_max = (bounds[1 - ray_dir_sign.x].x - ray_origin.x) * rcp_ray_dir.x;
-
-	if ((t_min > t_max_y) || (t_min_y > t_max))
-		return vec2(-1.0);
-
-	t_min_y = (bounds[    ray_dir_sign.y].y - ray_origin.y) * rcp_ray_dir.y;
-	t_max_y = (bounds[1 - ray_dir_sign.y].y - ray_origin.y) * rcp_ray_dir.y;
-
-	if (t_min_y > t_min)
-		t_min = t_min_y;
-	if (t_max_y < t_max)
-		t_max = t_max_y;
-
-	t_min_z = (bounds[    ray_dir_sign.z].z - ray_origin.z) * rcp_ray_dir.z;
-	t_max_z = (bounds[1 - ray_dir_sign.z].z - ray_origin.z) * rcp_ray_dir.z;
-
-	if ((t_min > t_max_z) || (t_min_z > t_max))
-		return vec2(-1.0);
-	if (t_min_z > t_min)
-		t_min = t_min_z;
-	if (t_max_z < t_max)
-		t_max = t_max_z;
-
-	return vec2(t_min, t_max);
-}
-
 // from https://ebruneton.github.io/precomputed_atmospheric_scattering/
 vec2 intersect_sphere(float mu, float r, float sphere_radius) {
 	float discriminant = r * r * (mu * mu - 1.0) + sqr(sphere_radius);

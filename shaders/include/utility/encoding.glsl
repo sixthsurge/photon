@@ -96,8 +96,8 @@ vec4 unpack_unorm_arb(uint pack, const uvec4 bits) {
 // Split one value to be encoded as 16 bit unorm into two values to be encoded as 8 bit unorm
 vec2 split_2x8(float x) {
 	uint i = uint(x * 65535.0);
-	uint lower = i & 255;
-	uint upper = i >> 8;
+	uint lower = i & 255u;
+	uint upper = i >> 8u;
 
 	return vec2(
 		float(lower) * rcp(255.0),

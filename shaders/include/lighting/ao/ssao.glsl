@@ -1,4 +1,5 @@
-#if !defined INCLUDE_LIGHTING_AO_SSAO #define INCLUDE_LIGHTING_AO_SSAO
+#if !defined INCLUDE_LIGHTING_AO_SSAO 
+#define INCLUDE_LIGHTING_AO_SSAO
 
 #include "/include/utility/random.glsl"
 #include "/include/utility/fast_math.glsl"
@@ -71,3 +72,4 @@ float compute_ssao(
 }
 
 #endif // INCLUDE_LIGHTING_AO_SSAO
+

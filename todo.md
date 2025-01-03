@@ -1,10 +1,15 @@
-## fixes
-- cloud shadows broken on OptiFine
+## bug fixes
+- precision errors on DH reflections
 
 ## features
-- rework rainy weather
-
-### sky
-- noctilucent clouds
-- improve aurora
+###  atmospherics
+- rainy weather rework
+- aurora rework
 - crepuscular rays
+- better stratus clouds
+
+### lighting 
+- SSRT shadows/SSS for distant terrain
+- improve AO filter 
+- floodfill fog contribution
+
