@@ -1,5 +1,5 @@
 #version 400 compatibility
 #define WORLD_END
-#define PROGRAM_GBUFFERS_PARTICLES_TRANSLUCENT
+#define PROGRAM_GBUFFERS_PARTICLES
 #define fsh
-#include "/program/gbuffers_all_translucent.fsh"
+#include "/program/gbuffers_all_solid.fsh"
