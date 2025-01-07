@@ -438,8 +438,7 @@ Material material_from(vec3 albedo_srgb, uint material_mask, vec3 world_pos, vec
 						} else { // 35
 							#ifdef HARDCODED_EMISSION
 							// Strong golden light
-							material.emission  = 0.85 * albedo_sqrt * linear_step(0.4, 0.6, 0.2 * hsl.y + 0.55 * hsl.z);
-							light_levels.x *= 0.85;
+							material.emission  = 0.85 * albedo_sqrt * hsl.z * linear_step(0.4, 0.6, 0.2 * hsl.y + 0.55 * hsl.z);
 							#endif
 						}
 					}
@@ -449,7 +448,6 @@ Material material_from(vec3 albedo_srgb, uint material_mask, vec3 world_pos, vec
 							#ifdef HARDCODED_EMISSION
 							// Medium golden light
 							material.emission  = 0.85 * albedo_sqrt * linear_step(0.78, 0.85, hsl.z);
-							light_levels.x *= 0.85;
 							#endif
 						} else { // 37
 							#ifdef HARDCODED_EMISSION
@@ -494,7 +492,6 @@ Material material_from(vec3 albedo_srgb, uint material_mask, vec3 world_pos, vec
 							#ifdef HARDCODED_EMISSION
 							// Jack o' Lantern
 							material.emission = 0.80 * albedo_sqrt * step(0.73, 0.8 * hsl.z);
-							light_levels.x *= 0.85;
 							#endif
 						} else { // 43
 							#ifdef HARDCODED_EMISSION
