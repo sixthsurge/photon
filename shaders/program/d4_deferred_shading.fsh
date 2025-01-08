@@ -266,7 +266,7 @@ void main() {
 		scene_color = scene_color * clouds_and_aurora.w + clouds_and_aurora.xyz;
 
 		// Apply blocky clouds 
-#ifdef BLOCKY_CLOUDS 
+#if defined WORLD_OVERWORLD && defined BLOCKY_CLOUDS 
 		scene_color = scene_color * blocky_clouds.w + blocky_clouds.xyz;
 #endif
 
@@ -466,7 +466,7 @@ void main() {
 		float view_distance = length(view_pos);
 
 #ifdef BORDER_FOG
-	#ifdef WORLD_OVERWORLD
+	#if defined WORLD_OVERWORLD
 		vec3 horizon_dir = normalize(vec3(world_dir.xz, min(world_dir.y, -0.1)).xzy);
 		vec3 horizon_color = texture(colortex4, project_sky(horizon_dir)).rgb;
 
@@ -486,12 +486,14 @@ void main() {
 		scene_color = scene_color * fog.a + fog.rgb;
 
 		// Apply clouds in front of terrain
-#ifndef BLOCKY_CLOUDS
+#if defined WORLD_OVERWORLD
+	#ifndef BLOCKY_CLOUDS
 		if (clouds_distance < view_distance) {
 			scene_color = scene_color * clouds_and_aurora.w + clouds_and_aurora.xyz;
 		}
-#else
+	#else
 		scene_color = scene_color * blocky_clouds.w + blocky_clouds.xyz;
+	#endif
 #endif
 
 		// Apply purkinje shift
