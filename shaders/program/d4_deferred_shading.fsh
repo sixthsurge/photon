@@ -219,7 +219,14 @@ void main() {
 	vec3 world_dir = normalize(scene_pos - gbufferModelViewInverse[3].xyz);
 
 #if defined WORLD_OVERWORLD
-	vec3 atmosphere = atmosphere_scattering(world_dir, sun_color, sun_dir, moon_color, moon_dir);
+	vec3 atmosphere = atmosphere_scattering(
+		world_dir, 
+		sun_color, 
+		sun_dir, 
+		moon_color, 
+		moon_dir, 
+		/* use_klein_nishina_phase */ depth == 1.0
+	);
 
 #ifdef BLOCKY_CLOUDS
 	vec3 world_start_pos = gbufferModelViewInverse[3].xyz + cameraPosition;

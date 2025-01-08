@@ -52,8 +52,10 @@ const mat3x3 air_extinction_coefficients = mat3x3(air_rayleigh_coefficient, air_
 
 uniform float atmosphere_saturation_boost_amount;
 
-float atmosphere_mie_phase(float nu) {
-	return klein_nishina_phase(nu, air_mie_energy_parameter);
+float atmosphere_mie_phase(float nu, bool use_klein_nishina_phase) {
+	return use_klein_nishina_phase
+		? klein_nishina_phase(nu, air_mie_energy_parameter)
+		: henyey_greenstein_phase(nu, air_mie_g);
 }
 
 // Post-processing applied to the atmosphere color
@@ -163,7 +165,12 @@ vec3 atmosphere_scattering_uv(float nu, float mu, float mu_s) {
 	return vec3(u_nu, u_mu, u_mu_s);
 }
 
-vec3 atmosphere_scattering(float nu, float mu, float mu_s) {
+vec3 atmosphere_scattering(
+	float nu, 
+	float mu, 
+	float mu_s, 
+	bool use_klein_nishina_phase
+) {
 #ifndef SKY_GROUND
 	float horizon_mu = mix(-0.01, 0.03, smoothstep(-0.05, 0.1, mu_s));
 	mu = max(mu, horizon_mu);
@@ -171,7 +178,7 @@ vec3 atmosphere_scattering(float nu, float mu, float mu_s) {
 
 	vec3 uv = atmosphere_scattering_uv(nu, mu, mu_s);
 
-	float mie_phase = atmosphere_mie_phase(nu);
+	float mie_phase = atmosphere_mie_phase(nu, use_klein_nishina_phase);
 
 	vec3 scattering;
 
@@ -186,17 +193,24 @@ vec3 atmosphere_scattering(float nu, float mu, float mu_s) {
 	return atmosphere_post_processing(scattering);
 }
 
-vec3 atmosphere_scattering(vec3 ray_dir, vec3 light_dir) {
+vec3 atmosphere_scattering(vec3 ray_dir, vec3 light_dir, bool use_klein_nishina_phase) {
 	float nu = dot(ray_dir, light_dir);
 	float mu = ray_dir.y;
 	float mu_s = light_dir.y;
 
-	return atmosphere_scattering(nu, mu, mu_s);
+	return atmosphere_scattering(nu, mu, mu_s, use_klein_nishina_phase);
 }
 
 // Samples atmospheric scattering LUT for both sun and moon together
 // Prevents a few repeated calculations
-vec3 atmosphere_scattering(vec3 ray_dir, vec3 sun_color, vec3 sun_dir, vec3 moon_color, vec3 moon_dir) {
+vec3 atmosphere_scattering(
+	vec3 ray_dir, 
+	vec3 sun_color, 
+	vec3 sun_dir, 
+	vec3 moon_color, 
+	vec3 moon_dir, 
+	bool use_klein_nishina_phase
+) {
 	// Calculate nu, mu, mu_s
 
 	float mu = ray_dir.y;
@@ -304,8 +318,8 @@ vec3 atmosphere_scattering(vec3 ray_dir, vec3 sun_color, vec3 sun_dir, vec3 moon
 	vec3 scattering_mc = texture(ATMOSPHERE_SCATTERING_LUT, uv_mc).rgb;
 	vec3 scattering_mm = texture(ATMOSPHERE_SCATTERING_LUT, uv_mm).rgb;
 
-	float mie_phase_sun  = atmosphere_mie_phase(nu_sun);
-	float mie_phase_moon = atmosphere_mie_phase(nu_moon);
+	float mie_phase_sun  = atmosphere_mie_phase(nu_sun, use_klein_nishina_phase);
+	float mie_phase_moon = atmosphere_mie_phase(nu_moon, use_klein_nishina_phase);
 
 	vec3 atmosphere = (scattering_sc + scattering_sm * mie_phase_sun)  * sun_color
 	     + (scattering_mc + scattering_mm * mie_phase_moon) * moon_color;

@@ -217,7 +217,7 @@ vec3 draw_sky(vec3 ray_dir, vec3 atmosphere) {
 }
 
 vec3 draw_sky(vec3 ray_dir) {
-	vec3 atmosphere = atmosphere_scattering(ray_dir, sun_color, sun_dir, moon_color, moon_dir);
+	vec3 atmosphere = atmosphere_scattering(ray_dir, sun_color, sun_dir, moon_color, moon_dir, true);
 	return draw_sky(ray_dir, atmosphere);
 }
 
