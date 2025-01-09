@@ -14,7 +14,11 @@
 layout (location = 0) out vec3 scene_color;
 layout (location = 1) out vec4 colortex3_clear;
 
+#ifdef IS_IRIS
+/* RENDERTARGETS: 0 */
+#else
 /* RENDERTARGETS: 0,3 */
+#endif
 
 in vec2 uv;
 

@@ -215,7 +215,7 @@ void main() {
 	vec2 refracted_uv = uv;
 
 #if REFRACTION != REFRACTION_OFF
-	if (front_depth != back_depth && refraction_data != vec4(0.0)) {
+	if (false) {
 		float layer_dist = abs(view_distance - length(back_position_view));
 
 		vec2 normal_tangent = vec2(
@@ -235,7 +235,7 @@ void main() {
 
 	// Blend layers
 
-	fragment_color = mix(fragment_color, translucent_color.rgb, translucent_color.a);
+	fragment_color = fragment_color * (1.0 - translucent_color.a) + translucent_color.rgb;
 
 	// Draw Distant Horizons water
 

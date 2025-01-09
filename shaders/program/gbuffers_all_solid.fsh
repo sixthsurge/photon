@@ -211,7 +211,7 @@ const float lod_bias = log2(taau_render_scale);
 void main() {
 #if defined TAA && defined TAAU
 	vec2 coord = gl_FragCoord.xy * view_pixel_size * rcp(taau_render_scale);
-	if (clamp01(coord) != coord) discard;
+	if (clamp01(coord) != coord) { discard; return; }
 #endif
 
 	bool parallax_shadow = false;
@@ -256,10 +256,10 @@ void main() {
 	vec4 specular_map = read_tex(specular);
 #endif
 
-#if defined PROGRAM_GBUFFERS_ENTITIES
+#if    defined PROGRAM_GBUFFERS_ENTITIES
 	if (material_mask == 102) base_color = vec4(1.0);
 	if (base_color.a < 0.1 && material_mask != 101) { discard; return; } // Save transparent quad in boats, which masks out water
-#else
+#elif !defined PROGRAM_GBUFFERS_TERRAIN_SOLID
 	if (base_color.a < 0.1) { discard; return; }
 #endif
 

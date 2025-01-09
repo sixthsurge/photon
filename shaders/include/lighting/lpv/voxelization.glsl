@@ -3,6 +3,10 @@
 
 const ivec3 voxel_volume_size = ivec3(VOXEL_VOLUME_SIZE);
 
+#ifdef COLORED_LIGHTS
+const float voxelDistance = 32.0;
+#endif
+
 vec3 scene_to_voxel_space(vec3 scene_pos) {
 	return scene_pos + fract(cameraPosition) + (0.5 * vec3(voxel_volume_size));
 }

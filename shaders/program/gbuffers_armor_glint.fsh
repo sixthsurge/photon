@@ -11,10 +11,13 @@
 
 #include "/include/global.glsl"
 
-layout (location = 0) out vec3 colortex0_out;
-layout (location = 1) out vec4 colortex3_out;
+layout (location = 0) out vec4 frag_color;
 
-/* RENDERTARGETS: 0,3 */
+#ifdef IS_IRIS
+/* RENDERTARGETS: 13 */
+#else
+/* RENDERTARGETS: 3 */
+#endif
 
 in vec2 uv;
 
@@ -39,11 +42,15 @@ void main() {
 
 	vec3 armor_glint = texture(gtexture, uv, lod_bias).rgb;
 
-	colortex0_out = srgb_eotf_inv(armor_glint) * rec709_to_working_color;
-
+#if defined IS_IRIS
+	// New overlay handling
+	frag_color.rgb = srgb_eotf_inv(armor_glint) * rec709_to_working_color;
+	frag_color.a   = 0.0;
+#else
 	// Old overlay handling
 	// alpha of 0 <=> enchantment glint
-	colortex3_out.rgb = armor_glint;
-	colortex3_out.a = 0.0 / 255.0;
+	frag_color.rgb = armor_glint;
+	frag_color.a   = 0.0 / 255.0;
+#endif
 }
 
