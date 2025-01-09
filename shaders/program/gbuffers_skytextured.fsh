@@ -17,6 +17,7 @@ layout (location = 0) out vec4 scene_color;
 /* RENDERTARGETS: 3 */
 
 in vec2 uv;
+in vec3 view_pos;
 
 flat in vec3 tint;
 
@@ -29,30 +30,33 @@ uniform sampler2D gtexture;
 uniform int moonPhase;
 uniform int renderStage;
 
+uniform vec3 view_sun_dir;
+
 void main() {
 	vec2 new_uv = uv;
 	vec2 offset;
 
-	switch (renderStage) {
-#ifdef VANILLA_SUN
-	case MC_RENDER_STAGE_SUN:
-	 	// alpha of 2 <=> sun
+	if (renderStage == MC_RENDER_STAGE_CUSTOM_SKY) {
+	 	// Alpha of 4 <=> custom sky
+		scene_color.a = 4.0 / 255.0;
+		scene_color.rgb = texture(gtexture, new_uv).rgb;
+	} else if (dot(view_pos, view_sun_dir) > 0.0) {
+		// NB: not using renderStage to distinguish sun and moon because it's broken in Iris for 
+		// Minecraft 1.21.4
+		
+	 	// Alpha of 2 <=> sun
 		scene_color.a = 2.0 / 255.0;
 
 		// Cut out the sun itself (discard the halo around it)
-		offset = uv * 2.0 - 1.0;
-		if (max_of(abs(offset)) > 0.25) discard;
+		// offset = uv * 2.0 - 1.0;
+		// if (max_of(abs(offset)) > 0.25) discard;
 
 		scene_color.rgb = texture(gtexture, new_uv).rgb;
-
-		break;
-#endif
-
-#ifdef VANILLA_MOON
-	case MC_RENDER_STAGE_MOON:
+	} else {
 	 	// Alpha of 3 <=> moon
 		scene_color.a = 3.0 / 255.0;
 
+#ifdef VANILLA_MOON
 		// Cut out the moon itself (discard the halo around it) and flip moon texture along the
 		// diagonal
 		/*
@@ -63,13 +67,7 @@ void main() {
 		*/
 
 		scene_color.rgb = texture(gtexture, new_uv).rgb * vec3(MOON_R, MOON_G, MOON_B);
-
-		break;
 #else
-	case MC_RENDER_STAGE_MOON:
-	 	// Alpha of 3 <=> moon
-		scene_color.a = 3.0 / 255.0;
-
 		// Shader moon
 		const float angle      = 0.7;
 		const mat2  rot        = mat2(cos(angle), sin(angle), -sin(angle), cos(angle));
@@ -117,21 +115,7 @@ void main() {
 		);
 
 		if (dist > 1.3) discard;
-
-		break;
 #endif
-
-#ifdef CUSTOM_SKY
-	case MC_RENDER_STAGE_CUSTOM_SKY:
-	 	// alpha of 4 <=> custom sky
-		scene_color.a = 4.0 / 255.0;
-		scene_color.rgb = texture(gtexture, new_uv).rgb;
-
-		break;
-#endif
-
-	default:
-		discard;
-	}
+	}	
 }
 

@@ -174,7 +174,7 @@ vec3 draw_sky(vec3 ray_dir, vec3 atmosphere) {
 #ifdef VANILLA_SUN
 	if (vanilla_sky_id == 2) {
 		const vec3 brightness_scale = sunlight_color * sun_luminance;
-		sky += vanilla_sky_color * brightness_scale * sun_color;
+		sky += vanilla_sky_color * dot(vanilla_sky_color, luminance_weights_rec2020) * brightness_scale * sun_color;
 	}
 #else
 	sky += draw_sun(ray_dir);
