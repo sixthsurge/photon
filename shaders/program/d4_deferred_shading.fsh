@@ -375,9 +375,7 @@ void main() {
 
 		#undef depth_weight
 
-		gtao = (gtao.w == 0.0) ? vec4(0.0) : gtao / gtao.w;
-
-		float ao = gtao.x;
+		float ao = (gtao.w == 0.0) ? half_res_00.x : gtao.x / gtao.w;
 #else
 		#define ao 1.0
 #endif
