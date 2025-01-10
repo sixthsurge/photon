@@ -44,9 +44,13 @@ void main() {
 	vec2 offset;
 
 	if (renderStage == MC_RENDER_STAGE_CUSTOM_SKY) {
+#ifdef CUSTOM_SKY
 		frag_color  = texture(gtexture, new_uv).rgb;
 		frag_color  = srgb_eotf_inv(frag_color) * rec709_to_working_color;
 		frag_color *= CUSTOM_SKY_BRIGHTNESS;
+#else
+		frag_color  = vec3(0.0);
+#endif
 	} else if (dot(view_pos, view_sun_dir) > 0.0) {
 		// Sun
 

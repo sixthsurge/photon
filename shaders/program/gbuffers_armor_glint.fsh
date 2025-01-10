@@ -44,7 +44,7 @@ void main() {
 
 #if defined IS_IRIS
 	// New overlay handling
-	frag_color.rgb = srgb_eotf_inv(armor_glint) * rec709_to_working_color;
+	frag_color.rgb = (srgb_eotf_inv(armor_glint) * rec709_to_working_color) * ENCHANTMENT_GLINT_BRIGHTNESS;
 	frag_color.a   = 0.0;
 #else
 	// Old overlay handling
