@@ -1,5 +1,6 @@
 ## bug fixes
 - precision errors on DH reflections
+- reflections artifact when close to water surface
 
 ## features
 ###  atmospherics

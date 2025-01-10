@@ -215,7 +215,7 @@ void main() {
 	vec2 refracted_uv = uv;
 
 #if REFRACTION != REFRACTION_OFF
-	if (false) {
+	if (front_depth != back_depth && refraction_data != vec4(0.0)) {
 		float layer_dist = abs(view_distance - length(back_position_view));
 
 		vec2 normal_tangent = vec2(

@@ -1,9 +1,22 @@
-The MIT License
+License Agreement
 
-Copyright © 2025 Benjamin Stott "sixthsurge"
+Copyright © 2025 Benjamin Stott ("SixthSurge")
 
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the “Software”), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+All rights reserved unless otherwise explicitly stated.
 
-The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+Any person obtaining a copy of this software package ("the Software") may:
+- Use the Software for personal gameplay and in both commercially and non-commercially published screenshots and videos.
+- Modify the Software for personal use.
+- Read and learn from the Software's code.
+- Redistribute modified or unmodified portions of the Software with the following exceptions:
+    - You may not redistribute the Software or derivative works on mod sharing websites that provide financial benefits to creators (e.g. Modrinth and CurseForge) without my explicit written permission.
+        - This exception is intended to avoid low-effort forks of Photon from competing with the original.
+    - You may not sell the Software or derivative works without my explicit written permission.
+        - "Selling" is defined as sharing copies of the software in exchange for money.
+        - This exception is intended to prevent scams from occurring.
+- Redistribute the Software as part of a Modpack under the condition that explicit credit is given in the Modpack description.
+
+This license document is to be included in all substantial copies of the Software.
 
 THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
