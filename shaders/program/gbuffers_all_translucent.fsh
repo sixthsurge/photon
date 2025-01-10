@@ -500,7 +500,7 @@ void main() {
 
 #if defined ENVIRONMENT_REFLECTIONS || defined SKY_REFLECTIONS
 	if (material.ssr_multiplier > eps) {
-		vec3 position_screen = vec3(gl_FragCoord.xy * view_pixel_size, gl_FragCoord.z);
+		vec3 position_screen = vec3(gl_FragCoord.xy * rcp(taau_render_scale) * view_pixel_size, gl_FragCoord.z);
 
 		mat3 new_tbn = get_tbn_matrix(normal);
 
