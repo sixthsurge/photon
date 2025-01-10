@@ -228,6 +228,8 @@ value.shadowDistance.384.0             = 24 chunks
 value.shadowDistance.512.0             = 32 chunks
 value.shadowDistance.768.0             = 48 chunks
 value.shadowDistance.1024.0            = 64 chunks
+value.shadowDistance.2048.0            = 128 chunks
+value.shadowDistance.4096.0            = 256 chunks
 
 # Sky settings
 
