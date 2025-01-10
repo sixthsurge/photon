@@ -365,6 +365,7 @@ void main() {
 				light_levels,
 				material.porosity,
 				normal,
+				material.albedo,
 				material.f0,
 				material.roughness,
 				material.ssr_multiplier
