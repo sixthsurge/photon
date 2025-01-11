@@ -375,7 +375,6 @@ void main() {
 
 		// Upscale ambient occlusion
 
-#ifdef GTAO
 		float lin_z = screen_to_view_space_depth(combined_projection_matrix_inverse, depth);
 
 		#define depth_weight(reversed_depth) exp2(-10.0 * abs(screen_to_view_space_depth(combined_projection_matrix_inverse, 1.0 - reversed_depth) - lin_z))
@@ -388,9 +387,6 @@ void main() {
 		#undef depth_weight
 
 		float ao = (gtao.w == 0.0) ? half_res_00.x : gtao.x / gtao.w;
-#else
-		#define ao 1.0
-#endif
 
 		// Shadows
 

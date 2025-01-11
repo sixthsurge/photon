@@ -96,7 +96,6 @@ uniform float time_midnight;
 #define TEMPORAL_REPROJECTION
 
 #include "/include/fog/simple_fog.glsl"
-#include "/include/lighting/specular_lighting.glsl"
 #include "/include/misc/distant_horizons.glsl"
 #include "/include/utility/color.glsl"
 #include "/include/utility/encoding.glsl"
@@ -104,7 +103,7 @@ uniform float time_midnight;
 #include "/include/utility/space_conversion.glsl"
 
 #ifdef DISTANT_HORIZONS
-#include "/include/misc/water_normal.glsl"
+#include "/include/misc/distant_water.glsl"
 #endif
 
 // https://iquilezles.org/www/articles/texture/texture.htm
@@ -205,7 +204,7 @@ void main() {
 	vec3 front_position_world  = front_position_scene + cameraPosition;
 
 	vec3 back_position_screen  = vec3(uv, back_is_dh_terrain ? back_depth_dh : back_depth);
-	vec3 back_position_view    = screen_to_view_space(vec3(uv, back_depth), true, back_is_dh_terrain);
+	vec3 back_position_view    = screen_to_view_space(back_position_screen, true, back_is_dh_terrain);
 
 	vec3 direction_world; float view_distance;
 	length_normalize(front_position_scene - gbufferModelViewInverse[3].xyz, direction_world, view_distance);
@@ -213,11 +212,10 @@ void main() {
 	// Refraction 
 
 	vec2 refracted_uv = uv;
+	float layer_dist = abs(view_distance - length(back_position_view));
 
 #if REFRACTION != REFRACTION_OFF
 	if (front_depth != back_depth && refraction_data != vec4(0.0)) {
-		float layer_dist = abs(view_distance - length(back_position_view));
-
 		vec2 normal_tangent = vec2(
 			unsplit_2x8(refraction_data.xy) * 2.0 - 1.0,
 			unsplit_2x8(refraction_data.zw) * 2.0 - 1.0
@@ -258,53 +256,18 @@ void main() {
 		vec2 light_levels  = data[3];
 
 		if (material_mask == 1) { // Water
-			// Water shadow
-
-			fragment_color.rgb *= exp(-5.0 * water_absorption_coeff);
-
-			// Get water wave normal 
-
-			mat3 tbn = get_tbn_matrix(flat_normal);
-			vec2 coord = (front_position_world * tbn).xy;
-			vec3 normal = tbn * get_water_normal(
-				front_position_world,
-				flat_normal, 
-				coord, 
-				vec2(0.0), 
-				light_levels.y, 
-				false
-			) * vec3(-1.0, 1.0, -1.0);
-			
-			// Specular highlight
-
-#if (defined WORLD_OVERWORLD || defined WORLD_END) && !defined NO_NORMAL
-			float NoL = dot(normal, light_dir);
-			float NoV = clamp01(dot(normal, -direction_world));
-			float LoV = dot(light_dir, -direction_world);
-			float halfway_norm = inversesqrt(2.0 * LoV + 2.0);
-			float NoH = (NoL + NoV) * halfway_norm;
-			float LoH = LoV * halfway_norm + halfway_norm;
-
-			fragment_color.rgb += get_specular_highlight(water_material, NoL, NoV, NoH, LoV, LoH) * light_color;
-#endif
-
-			// Specular reflections
-
-#if defined ENVIRONMENT_REFLECTIONS || defined SKY_REFLECTIONS
-			mat3 new_tbn = get_tbn_matrix(normal);
-			fragment_color.rgb += get_specular_reflections(
-				water_material,
-				new_tbn,
+			draw_distant_water(
+				fragment_color,
 				front_position_screen,
 				front_position_view,
-				normal,
-				flat_normal,
+				front_position_world,
 				direction_world,
-				direction_world * new_tbn,
-				light_levels.y,
-				true
+				flat_normal,
+				tint,
+				light_levels,
+				view_distance,
+				layer_dist
 			);
-#endif
 		}
 	}
 #endif

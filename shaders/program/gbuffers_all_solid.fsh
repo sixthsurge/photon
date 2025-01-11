@@ -268,7 +268,7 @@ void main() {
 #endif
 
 #if defined PROGRAM_GBUFFERS_TERRAIN && defined VANILLA_AO
-	#ifdef GTAO
+	#if SHADER_AO != SHADER_AO_NONE
 	const float vanilla_ao_strength = 0.9;
 	const float vanilla_ao_lift     = 0.5;
 	#else

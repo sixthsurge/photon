@@ -66,7 +66,11 @@ vec4 common_fog(float view_dist, const bool sky) {
 	fog.a   *= snow_fog;
 
 	// Blindness fog
-	float blindness_fog = spherical_fog(view_dist, blindness_fog_start, blindness * blindness_fog_density);
+	float blindness_fog = mix(
+		1.0,
+		spherical_fog(view_dist, blindness_fog_start, blindness * blindness_fog_density),
+		blindness
+	);
 	fog.rgb *= blindness_fog;
 	fog.a   *= blindness_fog;
 

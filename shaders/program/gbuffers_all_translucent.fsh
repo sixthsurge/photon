@@ -233,22 +233,6 @@ Material get_water_material(
 	return material;
 }
 
-vec3 get_water_wave_normal(vec3 direction_world) {
-	vec3 world_pos = position_scene + cameraPosition;
-
-	vec2 coord = -(world_pos * tbn).xy;
-
-	bool flowing_water = abs(tbn[2].y) < 0.99;
-	vec2 flow_dir = flowing_water ? normalize(tbn[2].xz) : vec2(0.0);
-
-#ifdef WATER_PARALLAX
-	vec3 direction_tangent = direction_world * tbn;
-	coord = get_water_parallax_coord(direction_tangent, coord, flow_dir, flowing_water);
-#endif
-
-	return get_water_normal(world_pos, tbn[2], coord, flow_dir, light_levels.y, flowing_water);
-}
-
 vec4 water_absorption_approx(vec4 color, float sss_depth, float layer_dist, float LoV, float NoV) {
 	vec3 biome_water_color = srgb_eotf_inv(tint.rgb) * rec709_to_working_color;
 	vec3 absorption_coeff = biome_water_coeff(biome_water_color);
@@ -261,7 +245,7 @@ vec4 water_absorption_approx(vec4 color, float sss_depth, float layer_dist, floa
 		light_levels,
 		dist,
 		-LoV,
-		0.0
+		sss_depth
 	);
 
 	float brightness_control = 1.0 - exp(-0.33 * layer_dist);
@@ -373,7 +357,24 @@ void main() {
 		);
 
 	#ifdef WATER_WAVES
-		normal_tangent = get_water_wave_normal(direction_world);
+		#ifdef DISTANT_HORIZONS
+		// Use same TBN matrix calculation for vanilla water as for DH water (wasteful)
+		mat3 tbn = get_tbn_matrix(tbn[2]);
+		#endif
+
+		vec3 world_pos = position_scene + cameraPosition;
+
+		vec2 coord = -(world_pos * tbn).xy;
+
+		bool flowing_water = abs(tbn[2].y) < 0.99;
+		vec2 flow_dir = flowing_water ? normalize(tbn[2].xz) : vec2(0.0);
+
+#ifdef WATER_PARALLAX
+		vec3 direction_tangent = direction_world * tbn;
+		coord = get_water_parallax_coord(direction_tangent, coord, flow_dir, flowing_water);
+#endif
+
+		normal_tangent = get_water_normal(world_pos, tbn[2], coord, flow_dir, light_levels.y, flowing_water);
 		normal = tbn * normal_tangent;
 	#endif
 #endif
