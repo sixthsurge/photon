@@ -3,11 +3,11 @@
 
 // Based on Ninjamike's implementation in shaderLABS #snippets
 
-vec2 get_directional_lightmaps(vec3 normal) {
+vec2 get_directional_lightmaps(vec3 position_scene, vec3 normal) {
 	vec2 lightmap_mul = vec2(1.0);
 
 	vec2 lightmap_gradient; vec3 lightmap_dir;
-	mat2x3 pos_gradient = mat2x3(dFdx(scene_pos), dFdy(scene_pos));
+	mat2x3 pos_gradient = mat2x3(dFdx(position_scene), dFdy(position_scene));
 
 	// Blocklight
 
