@@ -5,7 +5,7 @@
 
 const ivec2 cloud_shadow_res = ivec2(256);
 
-const float cloud_shadow_extent = 256.0;
+const float cloud_shadow_extent = 256.0 / (CLOUDS_SCALE / 10.0);
 
 vec2 shadow_view_to_cloud_shadow_space(vec3 shadow_view_pos) {
 	vec2 cloud_shadow_pos  = shadow_view_pos.xy / cloud_shadow_extent;

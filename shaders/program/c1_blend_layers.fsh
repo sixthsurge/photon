@@ -234,14 +234,22 @@ void main() {
 
 	fragment_color = texture(colortex0, refracted_uv * taau_render_scale).rgb;
 
-	// Blend layers
-
-	fragment_color = fragment_color * (1.0 - translucent_color.a) + translucent_color.rgb;
-
-	// Draw Distant Horizons water
+	// Blend layers and draw DH water
 
 #ifdef DISTANT_HORIZONS
-	if (front_depth_dh != back_depth_dh && front_depth == 1.0) {
+	bool is_dh_translucent = front_depth_dh != back_depth_dh;
+
+	float z_mc = screen_to_view_space_depth(gbufferProjectionInverse, front_depth);
+	float z_dh = screen_to_view_space_depth(dhProjectionInverse, front_depth_dh);
+
+	const float error_margin = 1.0;
+	bool dh_translucent_behind_mc_translucent = z_dh > z_mc + error_margin && front_depth != back_depth;
+
+	if (!dh_translucent_behind_mc_translucent) {
+		fragment_color = fragment_color * (1.0 - translucent_color.a) + translucent_color.rgb;
+	}
+
+	if (is_dh_translucent && (front_is_dh_terrain || dh_translucent_behind_mc_translucent)) {
 		// Unpack gbuffer data
 
 		vec4 gbuffer_data = texelFetch(colortex1, texel, 0);
@@ -258,12 +266,23 @@ void main() {
 		vec3 flat_normal   = decode_unit_vector(data[2]);
 		vec2 light_levels  = data[3];
 
+		vec3 position_screen, position_view, position_world;
+		if (dh_translucent_behind_mc_translucent) {
+			position_screen = vec3(uv, front_depth_dh);
+			position_view = screen_to_view_space(dhProjectionInverse, position_screen, true);
+			position_world = view_to_scene_space(position_view) + cameraPosition;
+		} else {
+			position_screen = front_position_screen;
+			position_view = front_position_view;
+			position_world = front_position_world;
+		}
+
 		if (material_mask == 1) { // Water
 			draw_distant_water(
 				fragment_color,
-				front_position_screen,
-				front_position_view,
-				front_position_world,
+				position_screen,
+				position_view,
+				position_world,
 				direction_world,
 				flat_normal,
 				tint,
@@ -273,6 +292,12 @@ void main() {
 			);
 		}
 	}
+
+	if (dh_translucent_behind_mc_translucent) {
+		fragment_color = fragment_color * (1.0 - translucent_color.a) + translucent_color.rgb;
+	}
+#else 
+	fragment_color = fragment_color * (1.0 - translucent_color.a) + translucent_color.rgb;
 #endif
 
 	// Blend clouds in front of translucents

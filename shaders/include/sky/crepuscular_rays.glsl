@@ -12,7 +12,7 @@ vec4 draw_crepuscular_rays(
 		return vec4(0.0, 0.0, 0.0, 1.0);
 	}
 	const uint step_count = 16u;
-	const float max_ray_length = 4096.0;
+	const float max_ray_length = 4096.0 / (CLOUDS_SCALE / 10.0);
 
 	const float clouds_cumulus_radius    = planet_radius + CLOUDS_CUMULUS_ALTITUDE;
 	const float clouds_cumulus_thickness = CLOUDS_CUMULUS_ALTITUDE * CLOUDS_CUMULUS_THICKNESS;
@@ -27,7 +27,7 @@ vec4 draw_crepuscular_rays(
 	float sunset_factor = pulse(light_dir.y, -0.01, 0.1);
 
 	float density_scale = 5.0 + 40.0 * daily_weather_variation.fogginess;
-	vec3 extinction_coeff = density_scale * (air_rayleigh_coefficient + 1.0 * air_mie_coefficient);
+	vec3 extinction_coeff = density_scale * (air_rayleigh_coefficient + 1.0 * air_mie_coefficient) * (CLOUDS_SCALE / 10.0);
 	vec3 scattering_coeff = extinction_coeff;
 	vec3 step_optical_depth = extinction_coeff * step_length;
 	vec3 step_transmittance = exp(-step_optical_depth);

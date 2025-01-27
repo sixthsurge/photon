@@ -414,7 +414,7 @@ void main() {
 
 		if (fragment_color.a < 0.1) discard;
 
-		material = material_from(fragment_color.rgb * fragment_color.a, material_mask, world_pos, tbn[2], adjusted_light_levels);
+		material = material_from(fragment_color.rgb, material_mask, world_pos, tbn[2], adjusted_light_levels);
 
 #if defined PROGRAM_GBUFFERS_LIGHTNING
 		// Lightning (since gbuffers_lightning)
@@ -497,7 +497,7 @@ void main() {
 		NoV,
 		NoH,
 		LoV
-	);
+	) * fragment_color.a;
 
 	// Specular highlight
 
@@ -545,8 +545,6 @@ void main() {
 	#endif
 	} 
 #endif 
-
-	fragment_color = vec4(fragment_color.rgb / max(fragment_color.a, eps), fragment_color.a);
 
 	// Fog
 
