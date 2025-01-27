@@ -13,7 +13,7 @@
 
 layout (location = 0) out vec4 damage_overlay;
 
-#ifdef IS_IRIS
+#ifdef USE_SEPARATE_ENTITY_DRAWS
 /* RENDERTARGETS: 0 */
 #else
 /* RENDERTARGETS: 3 */
@@ -43,7 +43,7 @@ void main() {
 	damage_overlay = texture(gtexture, uv, lod_bias);
 	if (damage_overlay.a < 0.1) discard;
 
-#ifdef IS_IRIS
+#ifdef USE_SEPARATE_ENTITY_DRAWS
 	damage_overlay.rgb = 0.5 * srgb_eotf_inv(2.0 * damage_overlay.rgb) * rec709_to_rec2020;
 	damage_overlay.a   = 1.0;
 #else

@@ -13,7 +13,7 @@
 
 layout (location = 0) out vec3 scene_color;
 
-#ifdef IS_IRIS
+#ifdef USE_SEPARATE_ENTITY_DRAWS
 /* RENDERTARGETS: 0 */
 #else
 layout (location = 1) out vec4 colortex3_clear;
@@ -53,7 +53,7 @@ uniform sampler2D colortex7; // previous frame fog scattering
 uniform sampler2D colortex11; // clouds history
 uniform sampler2D colortex12; // clouds apparent distance
 
-#ifndef IS_IRIS
+#ifndef USE_SEPARATE_ENTITY_DRAWS
 uniform sampler2D colortex3; // OF damage overlay, armor glint
 #endif
 
@@ -192,7 +192,7 @@ vec4 read_clouds_and_aurora(out float apparent_distance) {
 }
 
 void main() {
-#if !defined IS_IRIS
+#if !defined USE_SEPARATE_ENTITY_DRAWS
 	colortex3_clear = vec4(0.0);
 #endif
 
@@ -205,7 +205,7 @@ void main() {
 #if defined NORMAL_MAPPING || defined SPECULAR_MAPPING
 	vec4 gbuffer_data_1 = texelFetch(colortex2, texel, 0);
 #endif
-#if !defined IS_IRIS
+#if !defined USE_SEPARATE_ENTITY_DRAWS
 	vec4 overlays       = texelFetch(colortex3, texel, 0);
 #endif
 
@@ -323,7 +323,7 @@ void main() {
 		vec3 flat_normal   = decode_unit_vector(data[2]);
 		vec2 light_levels  = data[3];
 
-#if !defined IS_IRIS
+#if !defined USE_SEPARATE_ENTITY_DRAWS
 		uint overlay_id = uint(255.0 * overlays.a);
 		albedo = overlay_id == 0u ? albedo + overlays.rgb : albedo; // enchantment glint
 		albedo = overlay_id == 1u ? 2.0 * albedo * overlays.rgb : albedo; // damage overlay
