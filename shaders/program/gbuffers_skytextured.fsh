@@ -134,7 +134,7 @@ void main() {
 #endif
 
 		frag_color  = srgb_eotf_inv(frag_color) * rec709_to_working_color;
-		frag_color *= (sunlight_color * moon_luminance) * moon_color;
+		frag_color *= sunlight_color * moon_luminance;
 	}	
 }
 
