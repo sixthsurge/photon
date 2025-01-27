@@ -16,6 +16,13 @@ void draw_distant_water(
 	float view_distance,
 	float layer_distance
 ) {
+	// Use hardcoded TBN matrix pointing upwards that is the same for DH water and regular water
+	const mat3 tbn = mat3(
+		vec3(1.0, 0.0, 0.0),
+		vec3(0.0, 0.0, 1.0),
+		vec3(0.0, 1.0, 0.0)
+	);
+
 	// Common fog 
 
 	float fog_visibility = common_fog(view_distance, false).a;
@@ -50,16 +57,18 @@ void draw_distant_water(
 	// Account for 1/8 height difference between water and terrain
 	vec3 water_surface_pos = position_world - vec3(0.0, rcp(8.0), 0.0);
 
-	mat3 tbn = get_tbn_matrix(flat_normal);
-	vec2 coord = -(water_surface_pos * tbn).xy;
-	vec3 normal = tbn * get_water_normal(
-		water_surface_pos,
-		flat_normal, 
-		coord, 
-		vec2(0.0), 
-		light_levels.y, 
-		false
-	);
+	vec3 normal = flat_normal;
+	if (flat_normal.y > eps) {
+		vec2 coord = -(water_surface_pos * tbn).xy;
+		normal = tbn * get_water_normal(
+			water_surface_pos,
+			flat_normal, 
+			coord, 
+			vec2(0.0), 
+			light_levels.y, 
+			false
+		);
+	}
 	
 	// Specular highlight
 
