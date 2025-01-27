@@ -149,6 +149,8 @@ vec3 draw_sky(vec3 ray_dir, vec3 atmosphere) {
 		: mat3(-shadowModelViewInverse[0].xyz, shadowModelViewInverse[1].xyz, -shadowModelViewInverse[2].xyz);
 
 	vec3 celestial_dir = ray_dir * rot;
+#else 
+	vec3 celestial_dir = ray_dir;
 #endif
 
 	// Galaxy
