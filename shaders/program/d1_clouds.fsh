@@ -33,6 +33,7 @@ flat in DailyWeatherVariation daily_weather_variation;
 
 uniform sampler3D colortex6; // 3D worley noise
 uniform sampler3D colortex7; // 3D curl noise
+uniform sampler2D colortex8; // cloud shadow map
 
 uniform sampler3D depthtex0; // atmospheric scattering LUT
 uniform sampler2D depthtex1;
@@ -104,6 +105,7 @@ uniform float biome_humidity;
 #include "/include/sky/atmosphere.glsl"
 #include "/include/sky/aurora.glsl"
 #include "/include/sky/clouds.glsl"
+#include "/include/sky/crepuscular_rays.glsl"
 #endif
 
 #include "/include/misc/distant_horizons.glsl"
@@ -181,6 +183,14 @@ void main() {
 #else
 	clouds            = vec4(0.0, 0.0, 0.0, 1.0);
 	apparent_distance = 1e6;
+#endif
+
+	// Crepuscular rays 
+
+#ifdef CREPUSCULAR_RAYS
+	vec4 crepuscular_rays = draw_crepuscular_rays(colortex8, ray_dir, dither);
+	clouds *= crepuscular_rays.w;
+	clouds.rgb += crepuscular_rays.xyz;
 #endif
 
 	// Aurora
