@@ -12,9 +12,14 @@
 #include "/include/global.glsl"
 
 layout (location = 0) out vec3 fragment_color;
+
+/* RENDERTARGETS: 0 */
+
+#ifdef BLOOMY_FOG
 layout (location = 1) out float bloomy_fog;
 
 /* RENDERTARGETS: 0,3 */
+#endif
 
 in vec2 uv;
 
@@ -162,8 +167,6 @@ vec3 purkinje_shift(vec3 rgb, vec2 light_levels) {
 }
 
 void main() {
-	bloomy_fog = 1.0;
-
 	ivec2 texel = ivec2(gl_FragCoord.xy);
 
 	// Sample textures
@@ -295,8 +298,10 @@ void main() {
 
 	fragment_color = fragment_color * fog_transmittance + fog_scattering;
 
+	#ifdef BLOOMY_FOG
 	bloomy_fog = clamp01(dot(fog_transmittance, vec3(luminance_weights_rec2020)));
 	bloomy_fog = isEyeInWater == 1.0 ? sqrt(bloomy_fog) : bloomy_fog;
+	#endif
 #else
 	// Simple underwater fog
 
@@ -315,16 +320,22 @@ void main() {
 		fragment_color *= water_fog[1];
 		fragment_color += water_fog[0];
 
+	#ifdef BLOOMY_FOG
 		bloomy_fog = sqrt(clamp01(dot(water_fog[1], vec3(0.33))));
+	#endif
 	} else {
+	#ifdef BLOOMY_FOG
 		bloomy_fog = 1.0;
+	#endif
 	}
 #endif
 
-#if   defined WORLD_NETHER
+#ifdef BLOOMY_FOG
+	#if   defined WORLD_NETHER
 	bloomy_fog = spherical_fog(view_distance, nether_fog_start, nether_bloomy_fog_density) * 0.33 + 0.67;
-#elif defined WORLD_END
+	#elif defined WORLD_END
 	bloomy_fog = bloomy_fog * 0.5 + 0.5;
+	#endif
 #endif
 }
 
