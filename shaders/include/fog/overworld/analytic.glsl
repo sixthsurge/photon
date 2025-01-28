@@ -1,7 +1,9 @@
 #if !defined INCLUDE_FOG_AIR_FOG_ANALYTIC
 #define INCLUDE_FOG_AIR_FOG_ANALYTIC
 
-#include "/include/fog/air_fog_vl.glsl"
+#include "/include/fog/overworld/constants.glsl"
+#include "/include/sky/atmosphere.glsl"
+#include "/include/utility/phase_functions.glsl"
 	
 vec2 air_fog_analytic_airmass(vec3 ray_origin_world, vec3 ray_direction_world, float ray_length) {
 	// Integral of density function with respect to t
@@ -30,12 +32,13 @@ mat2x3 air_fog_analytic(vec3 ray_origin_world, vec3 ray_end_world, bool sky, flo
 		ray_direction_world,
 		ray_length 
 	);
-	vec3 optical_depth = air_fog_coeff[1] * airmass;
+	vec3 optical_depth = air_fog_coeff.rayleigh * airmass.x 
+		+ air_fog_coeff.mie_extinction * airmass.y;
 	vec3 transmittance = exp(-optical_depth);
 	vec3 scattering_integral = (1.0 - transmittance) / max(optical_depth, eps);
 
-	vec3 rayleigh_scattering = scattering_integral * airmass.x * air_fog_coeff[0][0];
-	vec3 mie_scattering = scattering_integral * airmass.y * air_fog_coeff[0][1];
+	vec3 rayleigh_scattering = scattering_integral * airmass.x * air_fog_coeff.rayleigh;
+	vec3 mie_scattering = scattering_integral * airmass.y * air_fog_coeff.mie_scattering;
 
 	float LoV = dot(ray_direction_world, light_dir);
 	float mie_phase = 0.7 * henyey_greenstein_phase(LoV, 0.5) + 0.3 * henyey_greenstein_phase(LoV, -0.2);
@@ -58,7 +61,6 @@ mat2x3 air_fog_analytic(vec3 ray_origin_world, vec3 ray_end_world, bool sky, flo
 		scattering += scatter_amount * (rayleigh_scattering * isotropic_phase + mie_scattering * mie_phase) * light_color;
 
 		scatter_amount *= 0.5;
-		mie_phase = 0.7 * henyey_greenstein_phase(LoV, 0.5) + 0.3 * isotropic_phase;
 		anisotropy *= 0.7;
 	}
 	//*/
@@ -74,4 +76,3 @@ mat2x3 air_fog_analytic(vec3 ray_origin_world, vec3 ray_end_world, bool sky, flo
 }
 
 #endif // INCLUDE_FOG_AIR_FOG_ANALYTIC
-

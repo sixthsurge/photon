@@ -6,6 +6,8 @@
 #include "/include/utility/fast_math.glsl"
 #include "/include/utility/phase_functions.glsl"
 
+const float max_ray_length = 50.0;
+
 mat2x3 raymarch_water_fog(
 	vec3 world_start_pos,
 	vec3 world_end_pos,
@@ -28,7 +30,7 @@ mat2x3 raymarch_water_fog(
 	vec3 world_dir = world_end_pos - world_start_pos;
 	float ray_length;
 	length_normalize(world_dir, world_dir, ray_length);
-	if (sky) ray_length = far;
+	if (sky || ray_length > max_ray_length) ray_length = max_ray_length;
 
 	// Adjust step count based on ray length
 	uint step_count = uint(float(min_step_count) + step_count_growth * ray_length);

@@ -30,6 +30,11 @@ flat out vec2 atlas_tile_offset;
 flat out vec2 atlas_tile_scale;
 #endif
 
+#if defined WORLD_OVERWORLD 
+#include "/include/fog/overworld/coeff_struct.glsl"
+flat out AirFogCoefficients air_fog_coeff;
+#endif
+
 // --------------
 //   Attributes
 // --------------
@@ -57,17 +62,43 @@ uniform float near;
 uniform float far;
 
 uniform ivec2 atlasSize;
-
-uniform int frameCounter;
 uniform int renderStage;
+
+uniform int worldTime;
+uniform int worldDay;
+uniform int frameCounter;
 uniform float frameTimeCounter;
+
+uniform float sunAngle;
 uniform float rainStrength;
+uniform float wetness;
 
 uniform vec2 view_res;
 uniform vec2 view_pixel_size;
 uniform vec2 taa_offset;
 
 uniform vec3 light_dir;
+uniform vec3 sun_dir;
+
+uniform float eye_skylight;
+
+uniform float biome_temperate;
+uniform float biome_arid;
+uniform float biome_snowy;
+uniform float biome_taiga;
+uniform float biome_jungle;
+uniform float biome_swamp;
+uniform float biome_may_rain;
+uniform float biome_may_snow;
+uniform float biome_temperature;
+uniform float biome_humidity;
+
+uniform float time_sunrise;
+uniform float time_noon;
+uniform float time_sunset;
+uniform float time_midnight;
+
+uniform float desert_sandstorm;
 
 #if defined PROGRAM_GBUFFERS_ENTITIES_TRANSLUCENT
 uniform int entityId;
@@ -84,6 +115,10 @@ uniform int currentRenderedItemId;
 #include "/include/utility/space_conversion.glsl"
 #include "/include/vertex/displacement.glsl"
 #include "/include/vertex/utility.glsl"
+
+#if defined WORLD_OVERWORLD 
+#include "/include/fog/overworld/coeff.glsl"
+#endif
 
 void main() {
 	uv            = mat2(gl_TextureMatrix[0]) * gl_MultiTexCoord0.xy + gl_TextureMatrix[0][3].xy;
@@ -133,6 +168,10 @@ void main() {
 	if (dot(position_scene, tbn[2]) > 0.0) tbn[2] = -tbn[2];
 #endif
 
+#if defined WORLD_OVERWORLD 
+	air_fog_coeff = calculate_air_fog_coefficients();
+#endif
+
 	position_view = scene_to_view_space(position_scene);
 	vec4 position_clip = project(gl_ProjectionMatrix, position_view);
 
@@ -145,4 +184,3 @@ void main() {
 
 	gl_Position = position_clip;
 }
-

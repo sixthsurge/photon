@@ -2,10 +2,10 @@
 #define INCLUDE_MISC_DISTANT_WATER
 
 #include "/include/lighting/specular_lighting.glsl"
+#include "/include/misc/purkinje_shift.glsl"
 #include "/include/misc/water_normal.glsl"
 
-void draw_distant_water(
-	inout vec3 color,
+vec4 draw_distant_water(
 	vec3 position_screen,
 	vec3 position_view,
 	vec3 position_world,
@@ -16,6 +16,8 @@ void draw_distant_water(
 	float view_distance,
 	float layer_distance
 ) {
+	vec4 water_color = vec4(0.0);
+
 	// Use hardcoded TBN matrix pointing upwards that is the same for DH water and regular water
 	const mat3 tbn = mat3(
 		vec3(1.0, 0.0, 0.0),
@@ -26,10 +28,6 @@ void draw_distant_water(
 	// Common fog 
 
 	float fog_visibility = common_fog(view_distance, false).a;
-
-	// Water shadow
-
-	//color.rgb *= exp(-5.0 * water_absorption_coeff * fog_visibility);
 
 	// Water absorption approx (must match gbuffers_water)
 
@@ -49,8 +47,8 @@ void draw_distant_water(
 	float brightness_control = 1.0 - exp(-0.33 * layer_distance);
 		  brightness_control = (1.0 - light_levels.y) + brightness_control * light_levels.y;
 
-	color *= water_fog[1].x;
-	color += water_fog[0] * (1.0 + 6.0 * sqr(water_fog[1])) * brightness_control * fog_visibility;
+	water_color.rgb = water_fog[0] * (1.0 + 6.0 * sqr(water_fog[1])) * brightness_control * fog_visibility;
+	water_color.a   = 1.0 - water_fog[1].x;
 
 	// Get water wave normal 
 
@@ -80,18 +78,19 @@ void draw_distant_water(
 	float NoH = (NoL + NoV) * halfway_norm;
 	float LoH = LoV * halfway_norm + halfway_norm;
 
-	color.rgb += get_specular_highlight(water_material, NoL, NoV, NoH, LoV, LoH) * light_color * fog_visibility;
+	water_color.rgb += get_specular_highlight(water_material, NoL, NoV, NoH, LoV, LoH) * light_color * fog_visibility;
 #endif
 
 	// Specular reflections
 
 #if defined ENVIRONMENT_REFLECTIONS || defined SKY_REFLECTIONS
 	mat3 new_tbn = get_tbn_matrix(normal);
-	color.rgb += get_specular_reflections(
+	water_color.rgb += get_specular_reflections(
 		water_material,
 		new_tbn,
 		position_screen,
 		position_view,
+		position_world,
 		normal,
 		flat_normal,
 		direction_world,
@@ -100,6 +99,12 @@ void draw_distant_water(
 		true
 	) * fog_visibility;
 #endif
+
+	// Purkinje shift
+
+	water_color.rgb = purkinje_shift(water_color.rgb, light_levels);
+
+	return water_color;
 }
 
 #endif // INCLUDE_MISC_DISTANT_WATER

@@ -20,6 +20,11 @@ flat out uint is_water;
 flat out vec3 light_color;
 flat out vec3 ambient_color;
 
+#if defined WORLD_OVERWORLD 
+#include "/include/fog/overworld/coeff_struct.glsl"
+flat out AirFogCoefficients air_fog_coeff;
+#endif
+
 // ------------
 //   Uniforms
 // ------------
@@ -41,16 +46,45 @@ uniform float far;
 
 uniform ivec2 atlasSize;
 
+uniform int worldTime;
+uniform int worldDay;
 uniform int frameCounter;
-uniform int renderStage;
 uniform float frameTimeCounter;
+
+uniform float sunAngle;
 uniform float rainStrength;
+uniform float wetness;
 
 uniform vec2 view_res;
 uniform vec2 view_pixel_size;
 uniform vec2 taa_offset;
 
 uniform vec3 light_dir;
+uniform vec3 sun_dir;
+
+uniform float eye_skylight;
+
+uniform float biome_temperate;
+uniform float biome_arid;
+uniform float biome_snowy;
+uniform float biome_taiga;
+uniform float biome_jungle;
+uniform float biome_swamp;
+uniform float biome_may_rain;
+uniform float biome_may_snow;
+uniform float biome_temperature;
+uniform float biome_humidity;
+
+uniform float time_sunrise;
+uniform float time_noon;
+uniform float time_sunset;
+uniform float time_midnight;
+
+uniform float desert_sandstorm;
+
+#if defined WORLD_OVERWORLD 
+#include "/include/fog/overworld/coeff.glsl"
+#endif
 
 void main() {
 	light_levels = linear_step(
@@ -80,6 +114,10 @@ void main() {
 	clip_pos.xy += taa_offset * clip_pos.w;
 #elif defined TAA
 	clip_pos.xy += taa_offset * clip_pos.w * 0.66;
+#endif
+
+#if defined WORLD_OVERWORLD
+    air_fog_coeff = calculate_air_fog_coefficients();
 #endif
 
     gl_Position = clip_pos;

@@ -23,6 +23,9 @@ flat out vec3 sky_color;
 
 #include "/include/misc/weather_struct.glsl"
 flat out DailyWeatherVariation daily_weather_variation;
+
+#include "/include/fog/overworld/coeff_struct.glsl"
+flat out AirFogCoefficients air_fog_coeff;
 #endif
 
 // ------------
@@ -71,6 +74,8 @@ uniform float biome_may_snow;
 uniform float biome_temperature;
 uniform float biome_humidity;
 
+uniform float desert_sandstorm;
+
 // ------------
 //   Includes
 // ------------
@@ -80,6 +85,7 @@ uniform float biome_humidity;
 #define WEATHER_CLOUDS
 
 #if defined WORLD_OVERWORLD
+#include "/include/fog/overworld/coeff.glsl"
 #include "/include/lighting/colors/light_color.glsl"
 #include "/include/lighting/colors/weather_color.glsl"
 #include "/include/misc/weather.glsl"
@@ -121,6 +127,8 @@ void main() {
 		daily_weather_variation.aurora_colors[1], 
 		0.25
 	);
+
+	air_fog_coeff = calculate_air_fog_coefficients();
 #endif
 
 	gl_Position = vec4(gl_Vertex.xy * 2.0 - 1.0, 0.0, 1.0);

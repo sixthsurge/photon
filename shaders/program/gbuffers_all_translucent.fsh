@@ -41,6 +41,11 @@ flat in vec2 atlas_tile_offset;
 flat in vec2 atlas_tile_scale;
 #endif
 
+#if defined WORLD_OVERWORLD 
+#include "/include/fog/overworld/coeff_struct.glsl"
+flat in AirFogCoefficients air_fog_coeff;
+#endif
+
 // ------------
 //   Uniforms
 // ------------
@@ -518,6 +523,7 @@ void main() {
 			new_tbn,
 			position_screen,
 			position_view,
+			world_pos,
 			normal,
 			tbn[2],
 			direction_world,
@@ -563,4 +569,3 @@ void main() {
 	refraction_data.zw = split_2x8(normal_tangent.y * 0.5 + 0.5);
 #endif
 }
-

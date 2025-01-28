@@ -25,6 +25,9 @@ flat out vec3 sky_sh[9];
 #else
 flat out mat3 sky_samples;
 #endif
+
+#include "/include/fog/overworld/coeff_struct.glsl"
+flat out AirFogCoefficients air_fog_coeff;
 #endif
 
 // ------------
@@ -58,6 +61,12 @@ uniform float biome_cave;
 uniform float biome_may_rain;
 uniform float biome_may_snow;
 uniform float biome_snowy;
+uniform float biome_temperate;
+uniform float biome_arid;
+uniform float biome_taiga;
+uniform float biome_jungle;
+uniform float biome_swamp;
+uniform float desert_sandstorm;
 
 uniform float time_sunrise;
 uniform float time_noon;
@@ -72,6 +81,7 @@ uniform float time_midnight;
 #define WEATHER_AURORA
 
 #if defined WORLD_OVERWORLD
+#include "/include/fog/overworld/coeff.glsl"
 #include "/include/lighting/colors/light_color.glsl"
 #include "/include/misc/weather.glsl"
 #include "/include/sky/atmosphere.glsl"
@@ -125,9 +135,10 @@ void main() {
 
 	sky_samples[0] += aurora_amount * AURORA_GROUND_LIGHTING * mix(aurora_colors[0], aurora_colors[1], 0.25);
 	#endif
+
+	air_fog_coeff = calculate_air_fog_coefficients();
 #endif
 
 	vec2 vertex_pos = gl_Vertex.xy * taau_render_scale;
 	gl_Position = vec4(vertex_pos * 2.0 - 1.0, 0.0, 1.0);
 }
-

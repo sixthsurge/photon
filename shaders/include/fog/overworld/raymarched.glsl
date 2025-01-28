@@ -1,20 +1,13 @@
 #if !defined INCLUDE_FOG_AIR_FOG_VL
 #define INCLUDE_FOG_AIR_FOG_VL
 
+#include "/include/fog/overworld/constants.glsl"
 #include "/include/lighting/distortion.glsl"
 #include "/include/sky/atmosphere.glsl"
 #include "/include/utility/encoding.glsl"
 #include "/include/utility/phase_functions.glsl"
 #include "/include/utility/random.glsl"
 #include "/include/utility/space_conversion.glsl"
-
-const uint  air_fog_min_step_count    = 8;
-const uint  air_fog_max_step_count    = 25;
-const float air_fog_step_count_growth = 0.1;
-const float air_fog_volume_top        = 320.0;
-const float air_fog_volume_bottom     = SEA_LEVEL - 24.0;
-const vec2  air_fog_falloff_start     = vec2(AIR_FOG_RAYLEIGH_FALLOFF_START, AIR_FOG_MIE_FALLOFF_START) + SEA_LEVEL;
-const vec2  air_fog_falloff_half_life = vec2(AIR_FOG_RAYLEIGH_FALLOFF_HALF_LIFE, AIR_FOG_MIE_FALLOFF_HALF_LIFE);
 
 vec2 air_fog_density(vec3 world_pos) {
 	const vec2 mul = -rcp(air_fog_falloff_half_life);
@@ -121,7 +114,8 @@ mat2x3 raymarch_air_fog(vec3 world_start_pos, vec3 world_end_pos, bool sky, floa
 
 		vec2 density = air_fog_density(world_pos) * step_length;
 
-		vec3 step_optical_depth = air_fog_coeff[1] * density;
+		vec3 step_optical_depth = air_fog_coeff.rayleigh * density.x 
+			+ air_fog_coeff.mie_extinction * density.y;
 		vec3 step_transmittance = exp(-step_optical_depth);
 		vec3 step_transmitted_fraction = (1.0 - step_transmittance) / max(step_optical_depth, eps);
 
@@ -135,10 +129,10 @@ mat2x3 raymarch_air_fog(vec3 world_start_pos, vec3 world_end_pos, bool sky, floa
 		transmittance *= step_transmittance;
 	}
 
-	light_sun[0] *= air_fog_coeff[0][0];
-	light_sun[1] *= air_fog_coeff[0][1];
-	light_sky[0] *= air_fog_coeff[0][0] * eye_skylight;
-	light_sky[1] *= air_fog_coeff[0][1] * eye_skylight;
+	light_sun[0] *= air_fog_coeff.rayleigh;
+	light_sun[1] *= air_fog_coeff.mie_scattering;
+	light_sky[0] *= air_fog_coeff.rayleigh;
+	light_sky[1] *= air_fog_coeff.mie_scattering;
 
 	if (!sky) {
 		// Skylight falloff
@@ -171,7 +165,6 @@ mat2x3 raymarch_air_fog(vec3 world_start_pos, vec3 world_end_pos, bool sky, floa
 		scattering += scatter_amount * (light_sun * vec2(isotropic_phase, mie_phase)) * light_color;
 
 		scatter_amount *= 0.5;
-		mie_phase = 0.7 * henyey_greenstein_phase(LoV, 0.5) + 0.3 * isotropic_phase;
 		anisotropy *= 0.7;
 	}
 	//*/
