@@ -18,6 +18,12 @@ layout (location = 0) out float cloud_shadow_map;
 
 in vec2 uv;
 
+#ifndef IS_IRIS 
+flat in vec3 sun_dir_fixed;
+flat in vec3 moon_dir_fixed;
+flat in vec3 light_dir_fixed;
+#endif
+
 #include "/include/misc/weather_struct.glsl"
 flat in DailyWeatherVariation daily_weather_variation;
 
@@ -79,6 +85,12 @@ const vec3 sky_color  = vec3(0.0);
 
 #ifdef DISTANT_HORIZONS
 uniform int dhRenderDistance;
+#endif
+
+#ifndef IS_IRIS 
+    #define sun_dir sun_dir_fixed 
+    #define moon_dir moon_dir_fixed
+    #define light_dir light_dir_fixed
 #endif
 
 #define PROGRAM_PREPARE

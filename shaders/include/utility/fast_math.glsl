@@ -101,4 +101,15 @@ vec3 clamp_length(vec3 v, float min_len, float max_len) {
 	return normalized * clamp(len, min_len, max_len);
 }
 
+// compute the length of a vector, knowing its direction
+float length_knowing_direction(vec3 v, vec3 v_norm) {
+	if (v_norm.x != 0.0) { 
+		return abs(v.x / v_norm.x);
+	} else if (v_norm.y != 0.0) {
+		return abs(v.y / v_norm.y);
+	} else {
+		return abs(v.z / v_norm.z);
+	}
+}
+
 #endif // INCLUDE_UTILITY_FAST_MATH

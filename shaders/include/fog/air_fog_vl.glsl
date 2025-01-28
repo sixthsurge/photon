@@ -30,10 +30,10 @@ vec2 air_fog_density(vec3 world_pos) {
 
 	float noise = texture(noisetex, 0.001 * world_pos.xz + wind.xz * frameTimeCounter).w;
 
-	density.y *= 2.0 * sqr(noise);
+	density.y *= 4.0 * sqr(noise);
 #endif
 
-	return density;
+	return density * (0.5 * OVERWORLD_FOG_INTENSITY);
 }
 
 mat2x3 raymarch_air_fog(vec3 world_start_pos, vec3 world_end_pos, bool sky, float skylight, float dither) {
@@ -179,8 +179,8 @@ mat2x3 raymarch_air_fog(vec3 world_start_pos, vec3 world_end_pos, bool sky, floa
 	scattering *= 1.0 - blindness;
 
 	// Artifically brighten fog in the early morning and evening (looks nice)
-	float evening_glow = 1.0 + 2.0 * linear_step(0.05, 1.0, exp(-300.0 * sqr(sun_dir.y + 0.02)));
-	scattering *= evening_glow;
+	float evening_glow = 0.75 * linear_step(0.05, 1.0, exp(-300.0 * sqr(sun_dir.y + 0.02)));
+	scattering += scattering * evening_glow;
 
 	return mat2x3(scattering, transmittance);
 }

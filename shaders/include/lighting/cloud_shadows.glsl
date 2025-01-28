@@ -41,7 +41,7 @@ float get_cloud_shadows(sampler2D cloud_shadow_map, vec3 scene_pos) {
 	//  - the fragment is above the cloud layer
 	//  - the sun is near the horizon
 	float altitude_fraction = (scene_pos.y + eyeAltitude - SEA_LEVEL) * (CLOUDS_SCALE / CLOUDS_CUMULUS_THICKNESS) - CLOUDS_CUMULUS_ALTITUDE;
-	float cloud_shadow_fade = smoothstep(0.1, 0.2, light_dir.y);
+	float cloud_shadow_fade = smoothstep(0.1, 0.3, light_dir.y);
 
 	float cloud_shadow = bicubic_filter(cloud_shadow_map, cloud_shadow_pos).x;
 	      cloud_shadow = cloud_shadow * cloud_shadow_fade + (1.0 - cloud_shadow_fade);
