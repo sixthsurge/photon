@@ -89,6 +89,9 @@ vec3 lift(vec3 x, float amount) {
 float cubic_smooth(float x) {
 	return sqr(x) * (3.0 - 2.0 * x);
 }
+vec2 cubic_smooth(vec2 x) {
+	return sqr(x) * (3.0 - 2.0 * x);
+}
 
 // Similar to the above, but even smoother with a zero second derivative at zero and one
 float quintic_smooth(float x) {

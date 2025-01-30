@@ -80,6 +80,32 @@ uniform bool world_age_changed;
 
 const float ao_render_scale = 0.5;
 
+vec3 resample_bent_normal(vec2 uv) {
+	vec4 xs = textureGather(colortex6, uv, 2);
+	vec4 ys = textureGather(colortex6, uv, 3);
+
+	xs = max0(xs);
+	ys = max0(ys);
+
+	mat4x3 bent_normals = mat4x3(
+		decode_unit_vector(vec2(xs.x, ys.x)),
+		decode_unit_vector(vec2(xs.y, ys.y)),
+		decode_unit_vector(vec2(xs.z, ys.z)),
+		decode_unit_vector(vec2(xs.w, ys.w))
+	);
+
+	vec2 f = cubic_smooth(fract(uv * (view_res * 0.5) + 0.5));
+	vec2 one_minus_f = 1.0 - f;
+	vec4 weights = vec4(
+		one_minus_f.x * f.y,
+		f.x * f.y,
+		f.x * one_minus_f.y,
+		one_minus_f.x * one_minus_f.y
+	);
+
+	return normalize_safe(bent_normals * weights);
+}
+
 void main() {
 	ivec2 texel      = ivec2(gl_FragCoord.xy);
 	ivec2 view_texel = ivec2(gl_FragCoord.xy * (taau_render_scale / ao_render_scale));
@@ -139,21 +165,18 @@ void main() {
 
 	// Calculate AO
 
-	float ao, ambient_sss;
+	vec2 ao;
 	vec3 bent_normal;
 
 #if   SHADER_AO == SHADER_AO_NONE
-	ao = 1.0;
-	ambient_sss = 0.0;
+	ao = vec2(1.0, 0.0);
 	bent_normal = flat_normal;
 #elif SHADER_AO == SHADER_AO_SSAO
 	ao.x = compute_ssao(screen_pos, view_pos, view_normal, dither);
 	ao.y = 0.0;
 	bent_normal = flat_normal;
 #elif SHADER_AO == SHADER_AO_GTAO
-	vec2 gtao = compute_gtao(screen_pos, view_pos, view_normal, dither, is_dh_terrain, bent_normal);
-	ao = gtao.x;
-	ambient_sss = gtao.y;
+	ao = compute_gtao(screen_pos, view_pos, view_normal, dither, is_dh_terrain, bent_normal);
 #endif
 
 	// Temporal accumulation
@@ -162,18 +185,14 @@ void main() {
 	const float depth_rejection_strength     = 16.0;
 	const float offcenter_rejection_strength = 0.25;
 
-	ivec2 history_texel = ivec2(previous_screen_pos.xy * view_res * (0.5 * taau_render_scale));
-	vec4 history = max0(texelFetch(colortex6, history_texel, 0));
-	vec2 history_data = max0(texelFetch(colortex14, history_texel, 0).xy);
+	vec2 history_ao = max0(catmull_rom_filter_fast_rgb(colortex6, previous_screen_pos.xy, 0.65).xy);
+	vec2 history_data = max0(texture(colortex14, previous_screen_pos.xy).xy);
+	vec3 history_bent_normal = resample_bent_normal(previous_screen_pos.xy);
 
 	if (clamp01(previous_screen_pos.xy) == previous_screen_pos.xy) {
 		// Unpack history data
-		float history_ao = history.x;
-		float history_ambient_sss = history.y;
 		float history_depth = 1.0 - history_data.x;
 		float pixel_age = min(history_data.y, max_accumulated_frames);
-
-		vec3 history_bent_normal = decode_unit_vector(history.zw);
 
 		// Depth rejection
 		float view_norm = rcp_length(view_pos);
@@ -192,7 +211,6 @@ void main() {
 		// Blend with history 
 		float history_weight = pixel_age / (pixel_age + 1.0);
 		ao = mix(ao, history_ao, history_weight);
-		ambient_sss = mix(ambient_sss, history_ambient_sss, history_weight);
 		bent_normal = mix(bent_normal, history_bent_normal, history_weight);
 		// re-normalize
 		float len_sq = length_squared(bent_normal);
@@ -205,7 +223,6 @@ void main() {
 
 	ambient = vec4(
 		ao,
-		ambient_sss,
 		encode_unit_vector(bent_normal)
 	);
 }
