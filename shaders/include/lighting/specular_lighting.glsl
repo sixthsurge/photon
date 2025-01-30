@@ -218,7 +218,7 @@ vec3 trace_specular_ray(
 		float border_attenuation = (hit_pos.x * hit_pos.y - hit_pos.x) * (hit_pos.x * hit_pos.y - hit_pos.y);
 		      border_attenuation = dampen(linear_step(0.0, border_attenuation_factor, border_attenuation));
 
-		vec3 hit_pos_view = screen_to_view_space(combined_projection_matrix_inverse, hit_pos, false);
+		vec3 hit_pos_view = screen_to_view_space(gbufferProjectionInverse, hit_pos, false);
 		vec3 hit_pos_scene = view_to_scene_space(hit_pos_view);
 
 		vec3 hit_pos_prev = reproject_scene_space(hit_pos_scene, false, false);

@@ -14,7 +14,7 @@
 #include "/include/global.glsl"
 
 /* RENDERTARGETS: 8 */
-layout (location = 0) out float cloud_shadow_map;
+layout (location = 0) out vec2 cloud_shadow_map;
 
 in vec2 uv;
 

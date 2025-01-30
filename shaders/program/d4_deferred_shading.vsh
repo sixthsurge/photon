@@ -20,14 +20,13 @@ flat out vec3 light_color;
 flat out vec3 sun_color;
 flat out vec3 moon_color;
 
-#if defined SH_SKYLIGHT
-flat out vec3 sky_sh[9];
-#else
-flat out mat3 sky_samples;
-#endif
-
 #include "/include/fog/overworld/coeff_struct.glsl"
 flat out AirFogCoefficients air_fog_coeff;
+
+#if defined SH_SKYLIGHT
+flat out vec3 sky_sh[9];
+flat out vec3 skylight_up;
+#endif
 #endif
 
 // ------------
@@ -101,7 +100,7 @@ void main() {
 #if defined WORLD_OVERWORLD
 	sun_color    = get_sun_exposure() * get_sun_tint();
 	moon_color   = get_moon_exposure() * get_moon_tint();
-	float skylight_boost = get_skylight_boost();
+	air_fog_coeff = calculate_air_fog_coefficients();
 
 	#ifdef SH_SKYLIGHT
 	// Initialize SH to 0
@@ -119,24 +118,12 @@ void main() {
 
 	// Apply skylight boost and normalize SH
 	const float step_solid_angle = tau / float(step_count);
-	for (uint band = 0; band < 9; ++band) sky_sh[band] *= skylight_boost * step_solid_angle;
-	#else
-	vec3 dir0 = normalize(vec3(0.0, 1.0, -0.8));               // Up
-	vec3 dir1 = normalize(vec3(sun_dir.xz + 0.1, 0.066).xzy);  // Sun-facing horizon
-	vec3 dir2 = normalize(vec3(moon_dir.xz + 0.1, 0.066).xzy); // Opposite horizon
+	float skylight_mul = get_skylight_boost() * step_solid_angle;
+	for (uint band = 0; band < 9; ++band) sky_sh[band] *= skylight_mul;
 
-	sky_samples[0] = atmosphere_scattering(dir0, sun_color, sun_dir, moon_color, moon_dir, /* use_klein_nishina_phase */ false) * skylight_boost;
-	sky_samples[1] = atmosphere_scattering(dir1, sun_color, sun_dir, moon_color, moon_dir, /* use_klein_nishina_phase */ false) * skylight_boost;
-	sky_samples[2] = atmosphere_scattering(dir2, sun_color, sun_dir, moon_color, moon_dir, /* use_klein_nishina_phase */ false) * skylight_boost;
-
-	// Aurorae
-	float aurora_amount = get_aurora_amount();
-	mat2x3 aurora_colors = get_aurora_colors();
-
-	sky_samples[0] += aurora_amount * AURORA_GROUND_LIGHTING * mix(aurora_colors[0], aurora_colors[1], 0.25);
+	// Calculate skylight in upwards direction
+	skylight_up = sh_evaluate_irradiance(sky_sh, vec3(0.0, 1.0, 0.0), 1.0);
 	#endif
-
-	air_fog_coeff = calculate_air_fog_coefficients();
 #endif
 
 	vec2 vertex_pos = gl_Vertex.xy * taau_render_scale;

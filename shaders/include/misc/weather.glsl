@@ -15,7 +15,7 @@ uint weather_day_index(int world_day) {
 
 #if WEATHER_DAY == -1
 	uint day_index = uint(world_day);
-	     day_index = (day_index) % day_count;
+	     day_index = lowbias32(day_index) % day_count;
 #else
 	uint day_index = WEATHER_DAY;
 #endif

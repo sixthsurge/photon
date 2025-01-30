@@ -137,10 +137,6 @@ uniform vec4 entityColor;
 	#undef SHADOW_COLOR
 #endif
 
-#ifdef SH_SKYLIGHT
-	#undef SH_SKYLIGHT
-#endif
-
 #if defined PROGRAM_GBUFFERS_TEXTURED || defined PROGRAM_GBUFFERS_PARTICLES_TRANSLUCENT
 	#define NO_NORMAL
 #endif
@@ -255,9 +251,11 @@ void main() {
 		scene_pos,
 		normal,
 		normal,
+		normal,
 		shadows,
 		light_levels,
 		1.0,
+		0.0,
 		sss_depth,
 #ifdef CLOUD_SHADOWS
 		cloud_shadows,

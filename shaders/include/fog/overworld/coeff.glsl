@@ -37,7 +37,8 @@ AirFogCoefficients calculate_air_fog_coefficients() {
 	          + AIR_FOG_MIE_DENSITY_NOON      * time_noon
 	          + AIR_FOG_MIE_DENSITY_EVENING   * time_sunset
 	          + AIR_FOG_MIE_DENSITY_MIDNIGHT  * time_midnight
-	          + AIR_FOG_MIE_DENSITY_BLUE_HOUR * blue_hour;
+	          + AIR_FOG_MIE_DENSITY_BLUE_HOUR * blue_hour
+			  + 0.001 * fogginess;
 
 	mie = mix(mie, AIR_FOG_MIE_DENSITY_RAIN, rainStrength * biome_may_rain);
 	mie = mix(mie, AIR_FOG_MIE_DENSITY_SNOW, rainStrength * biome_may_snow);

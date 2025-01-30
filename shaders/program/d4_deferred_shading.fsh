@@ -30,14 +30,13 @@ flat in vec3 light_color;
 flat in vec3 sun_color;
 flat in vec3 moon_color;
 
-#if defined SH_SKYLIGHT
-flat in vec3 sky_sh[9];
-#else
-flat in mat3 sky_samples;
-#endif
-
 #include "/include/fog/overworld/coeff_struct.glsl"
 flat in AirFogCoefficients air_fog_coeff;
+
+#if defined SH_SKYLIGHT
+flat in vec3 sky_sh[9];
+flat in vec3 skylight_up;
+#endif
 #endif
 
 // ------------
@@ -51,18 +50,19 @@ uniform sampler2D colortex1; // gbuffer 0
 uniform sampler2D colortex2; // gbuffer 1
 uniform sampler2D colortex4; // sky map
 uniform sampler2D colortex5; // previous frame color
-uniform sampler2D colortex6; // ambient occlusion
+uniform sampler2D colortex6; // ambient lighting data
 uniform sampler2D colortex7; // previous frame fog scattering
 uniform sampler2D colortex11; // clouds history
 uniform sampler2D colortex12; // clouds apparent distance
+uniform sampler2D colortex14; // ambient lighting history data
 
 #ifndef USE_SEPARATE_ENTITY_DRAWS
 uniform sampler2D colortex3; // OF damage overlay, armor glint
 #endif
 
 #if defined WORLD_OVERWORLD && defined GALAXY
-uniform sampler2D colortex14;
-#define galaxy_sampler colortex14
+uniform sampler2D colortex13;
+#define galaxy_sampler colortex13
 #endif
 
 #ifdef CLOUD_SHADOWS
@@ -307,10 +307,18 @@ void main() {
 		ivec2 i = ivec2(half_res_pos);
 		vec2  f = fract(half_res_pos);
 
-		vec3 half_res_00 = texelFetch(colortex6, i + ivec2(0, 0), 0).xyz;
-		vec3 half_res_10 = texelFetch(colortex6, i + ivec2(1, 0), 0).xyz;
-		vec3 half_res_01 = texelFetch(colortex6, i + ivec2(0, 1), 0).xyz;
-		vec3 half_res_11 = texelFetch(colortex6, i + ivec2(1, 1), 0).xyz;
+		ivec2 p10 = i + ivec2(1, 0);
+		ivec2 p01 = i + ivec2(0, 1);
+		ivec2 p11 = i + ivec2(1, 1);
+
+		vec4 ambient_00 = texelFetch(colortex6, i, 0);
+		vec4 ambient_10 = texelFetch(colortex6, p10, 0);
+		vec4 ambient_01 = texelFetch(colortex6, p01, 0);
+		vec4 ambient_11 = texelFetch(colortex6, p11, 0);
+		float ambient_depth_00 = texelFetch(colortex14, i, 0).x;
+		float ambient_depth_10 = texelFetch(colortex14, p10, 0).x;
+		float ambient_depth_01 = texelFetch(colortex14, p01, 0).x;
+		float ambient_depth_11 = texelFetch(colortex14, p11, 0).x;
 
 		// Unpack gbuffer data
 
@@ -378,18 +386,47 @@ void main() {
 
 		// Upscale ambient occlusion
 
+		float ao, ambient_sss;
+		vec3 bent_normal;
+
 		float lin_z = screen_to_view_space_depth(combined_projection_matrix_inverse, depth);
 
 		#define depth_weight(reversed_depth) exp2(-10.0 * abs(screen_to_view_space_depth(combined_projection_matrix_inverse, 1.0 - reversed_depth) - lin_z))
-
-		vec4 gtao = vec4(half_res_00, 1.0) * depth_weight(half_res_00.z) * (1.0 - f.x) * (1.0 - f.y)
-		          + vec4(half_res_10, 1.0) * depth_weight(half_res_10.z) * (f.x - f.x * f.y)
-		          + vec4(half_res_01, 1.0) * depth_weight(half_res_01.z) * (f.y - f.x * f.y)
-		          + vec4(half_res_11, 1.0) * depth_weight(half_res_11.z) * (f.x * f.y);
-
+		float w00 = depth_weight(ambient_depth_00) * (1.0 - f.x) * (1.0 - f.y);
+		float w10 = depth_weight(ambient_depth_10) * (f.x - f.x * f.y);
+		float w01 = depth_weight(ambient_depth_01) * (f.y - f.x * f.y);
+		float w11 = depth_weight(ambient_depth_11) * (f.x * f.y);
 		#undef depth_weight
 
-		float ao = (gtao.w == 0.0) ? half_res_00.x : gtao.x / gtao.w;
+		float weight_sum = w00 + w10 + w01 + w11;
+
+		if (weight_sum != 0.0) {
+			float rcp_weight_sum = rcp(weight_sum);
+
+			ao = ambient_00.x * w00
+				+ ambient_10.x * w10 
+				+ ambient_01.x * w01 
+				+ ambient_11.x * w11;
+			ao *= rcp_weight_sum;
+
+			ambient_sss = ambient_00.y * w00
+				+ ambient_10.y * w10 
+				+ ambient_01.y * w01 
+				+ ambient_11.y * w11;
+			ambient_sss *= rcp_weight_sum;
+
+			bent_normal = decode_unit_vector(ambient_00.zw) * w00
+				+ decode_unit_vector(ambient_10.zw) * w10 
+				+ decode_unit_vector(ambient_01.zw) * w01 
+				+ decode_unit_vector(ambient_11.zw) * w11;
+			// re-normalize
+			float len_sq = length_squared(bent_normal);
+			bent_normal = (len_sq == 0.0) ? flat_normal : bent_normal * inversesqrt(len_sq);
+		} else {
+			ao = ambient_00.x;
+			ambient_sss = ambient_00.y;
+			bent_normal = decode_unit_vector(ambient_00.zw);
+		}
 
 		// Shadows
 
@@ -435,9 +472,11 @@ void main() {
 			scene_pos,
 			normal,
 			flat_normal,
+			bent_normal,
 			shadows,
 			light_levels,
 			ao,
+			ambient_sss,
 			sss_depth,
 #ifdef CLOUD_SHADOWS
 			cloud_shadows,

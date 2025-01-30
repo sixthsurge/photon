@@ -50,9 +50,17 @@ float compute_maximum_horizon_angle(
 	return fast_acos(clamp(max_cos_theta, -1.0, 1.0));
 }
 
-float compute_gtao(vec3 screen_pos, vec3 view_pos, vec3 view_normal, vec2 dither, bool is_dh_terrain) {
+vec2 compute_gtao(
+	vec3 screen_pos, 
+	vec3 view_pos, 
+	vec3 view_normal, 
+	vec2 dither, 
+	bool is_dh_terrain, 
+	out vec3 bent_normal
+) {
 	float ao = 0.0;
-	// vec3 bent_normal = vec3(0.0);
+	float ambient_sss = 0.0;
+	bent_normal = vec3(0.0);
 
 	// Construct local working space
 	vec3 viewer_dir   = normalize(-view_pos);
@@ -63,7 +71,7 @@ float compute_gtao(vec3 screen_pos, vec3 view_pos, vec3 view_normal, vec2 dither
 	// Reduce AO radius very close up, makes some screen-space artifacts less obvious
 	float ao_radius = max(0.25 + 0.75 * smoothstep(0.0, 81.0, length_squared(view_pos)), 0.5);
 
-    // Increase AO radius for DH terrain (looks really good)
+    // Increase AO radius for DH terrain (looks nice)
 #ifdef DISTANT_HORIZONS
     if (is_dh_terrain) {
         ao_radius *= 3.0;
@@ -91,21 +99,25 @@ float compute_gtao(vec3 screen_pos, vec3 view_pos, vec3 view_normal, vec2 dither
 		max_horizon_angles.x = compute_maximum_horizon_angle(-view_slice_dir, viewer_dir, screen_pos, view_pos, ao_radius, dither.y, is_dh_terrain);
 		max_horizon_angles.y = compute_maximum_horizon_angle( view_slice_dir, viewer_dir, screen_pos, view_pos, ao_radius, dither.y, is_dh_terrain);
 
+		ambient_sss += max0(max_horizon_angles.y - half_pi) * rcp_pi;
+
 		max_horizon_angles = gamma + clamp(vec2(-1.0, 1.0) * max_horizon_angles - gamma, -half_pi, half_pi);
 		ao += integrate_arc(max_horizon_angles, gamma, cos_gamma) * len_sq * norm;
 
-		// float bent_angle = dot(max_horizon_angles, vec2(0.5));
-		// bent_normal += viewer_dir * cos(bent_angle) + ortho_dir * sin(bent_angle);
+		float bent_angle = dot(max_horizon_angles, vec2(0.5));
+		bent_normal += viewer_dir * cos(bent_angle) + ortho_dir * sin(bent_angle);
 	}
 
 	const float albedo = 0.2; // albedo of surroundings (for multibounce approx)
 
 	ao *= rcp(float(GTAO_SLICES));
+	ambient_sss *= rcp(float(GTAO_SLICES));
 	ao /= albedo * ao + (1.0 - albedo);
 
-	// bent_normal = normalize(normalize(bent_normal) - 0.5 * viewer_dir);
+	bent_normal = normalize(normalize(bent_normal) - 0.5 * viewer_dir);
+	bent_normal = mat3(gbufferModelViewInverse) * bent_normal;
 
-	return ao;
+	return clamp01(vec2(ao, ambient_sss));
 }
 
 #endif // INCLUDE_LIGHTING_AO_GTAO

@@ -130,7 +130,7 @@ vec2 clouds_cumulus_scattering(
 	vec3 phase_g = pow(vec3(0.6, 0.9, 0.3), vec3(1.0 + light_optical_depth));
 
 	for (uint i = 0u; i < 8u; ++i) {
-		scattering.x += scatter_amount * exp(-extinct_amount *  light_optical_depth) * phase * (1.0 - 0.8 * altocumulus_shadow);
+		scattering.x += scatter_amount * exp(-extinct_amount *  light_optical_depth) * phase * (1.0 - 0.3 * altocumulus_shadow);
 		scattering.x += scatter_amount * exp(-extinct_amount * ground_optical_depth) * isotropic_phase * bounced_light;
 		scattering.x += scatter_amount * exp(-extinct_amount *    sky_optical_depth) * isotropic_phase * altocumulus_shadow * 0.2; // fake bounced lighting from the layer above
 		scattering.y += scatter_amount * exp(-extinct_amount *    sky_optical_depth) * isotropic_phase;

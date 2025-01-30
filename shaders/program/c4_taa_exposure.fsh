@@ -34,8 +34,8 @@ uniform sampler2D colortex0; // Scene color
 uniform sampler2D colortex5; // Scene history
 
 #ifdef TAAU
-uniform sampler2D colortex13; // TAA min color
-uniform sampler2D colortex14; // TAA max color
+uniform sampler2D colortex1; // TAA min color
+uniform sampler2D colortex2; // TAA max color
 #endif
 
 uniform sampler2D depthtex0;
@@ -319,8 +319,8 @@ void main() {
 	history_color = reinhard(history_color);
 
 	// Interpolate AABB bounds across pixels
-	vec3 min_color = texture(colortex13, pos).rgb;
-	vec3 max_color = texture(colortex14, pos).rgb;
+	vec3 min_color = texture(colortex1, pos).rgb * 2.0 - 1.0;
+	vec3 max_color = texture(colortex2, pos).rgb * 2.0 - 1.0;
 
 	bool history_clipped;
 	history_color = rgb_to_ycocg(history_color);

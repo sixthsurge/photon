@@ -2,7 +2,6 @@
 #define INCLUDE_LIGHTING_DIFFUSE_LIGHTING
 
 #include "/include/lighting/colors/blocklight_color.glsl"
-#include "/include/lighting/colors/skylight_approx.glsl"
 #include "/include/lighting/bsdf.glsl"
 #include "/include/misc/end_lighting_fix.glsl"
 #include "/include/misc/material.glsl"
@@ -18,7 +17,7 @@
 #include "/include/lighting/handheld_lighting.glsl"
 #endif
 
-#ifndef WORLD_OVERWORLD
+#if !defined WORLD_OVERWORLD
 	#undef CLOUD_SHADOWS
 #endif
 
@@ -81,9 +80,11 @@ vec3 get_diffuse_lighting(
 	vec3 scene_pos,
 	vec3 normal,
 	vec3 flat_normal,
+	vec3 bent_normal,
 	vec3 shadows,
 	vec2 light_levels,
 	float ao,
+	float ambient_sss,
 	float sss_depth,
 #ifdef CLOUD_SHADOWS
 	float cloud_shadows,
@@ -100,7 +101,9 @@ vec3 get_diffuse_lighting(
 #endif
 
 	vec3 lighting = vec3(0.0);
-	float directional_lighting = (0.9 + 0.1 * normal.x) * (0.8 + 0.2 * abs(flat_normal.y)); // Random directional shading to make faces easier to distinguish
+
+	// Arbitrary directional shading to make faces easier to distinguish
+	float directional_lighting = (0.9 + 0.1 * normal.x) * (0.8 + 0.2 * abs(flat_normal.y)) + 2.0 * ambient_sss * material.sss_amount; 
 
 #if defined WORLD_OVERWORLD || defined WORLD_END
 
@@ -146,15 +149,17 @@ vec3 get_diffuse_lighting(
 
 	// Skylight
 
-#if defined WORLD_OVERWORLD && defined PROGRAM_DEFERRED4
-	#ifdef SH_SKYLIGHT
-	vec3 skylight = sh_evaluate_irradiance(sky_sh, normal, ao);
-	#else
-	vec3 skylight = skylight_approx(normal, flat_normal, shadows, directional_lighting, ao);
-	#endif
+#if defined WORLD_OVERWORLD && defined PROGRAM_DEFERRED4 && defined SH_SKYLIGHT
+	vec3 skylight = sh_evaluate_irradiance(sky_sh, bent_normal, ao);
+	skylight = mix(skylight_up, skylight, sqr(light_levels.y));
 #else
-	vec3 skylight  = ambient_color * ao;
+	vec3 skylight = ambient_color * ao;
+	vec3 skylight_up = skylight;
 #endif
+
+	// Skylight SSS
+	skylight = mix(skylight, 0.5 * skylight_up * ao, material.sss_amount);
+	skylight += ambient_sss * skylight_up * material.sss_amount * 2.0;
 
 #if defined WORLD_NETHER
 	// Brighten + desaturate nether ambient

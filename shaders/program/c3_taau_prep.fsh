@@ -14,7 +14,7 @@
 layout (location = 0) out vec3 min_color;
 layout (location = 1) out vec3 max_color;
 
-/* RENDERTARGETS: 13,14 */
+/* RENDERTARGETS: 1,2 */
 
 in vec2 uv;
 
@@ -75,9 +75,11 @@ void main() {
 	max_color  = max_of(b, d, e, f, h);
 	max_color += max_of(max_color, a, c, g, i);
 	max_color *= 0.5;
+
+	min_color = min_color * 0.5 + 0.5;
+	max_color = max_color * 0.5 + 0.5;
 }
 
 #endif
 //----------------------------------------------------------------------------//
 
-#ifndef TAAU

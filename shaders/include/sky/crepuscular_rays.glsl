@@ -17,7 +17,7 @@ vec4 draw_crepuscular_rays(
 	const float clouds_cumulus_radius    = planet_radius + CLOUDS_CUMULUS_ALTITUDE;
 	const float clouds_cumulus_thickness = CLOUDS_CUMULUS_ALTITUDE * CLOUDS_CUMULUS_THICKNESS;
 	vec3 ray_origin_air = vec3(vec2(0.0), eyeAltitude - SEA_LEVEL).xzy * CLOUDS_SCALE + vec3(0.0, planet_radius, 0.0);
-	float ray_length = intersect_sphere(ray_origin_air, ray_direction_world, clouds_cumulus_radius + 0.25 * clouds_cumulus_thickness).y / CLOUDS_SCALE;
+	float ray_length = intersect_sphere(ray_origin_air, ray_direction_world, clouds_cumulus_radius + 0.0 * clouds_cumulus_thickness).y / CLOUDS_SCALE;
 	ray_length = min(ray_length, max_ray_length);
 	float step_length = ray_length * rcp(float(step_count));
 
@@ -27,7 +27,7 @@ vec4 draw_crepuscular_rays(
 	float sunset_factor = pulse(light_dir.y, -0.01, 0.1);
 
 	float density_scale = 5.0 + 40.0 * daily_weather_variation.fogginess;
-	vec3 extinction_coeff = density_scale * (air_rayleigh_coefficient + 1.0 * air_mie_coefficient) * (CLOUDS_SCALE / 10.0);
+	vec3 extinction_coeff = density_scale * (0.05 * air_rayleigh_coefficient + 1.0 * air_mie_coefficient) * (CLOUDS_SCALE / 10.0);
 	vec3 scattering_coeff = extinction_coeff;
 	vec3 step_optical_depth = extinction_coeff * step_length;
 	vec3 step_transmittance = exp(-step_optical_depth);
@@ -44,8 +44,8 @@ vec4 draw_crepuscular_rays(
 		vec3 ray_position_shadow = ray_origin_shadow + ray_step_shadow * (float(i) + dither);
 		vec2 cloud_shadow_uv = shadow_view_to_cloud_shadow_space(ray_position_shadow);
 
-		float cloud_shadow = texelFetch(cloud_shadow_map, ivec2(cloud_shadow_uv * vec2(cloud_shadow_res)), 0).x;
-		//float cloud_shadow = texture(cloud_shadow_map, cloud_shadow_uv).x;
+		//float cloud_shadow = texelFetch(cloud_shadow_map, ivec2(cloud_shadow_uv * vec2(cloud_shadow_res)), 0).x;
+		float cloud_shadow = texture(cloud_shadow_map, cloud_shadow_uv).y;
 		      cloud_shadow = linear_step(0.8, 1.0, cloud_shadow);
 
 		vec3 visible_scattering = step_transmitted_fraction * transmittance;
@@ -57,18 +57,17 @@ vec4 draw_crepuscular_rays(
 
 	float LoV = dot(ray_direction_world, light_dir);
 
-	float forwards_a = sunset_factor * klein_nishina_phase(LoV, 2600.0); // this gives a nice glow very close to the sun
-	float forwards_b = henyey_greenstein_phase(LoV, 0.5); 
+	float forwards = henyey_greenstein_phase(LoV, 0.5); 
 
-	float phase = 0.8 * max(forwards_a, forwards_b) // forwards lobe (max'ing them is completely nonsensical but it looks nice)
-		+ 0.2 * henyey_greenstein_phase(LoV, -0.2); // backwards lobe
+	float phase = 0.5 * forwards // forwards lobe (max'ing them is completely nonsensical but it looks nice)
+		+ 0.5 * henyey_greenstein_phase(LoV, -0.2); // backwards lobe
 
-	scattering *= 2.0 * phase;
+	scattering *= 4.0 * phase * sqr(daily_weather_variation.fogginess);
 	float horizon_fade = clamp01(40.0 * ray_direction_world.y);
 	scattering *= horizon_fade;
 	transmittance = mix(vec3(1.0), transmittance, horizon_fade);
 
-	return vec4(scattering, dot(transmittance, vec3(rcp(3.0))));
+	return vec4(scattering, dampen(dot(transmittance, vec3(rcp(3.0)))));
 }
 
 #endif // INCLUDE_SKY_CREPUSCULAR_RAYS

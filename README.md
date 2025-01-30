@@ -68,5 +68,5 @@
 
 ## community
 
-For questions, suggestions and news regarding this shader pack, head to my [discord server](https://discord.gg/ngEW66HScd)
-
+- For questions, suggestions and news regarding this shader pack, head to my [discord server](https://discord.gg/ngEW66HScd)
+- You can also [give me money](https://ko-fi.com/sixthsurge) if you want to 

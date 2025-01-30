@@ -71,6 +71,6 @@ void main() {
 	air_fog_coeff = calculate_air_fog_coefficients();
 #endif
 
-	vec2 vertex_pos = gl_Vertex.xy;
+	vec2 vertex_pos = gl_Vertex.xy * taau_render_scale;
 	gl_Position = vec4(vertex_pos * 2.0 - 1.0, 0.0, 1.0);
 }

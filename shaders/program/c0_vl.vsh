@@ -59,6 +59,7 @@ uniform float desert_sandstorm;
 
 #if defined WORLD_OVERWORLD
 #include "/include/fog/overworld/coeff.glsl"
+#include "/include/sky/projection.glsl"
 #endif
 
 void main() {
