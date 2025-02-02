@@ -501,6 +501,9 @@ const float wetnessHalflife         = 70.0;
 
   #define NOISE_ON_DH_TERRAIN // High-frequency noise on Distant Horizons terrain
 
+  #define WORLD_CURVATURE // Curve the world (Works well with 16384 and DH chunk distance of 256)
+  #define WORLD_CURVATURE_SIZE 256 // [-256 -512 -1024 -2048 -4096 -8192 -16384 16384 8192 4096 2048 1024 512 256 128 64 32 16]
+
   // Daily Weather System
   #define WEATHER_DAY -1 // [-1 0 1 2 3 4 5 6 7 8 9 10 11]
 

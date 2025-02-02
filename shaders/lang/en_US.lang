@@ -661,6 +661,10 @@ option.CUSTOM_SKY.comment              = Enable custom skies from resource packs
 option.CUSTOM_SKY_BRIGHTNESS           = Custom Sky Brightness
 option.CUSTOM_SKY_BRIGHTNESS.comment   = Adjust custom sky brightness
 option.NOISE_ON_DH_TERRAIN             = Noise on DH terrain
+option.WORLD_CURVATURE                 = World curvature
+option.WORLD_CURVATURE.comment         = Enables world curvature. §e[*]§rWorks in overworld only. §c[-]§rMissing chunks are handled by Minecraft itself which I can't fix. §c[-]§rMay break block selection highlight on 1.17.
+option.WORLD_CURVATURE_SIZE            = World curvature size
+option.WORLD_CURVATURE_SIZE.comment    = Adjusts world curvature size. Negative values will bend the world upwards.
 option.ENCHANTMENT_GLINT_BRIGHTNESS    = Enchantment Glint Brightness
 
 value.DEBUG_VIEW.DEBUG_VIEW_NONE       = OFF

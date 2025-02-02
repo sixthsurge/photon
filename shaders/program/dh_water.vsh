@@ -69,6 +69,9 @@ void main() {
 
     vec3 pos = gl_Vertex.xyz;
          pos = floor(pos + camera_offset + 0.5) - camera_offset;
+         #ifdef WORLD_CURVATURE
+         pos.y -= dot(pos.xz, pos.xz) / WORLD_CURVATURE_SIZE;
+         #endif
          pos = transform(gl_ModelViewMatrix, pos);
 
     scene_pos = transform(gbufferModelViewInverse, pos);
