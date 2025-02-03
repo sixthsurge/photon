@@ -24,8 +24,8 @@ flat in vec3 moon_dir_fixed;
 flat in vec3 light_dir_fixed;
 #endif
 
-#include "/include/misc/weather_struct.glsl"
-flat in DailyWeatherVariation daily_weather_variation;
+#include "/include/sky/clouds/parameters.glsl"
+flat in CloudsParameters clouds_params;
 
 // ------------
 //   Uniforms

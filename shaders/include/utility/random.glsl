@@ -185,4 +185,13 @@ vec4 hash4(vec4 p4) {
 }
 //*/
 
+//----------------------------------------------------------------------------//
+
+// One dimensional value noise
+float noise_1d(float x) {
+	float i, f = modf(x, i);
+	f = cubic_smooth(f);
+	return mix(hash1(i), hash1(i + 1.0), f);
+}
+
 #endif // INCLUDE_UTILITY_RANDOM

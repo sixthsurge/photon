@@ -2,6 +2,7 @@
 #define INCLUDE_FOG_AIR_FOG_VL
 
 #include "/include/fog/overworld/constants.glsl"
+#include "/include/lighting/cloud_shadows.glsl"
 #include "/include/lighting/distortion.glsl"
 #include "/include/sky/atmosphere.glsl"
 #include "/include/utility/encoding.glsl"
@@ -114,8 +115,8 @@ mat2x3 raymarch_air_fog(vec3 world_start_pos, vec3 world_end_pos, bool sky, floa
 
 		vec2 density = air_fog_density(world_pos) * step_length;
 
-		vec3 step_optical_depth = air_fog_coeff.rayleigh * density.x 
-			+ air_fog_coeff.mie_extinction * density.y;
+		vec3 step_optical_depth = fog_params.rayleigh_scattering_coeff * density.x 
+			+ fog_params.mie_extinction_coeff * density.y;
 		vec3 step_transmittance = exp(-step_optical_depth);
 		vec3 step_transmitted_fraction = (1.0 - step_transmittance) / max(step_optical_depth, eps);
 
@@ -129,10 +130,10 @@ mat2x3 raymarch_air_fog(vec3 world_start_pos, vec3 world_end_pos, bool sky, floa
 		transmittance *= step_transmittance;
 	}
 
-	light_sun[0] *= air_fog_coeff.rayleigh;
-	light_sun[1] *= air_fog_coeff.mie_scattering;
-	light_sky[0] *= air_fog_coeff.rayleigh;
-	light_sky[1] *= air_fog_coeff.mie_scattering;
+	light_sun[0] *= fog_params.rayleigh_scattering_coeff;
+	light_sun[1] *= fog_params.mie_scattering_coeff;
+	light_sky[0] *= fog_params.rayleigh_scattering_coeff;
+	light_sky[1] *= fog_params.mie_scattering_coeff;
 
 	if (!sky) {
 		// Skylight falloff
@@ -162,7 +163,7 @@ mat2x3 raymarch_air_fog(vec3 world_start_pos, vec3 world_end_pos, bool sky, floa
 	for (int i = 0; i < 4; ++i) {
 		float mie_phase = 0.7 * henyey_greenstein_phase(LoV, 0.5 * anisotropy) + 0.3 * henyey_greenstein_phase(LoV, -0.2 * anisotropy);
 
-		scattering += scatter_amount * (light_sun * vec2(isotropic_phase, mie_phase)) * light_color;
+		scattering += scatter_amount * (light_sun * vec2(isotropic_phase, mie_phase)) * light_color * (1.0 - 0.9 * rainStrength);
 
 		scatter_amount *= 0.5;
 		anisotropy *= 0.7;

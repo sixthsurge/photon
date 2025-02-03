@@ -5,9 +5,6 @@
 
 #include "common.glsl"
 
-const float clouds_noctilucent_altitude = 80000.0;
-const float clouds_noctilucent_radius = planet_radius + clouds_noctilucent_altitude;
-
 float clouds_noctilucent_density(vec2 coord, vec3 ray_dir) {
 	coord *= 0.25;
 
@@ -36,7 +33,7 @@ float clouds_noctilucent_density(vec2 coord, vec3 ray_dir) {
 
 	density += 2.0 * pow8(max0(highlight));
 
-	return sqr(max0(density)) * daily_weather_variation.nlc_amount;
+	return sqr(max0(density)) * clouds_params.noctilucent_amount;
 }
 
 vec4 draw_noctilucent_clouds(
@@ -49,7 +46,10 @@ vec4 draw_noctilucent_clouds(
 	const float extinction_coeff = 0.001; 
 
 	float visibility = pulse(sun_dir.y, -0.10, 0.1);
-	if (visibility < eps) return vec4(0.0, 0.0, 0.0, 1.0);
+
+	if (visibility < eps || clouds_params.noctilucent_amount < eps) {
+		return vec4(0.0, 0.0, 0.0, 1.0);
+	}
 
 	// ---------------
 	//   Ray Casting

@@ -10,6 +10,8 @@
 	#undef WATER_DISPLACEMENT
 #endif
 
+#include "/include/misc/material_masks.glsl"
+
 #ifdef IS_IRIS 
 uniform vec3 eyePosition;
 #else 
@@ -77,24 +79,24 @@ vec3 animate_vertex(vec3 world_pos, bool is_top_vertex, float skylight, uint mat
 
 	switch (material_mask) {
 #ifdef WATER_DISPLACEMENT
-	case 1:
+	case MATERIAL_WATER:
 		world_pos.y += get_water_displacement(world_pos, skylight);
 		return world_pos;
 #endif
 
 #ifdef WAVING_PLANTS
-	case 2:
+	case MATERIAL_SMALL_PLANTS:
 		return world_pos + (get_wind_displacement(world_pos, wind_speed, wind_strength, false) + player_displacement) * float(is_top_vertex);
 
-	case 3:
+	case MATERIAL_TALL_PLANTS_LOWER:
 		return world_pos + (get_wind_displacement(world_pos, wind_speed, wind_strength, false) + player_displacement) * float(is_top_vertex);
 
-	case 4:
+	case MATERIAL_TALL_PLANTS_UPPER:
 		return world_pos + (get_wind_displacement(world_pos, wind_speed, wind_strength, is_top_vertex) + player_displacement);
 #endif
 
 #ifdef WAVING_LEAVES
-	case 5:
+	case MATERIAL_LEAVES:
 		return world_pos + get_wind_displacement(world_pos, wind_speed, wind_strength * 0.5, false);
 #endif
 

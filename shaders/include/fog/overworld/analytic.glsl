@@ -32,13 +32,13 @@ mat2x3 air_fog_analytic(vec3 ray_origin_world, vec3 ray_end_world, bool sky, flo
 		ray_direction_world,
 		ray_length 
 	);
-	vec3 optical_depth = air_fog_coeff.rayleigh * airmass.x 
-		+ air_fog_coeff.mie_extinction * airmass.y;
+	vec3 optical_depth = fog_params.rayleigh_scattering_coeff * airmass.x 
+		+ fog_params.mie_extinction_coeff * airmass.y;
 	vec3 transmittance = exp(-optical_depth);
 	vec3 scattering_integral = (1.0 - transmittance) / max(optical_depth, eps);
 
-	vec3 rayleigh_scattering = scattering_integral * airmass.x * air_fog_coeff.rayleigh;
-	vec3 mie_scattering = scattering_integral * airmass.y * air_fog_coeff.mie_scattering;
+	vec3 rayleigh_scattering = scattering_integral * airmass.x * fog_params.rayleigh_scattering_coeff;
+	vec3 mie_scattering = scattering_integral * airmass.y * fog_params.mie_scattering_coeff;
 
 	float LoV = dot(ray_direction_world, light_dir);
 	float mie_phase = 0.7 * henyey_greenstein_phase(LoV, 0.5) + 0.3 * henyey_greenstein_phase(LoV, -0.2);
@@ -58,7 +58,7 @@ mat2x3 air_fog_analytic(vec3 ray_origin_world, vec3 ray_end_world, bool sky, flo
 	for (int i = 0; i < 4; ++i) {
 		float mie_phase = 0.7 * henyey_greenstein_phase(LoV, 0.5 * anisotropy) + 0.3 * henyey_greenstein_phase(LoV, -0.2 * anisotropy);
 
-		scattering += scatter_amount * (rayleigh_scattering * isotropic_phase + mie_scattering * mie_phase) * light_color;
+		scattering += scatter_amount * (rayleigh_scattering * isotropic_phase + mie_scattering * mie_phase) * light_color * (1.0 - 0.9 * rainStrength);
 
 		scatter_amount *= 0.5;
 		anisotropy *= 0.7;

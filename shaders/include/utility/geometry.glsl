@@ -34,6 +34,22 @@ vec2 intersect_sphere(vec3 ray_origin, vec3 ray_dir, float sphere_radius) {
 	return -b + vec2(-discriminant, discriminant);
 }
 
+vec2 intersect_spherical_shell(float mu, float r, float inner_sphere_radius, float outer_sphere_radius) {
+	vec2 inner_sphere_dists = intersect_sphere(mu, r, inner_sphere_radius);
+	vec2 outer_sphere_dists = intersect_sphere(mu, r, outer_sphere_radius);
+
+	bool inner_sphere_intersected = inner_sphere_dists.y >= 0.0;
+	bool outer_sphere_intersected = outer_sphere_dists.y >= 0.0;
+
+	if (!outer_sphere_intersected) return vec2(-1.0);
+
+	vec2 dists;
+	dists.x = inner_sphere_intersected && inner_sphere_dists.x < 0.0 ? inner_sphere_dists.y : max0(outer_sphere_dists.x);
+	dists.y = inner_sphere_intersected && inner_sphere_dists.x > 0.0 ? inner_sphere_dists.x : outer_sphere_dists.y;
+
+	return dists;
+}
+
 vec2 intersect_spherical_shell(vec3 ray_origin, vec3 ray_dir, float inner_sphere_radius, float outer_sphere_radius) {
 	vec2 inner_sphere_dists = intersect_sphere(ray_origin, ray_dir, inner_sphere_radius);
 	vec2 outer_sphere_dists = intersect_sphere(ray_origin, ray_dir, outer_sphere_radius);

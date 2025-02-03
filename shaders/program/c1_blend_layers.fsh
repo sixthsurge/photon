@@ -27,8 +27,8 @@ flat in vec3 ambient_color;
 flat in vec3 light_color;
 
 #ifdef WORLD_OVERWORLD 
-#include "/include/fog/overworld/coeff_struct.glsl"
-flat in AirFogCoefficients air_fog_coeff;
+#include "/include/fog/overworld/parameters.glsl"
+flat in OverworldFogParameters fog_params;
 #endif
 
 // ------------
@@ -119,6 +119,7 @@ uniform float time_midnight;
 
 #include "/include/fog/simple_fog.glsl"
 #include "/include/misc/distant_horizons.glsl"
+#include "/include/misc/material_masks.glsl"
 #include "/include/utility/color.glsl"
 #include "/include/utility/encoding.glsl"
 #include "/include/utility/fast_math.glsl"
@@ -210,11 +211,14 @@ void main() {
 
     bool front_is_dh_terrain = is_distant_horizons_terrain(front_depth, front_depth_dh);
     bool back_is_dh_terrain = is_distant_horizons_terrain(back_depth, back_depth_dh);
+
+	bool is_dh_translucent = front_depth_dh != back_depth_dh;
 #else
 	#define front_depth_dh      front_depth
 	#define back_depth_dh       back_depth
 	#define front_is_dh_terrain false
 	#define back_is_dh_terrain  false
+	#define is_dh_translucent
 #endif
 
 	bool is_translucent = front_depth != back_depth;
@@ -296,7 +300,7 @@ void main() {
 			vec3 flat_normal   = decode_unit_vector(data[2]);
 			vec2 light_levels  = data[3];
 
-			if (material_mask == 1) { // Water
+			if (material_mask == MATERIAL_WATER) { // Water
 				vec4 water_color = draw_distant_water(
 					dh_position_screen,
 					dh_position_view,
@@ -332,7 +336,7 @@ void main() {
 
 	// Blend clouds in front of translucents
 
-	if (is_translucent) {
+	if (is_translucent || is_dh_translucent) {
 		float clouds_dist;
 		vec4 clouds = read_clouds(clouds_dist);
 

@@ -31,7 +31,7 @@ in vec2 uv;
 
 uniform sampler2D noisetex;
 
-uniform sampler2D colortex6;  // previous frame depth
+uniform sampler2D colortex14; // previous frame depth
 uniform sampler2D colortex9;  // low-res clouds
 uniform sampler2D colortex10; // low-res clouds apparent distance
 uniform sampler2D colortex11; // clouds history
@@ -235,7 +235,7 @@ void main() {
 	vec2 history_data = texture(colortex12, previous_uv_clamped * taau_render_scale).xy;
 
 	// Depth at the previous position
-	float history_depth = 1.0 - min_of(textureGather(colortex6, previous_uv_clamped, 2));
+	float history_depth = 1.0 - min_of(textureGather(colortex14, previous_uv_clamped, 0));
 
 	// Get distance to terrain in the previous frame
 	float distance_to_terrain_squared = length_squared(

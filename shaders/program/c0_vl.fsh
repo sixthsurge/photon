@@ -22,8 +22,8 @@ flat in vec3 ambient_color;
 flat in vec3 light_color;
 
 #if defined WORLD_OVERWORLD
-#include "/include/fog/overworld/coeff_struct.glsl"
-flat in AirFogCoefficients air_fog_coeff;
+#include "/include/fog/overworld/parameters.glsl"
+flat in OverworldFogParameters fog_params;
 #endif
 
 // ------------
@@ -36,6 +36,7 @@ uniform sampler3D colortex0; // 3D worley noise
 uniform sampler2D colortex1; // gbuffer data
 uniform sampler2D colortex3; // translucent color
 uniform sampler2D colortex4; // sky map
+uniform sampler2D colortex8; // cloud shadow map
 
 uniform sampler2D depthtex0;
 uniform sampler2D depthtex1;

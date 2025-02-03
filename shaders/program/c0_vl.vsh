@@ -17,8 +17,8 @@ flat out vec3 ambient_color;
 flat out vec3 light_color;
 
 #if defined WORLD_OVERWORLD
-#include "/include/fog/overworld/coeff_struct.glsl"
-flat out AirFogCoefficients air_fog_coeff;
+#include "/include/fog/overworld/parameters.glsl"
+flat out OverworldFogParameters fog_params;
 #endif
 
 // ------------
@@ -50,6 +50,7 @@ uniform float biome_may_snow;
 uniform float biome_temperature;
 uniform float biome_humidity;
 
+uniform float world_age;
 uniform float time_sunrise;
 uniform float time_noon;
 uniform float time_sunset;
@@ -58,7 +59,7 @@ uniform float time_midnight;
 uniform float desert_sandstorm;
 
 #if defined WORLD_OVERWORLD
-#include "/include/fog/overworld/coeff.glsl"
+#include "/include/misc/weather.glsl"
 #include "/include/sky/projection.glsl"
 #endif
 
@@ -69,7 +70,7 @@ void main() {
 	ambient_color = texelFetch(colortex4, ivec2(191, 1), 0).rgb;
 
 #if defined WORLD_OVERWORLD
-	air_fog_coeff = calculate_air_fog_coefficients();
+	fog_params = get_fog_parameters(get_weather());
 #endif
 
 	vec2 vertex_pos = gl_Vertex.xy;

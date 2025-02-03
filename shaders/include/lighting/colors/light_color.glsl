@@ -56,7 +56,6 @@ vec3 get_light_color() {
 	     light_color *= mix(get_sun_exposure() * get_sun_tint(), get_moon_exposure() * get_moon_tint(), step(0.5, sunAngle));
 	     light_color *= clamp01(rcp(0.02) * light_dir.y); // fade away during day/night transition
 		 light_color *= 1.0 - 0.25 * pulse(abs(light_dir.y), 0.15, 0.11);
-		 light_color *= 1.0 - rainStrength;
 
 	return light_color;
 }

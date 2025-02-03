@@ -12,6 +12,26 @@
 
 uniform float day_factor;
 
+const float clouds_cumulus_radius          = planet_radius + CLOUDS_CUMULUS_ALTITUDE;
+const float clouds_cumulus_thickness       = CLOUDS_CUMULUS_ALTITUDE * CLOUDS_CUMULUS_THICKNESS;
+const float clouds_cumulus_top_radius      = clouds_cumulus_radius + clouds_cumulus_thickness;
+
+const float clouds_altocumulus_radius      = planet_radius + CLOUDS_ALTOCUMULUS_ALTITUDE;
+const float clouds_altocumulus_thickness   = CLOUDS_ALTOCUMULUS_ALTITUDE * CLOUDS_ALTOCUMULUS_THICKNESS;
+const float clouds_altocumulus_top_radius  = clouds_altocumulus_radius + clouds_altocumulus_thickness;
+
+const float clouds_cirrus_radius           = planet_radius + CLOUDS_CIRRUS_ALTITUDE;
+const float clouds_cirrus_thickness        = CLOUDS_CIRRUS_ALTITUDE * CLOUDS_ALTOCUMULUS_THICKNESS;
+const float clouds_cirrus_top_radius       = clouds_cirrus_radius + clouds_cirrus_thickness;
+const float clouds_cirrus_extinction_coeff = 0.15;
+const float clouds_cirrus_scattering_coeff = clouds_cirrus_extinction_coeff;
+
+const float clouds_noctilucent_altitude    = 80000.0;
+const float clouds_noctilucent_radius      = planet_radius + clouds_noctilucent_altitude;
+
+
+// ----
+
 struct CloudsResult {
 	vec3 scattering;
 	float transmittance;
@@ -25,6 +45,35 @@ const CloudsResult clouds_not_hit = CloudsResult(
 );
 
 // ----
+
+// from https://iquilezles.org/articles/gradientnoise/
+vec2 perlin_gradient(vec2 coord) {
+	vec2 i = floor(coord);
+	vec2 f = fract(coord);
+
+	vec2 u  = f * f * f * (f * (f * 6.0 - 15.0) + 10.0);
+	vec2 du = 30.0 * f * f * ( f *( f - 2.0) + 1.0);
+
+	vec2 g0 = hash2(i + vec2(0.0, 0.0));
+	vec2 g1 = hash2(i + vec2(1.0, 0.0));
+	vec2 g2 = hash2(i + vec2(0.0, 1.0));
+	vec2 g3 = hash2(i + vec2(1.0, 1.0));
+
+	float v0 = dot(g0, f - vec2(0.0, 0.0));
+	float v1 = dot(g1, f - vec2(1.0, 0.0));
+	float v2 = dot(g2, f - vec2(0.0, 1.0));
+	float v3 = dot(g3, f - vec2(1.0, 1.0));
+
+	return vec2(
+		g0 + u.x * (g1 - g0) + u.y * (g2 - g0) + u.x * u.y * (g0 - g1 - g2 + g3) + // d/dx
+		du * (u.yx * (v0 - v1 - v2 + v3) + vec2(v1, v2) - v0)                      // d/dy
+	);
+}
+
+vec2 curl2D(vec2 coord) {
+	vec2 gradient = perlin_gradient(coord);
+	return vec2(gradient.y, -gradient.x);
+}
 
 float clouds_phase_single(float cos_theta) { // Single scattering phase function
 	float forwards_a = klein_nishina_phase(cos_theta, 2600.0); // this gives a nice glow very close to the sun

@@ -8,8 +8,8 @@ mat2x3 get_lpv_fog_coefficients(vec3 position_world) {
 	vec2 densities = air_fog_density(position_world);
 
 	return mat2x3(
-		air_fog_coeff[0][0] * densities.x + air_fog_coeff[1][0] * densities.y,
-		air_fog_coeff[1][0] * densities.x + air_fog_coeff[1][1] * densities.y
+		fog_params[0][0] * densities.x + fog_params[1][0] * densities.y,
+		fog_params[1][0] * densities.x + fog_params[1][1] * densities.y
 	);
 #else 
 	return vec3(1e-3);

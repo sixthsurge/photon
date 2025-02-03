@@ -18,8 +18,11 @@ flat out vec3 sun_color;
 flat out vec3 moon_color;
 flat out vec3 sky_color;
 
-#include "/include/misc/weather_struct.glsl"
-flat out DailyWeatherVariation daily_weather_variation;
+flat out float aurora_amount;
+flat out mat2x3 aurora_colors;
+
+#include "/include/sky/clouds/parameters.glsl"
+flat out CloudsParameters clouds_params;
 #endif
 
 // ------------
@@ -63,19 +66,20 @@ uniform float biome_may_snow;
 uniform float biome_temperature;
 uniform float biome_humidity;
 
+uniform float desert_sandstorm;
+
 // ------------
 //   Includes
 // ------------
 
 #define ATMOSPHERE_SCATTERING_LUT depthtex0
-#define WEATHER_AURORA
-#define WEATHER_CLOUDS
 
 #if defined WORLD_OVERWORLD
 #include "/include/lighting/colors/light_color.glsl"
 #include "/include/lighting/colors/weather_color.glsl"
 #include "/include/misc/weather.glsl"
 #include "/include/sky/atmosphere.glsl"
+#include "/include/sky/aurora_colors.glsl"
 #endif
 
 void main() {
@@ -90,11 +94,14 @@ void main() {
 	sky_color = (tau * 1.13) * sky_color;
 	sky_color = mix(sky_color, tau * get_weather_color(), rainStrength);
 
-	daily_weather_variation = get_daily_weather_variation();
+	aurora_amount = get_aurora_amount();
+	aurora_colors = get_aurora_colors();
 
-	sky_color += daily_weather_variation.aurora_amount * AURORA_CLOUD_LIGHTING * mix(
-		daily_weather_variation.aurora_colors[0], 
-		daily_weather_variation.aurora_colors[1], 
+	clouds_params = get_clouds_parameters(get_weather());
+
+	sky_color += aurora_amount * AURORA_CLOUD_LIGHTING * mix(
+		aurora_colors[0], 
+		aurora_colors[1], 
 		0.25
 	);
 #endif

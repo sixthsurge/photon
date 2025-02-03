@@ -31,8 +31,8 @@ flat out vec2 atlas_tile_scale;
 #endif
 
 #if defined WORLD_OVERWORLD 
-#include "/include/fog/overworld/coeff_struct.glsl"
-flat out AirFogCoefficients air_fog_coeff;
+#include "/include/fog/overworld/parameters.glsl"
+flat out OverworldFogParameters fog_params;
 #endif
 
 // --------------
@@ -50,6 +50,7 @@ attribute vec2 mc_midTexCoord;
 uniform sampler2D noisetex;
 
 uniform sampler2D colortex4; // Sky map, lighting colors
+uniform sampler2D colortex9; // Sky SH
 
 uniform mat4 gbufferModelView;
 uniform mat4 gbufferModelViewInverse;
@@ -93,6 +94,7 @@ uniform float biome_may_snow;
 uniform float biome_temperature;
 uniform float biome_humidity;
 
+uniform float world_age;
 uniform float time_sunrise;
 uniform float time_noon;
 uniform float time_sunset;
@@ -117,7 +119,7 @@ uniform int currentRenderedItemId;
 #include "/include/vertex/utility.glsl"
 
 #if defined WORLD_OVERWORLD 
-#include "/include/fog/overworld/coeff.glsl"
+#include "/include/misc/weather.glsl"
 #endif
 
 void main() {
@@ -128,7 +130,11 @@ void main() {
 	tbn           = get_tbn_matrix();
 
 	light_color   = texelFetch(colortex4, ivec2(191, 0), 0).rgb;
+#if defined WORLD_OVERWORLD && defined SH_SKYLIGHT
+	ambient_color = texelFetch(colortex9, ivec2(9, 0), 0).rgb;
+#else
 	ambient_color = texelFetch(colortex4, ivec2(191, 1), 0).rgb;
+#endif
 
 	bool is_top_vertex = uv.y < mc_midTexCoord.y;
 
@@ -169,7 +175,7 @@ void main() {
 #endif
 
 #if defined WORLD_OVERWORLD 
-	air_fog_coeff = calculate_air_fog_coefficients();
+	fog_params = get_fog_parameters(get_weather());
 #endif
 
 	position_view = scene_to_view_space(position_scene);

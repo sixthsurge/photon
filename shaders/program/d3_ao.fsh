@@ -170,11 +170,11 @@ void main() {
 
 #if   SHADER_AO == SHADER_AO_NONE
 	ao = vec2(1.0, 0.0);
-	bent_normal = flat_normal;
+	bent_normal = world_normal;
 #elif SHADER_AO == SHADER_AO_SSAO
 	ao.x = compute_ssao(screen_pos, view_pos, view_normal, dither);
 	ao.y = 0.0;
-	bent_normal = flat_normal;
+	bent_normal = world_normal;
 #elif SHADER_AO == SHADER_AO_GTAO
 	ao = compute_gtao(screen_pos, view_pos, view_normal, dither, is_dh_terrain, bent_normal);
 #endif

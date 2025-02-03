@@ -30,8 +30,8 @@ flat in vec3 light_color;
 flat in vec3 sun_color;
 flat in vec3 moon_color;
 
-#include "/include/fog/overworld/coeff_struct.glsl"
-flat in AirFogCoefficients air_fog_coeff;
+#include "/include/fog/overworld/parameters.glsl"
+flat in OverworldFogParameters fog_params;
 
 #if defined SH_SKYLIGHT
 flat in vec3 sky_sh[9];
@@ -375,6 +375,7 @@ void main() {
 				flat_normal,
 				light_levels,
 				material.porosity,
+				material_mask,
 				normal,
 				material.albedo,
 				material.f0,

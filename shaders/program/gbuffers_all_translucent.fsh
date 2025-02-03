@@ -42,8 +42,8 @@ flat in vec2 atlas_tile_scale;
 #endif
 
 #if defined WORLD_OVERWORLD 
-#include "/include/fog/overworld/coeff_struct.glsl"
-flat in AirFogCoefficients air_fog_coeff;
+#include "/include/fog/overworld/parameters.glsl"
+flat in OverworldFogParameters fog_params;
 #endif
 
 // ------------
@@ -164,6 +164,7 @@ uniform vec4 entityColor;
 #include "/include/lighting/specular_lighting.glsl"
 #include "/include/misc/distant_horizons.glsl"
 #include "/include/misc/material.glsl"
+#include "/include/misc/material_masks.glsl"
 #include "/include/misc/purkinje_shift.glsl"
 #include "/include/misc/water_normal.glsl"
 #include "/include/utility/color.glsl"
@@ -343,8 +344,8 @@ void main() {
 	vec3 normal = tbn[2];
 	vec3 normal_tangent = vec3(0.0, 0.0, 1.0);
 
-	bool is_water         = material_mask == 1;
-	bool is_nether_portal = material_mask == 62;
+	bool is_water         = material_mask == MATERIAL_WATER;
+	bool is_nether_portal = material_mask == MATERIAL_NETHER_PORTAL;
 
 	vec2 adjusted_light_levels = light_levels;
 
@@ -407,7 +408,7 @@ void main() {
 
 #if defined PROGRAM_GBUFFERS_ENTITIES_TRANSLUCENT
 		// Lightning (old versions)
-		if (material_mask == 102) fragment_color = vec4(1.0);
+		if (material_mask == MATERIAL_LIGHTNING_BOLT) fragment_color = vec4(1.0);
 
 		// Hit mob tint
 		fragment_color.rgb = mix(fragment_color.rgb, entityColor.rgb, entityColor.a);

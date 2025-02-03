@@ -243,7 +243,7 @@ void print_float(float value) {
 		float i, f = modf(abs(value), i);
 
 		uint integral_part   = uint(i);
-		uint fractional_part = uint(f * pow(float(text.base), float(text.fp_precision)) + 0.5);
+		uint fractional_part = uint(f * pow(float(text.base), float(text.fp_precision)));
 
 		print_unsigned_int(integral_part);
 		print_char(_dot);

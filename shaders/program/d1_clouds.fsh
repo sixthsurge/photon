@@ -23,8 +23,11 @@ flat in vec3 sun_color;
 flat in vec3 moon_color;
 flat in vec3 sky_color;
 
-#include "/include/misc/weather_struct.glsl"
-flat in DailyWeatherVariation daily_weather_variation;
+flat in float aurora_amount;
+flat in mat2x3 aurora_colors;
+
+#include "/include/sky/clouds/parameters.glsl"
+flat in CloudsParameters clouds_params;
 #endif
 
 // ------------
@@ -188,7 +191,12 @@ void main() {
 	// Crepuscular rays 
 
 #ifdef CREPUSCULAR_RAYS
-	vec4 crepuscular_rays = draw_crepuscular_rays(colortex8, ray_dir, dither);
+	vec4 crepuscular_rays = draw_crepuscular_rays(
+		colortex8, 
+		ray_dir, 
+		distance_to_terrain > 0.0,
+		dither
+	);
 	clouds *= crepuscular_rays.w;
 	clouds.rgb += crepuscular_rays.xyz;
 #endif

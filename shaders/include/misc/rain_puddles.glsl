@@ -1,6 +1,8 @@
 #if !defined INCLUDE_MISC_RAIN_PUDDLES
 #define INCLUDE_MISC_RAIN_PUDDLES
 
+#include "/include/misc/material_masks.glsl"
+
 float get_ripple_height(vec2 coord) {
 	const float ripple_frequency = 0.3;
 	const float ripple_speed     = 0.1;
@@ -17,10 +19,10 @@ float get_puddle_noise(vec3 world_pos, vec3 flat_normal, vec2 light_levels) {
 	const float puddle_frequency = 0.025;
 
 	float puddle = texture(noisetex, world_pos.xz * puddle_frequency).w;
-	      puddle = linear_step(0.45, 0.55, puddle) * wetness * biome_may_rain * max0(flat_normal.y);
+	      puddle = linear_step(0.45, 0.55, puddle) * wetness * biome_may_rain * step(0.99, flat_normal.y);
 
 	// Prevent puddles from appearing indoors
-	puddle *= (1.0 - cube(light_levels.x)) * pow5(light_levels.y);
+	puddle *= (1.0 - cube(light_levels.x)) * linear_step(14.0 / 15.0, 1.0, light_levels.y);
 
 	return puddle;
 }
@@ -30,6 +32,7 @@ bool get_rain_puddles(
 	vec3 flat_normal,
 	vec2 light_levels,
 	float porosity,
+	uint material_mask,
 	inout vec3 normal,
 	inout vec3 albedo,
 	inout vec3 f0,
@@ -45,7 +48,7 @@ bool get_rain_puddles(
 	const float puddle_darkening_factor        = 0.33;
 	const float puddle_darkening_factor_porous = 0.67;
 
-	if (wetness < 0.0 || biome_may_rain < 0.0) return false;
+	if (wetness < 0.0 || biome_may_rain < 0.0 || material_mask == MATERIAL_LEAVES) return false;
 
 	float puddle = get_puddle_noise(world_pos, flat_normal, light_levels);
 

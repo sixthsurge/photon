@@ -15,8 +15,8 @@
 
 out vec2 uv;
 
-#include "/include/misc/weather_struct.glsl"
-flat out DailyWeatherVariation daily_weather_variation;
+#include "/include/sky/clouds/parameters.glsl"
+flat out CloudsParameters clouds_params;
 
 #ifndef IS_IRIS
 flat out vec3 sun_dir_fixed;
@@ -62,8 +62,9 @@ uniform float biome_may_snow;
 uniform float biome_temperature;
 uniform float biome_humidity;
 
+uniform float desert_sandstorm;
+
 #define PROGRAM_PREPARE
-#define WEATHER_CLOUDS
 
 #include "/include/misc/weather.glsl"
 
@@ -82,7 +83,8 @@ vec3 calculate_sun_direction() {
 void main() {
 	uv = gl_MultiTexCoord0.xy;
 
-	daily_weather_variation = get_daily_weather_variation();
+	Weather weather = get_weather();
+	clouds_params = get_clouds_parameters(weather);
 
 #ifndef IS_IRIS
 	sun_dir_fixed = calculate_sun_direction();

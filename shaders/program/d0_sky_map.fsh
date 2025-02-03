@@ -25,11 +25,14 @@ flat in vec3 sun_color;
 flat in vec3 moon_color;
 flat in vec3 sky_color;
 
-#include "/include/misc/weather_struct.glsl"
-flat in DailyWeatherVariation daily_weather_variation;
+flat in float aurora_amount;
+flat in mat2x3 aurora_colors;
 
-#include "/include/fog/overworld/coeff_struct.glsl"
-flat in AirFogCoefficients air_fog_coeff;
+#include "/include/sky/clouds/parameters.glsl"
+flat in CloudsParameters clouds_params;
+
+#include "/include/fog/overworld/parameters.glsl"
+flat in OverworldFogParameters fog_params;
 #endif
 
 // ------------

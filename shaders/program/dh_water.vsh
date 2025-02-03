@@ -21,8 +21,8 @@ flat out vec3 light_color;
 flat out vec3 ambient_color;
 
 #if defined WORLD_OVERWORLD 
-#include "/include/fog/overworld/coeff_struct.glsl"
-flat out AirFogCoefficients air_fog_coeff;
+#include "/include/fog/overworld/parameters.glsl"
+flat out OverworldFogParameters fog_params;
 #endif
 
 // ------------
@@ -30,6 +30,7 @@ flat out AirFogCoefficients air_fog_coeff;
 // ------------
 
 uniform sampler2D colortex4; // Sky map, lighting colors
+uniform sampler2D colortex9; // Sky SH
 
 uniform mat4 gbufferModelView;
 uniform mat4 gbufferModelViewInverse;
@@ -75,6 +76,7 @@ uniform float biome_may_snow;
 uniform float biome_temperature;
 uniform float biome_humidity;
 
+uniform float world_age;
 uniform float time_sunrise;
 uniform float time_noon;
 uniform float time_sunset;
@@ -83,7 +85,7 @@ uniform float time_midnight;
 uniform float desert_sandstorm;
 
 #if defined WORLD_OVERWORLD 
-#include "/include/fog/overworld/coeff.glsl"
+#include "/include/misc/weather.glsl"
 #endif
 
 void main() {
@@ -94,8 +96,13 @@ void main() {
     );
 	tint          = gl_Color;
     normal        = mat3(gbufferModelViewInverse) * (mat3(gl_ModelViewMatrix) * gl_Normal);
+
 	light_color   = texelFetch(colortex4, ivec2(191, 0), 0).rgb;
+#if defined WORLD_OVERWORLD && defined SH_SKYLIGHT
+	ambient_color = texelFetch(colortex9, ivec2(9, 0), 0).rgb;
+#else
 	ambient_color = texelFetch(colortex4, ivec2(191, 1), 0).rgb;
+#endif
 
 	is_water = uint(dhMaterialId == DH_BLOCK_WATER);
 
@@ -117,9 +124,8 @@ void main() {
 #endif
 
 #if defined WORLD_OVERWORLD
-    air_fog_coeff = calculate_air_fog_coefficients();
+    fog_params = get_fog_parameters(get_weather());
 #endif
 
     gl_Position = clip_pos;
 }
-
