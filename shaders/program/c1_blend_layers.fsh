@@ -218,7 +218,7 @@ void main() {
 	#define back_depth_dh       back_depth
 	#define front_is_dh_terrain false
 	#define back_is_dh_terrain  false
-	#define is_dh_translucent
+	#define is_dh_translucent   false
 #endif
 
 	bool is_translucent = front_depth != back_depth;

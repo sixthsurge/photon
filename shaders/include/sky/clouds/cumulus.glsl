@@ -16,34 +16,53 @@ float clouds_cumulus_altitude_shaping(float density, float altitude_fraction) {
 	return density;
 }
 
-float clouds_cumulus_density(vec3 pos, vec2 detail_weights, vec2 edge_sharpening, float dynamic_thickness) {
+float clouds_cumulus_density(vec3 pos) {
 	const float wind_angle = CLOUDS_CUMULUS_WIND_ANGLE * degree;
 	const vec2 wind_velocity = CLOUDS_CUMULUS_WIND_SPEED * vec2(cos(wind_angle), sin(wind_angle));
 
 	float r = length(pos);
 	if (r < clouds_cumulus_radius || r > clouds_cumulus_top_radius) return 0.0;
 
-	float altitude_fraction = 0.8 * (r - clouds_cumulus_radius) * rcp(clouds_cumulus_thickness * dynamic_thickness);
+	float altitude_fraction = (r - clouds_cumulus_radius) * clouds_params.l0_altitude_scale;
 
 	pos.xz += cameraPosition.xz * CLOUDS_SCALE + wind_velocity * world_age;
 
 	// 2D noise for base shape and coverage
+	vec2 p1 = (0.000002 / CLOUDS_CUMULUS_SIZE) * pos.xz;
+	vec2 p2 = (0.000027 / CLOUDS_CUMULUS_SIZE) * pos.xz;
 	vec2 noise = vec2(
-		texture(noisetex, (0.000002 / CLOUDS_CUMULUS_SIZE) * pos.xz).x, // cloud coverage
-		texture(noisetex, (0.000027 / CLOUDS_CUMULUS_SIZE) * pos.xz).w  // cloud shape
+		texture(noisetex, p1).x, // cloud coverage
+		texture(noisetex, p2).w  // cloud shape
 	);
 
-	float density_cu = mix(clouds_params.l0_coverage.x, clouds_params.l0_coverage.y, noise.x);
-	density_cu = linear_step(1.0 - density_cu, 1.0, noise.y);
+	float density_cu = 0.0, density_st = 0.0;
 
-	float density_st = cubic_smooth(linear_step(0.9 - clouds_params.l0_coverage.x, 1.0, 2.0 * noise.x * clouds_params.l0_coverage.y));
-	density_st = 0.5 * density_st + 1.0 * density_st * linear_step(0.3, 0.6, noise.y);
-	density_st = density_st / (density_st + 1.0);
-	density_st *= dampen(clamp01(2.0 * altitude_fraction) * linear_step(0.0, 0.1, altitude_fraction) * linear_step(0.0, 0.6, 1.0 - altitude_fraction));
-	density_st = clamp01(density_st);
+	if (clouds_params.l0_cumulus_stratus_blend < 1.0 - eps) {
+		density_cu = mix(clouds_params.l0_coverage.x, clouds_params.l0_coverage.y, noise.x);
+		density_cu = linear_step(1.0 - density_cu, 1.0, noise.y);
+	}
 
-	float density = mix(density_cu, density_st, clouds_params.l0_cumulus_stratus_blend);
-	density = clouds_cumulus_altitude_shaping(density, altitude_fraction);
+	if (clouds_params.l0_cumulus_stratus_blend > eps) {
+		density_st = cubic_smooth(
+			linear_step(
+				0.9 - clouds_params.l0_coverage.x, 
+				1.0, 
+				2.0 * noise.x * clouds_params.l0_coverage.y
+			)
+		);
+		density_st = 0.5 * density_st + 1.0 * density_st * linear_step(0.3, 0.6, noise.y);
+		density_st = density_st / (density_st + 1.0);
+		density_st = clamp01(
+			density_st * dampen(clamp01(2.0 * altitude_fraction) 
+				* linear_step(0.0, 0.1, altitude_fraction) 
+				* linear_step(0.0, 0.6, 1.0 - altitude_fraction))
+		);
+	}
+
+	float density = clouds_cumulus_altitude_shaping(
+		mix(density_cu, density_st, clouds_params.l0_cumulus_stratus_blend),
+		altitude_fraction
+	);
 
 	if (density < eps) return 0.0;
 
@@ -63,12 +82,19 @@ float clouds_cumulus_density(vec3 pos, vec2 detail_weights, vec2 edge_sharpening
 	float detail_fade = 0.20 * smoothstep(0.85, 1.0, 1.0 - altitude_fraction)
 	                  - 0.35 * smoothstep(0.05, 0.5, altitude_fraction) + 0.6;
 
-	density -= detail_weights.x * sqr(worley_0) * dampen(clamp01(1.0 - density));
-	density -= detail_weights.y * sqr(worley_1) * dampen(clamp01(1.0 - density)) * detail_fade;
+	density -= clouds_params.l0_detail_weights.x * sqr(worley_0) * dampen(clamp01(1.0 - density));
+	density -= clouds_params.l0_detail_weights.y * sqr(worley_1) * dampen(clamp01(1.0 - density)) * detail_fade;
 
 	// Adjust density so that the clouds are wispy at the bottom and hard at the top
-	density  = max0(density);
-	density  = 1.0 - pow(1.0 - density, mix(edge_sharpening.x, edge_sharpening.y, altitude_fraction));
+	density = max0(density);
+	density = 1.0 - pow(
+		1.0 - density, 
+		mix(
+			clouds_params.l0_edge_sharpening.x, 
+			clouds_params.l0_edge_sharpening.y, 
+			altitude_fraction
+		)
+	);
 	density *= 0.1 + 0.9 * smoothstep(0.2, 0.7, altitude_fraction);
 
 	return density;
@@ -77,10 +103,6 @@ float clouds_cumulus_density(vec3 pos, vec2 detail_weights, vec2 edge_sharpening
 float clouds_cumulus_optical_depth(
 	vec3 ray_origin,
 	vec3 ray_dir,
-	vec2 detail_weights,
-	vec2 edge_sharpening,
-	float dynamic_thickness,
-
 	float dither,
 	const uint step_count
 ) {
@@ -95,7 +117,7 @@ float clouds_cumulus_optical_depth(
 
 	for (uint i = 0u; i < step_count; ++i, ray_pos += ray_step.xyz) {
 		ray_step *= step_growth;
-		optical_depth += clouds_cumulus_density(ray_pos + ray_step.xyz * dither, detail_weights, edge_sharpening, dynamic_thickness) * ray_step.w;
+		optical_depth += clouds_cumulus_density(ray_pos + ray_step.xyz * dither) * ray_step.w;
 	}
 
 	return optical_depth;
@@ -200,14 +222,6 @@ CloudsResult draw_cumulus_clouds(
 	float cos_theta          = dot(ray_dir, light_dir);
 	float bounced_light      = planet_albedo * light_dir.y * rcp_pi;
 
-	float dynamic_thickness  = mix(0.5, 1.0, smoothstep(0.4, 0.6, dot(clouds_params.l0_coverage, vec2(0.25, 0.75))));
-	vec2  detail_weights     = mix(
-		vec2(0.33, 0.40) * (1.0 + 0.5 * clouds_params.l0_wind_torn_factor), 
-		vec2(0.07, 0.10),
-		sqr(clouds_params.l0_cumulus_stratus_blend)
-	) * CLOUDS_CUMULUS_DETAIL_STRENGTH;
-	vec2  edge_sharpening    = mix(vec2(3.0, 8.0), vec2(1.0, 2.0), sqr(clouds_params.l0_cumulus_stratus_blend));
-
 	// --------------------
 	//   Raymarching Loop
 	// --------------------
@@ -219,7 +233,7 @@ CloudsResult draw_cumulus_clouds(
 
 		float altitude_fraction = (length(ray_pos) - clouds_cumulus_radius) * rcp(clouds_cumulus_thickness);
 
-		float density = clouds_cumulus_density(ray_pos, detail_weights, edge_sharpening, dynamic_thickness);
+		float density = clouds_cumulus_density(ray_pos); 
 
 		if (density < eps) continue;
 
@@ -238,9 +252,14 @@ CloudsResult draw_cumulus_clouds(
 		vec2 hash = hash2(fract(ray_pos)); // used to dither the light rays
 #endif
 
-		float light_optical_depth  = clouds_cumulus_optical_depth(ray_pos, light_dir, detail_weights, edge_sharpening, dynamic_thickness, hash.x, lighting_steps);
-		float sky_optical_depth    = clouds_cumulus_optical_depth(ray_pos, sky_dir, detail_weights, edge_sharpening, dynamic_thickness, hash.y, ambient_steps);
-		float ground_optical_depth = mix(density, 1.0, clamp01(altitude_fraction * 2.0 - 1.0)) * altitude_fraction * clouds_cumulus_thickness; // guess optical depth to the ground using altitude fraction and density from this sample
+		float light_optical_depth  = clouds_cumulus_optical_depth(ray_pos, light_dir, hash.x, lighting_steps);
+		float sky_optical_depth    = clouds_cumulus_optical_depth(ray_pos, sky_dir, hash.y, ambient_steps);
+		// guess optical depth to the ground using altitude fraction and density from this sample
+		float ground_optical_depth = mix(
+			density, 
+			1.0, 
+			clamp01(altitude_fraction * 2.0 - 1.0)
+		) * altitude_fraction * clouds_cumulus_thickness; 
 
 		scattering += clouds_cumulus_scattering(
 			density,

@@ -2,6 +2,7 @@
 #define INCLUDE_MISC_WEATHER
 
 #include "/include/fog/overworld/parameters.glsl"
+#include "/include/sky/clouds/constants.glsl"
 #include "/include/sky/clouds/parameters.glsl"
 #include "/include/utility/color.glsl"
 #include "/include/utility/fast_math.glsl"
@@ -66,6 +67,10 @@ Weather get_weather() {
 	return weather;
 }
 
+float clouds_cumulus_congestus_blend(Weather weather) {
+	return linear_step(0.4, 0.6, weather.temperature * weather.wind);
+}
+
 float clouds_l0_cumulus_stratus_blend(Weather weather) {
 	float temperature_weight = dampen(linear_step(0.5, 1.0, 1.0 - weather.temperature));
 	float wind_weight = dampen(1.0 - weather.wind);
@@ -73,7 +78,7 @@ float clouds_l0_cumulus_stratus_blend(Weather weather) {
 	return clamp01(temperature_weight * wind_weight);
 }
 
-vec2 clouds_l0_coverage(Weather weather) {
+vec2 clouds_l0_coverage(Weather weather, float cumulus_congestus_blend) {
 	// very high temperature -> lower coverage
 	// higher humidity -> higher coverage
 	float temperature_weight = 1.0 - 0.33 * linear_step(0.67, 1.0, weather.temperature);
@@ -81,11 +86,18 @@ vec2 clouds_l0_coverage(Weather weather) {
 	float stratus_sheet = sqr(clouds_l0_cumulus_stratus_blend(weather));
 	vec2 local_variation = vec2(0.0, 1.0) * (0.2 + 0.2 * weather.wind) * (1.0 + 0.2 * stratus_sheet);
 
-	return clamp01(temperature_weight * humidity_weight + local_variation + 0.3 * stratus_sheet);
+	return clamp01(temperature_weight * humidity_weight + local_variation + 0.3 * stratus_sheet) 
+		* clamp01(1.0 - 2.0 * cumulus_congestus_blend);
 }
 
-float clouds_l0_wind_torn_factor(Weather weather) {
-	return linear_step(0.66, 0.9, weather.wind);
+vec2 clouds_l0_detail_weights(Weather weather, float cumulus_stratus_blend) {
+	float wind_torn_factor = linear_step(0.66, 0.9, weather.wind) * (1.0 - cumulus_stratus_blend);
+
+	return mix(
+		vec2(0.33, 0.40) * (1.0 + 0.5 * wind_torn_factor), 
+		vec2(0.07, 0.10),
+		sqr(cumulus_stratus_blend)
+	) * CLOUDS_CUMULUS_DETAIL_STRENGTH;
 }
 
 float clouds_l1_cumulus_stratus_blend(Weather weather) {
@@ -96,7 +108,9 @@ float clouds_l1_cumulus_stratus_blend(Weather weather) {
 
 vec2 clouds_l1_coverage(Weather weather, float cumulus_stratus_blend) {
 	// Altocumulus: high temperature, high humidity, not too high temperature
-	vec2 coverage_ac = 1.0 * weather.humidity * linear_step(0.25, 0.75, weather.wind) * dampen(linear_step(0.5, 1.0, weather.temperature) * linear_step(0.0, 0.1, 1.0 - weather.temperature)) * vec2(0.5, 1.5);
+	vec2 coverage_ac = weather.humidity * linear_step(0.25, 0.75, weather.wind) 
+		* dampen(linear_step(0.5, 1.0, weather.temperature) 
+		* linear_step(0.0, 0.1, 1.0 - weather.temperature)) * vec2(0.5, 1.5);
 
 	// Altostratus: high wind, high humidity
 	vec2 coverage_as = vec2(linear_step(0.25, 0.45, weather.wind * weather.humidity));
@@ -106,8 +120,8 @@ vec2 clouds_l1_coverage(Weather weather, float cumulus_stratus_blend) {
 
 float clouds_cirrus_amount(Weather weather) {
 	float temperature_weight = 0.6 + 0.4 * sqr(linear_step(0.5, 0.9, weather.temperature))
-	                        + 0.4 * (1.0 - linear_step(0.0, 0.2, weather.temperature));
-	float humidity_weight    = 1.0 - 0.33 * linear_step(0.5, 0.75, weather.humidity);
+		+ 0.4 * (1.0 - linear_step(0.0, 0.2, weather.temperature));
+	float humidity_weight = 1.0 - 0.33 * linear_step(0.5, 0.75, weather.humidity);
 
 	return clamp01(0.5 * temperature_weight * humidity_weight + 0.5 * rainStrength);
 }
@@ -129,18 +143,25 @@ float clouds_noctilucent_amount() {
 CloudsParameters get_clouds_parameters(Weather weather) {
 	CloudsParameters params;
 
-	params.cumulus_congestus_blend = linear_step(0.4, 0.6, weather.temperature * weather.wind);
+	// Shaping parameters
 
-	// Layer 1 - altocumulus/altostratus/undulatus
+	params.cumulus_congestus_blend  = clouds_cumulus_congestus_blend(weather);
 
-	params.l1_cumulus_stratus_blend = clouds_l1_cumulus_stratus_blend(weather);
-	params.l1_coverage = clouds_l1_coverage(weather, params.l1_cumulus_stratus_blend);
-
-	// Layer 0 - cumulus/stratocumulus/stratus
-
-	params.l0_coverage = clouds_l0_coverage(weather) * clamp01(1.0 - 2.0 * params.cumulus_congestus_blend);
+	// Volumetric layer 0 - cumulus/stratocumulus/stratus
+	params.l0_coverage              = clouds_l0_coverage(weather, params.cumulus_congestus_blend);
 	params.l0_cumulus_stratus_blend = clouds_l0_cumulus_stratus_blend(weather);
-	params.l0_wind_torn_factor = clouds_l0_wind_torn_factor(weather) * (1.0 - params.l0_cumulus_stratus_blend);
+
+	// Volumetric layer 1 - altocumulus/altostratus/undulatus
+	params.l1_cumulus_stratus_blend = clouds_l1_cumulus_stratus_blend(weather);
+	params.l1_coverage              = clouds_l1_coverage(weather, params.l1_cumulus_stratus_blend);
+
+	// Planar clouds
+	params.cirrus_amount            = clouds_cirrus_amount(weather);
+	params.cirrocumulus_amount      = clouds_cirrocumulus_amount(weather);
+	params.noctilucent_amount       = clouds_noctilucent_amount();
+
+	// Lighting parameters
+
 	params.l0_shadow = linear_step(
 		0.7, 
 		1.0, 
@@ -150,15 +171,15 @@ CloudsParameters get_clouds_parameters(Weather weather) {
 	params.l0_extinction_coeff *= 1.0 - 0.4 * linear_step(0.8, 1.0, params.l0_coverage.y - params.l0_coverage.y * params.l0_cumulus_stratus_blend);
 	params.l0_scattering_coeff = params.l0_extinction_coeff * mix(1.00, 0.66, rainStrength);
 
-	// Planar clouds
-
-	params.cirrus_amount = clouds_cirrus_amount(weather);
-	params.cirrocumulus_amount = clouds_cirrocumulus_amount(weather);
-	params.noctilucent_amount = clouds_noctilucent_amount();
-
 	// Crepuscular rays
 
 	params.crepuscular_rays_amount = cube(linear_step(0.4, 0.75, dot(params.l0_coverage, vec2(0.25, 0.75))));
+
+	float dynamic_thickness = mix(0.5, 1.0, smoothstep(0.4, 0.6, dot(params.l0_coverage, vec2(0.25, 0.75))));
+	params.l0_altitude_scale = 0.8 * rcp(dynamic_thickness * clouds_cumulus_thickness);
+
+	params.l0_detail_weights = clouds_l0_detail_weights(weather, params.l0_cumulus_stratus_blend);
+	params.l0_edge_sharpening = mix(vec2(3.0, 8.0), vec2(1.0, 2.0), sqr(params.l0_cumulus_stratus_blend));
 
 	return params;
 }

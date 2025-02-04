@@ -2,21 +2,29 @@
 #define INCLUDE_SKY_CLOUDS_PARAMETERS
 
 struct CloudsParameters {
+	// Cumulus congestus
 	float cumulus_congestus_blend; // replaces layer 0
-	vec2  l0_coverage; // x = min, y = max
+	// Volumetric layer 0
+	vec2  l0_coverage; 
+	vec2  l0_detail_weights;
+	vec2  l0_edge_sharpening;
+	float l0_altitude_scale;
 	float l0_cumulus_stratus_blend;
-	float l0_extinction_coeff;
-	float l0_scattering_coeff;
+	float l0_extinction_coeff; // also applies for Cu Con
+	float l0_scattering_coeff; // also applies for Cu Con
 	float l0_shadow;
-	float l0_wind_torn_factor;
-	vec2  l1_coverage; // x = min, y = max
+	// Volumetric layer 1
+	vec2  l1_coverage;
+	vec2  l1_detail_weights;
 	float l1_cumulus_stratus_blend;
 	float l1_extinction_coeff;
 	float l1_scattering_coeff;
 	float l1_shadow;
+	// Planar clouds
 	float cirrus_amount;
 	float cirrocumulus_amount;
 	float noctilucent_amount;
+	// Other
 	float crepuscular_rays_amount;
 };
 
