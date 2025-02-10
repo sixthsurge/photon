@@ -387,9 +387,6 @@ void main() {
 
 		// Upscale ambient occlusion
 
-		float ao, ambient_sss;
-		vec3 bent_normal;
-
 		float lin_z = screen_to_view_space_depth(combined_projection_matrix_inverse, depth);
 
 		#define depth_weight(reversed_depth) exp2(-10.0 * abs(screen_to_view_space_depth(combined_projection_matrix_inverse, 1.0 - reversed_depth) - lin_z))
@@ -399,35 +396,28 @@ void main() {
 		float w11 = depth_weight(ambient_depth_11) * (f.x * f.y);
 		#undef depth_weight
 
+		vec4 ambient_upscaled;
 		float weight_sum = w00 + w10 + w01 + w11;
 
 		if (weight_sum != 0.0) {
-			float rcp_weight_sum = rcp(weight_sum);
+			ambient_upscaled 
+				= ambient_00 * w00 
+				+ ambient_10 * w10 
+				+ ambient_01 * w01 
+				+ ambient_11 * w11;
 
-			ao = ambient_00.x * w00
-				+ ambient_10.x * w10 
-				+ ambient_01.x * w01 
-				+ ambient_11.x * w11;
-			ao *= rcp_weight_sum;
-
-			ambient_sss = ambient_00.y * w00
-				+ ambient_10.y * w10 
-				+ ambient_01.y * w01 
-				+ ambient_11.y * w11;
-			ambient_sss *= rcp_weight_sum;
-
-			bent_normal = decode_unit_vector(ambient_00.zw) * w00
-				+ decode_unit_vector(ambient_10.zw) * w10 
-				+ decode_unit_vector(ambient_01.zw) * w01 
-				+ decode_unit_vector(ambient_11.zw) * w11;
-			// re-normalize
-			float len_sq = length_squared(bent_normal);
-			bent_normal = (len_sq == 0.0) ? flat_normal : bent_normal * inversesqrt(len_sq);
+			ambient_upscaled *= rcp(weight_sum);
 		} else {
-			ao = ambient_00.x;
-			ambient_sss = ambient_00.y;
-			bent_normal = decode_unit_vector(ambient_00.zw);
+			ambient_upscaled = ambient_00;
 		}
+
+		float ao = ambient_upscaled.x;
+		float ambient_sss = ambient_upscaled.y;
+
+		vec3 bent_normal;
+		bent_normal.xy = ambient_upscaled.zw * 2.0 - 1.0;
+		bent_normal.z = sqrt(clamp01(1.0 - dot(bent_normal.xy, bent_normal.xy)));
+		bent_normal = mat3(gbufferModelViewInverse) * bent_normal;
 
 		// Shadows
 

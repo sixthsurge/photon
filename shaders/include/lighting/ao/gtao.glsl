@@ -115,7 +115,6 @@ vec2 compute_gtao(
 	ao /= albedo * ao + (1.0 - albedo);
 
 	bent_normal = normalize(normalize(bent_normal) - 0.5 * viewer_dir);
-	bent_normal = mat3(gbufferModelViewInverse) * bent_normal;
 
 	return clamp01(vec2(ao, ambient_sss));
 }

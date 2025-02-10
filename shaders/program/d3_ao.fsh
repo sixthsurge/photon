@@ -80,32 +80,6 @@ uniform bool world_age_changed;
 
 const float ao_render_scale = 0.5;
 
-vec3 resample_bent_normal(vec2 uv) {
-	vec4 xs = textureGather(colortex6, uv, 2);
-	vec4 ys = textureGather(colortex6, uv, 3);
-
-	xs = max0(xs);
-	ys = max0(ys);
-
-	mat4x3 bent_normals = mat4x3(
-		decode_unit_vector(vec2(xs.x, ys.x)),
-		decode_unit_vector(vec2(xs.y, ys.y)),
-		decode_unit_vector(vec2(xs.z, ys.z)),
-		decode_unit_vector(vec2(xs.w, ys.w))
-	);
-
-	vec2 f = cubic_smooth(fract(uv * (view_res * 0.5) + 0.5));
-	vec2 one_minus_f = 1.0 - f;
-	vec4 weights = vec4(
-		one_minus_f.x * f.y,
-		f.x * f.y,
-		f.x * one_minus_f.y,
-		one_minus_f.x * one_minus_f.y
-	);
-
-	return normalize_safe(bent_normals * weights);
-}
-
 void main() {
 	ivec2 texel      = ivec2(gl_FragCoord.xy);
 	ivec2 view_texel = ivec2(gl_FragCoord.xy * (taau_render_scale / ao_render_scale));
@@ -119,7 +93,6 @@ void main() {
 #else
 	vec4 gbuffer_data = texelFetch(colortex2, view_texel, 0);
 #endif
-
 	vec2 dither = vec2(texelFetch(noisetex, texel & 511, 0).b, texelFetch(noisetex, (texel + 249) & 511, 0).b);
 
     // Distant Horizons support
@@ -131,8 +104,6 @@ void main() {
 #else
     const bool is_dh_terrain = false;
 #endif
-
-	depth += 0.38 * float(depth < hand_depth); // Hand lighting fix from Capt Tatsu
 
 	vec3 screen_pos = vec3(uv, depth);
 	vec3 view_pos = screen_to_view_space(combined_projection_matrix_inverse, screen_pos, true);
@@ -170,11 +141,11 @@ void main() {
 
 #if   SHADER_AO == SHADER_AO_NONE
 	ao = vec2(1.0, 0.0);
-	bent_normal = world_normal;
+	bent_normal = view_normal;
 #elif SHADER_AO == SHADER_AO_SSAO
 	ao.x = compute_ssao(screen_pos, view_pos, view_normal, dither);
 	ao.y = 0.0;
-	bent_normal = world_normal;
+	bent_normal = view_normal;
 #elif SHADER_AO == SHADER_AO_GTAO
 	ao = compute_gtao(screen_pos, view_pos, view_normal, dither, is_dh_terrain, bent_normal);
 #endif
@@ -185,14 +156,17 @@ void main() {
 	const float depth_rejection_strength     = 16.0;
 	const float offcenter_rejection_strength = 0.25;
 
-	vec2 history_ao = max0(catmull_rom_filter_fast_rgb(colortex6, previous_screen_pos.xy, 0.65).xy);
+	vec4 history = max0(catmull_rom_filter_fast(colortex6, previous_screen_pos.xy, 0.65));
 	vec2 history_data = max0(texture(colortex14, previous_screen_pos.xy).xy);
-	vec3 history_bent_normal = resample_bent_normal(previous_screen_pos.xy);
 
 	if (clamp01(previous_screen_pos.xy) == previous_screen_pos.xy) {
 		// Unpack history data
 		float history_depth = 1.0 - history_data.x;
 		float pixel_age = min(history_data.y, max_accumulated_frames);
+
+		vec3 history_bent_normal;
+		history_bent_normal.xy = history.zw * 2.0 - 1.0;
+		history_bent_normal.z  = sqrt(clamp01(1.0 - dot(history_bent_normal.xy, history_bent_normal.xy)));
 
 		// Depth rejection
 		float view_norm = rcp_length(view_pos);
@@ -210,20 +184,15 @@ void main() {
 
 		// Blend with history 
 		float history_weight = pixel_age / (pixel_age + 1.0);
-		ao = mix(ao, history_ao, history_weight);
-		bent_normal = mix(bent_normal, history_bent_normal, history_weight);
-		// re-normalize
-		float len_sq = length_squared(bent_normal);
-		bent_normal = (len_sq == 0.0) ? world_normal : bent_normal * inversesqrt(len_sq);
 
+		ao = mix(ao, history.xy, history_weight);
+		bent_normal = slerp(bent_normal, history_bent_normal, history_weight);
+
+		ambient = vec4(ao, bent_normal.xy * 0.5 + 0.5);
 		ambient_history_data = vec2(1.0 - depth, pixel_age + 1.0);
 	} else {
+		ambient = vec4(ao, bent_normal.xy * 0.5 + 0.5);
 		ambient_history_data = vec2(0.0);
 	}
-
-	ambient = vec4(
-		ao,
-		encode_unit_vector(bent_normal)
-	);
 }
 

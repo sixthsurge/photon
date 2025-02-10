@@ -10,13 +10,13 @@ const float clouds_cumulus_congestus_thickness        = CLOUDS_CUMULUS_CONGESTUS
 const float clouds_cumulus_congestus_top_radius       = clouds_cumulus_congestus_radius + clouds_cumulus_congestus_thickness;
 const float clouds_cumulus_congestus_distance         = 30000.0;
 const float clouds_cumulus_congestus_end_distance     = 50000.0;
-float clouds_cumulus_congestus_extinction_coeff       = 0.16 * (1.0 - 0.5 * rainStrength);
+float clouds_cumulus_congestus_extinction_coeff       = 0.08;
 float clouds_cumulus_congestus_scattering_coeff       = clouds_cumulus_congestus_extinction_coeff * (1.0 - 0.2 * rainStrength);
 
 // altitude_fraction := 0 at the bottom of the cloud layer and 1 at the top
 float clouds_cumulus_congestus_altitude_shaping(float density, float altitude_fraction) {
 	// Carve egg shape
-	density -= sqr(linear_step(0.3, 1.0, altitude_fraction)) * 0.6 * (1.0 + 2.0 * clouds_params.cumulus_congestus_blend);
+	density -= sqr(linear_step(0.3, 1.0, altitude_fraction)) * clamp01(1.0 - 0.4 * clouds_params.cumulus_congestus_blend);
 
 	// Reduce density at the top and bottom of the cloud
 	density *= smoothstep(0.0, 0.1, altitude_fraction);
@@ -43,32 +43,33 @@ float clouds_cumulus_congestus_density(vec3 pos) {
 	float density  = 1.5 * sqr(linear_step(0.75 - 0.15 * clamp01(2.0 * clouds_params.cumulus_congestus_blend - 1.0), 1.0, sqrt(noise)));
 	      density  = clouds_cumulus_congestus_altitude_shaping(density, altitude_fraction);
 		  density *= 4.0 * distance_fraction * (1.0 - distance_fraction);
+		  density *= linear_step(0.5, 0.6, clouds_params.cumulus_congestus_blend);
 
 	if (density < eps) return 0.0;
 
 #ifndef PROGRAM_PREPARE
 	// Curl noise used to warp the 3D noise into swirling shapes
-	vec3 curl = (0.181 * CLOUDS_CUMULUS_CONGESTUS_CURL_STRENGTH) * texture(colortex7, 0.00002 * pos).xyz * smoothstep(0.4, 1.0, 1.0 - altitude_fraction);
 	vec3 wind = vec3(wind_velocity * world_age, 0.0).xzy;
 
 	// 3D worley noise for detail
-	float worley_0 = texture(colortex6, (pos + 0.2 * wind) * 0.00006 + curl * 1.0).x;
-	float worley_1 = texture(colortex6, (pos + 0.4 * wind) * 0.00038 + curl * 3.0).x;
+	float worley_0 = texture(colortex6, (pos + 0.2 * wind) * 0.00005).x;
+	float worley_1 = texture(colortex6, (pos + 0.4 * wind) * 0.00023).x;
 #else
 	const float worley_0 = 0.5;
+
 	const float worley_1 = 0.5;
 #endif
 
 	float detail_fade = 0.20 * smoothstep(0.85, 1.0, 1.0 - altitude_fraction)
 	                  - 0.35 * smoothstep(0.05, 0.5, altitude_fraction) + 0.8;
 
-	density -= (4.0 * CLOUDS_CUMULUS_CONGESTUS_DETAIL_STRENGTH) * clamp01(1.0 - density) * cube(worley_0) * sqr(altitude_fraction);
-	density -= (0.11 * CLOUDS_CUMULUS_CONGESTUS_DETAIL_STRENGTH) * sqr(worley_1) * dampen(clamp01(1.0 - density)) * dampen(clamp01(detail_fade));
+	density -= (7.0 * CLOUDS_CUMULUS_CONGESTUS_DETAIL_STRENGTH) * sqr(clamp01(1.0 - density)) * cube(worley_0) * sqr(altitude_fraction);
+	density -= (0.2 * CLOUDS_CUMULUS_CONGESTUS_DETAIL_STRENGTH) * sqr(worley_1) * dampen(clamp01(1.0 - density)) * dampen(dampen(clamp01(detail_fade + 0.5 * sqr(altitude_fraction))));
 
 	// Adjust density so that the clouds are wispy at the bottom and hard at the top
 	density  = max0(density);
 	density  = 1.0 - pow(max0(1.0 - density), mix(2.0, 5.0, altitude_fraction));
-	density *= sqr(linear_step(0.0, 0.3, altitude_fraction));
+	density *= sqr(linear_step(0.0, 0.5, altitude_fraction));
 
 	return density;
 }

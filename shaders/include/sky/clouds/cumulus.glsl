@@ -8,7 +8,8 @@
 // altitude_fraction := 0 at the bottom of the cloud layer and 1 at the top
 float clouds_cumulus_altitude_shaping(float density, float altitude_fraction) {
 	// Carve egg shape
-	density -= smoothstep(0.2, 1.0, altitude_fraction) * 0.6;
+	density -= smoothstep(0.2, 1.0, altitude_fraction) 
+		* (0.6 - 0.3 * clouds_params.l0_cumulus_stratus_blend);
 
 	// Reduce density at the bottom of the cloud
 	density *= smoothstep(0.0, 0.2, altitude_fraction);
