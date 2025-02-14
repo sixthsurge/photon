@@ -359,16 +359,19 @@ void main() {
 		);
 
 	#ifdef WATER_WAVES
-		if (normal.y > eps) {
+		if (abs(normal.y) > eps) {
 			vec3 flat_normal = tbn[2];
 
 		#ifdef DISTANT_HORIZONS
 			// Use hardcoded TBN matrix pointing upwards that is the same for DH water and regular water
-			const mat3 tbn = mat3(
+			mat3 tbn = mat3(
 				vec3(1.0, 0.0, 0.0),
 				vec3(0.0, 0.0, 1.0),
 				vec3(0.0, 1.0, 0.0)
 			);
+			if (normal.y < 0.0) {
+				tbn = -tbn;
+			}
 		#endif
 
 			vec3 world_pos = position_scene + cameraPosition;
