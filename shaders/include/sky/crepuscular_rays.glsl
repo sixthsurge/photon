@@ -74,7 +74,7 @@ vec4 draw_crepuscular_rays(
 		+ 0.5 * henyey_greenstein_phase(LoV, -0.2); // backwards lobe
 
 	scattering *= scattering_coeff * step_transmitted_fraction * light_color * step_length;
-	scattering *= 2.0 * phase * clouds_params.crepuscular_rays_amount;
+	scattering *= 4.0 * phase * clouds_params.crepuscular_rays_amount;
 	transmittance = mix(vec3(1.0), transmittance, clouds_params.crepuscular_rays_amount);
 
 	return vec4(scattering, dampen(dampen(dot(transmittance, vec3(rcp(3.0))))));

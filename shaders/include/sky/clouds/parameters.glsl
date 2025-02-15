@@ -15,10 +15,7 @@ struct CloudsParameters {
 	float l0_shadow;
 	// Volumetric layer 1
 	vec2  l1_coverage;
-	vec2  l1_detail_weights;
 	float l1_cumulus_stratus_blend;
-	float l1_extinction_coeff;
-	float l1_scattering_coeff;
 	float l1_shadow;
 	// Planar clouds
 	float cirrus_amount;

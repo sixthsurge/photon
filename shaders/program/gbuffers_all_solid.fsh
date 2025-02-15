@@ -291,7 +291,7 @@ void main() {
 
 #if defined PROGRAM_GBUFFERS_BEACONBEAM
 	// Discard the translucent edge part of the beam
-	if (base_color.a < 0.99) discard;
+	if (base_color.a < 0.5) discard;
 #endif
 
 	vec2 adjusted_light_levels = light_levels;
