@@ -231,7 +231,7 @@ void main() {
 	#define previous_uv_clamped previous_uv
 #endif
 
-	vec4 history = catmull_rom_filter_fast(colortex11, previous_uv_clamped * taau_render_scale, 0.65);
+	vec4 history = max0(catmull_rom_filter_fast(colortex11, previous_uv_clamped * taau_render_scale, 0.65));
 	vec2 history_data = texture(colortex12, previous_uv_clamped * taau_render_scale).xy;
 
 	// Depth at the previous position
