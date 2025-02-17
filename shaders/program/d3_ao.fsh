@@ -68,6 +68,7 @@ uniform bool world_age_changed;
 #include "/include/utility/encoding.glsl"
 #include "/include/utility/fast_math.glsl"
 #include "/include/utility/random.glsl"
+#include "/include/utility/slerp.glsl"
 #include "/include/utility/space_conversion.glsl"
 
 #if SHADER_AO == SHADER_AO_SSAO

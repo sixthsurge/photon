@@ -39,8 +39,10 @@ flat in OverworldFogParameters fog_params;
 //   Uniforms
 // ------------
 
-uniform sampler3D colortex6; // 3D worley noise
-uniform sampler3D colortex7; // 3D curl noise
+uniform sampler3D colortex6; // 3D bubbly worley noise
+#define SAMPLER_WORLEY_BUBBLY colortex6
+uniform sampler3D colortex7; // 3D swirley worley noise
+#define SAMPLER_WORLEY_SWIRLEY colortex7
 
 #if defined WORLD_OVERWORLD && defined GALAXY
 uniform sampler2D colortex13;
