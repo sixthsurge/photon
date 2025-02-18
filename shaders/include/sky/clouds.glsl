@@ -74,7 +74,7 @@ CloudsResult draw_clouds(
 	
 #ifdef CLOUDS_NOCTILUCENT
 	vec4 result_nlc = draw_noctilucent_clouds(air_viewer_pos, ray_dir, clear_sky);
-	result.scattering += result_nlc.xyz * result.transmittance;
+	result.scattering.rgb += result_nlc.xyz * result.transmittance;
 	result.transmittance *= result_nlc.w;
 #endif
 

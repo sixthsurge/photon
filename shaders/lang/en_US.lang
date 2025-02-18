@@ -240,6 +240,7 @@ option.GALAXY.comment                  = Galaxy image in the night sky
 option.GALAXY_INTENSITY                = Galaxy Intensity
 option.GALAXY_INTENSITY.comment        = Controls the brightness of the galaxy in the night sky
 option.CREPUSCULAR_RAYS                = Crepuscular Rays
+option.LIGHTNING_FLASH                 = Lightning Flash
 
 # Clouds
 option.CLOUDS_CUMULUS                       = Cumulus Clouds

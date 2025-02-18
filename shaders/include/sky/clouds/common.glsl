@@ -15,13 +15,13 @@ uniform float day_factor;
 // ----
 
 struct CloudsResult {
-	vec3 scattering;
+	vec4 scattering; // w = ambient scattering, for lightning flashes
 	float transmittance;
 	float apparent_distance;
 };
 
 const CloudsResult clouds_not_hit = CloudsResult(
-	vec3(0.0),
+	vec4(0.0),
 	1.0,
 	1e5
 );
@@ -114,8 +114,8 @@ vec3 clouds_aerial_perspective(
 CloudsResult blend_layers(CloudsResult old, CloudsResult new) {
 	bool new_in_front = new.apparent_distance < old.apparent_distance;
 
-	vec3 scattering_behind       = new_in_front ? old.scattering : new.scattering;
-	vec3 scattering_in_front     = new_in_front ? new.scattering : old.scattering;
+	vec4 scattering_behind       = new_in_front ? old.scattering : new.scattering;
+	vec4 scattering_in_front     = new_in_front ? new.scattering : old.scattering;
 	float transmittance_in_front = new_in_front ? new.transmittance : old.transmittance;
 
 	return CloudsResult(

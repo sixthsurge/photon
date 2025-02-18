@@ -284,7 +284,7 @@ CloudsResult draw_altocumulus_clouds(
 		: (distance_sum / distance_weight_sum) + distance(air_viewer_pos, ray_origin);
 
 	return CloudsResult(
-		clouds_scattering,
+		vec4(clouds_scattering, scattering.y),
 		clouds_transmittance,
 		apparent_distance
 	);

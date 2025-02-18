@@ -209,7 +209,7 @@ CloudsResult draw_cirrus_clouds(
 	     clouds_scattering = clouds_aerial_perspective(clouds_scattering, view_transmittance, air_viewer_pos, sphere_pos, ray_dir, clear_sky);
 
 	return CloudsResult(
-		clouds_scattering,
+		vec4(clouds_scattering, scattering.y),
 		view_transmittance,
 		distance_to_sphere
 	);

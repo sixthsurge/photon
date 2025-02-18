@@ -64,6 +64,7 @@ vec3 draw_stars(vec3 ray_dir, float galaxy_luminance) {
 #include "/include/lighting/colors/light_color.glsl"
 #include "/include/lighting/colors/weather_color.glsl"
 #include "/include/lighting/bsdf.glsl"
+#include "/include/misc/lightning_flash.glsl"
 #include "/include/sky/atmosphere.glsl"
 #include "/include/sky/projection.glsl"
 #include "/include/utility/geometry.glsl"
@@ -123,6 +124,9 @@ vec4 get_clouds_and_aurora(vec3 ray_dir, vec3 clear_sky) {
 	#ifndef BLOCKY_CLOUDS
 	const vec3 air_viewer_pos = vec3(0.0, planet_radius, 0.0);
 	CloudsResult result = draw_clouds(air_viewer_pos, ray_dir, clear_sky, -1.0, dither);
+
+	// Lightning flash
+	result.scattering.rgb += LIGHTNING_FLASH_UNIFORM * lightning_flash_intensity * result.scattering.a;
 	#else
 	CloudsResult result = clouds_not_hit;
 	#endif
@@ -131,7 +135,7 @@ vec4 get_clouds_and_aurora(vec3 ray_dir, vec3 clear_sky) {
 	vec3 aurora = draw_aurora(ray_dir, dither);
 
 	return vec4(
-		result.scattering + aurora * result.transmittance,
+		result.scattering.xyz + aurora * result.transmittance,
 		result.transmittance
 	);
 #else

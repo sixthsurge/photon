@@ -13,7 +13,7 @@
 #include "/include/global.glsl"
 
 layout (location = 0) out vec4 clouds_history;
-layout (location = 1) out vec2 clouds_data;
+layout (location = 1) out vec3 clouds_data;
 
 /* RENDERTARGETS: 11,12 */
 
@@ -161,9 +161,9 @@ void main() {
 	ivec2 dst_texel = ivec2(gl_FragCoord.xy);
 	ivec2 src_texel = clamp(dst_texel / CLOUDS_TEMPORAL_UPSCALING, ivec2(0), ivec2(view_res * taau_render_scale) / CLOUDS_TEMPORAL_UPSCALING - 1);
 
-	vec4 current            = texelFetch(colortex9, src_texel, 0);
-	float apparent_distance = texelFetch(colortex10, src_texel, 0).x;
-	float depth             = texelFetch(depthtex1, dst_texel, 0).x;
+	vec4 current      = texelFetch(colortex9, src_texel, 0);
+	vec2 current_data = texelFetch(colortex10, src_texel, 0).xy;
+	float depth       = texelFetch(depthtex1, dst_texel, 0).x;
 	
 	// --------------------------------
 	//   combined depth buffer for DH
@@ -203,6 +203,9 @@ void main() {
 	#define uv_clamped uv
 #endif
 
+	float apparent_distance = current_data.x;
+	float ambient_scattering = current_data.y;
+
 	// Find the closest cloud distance between the current frame and a 4x4 area of the previous frame
 	float closest_distance = min(
 		apparent_distance,
@@ -218,6 +221,7 @@ void main() {
 			clouds_history = current;
 			clouds_data.x = 1e6; // apparent distance
 			clouds_data.y = 0.0; // pixel age
+			clouds_data.z = 0.0; // ambient scattering
 			return;
 		}
 	}
@@ -232,7 +236,7 @@ void main() {
 #endif
 
 	vec4 history = max0(catmull_rom_filter_fast(colortex11, previous_uv_clamped * taau_render_scale, 0.65));
-	vec2 history_data = texture(colortex12, previous_uv_clamped * taau_render_scale).xy;
+	vec3 history_data = texture(colortex12, previous_uv_clamped * taau_render_scale).xyz;
 
 	// Depth at the previous position
 	float history_depth = 1.0 - min_of(textureGather(colortex14, previous_uv_clamped, 0));
@@ -253,7 +257,10 @@ void main() {
 	     disocclusion = disocclusion || world_age_changed;
 
 	// Replace history if a disocclusion was detected
-	if (disocclusion) history = current;
+	if (disocclusion) {
+		history = current; 
+		history.z = ambient_scattering;
+	}
 
 	// Perform neighbourhood clamping when moving quickly relative to the clouds
 	float velocity = rcp(sqr(frameTime)) * length_squared(cameraPosition - previousCameraPosition);
@@ -303,6 +310,7 @@ void main() {
 	if (offset_0 != offset_1 && !disocclusion) {
 		current = history;
 		apparent_distance = min(apparent_distance, apparent_distance_history);
+		ambient_scattering = history_data.z;
 	}
 
 	float pixel_age = max0(history_data.y) * float(!disocclusion);
@@ -320,5 +328,6 @@ void main() {
 	clouds_history = max0(mix(current, history, history_weight));
 	clouds_data.x = mix(apparent_distance, apparent_distance_history, history_weight);
 	clouds_data.y = min(++pixel_age, CLOUDS_ACCUMULATION_LIMIT);
+	clouds_data.z = mix(ambient_scattering, history_data.z, history_weight);
 }
 

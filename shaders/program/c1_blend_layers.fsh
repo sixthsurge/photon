@@ -124,6 +124,7 @@ const bool colortex11MipmapEnabled = true;
 
 #include "/include/fog/simple_fog.glsl"
 #include "/include/misc/distant_horizons.glsl"
+#include "/include/misc/lightning_flash.glsl"
 #include "/include/misc/material_masks.glsl"
 #include "/include/utility/color.glsl"
 #include "/include/utility/encoding.glsl"
@@ -185,8 +186,14 @@ vec4 read_clouds_and_aurora(vec2 uv, out float apparent_distance) {
 	float ld = 2.0 * dampen(max0(1.0 - 0.1 * pixel_age));
 
 	apparent_distance = min_of(textureGather(colortex12, uv * taau_render_scale, 0));
+	vec4 result = textureLod(colortex11, uv * taau_render_scale, ld);
 
-	return textureLod(colortex11, uv * taau_render_scale, ld);
+	if (LIGHTNING_FLASH_UNIFORM > 0.01) {
+		float ambient_scattering = texture(colortex12, uv * taau_render_scale).z;
+		result.xyz += LIGHTNING_FLASH_UNIFORM * lightning_flash_intensity * ambient_scattering;
+	}
+
+	return result;
 #else
 	return vec4(0.0, 0.0, 0.0, 1.0);
 #endif
