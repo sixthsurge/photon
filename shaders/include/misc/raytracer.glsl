@@ -4,9 +4,17 @@
 #include "/include/utility/geometry.glsl"
 #include "/include/utility/space_conversion.glsl"
 
+#if defined SSRT_DH 
+	#define SSRT_DEPTH_SAMPLER             dhDepthTex1
+	#define SSRT_PROJECTION_MATRIX         dhProjection
+	#define SSRT_PROJECTION_MATRIX_INVERSE dhProjectionInverse
+#else 
+	#define SSRT_DEPTH_SAMPLER             combined_depth_buffer
+	#define SSRT_PROJECTION_MATRIX         combined_projection_matrix
+	#define SSRT_PROJECTION_MATRIX_INVERSE combined_projection_matrix_inverse
+#endif
+
 bool raymarch_depth_buffer(
-	sampler2D depth_sampler,
-	mat4 projection_matrix,
 	vec3 screen_pos,
 	vec3 view_pos,
 	vec3 view_dir,
@@ -17,7 +25,9 @@ bool raymarch_depth_buffer(
 ) {
 	if (view_dir.z > 0.0 && view_dir.z >= -view_pos.z) return false;
 
-	vec3 screen_dir = normalize(view_to_screen_space(projection_matrix, view_pos + view_dir, true) - screen_pos);
+	vec3 screen_dir = normalize(
+		view_to_screen_space(SSRT_PROJECTION_MATRIX, view_pos + view_dir, true) - screen_pos
+	);
 
 	float ray_length = min_of(abs(sign(screen_dir) - screen_pos) / max(abs(screen_dir), eps));
 
@@ -38,7 +48,7 @@ bool raymarch_depth_buffer(
 #endif
 		if (clamp01(ray_pos) != ray_pos) return false;
 
-		float depth = texelFetch(depth_sampler, ivec2(ray_pos.xy * view_res * taau_render_scale), 0).x;
+		float depth = texelFetch(SSRT_DEPTH_SAMPLER, ivec2(ray_pos.xy * view_res * taau_render_scale), 0).x;
 
 		if (depth < ray_pos.z && abs(depth_tolerance - (ray_pos.z - depth)) < depth_tolerance) {
 			hit = true;
@@ -56,7 +66,7 @@ bool raymarch_depth_buffer(
 	for (int i = 0; i < refinement_step_count; ++i) {
 		ray_step *= 0.5;
 
-		float depth = texelFetch(depth_sampler, ivec2(hit_pos.xy * view_res * taau_render_scale), 0).x;
+		float depth = texelFetch(SSRT_DEPTH_SAMPLER, ivec2(hit_pos.xy * view_res * taau_render_scale), 0).x;
 
 		if (depth < hit_pos.z && abs(depth_tolerance - (hit_pos.z - depth)) < depth_tolerance)
 			hit_pos -= ray_step;

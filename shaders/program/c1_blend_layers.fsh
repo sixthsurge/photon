@@ -119,6 +119,7 @@ const bool colortex11MipmapEnabled = true;
 //   Includes
 // ------------
 
+#define SSRT_DH
 #define TEMPORAL_REPROJECTION
 
 #include "/include/fog/simple_fog.glsl"

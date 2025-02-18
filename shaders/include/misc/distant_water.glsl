@@ -56,6 +56,8 @@ vec4 draw_distant_water(
 	vec3 water_surface_pos = position_world - vec3(0.0, rcp(8.0), 0.0);
 
 	vec3 normal = flat_normal;
+
+#ifdef WATER_WAVES
 	if (flat_normal.y > eps) {
 		vec2 coord = -(water_surface_pos * tbn).xy;
 		normal = tbn * get_water_normal(
@@ -67,6 +69,7 @@ vec4 draw_distant_water(
 			false
 		);
 	}
+#endif
 	
 	// Specular highlight
 

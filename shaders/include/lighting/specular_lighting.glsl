@@ -188,12 +188,6 @@ vec3 trace_specular_ray(
 #ifdef ENVIRONMENT_REFLECTIONS
 	vec3 hit_pos;
 	bool hit = raymarch_depth_buffer(
-	#ifdef DISTANT_HORIZONS
-		combined_depth_buffer,
-	#else
-		depthtex1,
-	#endif
-		combined_projection_matrix,
 		screen_pos,
 		view_pos,
 		view_dir,
@@ -218,15 +212,15 @@ vec3 trace_specular_ray(
 		float border_attenuation = (hit_pos.x * hit_pos.y - hit_pos.x) * (hit_pos.x * hit_pos.y - hit_pos.y);
 		      border_attenuation = dampen(linear_step(0.0, border_attenuation_factor, border_attenuation));
 
-		vec3 hit_pos_view = screen_to_view_space(gbufferProjectionInverse, hit_pos, false);
+		vec3 hit_pos_view = screen_to_view_space(SSRT_PROJECTION_MATRIX_INVERSE, hit_pos, false);
 		vec3 hit_pos_scene = view_to_scene_space(hit_pos_view);
 
-		vec3 hit_pos_prev = reproject_scene_space(hit_pos_scene, false, false);
-		if (clamp01(hit_pos_prev) != hit_pos_prev) return sky_reflection;
+		vec2 hit_uv_prev = reproject_scene_space(hit_pos_scene, false, false).xy;
+		if (clamp01(hit_uv_prev) != hit_uv_prev) return sky_reflection;
 
-		vec3 reflection = textureLod(colortex5, hit_pos_prev.xy, mip_level).rgb;
+		vec3 reflection = textureLod(colortex5, hit_uv_prev, mip_level).rgb;
 
-		vec3 fog_scattering_previous = texture(colortex7, hit_pos_prev.xy).rgb;
+		vec3 fog_scattering_previous = texture(colortex7, hit_uv_prev).rgb;
 
 #if defined WORLD_OVERWORLD
 		// Apply analytic fog in reflection
@@ -267,7 +261,7 @@ vec3 get_specular_reflections(
 
 #ifdef DISTANT_HORIZONS
 	// Convert screen depth to combined depth
-	screen_pos = view_to_screen_space(combined_projection_matrix, view_pos, true);
+	screen_pos = view_to_screen_space(SSRT_PROJECTION_MATRIX, view_pos, true);
 #endif
 
 #if defined SSR_ROUGHNESS_SUPPORT && defined SPECULAR_MAPPING
