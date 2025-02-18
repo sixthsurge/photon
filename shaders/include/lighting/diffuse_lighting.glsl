@@ -46,7 +46,14 @@ float get_skylight_falloff(float skylight) {
 }
 
 #ifdef SHADOW_VPS
-vec3 sss_approx(vec3 albedo, float sss_amount, float sheen_amount, float sss_depth, float LoV, float shadow) {
+vec3 sss_approx(
+	vec3 albedo, 
+	float sss_amount, 
+	float sheen_amount, 
+	float sss_depth, 
+	float LoV, 
+	float shadow
+) {
 	// Transmittance-based SSS
 	if (sss_amount < eps) return vec3(0.0);
 
@@ -66,7 +73,14 @@ vec3 sss_approx(vec3 albedo, float sss_amount, float sheen_amount, float sss_dep
 	return sss;
 }
 #else
-vec3 sss_approx(vec3 albedo, float sss_amount, float sheen_amount, float sss_depth, float LoV, float shadow) {
+vec3 sss_approx(
+	vec3 albedo, 
+	float sss_amount, 
+	float sheen_amount, 
+	float sss_depth, 
+	float LoV, 
+	float shadow
+) {
 	// Blur-based SSS
 	float sss = 0.06 * sss_scale * pi;
 	vec3 sheen = 0.8 * rcp(albedo + eps) * henyey_greenstein_phase(-LoV, 0.5) * linear_step(-0.8, -0.2, -LoV) * shadow;
@@ -115,7 +129,7 @@ vec3 get_diffuse_lighting(
 	vec3 sss = sss_approx(material.albedo, material.sss_amount, material.sheen_amount, mix(sss_depth, 0.0, shadow_distance_fade), LoV, shadows.x);
 
 	// Adjust SSS outside of shadow distance
-	sss *= mix(1.0, ao * (clamp01(NoL) * 0.9 + 0.1), clamp01(shadow_distance_fade));
+	sss *= mix(1.0, (ao + pi * ambient_sss) * (clamp01(NoL) * 0.8 + 0.2), clamp01(shadow_distance_fade));
 
 	#ifdef AO_IN_SUNLIGHT
 	diffuse *= sqr(ao);
