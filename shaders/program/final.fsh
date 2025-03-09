@@ -37,6 +37,22 @@ uniform sampler2D shadowtex0;
 #include "/include/utility/dithering.glsl"
 #include "/include/utility/text_rendering.glsl"
 
+#ifdef DISTANCE_VIEW
+uniform mat4 gbufferModelView;
+uniform mat4 gbufferModelViewInverse;
+uniform mat4 gbufferProjection;
+uniform mat4 gbufferProjectionInverse;
+
+uniform vec2 view_res;
+uniform vec2 taa_offset;
+
+uniform float near;
+uniform float far;
+
+#include "/include/misc/distant_horizons.glsl"
+#include "/include/utility/space_conversion.glsl"
+#endif
+
 const int debug_text_scale = 2;
 ivec2 debug_text_position = ivec2(0, int(viewHeight) / debug_text_scale);
 
@@ -144,6 +160,21 @@ void main() {
 	}
 #elif DEBUG_VIEW == DEBUG_VIEW_WEATHER 
 	debug_weather(fragment_color);
+#endif
+
+#ifdef DISTANCE_VIEW 
+	float depth = texelFetch(combined_depth_buffer, ivec2(uv * view_res * taau_render_scale), 0).x;
+
+	vec3 position_screen = vec3(uv, depth);
+	vec3 position_view = screen_to_view_space(combined_projection_matrix_inverse, position_screen, true);
+
+	#if DISTANCE_VIEW_METHOD == DISTANCE_VIEW_DISTANCE
+	float dist = length(position_view);
+	#elif DISTANCE_VIEW_METHOD == DISTANCE_VIEW_DEPTH 
+	float dist = -position_view.z;
+	#endif
+
+	fragment_color = vec3(clamp01(dist * rcp(DISTANCE_VIEW_MAX_DISTANCE)));
 #endif
 
 #if defined COLORED_LIGHTS && (defined WORLD_NETHER || !defined SHADOW)

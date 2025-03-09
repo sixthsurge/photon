@@ -60,6 +60,8 @@ screen.end_light_color                 = Light Color
 screen.end_ambient_color               = Ambient Color
 screen.nether_color                    = Static Color
 
+screen.distance_view                   = Distance View
+
 option.INFO                            = Photon Shader
 value.INFO.0                           = §eby SixthSurge
 value.INFO.1                           = §aby SixthSurge
@@ -677,6 +679,16 @@ value.tonemap_right.tonemap_tech           = Tech
 value.tonemap_right.tonemap_ozius          = Ozius
 value.tonemap_right.tonemap_reinhard       = Reinhard
 value.tonemap_right.tonemap_reinhard_jodie = Reinhard-Jodie
+
+# Distance View 
+
+option.DISTANCE_VIEW                   = Enabled
+option.DISTANCE_VIEW_METHOD            = Method
+option.DISTANCE_VIEW_MAX_DISTANCE      = Max Distance
+suffix.DISTANCE_VIEW_MAX_DISTANCE      = m
+
+value.DISTANCE_VIEW_METHOD.DISTANCE_VIEW_DISTANCE = Distance
+value.DISTANCE_VIEW_METHOD.DISTANCE_VIEW_DEPTH    = Depth
 
 # Box
 
