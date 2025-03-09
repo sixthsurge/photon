@@ -38,6 +38,8 @@ uniform sampler2D shadowtex0;
 #include "/include/utility/text_rendering.glsl"
 
 #ifdef DISTANCE_VIEW
+uniform sampler2D depthtex0;
+
 uniform mat4 gbufferModelView;
 uniform mat4 gbufferModelViewInverse;
 uniform mat4 gbufferProjection;
@@ -163,10 +165,23 @@ void main() {
 #endif
 
 #ifdef DISTANCE_VIEW 
-	float depth = texelFetch(combined_depth_buffer, ivec2(uv * view_res * taau_render_scale), 0).x;
+	float depth = texelFetch(depthtex0, ivec2(uv * view_res * taau_render_scale), 0).x;
 
 	vec3 position_screen = vec3(uv, depth);
-	vec3 position_view = screen_to_view_space(combined_projection_matrix_inverse, position_screen, true);
+	vec3 position_view = screen_to_view_space(gbufferProjectionInverse, position_screen, true);
+
+	bool is_sky = depth == 1.0;
+
+	#ifdef DISTANT_HORIZONS
+    float depth_dh = texelFetch(dhDepthTex, texel, 0).x;
+	bool is_dh_terrain = is_distant_horizons_terrain(depth, depth_dh);
+
+	if (is_dh_terrain) {
+		position_view = screen_to_view_space(dhProjectionInverse, vec3(uv, depth_dh), true);
+	}
+
+	is_sky = is_sky && depth_dh == 1.0;
+	#endif
 
 	#if DISTANCE_VIEW_METHOD == DISTANCE_VIEW_DISTANCE
 	float dist = length(position_view);
@@ -174,7 +189,9 @@ void main() {
 	float dist = -position_view.z;
 	#endif
 
-	fragment_color = vec3(clamp01(dist * rcp(DISTANCE_VIEW_MAX_DISTANCE)));
+	fragment_color = is_sky 
+		? vec3(1.0)
+		: vec3(clamp01(dist * rcp(DISTANCE_VIEW_MAX_DISTANCE)));
 #endif
 
 #if defined COLORED_LIGHTS && (defined WORLD_NETHER || !defined SHADOW)
