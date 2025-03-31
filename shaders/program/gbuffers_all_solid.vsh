@@ -137,6 +137,9 @@ void main() {
 	tangent_pos = (pos - gbufferModelViewInverse[3].xyz) * tbn;
 #endif
 
+	#ifdef WORLD_CURVATURE
+	pos.y -= dot(pos.xz, pos.xz) / WORLD_CURVATURE_SIZE;
+	#endif
 	vec3 view_pos = scene_to_view_space(pos);
 	vec4 clip_pos = project(gl_ProjectionMatrix, view_pos);
 

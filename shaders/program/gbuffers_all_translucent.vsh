@@ -133,6 +133,9 @@ void main() {
 	if (dot(position_scene, tbn[2]) > 0.0) tbn[2] = -tbn[2];
 #endif
 
+	#ifdef WORLD_CURVATURE
+	position_scene.y -= dot(position_scene.xz, position_scene.xz) / WORLD_CURVATURE_SIZE;
+	#endif
 	position_view = scene_to_view_space(position_scene);
 	vec4 position_clip = project(gl_ProjectionMatrix, position_view);
 
