@@ -259,4 +259,8 @@ OverworldFogParameters get_fog_parameters(Weather weather) {
 	return params;
 }
 
+float get_rainbow_amount(Weather weather) {
+	return max(wetness, 0.5 * linear_step(0.6, 1.0, weather.humidity)) * float(1.0 - rainStrength);
+}
+
 #endif // INCLUDE_MISC_WEATHER

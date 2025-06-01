@@ -19,6 +19,8 @@ flat out vec3 light_color;
 #if defined WORLD_OVERWORLD
 #include "/include/fog/overworld/parameters.glsl"
 flat out OverworldFogParameters fog_params;
+
+flat out float rainbow_amount;
 #endif
 
 // ------------
@@ -73,8 +75,11 @@ void main() {
 	ambient_color = texelFetch(colortex4, ivec2(191, 1), 0).rgb;
 #endif
 
+	Weather weather = get_weather();
+
 #if defined WORLD_OVERWORLD
-	fog_params = get_fog_parameters(get_weather());
+	fog_params = get_fog_parameters(weather);
+	rainbow_amount = get_rainbow_amount(weather);
 #endif
 
 	vec2 vertex_pos = gl_Vertex.xy * taau_render_scale;
