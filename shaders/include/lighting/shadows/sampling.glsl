@@ -3,7 +3,7 @@
 
 #if defined WORLD_OVERWORLD || defined WORLD_END
 
-#include "/include/lighting/distortion.glsl"
+#include "/include/lighting/shadows/distortion.glsl"
 #include "/include/utility/color.glsl"
 #include "/include/utility/dithering.glsl"
 #include "/include/utility/random.glsl"

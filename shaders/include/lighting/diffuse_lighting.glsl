@@ -4,7 +4,7 @@
 #include "/include/lighting/colors/blocklight_color.glsl"
 #include "/include/lighting/bsdf.glsl"
 #include "/include/misc/end_lighting_fix.glsl"
-#include "/include/misc/material.glsl"
+#include "/include/surface/material.glsl"
 #include "/include/utility/phase_functions.glsl"
 #include "/include/utility/fast_math.glsl"
 #include "/include/utility/spherical_harmonics.glsl"

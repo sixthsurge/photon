@@ -65,7 +65,7 @@ uniform int renderStage;
 //   Includes
 // ------------
 
-#include "/include/lighting/distortion.glsl"
+#include "/include/lighting/shadows/distortion.glsl"
 #include "/include/vertex/displacement.glsl"
 
 #ifdef COLORED_LIGHTS
@@ -99,4 +99,3 @@ void main() {
 
 	gl_Position = vec4(shadow_clip_pos, 1.0);
 }
-

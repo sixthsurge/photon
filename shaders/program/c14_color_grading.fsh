@@ -36,7 +36,7 @@ uniform float eye_skylight;
 
 uniform vec2 view_pixel_size;
 
-#include "/include/misc/tonemap_operators.glsl"
+#include "/include/post_processing/tonemap_operators.glsl"
 #include "/include/utility/bicubic.glsl"
 #include "/include/utility/color.glsl"
 
@@ -227,4 +227,3 @@ void main() {
 	if (abs(uv_scaled.y - y) < 0.001 * scale) scene_color = vec3(1.0);
 #endif
 }
-

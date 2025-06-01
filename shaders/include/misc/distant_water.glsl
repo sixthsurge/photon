@@ -3,7 +3,7 @@
 
 #include "/include/lighting/specular_lighting.glsl"
 #include "/include/misc/purkinje_shift.glsl"
-#include "/include/misc/water_normal.glsl"
+#include "/include/surface/water_normal.glsl"
 
 vec4 draw_distant_water(
 	vec3 position_screen,

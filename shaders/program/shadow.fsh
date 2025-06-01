@@ -53,7 +53,7 @@ uniform float rainStrength;
 uniform vec2 taa_offset;
 uniform vec3 light_dir;
 
-#include "/include/misc/water_normal.glsl"
+#include "/include/surface/water_normal.glsl"
 #include "/include/utility/color.glsl"
 
 const float air_n = 1.000293; // for 0°C and 1 atm
@@ -143,4 +143,3 @@ void main() {
 	if (texture(tex, uv).a < 0.1) discard;
 #endif
 }
-

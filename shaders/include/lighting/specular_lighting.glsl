@@ -3,7 +3,7 @@
 
 #include "/include/lighting/bsdf.glsl"
 #include "/include/misc/distant_horizons.glsl"
-#include "/include/misc/material.glsl"
+#include "/include/surface/material.glsl"
 #include "/include/misc/raytracer.glsl"
 #include "/include/sky/projection.glsl"
 #include "/include/utility/bicubic.glsl"

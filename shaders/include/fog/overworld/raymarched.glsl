@@ -3,7 +3,7 @@
 
 #include "/include/fog/overworld/constants.glsl"
 #include "/include/lighting/cloud_shadows.glsl"
-#include "/include/lighting/distortion.glsl"
+#include "/include/lighting/shadows/distortion.glsl"
 #include "/include/sky/atmosphere.glsl"
 #include "/include/utility/encoding.glsl"
 #include "/include/utility/phase_functions.glsl"
