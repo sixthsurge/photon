@@ -111,7 +111,7 @@ vec2 clouds_l0_detail_weights(Weather weather, float cumulus_stratus_blend) {
 }
 
 vec2 clouds_l0_edge_sharpening(Weather weather, float cumulus_stratus_blend) {
-	return mix(vec2(3.0, 8.0), vec2(1.0, 2.0), sqr(cumulus_stratus_blend));
+	return mix(vec2(3.0, 12.0), vec2(2.0, 7.0), sqr(cumulus_stratus_blend));
 }
 
 float clouds_l0_altitude_scale(Weather weather, vec2 coverage) {

@@ -72,9 +72,9 @@ float clouds_altocumulus_density(vec3 pos) {
 		* dampen(clamp01(1.0 - density)) * (1.0 - 0.85 * clouds_params.l1_cumulus_stratus_blend);
 
 	// Adjust density so that the clouds are wispy at the bottom and hard at the top
-	vec2 edge_sharpening = mix(vec2(3.0, 8.0), vec2(2.0, 4.0), clouds_params.l1_cumulus_stratus_blend);
+	vec2 edge_sharpening = mix(vec2(3.0, 14.0), vec2(2.0, 7.0), clouds_params.l1_cumulus_stratus_blend);
 	density  = max0(density);
-	density  = 1.0 - pow(1.0 - density, mix(edge_sharpening.x, edge_sharpening.y, altitude_fraction));
+	density  = lift(density, mix(edge_sharpening.x, edge_sharpening.y, altitude_fraction));
 	density *= 0.1 + 0.9 * smoothstep(0.2, 0.7, altitude_fraction);
 
 	return density;
