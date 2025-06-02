@@ -41,7 +41,7 @@ mat2x3 get_lpv_fog_coefficients(vec3 position_world) {
 	}
 
 #if defined WORLD_OVERWORLD
-	const float overworld_density_scale = 32.0 * LPV_VL_INTENSITY_OVERWORLD;
+	const float overworld_density_scale = 8.0 * LPV_VL_INTENSITY_OVERWORLD;
 	const vec3 underground_fog_extinction = vec3(0.001) * LPV_VL_INTENSITY_UNDERGROUND;
 	const vec3 underground_fog_scattering = underground_fog_extinction * 0.95;
 	const float underground_fog_fade_distance = 10.0;

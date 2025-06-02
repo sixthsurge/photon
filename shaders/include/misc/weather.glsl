@@ -28,8 +28,8 @@ Weather get_weather() {
 	const float random_humidity_max         = 0.8;
 	const float random_wind_min             = 0.0;
 	const float random_wind_max             = 1.0;
-	const float biome_temperature_influence = 0.1;
-	const float biome_humidity_influence    = 0.1;
+	const float biome_temperature_influence = 0.05;
+	const float biome_humidity_influence    = 0.05;
 
 #ifdef RANDOM_WEATHER_VARIATION
 	weather.temperature = mix(
@@ -75,11 +75,11 @@ Weather get_weather() {
 }
 
 float clouds_cumulus_congestus_blend(Weather weather) {
-	float temperature_weight = linear_step(0.33, 1.0, weather.temperature);
-	float humidity_weight = linear_step(0.1, 0.9, weather.humidity);
-	float wind_weight = weather.wind;
+	float temperature_weight = linear_step(0.5, 1.0, weather.temperature);
+	float humidity_weight = linear_step(0.3, 0.9, weather.humidity);
+	float wind_weight = sqr(weather.wind);
 
-	return dampen(temperature_weight * humidity_weight) * wind_weight;
+	return clamp01(1.5 * dampen(dampen(temperature_weight * humidity_weight * wind_weight)));
 }
 
 float clouds_l0_cumulus_stratus_blend(Weather weather) {
@@ -92,10 +92,10 @@ float clouds_l0_cumulus_stratus_blend(Weather weather) {
 vec2 clouds_l0_coverage(Weather weather, float cumulus_congestus_blend) {
 	// very high temperature -> lower coverage
 	// higher humidity -> higher coverage
-	float temperature_weight = 1.0 - 0.33 * linear_step(0.67, 1.0, weather.temperature);
-	float humidity_weight = 0.5 * weather.humidity + 0.5 * cube(weather.humidity);
+	float temperature_weight = 1.0 - 0.15 * linear_step(0.6, 1.0, weather.temperature);
+	float humidity_weight = 0.4 * weather.humidity + 0.5 * sqr(weather.humidity);
 	float stratus_sheet = sqr(clouds_l0_cumulus_stratus_blend(weather));
-	vec2 local_variation = vec2(0.0, 1.0) * (0.2 + 0.2 * weather.wind) * (1.0 + 0.2 * stratus_sheet);
+	vec2 local_variation = vec2(-0.1, 1.0) * (0.1 + 0.1 * weather.wind);
 
 	return clamp01(temperature_weight * humidity_weight + local_variation + 0.3 * stratus_sheet);
 }
@@ -127,9 +127,9 @@ float clouds_l1_cumulus_stratus_blend(Weather weather) {
 
 vec2 clouds_l1_coverage(Weather weather, float cumulus_stratus_blend) {
 	// Altocumulus: high temperature, high humidity, not too high temperature
-	vec2 coverage_ac = weather.humidity * linear_step(0.25, 0.75, weather.wind) 
-		* dampen(linear_step(0.25, 1.0, weather.temperature) 
-		* linear_step(0.0, 0.1, 1.0 - weather.temperature)) * vec2(0.5, 1.5);
+	vec2 coverage_ac = dampen(linear_step(0.3, 1.0, weather.humidity)) * linear_step(0.0, 0.66, weather.wind) 
+		* dampen(linear_step(1.0, 0.5, weather.temperature) 
+		* linear_step(1.0, 0.9, weather.temperature)) * vec2(0.5, 1.5);
 
 	// Altostratus: high wind, high humidity
 	vec2 coverage_as = vec2(linear_step(0.25, 0.45, weather.wind * weather.humidity));
@@ -138,18 +138,19 @@ vec2 clouds_l1_coverage(Weather weather, float cumulus_stratus_blend) {
 }
 
 float clouds_cirrus_amount(Weather weather) {
-	float temperature_weight = 0.6 + 0.4 * sqr(linear_step(0.5, 0.9, weather.temperature))
+	float temperature_weight = 0.6 - 0.4 * sqr(linear_step(0.5, 0.9, weather.temperature))
 		+ 0.4 * (1.0 - linear_step(0.0, 0.2, weather.temperature));
-	float humidity_weight = 1.0 - 0.33 * linear_step(0.5, 0.75, weather.humidity);
+	float humidity_weight = 1.0 - 0.5 * linear_step(0.5, 0.75, weather.humidity);
 
 	return clamp01(0.5 * temperature_weight * humidity_weight + 0.5 * rainStrength);
 }
 
 float clouds_cirrocumulus_amount(Weather weather) {
-	float temperature_weight = 0.4 + 0.6 * linear_step(0.5, 0.8, weather.temperature);
-	float humidity_weight    = linear_step(0.4, 0.6, weather.humidity);
+	float temperature_weight = 0.4 + 0.6 * linear_step(0.0, 0.5, weather.temperature);
+	float humidity_weight    = linear_step(0.4, 1.0, weather.humidity);
+	float wind_weight        = sqr(weather.wind);
 
-	return 0.5 * dampen(temperature_weight * humidity_weight);
+	return 0.8 * dampen(temperature_weight * humidity_weight * wind_weight);
 }
 
 float clouds_noctilucent_amount() {

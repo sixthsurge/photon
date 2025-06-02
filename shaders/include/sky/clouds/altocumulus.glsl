@@ -132,7 +132,7 @@ vec2 clouds_altocumulus_scattering(
 		scattering.y += scatter_amount * exp(-extinct_amount *    sky_optical_depth) * isotropic_phase;
 
 		scatter_amount *= 0.5 * mix(lift(clamp01(scattering_coeff / 0.05), 0.33), 1.0, cos_theta * 0.5 + 0.5) * powder_effect;
-		extinct_amount *= 0.4;
+		extinct_amount *= 0.45;
 		phase_g *= 0.7;
 
 		powder_effect = mix(powder_effect, sqrt(powder_effect), 0.5);

@@ -130,7 +130,7 @@ vec2 clouds_cirrus_scattering(
 	float phase = clouds_phase_single(cos_theta);
 	vec3 phase_g = vec3(0.6, 0.9, 0.3);
 
-	float powder_effect = 4.0 * (1.0 - exp(-40.0 * density));
+	float powder_effect = 8.0 * (1.0 - exp(-40.0 * density));
 	      powder_effect = mix(powder_effect, 1.0, pow1d5(cos_theta * 0.5 + 0.5));
 
 	float scatter_amount = clouds_cirrus_scattering_coeff;
@@ -205,7 +205,7 @@ CloudsResult draw_cirrus_clouds(
 	     light_color *= moonlit ? moon_color : sun_color;
 
 	// Remap the transmittance so that min_transmittance is 0
-	vec3 clouds_scattering = scattering.x * light_color + scattering.y * sky_color;
+	vec3 clouds_scattering = scattering.x * light_color + scattering.y * sky_color * 1.41;
 	     clouds_scattering = clouds_aerial_perspective(clouds_scattering, view_transmittance, air_viewer_pos, sphere_pos, ray_dir, clear_sky);
 
 	return CloudsResult(
