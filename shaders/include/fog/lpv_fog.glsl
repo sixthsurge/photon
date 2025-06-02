@@ -30,6 +30,16 @@ vec2 overworld_fog_density_no_noise(vec3 position_world) {
 #endif
 
 mat2x3 get_lpv_fog_coefficients(vec3 position_world) {
+	if (isEyeInWater == 1) {
+		// Underwater
+
+		const vec3 absorption_coeff = vec3(WATER_ABSORPTION_R_UNDERWATER, WATER_ABSORPTION_G_UNDERWATER, WATER_ABSORPTION_B_UNDERWATER) * rec709_to_working_color;
+		const vec3 scattering_coeff = vec3(WATER_SCATTERING_UNDERWATER);
+		const vec3 extinction_coeff = absorption_coeff + scattering_coeff;
+
+		return mat2x3(3.0 * scattering_coeff, extinction_coeff);
+	}
+
 #if defined WORLD_OVERWORLD
 	const float overworld_density_scale = 32.0 * LPV_VL_INTENSITY_OVERWORLD;
 	const vec3 underground_fog_extinction = vec3(0.001) * LPV_VL_INTENSITY_UNDERGROUND;
