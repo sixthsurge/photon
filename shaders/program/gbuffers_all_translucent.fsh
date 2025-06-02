@@ -560,7 +560,6 @@ void main() {
 
 	vec4 fog = common_fog(length(position_scene), false);
 	fragment_color.rgb  = fragment_color.rgb * fog.a + fog.rgb;
-	fragment_color.a   *= border_fog(position_scene, direction_world);
 
 	// Purkinje shift
 
