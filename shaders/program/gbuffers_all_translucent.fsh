@@ -363,31 +363,33 @@ void main() {
 			vec3 flat_normal = tbn[2];
 
 		#ifdef DISTANT_HORIZONS
-			// Use hardcoded TBN matrix pointing upwards that is the same for DH water and regular water
-			mat3 tbn = mat3(
-				vec3(1.0, 0.0, 0.0),
-				vec3(0.0, 0.0, 1.0),
-				vec3(0.0, 1.0, 0.0)
-			);
-			if (normal.y < 0.0) {
-				tbn = -tbn;
+			mat3 tbn_fixed = tbn;
+			if (normal.y > 0.99) {
+				// Top surface: Use hardcoded TBN matrix pointing upwards that is the same for DH water and regular water
+				tbn_fixed = mat3(
+					vec3(1.0, 0.0, 0.0),
+					vec3(0.0, 0.0, 1.0),
+					vec3(0.0, 1.0, 0.0)
+				);
 			}
+		#else
+			#define tbn_fixed tbn
 		#endif
 
 			vec3 world_pos = position_scene + cameraPosition;
 
-			vec2 coord = -(world_pos * tbn).xy;
+			vec2 coord = -(world_pos * tbn_fixed).xy;
 
 			bool flowing_water = abs(flat_normal.y) < 0.99;
 			vec2 flow_dir = flowing_water ? normalize(flat_normal.xz) : vec2(0.0);
 
 		#ifdef WATER_PARALLAX
-			vec3 direction_tangent = direction_world * tbn;
+			vec3 direction_tangent = direction_world * tbn_fixed;
 			coord = get_water_parallax_coord(direction_tangent, coord, flow_dir, flowing_water);
 		#endif
 
 			normal_tangent = get_water_normal(world_pos, flat_normal, coord, flow_dir, light_levels.y, flowing_water);
-			normal = tbn * normal_tangent;
+			normal = tbn_fixed * normal_tangent;
 		}
 	#endif
 #endif

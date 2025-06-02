@@ -24,7 +24,7 @@
 
 * [Download on Modrinth](https://modrinth.com/shader/photon-shader/versions) (recommended)
 * [Download latest stable commit](https://github.com/sixthsurge/photon/archive/refs/heads/main.zip)
-* [Download latest unstable commit](https://github.com/sixthsurge/photon/archive/refs/heads/dev.zip)
+* [Download latest dev commit](https://github.com/sixthsurge/photon/archive/refs/heads/dev.zip)
 
 * Photon can be used with [Iris](https://irisshaders.dev/download) (recommended) or [OptiFine](https://optifine.net/home)
 * Iris is a modern shader loader with far better performance, mod compatibility and developer features than OptiFine. Some features (Colored Lighting) will only work on Iris

@@ -75,9 +75,9 @@ void main() {
 	ambient_color = texelFetch(colortex4, ivec2(191, 1), 0).rgb;
 #endif
 
+#if defined WORLD_OVERWORLD
 	Weather weather = get_weather();
 
-#if defined WORLD_OVERWORLD
 	fog_params = get_fog_parameters(weather);
 	rainbow_amount = get_rainbow_amount(weather);
 #endif

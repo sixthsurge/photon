@@ -130,7 +130,6 @@ const bool colortex11MipmapEnabled = true;
 #define SSRT_DH
 #define TEMPORAL_REPROJECTION
 
-#include "/include/sky/rainbow.glsl"
 #include "/include/fog/simple_fog.glsl"
 #include "/include/misc/distant_horizons.glsl"
 #include "/include/misc/lightning_flash.glsl"
@@ -142,6 +141,7 @@ const bool colortex11MipmapEnabled = true;
 
 #ifdef WORLD_OVERWORLD
 #include "/include/fog/overworld/analytic.glsl"
+#include "/include/sky/rainbow.glsl"
 #endif
 
 #ifdef DISTANT_HORIZONS
@@ -219,7 +219,7 @@ void main() {
 	vec4 refraction_data   = texelFetch(colortex3, texel, 0);
 	vec4 translucent_color = texelFetch(colortex13, texel, 0);
 	
-#ifdef VL
+#if defined VL || defined LPV_VL
 	vec3 fog_transmittance = smooth_filter(colortex6, uv).rgb;
 	vec3 fog_scattering    = smooth_filter(colortex7, uv).rgb;
 #endif
@@ -292,15 +292,17 @@ void main() {
 
 	// Apply rainbows
 
+#if defined WORLD_OVERWORLD
 	fragment_color = draw_rainbows(
 		fragment_color, 
 		direction_world, 
 		min(is_sky ? 1e6 : view_distance, mix(clouds_apparent_distance, 1e6, linear_step(1.0, 0.95, clouds_and_aurora.w)))
 	);
+#endif
 
 	// Draw DH water
 
-#ifdef DISTANT_HORIZONS
+#if defined DISTANT_HORIZONS
 	if (front_depth_dh != back_depth_dh) {
 		// if there is a layer of DH water behind the translucent layer, these 
 		// will store the position of that layer
@@ -382,7 +384,7 @@ void main() {
 
 	// Blend fog
 
-#if (defined WORLD_OVERWORLD || defined WORLD_END) && defined VL
+#if defined VL || defined LPV_VL
 	// Volumetric fog
 
 	fragment_color = fragment_color * fog_transmittance + fog_scattering;
@@ -391,7 +393,9 @@ void main() {
 	bloomy_fog = clamp01(dot(fog_transmittance, vec3(luminance_weights_rec2020)));
 	bloomy_fog = isEyeInWater == 1.0 ? sqrt(bloomy_fog) : bloomy_fog;
 	#endif
-#else
+#endif
+
+#if !defined VL 
 	// Analytic fog
 
 	if (isEyeInWater == 1) {

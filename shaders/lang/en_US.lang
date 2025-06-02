@@ -26,6 +26,7 @@ screen.shadows                         = Shadows
 screen.ao                              = Ambient Occlusion
 screen.color_grading                   = Color Grading
 screen.exposure                        = Exposure
+screen.lpv_vl                          = Colored Lights Fog Scattering
 
 screen.aurora                          = Aurora
 screen.clouds                          = Clouds
@@ -91,7 +92,7 @@ option.MOON_PHASE_AFFECTS_BRIGHTNESS.comment = Night time brightness is affected
 option.DESERT_SANDSTORM                = Desert Sandstorm
 option.DESERT_SANDSTORM.comment        = Sandstorm during rain in desert biome
 option.END_GLOW                        = End Glow
-option.END_GLOW.comment                = Wavery glowing effect in the End. Requires Volumetric Lighting
+option.END_GLOW.comment                = Wavery glowing effect in the End. Requires Volumetric Fog
 
 # Lighting settings
 
@@ -380,13 +381,22 @@ option.BLOOMY_FOG_INTENSITY            = Bloomy Fog Intensity
 option.BLOOMY_FOG_INTENSITY.comment    = Adjusts the intensity of "bloomy fog"
 option.OVERWORLD_FOG_INTENSITY         = Overworld Fog Intensity
 option.NETHER_FOG_INTENSITY            = Nether Fog Intensity
-option.VL                              = Volumetric Lighting
+option.VL                              = Volumetric Fog
+comment.LPV_VL                         = Light sources illuminate the fog. Requires Colored Lights! 
 option.VL.comment                      = Adds light shafts and variable fog density
 option.VL_RENDER_SCALE                 = VL Render Scale
 option.AIR_FOG_CLOUDY_NOISE            = Cloudy Fog
 option.AIR_FOG_CLOUDY_NOISE.comment    = Subtle cloudy shapes in the fog, best visible in the morning.\nRequires volumetric fog!
 option.AIR_FOG_COLORED_LIGHT_SHAFTS    = Colored Light Shafts
 option.AIR_FOG_COLORED_LIGHT_SHAFTS.comment = Light shafts passing through translucent objects are tinted by their color
+
+# LPV VL
+option.LPV_VL                          = Enabled
+option.LPV_VL_STEPS                    = Steps 
+option.LPV_VL_INTENSITY_OVERWORLD      = Overworld Intensity
+option.LPV_VL_INTENSITY_UNDERGROUND    = Underground Intensity
+option.LPV_VL_INTENSITY_NETHER         = Nether Intensity
+option.LPV_VL_INTENSITY_END            = End Intensity
 
 option.AIR_FOG_RAYLEIGH_FALLOFF_START     = Rayleigh Falloff Start
 option.AIR_FOG_RAYLEIGH_FALLOFF_START.comment = Altitude above sea level at which the rayleigh fog begins to decrease
