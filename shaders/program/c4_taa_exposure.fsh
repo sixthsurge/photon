@@ -124,7 +124,7 @@ vec3 clip_aabb(vec3 history_color, vec3 min_color, vec3 max_color, out bool hist
 	vec3 e_clip = 0.5 * (max_color - min_color);
 
 	vec3 v_clip = history_color - p_clip;
-	vec3 v_unit = v_clip / e_clip;
+	vec3 v_unit = v_clip / max(e_clip, 1e-3);
 	vec3 a_unit = abs(v_unit);
 	float ma_unit = max_of(a_unit);
 	history_clipped = ma_unit > 1.0;
