@@ -197,6 +197,10 @@ vec3 calculate_shadows(
 	sss_depth = 0.0;
 	distance_fade = 0.0;
 
+	#ifdef WORLD_CURVATURE
+	scene_pos.y += dot(scene_pos.xz, scene_pos.xz) / WORLD_CURVATURE_SIZE;
+	#endif
+
 	float NoL = dot(flat_normal, light_dir);
 	if (NoL < 1e-3 && sss_amount < 1e-3) return vec3(0.0);
 
