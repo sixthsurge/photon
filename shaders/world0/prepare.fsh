@@ -100,7 +100,7 @@ void main() {
 #ifndef BLOCKY_CLOUDS
     cloud_shadow_map = render_cloud_shadow_map(uv);
 #else
-    cloud_shadow_map = 1.0;
+    cloud_shadow_map = vec2(1.0);
 #endif
 }
 

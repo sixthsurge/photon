@@ -87,3 +87,6 @@ void main() {
 	scene_color *= rcp(DOF_SAMPLES);
 }
 
+#ifndef DOF 
+	#error "This program should be disabled if Depth of Field is disabled"
+#endif

@@ -249,6 +249,6 @@ void main() {
 	scene_color = textureLod(colortex0, final_uv, 0).rgb;
 }
 
+#ifndef FXAA 
+	#error "This program should be disabled if FXAA is disabled"
 #endif
-//----------------------------------------------------------------------------//
-

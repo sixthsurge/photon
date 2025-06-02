@@ -54,6 +54,10 @@ vec3 draw_rainbows(
 	vec3 direction_world,
 	float view_distance
 ) {
+#ifndef RAINBOWS
+	return fragment_color;
+#endif
+
 	if (rainbow_amount < eps) {
 		return fragment_color;
 	}

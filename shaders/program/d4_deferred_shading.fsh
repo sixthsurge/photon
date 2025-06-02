@@ -208,6 +208,9 @@ void main() {
 	// Space conversions
 
 	depth += 0.38 * float(depth < hand_depth); // Hand lighting fix from Capt Tatsu
+	if (depth < hand_depth) {
+		return;
+	}
 
 	vec3 view_pos = screen_to_view_space(combined_projection_matrix_inverse, vec3(uv, depth), true);
 	vec3 scene_pos = view_to_scene_space(view_pos);

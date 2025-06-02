@@ -47,10 +47,14 @@ Weather get_weather() {
 		random_wind_max,
 		noise_1d(world_age * wind_variation_speed + 83.236)
 	);
+#else 
+	weather.temperature = 0.5;
+	weather.humidity    = 0.5;
+	weather.wind        = 0.5;
+#endif
 
 	// Time-of-day-based variation 
 	weather.temperature -= 0.2 * time_sunrise + 0.2 * time_midnight;
-#endif
 
 #ifdef BIOME_WEATHER_VARIATION
 	weather.temperature += (biome_temperature - 0.6) * biome_temperature_influence;

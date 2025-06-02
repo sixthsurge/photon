@@ -38,8 +38,8 @@
 * Extensive settings menu allowing you to customize every aspect of the shader
 * Screen-space reflections
 * Volumetric lighting
-* Soft shadows with variable penumbra size
-* Ground Truth-based Ambient occlusion (GTAO)
+* Soft shadows with variable-size penumbras
+* Detailed ambient occlusion (GTAO)
 * Camera effects: bloom, depth of field, motion blur
 * Much improved image quality with TAA, FXAA and CAS
 * Advanced temporal upscaling (disabled by default) for low end devices

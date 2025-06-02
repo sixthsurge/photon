@@ -15,8 +15,8 @@ screen.materials                       = Materials
 screen.water                           = Water
 screen.post                            = Post-Processing
 screen.misc                            = Misc
-screen.box                             = Box
 
+screen.weather                         = Weather 
 screen.colored_lights                  = Colored Lights Settings
 screen.rp_settings                     = Resource Pack Settings
 screen.reflections                     = Reflections
@@ -27,6 +27,7 @@ screen.ao                              = Ambient Occlusion
 screen.color_grading                   = Color Grading
 screen.exposure                        = Exposure
 screen.lpv_vl                          = Colored Lights Fog Scattering
+screen.box                             = Selection Box
 
 screen.aurora                          = Aurora
 screen.clouds                          = Clouds
@@ -63,7 +64,7 @@ screen.nether_color                    = Static Color
 
 screen.distance_view                   = Distance View
 
-option.INFO                            = Photon Shader
+option.INFO                            = Photon Shaders
 value.INFO.0                           = §eby SixthSurge
 value.INFO.1                           = §aby SixthSurge
 value.INFO.2                           = §bby SixthSurge
@@ -93,6 +94,16 @@ option.DESERT_SANDSTORM                = Desert Sandstorm
 option.DESERT_SANDSTORM.comment        = Sandstorm during rain in desert biome
 option.END_GLOW                        = End Glow
 option.END_GLOW.comment                = Wavery glowing effect in the End. Requires Volumetric Fog
+
+# Weather
+option.RANDOM_WEATHER_VARIATION            = Random Variation
+option.BIOME_WEATHER_VARIATION             = Biome-based Variation
+option.WEATHER_TEMPERATURE_BIAS            = Temperature Bias
+option.WEATHER_HUMIDITY_BIAS               = Humidity Bias
+option.WEATHER_WIND_BIAS                   = Windiness Bias
+option.WEATHER_TEMPERATURE_VARIATION_SPEED = Temperature Variation Speed
+option.WEATHER_HUMIDITY_VARIATION_SPEED    = Humidity Variation Speed
+option.WEATHER_WIND_VARIATION_SPEED        = Windiness Variation Speed
 
 # Lighting settings
 
@@ -244,6 +255,8 @@ option.GALAXY_INTENSITY                = Galaxy Intensity
 option.GALAXY_INTENSITY.comment        = Controls the brightness of the galaxy in the night sky
 option.CREPUSCULAR_RAYS                = Crepuscular Rays
 option.LIGHTNING_FLASH                 = Lightning Flash
+option.RAINBOWS                        = Rainbows
+option.END_SUN_EFFECT                  = End Sun Effect
 
 # Clouds
 option.CLOUDS_CUMULUS                       = Cumulus Clouds
@@ -318,8 +331,6 @@ option.BLOCKY_CLOUDS_SHARPNESS         = Sharpness
 option.BLOCKY_CLOUDS_SHARPNESS.comment = Cloud edge sharpness
 
 option.CLOUDS_TEMPORAL_UPSCALING       = Temporal Upscaling
-option.CLOUDS_DAILY_WEATHER            = Daily Weather Variation
-option.CLOUDS_DAILY_WEATHER.comment    = Clouds are affected by the daily weather system
 option.CLOUDS_AERIAL_PERSPECTIVE_BOOST = Aerial Perspective Boost
 option.CLOUDS_SCALE                    = Scale
 option.CLOUDS_SCALE.comment            = Applied as a scale factor to all clouds, to bring the clouds from a realistic size and altitude to an altitude that is accessible during gameplay. If this value is 1.0, clouds are positioned realistically, with the first layer 800 blocks up by default. If this value is higher, then clouds will appear smaller and form closer to the ground. This also affects the size of cloud shadows
@@ -544,7 +555,7 @@ option.WATER_PARALLAX                  = Water Parallax
 option.WATER_PARALLAX.comment          = Makes water waves appear 3D
 option.WATER_DISPLACEMENT              = Water Displacement
 option.WATER_DISPLACEMENT.comment      = Similar to how waving leaves work, it makes the water geometry itself wave slightly, so the shore line appears less flat
-option.WATER_WAVES_HEIGHT_VARIATION    = Water Waves Height Variation
+option.WATER_WAVES_HEIGHT_VARIATION    = Local Height Variation 
 comment.WATER_WAVES_HEIGHT_VARIATION   = The height of water waves varies in space
 
 option.WATER_ABSORPTION_R              = Red Absorption
@@ -658,7 +669,7 @@ option.CUSTOM_SKY                      = Custom Sky
 option.CUSTOM_SKY.comment              = Enable custom skies from resource packs
 option.CUSTOM_SKY_BRIGHTNESS           = Custom Sky Brightness
 option.CUSTOM_SKY_BRIGHTNESS.comment   = Adjust custom sky brightness
-option.NOISE_ON_DH_TERRAIN             = Noise on DH terrain
+option.NOISE_ON_DH_TERRAIN             = Noise on DH Terrain
 option.ENCHANTMENT_GLINT_BRIGHTNESS    = Enchantment Glint Brightness
 option.USE_SEPARATE_ENTITY_DRAWS       = Use "Separate Entity Draws"
 comment.USE_SEPARATE_ENTITY_DRAWS      = "separateEntityDraws" is an Iris feature enabling shaderpacks which use deferred-forward hybrid shading, like Photon, to correctly render translucent entities and other objects. However, it can be the cause of some issues. Expect rendering issues such as translucent entities becoming opaque if you disable this!
@@ -668,8 +679,8 @@ value.DEBUG_VIEW.DEBUG_VIEW_SAMPLER    = Sampler
 value.DEBUG_VIEW.DEBUG_VIEW_HISTOGRAM  = Histogram
 value.DEBUG_VIEW.DEBUG_VIEW_WEATHER    = Weather
 
-value.tonemap_left.academy_fit            = Academy Fit
-value.tonemap_left.academy_rrt            = Academy RRT
+value.tonemap_left.tonemap_aces_fit       = ACES Fit
+value.tonemap_left.tonemap_aces_full      = ACES Full
 value.tonemap_left.tonemap_lottes         = Lottes
 value.tonemap_left.tonemap_hejl_2015      = Hejl 2015
 value.tonemap_left.tonemap_hejl_burgess   = Hejl-Burgess
@@ -679,8 +690,8 @@ value.tonemap_left.tonemap_ozius          = Ozius
 value.tonemap_left.tonemap_reinhard       = Reinhard
 value.tonemap_left.tonemap_reinhard_jodie = Reinhard-Jodie
 
-value.tonemap_right.academy_fit            = Academy Fit
-value.tonemap_right.academy_rrt            = Academy RRT
+value.tonemap_right.tonemap_aces_fit       = ACES Fit
+value.tonemap_right.tonemap_aces_full      = ACES Full
 value.tonemap_right.tonemap_lottes         = Lottes
 value.tonemap_right.tonemap_hejl_burgess   = Hejl-Burgess
 value.tonemap_right.tonemap_hejl_2015      = Hejl 2015
@@ -702,10 +713,10 @@ value.DISTANCE_VIEW_METHOD.DISTANCE_VIEW_DEPTH    = Depth
 
 # Box
 
-option.BOX_MODE                 = Box Mode
-option.BOX_MODE.comment         = Selection Outline Box Mode\n\nNone: Default\nColor: User Color\nRainbow: Fancy RGB Effect
-value.BOX_MODE.BOX_MODE_NONE    = None
-value.BOX_MODE.BOX_MODE_COLOR   = Color
+option.BOX_MODE                 = Mode
+option.BOX_MODE.comment         = Selection Box Mode
+value.BOX_MODE.BOX_MODE_NONE    = Default
+value.BOX_MODE.BOX_MODE_COLOR   = Custom Color
 value.BOX_MODE.BOX_MODE_RAINBOW = Rainbow
 option.BOX_COLOR_R              = Red
 option.BOX_COLOR_G              = Green

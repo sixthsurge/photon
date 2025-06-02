@@ -216,7 +216,9 @@ vec3 draw_sky(vec3 ray_dir) {
 #if defined PROGRAM_DEFERRED4
 	// Sun
 
+	#ifdef END_SUN_EFFECT
 	sky += draw_sun(ray_dir);
+	#endif
 
 	// Stars
 

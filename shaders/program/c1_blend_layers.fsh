@@ -294,7 +294,7 @@ void main() {
 
 	// Apply rainbows
 
-#if defined WORLD_OVERWORLD
+#if defined WORLD_OVERWORLD && defined RAINBOWS
 	fragment_color = draw_rainbows(
 		fragment_color, 
 		direction_world, 
@@ -411,7 +411,7 @@ void main() {
 	// Analytic fog
 
 	if (isEyeInWater == 1) {
-		// water fog
+		// Underwater fog
 		float LoV = dot(direction_world, light_dir);
 
 		mat2x3 analytic_fog = water_fog_simple(
@@ -431,14 +431,15 @@ void main() {
 		bloomy_fog = sqrt(clamp01(dot(analytic_fog[1], vec3(0.33))));
 	#endif
 	} else {
-		// air fog
-
 	#if defined WORLD_OVERWORLD
+		// Overworld fog
+
 		mat2x3 analytic_fog = air_fog_analytic(
 			cameraPosition,
 			front_position_world,
 			is_sky,
-			eye_skylight
+			eye_skylight,
+			1.0
 		);
 
 		fragment_color *= analytic_fog[1];

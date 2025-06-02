@@ -129,11 +129,13 @@ void main() {
 	fog_params = get_fog_parameters(weather);
 
 	// Aurora clouds influence
-	sky_color += aurora_amount * AURORA_CLOUD_LIGHTING * mix(
+	vec3 aurora_lighting = mix(
 		aurora_colors[0], 
 		aurora_colors[1], 
 		0.25
-	);
+	) * aurora_amount;
+	sky_color += AURORA_CLOUD_LIGHTING * aurora_lighting;
+	ambient_color += AURORA_CLOUD_LIGHTING * aurora_lighting;
 #endif
 
 	gl_Position = vec4(gl_Vertex.xy * 2.0 - 1.0, 0.0, 1.0);
