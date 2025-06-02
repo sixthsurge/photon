@@ -140,7 +140,8 @@ void main() {
 			cameraPosition,
 			cameraPosition + ray_dir,
 			true,
-			eye_skylight
+			eye_skylight,
+			1.0
 		);
 		sky_map = sky_map * fog[1] + fog[0];
 #endif

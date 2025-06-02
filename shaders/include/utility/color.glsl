@@ -162,7 +162,7 @@ vec3 lab_to_xyz(vec3 lab) {
 
 // Original source: https://github.com/Jessie-LC/open-source-utility-code/blob/main/advanced/blackbody.glsl
 vec3 blackbody(float temperature) {
-	const vec3 lambda  = primary_wavelengths_ap1;
+	const vec3 lambda  = primary_wavelengths_rec2020;
 	const vec3 lambda2 = lambda * lambda;
 	const vec3 lambda5 = lambda2 * lambda2 * lambda;
 

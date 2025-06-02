@@ -22,7 +22,7 @@ vec2 air_fog_analytic_airmass(vec3 ray_origin_world, vec3 ray_direction_world, f
 	) * (0.5 * OVERWORLD_FOG_INTENSITY);
 }
 
-mat2x3 air_fog_analytic(vec3 ray_origin_world, vec3 ray_end_world, bool sky, float skylight) {
+mat2x3 air_fog_analytic(vec3 ray_origin_world, vec3 ray_end_world, bool sky, float skylight, float shadow) {
 	vec3 ray_direction_world; float ray_length;
 	length_normalize(ray_end_world - ray_origin_world, ray_direction_world, ray_length);
 	ray_length = sky ? 4096.0 : ray_length;
@@ -58,7 +58,7 @@ mat2x3 air_fog_analytic(vec3 ray_origin_world, vec3 ray_end_world, bool sky, flo
 	for (int i = 0; i < 4; ++i) {
 		float mie_phase = 0.7 * henyey_greenstein_phase(LoV, 0.5 * anisotropy) + 0.3 * henyey_greenstein_phase(LoV, -0.2 * anisotropy);
 
-		scattering += scatter_amount * (rayleigh_scattering * isotropic_phase + mie_scattering * mie_phase) * light_color * (1.0 - 0.9 * rainStrength);
+		scattering += scatter_amount * (rayleigh_scattering * isotropic_phase + mie_scattering * mie_phase) * light_color * (1.0 - 0.9 * rainStrength) * shadow;
 
 		scatter_amount *= 0.5;
 		anisotropy *= 0.7;

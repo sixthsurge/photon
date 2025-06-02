@@ -223,12 +223,25 @@ vec3 trace_specular_ray(
 		vec3 fog_scattering_previous = texture(colortex7, hit_uv_prev).rgb;
 
 #if defined WORLD_OVERWORLD
+	#ifdef VL 
+		// Intended to make reflected fog better match VL
+		// Assumption is that if there is a hit and the hit object is vaguely in the direction 
+		// of the sun then the fog would be shadowed by the hit object
+		float fog_shadow = hit 
+			? 1.0 - sqr(max0(dot(light_dir, ray_dir)))
+			: 1.0;
+	#else 
+		const float fog_shadow = 1.0;
+	#endif
+
+
 		// Apply analytic fog in reflection
 		mat2x3 analytic_fog = air_fog_analytic(
 			world_pos,
 			hit_pos_scene + cameraPosition,
 			false,
-			eye_skylight
+			eye_skylight,
+			fog_shadow
 		);
 
 		reflection = max0(reflection - fog_scattering_previous);
