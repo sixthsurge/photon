@@ -23,9 +23,15 @@ vec2 air_fog_analytic_airmass(vec3 ray_origin_world, vec3 ray_direction_world, f
 }
 
 mat2x3 air_fog_analytic(vec3 ray_origin_world, vec3 ray_end_world, bool sky, float skylight, float shadow) {
+#ifdef DISTANT_HORIZONS
+    float fog_end = float(dhRenderDistance);
+#else
+    float fog_end = far;
+#endif
+
 	vec3 ray_direction_world; float ray_length;
 	length_normalize(ray_end_world - ray_origin_world, ray_direction_world, ray_length);
-	ray_length = sky ? 4096.0 : ray_length;
+	ray_length = sky ? fog_end : ray_length;
 
 	vec2 airmass = air_fog_analytic_airmass(
 		ray_origin_world, 

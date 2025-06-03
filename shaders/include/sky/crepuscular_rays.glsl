@@ -12,9 +12,16 @@ vec4 draw_crepuscular_rays(
 ) {
 	const uint step_count = 16u;
 	const float max_ray_length = 4096.0 / (CLOUDS_SCALE / 10.0);
+#ifdef SKY_GROUND
 	const float volume_inner_radius = planet_radius;
+#else 
+	// Allow volume to extend indefinitely into planet 
+	const float volume_inner_radius = 1.0;
+#endif
 	const float volume_outer_radius = clouds_cumulus_radius + clouds_cumulus_thickness * 0.5;
 	const vec3 extinction_coeff = (air_rayleigh_coefficient + 400.0 * air_mie_coefficient) * (CLOUDS_SCALE / 10.0);
+
+	const float underground_light_fade_distance = 100.0;
 
 	// Calculate ray start and ray end
 
@@ -23,7 +30,7 @@ vec4 draw_crepuscular_rays(
 	bool planet_intersected = intersect_sphere(ray_direction_world.y, r, min(r - 10.0, planet_radius)).y >= 0.0;
 
 	if (dists.y < 0.0                                   // volume not intersected
-	 || planet_intersected && r < clouds_cumulus_radius // planet blocking clouds
+	 //|| planet_intersected && r < clouds_cumulus_radius // planet blocking clouds
 	 || is_terrain                             // terrain blocking clouds
 	) { return vec4(vec3(0.0), 1.0); }
 
@@ -36,6 +43,9 @@ vec4 draw_crepuscular_rays(
 	vec3 ray_origin_shadow = shadowModelView[3].xyz + ray_direction_shadow * dists.x;
 	vec3 ray_step_shadow = ray_direction_shadow * step_length;
 
+	vec3 ray_origin_world = vec3(0.0, planet_radius, 0.0) + ray_direction_world * dists.x;
+	vec3 ray_step_planet = ray_direction_world * step_length;
+
 	// Raymarching loop
 
 	vec3 scattering_coeff = extinction_coeff;
@@ -46,6 +56,7 @@ vec4 draw_crepuscular_rays(
 	vec3 transmittance = vec3(1.0);
 
 	for (uint i = 0u; i < step_count; ++i) {
+		vec3 ray_position_planet = ray_origin_world + ray_step_planet * (float(i) + dither);
 		vec3 ray_position_shadow = ray_origin_shadow + ray_step_shadow * (float(i) + dither);
 
 		float cloud_shadow = texture(
@@ -53,7 +64,13 @@ vec4 draw_crepuscular_rays(
 			shadow_view_to_cloud_shadow_space(ray_position_shadow)
 		).y;
 
-		scattering += cube(cloud_shadow) * transmittance;
+		float a = linear_step(
+			sqr(planet_radius - underground_light_fade_distance), 
+			sqr(planet_radius), 
+			length_squared(ray_position_planet)
+		);
+
+		scattering += cube(cloud_shadow) * transmittance * a;
 		transmittance *= step_transmittance;
 	}
 

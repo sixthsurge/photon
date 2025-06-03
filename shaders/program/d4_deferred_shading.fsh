@@ -503,6 +503,7 @@ void main() {
 
 		float horizon_factor = linear_step(0.1, 1.0, exp(-75.0 * sqr(sun_dir.y + 0.0496)));
 			  horizon_factor = clamp01(horizon_factor + step(0.01, rainStrength));
+			  horizon_factor = max(horizon_factor, dampen(linear_step(0.15, 0.05, world_dir.y)));
 
 		vec3 border_fog_color = mix(atmosphere, horizon_color, sqr(horizon_factor)) * (1.0 - biome_cave);
 	#else

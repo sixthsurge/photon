@@ -18,6 +18,14 @@
 #include "/include/sky/stars.glsl"
 #include "/include/utility/geometry.glsl"
 
+#if defined PROGRAM_DEFERRED0
+#include "/include/sky/clouds.glsl"
+
+#if defined CREPUSCULAR_RAYS && !defined BLOCKY_CLOUDS
+#include "/include/sky/crepuscular_rays.glsl"
+#endif
+#endif
+
 const float sun_luminance  = 40.0; // luminance of sun disk
 const float moon_luminance = 4.0; // luminance of moon disk
 
@@ -76,6 +84,7 @@ vec4 get_clouds_and_aurora(vec3 ray_dir, vec3 clear_sky) {
 
 	// Lightning flash
 	result.scattering.rgb += LIGHTNING_FLASH_UNIFORM * lightning_flash_intensity * result.scattering.a;
+
 	#else
 	CloudsResult result = clouds_not_hit;
 	#endif
@@ -83,10 +92,25 @@ vec4 get_clouds_and_aurora(vec3 ray_dir, vec3 clear_sky) {
 	// Render aurora
 	vec3 aurora = draw_aurora(ray_dir, dither);
 
-	return vec4(
+	vec4 clouds_and_aurora = vec4(
 		result.scattering.xyz + aurora * result.transmittance,
 		result.transmittance
 	);
+
+	// Crepuscular rays
+
+	#if defined CREPUSCULAR_RAYS && !defined BLOCKY_CLOUDS
+	vec4 crepuscular_rays = draw_crepuscular_rays(
+		colortex8, 
+		ray_dir, 
+		false,
+		dither
+	);
+	clouds_and_aurora *= crepuscular_rays.w;
+	clouds_and_aurora.rgb += crepuscular_rays.xyz;
+	#endif
+
+	return clouds_and_aurora;
 #else
 	return vec4(0.0, 0.0, 0.0, 1.0);
 #endif
@@ -154,7 +178,14 @@ vec3 draw_sky(vec3 ray_dir, vec3 atmosphere) {
 }
 
 vec3 draw_sky(vec3 ray_dir) {
-	vec3 atmosphere = atmosphere_scattering(ray_dir, sun_color, sun_dir, moon_color, moon_dir, true);
+	vec3 atmosphere = atmosphere_scattering(
+		ray_dir, 
+		sun_color, 
+		sun_dir, 
+		moon_color, 
+		moon_dir,
+		true
+	);
 	return draw_sky(ray_dir, atmosphere);
 }
 

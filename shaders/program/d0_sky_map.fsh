@@ -52,6 +52,8 @@ uniform sampler2D colortex13;
 uniform sampler3D depthtex0; // atmospheric scattering LUT
 uniform sampler2D depthtex1;
 
+uniform sampler2D colortex8; // cloud shadow map
+
 uniform sampler2D noisetex;
 
 uniform mat4 gbufferModelView;
@@ -109,7 +111,6 @@ uniform float biome_may_snow;
 #if defined WORLD_OVERWORLD
 #include "/include/fog/overworld/analytic.glsl"
 #include "/include/sky/aurora.glsl"
-#include "/include/sky/clouds.glsl"
 #endif
 
 #include "/include/sky/sky.glsl"
