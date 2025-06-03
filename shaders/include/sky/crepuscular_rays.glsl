@@ -1,6 +1,7 @@
 #if !defined INCLUDE_SKY_CREPUSCULAR_RAYS
 #define INCLUDE_SKY_CREPUSCULAR_RAYS
 
+#include "/include/misc/distant_horizons.glsl"
 #include "/include/sky/clouds/common.glsl"
 #include "/include/lighting/cloud_shadows.glsl"
 
