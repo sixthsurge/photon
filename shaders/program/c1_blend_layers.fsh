@@ -281,7 +281,6 @@ void main() {
 #endif
 
 	fragment_color = texture(colortex0, refracted_uv * taau_render_scale).rgb;
-	vec3 original_color = fragment_color;
 
 	// Blend clouds behind translucents
 
@@ -291,6 +290,8 @@ void main() {
 	if (is_sky || sqr(clouds_apparent_distance) < length_squared(back_position_view)) {
 		fragment_color = fragment_color * clouds_and_aurora.w + clouds_and_aurora.xyz;
 	}
+
+	vec3 original_color = fragment_color;
 
 	// Apply rainbows
 
