@@ -3,7 +3,7 @@
 
 #include "/include/utility/bicubic.glsl"
 
-const ivec2 cloud_shadow_res = ivec2(256);
+const ivec2 cloud_shadow_res = ivec2(512);
 
 const float cloud_shadow_extent = 256.0 / (CLOUDS_SCALE / 10.0);
 

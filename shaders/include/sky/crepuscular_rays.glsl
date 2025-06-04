@@ -11,7 +11,8 @@ vec4 draw_crepuscular_rays(
 	bool is_terrain,
 	float dither
 ) {
-	const uint step_count = 16u;
+	const uint step_count_horizon = 20u;
+	const uint step_count_zenith  = 8u;
 	const float max_ray_length = 4096.0 / (CLOUDS_SCALE / 10.0);
 #ifdef SKY_GROUND
 	const float volume_inner_radius = planet_radius;
@@ -23,6 +24,12 @@ vec4 draw_crepuscular_rays(
 	const vec3 extinction_coeff = (air_rayleigh_coefficient + 400.0 * air_mie_coefficient) * (CLOUDS_SCALE / 10.0);
 
 	const float underground_light_fade_distance = 100.0;
+
+	uint step_count = uint(mix(
+		step_count_horizon, 
+		step_count_zenith, 
+		dampen(abs(ray_direction_world.y))
+	));
 
 	// Calculate ray start and ray end
 

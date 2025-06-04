@@ -105,6 +105,10 @@ uniform float biome_humidity;
 #define ATMOSPHERE_SCATTERING_LUT depthtex0
 #define MIE_PHASE_CLAMP
 
+#ifdef CLOUDS_CUMULUS_PRECOMPUTE_LOCAL_COVERAGE
+	#define CLOUDS_USE_LOCAL_COVERAGE_MAP
+#endif
+
 #if defined WORLD_OVERWORLD
 #include "/include/sky/atmosphere.glsl"
 #include "/include/sky/aurora.glsl"

@@ -276,6 +276,8 @@ option.CLOUDS_CUMULUS_WIND_SPEED            = Wind Speed
 suffix.CLOUDS_CUMULUS_ALTITUDE              = m/s
 option.CLOUDS_CUMULUS_WIND_ANGLE            = Wind Angle
 suffix.CLOUDS_CUMULUS_ALTITUDE              = °
+option.CLOUDS_CUMULUS_PRECOMPUTE_LOCAL_COVERAGE = Precompute Local Coverage
+comment.CLOUDS_CUMULUS_PRECOMPUTE_LOCAL_COVERAGE = Aggressive optimization for cumulus clouds. Reduces the maximum distance clouds can be drawn and can cause some artifacts with cloud shapes morphing when the camera moves. Disable for taking screenshots above the clouds
 
 option.CLOUDS_ALTOCUMULUS                       = Altocumulus Clouds
 option.CLOUDS_ALTOCUMULUS.comment               = Mid-altitude volumetric clouds made to resemble altocumulus clouds

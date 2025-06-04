@@ -59,7 +59,6 @@ float clouds_altocumulus_density(vec3 pos) {
 	if (density < eps) return 0.0;
 
 #ifndef PROGRAM_PREPARE
-	// Curl noise used to warp the 3D noise into swirling shapes
 	vec3 wind = vec3(wind_velocity * world_age, 0.0).xzy;
 
 	// 3D worley noise for detail
@@ -167,6 +166,9 @@ CloudsResult draw_altocumulus_clouds(
 	const float min_transmittance     = 0.075;
 	const float planet_albedo         = 0.4;
 	const vec3  sky_dir               = vec3(0.0, 1.0, 0.0);
+
+	// Early exit if coverage is 0
+	if (clouds_params.l1_coverage.y < eps) { return clouds_not_hit; }
 
 	uint primary_steps = uint(mix(primary_steps_horizon, primary_steps_zenith, abs(ray_dir.y)));
 

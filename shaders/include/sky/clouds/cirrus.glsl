@@ -160,6 +160,11 @@ CloudsResult draw_cirrus_clouds(
 	float distance_to_terrain,
 	float dither
 ) {
+	// Early exit if coverage is 0
+	if (clouds_params.cirrus_amount < eps && clouds_params.cirrocumulus_amount < eps) { 
+		return clouds_not_hit; 
+	}
+
 	// ---------------
 	//   Ray Casting
 	// ---------------

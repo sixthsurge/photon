@@ -109,6 +109,11 @@ uniform float biome_may_snow;
 // ------------
 
 #define ATMOSPHERE_SCATTERING_LUT depthtex0
+#define CLOUDS_USE_LOCAL_COVERAGE_MAP
+
+#ifdef CLOUDS_CUMULUS_PRECOMPUTE_LOCAL_COVERAGE
+	#define CLOUDS_USE_LOCAL_COVERAGE_MAP
+#endif
 
 #if defined WORLD_OVERWORLD
 #include "/include/fog/overworld/analytic.glsl"
