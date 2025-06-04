@@ -2,14 +2,14 @@
 #define INCLUDE_LIGHTING_LPV_LIGHT_COLORS
 
 const vec3[32] light_color = vec3[32](
-	vec3(1.00, 1.00, 1.00) * 16.0, // Strong white light
+	vec3(1.00, 1.00, 1.00) * 12.0, // Strong white light
 	vec3(1.00, 1.00, 1.00) *  6.0, // Medium white light
 	vec3(1.00, 1.00, 1.00) *  1.0, // Weak white light
-	vec3(1.00, 0.55, 0.27) * 16.0, // Strong golden light
+	vec3(1.00, 0.55, 0.27) * 14.0, // Strong golden light
 	vec3(1.00, 0.57, 0.30) *  8.0, // Medium golden light
 	vec3(1.00, 0.57, 0.30) *  4.0, // Weak golden light
 	vec3(1.00, 0.18, 0.10) *  5.0, // Redstone components
-	vec3(1.00, 0.30, 0.10) * 24.0, // Lava
+	vec3(1.00, 0.38, 0.10) *  7.0, // Lava
 	vec3(1.00, 0.45, 0.10) *  9.0, // Medium orange light
 	vec3(1.00, 0.63, 0.15) *  4.0, // Brewing stand
 	vec3(1.00, 0.57, 0.30) * 12.0, // Medium golden light
@@ -17,7 +17,7 @@ const vec3[32] light_color = vec3[32](
 	vec3(0.45, 0.73, 1.00) * 14.0, // Beacon
 	vec3(0.75, 1.00, 0.83) *  3.0, // Sculk
 	vec3(0.75, 1.00, 0.83) *  1.0, // End portal frame
-	vec3(0.60, 0.10, 1.00) *  4.0, // Pink glow
+	vec3(0.60, 0.10, 1.00) *  2.5, // Pink glow
 	vec3(0.75, 1.00, 0.50) *  1.0, // Sea pickle
 	vec3(1.00, 0.50, 0.25) *  4.0, // Nether plants
 	vec3(1.00, 0.57, 0.30) *  8.0, // Medium golden light
