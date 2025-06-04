@@ -205,6 +205,11 @@ option.BLOCKLIGHT_I                    = Blocklight Intensity
 option.VOXEL_VOLUME_SIZE               = Voxel Volume Size
 option.VOXEL_VOLUME_SIZE.comment       = High performance impact, also affected by shadow distance
 suffix.VOXEL_VOLUME_SIZE               = m
+option.VOXEL_VOLUME_CENTER             = Voxel Volume Center
+option.VOXEL_VOLUME_CENTER.comment     = Ahead: voxel volume is centered in front of the player, meaning that more of it is visible
+
+value.VOXEL_VOLUME_CENTER.VOXEL_VOLUME_CENTER_AHEAD  = Ahead
+value.VOXEL_VOLUME_CENTER.VOXEL_VOLUME_CENTER_PLAYER = Player
 
 suffix.shadowMapResolution             = ²
 suffix.sunPathRotation                 = °

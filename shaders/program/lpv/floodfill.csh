@@ -32,6 +32,9 @@ uniform sampler3D light_sampler_b;
 uniform usampler3D voxel_sampler;
 uniform sampler2D light_data_sampler;
 
+uniform mat4 gbufferModelViewInverse;
+uniform mat4 gbufferPreviousModelView;
+
 uniform vec3 cameraPosition;
 uniform vec3 previousCameraPosition;
 

@@ -7,12 +7,29 @@ const ivec3 voxel_volume_size = ivec3(VOXEL_VOLUME_SIZE);
 const float voxelDistance = 32.0;
 #endif
 
+vec3 get_voxel_volume_center(vec3 look_direction) {
+#if   VOXEL_VOLUME_CENTER == VOXEL_VOLUME_CENTER_AHEAD
+	// Center the voxel volume in front of the player
+	// Returns the integer offsets towards the center from the scene space origin
+
+	// Fraction of the voxel volume size that is behind the player
+	const float voxelization_fraction_behind_player = 0.15; // blocks
+
+	return floor(look_direction * voxel_volume_size * (0.5 - voxelization_fraction_behind_player) * rcp(max_of(abs(look_direction))));
+#else 
+	// Voxel volume is centered on the player (origin in scene space)
+	return vec3(0.0);
+#endif
+}
+
 vec3 scene_to_voxel_space(vec3 scene_pos) {
-	return scene_pos + fract(cameraPosition) + (0.5 * vec3(voxel_volume_size));
+	vec3 to_center = get_voxel_volume_center(gbufferModelViewInverse[2].xyz);
+	return scene_pos + fract(cameraPosition) + (0.5 * vec3(voxel_volume_size)) + to_center;
 }
 
 vec3 voxel_to_scene_space(vec3 voxel_pos) {
-	return voxel_pos - fract(cameraPosition) - (0.5 * vec3(voxel_volume_size));
+	vec3 to_center = get_voxel_volume_center(gbufferModelViewInverse[2].xyz);
+	return voxel_pos - fract(cameraPosition) - (0.5 * vec3(voxel_volume_size)) - to_center;
 }
 
 bool is_inside_voxel_volume(vec3 voxel_pos) {
