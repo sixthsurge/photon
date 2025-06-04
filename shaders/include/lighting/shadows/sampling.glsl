@@ -113,6 +113,10 @@ vec3 shadow_basic(vec3 shadow_screen_pos) {
 vec3 shadow_pcf(
 	vec3 shadow_screen_pos,
 	vec3 shadow_clip_pos,
+#ifdef SHADOW_COLOR 
+	vec3 shadow_screen_pos_translucent, 
+	vec3 shadow_clip_pos_translucent, 
+#endif
 	float penumbra_size,
 	float dither
 ) {
@@ -142,15 +146,20 @@ vec3 shadow_pcf(
 		     uv /= get_distortion_factor(uv);
 		     uv  = uv * 0.5 + 0.5;
 
-		ivec2 texel = ivec2(uv * shadow_map_res);
-
 		shadow += texture(shadowtex1, vec3(uv, shadow_screen_pos.z));
 
 #ifdef SHADOW_COLOR
+		// sample shadow color
+		uv  = shadow_clip_pos_translucent.xy + offset;
+		uv /= get_distortion_factor(uv);
+		uv  = uv * 0.5 + 0.5;
+
+		ivec2 texel = ivec2(uv * shadow_map_res);
+
 		float depth = texelFetch(shadowtex0, texel, 0).x;
 
 		vec3 color = texelFetch(shadowcolor0, texel, 0).rgb;
-		     color = mix(vec3(1.0), 4.0 * color, step(depth, shadow_screen_pos.z));
+		     color = mix(vec3(1.0), 4.0 * color, step(depth, shadow_screen_pos_translucent.z));
 
 		float weight = step(eps, max_of(color));
 
@@ -202,6 +211,10 @@ vec3 calculate_shadows(
 
 	vec3 bias = get_shadow_bias(scene_pos, flat_normal, NoL, skylight);
 
+	// Light leaking prevention from Complementary Reimagined, used with permission
+	vec3 edge_factor = 0.1 - 0.2 * fract(scene_pos + cameraPosition + flat_normal * 0.01);
+	edge_factor -= edge_factor * skylight;
+
 #ifdef PIXELATED_SHADOWS
 	// Snap position to the nearest block texel
 	const float pixel_scale = float(PIXELATED_SHADOWS_RESOLUTION);
@@ -210,7 +223,7 @@ vec3 calculate_shadows(
 	scene_pos = scene_pos - cameraPosition;
 #endif
 
-	vec3 shadow_view_pos = transform(shadowModelView, scene_pos + bias);
+	vec3 shadow_view_pos = transform(shadowModelView, scene_pos + bias + edge_factor);
 	vec3 shadow_clip_pos = project_ortho(shadowProjection, shadow_view_pos);
 	vec3 shadow_screen_pos = distort_shadow_space(shadow_clip_pos) * 0.5 + 0.5;
 
@@ -249,8 +262,25 @@ vec3 calculate_shadows(
 	penumbra_size *= 1.0 + 7.0 * sss_amount;
 #endif
 
+#ifdef SHADOW_COLOR
+	// Calculate position without light leaking fix applied, for colored shadow
+	// Applying light leaking fix to translucent shadows causes artifacts on water caustics
+	vec3 shadow_view_pos_translucent = transform(shadowModelView, scene_pos + bias);
+	vec3 shadow_clip_pos_translucent = project_ortho(shadowProjection, shadow_view_pos_translucent);
+	vec3 shadow_screen_pos_translucent = distort_shadow_space(shadow_clip_pos_translucent) * 0.5 + 0.5;
+#endif
+
 #ifdef SHADOW_PCF
-	vec3 shadow = shadow_pcf(shadow_screen_pos, shadow_clip_pos, penumbra_size, dither);
+	vec3 shadow = shadow_pcf(
+		shadow_screen_pos, 
+		shadow_clip_pos, 
+	#ifdef SHADOW_COLOR 
+		shadow_screen_pos_translucent,
+		shadow_clip_pos_translucent,
+	#endif
+		penumbra_size, 
+		dither
+	);
 #else
 	vec3 shadow = shadow_basic(shadow_screen_pos);
 #endif

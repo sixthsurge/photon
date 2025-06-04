@@ -28,8 +28,7 @@ vec3 undistort_shadow_space(vec3 shadow_clip_pos) {
 	return shadow_clip_pos;
 }
 
-// Shadow bias method from Complementary Reimagined by Emin (fully fixes peter panning
-// and light leaking underground!)
+// Shadow bias method from Complementary Reimagined by Emin 
 // Many thanks to Emin for letting me use it <3
 // https://www.complementary.dev/reimagined
 vec3 get_shadow_bias(vec3 scene_pos, vec3 normal, float NoL, float skylight) {
@@ -38,12 +37,7 @@ vec3 get_shadow_bias(vec3 scene_pos, vec3 normal, float NoL, float skylight) {
 #endif
 
 	// Shadow bias without peter-panning
-	vec3 bias = 0.25 * normal * clamp01(0.12 + 0.01 * length(scene_pos)) * (2.0 - clamp01(NoL));
-
-	// Fix light leaking in caves
-	vec3 edge_factor = 0.1 - 0.2 * fract(scene_pos + cameraPosition + normal * 0.01);
-
-	return bias + edge_factor * clamp01(1.0 - skylight);
+	return 0.25 * normal * clamp01(0.12 + 0.01 * length(scene_pos)) * (2.0 - clamp01(NoL));
 }
 
 #endif // INCLUDE_LIGHTING_DISTORTION
