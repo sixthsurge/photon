@@ -40,7 +40,7 @@ float clouds_cumulus_congestus_density(vec3 pos) {
 	// 2D noise for base shape and coverage
 	float noise = texture(noisetex, (0.000003 / CLOUDS_CUMULUS_CONGESTUS_SIZE) * (pos.xz + wind_velocity * (world_age + 50.0 * sqr(altitude_fraction)))).w;
 
-	float density  = 1.5 * sqr(linear_step(0.75 - 0.15 * clamp01(clouds_params.cumulus_congestus_blend), 1.0, sqrt(noise)));
+	float density  = 1.5 * sqr(linear_step(0.75 - 0.15 * clamp01(clouds_params.cumulus_congestus_blend * CLOUDS_CUMULUS_CONGESTUS_COVERAGE), 1.0, sqrt(noise)));
 	      density  = clouds_cumulus_congestus_altitude_shaping(density, altitude_fraction);
 		  density *= 4.0 * distance_fraction * (1.0 - distance_fraction);
 		  density *= linear_step(0.0, 0.3, clouds_params.cumulus_congestus_blend);
