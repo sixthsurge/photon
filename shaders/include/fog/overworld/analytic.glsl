@@ -72,7 +72,7 @@ mat2x3 air_fog_analytic(vec3 ray_origin_world, vec3 ray_end_world, bool sky, flo
 	//*/
 
 	scattering *= max(skylight, eye_skylight);
-	scattering *= 1.0 - blindness;
+	scattering *= clamp01(1.0 - blindness - darknessFactor);
 
 	// Artifically brighten fog in the early morning and evening (looks nice)
 	float evening_glow = 0.75 * linear_step(0.05, 1.0, exp(-300.0 * sqr(sun_dir.y + 0.02)));

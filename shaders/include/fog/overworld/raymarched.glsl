@@ -170,7 +170,7 @@ mat2x3 raymarch_air_fog(vec3 world_start_pos, vec3 world_end_pos, bool sky, floa
 	}
 	//*/
 
-	scattering *= 1.0 - blindness;
+	scattering *= clamp01(1.0 - blindness - darknessFactor);
 
 	// Artifically brighten fog in the early morning and evening (looks nice)
 	float evening_glow = 0.75 * linear_step(0.05, 1.0, exp(-300.0 * sqr(sun_dir.y + 0.02)));

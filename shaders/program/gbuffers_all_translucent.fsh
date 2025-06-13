@@ -354,6 +354,14 @@ void main() {
 
 	vec2 adjusted_light_levels = light_levels;
 
+
+#ifdef NO_NORMAL
+	// No normal vector => make one from screen-space partial derivatives
+	// NB: It is important to do this before the alpha discard, otherwise it creates issues on the
+	// outline of things
+	normal = normalize(cross(dFdx(position_scene), dFdy(position_scene)));
+#endif
+
 	//------------------------------------------------------------------------//
 	if (is_water) {
 #ifdef PROGRAM_GBUFFERS_WATER
@@ -424,7 +432,7 @@ void main() {
 		fragment_color.rgb = mix(fragment_color.rgb, entityColor.rgb, entityColor.a);
 #endif
 
-		if (fragment_color.a < 0.1) discard;
+		if (fragment_color.a < 0.1) { discard; return; }
 
 		material = material_from(fragment_color.rgb, material_mask, world_pos, tbn[2], adjusted_light_levels);
 
@@ -436,7 +444,7 @@ void main() {
 
 		//--//
 
-#ifdef NORMAL_MAPPING
+#if defined NORMAL_MAPPING && !defined NO_NORMAL
 		float material_ao;
 		decode_normal_map(normal_map, normal_tangent, material_ao);
 
@@ -451,11 +459,6 @@ void main() {
 
 #ifdef SPECULAR_MAPPING
 		decode_specular_map(specular_map, material);
-#endif
-
-#ifdef NO_NORMAL
-		// No normal vector => make one from screen-space partial derivatives
-		normal = normalize(cross(dFdx(position_scene), dFdy(position_scene)));
 #endif
 
 		fragment_color.a = sqrt(fragment_color.a);

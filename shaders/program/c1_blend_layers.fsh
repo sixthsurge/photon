@@ -203,6 +203,8 @@ vec4 read_clouds_and_aurora(vec2 uv, out float apparent_distance) {
 		result.xyz += LIGHTNING_FLASH_UNIFORM * lightning_flash_intensity * ambient_scattering;
 	}
 
+	result.xyz *= clamp01(1.0 - blindness - darknessFactor);
+
 	return result;
 #else
 	return vec4(0.0, 0.0, 0.0, 1.0);

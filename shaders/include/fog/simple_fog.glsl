@@ -26,6 +26,9 @@ const float nether_fog_density = 0.01 * NETHER_FOG_INTENSITY;
 const float blindness_fog_start   = 2.0;
 const float blindness_fog_density = 1.0;
 
+const float darkness_fog_start   = 8.0;
+const float darkness_fog_density = 2.0;
+
 const float nether_bloomy_fog_density = 0.25 * nether_fog_density;
 
 #ifdef DISTANT_HORIZONS
@@ -66,13 +69,18 @@ vec4 common_fog(float view_dist, const bool sky) {
 	fog.a   *= snow_fog;
 
 	// Blindness fog
-	float blindness_fog = mix(
+	fog *= mix(
 		1.0,
 		spherical_fog(view_dist, blindness_fog_start, blindness * blindness_fog_density),
-		blindness
+		blindness 
 	);
-	fog.rgb *= blindness_fog;
-	fog.a   *= blindness_fog;
+
+	// Darkness fog
+	fog *= mix(
+		1.0,
+		spherical_fog(view_dist, darkness_fog_start, darknessFactor * darkness_fog_density),
+		darknessFactor
+	);
 
 #if defined WORLD_OVERWORLD && defined CAVE_FOG
 	// Cave fog

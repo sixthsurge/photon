@@ -82,6 +82,7 @@ uniform int isEyeInWater;
 uniform float eyeAltitude;
 uniform float rainStrength;
 uniform float blindness;
+uniform float darknessFactor;
 
 uniform int dhRenderDistance;
 
