@@ -15,6 +15,8 @@ layout (local_size_x = 32) in;
 
 #if   VOXEL_VOLUME_SIZE == 64
 const ivec3 workGroups = ivec3(2, 64, 64);
+#elif VOXEL_VOLUME_SIZE == 96
+const ivec3 workGroups = ivec3(3, 96, 96);
 #elif VOXEL_VOLUME_SIZE == 128
 const ivec3 workGroups = ivec3(4, 128, 128);
 #elif VOXEL_VOLUME_SIZE == 256

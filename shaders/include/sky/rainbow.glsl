@@ -62,7 +62,7 @@ vec3 draw_rainbows(
 		return fragment_color;
 	}
 
-	float rainbow_angle = fast_acos(clamp01(-dot(direction_world, sun_dir)));
+	float rainbow_angle = fast_acos(clamp01(-dot(direction_world, light_dir)));
 
 	vec3 first_rainbow = draw_single_rainbow(
 		rainbow_angle,

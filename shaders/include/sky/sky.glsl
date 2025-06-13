@@ -1,4 +1,4 @@
-#if !defined INCLUDE_SKY_SKY
+#if !defined INCLUDE_SKY_SKYsky
 #define INCLUDE_SKY_SKY
 
 #include "/include/utility/color.glsl"
@@ -27,7 +27,7 @@
 #endif
 
 const float sun_luminance  = 40.0; // luminance of sun disk
-const float moon_luminance = 4.0; // luminance of moon disk
+const float moon_luminance = 10.0; // luminance of moon disk
 
 vec3 draw_sun(vec3 ray_dir) {
 	float nu = dot(ray_dir, sun_dir);

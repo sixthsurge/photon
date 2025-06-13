@@ -224,7 +224,8 @@ void main() {
 		sun_dir, 
 		moon_color, 
 		moon_dir, 
-		/* use_klein_nishina_phase */ depth == 1.0
+		/* use_klein_nishina_phase */ depth == 1.0 
+			&& !(sunAngle > 0.5 && any(equal(ivec3(moonPhase), ivec3(3, 4, 5)))) 
 	);
 
 #ifdef BLOCKY_CLOUDS
