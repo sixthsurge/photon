@@ -27,7 +27,7 @@ OverworldFogParameters get_fog_parameters(Weather weather) {
 
 	// rain
 	params.rayleigh_scattering_coeff = mix(
-		params.rayleigh_scattering_coeff, 
+		params.rayleigh_scattering_coeff * (1.0 + weather.humidity * weather.temperature), 
 		rayleigh_rain, 
 		rainStrength * biome_may_rain
 	);
@@ -44,7 +44,12 @@ OverworldFogParameters get_fog_parameters(Weather weather) {
 		+ AIR_FOG_MIE_DENSITY_MIDNIGHT  * time_midnight
 		+ AIR_FOG_MIE_DENSITY_BLUE_HOUR * blue_hour;
 
-	mie = mix(mie, AIR_FOG_MIE_DENSITY_RAIN, rainStrength * biome_may_rain);
+	// Weather influence
+	mie = mix(
+		mie + 8.0 * AIR_FOG_MIE_DENSITY_NOON * sqr(clamp01(weather.humidity * rcp(0.8))), 
+		AIR_FOG_MIE_DENSITY_RAIN, 
+		rainStrength * biome_may_rain
+	);
 	mie = mix(mie, AIR_FOG_MIE_DENSITY_SNOW, rainStrength * biome_may_snow);
 
 	float mie_albedo = mix(0.9, 0.5, rainStrength * biome_may_rain);

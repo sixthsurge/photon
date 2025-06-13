@@ -12,8 +12,8 @@
 
 #include "/include/misc/material_masks.glsl"
 
-#if defined PROGRAM_GBUFFERS_TERRAIN 
-//#include "/include/misc/weather.glsl"
+#if defined WAVING_PLANTS || defined WAVING_LEAVES
+#include "/include/weather/core.glsl"
 #endif
 
 #ifdef IS_IRIS 
@@ -55,7 +55,9 @@ vec3 get_wind_displacement(vec3 world_pos, float wind_speed, float wind_strength
 	const vec2  wind_dir   = vec2(cos(wind_angle), sin(wind_angle));
 
 	#if defined WORLD_OVERWORLD
-	// Get weather windiness
+	// Adjust wind strength based on weather windiness
+	float windiness = weather_wind();
+	wind_strength *= 0.5 + windiness;
 	#endif
 
 	float t = wind_speed * frameTimeCounter;

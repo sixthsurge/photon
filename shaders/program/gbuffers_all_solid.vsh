@@ -62,9 +62,18 @@ uniform ivec2 atlasSize;
 
 uniform float frameTimeCounter;
 uniform float rainStrength;
+uniform float wetness;
 
 uniform vec2 taa_offset;
 uniform vec3 light_dir;
+
+uniform float world_age;
+uniform float time_sunrise;
+uniform float time_noon;
+uniform float time_sunset;
+uniform float time_midnight;
+uniform float biome_temperature;
+uniform float biome_humidity;
 
 #if defined PROGRAM_GBUFFERS_BLOCK
 uniform int blockEntityId;
