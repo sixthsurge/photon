@@ -85,9 +85,9 @@ uniform float time_midnight;
 
 #if defined WORLD_OVERWORLD
 #include "/include/lighting/colors/light_color.glsl"
-#include "/include/misc/weather.glsl"
 #include "/include/sky/atmosphere.glsl"
 #include "/include/sky/projection.glsl"
+#include "/include/weather/fog.glsl"
 #endif
 
 #include "/include/utility/random.glsl"

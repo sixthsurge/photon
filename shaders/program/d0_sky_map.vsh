@@ -89,7 +89,8 @@ uniform float desert_sandstorm;
 #include "/include/sky/aurora_colors.glsl"
 #include "/include/lighting/colors/light_color.glsl"
 #include "/include/lighting/colors/weather_color.glsl"
-#include "/include/misc/weather.glsl"
+#include "/include/weather/fog.glsl"
+#include "/include/weather/clouds.glsl"
 #endif
 
 #if defined WORLD_NETHER

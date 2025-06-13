@@ -85,7 +85,7 @@ uniform float time_midnight;
 uniform float desert_sandstorm;
 
 #if defined WORLD_OVERWORLD 
-#include "/include/misc/weather.glsl"
+#include "/include/weather/fog.glsl"
 #endif
 
 void main() {

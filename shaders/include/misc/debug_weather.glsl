@@ -33,7 +33,8 @@ uniform float biome_humidity;
 
 uniform float desert_sandstorm;
 
-#include "/include/misc/weather.glsl"
+#include "/include/weather/core.glsl"
+#include "/include/weather/clouds.glsl"
 
 void debug_weather(inout vec3 color) {
 	const int number_col = 30;

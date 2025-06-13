@@ -77,9 +77,9 @@ uniform float desert_sandstorm;
 #if defined WORLD_OVERWORLD
 #include "/include/lighting/colors/light_color.glsl"
 #include "/include/lighting/colors/weather_color.glsl"
-#include "/include/misc/weather.glsl"
 #include "/include/sky/atmosphere.glsl"
 #include "/include/sky/aurora_colors.glsl"
+#include "/include/weather/clouds.glsl"
 #endif
 
 void main() {

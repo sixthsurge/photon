@@ -119,7 +119,7 @@ uniform int currentRenderedItemId;
 #include "/include/vertex/utility.glsl"
 
 #if defined WORLD_OVERWORLD 
-#include "/include/misc/weather.glsl"
+#include "/include/weather/fog.glsl"
 #endif
 
 void main() {

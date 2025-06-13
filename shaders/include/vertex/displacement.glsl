@@ -12,6 +12,10 @@
 
 #include "/include/misc/material_masks.glsl"
 
+#if defined PROGRAM_GBUFFERS_TERRAIN 
+//#include "/include/misc/weather.glsl"
+#endif
+
 #ifdef IS_IRIS 
 uniform vec3 eyePosition;
 #else 
@@ -49,6 +53,10 @@ float get_water_displacement(vec3 world_pos, float skylight) {
 vec3 get_wind_displacement(vec3 world_pos, float wind_speed, float wind_strength, bool is_tall_plant_top_vertex) {
 	const float wind_angle = 30.0 * degree;
 	const vec2  wind_dir   = vec2(cos(wind_angle), sin(wind_angle));
+
+	#if defined WORLD_OVERWORLD
+	// Get weather windiness
+	#endif
 
 	float t = wind_speed * frameTimeCounter;
 

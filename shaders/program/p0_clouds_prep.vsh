@@ -63,7 +63,7 @@ uniform float biome_humidity;
 uniform float desert_sandstorm;
 
 
-#include "/include/misc/weather.glsl"
+#include "/include/weather/clouds.glsl"
 
 #ifndef IS_IRIS
 // `sunPosition` fix by Builderb0y 
