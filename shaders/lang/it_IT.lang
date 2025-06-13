@@ -15,16 +15,19 @@ screen.materials                       = Materiali
 screen.water                           = Acqua
 screen.post                            = Post-Elaborazione
 screen.misc                            = Varie
-screen.box                             = Box
 
+screen.weather                         = Meteo 
 screen.colored_lights                  = Impostazioni Luci Colorate
 screen.rp_settings                     = Impostazioni Resource Pack
 screen.reflections                     = Riflessi
 screen.refraction                      = Rifrazione
 screen.light_sources                   = Fonti di luce
 screen.shadows                         = Ombre
+screen.ao                              = Occlusione ambientale
 screen.color_grading                   = Gradiente di Colore
 screen.exposure                        = Esposizione
+screen.lpv_vl                          = Dispersione Luci Colorate Nebbia
+screen.box                             = Box di selezione
 
 screen.aurora                          = Aurora
 screen.clouds                          = Nuvole
@@ -33,6 +36,7 @@ screen.clouds_altocumulus              = Impostazioni Nuvole Altocumulus
 screen.clouds_cumulus_congestus        = Impostazioni Nuvole Cumulus Congestus
 screen.clouds_cirrus                   = Impostazioni Nuvole Cirrus/Cirrocumulus
 screen.clouds_minecrafty               = Impostazioni Nuvole vanilla
+screen.clouds_noctilucent              = Impostazioni Nuvole Nottilucenti
 
 screen.fog_rlh                         = Coefficente Rayleigh
 screen.fog_mie                         = Coefficente Mie
@@ -54,23 +58,11 @@ screen.fog_rlh_swamp                   = Colore Palude
 screen.water_waves                     = Onde
 screen.water_fog_coeff                 = Coefficente sott'acqua
 
-screen.weather                         = Sistema meteo giornaliero
-screen.weather_d0                      = Giorno 0
-screen.weather_d1                      = Giorno 1
-screen.weather_d2                      = Giorno 2
-screen.weather_d3                      = Giorno 3
-screen.weather_d4                      = Giorno 4
-screen.weather_d5                      = Giorno 5
-screen.weather_d6                      = Giorno 6
-screen.weather_d7                      = Giorno 7
-screen.weather_d8                      = Giorno 8
-screen.weather_d9                      = Giorno 9
-screen.weather_d10                     = Giorno 10
-screen.weather_d11                     = Giorno 11
-
 screen.end_light_color                 = Colore Luci
 screen.end_ambient_color               = Colore Ambiente
 screen.nether_color                    = Colore Statico
+
+screen.distance_view                   = Distanza Visiva
 
 option.INFO                            = Photon Shader
 value.INFO.0                           = §eby SixthSurge
@@ -103,19 +95,25 @@ option.DESERT_SANDSTORM.comment        = Tempeste di Sabbbia quando piove in un 
 option.END_GLOW                        = End Luminoso
 option.END_GLOW.comment                = Effetto luminoso ondeggiante nell'End. Richiede Luci Volumetriche
 
+# Weather
+option.RANDOM_WEATHER_VARIATION            = Variazione Random
+option.BIOME_WEATHER_VARIATION             = Variazione Bioma
+option.WEATHER_TEMPERATURE_BIAS            = Variabile Temperatura
+option.WEATHER_HUMIDITY_BIAS               = Variabile Umidità
+option.WEATHER_WIND_BIAS                   = Variabile Vento
+option.WEATHER_TEMPERATURE_VARIATION_SPEED = Velocità Variazione Temperatura
+option.WEATHER_HUMIDITY_VARIATION_SPEED    = Velocità Variazione Umidità
+option.WEATHER_WIND_VARIATION_SPEED        = Velocità Variazione Vento
+
 # Lighting settings
 
-option.COLORosso_LIGHTS                  = Luci Colorate
-option.COLORosso_LIGHTS.comment          = Blocchi luci con colore variabile usando algoritmo Flood Fill. Richiede Iris 1.6 o superiori
-option.COLORosso_LIGHTS_VANILLA_LIGHTMAP_CONTRIBUTION = Contributo Vanilla lightmap
+option.COLORED_LIGHTS                    = Luci Colorate
+option.COLORED_LIGHTS.comment            = Blocchi luci con colore variabile usando algoritmo Flood Fill. Richiede Iris 1.6 o superiori
+option.COLORED_LIGHTS_VANILLA_LIGHTMAP_CONTRIBUTION = Contributo Vanilla lightmap
 option.HANDHELD_LIGHTING               = Illuminazione in mano
 option.HANDHELD_LIGHTING.comment       = Illuminazione dell'ambiente con oggetti luminosi in mano. Se Luci Colorate è attivo l'Illuminazione in mano sarà colorata in base all'oggetto
 option.HANDHELD_LIGHTING_INTENSITY     = Intensità Illuminazione in mano
 option.HANDHELD_LIGHTING_INTENSITY.comment = Modifica la luminosità degli oggetti con Illuminazione in mano attivata
-option.GTAO                            = Shader AO
-option.GTAO.comment                    = Occlusione Ambientale "Ground-Truth" (GTAO). Aggiunge ombre leggere nei bordi
-option.VANILLA_AO                      = Vanilla AO
-option.VANILLA_AO.comment              = Occlusione Ambientale nativa di Minecraft
 option.AO_IN_SUNLIGHT                  = AO nella Luce Solare
 option.AO_IN_SUNLIGHT.comment          = Applicazione dell'occlusione ambientale sotto luce solare o lunare
 option.CLOUD_SHADOWS                   = Ombre Nuvole
@@ -148,6 +146,24 @@ option.BLOCK_ENTITY_SHADOWS            = Ombre Entità Blocchi
 option.PIXELATED_SHADOWS               = Ombre Pixellate
 option.PIXELATED_SHADOWS.comment       = Ombre suddivise in piccoli blocchi, creando un look pixellato
 option.PIXELATED_SHADOWS_RESOLUTION    = Risoluzione Ombre Pixellate
+
+option.SHADER_AO                       = Shader AO
+option.SHADER_AO.comment               = Metodo usato AO. Off - no shader AO. SSAO - qualità minore ma richiede meno filtraggio. GTAO - qualità migliore ma richiede più filtraggio
+value.SHADER_AO.SHADER_AO_NONE         = Off
+value.SHADER_AO.SHADER_AO_SSAO         = SSAO
+value.SHADER_AO.SHADER_AO_GTAO         = GTAO
+option.VANILLA_AO                      = AO Vanilla
+option.VANILLA_AO.comment              = Occlusione ambientale di Minecraft
+option.SSAO_RADIUS                     = Raggio SSAO
+comment.SSAO_RADIUS                    = Modifica il raggio di azione del SSAO - distanza alla quale gli oggetti possono occludersi a vicenda
+option.SSAO_STEPS                      = Qualità SSAO
+comment.SSAO_STEPS                     = Controlla quanto rumore produce Il SSAO
+option.GTAO_RADIUS                     = Raggio GTAO
+comment.GTAO_RADIUS                    = MOdifica il raggio di azione del GTAO - distanza alla quale gli oggetti possono occludersi a vicenda
+option.GTAO_SLICES                     = Qualità GTAO
+comment.GTAO_SLICES                    = Controlla quanto rumore produce il GTAO
+option.GTAO_HORIZON_STEPS              = Qualità Orizzonte GTAO
+comment.GTAO_HORIZON_STEPS             = Controlla l'accuratezza del GTAO
 
 option.SUN_NR                          = Rosso
 option.SUN_NG                          = Verde
@@ -189,6 +205,11 @@ option.BLOCKLIGHT_I                    = Intensità Luce Blocchi
 option.VOXEL_VOLUME_SIZE               = Dimensioni volume Voxel
 option.VOXEL_VOLUME_SIZE.comment       = Grosso impatto performance, anche affetto dalla Distanza Ombre
 suffix.VOXEL_VOLUME_SIZE               = m
+option.VOXEL_VOLUME_CENTER             = Centro Volume Voxel
+option.VOXEL_VOLUME_CENTER.comment     = Davanti: volume voxel è centrato davanti il giocatore, rendendolo più visibile.
+
+value.VOXEL_VOLUME_CENTER.VOXEL_VOLUME_CENTER_AHEAD  = Davanti
+value.VOXEL_VOLUME_CENTER.VOXEL_VOLUME_CENTER_PLAYER = Giocatore
 
 suffix.shadowMapResolution             = ²
 suffix.sunPathRotation                 = °
@@ -212,6 +233,8 @@ value.shadowDistance.384.0             = 24 chunks
 value.shadowDistance.512.0             = 32 chunks
 value.shadowDistance.768.0             = 48 chunks
 value.shadowDistance.1024.0            = 64 chunks
+value.shadowDistance.2048.0            = 128 chunks
+value.shadowDistance.4096.0            = 256 chunks
 
 # Sky settings
 
@@ -235,6 +258,10 @@ option.GALAXY                          = Galassia
 option.GALAXY.comment                  = Galassia nel cielo notturno
 option.GALAXY_INTENSITY                = Intensità Galassia
 option.GALAXY_INTENSITY.comment        = Controlla la luminosità della galassia nel cielo notturno
+option.CREPUSCULAR_RAYS                = Raggi Crepuscolari
+option.LIGHTNING_FLASH                 = Lampi
+option.RAINBOWS                        = Arcobaleno
+option.END_SUN_EFFECT                  = Effetto Sole End
 
 # Clouds
 option.CLOUDS_CUMULUS                       = Nuvole Cumulus
@@ -250,11 +277,12 @@ option.CLOUDS_CUMULUS_DENSITY               = Densità
 option.CLOUDS_CUMULUS_COVERAGE              = Copertura
 option.CLOUDS_CUMULUS_SIZE                  = Dimensione
 option.CLOUDS_CUMULUS_DETAIL_STRENGTH       = Scala Dettagli
-option.CLOUDS_CUMULUS_CURL_STRENGTH         = Scala Arricciamento
 option.CLOUDS_CUMULUS_WIND_SPEED            = Velocità Vento
 suffix.CLOUDS_CUMULUS_ALTITUDE              = m/s
 option.CLOUDS_CUMULUS_WIND_ANGLE            = Angolo Vento
 suffix.CLOUDS_CUMULUS_ALTITUDE              = °
+option.CLOUDS_CUMULUS_PRECOMPUTE_LOCAL_COVERAGE = Copertura Locale Precompilata
+comment.CLOUDS_CUMULUS_PRECOMPUTE_LOCAL_COVERAGE = Ottimizzazione aggressiva per i cumuli. Riduce la distanza massima in cui le nuvole possono generarsi e può creare artefatti quando la camera si muove. Disabilità per fare foto alle nuvole da sopra
 
 option.CLOUDS_ALTOCUMULUS                       = Nuvole Altocumulus
 option.CLOUDS_ALTOCUMULUS.comment               = Nuvole volumetriche di media altitudine fatte per assomigliare a nuvole altocumulus
@@ -269,7 +297,6 @@ option.CLOUDS_ALTOCUMULUS_DENSITY               = Densità
 option.CLOUDS_ALTOCUMULUS_COVERAGE              = Copertura
 option.CLOUDS_ALTOCUMULUS_SIZE                  = Dimensione
 option.CLOUDS_ALTOCUMULUS_DETAIL_STRENGTH       = Scala Dettagli
-option.CLOUDS_ALTOCUMULUS_CURL_STRENGTH         = Scala Arricciamento
 option.CLOUDS_ALTOCUMULUS_WIND_SPEED            = Velocità Vento
 suffix.CLOUDS_ALTOCUMULUS_ALTITUDE              = m/s
 option.CLOUDS_ALTOCUMULUS_WIND_ANGLE            = Angolo Vento
@@ -288,7 +315,6 @@ option.CLOUDS_CUMULUS_CONGESTUS_DENSITY               = Densità
 option.CLOUDS_CUMULUS_CONGESTUS_COVERAGE              = Copertura
 option.CLOUDS_CUMULUS_CONGESTUS_SIZE                  = Dimensioni
 option.CLOUDS_CUMULUS_CONGESTUS_DETAIL_STRENGTH       = Scala Dettagli
-option.CLOUDS_CUMULUS_CONGESTUS_CURL_STRENGTH         = Scala Arricciamento
 option.CLOUDS_CUMULUS_CONGESTUS_WIND_SPEED            = Velocità Vento
 suffix.CLOUDS_CUMULUS_CONGESTUS_ALTITUDE              = m/s
 option.CLOUDS_CUMULUS_CONGESTUS_WIND_ANGLE            = Angolo Vento
@@ -312,8 +338,6 @@ option.BLOCKY_CLOUDS_SHARPNESS         = Affilatezza
 option.BLOCKY_CLOUDS_SHARPNESS.comment = Affilatezza dei bordi delle nuvole vanilla
 
 option.CLOUDS_TEMPORAL_UPSCALING       = Upscaling Temporale
-option.CLOUDS_DAILY_WEATHER            = Variazione Meteo Giornaliera
-option.CLOUDS_DAILY_WEATHER.comment    = Nuvole sono affette dalla variazione meteo giornaliera
 option.CLOUDS_AERIAL_PERSPECTIVE_BOOST = Aumento Prospettiva Aerea
 option.CLOUDS_SCALE                    = Scala Nuvole
 option.CLOUDS_SCALE.comment            = Applica una scala a tutte le nuvole, Per rendere le nuvole da dimensioni e altitudini realistiche ad accessibili nel gameplay. Se questo valore è 1.0, le nuvole sono in altitudine realistica, con il primo strato a 800 blocchi su dal terreno. Se il valore è maggiore, allora le nuvole appariranno più piccole e più lontane. questa opzione cambia pure le ombre delle nuvole
@@ -345,6 +369,9 @@ option.CLOUDS_CIRROCUMULUS_SIZE            = Dimensione Cirrocumulus
 option.CLOUDS_CIRROCUMULUS_DETAIL_STRENGTH = Scala Dettaglio Cirrocumulus 
 option.CLOUDS_CIRROCUMULUS_CURL_STRENGTH   = Scala Arricciamento Cirrocumulus
 
+option.CLOUDS_NOCTILUCENT_INTENSITY    = Intensità
+option.CLOUDS_NOCTILUCENT_RARITY       = Rarità
+
 option.AURORA_NORMAL                   = Aurora in qualsiasi bioma
 option.AURORA_SNOW                     = Aurora in biomi nevosi
 option.AURORA_BRIGHTNESS               = Luminosità Aurora
@@ -370,14 +397,24 @@ option.BLOOMY_FOG                      = Aura Nebbiosa
 option.BLOOMY_FOG.comment              = Aura luminosa intensa nella nebbia. Da l'apparenza di dispersione di luce nella nebbia da fonti luminose, e illumina l'area circostante. Quasi nessun costo di performance
 option.BLOOMY_FOG_INTENSITY            = Intensità aura nebbiosa
 option.BLOOMY_FOG_INTENSITY.comment    = Modifica l'intensità dell'aura nebbiosa
+option.OVERWORLD_FOG_INTENSITY         = Intensità Nebbia Overworld
 option.NETHER_FOG_INTENSITY            = Intensità Nebbia Nether
 option.VL                              = Illuminazione Volumetrica
+comment.LPV_VL                         = Fonti di luce illuminano la nebbia. Richiede luci colorate! 
 option.VL.comment                      = Aggiunge raggi di luce e variabile nebbia volumetrica
 option.VL_RENDER_SCALE                 = Scala Render VL
 option.AIR_FOG_CLOUDY_NOISE            = Foschia nuvolosa
 option.AIR_FOG_CLOUDY_NOISE.comment    = Foschia a bassa quota, meglio visibile la mattina.\nRichiede Nebbia Volumetrica!
 option.AIR_FOG_COLORosso_LIGHT_SHAFTS    = Raggi di Luce Colorati
 option.AIR_FOG_COLORosso_LIGHT_SHAFTS.comment = Raggi di luce che passano oggetti trasparenti colorati per poi colorarsi a loro volta
+
+# LPV VL
+option.LPV_VL                          = Attivato
+option.LPV_VL_STEPS                    = Passaggi 
+option.LPV_VL_INTENSITY_OVERWORLD      = Intensità Overworld
+option.LPV_VL_INTENSITY_UNDERGROUND    = intensità Sottoterra
+option.LPV_VL_INTENSITY_NETHER         = Intensità Nether
+option.LPV_VL_INTENSITY_END            = Intensità End
 
 option.AIR_FOG_RAYLEIGH_FALLOFF_START     = Inizio Caduta Rayleigh
 option.AIR_FOG_RAYLEIGH_FALLOFF_START.comment = Altitudine sopra il livello del mare in cui la nebbia Rayleigh inizia a diminuire
@@ -640,11 +677,14 @@ option.CUSTOM_SKY.comment              = Attiva il cielo personalizzato delle re
 option.CUSTOM_SKY_BRIGHTNESS           = Luminosità Cielo Custom
 option.CUSTOM_SKY_BRIGHTNESS.comment   = Modifica la luminosità del cielo Custom
 option.NOISE_ON_DH_TERRAIN             = Rumore visivo nel terreno DH
+option.ENCHANTMENT_GLINT_BRIGHTNESS    = Luminosità luccicantezza Incantamenti
+option.USE_SEPARATE_ENTITY_DRAWS       = Usa "Generazione Entità Separate"
+comment.USE_SEPARATE_ENTITY_DRAWS      = "Generazione Entità Separate" è una funzione di Iris utilizzata dalle shaderpack, Come Photon, per renderizzare correttamente oggetti trasparenti. eppure può causare vari problemi. Aspettati problemi di entità transparenti opache se disattivi questa funzione!
 
 value.DEBUG_VIEW.DEBUG_VIEW_NONE       = OFF
 value.DEBUG_VIEW.DEBUG_VIEW_SAMPLER    = Sampler
-value.DEBUG_VIEW.DEBUG_VIEW_WEATHER    = Meteo
 value.DEBUG_VIEW.DEBUG_VIEW_HISTOGRAM  = Istogramma
+value.DEBUG_VIEW.DEBUG_VIEW_WEATHER    = Meteo
 
 value.tonemap_left.academy_fit            = Academy Fit
 value.tonemap_left.academy_rrt            = Academy RRT
@@ -668,6 +708,16 @@ value.tonemap_right.tonemap_ozius          = Ozius
 value.tonemap_right.tonemap_reinhard       = Reinhard
 value.tonemap_right.tonemap_reinhard_jodie = Reinhard-Jodie
 
+# Distance View 
+
+option.DISTANCE_VIEW                   = Attivato
+option.DISTANCE_VIEW_METHOD            = Metodo
+option.DISTANCE_VIEW_MAX_DISTANCE      = Distanza massima
+suffix.DISTANCE_VIEW_MAX_DISTANCE      = m
+
+value.DISTANCE_VIEW_METHOD.DISTANCE_VIEW_DISTANCE = Distanza
+value.DISTANCE_VIEW_METHOD.DISTANCE_VIEW_DEPTH    = Profondità
+
 # Box
 
 option.BOX_MODE                 = Modalità scatola
@@ -681,117 +731,3 @@ option.BOX_COLOR_B              = Blu
 option.BOX_EMISSION             = Emissione
 option.BOX_EMISSION.comment     = Scala i colori dopo 1. Richiede aura (bloom).
 option.BOX_LINE_WIDTH           = Larghezza Linea
-
-# Daily Weather System
-
-option.WEATHER_DAY                         = Giorno
-value.WEATHER_DAY.-1                       = Random
-
-option.WEATHER_D0_CLOUDS_CUMULUS_MIN       = Min Cumulus Presenti
-option.WEATHER_D0_CLOUDS_CUMULUS_MAX       = Max Cumulus Presenti
-option.WEATHER_D0_CLOUDS_ALTOCUMULUS_MIN   = Min Altocumulus Presenti
-option.WEATHER_D0_CLOUDS_ALTOCUMULUS_MAX   = Max Altocumulus Presenti
-option.WEATHER_D0_CLOUDS_CIRRUS            = Cirrus Presenti
-option.WEATHER_D0_CLOUDS_CIRROCUMULUS      = Cirrocumulus Presenti
-option.WEATHER_D0_FOGGINESS                = Nebbioso
-option.WEATHER_D0_CLOUDS_CUMULUS_CONGESTUS_AMOUNT = Nuvole Cumulus Congestus
-option.WEATHER_D0_CLOUDS_STRATUS_AMOUNT    = Nuvole Stratus
-option.WEATHER_D1_CLOUDS_CUMULUS_MIN       = Min Cumulus Presenti
-option.WEATHER_D1_CLOUDS_CUMULUS_MAX       = Max Cumulus Presenti
-option.WEATHER_D1_CLOUDS_ALTOCUMULUS_MIN   = Min Altocumulus Presenti
-option.WEATHER_D1_CLOUDS_ALTOCUMULUS_MAX   = Max Altocumulus Presenti
-option.WEATHER_D1_CLOUDS_CIRRUS            = Cirrus Presenti
-option.WEATHER_D1_CLOUDS_CIRROCUMULUS      = Cirrocumulus Presenti
-option.WEATHER_D1_FOGGINESS                = Nebbioso
-option.WEATHER_D1_CLOUDS_CUMULUS_CONGESTUS_AMOUNT = Nuvole Cumulus Congestus
-option.WEATHER_D1_CLOUDS_STRATUS_AMOUNT    = Nuvole Stratus 
-option.WEATHER_D2_CLOUDS_CUMULUS_MIN       = Min Cumulus Presenti
-option.WEATHER_D2_CLOUDS_CUMULUS_MAX       = Max Cumulus Presenti
-option.WEATHER_D2_CLOUDS_ALTOCUMULUS_MIN   = Min Altocumulus Presenti
-option.WEATHER_D2_CLOUDS_ALTOCUMULUS_MAX   = Max Altocumulus Presenti
-option.WEATHER_D2_CLOUDS_CIRRUS            = Cirrus Presenti
-option.WEATHER_D2_CLOUDS_CIRROCUMULUS      = Cirrocumulus Presenti
-option.WEATHER_D2_FOGGINESS                = Nebbioso
-option.WEATHER_D2_CLOUDS_CUMULUS_CONGESTUS_AMOUNT = Nuvole Cumulus Congestus
-option.WEATHER_D2_CLOUDS_STRATUS_AMOUNT    = Nuvole Stratus
-option.WEATHER_D3_CLOUDS_CUMULUS_MIN       = Min Cumulus Presenti
-option.WEATHER_D3_CLOUDS_CUMULUS_MAX       = Max Cumulus Presenti
-option.WEATHER_D3_CLOUDS_ALTOCUMULUS_MIN   = Min Altocumulus Presenti
-option.WEATHER_D3_CLOUDS_ALTOCUMULUS_MAX   = Max Altocumulus Presenti
-option.WEATHER_D3_CLOUDS_CIRRUS            = Cirrus Presenti
-option.WEATHER_D3_CLOUDS_CIRROCUMULUS      = Cirrocumulus Presenti
-option.WEATHER_D3_FOGGINESS                = Nebbioso
-option.WEATHER_D3_CLOUDS_CUMULUS_CONGESTUS_AMOUNT = Nuvole Cumulus Congestus
-option.WEATHER_D3_CLOUDS_STRATUS_AMOUNT    = Nuvole Stratus
-option.WEATHER_D4_CLOUDS_CUMULUS_MIN       = Min Cumulus Presenti
-option.WEATHER_D4_CLOUDS_CUMULUS_MAX       = Max Cumulus Presenti
-option.WEATHER_D4_CLOUDS_ALTOCUMULUS_MIN   = Min Altocumulus Presenti
-option.WEATHER_D4_CLOUDS_ALTOCUMULUS_MAX   = Max Altocumulus Presenti
-option.WEATHER_D4_CLOUDS_CIRRUS            = Cirrus Presenti
-option.WEATHER_D4_CLOUDS_CIRROCUMULUS      = Cirrocumulus Presenti
-option.WEATHER_D4_FOGGINESS                = Nebbioso
-option.WEATHER_D4_CLOUDS_CUMULUS_CONGESTUS_AMOUNT = Nuvole Cumulus Congestus
-option.WEATHER_D4_CLOUDS_STRATUS_AMOUNT    = Nuvole Stratus 
-option.WEATHER_D5_CLOUDS_CUMULUS_MIN       = Min Cumulus Presenti
-option.WEATHER_D5_CLOUDS_CUMULUS_MAX       = Max Cumulus Presenti
-option.WEATHER_D5_CLOUDS_ALTOCUMULUS_MIN   = Min Altocumulus Presenti
-option.WEATHER_D5_CLOUDS_ALTOCUMULUS_MAX   = Max Altocumulus Presenti
-option.WEATHER_D5_CLOUDS_CIRRUS            = Cirrus Presenti
-option.WEATHER_D5_CLOUDS_CIRROCUMULUS      = Cirrocumulus Presenti
-option.WEATHER_D5_FOGGINESS                = Nebbioso
-option.WEATHER_D5_CLOUDS_CUMULUS_CONGESTUS_AMOUNT = Nuvole Cumulus Congestus
-option.WEATHER_D5_CLOUDS_STRATUS_AMOUNT    = Nuvole Stratus
-option.WEATHER_D6_CLOUDS_CUMULUS_MIN       = Min Cumulus Presenti
-option.WEATHER_D6_CLOUDS_CUMULUS_MAX       = Max Cumulus Presenti
-option.WEATHER_D6_CLOUDS_ALTOCUMULUS_MIN   = Min Altocumulus Presenti
-option.WEATHER_D6_CLOUDS_ALTOCUMULUS_MAX   = Max Altocumulus Presenti
-option.WEATHER_D6_CLOUDS_CIRRUS            = Cirrus Presenti
-option.WEATHER_D6_CLOUDS_CIRROCUMULUS      = Cirrocumulus Presenti
-option.WEATHER_D6_FOGGINESS                = Nebbioso
-option.WEATHER_D6_CLOUDS_CUMULUS_CONGESTUS_AMOUNT = Nuvole Cumulus Congestus
-option.WEATHER_D6_CLOUDS_STRATUS_AMOUNT    = Nuvole Stratus
-option.WEATHER_D7_CLOUDS_CUMULUS_MIN       = Min Cumulus Presenti
-option.WEATHER_D7_CLOUDS_CUMULUS_MAX       = Max Cumulus Presenti
-option.WEATHER_D7_CLOUDS_ALTOCUMULUS_MIN   = Min Altocumulus Presenti
-option.WEATHER_D7_CLOUDS_ALTOCUMULUS_MAX   = Max Altocumulus Presenti
-option.WEATHER_D7_CLOUDS_CIRRUS            = Cirrus Presenti
-option.WEATHER_D7_CLOUDS_CIRROCUMULUS      = Cirrocumulus Presenti
-option.WEATHER_D7_FOGGINESS                = Nebbioso
-option.WEATHER_D7_CLOUDS_CUMULUS_CONGESTUS_AMOUNT = Nuvole Cumulus Congestus
-option.WEATHER_D7_CLOUDS_STRATUS_AMOUNT    = Nuvole Stratus
-option.WEATHER_D8_CLOUDS_CUMULUS_MIN       = Min Cumulus Presenti
-option.WEATHER_D8_CLOUDS_CUMULUS_MAX       = Max Cumulus Presenti
-option.WEATHER_D8_CLOUDS_ALTOCUMULUS_MIN   = Min Altocumulus Presenti
-option.WEATHER_D8_CLOUDS_ALTOCUMULUS_MAX   = Max Altocumulus Presenti
-option.WEATHER_D8_CLOUDS_CIRRUS            = Cirrus Presenti
-option.WEATHER_D8_CLOUDS_CIRROCUMULUS      = Cirrocumulus Presenti
-option.WEATHER_D8_FOGGINESS                = Nebbioso
-option.WEATHER_D8_CLOUDS_CUMULUS_CONGESTUS_AMOUNT = Nuvole Cumulus Congestus
-option.WEATHER_D8_CLOUDS_STRATUS_AMOUNT    = Nuvole Stratus
-option.WEATHER_D9_CLOUDS_CUMULUS_MIN       = Min Cumulus Presenti
-option.WEATHER_D9_CLOUDS_CUMULUS_MAX       = Max Cumulus Presenti
-option.WEATHER_D9_CLOUDS_ALTOCUMULUS_MIN   = Min Altocumulus Presenti
-option.WEATHER_D9_CLOUDS_ALTOCUMULUS_MAX   = Max Altocumulus Presenti
-option.WEATHER_D9_CLOUDS_CIRRUS            = Cirrus Presenti
-option.WEATHER_D9_CLOUDS_CIRROCUMULUS      = Cirrocumulus Presenti
-option.WEATHER_D9_FOGGINESS                = Nebbioso
-option.WEATHER_D9_CLOUDS_CUMULUS_CONGESTUS_AMOUNT = Nuvole Cumulus Congestus
-option.WEATHER_D9_CLOUDS_STRATUS_AMOUNT    = Nuvole Stratus
-option.WEATHER_D10_CLOUDS_CUMULUS_MIN      = Min Cumulus Presenti
-option.WEATHER_D10_CLOUDS_CUMULUS_MAX      = Max Cumulus Presenti
-option.WEATHER_D10_CLOUDS_ALTOCUMULUS_MIN  = Min Altocumulus Presenti
-option.WEATHER_D10_CLOUDS_ALTOCUMULUS_MAX  = Max Altocumulus Presenti
-option.WEATHER_D10_CLOUDS_CIRRUS           = Cirrus Presenti
-option.WEATHER_D10_CLOUDS_CIRROCUMULUS     = Cirrocumulus Presenti
-option.WEATHER_D10_FOGGINESS               = Nebbioso
-option.WEATHER_D10_CLOUDS_CUMULUS_CONGESTUS_AMOUNT = Nuvole Cumulus Congestus
-option.WEATHER_D10_CLOUDS_STRATUS_AMOUNT   = Nuvole Stratus
-option.WEATHER_D11_CLOUDS_CUMULUS_MIN      = Min Cumulus Presenti
-option.WEATHER_D11_CLOUDS_CUMULUS_MAX      = Max Cumulus Presenti
-option.WEATHER_D11_CLOUDS_ALTOCUMULUS_MIN  = Min Altocumulus Presenti
-option.WEATHER_D11_CLOUDS_ALTOCUMULUS_MAX  = Max Altocumulus Presenti
-option.WEATHER_D11_CLOUDS_CIRRUS           = Cirrus Presenti
-option.WEATHER_D11_CLOUDS_CIRROCUMULUS     = Cirrocumulus Presenti
-option.WEATHER_D11_FOGGINESS               = Nebbioso
-option.WEATHER_D11_CLOUDS_CUMULUS_CONGESTUS_AMOUNT = Nuvole Cumulus Congestus
-option.WEATHER_D11_CLOUDS_STRATUS_AMOUNT   = Nuvole Stratus
