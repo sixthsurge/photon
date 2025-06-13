@@ -270,7 +270,7 @@ vec2 get_local_coord_from_uv(vec2 uv) {
 	return (uv - atlas_tile_offset) * rcp(atlas_tile_scale);
 }
 
-vec4 draw_nether_portal() {
+vec4 draw_nether_portal(vec3 direction_world, float layer_dist) {
 	const int step_count          = 20;
 	const float parallax_depth    = 0.2;
 	const float portal_brightness = 4.0;
@@ -300,11 +300,16 @@ vec4 draw_nether_portal() {
 		pos += ray_step;
 	}
 
+	// Edge highlight
+	float dist = layer_dist * max_of(abs(direction_world));
+	float edge_highlight = cube(max0(1.0 - 2.0 * dist));
+	result *= 1.0 + 2.0 * edge_highlight;
+
 	return clamp01(result * portal_brightness * depth_step);
 }
 
 #else
-vec4 draw_nether_portal() { return vec4(0.0); }
+vec4 draw_nether_portal(vec3 direction_world, float layer_dist) { return vec4(0.0); }
 #endif
 
 void main() {
@@ -407,7 +412,7 @@ void main() {
 
 #ifdef FANCY_NETHER_PORTAL
 		if (is_nether_portal) {
-			fragment_color = draw_nether_portal();
+			fragment_color = draw_nether_portal(direction_world, layer_dist);
 		}
 #endif
 
