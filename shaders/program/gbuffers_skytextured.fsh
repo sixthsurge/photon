@@ -58,8 +58,8 @@ void main() {
 		// Minecraft 1.21.4
 
 		// Cut out the sun itself (discard the halo around it)
-		// offset = uv * 2.0 - 1.0;
-		// if (max_of(abs(offset)) > 0.25) discard;
+		if (max_of(abs(offset)) > 0.25) discard;
+		offset = uv * 2.0 - 1.0;
 
 #ifdef VANILLA_SUN
 		frag_color  = texture(gtexture, new_uv).rgb;
@@ -73,12 +73,10 @@ void main() {
 #ifdef VANILLA_MOON
 		// Cut out the moon itself (discard the halo around it) and flip moon texture along the
 		// diagonal
-		/*
 		offset = fract(vec2(4.0, 2.0) * uv);
 		new_uv = new_uv + vec2(0.25, 0.5) * ((1.0 - offset.yx) - offset);
 		offset = offset * 2.0 - 1.0;
 		if (max_of(abs(offset)) > 0.25) discard;
-		*/
 
 		frag_color = texture(gtexture, new_uv).rgb * vec3(MOON_R, MOON_G, MOON_B);
 #else
