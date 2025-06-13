@@ -140,7 +140,7 @@ vec3 get_lpv_fog_scattering(
 	
 	}
 
-	return inscattered_light * isotropic_phase * (1.0 - blindness);
+	return inscattered_light * isotropic_phase * clamp01(1.0 - blindness - darknessFactor);
 }
 
 #endif // INCLUDE_FOG_LPV_FOG

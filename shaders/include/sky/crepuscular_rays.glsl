@@ -11,8 +11,8 @@ vec4 draw_crepuscular_rays(
 	bool is_terrain,
 	float dither
 ) {
-	const uint step_count_horizon = 20u;
-	const uint step_count_zenith  = 8u;
+	const uint step_count_horizon = CREPUSCULAR_RAYS_STEPS_HORIZON;
+	const uint step_count_zenith  = CREPUSCULAR_RAYS_STEPS_ZENITH;
 	const float max_ray_length = 4096.0 / (CLOUDS_SCALE / 10.0);
 #ifdef SKY_GROUND
 	const float volume_inner_radius = planet_radius;
@@ -99,7 +99,7 @@ vec4 draw_crepuscular_rays(
 		+ 0.5 * henyey_greenstein_phase(LoV, -0.2); // backwards lobe
 
 	scattering *= scattering_coeff * step_transmitted_fraction * light_color * step_length;
-	scattering *= 4.0 * phase * clouds_params.crepuscular_rays_amount;
+	scattering *= (4.0 * CREPUSCULAR_RAYS_INTENSITY) * phase * clouds_params.crepuscular_rays_amount;
 	transmittance = mix(vec3(1.0), transmittance, clouds_params.crepuscular_rays_amount);
 
 	return vec4(scattering, dampen(dampen(dot(transmittance, vec3(rcp(3.0))))));

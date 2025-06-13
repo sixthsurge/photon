@@ -31,6 +31,8 @@ screen.box                             = Selection Box
 
 screen.aurora                          = Aurora
 screen.clouds                          = Clouds
+screen.crepuscular_rays                = Crepuscular Rays
+screen.stars                           = Stars
 screen.clouds_cumulus                  = Cumulus Clouds Settings
 screen.clouds_altocumulus              = Altocumulus Clouds Settings
 screen.clouds_cumulus_congestus        = Cumulus Congestus Clouds Settings
@@ -38,8 +40,8 @@ screen.clouds_cirrus                   = Cirrus/Cirrocumulus Clouds Settings
 screen.clouds_minecrafty               = Blocky Clouds Settings
 screen.clouds_noctilucent              = Noctilucent Clouds Settings
 
-screen.fog_rlh                         = Rayleigh Coefficient
-screen.fog_mie                         = Mie Coefficient
+screen.fog_rlh                         = Rayleigh Fog
+screen.fog_mie                         = Mie Fog
 screen.sunlight_color                  = Sunlight Color
 screen.moonlight_color                 = Moonlight Color
 screen.blocklight_color                = Blocklight Color
@@ -146,6 +148,8 @@ option.BLOCK_ENTITY_SHADOWS            = Block Entity Shadows
 option.PIXELATED_SHADOWS               = Pixelated Shadows
 option.PIXELATED_SHADOWS.comment       = Shadows snap to block texels, creating a pixelated look
 option.PIXELATED_SHADOWS_RESOLUTION    = Pixelated Shadows Resolution
+option.SSS_STEPS                       = SSS Steps 
+option.SSS_STEPS.comment               = Increase to reduce noise on foliage and other materials with SSS, at the cost of performance.
 
 option.SHADER_AO                       = Shader AO
 option.SHADER_AO.comment               = AO method used. Off - no shader AO. SSAO - lower quality but requires fewer samples/less filtering. GTAO - better quality but requires more samples/filtering
@@ -248,17 +252,20 @@ option.ATMOSPHERE_SATURATION_BOOST     = Atmosphere Saturation Boost
 comment.ATMOSPHERE_SATURATION_BOOST    = Increases the saturation of the sky and sunlight color depending on the time of day
 option.ATMOSPHERE_SATURATION_BOOST_INTENSITY = Atmosphere Saturation Boost Intensity
 comment.ATMOSPHERE_SATURATION_BOOST_INTENSITY = Adjust the intensity of Atmosphere Saturation Boost
-option.STARS                           = Stars
+option.STARS                           = Enabled
 option.STARS.comment                   = Stars in the night sky. Low performance impact
-option.STARS_INTENSITY                 = Stars Intensity
+option.STARS_INTENSITY                 = Intensity
 option.STARS_INTENSITY.comment         = Controls the brightness of stars in the night sky
-option.STARS_COVERAGE                  = Stars Coverage
+option.STARS_COVERAGE                  = Coverage
 option.STARS_COVERAGE.comment          = Controls the number of stars in the night sky
 option.GALAXY                          = Galaxy
 option.GALAXY.comment                  = Galaxy image in the night sky
 option.GALAXY_INTENSITY                = Galaxy Intensity
 option.GALAXY_INTENSITY.comment        = Controls the brightness of the galaxy in the night sky
-option.CREPUSCULAR_RAYS                = Crepuscular Rays
+option.CREPUSCULAR_RAYS                = Enabled
+option.CREPUSCULAR_RAYS_INTENSITY      = Intensity
+option.CREPUSCULAR_RAYS_STEPS_HORIZON  = Step Count - Horizon
+option.CREPUSCULAR_RAYS_STEPS_ZENITH   = Step Count - Zenith
 option.LIGHTNING_FLASH                 = Lightning Flash
 option.RAINBOWS                        = Rainbows
 option.END_SUN_EFFECT                  = End Sun Effect
@@ -416,6 +423,7 @@ option.LPV_VL_INTENSITY_UNDERGROUND    = Underground Intensity
 option.LPV_VL_INTENSITY_NETHER         = Nether Intensity
 option.LPV_VL_INTENSITY_END            = End Intensity
 
+# Rayleigh Fog
 option.AIR_FOG_RAYLEIGH_FALLOFF_START     = Rayleigh Falloff Start
 option.AIR_FOG_RAYLEIGH_FALLOFF_START.comment = Altitude above sea level at which the rayleigh fog begins to decrease
 option.AIR_FOG_RAYLEIGH_FALLOFF_HALF_LIFE = Rayleigh Falloff Half-Life
@@ -460,12 +468,18 @@ option.AIR_FOG_RAYLEIGH_R_SWAMP        = §4Red
 option.AIR_FOG_RAYLEIGH_G_SWAMP        = §2Green
 option.AIR_FOG_RAYLEIGH_B_SWAMP        = §1Blue
 
+option.AIR_FOG_RAYLEIGH_FALLOFF_START     = Altitude Fade Start
+option.AIR_FOG_RAYLEIGH_FALLOFF_HALF_LIFE = Altitude Fade Half Life
+
+# Mie Fog
 option.AIR_FOG_MIE_DENSITY_MORNING     = Morning Density
 option.AIR_FOG_MIE_DENSITY_NOON        = Noon Density
 option.AIR_FOG_MIE_DENSITY_EVENING     = Evening Density
 option.AIR_FOG_MIE_DENSITY_MIDNIGHT    = Midnight Density
 option.AIR_FOG_MIE_DENSITY_RAIN        = Rain Density
 option.AIR_FOG_MIE_DENSITY_BLUE_HOUR   = Dawn/Dusk Density
+option.AIR_FOG_MIE_FALLOFF_START       = Altitude Fade Start
+option.AIR_FOG_MIE_FALLOFF_HALF_LIFE   = Altitude Fade Half Life
 
 # Materials settings
 

@@ -60,7 +60,7 @@ float lightmap_shadows(float skylight, float NoL) {
 
 #ifdef SHADOW
 vec2 blocker_search(vec3 scene_pos, float dither, bool has_sss) {
-	uint step_count = has_sss ? 12u : 3u;
+	uint step_count = has_sss ? SSS_STEPS : 3;
 
 	vec3 shadow_view_pos = transform(shadowModelView, scene_pos);
 	vec3 shadow_clip_pos = project_ortho(shadowProjection, shadow_view_pos);
