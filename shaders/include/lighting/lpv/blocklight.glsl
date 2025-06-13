@@ -30,6 +30,8 @@ vec3 get_lpv_blocklight(vec3 scene_pos, vec3 normal, vec3 mc_blocklight, float a
 		vec3 lpv_blocklight = sqrt(read_lpv_linear(sample_pos));
 #endif
 
+		lpv_blocklight *= 1.25 * BLOCKLIGHT_I;
+
 #ifdef COLORED_LIGHTS_VANILLA_LIGHTMAP_CONTRIBUTION
 		float vanilla_lightmap_contribution = exp2(-4.0 * dot(lpv_blocklight, luminance_weights_rec2020));
 		lpv_blocklight += mc_blocklight * vanilla_lightmap_contribution;

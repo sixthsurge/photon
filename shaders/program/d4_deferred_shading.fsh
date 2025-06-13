@@ -399,6 +399,9 @@ void main() {
 		bent_normal.z = sqrt(clamp01(1.0 - dot(bent_normal.xy, bent_normal.xy)));
 		bent_normal = mat3(gbufferModelViewInverse) * bent_normal;
 
+		// Sense check bent normal
+		if (dot(bent_normal, normal) < eps) bent_normal = normal;
+
 		// Shadows
 
 		float NoL = dot(normal, light_dir);

@@ -506,7 +506,11 @@ void main() {
 		NoV,
 		NoH,
 		LoV
-	) * sqr(fragment_color.a);
+	);
+
+	if (!is_water) {
+		fragment_color.rgb *= sqr(fragment_color.a);
+	}
 
 	// Specular highlight
 

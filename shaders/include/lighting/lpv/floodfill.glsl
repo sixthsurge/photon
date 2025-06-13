@@ -45,13 +45,17 @@ vec3 gather_light(sampler3D light_sampler, ivec3 pos) {
 		return vec3(0.0);
 	}
 
-	return texelFetch(light_sampler, pos, 0).rgb +
-	       texelFetch(light_sampler, clamp_to_voxel_volume(pos + face_offsets[0]), 0).xyz +
-	       texelFetch(light_sampler, clamp_to_voxel_volume(pos + face_offsets[1]), 0).xyz +
-	       texelFetch(light_sampler, clamp_to_voxel_volume(pos + face_offsets[2]), 0).xyz +
-	       texelFetch(light_sampler, clamp_to_voxel_volume(pos + face_offsets[3]), 0).xyz +
-	       texelFetch(light_sampler, clamp_to_voxel_volume(pos + face_offsets[4]), 0).xyz +
-	       texelFetch(light_sampler, clamp_to_voxel_volume(pos + face_offsets[5]), 0).xyz;
+	const float center_weight = 1.05;
+
+	return (
+		texelFetch(light_sampler, pos, 0).rgb * center_weight +
+		texelFetch(light_sampler, clamp_to_voxel_volume(pos + face_offsets[0]), 0).xyz +
+		texelFetch(light_sampler, clamp_to_voxel_volume(pos + face_offsets[1]), 0).xyz +
+		texelFetch(light_sampler, clamp_to_voxel_volume(pos + face_offsets[2]), 0).xyz +
+		texelFetch(light_sampler, clamp_to_voxel_volume(pos + face_offsets[3]), 0).xyz +
+		texelFetch(light_sampler, clamp_to_voxel_volume(pos + face_offsets[4]), 0).xyz +
+		texelFetch(light_sampler, clamp_to_voxel_volume(pos + face_offsets[5]), 0).xyz
+	) * rcp(7.0 * center_weight);
 }
 
 void update_lpv(writeonly image3D light_img, sampler3D light_sampler) {
@@ -70,7 +74,7 @@ void update_lpv(writeonly image3D light_img, sampler3D light_sampler) {
 	uint block_id       = texelFetch(voxel_sampler, pos, 0).x;
 	bool transparent    = block_id == 0u || block_id >= 128u;
 	block_id            = block_id & 127;
-	vec3 light_avg      = gather_light(light_sampler, previous_pos) * rcp(7.0);
+	vec3 light_avg      = gather_light(light_sampler, previous_pos);
 	vec3 emitted_light  = sqr(get_emitted_light(block_id));
 	vec3 tint           = sqr(get_tint(block_id, transparent));
 

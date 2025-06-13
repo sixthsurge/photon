@@ -33,23 +33,24 @@ mat2x3 get_lpv_fog_coefficients(vec3 position_world) {
 	if (isEyeInWater == 1) {
 		// Underwater
 
-		const vec3 absorption_coeff = vec3(WATER_ABSORPTION_R_UNDERWATER, WATER_ABSORPTION_G_UNDERWATER, WATER_ABSORPTION_B_UNDERWATER) * rec709_to_working_color;
-		const vec3 scattering_coeff = vec3(WATER_SCATTERING_UNDERWATER);
+		const float density_mul = 8.0;
+		const vec3 absorption_coeff = density_mul * vec3(WATER_ABSORPTION_R_UNDERWATER, WATER_ABSORPTION_G_UNDERWATER, WATER_ABSORPTION_B_UNDERWATER) * rec709_to_working_color;
+		const vec3 scattering_coeff = density_mul * vec3(WATER_SCATTERING_UNDERWATER);
 		const vec3 extinction_coeff = absorption_coeff + scattering_coeff;
 
-		return mat2x3(3.0 * scattering_coeff, extinction_coeff);
+		return mat2x3(scattering_coeff, extinction_coeff);
 	}
 
 #if defined WORLD_OVERWORLD
 	// Scale applied to air fog coefficients
-	const float overworld_density_scale = 4.0 * LPV_VL_INTENSITY_OVERWORLD;
+	const float overworld_density_scale = 8.0 * LPV_VL_INTENSITY_OVERWORLD;
 
 	// Minimum overworld surface extinction and scattering - to prevent no glow when fog is very thin (high up)
 	const vec3 overworld_fog_min_extinction = vec3(0.001);
 	const vec3 overworld_fog_min_scattering = overworld_fog_min_extinction;
 
 	// Overworld underground extinction and scattering
-	const vec3 underground_fog_extinction = vec3(0.008) * LPV_VL_INTENSITY_UNDERGROUND;
+	const vec3 underground_fog_extinction = vec3(0.025) * LPV_VL_INTENSITY_UNDERGROUND;
 	const vec3 underground_fog_scattering = underground_fog_extinction * 0.95;
 	const float underground_fog_fade_length = 20.0;
 
@@ -79,10 +80,10 @@ mat2x3 get_lpv_fog_coefficients(vec3 position_world) {
 
 	return mat2x3(scattering, extinction);
 #elif defined WORLD_NETHER
-	float density = 0.01 * LPV_VL_INTENSITY_NETHER;
+	float density = 0.05 * LPV_VL_INTENSITY_NETHER;
 	return mat2x3(vec3(density), density * (exp2(-4.0 * ambient_color)));
 #elif defined WORLD_END 
-	float density = 0.02 * LPV_VL_INTENSITY_END;
+	float density = 0.06 * LPV_VL_INTENSITY_END;
 	return mat2x3(vec3(density), density * (exp2(-4.0 * ambient_color)));
 #endif
 }
@@ -116,10 +117,15 @@ vec3 get_lpv_fog_scattering(
 
 	for (uint i = 0u; i < step_count; ++i) { 
 		vec3 dithered_position_world = ray_position_world + ray_direction_world * (dither * step_length);
+		
+		// Greater density further from the camera
+		float distance_factor = 0.1 + 0.9 * clamp01(
+			length_squared(dithered_position_world - cameraPosition) * rcp(32.0 * 32.0)
+		);
 
 		vec3 light = sqrt(sample_lpv(dithered_position_world));
 		light *= sqrt(sqrt(light));
-		mat2x3 coefficients = get_lpv_fog_coefficients(dithered_position_world) * step_length; // scattering, extinction
+		mat2x3 coefficients = get_lpv_fog_coefficients(dithered_position_world) * step_length * distance_factor; // scattering, extinction
 
 		vec3 step_transmittance = exp(-coefficients[1]);
 		vec3 step_transmitted_fraction = (1.0 - step_transmittance) / max(coefficients[1], eps);
