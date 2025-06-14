@@ -28,6 +28,8 @@ screen.color_grading                   = Color Grading
 screen.exposure                        = Exposure
 screen.lpv_vl                          = Colored Lights Fog Scattering
 screen.box                             = Selection Box
+screen.distant_horizons                = Distant Horizons 
+screen.developer                       = Developer Options
 
 screen.aurora                          = Aurora
 screen.clouds                          = Clouds
@@ -690,6 +692,8 @@ option.CUSTOM_SKY                      = Custom Sky
 option.CUSTOM_SKY.comment              = Enable custom skies from resource packs
 option.CUSTOM_SKY_BRIGHTNESS           = Custom Sky Brightness
 option.CUSTOM_SKY_BRIGHTNESS.comment   = Adjust custom sky brightness
+option.DH_OVERDRAW_DISTANCE            = Overdraw Distance
+option.DH_OVERDRAW_FADE_LENGTH         = Overdraw Fade Length
 option.NOISE_ON_DH_TERRAIN             = Noise on DH Terrain
 option.ENCHANTMENT_GLINT_BRIGHTNESS    = Enchantment Glint Brightness
 option.USE_SEPARATE_ENTITY_DRAWS       = Use "Separate Entity Draws"
