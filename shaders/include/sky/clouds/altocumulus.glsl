@@ -176,7 +176,7 @@ CloudsResult draw_altocumulus_clouds(
 
 	vec2 dists = intersect_spherical_shell(air_viewer_pos, ray_dir, clouds_altocumulus_radius, clouds_altocumulus_top_radius);
 	bool planet_intersected = intersect_sphere(air_viewer_pos, ray_dir, min(r - 10.0, planet_radius)).y >= 0.0;
-	bool terrain_intersected = distance_to_terrain >= 0.0 && r < clouds_altocumulus_radius && distance_to_terrain * CLOUDS_SCALE < dists.y;
+	bool terrain_intersected = distance_to_terrain >= 0.0 && r < clouds_altocumulus_radius && distance_to_terrain < dists.x;
 
 	if (dists.y < 0.0                                   // volume not intersected
 	 || planet_intersected && r < clouds_altocumulus_radius // planet blocking clouds

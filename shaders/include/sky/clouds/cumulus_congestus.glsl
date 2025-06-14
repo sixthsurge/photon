@@ -163,6 +163,7 @@ CloudsResult draw_cumulus_congestus_clouds(
 
 	if (dists.y < 0.0
 	 || planet_intersected && length(air_viewer_pos) < clouds_cumulus_congestus_radius
+	 || distance_to_terrain > 0.0
 	) { return clouds_not_hit; }
 
 	float ray_length = dists.y - dists.x;
