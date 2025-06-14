@@ -164,6 +164,8 @@ uniform vec4 entityColor;
 void main() {
 	// Clip to TAAU viewport
 
+	vec2 coord = gl_FragCoord.xy * view_pixel_size * rcp(taau_render_scale);
+
 #if defined TAA && defined TAAU
 	if (clamp01(coord) != coord) discard;
 #endif
@@ -181,8 +183,6 @@ void main() {
         discard;
         return;
     }
-
-	vec2 coord = gl_FragCoord.xy * view_pixel_size * rcp(taau_render_scale);
 
 	// Encode gbuffer data
 
