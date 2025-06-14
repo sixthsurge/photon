@@ -28,9 +28,13 @@ screen.color_grading                   = 颜色分级
 screen.exposure                        = 曝光
 screen.lpv_vl                          = 彩色光源雾气散射
 screen.box                             = 选择框
+screen.distant_horizons                = Distant Horizons 
+screen.developer                       = 开发者选项
 
 screen.aurora                          = 极光
 screen.clouds                          = 云层
+screen.crepuscular_rays                = 云隙光
+screen.stars                           = 星星
 screen.clouds_cumulus                  = 积云设置
 screen.clouds_altocumulus              = 高积云设置
 screen.clouds_cumulus_congestus        = 浓积云设置
@@ -38,8 +42,8 @@ screen.clouds_cirrus                   = 卷云/卷积云设置
 screen.clouds_minecrafty               = 方块云层设置
 screen.clouds_noctilucent              = 夜光云设置
 
-screen.fog_rlh                         = 瑞利系数
-screen.fog_mie                         = 米氏系数
+screen.fog_rlh                         = 瑞利雾气
+screen.fog_mie                         = 米氏雾气
 screen.sunlight_color                  = 阳光颜色
 screen.moonlight_color                 = 月光颜色
 screen.blocklight_color                = 方块光颜色
@@ -146,6 +150,8 @@ option.BLOCK_ENTITY_SHADOWS            = 方块实体阴影
 option.PIXELATED_SHADOWS               = 像素阴影
 option.PIXELATED_SHADOWS.comment       = 使阴影捕捉方块纹理像素以创建像素化的阴影外观.
 option.PIXELATED_SHADOWS_RESOLUTION    = 像素阴影分辨率
+option.SSS_STEPS                       = 次表面散射采样值 
+option.SSS_STEPS.comment               = 以牺牲性能为代价提高次表面散射采样值来减少树叶和其他材质上的噪点.
 
 option.SHADER_AO                       = 光影环境光遮蔽
 option.SHADER_AO.comment               = 选择环境光遮蔽的算法类型. 关 - 不计算光影的环境光遮蔽算法. SSAO - 需要的采样数不多/闪烁更少但质量较低. GTAO - 更好的视觉质量但需要更多的采样也更多闪烁.
@@ -259,6 +265,9 @@ option.GALAXY.comment                  = 夜空中的星系图像.
 option.GALAXY_INTENSITY                = 星系强度
 option.GALAXY_INTENSITY.comment        = 控制夜空中星系的亮度.
 option.CREPUSCULAR_RAYS                = 云隙光
+option.CREPUSCULAR_RAYS_INTENSITY      = 强度
+option.CREPUSCULAR_RAYS_STEPS_HORIZON  = 采样数 - 地平线
+option.CREPUSCULAR_RAYS_STEPS_ZENITH   = 采样数 - 天顶
 option.LIGHTNING_FLASH                 = 闪电闪光
 option.RAINBOWS                        = 彩虹
 option.END_SUN_EFFECT                  = 末地日轮
@@ -416,6 +425,7 @@ option.LPV_VL_INTENSITY_UNDERGROUND    = 强度 - 地下
 option.LPV_VL_INTENSITY_NETHER         = 强度 - 下界
 option.LPV_VL_INTENSITY_END            = 强度 - 末地
 
+# Rayleigh Fog
 option.AIR_FOG_RAYLEIGH_FALLOFF_START     = 瑞利 - 雾气消散起始位置
 option.AIR_FOG_RAYLEIGH_FALLOFF_START.comment = 瑞利雾气开始消散的海拔高度.
 option.AIR_FOG_RAYLEIGH_FALLOFF_HALF_LIFE = 瑞利 - 雾气密度减半位置
@@ -460,12 +470,18 @@ option.AIR_FOG_RAYLEIGH_R_SWAMP        = §4红色比重
 option.AIR_FOG_RAYLEIGH_G_SWAMP        = §2绿色比重
 option.AIR_FOG_RAYLEIGH_B_SWAMP        = §1蓝色比重
 
+option.AIR_FOG_RAYLEIGH_FALLOFF_START     = 开始消散高度
+option.AIR_FOG_RAYLEIGH_FALLOFF_HALF_LIFE = 密度减半高度
+
+# Mie Fog
 option.AIR_FOG_MIE_DENSITY_MORNING     = 清晨密度
 option.AIR_FOG_MIE_DENSITY_NOON        = 正午密度
 option.AIR_FOG_MIE_DENSITY_EVENING     = 傍晚密度
 option.AIR_FOG_MIE_DENSITY_MIDNIGHT    = 午夜密度
 option.AIR_FOG_MIE_DENSITY_RAIN        = 雨天密度
 option.AIR_FOG_MIE_DENSITY_BLUE_HOUR   = 黎明/黄昏 密度
+option.AIR_FOG_MIE_FALLOFF_START       = 开始消散高度
+option.AIR_FOG_MIE_FALLOFF_HALF_LIFE   = 密度减半高度
 
 # Materials settings
 
@@ -676,6 +692,8 @@ option.CUSTOM_SKY                      = 自定义天空
 option.CUSTOM_SKY.comment              = 启用对资源包自定义天空的支持.
 option.CUSTOM_SKY_BRIGHTNESS           = 自定义天空亮度
 option.CUSTOM_SKY_BRIGHTNESS.comment   = 自定义天空的亮度.
+option.DH_OVERDRAW_DISTANCE            = 过度绘制距离
+option.DH_OVERDRAW_FADE_LENGTH         = 过度绘制淡化长度
 option.NOISE_ON_DH_TERRAIN             = DH 地形噪声
 option.ENCHANTMENT_GLINT_BRIGHTNESS    = 附魔闪光亮度
 option.USE_SEPARATE_ENTITY_DRAWS       = "分离绘制实体"
@@ -731,6 +749,7 @@ option.BOX_COLOR_B              = 蓝色比重
 option.BOX_EMISSION             = 框线发光
 option.BOX_EMISSION.comment     = 框线发光强度. 需要启用泛光.
 option.BOX_LINE_WIDTH           = 框线宽度
+
 
 #additional comment
 
