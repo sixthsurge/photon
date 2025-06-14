@@ -96,6 +96,7 @@ vec3 animate_vertex(vec3 world_pos, bool is_top_vertex, float skylight, uint mat
 
 #ifdef WAVING_PLANTS
 	case MATERIAL_SMALL_PLANTS:
+	case MATERIAL_OPEN_EYEBLOSSOM:
 		return world_pos + (get_wind_displacement(world_pos, wind_speed, wind_strength, false) + player_displacement) * float(is_top_vertex);
 
 	case MATERIAL_TALL_PLANTS_LOWER:

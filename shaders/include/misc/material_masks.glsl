@@ -9,6 +9,7 @@
 #define MATERIAL_TALL_PLANTS_UPPER 4
 #define MATERIAL_LEAVES            5
 #define MATERIAL_LAVA              39
+#define MATERIAL_OPEN_EYEBLOSSOM   59
 #define MATERIAL_NETHER_PORTAL     62 
 #define MATERIAL_END_PORTAL        63
 #define MATERIAL_ITEM              100

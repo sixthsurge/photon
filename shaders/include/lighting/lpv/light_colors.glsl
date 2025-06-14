@@ -29,7 +29,7 @@ const vec3[32] light_color = vec3[32](
 	vec3(0.75, 0.44, 1.00) *  4.0, // Calibrated sculk sensor
 	vec3(0.75, 1.00, 0.83) *  6.0, // Active sculk sensor
 	vec3(1.00, 0.18, 0.10) *  3.3, // Redstone block
-	vec3(0.0), // Unused
+	vec3(1.00, 0.50, 0.25) *  3.0, // Open eyeblossom
 	vec3(0.0), // Unused
 	vec3(0.0), // Unused
 	vec3(0.60, 0.10, 1.00) * 12.0, // Nether portal

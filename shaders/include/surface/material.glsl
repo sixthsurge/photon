@@ -600,7 +600,17 @@ Material material_from(vec3 albedo_srgb, uint material_mask, vec3 world_pos, vec
 							material.emission = 0.33 * albedo_sqrt;
 							#endif
 						} else { // 59
+							// Open eyeblossom
 
+							#ifdef HARDCODED_SSS
+							material.sss_amount = 0.5;
+							material.sheen_amount = 1.0;
+							#endif
+
+							#ifdef HARDCODED_EMISSION
+							// Redstone block
+							material.emission = 0.9 * albedo_sqrt * step(0.5, hsl.y);
+							#endif
 						}
 					}
 				} else { // 60-64
