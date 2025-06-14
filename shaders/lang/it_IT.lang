@@ -31,6 +31,8 @@ screen.box                             = Box di selezione
 
 screen.aurora                          = Aurora
 screen.clouds                          = Nuvole
+screen.crepuscular_rays                = Raggi Crepuscolari
+screen.stars                           = Stelle
 screen.clouds_cumulus                  = Impostazioni Nuvole Cumulus
 screen.clouds_altocumulus              = Impostazioni Nuvole Altocumulus
 screen.clouds_cumulus_congestus        = Impostazioni Nuvole Cumulus Congestus
@@ -38,8 +40,8 @@ screen.clouds_cirrus                   = Impostazioni Nuvole Cirrus/Cirrocumulus
 screen.clouds_minecrafty               = Impostazioni Nuvole vanilla
 screen.clouds_noctilucent              = Impostazioni Nuvole Nottilucenti
 
-screen.fog_rlh                         = Coefficente Rayleigh
-screen.fog_mie                         = Coefficente Mie
+screen.fog_rlh                         = Nebbia Rayleigh
+screen.fog_mie                         = Nebbia Mie
 screen.sunlight_color                  = Colore Luce Solare
 screen.moonlight_color                 = Colore Luce Lunare
 screen.blocklight_color                = Colore Luce Blocchi
@@ -146,6 +148,8 @@ option.BLOCK_ENTITY_SHADOWS            = Ombre Entità Blocchi
 option.PIXELATED_SHADOWS               = Ombre Pixellate
 option.PIXELATED_SHADOWS.comment       = Ombre suddivise in piccoli blocchi, creando un look pixellato
 option.PIXELATED_SHADOWS_RESOLUTION    = Risoluzione Ombre Pixellate
+option.SSS_STEPS                       = Passaggi SSS 
+option.SSS_STEPS.comment               = Aumenta per ridurre il rumore nel fogliame o materiali con SSS, al costo delle performance.
 
 option.SHADER_AO                       = Shader AO
 option.SHADER_AO.comment               = Metodo usato AO. Off - no shader AO. SSAO - qualità minore ma richiede meno filtraggio. GTAO - qualità migliore ma richiede più filtraggio
@@ -248,17 +252,20 @@ option.ATMOSPHERE_SATURATION_BOOST     = Aumento Saturazione Atmosferica
 comment.ATMOSPHERE_SATURATION_BOOST    = Aumenta la saturazione del cielo e del colore della luce solare secondo l'ora del giorno
 option.ATMOSPHERE_SATURATION_BOOST_INTENSITY = Aumento Intensità Saturazione Atmosferica
 comment.ATMOSPHERE_SATURATION_BOOST_INTENSITY = Modifica l'Intensità dell'Aumento di Saturazione Atmosferica
-option.STARS                           = Stelle
+option.STARS                           = Attivato
 option.STARS.comment                   = Stelle nel cielo notturno. Impatto performance basso
-option.STARS_INTENSITY                 = Intensità Stelle
+option.STARS_INTENSITY                 = Intensità
 option.STARS_INTENSITY.comment         = Controlla la luminosità delle stelle nel cielo notturno
-option.STARS_COVERAGE                  = Numero Stelle
+option.STARS_COVERAGE                  = Numero
 option.STARS_COVERAGE.comment          = Controlla il numero di stelle nel cielo notturno
 option.GALAXY                          = Galassia
 option.GALAXY.comment                  = Galassia nel cielo notturno
 option.GALAXY_INTENSITY                = Intensità Galassia
 option.GALAXY_INTENSITY.comment        = Controlla la luminosità della galassia nel cielo notturno
-option.CREPUSCULAR_RAYS                = Raggi Crepuscolari
+option.CREPUSCULAR_RAYS                = Attivato
+option.CREPUSCULAR_RAYS_INTENSITY      = Intensità
+option.CREPUSCULAR_RAYS_STEPS_HORIZON  = Numero Passaggi - Orizzonte
+option.CREPUSCULAR_RAYS_STEPS_ZENITH   = Numero Passaggi - Zenit
 option.LIGHTNING_FLASH                 = Lampi
 option.RAINBOWS                        = Arcobaleno
 option.END_SUN_EFFECT                  = Effetto Sole End
@@ -266,8 +273,8 @@ option.END_SUN_EFFECT                  = Effetto Sole End
 # Clouds
 option.CLOUDS_CUMULUS                       = Nuvole Cumulus
 option.CLOUDS_CUMULUS.comment               = Nuvole volumetrice di bassa altitudine fatte per assomigliare ai Cumuli
-option.CLOUDS_CUMULUS_PRIMARY_STEPS_H       = Passaggi Primari - Horizon
-option.CLOUDS_CUMULUS_PRIMARY_STEPS_Z       = Passaggi Primari - Zenith
+option.CLOUDS_CUMULUS_PRIMARY_STEPS_H       = Passaggi Primari - Orizzonte
+option.CLOUDS_CUMULUS_PRIMARY_STEPS_Z       = Passaggi Primari - Zenit
 option.CLOUDS_CUMULUS_LIGHTING_STEPS        = Passaggi di Luce
 option.CLOUDS_CUMULUS_AMBIENT_STEPS         = Passaggi d'Ambiente
 option.CLOUDS_CUMULUS_ALTITUDE              = Altitudine
@@ -304,8 +311,8 @@ suffix.CLOUDS_ALTOCUMULUS_ALTITUDE              = °
 
 option.CLOUDS_CUMULUS_CONGESTUS                       = Nuvole Cumulus Congestus
 option.CLOUDS_CUMULUS_CONGESTUS.comment               = Enormi, distanti nuvole volumetriche
-option.CLOUDS_CUMULUS_CONGESTUS_PRIMARY_STEPS_H       = Passaggi Primari - Horizon
-option.CLOUDS_CUMULUS_CONGESTUS_PRIMARY_STEPS_Z       = Passaggi Primari - Zenith
+option.CLOUDS_CUMULUS_CONGESTUS_PRIMARY_STEPS_H       = Passaggi Primari - Orizzonte
+option.CLOUDS_CUMULUS_CONGESTUS_PRIMARY_STEPS_Z       = Passaggi Primari - Zenit
 option.CLOUDS_CUMULUS_CONGESTUS_LIGHTING_STEPS        = Passaggi di Luce
 option.CLOUDS_CUMULUS_CONGESTUS_AMBIENT_STEPS         = Passaggi d'Ambiente
 option.CLOUDS_CUMULUS_CONGESTUS_ALTITUDE              = Altitudine
@@ -416,6 +423,7 @@ option.LPV_VL_INTENSITY_UNDERGROUND    = intensità Sottoterra
 option.LPV_VL_INTENSITY_NETHER         = Intensità Nether
 option.LPV_VL_INTENSITY_END            = Intensità End
 
+# Rayleigh Fog
 option.AIR_FOG_RAYLEIGH_FALLOFF_START     = Inizio Caduta Rayleigh
 option.AIR_FOG_RAYLEIGH_FALLOFF_START.comment = Altitudine sopra il livello del mare in cui la nebbia Rayleigh inizia a diminuire
 option.AIR_FOG_RAYLEIGH_FALLOFF_HALF_LIFE = Caduta Dimezzata Rayleigh
@@ -460,12 +468,18 @@ option.AIR_FOG_RAYLEIGH_R_SWAMP        = §4Rosso
 option.AIR_FOG_RAYLEIGH_G_SWAMP        = §2Verde
 option.AIR_FOG_RAYLEIGH_B_SWAMP        = §1Blu
 
+option.AIR_FOG_RAYLEIGH_FALLOFF_START     = Inizio Dissolvenza Altitudine
+option.AIR_FOG_RAYLEIGH_FALLOFF_HALF_LIFE = Metà Dissolvenza Altitudine
+
+# Mie Fog
 option.AIR_FOG_MIE_DENSITY_MORNING     = Densità Mattina
 option.AIR_FOG_MIE_DENSITY_NOON        = Densità Mezzogiorno
 option.AIR_FOG_MIE_DENSITY_EVENING     = Densità Sera
 option.AIR_FOG_MIE_DENSITY_MIDNIGHT    = Densità Mezzanotte
 option.AIR_FOG_MIE_DENSITY_RAIN        = Densità Pioggia
 option.AIR_FOG_MIE_DENSITY_BLUE_HOUR   = Densità Alba/Tramonto
+option.AIR_FOG_MIE_FALLOFF_START       = Inizio Dissolvenza Altitudine
+option.AIR_FOG_MIE_FALLOFF_HALF_LIFE   = Metà Dissolvenza Altitudine
 
 # Materials settings
 
