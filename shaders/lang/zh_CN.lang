@@ -31,6 +31,8 @@ screen.box                             = 选择框
 
 screen.aurora                          = 极光
 screen.clouds                          = 云层
+screen.crepuscular_rays                = 云隙光
+screen.stars                           = 星星
 screen.clouds_cumulus                  = 积云设置
 screen.clouds_altocumulus              = 高积云设置
 screen.clouds_cumulus_congestus        = 浓积云设置
@@ -146,6 +148,8 @@ option.BLOCK_ENTITY_SHADOWS            = 方块实体阴影
 option.PIXELATED_SHADOWS               = 像素阴影
 option.PIXELATED_SHADOWS.comment       = 使阴影捕捉方块纹理像素以创建像素化的阴影外观.
 option.PIXELATED_SHADOWS_RESOLUTION    = 像素阴影分辨率
+option.SSS_STEPS                       = 次表面散射步数
+option.SSS_STEPS.comment               = 增加以减少草丛和其他具有次表面散射(SSS)材质的噪点, 但会牺牲性能.
 
 option.SHADER_AO                       = 光影环境光遮蔽
 option.SHADER_AO.comment               = 选择环境光遮蔽的算法类型. 关 - 不计算光影的环境光遮蔽算法. SSAO - 需要的采样数不多/闪烁更少但质量较低. GTAO - 更好的视觉质量但需要更多的采样也更多闪烁.
@@ -161,7 +165,7 @@ option.SSAO_STEPS.comment              = 控制 SSAO 噪点明显程度.
 option.GTAO_RADIUS                     = GTAO 半径
 option.GTAO_RADIUS.comment             = 调节 GTAO 的半径 - 物体之间可以互相遮蔽的距离.
 option.GTAO_SLICES                     = GTAO 切面数
-option.GTAO_SLICES.comment             = 控制 SSAO 噪点明显程度.
+option.GTAO_SLICES.comment             = 控制 GTAO 噪点明显程度.
 option.GTAO_HORIZON_STEPS              = GTAO 水平线采样数
 option.GTAO_HORIZON_STEPS.comment      = 控制 GTAO 的精确度.
 
@@ -259,6 +263,9 @@ option.GALAXY.comment                  = 夜空中的星系图像.
 option.GALAXY_INTENSITY                = 星系强度
 option.GALAXY_INTENSITY.comment        = 控制夜空中星系的亮度.
 option.CREPUSCULAR_RAYS                = 云隙光
+option.CREPUSCULAR_RAYS_INTENSITY      = 云隙光强度
+option.CREPUSCULAR_RAYS_STEPS_HORIZON  = 基础采样数 - 地平线
+option.CREPUSCULAR_RAYS_STEPS_ZENITH   = 基础采样数 - 天顶
 option.LIGHTNING_FLASH                 = 闪电闪光
 option.RAINBOWS                        = 彩虹
 option.END_SUN_EFFECT                  = 末地日轮
