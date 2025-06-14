@@ -132,7 +132,7 @@ CloudsParameters get_clouds_parameters(Weather weather) {
 
 	// Crepuscular rays
 
-	params.crepuscular_rays_amount = dampen(clamp01(2.0 * weather.humidity)) * (linear_step(0.45, 0.7, (1.0 + 0.2 * sqr(params.l0_cumulus_stratus_blend)) * dot(params.l0_coverage, vec2(0.66, 0.33))) + 0.12 * params.l1_coverage.y);
+	params.crepuscular_rays_amount = dampen(clamp01(2.0 * weather.humidity)) * (linear_step(0.45, 0.7, (1.0 + 0.2 * sqr(params.l0_cumulus_stratus_blend)) * dot(params.l0_coverage, vec2(0.66, 0.33)) + 0.09 * params.l1_coverage.y));
 
 	return params;
 }

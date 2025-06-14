@@ -21,7 +21,7 @@ vec4 draw_crepuscular_rays(
 	const float volume_inner_radius = 1.0;
 #endif
 	const float volume_outer_radius = clouds_cumulus_radius + clouds_cumulus_thickness * 0.5;
-	vec3 extinction_coeff = 2.0 * (clouds_params.crepuscular_rays_amount) * (50.0 * air_rayleigh_coefficient + 400.0 * air_mie_coefficient) * (CLOUDS_SCALE / 10.0);
+	vec3 extinction_coeff = 2.0 * dampen(clouds_params.crepuscular_rays_amount) * (50.0 * air_rayleigh_coefficient + 400.0 * air_mie_coefficient) * (CLOUDS_SCALE / 10.0);
 
 	const float underground_light_fade_distance = 1000.0;
 
@@ -101,7 +101,7 @@ vec4 draw_crepuscular_rays(
 	float phase = mix(0.5, 1.5, time_sunrise + time_sunset) * forwards // forwards lobe (max'ing them is completely nonsensical but it looks nice)
 		+ 0.5 * henyey_greenstein_phase(LoV, -0.2); // backwards lobe
 
-	scattering *= scattering_coeff * step_transmitted_fraction * light_color * step_length * dampen(clouds_params.crepuscular_rays_amount);
+	scattering *= scattering_coeff * step_transmitted_fraction * light_color * step_length * clouds_params.crepuscular_rays_amount;
 	scattering *= (6.0 * CREPUSCULAR_RAYS_INTENSITY) * phase;
 	transmittance = mix(vec3(1.0), transmittance, clouds_params.crepuscular_rays_amount);
 
