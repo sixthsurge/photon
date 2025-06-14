@@ -4,7 +4,7 @@
 
 <p align = "center">A gameplay-focused shader pack for Minecraft</p>
 
-![Screenshot](https://cdn.discordapp.com/attachments/1273346654946328718/1378837863394840606/2025-06-01_21.48.46.png?ex=684de054&is=684c8ed4&hm=53bdf83b46b7a540f551ea6ea7c26cd532e389e218c10f0c8ea82878a964527b&)
+![Screenshot](docs/images/rainbow.png)
 
 ## Acknowledgments
 
@@ -34,7 +34,7 @@
 ## Features
 * Fully revamped sky, lighting and water with a cohesive visual style
 * Immersive weather system with different skies each day, featuring multiple volumetric cloud layers
-* [Colored lighting](https://cdn.discordapp.com/attachments/736930818835873813/1123586429902135338/2023-06-28_13.02.33.png?ex=65f197e8&is=65df22e8&hm=c7871d2d3a5af5f6c84d98ad9997e4f4e1cfff40d3d9539b03e471abf48f677c&) using a voxel flood-fill algorithm (enabled with Ultra profile, requires Iris)
+* Colored lighting using a voxel flood-fill algorithm (enabled with Ultra profile, requires Iris)
 * Full labPBR resource pack support
 * Extensive settings menu allowing you to customize every aspect of the shader
 * Screen-space reflections
