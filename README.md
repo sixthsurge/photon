@@ -4,7 +4,7 @@
 
 <p align = "center">A gameplay-focused shader pack for Minecraft</p>
 
-![Screenshot](https://imgur.com/a/De917tI)
+![Screenshot](https://cdn.discordapp.com/attachments/1273346654946328718/1378837863394840606/2025-06-01_21.48.46.png?ex=684de054&is=684c8ed4&hm=53bdf83b46b7a540f551ea6ea7c26cd532e389e218c10f0c8ea82878a964527b&)
 
 ## Acknowledgments
 
