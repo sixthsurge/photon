@@ -65,7 +65,7 @@ vec2 render_cloud_shadow_map(vec2 uv) {
 	float shadow = 1.0;
 	float shadow_cumulus_only = 1.0;
 	float distance_fade;
-	float distance_fade_strength = 0.0000001 * pulse(light_dir.y, -0.01, 0.2);
+	float distance_fade_strength = 0.00000001 * pulse(light_dir.y, -0.01, 0.2);
 
 #ifdef CLOUDS_CUMULUS
 	extinction_coeff = 0.25 * clouds_params.l0_extinction_coeff;

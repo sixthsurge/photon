@@ -13,7 +13,7 @@ struct Weather {
 };
 
 float weather_temperature() {
-	const float temperature_variation_speed = golden_ratio * rcp(600.0) * WEATHER_TEMPERATURE_VARIATION_SPEED;
+	const float temperature_variation_speed = 0.75 * golden_ratio * rcp(600.0) * WEATHER_TEMPERATURE_VARIATION_SPEED;
 	const float random_temperature_min      = 0.0;
 	const float random_temperature_max      = 1.0;
 	const float biome_temperature_influence = 0.1;
@@ -46,7 +46,7 @@ float weather_temperature() {
 }
 
 float weather_humidity() {
-	const float humidity_variation_speed    = golden_ratio * rcp(600.0) * WEATHER_HUMIDITY_VARIATION_SPEED;
+	const float humidity_variation_speed    = 0.75 * golden_ratio * rcp(600.0) * WEATHER_HUMIDITY_VARIATION_SPEED;
 	const float random_humidity_min         = 0.2;
 	const float random_humidity_max         = 0.8;
 	const float biome_humidity_influence    = 0.1;

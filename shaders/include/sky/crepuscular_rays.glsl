@@ -21,9 +21,9 @@ vec4 draw_crepuscular_rays(
 	const float volume_inner_radius = 1.0;
 #endif
 	const float volume_outer_radius = clouds_cumulus_radius + clouds_cumulus_thickness * 0.5;
-	const vec3 extinction_coeff = (air_rayleigh_coefficient + 400.0 * air_mie_coefficient) * (CLOUDS_SCALE / 10.0);
+	vec3 extinction_coeff = 2.0 * (clouds_params.crepuscular_rays_amount) * (50.0 * air_rayleigh_coefficient + 400.0 * air_mie_coefficient) * (CLOUDS_SCALE / 10.0);
 
-	const float underground_light_fade_distance = 100.0;
+	const float underground_light_fade_distance = 1000.0;
 
 	uint step_count = uint(mix(
 		step_count_horizon, 
@@ -67,18 +67,21 @@ vec4 draw_crepuscular_rays(
 		vec3 ray_position_planet = ray_origin_world + ray_step_planet * (float(i) + dither);
 		vec3 ray_position_shadow = ray_origin_shadow + ray_step_shadow * (float(i) + dither);
 
-		float cloud_shadow = texture(
+		float d = step_length * (float(i) + dither);
+
+		float cloud_shadow = dot(texture(
 			cloud_shadow_map, 
 			shadow_view_to_cloud_shadow_space(ray_position_shadow)
-		).y;
 
+			).xy, vec2(0.5));
 		float a = linear_step(
 			sqr(planet_radius - underground_light_fade_distance), 
 			sqr(planet_radius), 
 			length_squared(ray_position_planet)
 		);
+		float b = 1.0 - exp2(-0.002 * d);
 
-		scattering += cube(cloud_shadow) * transmittance * a;
+		scattering += cube(cloud_shadow) * transmittance * a * b;
 		transmittance *= step_transmittance;
 	}
 
@@ -98,11 +101,11 @@ vec4 draw_crepuscular_rays(
 	float phase = mix(0.5, 1.5, time_sunrise + time_sunset) * forwards // forwards lobe (max'ing them is completely nonsensical but it looks nice)
 		+ 0.5 * henyey_greenstein_phase(LoV, -0.2); // backwards lobe
 
-	scattering *= scattering_coeff * step_transmitted_fraction * light_color * step_length;
-	scattering *= (4.0 * CREPUSCULAR_RAYS_INTENSITY) * phase * clouds_params.crepuscular_rays_amount;
+	scattering *= scattering_coeff * step_transmitted_fraction * light_color * step_length * dampen(clouds_params.crepuscular_rays_amount);
+	scattering *= (6.0 * CREPUSCULAR_RAYS_INTENSITY) * phase;
 	transmittance = mix(vec3(1.0), transmittance, clouds_params.crepuscular_rays_amount);
 
-	return vec4(scattering, dampen(dampen(dot(transmittance, vec3(rcp(3.0))))));
+	return vec4(scattering, 1.0);
 }
 
 #endif // INCLUDE_SKY_CREPUSCULAR_RAYS
