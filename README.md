@@ -4,7 +4,7 @@
 
 <p align = "center">A gameplay-focused shader pack for Minecraft</p>
 
-![Screenshot](docs/images/a.png)
+![Screenshot](https://imgur.com/a/De917tI)
 
 ## Acknowledgments
 
@@ -22,13 +22,14 @@
 
 ## Installation
 
-* [Download on Modrinth](https://modrinth.com/shader/photon-shader/versions) (recommended)
-* [Download latest stable commit](https://github.com/sixthsurge/photon/archive/refs/heads/main.zip)
-* [Download latest dev commit](https://github.com/sixthsurge/photon/archive/refs/heads/dev.zip)
-
 * Photon can be used with [Iris](https://irisshaders.dev/download) (recommended) or [OptiFine](https://optifine.net/home)
 * Iris is a modern shader loader with far better performance, mod compatibility and developer features than OptiFine. Some features (Colored Lighting) will only work on Iris
 * Once you have your preferred shader loader installed, simply place the downloaded zip file in your `.minecraft/shaderpacks` folder
+
+### Downloads
+* [Releases](https://modrinth.com/shader/photon-shader/versions) (recommended)
+* [Stable](https://github.com/sixthsurge/photon/archive/refs/heads/iris-stable.zip)
+* [Unstable](https://github.com/sixthsurge/photon/archive/refs/heads/iris-unstable.zip)
 
 ## Features
 * Fully revamped sky, lighting and water with a cohesive visual style
@@ -49,7 +50,7 @@
 * Iris - version 1.5 and above
 * OptiFine - on Minecraft 1.16.5 and above
 * Photon is also compatible with [Distant Horizons](https://www.curseforge.com/minecraft/mc-mods/distant-horizons) 
-* Mac OS: Disable _SH Skylight_ and _Colored Shadows_
+* Apple Metal: Disable _SH Skylight_ and _Colored Shadows_
 
 ## Showcase videos
 
