@@ -142,6 +142,13 @@ const bool colortex11MipmapEnabled = true;
 #ifdef WORLD_OVERWORLD
 #include "/include/fog/overworld/analytic.glsl"
 #include "/include/sky/rainbow.glsl"
+
+#ifdef DISTANT_HORIZONS
+uniform sampler2D colortex8;
+uniform mat4 shadowModelViewInverse;
+
+#include "/include/lighting/cloud_shadows.glsl"
+#endif
 #endif
 
 #ifdef DISTANT_HORIZONS

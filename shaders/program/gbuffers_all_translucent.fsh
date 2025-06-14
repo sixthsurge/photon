@@ -235,13 +235,20 @@ Material get_water_material(
 	return material;
 }
 
-vec4 water_absorption_approx(vec4 color, float sss_depth, float layer_dist, float LoV, float NoV) {
+vec4 water_absorption_approx(
+	vec4 color, 
+	float sss_depth, 
+	float layer_dist, 
+	float LoV, 
+	float NoV, 
+	float cloud_shadows
+) {
 	vec3 biome_water_color = srgb_eotf_inv(tint.rgb) * rec709_to_working_color;
 	vec3 absorption_coeff = biome_water_coeff(biome_water_color);
 	float dist = layer_dist * float(isEyeInWater != 1 || NoV >= 0.0);
 
 	mat2x3 water_fog = water_fog_simple(
-		light_color,
+		light_color * cloud_shadows,
 		ambient_color,
 		absorption_coeff,
 		light_levels,
@@ -554,7 +561,14 @@ void main() {
 
 #if defined PROGRAM_GBUFFERS_WATER
 	if (is_water) {
-		fragment_color = water_absorption_approx(fragment_color, sss_depth, layer_dist, LoV, dot(tbn[2], direction_world));
+		fragment_color = water_absorption_approx(
+			fragment_color, 
+			sss_depth, 
+			layer_dist, 
+			LoV, 
+			dot(tbn[2], direction_world), 
+			cloud_shadows
+		);
 
 	#ifdef SNELLS_WINDOW
 		if (isEyeInWater == 1) {
