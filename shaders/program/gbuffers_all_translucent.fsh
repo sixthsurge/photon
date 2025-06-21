@@ -197,24 +197,28 @@ void decode_normal_map(vec3 normal_map, out vec3 normal, out float ao) {
 Material get_water_material(
 	vec3 direction_world,
 	vec3 normal,
-	float layer_dist
+	float layer_dist,
+	out float alpha
 ) {
 	Material material = water_material;
+	alpha = 0.01;
 
 	// Water texture
 
 #if WATER_TEXTURE == WATER_TEXTURE_HIGHLIGHT || WATER_TEXTURE == WATER_TEXTURE_HIGHLIGHT_UNDERGROUND
 	vec4 base_color = texture(gtexture, uv, lod_bias);
-	float texture_highlight  = 0.5 * sqr(linear_step(0.63, 1.0, base_color.r)) + 0.03 * base_color.r;
+	float texture_highlight  = dampen(0.5 * sqr(linear_step(0.63, 1.0, base_color.r)) + 0.03 * base_color.r);
 #if WATER_TEXTURE == WATER_TEXTURE_HIGHLIGHT_UNDERGROUND
 		  texture_highlight *= 1.0 - cube(linear_step(0.0, 0.5, light_levels.y));
 #endif
 
 	material.albedo     = clamp01(0.5 * exp(-2.0 * water_absorption_coeff) * texture_highlight);
 	material.roughness += 0.3 * texture_highlight;
+	alpha              += texture_highlight;
 #elif WATER_TEXTURE == WATER_TEXTURE_VANILLA
 	vec4 base_color = texture(gtexture, uv, lod_bias) * tint;
 	material.albedo = srgb_eotf_inv(base_color.rgb * base_color.a) * rec709_to_working_color;
+	alpha = base_color.a;
 #endif
 
 	// Water edge highlight
@@ -231,6 +235,7 @@ Material get_water_material(
 
 	material.albedo += 0.1 * edge_highlight / mix(1.0, max(dot(ambient_color, luminance_weights_rec2020), 0.5), light_levels.y);
 	material.albedo  = clamp01(material.albedo);
+	alpha += edge_highlight;
 #endif
 
 	return material;
@@ -376,7 +381,8 @@ void main() {
 		material = get_water_material(
 			direction_world,
 			normal,
-			layer_dist
+			layer_dist,
+			fragment_color.a
 		);
 
 	#ifdef WATER_WAVES
