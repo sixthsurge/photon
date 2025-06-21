@@ -474,7 +474,6 @@ void main() {
 
 		fragment_color.a = sqrt(fragment_color.a);
 	}
-	//fragment_color.a = 0.01;
 
 	// Shadows
 
