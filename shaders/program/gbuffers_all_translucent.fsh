@@ -474,6 +474,7 @@ void main() {
 
 		fragment_color.a = sqrt(fragment_color.a);
 	}
+	//fragment_color.a = 0.01;
 
 	// Shadows
 
@@ -525,11 +526,7 @@ void main() {
 		NoV,
 		NoH,
 		LoV
-	);
-
-	if (!is_water) {
-		fragment_color.rgb *= sqr(fragment_color.a);
-	}
+	) * fragment_color.a;
 
 	// Specular highlight
 
