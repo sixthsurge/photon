@@ -136,7 +136,8 @@ uniform float time_noon;
 uniform float time_sunset;
 uniform float time_midnight;
 
-#if defined PROGRAM_GBUFFERS_ENTITIES_TRANSLUCENT
+#if defined PROGRAM_GBUFFERS_ENTITIES_TRANSLUCENT || defined PROGRAM_GBUFFERS_LIGHTNING
+uniform int entityId;
 uniform vec4 entityColor;
 #endif
 
@@ -444,9 +445,12 @@ void main() {
 		material = material_from(fragment_color.rgb, material_mask, world_pos, tbn[2], adjusted_light_levels);
 
 #if defined PROGRAM_GBUFFERS_LIGHTNING
-		// Lightning (since gbuffers_lightning)
-		material.albedo   = vec3(1.0);
-		material.emission = vec3(1.0);
+		if (material_mask == MATERIAL_DRAGON_BEAM) {
+			material.albedo *= tint.a;
+		} else {
+			material.albedo   = vec3(1.0);
+			material.emission = vec3(1.0);
+		}
 #endif
 
 		//--//
@@ -586,7 +590,7 @@ void main() {
 
 	vec4 fog = common_fog(length(position_scene), false);
 	fragment_color.rgb  = fragment_color.rgb * fog.a + fog.rgb;
-
+	
 	// Purkinje shift
 
 	fragment_color.rgb = purkinje_shift(fragment_color.rgb, adjusted_light_levels);

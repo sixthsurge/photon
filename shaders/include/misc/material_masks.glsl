@@ -16,4 +16,7 @@
 #define MATERIAL_BOAT              101 
 #define MATERIAL_LIGHTNING_BOLT    102
 
+// Special material for dragon death beams
+#define MATERIAL_DRAGON_BEAM       103
+
 #endif // INCLUDE_MISC_MATERIAL_MASKS

@@ -27,12 +27,8 @@ flat in vec4 tint;
 uniform vec2 view_res;
 uniform vec2 view_pixel_size;
 
-#if BOX_MODE != BOX_MODE_NONE
 uniform int renderStage;
-#if BOX_MODE == BOX_MODE_RAINBOW
 uniform float frameTimeCounter;
-#endif
-#endif
 
 #include "/include/utility/color.glsl"
 #include "/include/utility/encoding.glsl"
