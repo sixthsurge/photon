@@ -19,7 +19,6 @@
 * http://momentsingraphics.de/ - Blue noise texture
 * [NASA Scientific Visualization Studio](https://svs.gsfc.nasa.gov/4851) - Galaxy image
 
-
 ## Installation
 
 * Photon can be used with [Iris](https://irisshaders.dev/download) (recommended) or [OptiFine](https://optifine.net/home)
@@ -32,18 +31,19 @@
 * [Unstable](https://github.com/sixthsurge/photon/archive/refs/heads/iris-unstable.zip)
 
 ## Features
-* Fully revamped sky, lighting and water with a cohesive visual style
-* Immersive weather system with different skies each day, featuring multiple volumetric cloud layers
-* Colored lighting using a voxel flood-fill algorithm (enabled with Ultra profile, requires Iris)
-* Full labPBR resource pack support
-* Extensive settings menu allowing you to customize every aspect of the shader
+* Fully revamped sky, lighting and water 
+* Detailed clouds with many layers and cloud types
+* Immersive weather system providing different skies each day
+* Voxel-based colored lighting (enabled with Ultra profile, requires Iris)
 * Screen-space reflections
-* Volumetric lighting
+* Volumetric fog
 * Soft shadows with variable-size penumbras
 * Detailed ambient occlusion (GTAO)
 * Camera effects: bloom, depth of field, motion blur
 * Much improved image quality with TAA, FXAA and CAS
 * Advanced temporal upscaling (disabled by default) for low end devices
+* Extensive settings menu allowing you to customize every aspect of the shader
+* Full labPBR resource pack support
 
 ## Compatibility
 * Nvidia, AMD and Intel GPUs
