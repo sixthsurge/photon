@@ -9,6 +9,9 @@
 --------------------------------------------------------------------------------
 */
 
+#if !defined SETTINGS_INCLUDED
+#define SETTINGS_INCLUDED
+
 const int noiseTextureResolution = 512;
 
 const bool shadowHardwareFiltering1 = true;
@@ -605,3 +608,5 @@ const float wetnessHalflife         = 70.0;
 #ifndef IS_IRIS
     #undef USE_SEPARATE_ENTITY_DRAWS
 #endif
+
+#endif // SETTINGS_INCLUDED
