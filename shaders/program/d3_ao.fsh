@@ -103,8 +103,12 @@ void main() {
     float depth_dh = texelFetch(dhDepthTex, view_texel, 0).x;
 	bool is_dh_terrain = is_distant_horizons_terrain(depth_mc, depth_dh);
 #else
+	#define depth_mc depth
     const bool is_dh_terrain = false;
 #endif
+
+	bool is_hand;
+	fix_hand_depth(depth_mc, is_hand);
 
 	vec3 screen_pos = vec3(uv, depth);
 	vec3 view_pos = screen_to_view_space(combined_projection_matrix_inverse, screen_pos, true);
@@ -194,6 +198,10 @@ void main() {
 	} else {
 		ambient = vec4(ao, bent_normal.xy * 0.5 + 0.5);
 		ambient_history_data = vec2(0.0);
+	}
+
+	if (is_hand) {
+		ambient_history_data.x = 1.0;
 	}
 }
 

@@ -203,14 +203,13 @@ void main() {
 	bool is_dh_terrain = is_distant_horizons_terrain(depth_mc, depth_dh);
 #else
     const bool is_dh_terrain = false;
+	#define depth_mc depth
 #endif
 
 	// Space conversions
 
-	depth += 0.38 * float(depth < hand_depth); // Hand lighting fix from Capt Tatsu
-	if (depth < hand_depth) {
-		return;
-	}
+	bool is_hand;
+	fix_hand_depth(depth_mc, is_hand);
 
 	vec3 view_pos = screen_to_view_space(combined_projection_matrix_inverse, vec3(uv, depth), true);
 	vec3 scene_pos = view_to_scene_space(view_pos);
@@ -402,6 +401,12 @@ void main() {
 
 		// Sense check bent normal
 		if (dot(bent_normal, normal) < eps) bent_normal = normal;
+
+		// No AO/bent normal on hand
+		if (is_hand) {
+			ao = 1.0;
+			bent_normal = normal;
+		}
 
 		// Shadows
 

@@ -164,6 +164,9 @@ void main() {
 	vec4 current      = texelFetch(colortex9, src_texel, 0);
 	vec2 current_data = texelFetch(colortex10, src_texel, 0).xy;
 	float depth       = texelFetch(depthtex1, dst_texel, 0).x;
+
+	bool is_hand;
+	fix_hand_depth(depth, is_hand);
 	
 	// --------------------------------
 	//   combined depth buffer for DH
@@ -217,7 +220,7 @@ void main() {
 		float view_distance_squared = length_squared(
 			screen_to_view_space(vec3(uv, depth), true)
 		);
-		if (view_distance_squared < sqr(closest_distance)) {
+		if (view_distance_squared < sqr(closest_distance) && !is_hand) {
 			clouds_history = current;
 			clouds_data.x = 1e6; // apparent distance
 			clouds_data.y = 0.0; // pixel age
@@ -253,6 +256,7 @@ void main() {
 	// Work out whether the history should be invalidated
 	bool disocclusion = clamp01(previous_uv) != previous_uv;
 		 disocclusion = disocclusion || (history_depth < 1.0 && distance_to_terrain_squared < sqr(closest_distance));
+		 disocclusion = disocclusion || history_depth == 0.0; // Signals hand
 		 disocclusion = disocclusion || any(isnan(history));
 	     disocclusion = disocclusion || world_age_changed;
 

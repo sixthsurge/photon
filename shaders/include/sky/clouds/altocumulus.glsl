@@ -28,8 +28,8 @@ float clouds_altocumulus_density(vec3 pos) {
 
 	pos.xz += cameraPosition.xz * CLOUDS_SCALE + wind_velocity * world_age;
 
-	// 2D noise for base shape and coverage
 	vec4 noise = vec4(
+	// 2D noise for base shape and coverage
 		texture(noisetex, (0.000005 / CLOUDS_ALTOCUMULUS_SIZE) * pos.xz + 0.01).x, // cloud coverage
 		texture(noisetex, (0.000047 / CLOUDS_ALTOCUMULUS_SIZE) * pos.xz + 0.3).wx, // cloud shape
 		texture(noisetex, (0.0001 / CLOUDS_ALTOCUMULUS_SIZE) * pos.xz + 0.6).w // cloud detail
