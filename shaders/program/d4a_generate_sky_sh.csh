@@ -15,7 +15,7 @@ layout (local_size_x = 256) in;
 
 const ivec3 workGroups = ivec3(1, 1, 1);
 
-layout (rgba16f) writeonly uniform image2D colorimg9;
+layout (rgba16f) writeonly uniform image2D colorimg4;
 
 uniform sampler2D colortex4;
 
@@ -80,16 +80,16 @@ void main() {
 
 	#undef PARALLEL_REDUCTION_ITER
 
-	// Save SH coeff in colorimg9
+	// Save SH coeff in colorimg4
 
 	if (i == 0u) {
 		for (uint band = 0u; band < 9u; ++band) {
 			vec3 sh_coeff = shared_memory[0][band];
-			imageStore(colorimg9, ivec2(band, 0), vec4(sh_coeff, 0.0));
+			imageStore(colorimg4, ivec2(191, 2 + band), vec4(sh_coeff, 0.0));
 		}
 
 		// Store irradiance facing up for forward lighting 
 		vec3 irradiance_up = sh_evaluate_irradiance(shared_memory[0], vec3(0.0, 1.0, 0.0), 1.0);
-		imageStore(colorimg9, ivec2(9, 0), vec4(irradiance_up, 0.0));
+		imageStore(colorimg4, ivec2(191, 2 + 9), vec4(irradiance_up, 0.0));
 	}
 }
