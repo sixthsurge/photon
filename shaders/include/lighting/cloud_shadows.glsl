@@ -1,6 +1,7 @@
 #if !defined INCLUDE_LIGHTING_CLOUD_SHADOWS
 #define INCLUDE_LIGHTING_CLOUD_SHADOWS
 
+#include "/include/sky/clouds/constants.glsl"
 #include "/include/utility/bicubic.glsl"
 
 const ivec2 cloud_shadow_res = ivec2(512);
@@ -40,8 +41,9 @@ float get_cloud_shadows(sampler2D cloud_shadow_map, vec3 scene_pos) {
 	// fade out cloud shadows when:
 	//  - the fragment is above the cloud layer
 	//  - the sun is near the horizon
-	float altitude_fraction = (scene_pos.y + eyeAltitude - SEA_LEVEL) * (CLOUDS_SCALE / CLOUDS_CUMULUS_THICKNESS) - CLOUDS_CUMULUS_ALTITUDE;
-	float cloud_shadow_fade = smoothstep(0.05, 0.15, light_dir.y);
+	float r = planet_radius + (scene_pos.y + eyeAltitude - SEA_LEVEL) * CLOUDS_SCALE;
+	float altitude_fraction = linear_step(clouds_cumulus_radius, clouds_cumulus_top_radius, r);
+	float cloud_shadow_fade = smoothstep(0.05, 0.15, light_dir.y) * clamp01(1.0 - altitude_fraction);
 
 	float cloud_shadow = bicubic_filter(cloud_shadow_map, cloud_shadow_pos).x;
 	      cloud_shadow = cloud_shadow * cloud_shadow_fade + (1.0 - cloud_shadow_fade);
