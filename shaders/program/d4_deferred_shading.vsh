@@ -37,8 +37,7 @@ flat out float rainbow_amount;
 
 uniform sampler3D depthtex0; // Atmosphere scattering LUT
 
-uniform sampler2D colortex4; // Sky map, lighting colors
-uniform sampler2D colortex9; // Skylight SH
+uniform sampler2D colortex4; // Sky map, lighting colors, sky SH
 
 uniform int worldTime;
 uniform int worldDay;
@@ -112,16 +111,16 @@ void main() {
 
 	#ifdef SH_SKYLIGHT
 	// Sample sky SH
-	sky_sh[0]   = texelFetch(colortex9, ivec2(0, 0), 0).rgb;
-	sky_sh[1]   = texelFetch(colortex9, ivec2(1, 0), 0).rgb;
-	sky_sh[2]   = texelFetch(colortex9, ivec2(2, 0), 0).rgb;
-	sky_sh[3]   = texelFetch(colortex9, ivec2(3, 0), 0).rgb;
-	sky_sh[4]   = texelFetch(colortex9, ivec2(4, 0), 0).rgb;
-	sky_sh[5]   = texelFetch(colortex9, ivec2(5, 0), 0).rgb;
-	sky_sh[6]   = texelFetch(colortex9, ivec2(6, 0), 0).rgb;
-	sky_sh[7]   = texelFetch(colortex9, ivec2(7, 0), 0).rgb;
-	sky_sh[8]   = texelFetch(colortex9, ivec2(8, 0), 0).rgb;
-	skylight_up = texelFetch(colortex9, ivec2(9, 0), 0).rgb;
+	sky_sh[0]   = texelFetch(colortex4, ivec2(191, 2), 0).rgb;
+	sky_sh[1]   = texelFetch(colortex4, ivec2(191, 3), 0).rgb;
+	sky_sh[2]   = texelFetch(colortex4, ivec2(191, 4), 0).rgb;
+	sky_sh[3]   = texelFetch(colortex4, ivec2(191, 5), 0).rgb;
+	sky_sh[4]   = texelFetch(colortex4, ivec2(191, 6), 0).rgb;
+	sky_sh[5]   = texelFetch(colortex4, ivec2(191, 7), 0).rgb;
+	sky_sh[6]   = texelFetch(colortex4, ivec2(191, 8), 0).rgb;
+	sky_sh[7]   = texelFetch(colortex4, ivec2(191, 9), 0).rgb;
+	sky_sh[8]   = texelFetch(colortex4, ivec2(191, 10), 0).rgb;
+	skylight_up = texelFetch(colortex4, ivec2(191, 11), 0).rgb;
 	#endif
 
 	rainbow_amount = get_rainbow_amount(weather);

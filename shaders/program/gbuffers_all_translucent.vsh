@@ -49,8 +49,7 @@ attribute vec2 mc_midTexCoord;
 
 uniform sampler2D noisetex;
 
-uniform sampler2D colortex4; // Sky map, lighting colors
-uniform sampler2D colortex9; // Sky SH
+uniform sampler2D colortex4; // Sky map, lighting colors, sky SH
 
 uniform mat4 gbufferModelView;
 uniform mat4 gbufferModelViewInverse;
@@ -132,7 +131,7 @@ void main() {
 
 	light_color   = texelFetch(colortex4, ivec2(191, 0), 0).rgb;
 #if defined WORLD_OVERWORLD && defined SH_SKYLIGHT
-	ambient_color = texelFetch(colortex9, ivec2(9, 0), 0).rgb;
+	ambient_color = texelFetch(colortex4, ivec2(191, 11), 0).rgb;
 #else
 	ambient_color = texelFetch(colortex4, ivec2(191, 1), 0).rgb;
 #endif
