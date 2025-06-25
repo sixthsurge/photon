@@ -159,7 +159,11 @@ void main() {
 	const int checkerboard_area = CLOUDS_TEMPORAL_UPSCALING * CLOUDS_TEMPORAL_UPSCALING;
 
 	ivec2 dst_texel = ivec2(gl_FragCoord.xy);
-	ivec2 src_texel = clamp(dst_texel / CLOUDS_TEMPORAL_UPSCALING, ivec2(0), ivec2(textureSize(colortex9, 0).xy) - 1);
+	ivec2 src_texel = clamp(
+		dst_texel / CLOUDS_TEMPORAL_UPSCALING, 
+		ivec2(0), 
+		ivec2(vec2(textureSize(colortex9, 0).xy) * taau_render_scale - 1.0)
+	);
 
 	vec4 current      = texelFetch(colortex9, src_texel, 0);
 	vec2 current_data = texelFetch(colortex10, src_texel, 0).xy;
