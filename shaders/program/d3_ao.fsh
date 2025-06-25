@@ -173,6 +173,10 @@ void main() {
 		history_bent_normal.xy = history.zw * 2.0 - 1.0;
 		history_bent_normal.z  = sqrt(clamp01(1.0 - dot(history_bent_normal.xy, history_bent_normal.xy)));
 
+		// Reproject bent normal
+		history_bent_normal = history_bent_normal * mat3(gbufferPreviousModelView);
+		history_bent_normal = mat3(gbufferModelView) * history_bent_normal;
+
 		// Depth rejection
 		float view_norm = rcp_length(view_pos);
 		float NoV = abs(dot(view_normal, view_pos)) * view_norm; // NoV / sqrt(length(view_pos))
