@@ -11,7 +11,7 @@
 
 #include "/include/global.glsl"
 
-layout (location = 0) out vec3 scene_color;
+layout (location = 0) out vec3 fragment_color;
 
 #ifdef USE_SEPARATE_ENTITY_DRAWS
 /* RENDERTARGETS: 0 */
@@ -37,6 +37,8 @@ flat in OverworldFogParameters fog_params;
 flat in vec3 sky_sh[9];
 flat in vec3 skylight_up;
 #endif
+
+flat in float rainbow_amount;
 #endif
 
 // ------------
@@ -52,6 +54,8 @@ uniform sampler2D colortex4; // sky map
 uniform sampler2D colortex5; // previous frame color
 uniform sampler2D colortex6; // ambient lighting data
 uniform sampler2D colortex7; // previous frame fog scattering
+uniform sampler2D colortex11; // clouds history
+uniform sampler2D colortex12; // clouds data
 uniform sampler2D colortex14; // ambient lighting history data
 
 #ifndef USE_SEPARATE_ENTITY_DRAWS
@@ -169,8 +173,12 @@ const bool colortex5MipmapEnabled = true;
 #include "/include/utility/encoding.glsl"
 #include "/include/utility/space_conversion.glsl"
 
-#if defined WORLD_OVERWORLD && defined BLOCKY_CLOUDS
+#if defined WORLD_OVERWORLD
+#include "/include/sky/clouds/sampling.glsl"
+#include "/include/sky/rainbow.glsl"
+#if defined BLOCKY_CLOUDS
 #include "/include/sky/blocky_clouds.glsl"
+#endif
 #endif
 
 #if defined CLOUD_SHADOWS
@@ -211,14 +219,16 @@ void main() {
 	bool is_hand;
 	fix_hand_depth(depth_mc, is_hand);
 
-	vec3 view_pos = screen_to_view_space(combined_projection_matrix_inverse, vec3(uv, depth), true);
-	vec3 scene_pos = view_to_scene_space(view_pos);
-	vec3 world_pos = scene_pos + cameraPosition;
-	vec3 world_dir = normalize(scene_pos - gbufferModelViewInverse[3].xyz);
+	vec3 position_view = screen_to_view_space(combined_projection_matrix_inverse, vec3(uv, depth), true);
+	vec3 position_scene = view_to_scene_space(position_view);
+	vec3 position_world = position_scene + cameraPosition;
+	vec3 direction_world = normalize(position_scene - gbufferModelViewInverse[3].xyz);
 
 #if defined WORLD_OVERWORLD
+	// Atmosphere
+
 	vec3 atmosphere = atmosphere_scattering(
-		world_dir, 
+		direction_world, 
 		sun_color, 
 		sun_dir, 
 		moon_color, 
@@ -227,9 +237,16 @@ void main() {
 			&& !(sunAngle > 0.5 && any(equal(ivec3(moonPhase), ivec3(3, 4, 5)))) 
 	);
 
+	// Read clouds/aurora/crepuscular rays
+
+	float clouds_apparent_distance;
+	vec4 clouds_and_aurora = read_clouds_and_aurora(uv, clouds_apparent_distance);
+
+	// Blocky clouds
+
 #ifdef BLOCKY_CLOUDS
 	vec3 world_start_pos = gbufferModelViewInverse[3].xyz + cameraPosition;
-	vec3 world_end_pos   = world_pos;
+	vec3 world_end_pos   = position_world;
 
 	float dither = texelFetch(noisetex, texel & 511, 0).b;
 	      dither = r1(frameCounter, dither);
@@ -263,22 +280,22 @@ void main() {
 
 	if (depth == 1.0) { // Sky
 #if defined WORLD_OVERWORLD
-		scene_color = draw_sky(world_dir, atmosphere);
+		fragment_color = draw_sky(direction_world, atmosphere, clouds_and_aurora, clouds_apparent_distance);
 #else
-		scene_color = draw_sky(world_dir);
+		fragment_color = draw_sky(direction_world);
 #endif
 
 		// Apply blocky clouds 
 #if defined WORLD_OVERWORLD && defined BLOCKY_CLOUDS 
-		scene_color = scene_color * blocky_clouds.w + blocky_clouds.xyz;
+		fragment_color = fragment_color * blocky_clouds.w + blocky_clouds.xyz;
 #endif
 
 		// Apply common fog
 		vec4 fog = common_fog(far, true);
-		scene_color = mix(fog.rgb, scene_color.rgb, fog.a);
+		fragment_color = mix(fog.rgb, fragment_color.rgb, fog.a);
 
 		// Apply purkinje shift
-		scene_color = purkinje_shift(scene_color, vec2(0.0, 1.0));
+		fragment_color = purkinje_shift(fragment_color, vec2(0.0, 1.0));
 	} else { // Terrain
 		// Sample ambient occlusion a while before using it (latency hiding)
 
@@ -322,7 +339,7 @@ void main() {
 
 		// Get material and normal
 
-		Material material = material_from(albedo, material_mask, world_pos, flat_normal, light_levels);
+		Material material = material_from(albedo, material_mask, position_world, flat_normal, light_levels);
 
 		vec3 normal = flat_normal;
         bool parallax_shadow = false;
@@ -351,7 +368,7 @@ void main() {
 #if defined WORLD_OVERWORLD && defined RAIN_PUDDLES
 		if (wetness > eps && biome_may_rain > eps) {
 			bool puddle = get_rain_puddles(
-				world_pos,
+				position_world,
 				flat_normal,
 				light_levels,
 				material.porosity,
@@ -411,14 +428,14 @@ void main() {
 		// Shadows
 
 		float NoL = dot(normal, light_dir);
-		float NoV = clamp01(dot(normal, -world_dir));
-		float LoV = dot(light_dir, -world_dir);
+		float NoV = clamp01(dot(normal, -direction_world));
+		float LoV = dot(light_dir, -direction_world);
 		float halfway_norm = inversesqrt(2.0 * LoV + 2.0);
 		float NoH = (NoL + NoV) * halfway_norm;
 		float LoH = LoV * halfway_norm + halfway_norm;
 
 #if defined WORLD_OVERWORLD && defined CLOUD_SHADOWS
-		float cloud_shadows = get_cloud_shadows(colortex8, scene_pos);
+		float cloud_shadows = get_cloud_shadows(colortex8, position_scene);
 #else
 		const float cloud_shadows = 1.0;
 #endif
@@ -428,7 +445,7 @@ void main() {
 		float shadow_distance_fade;
 		vec3 shadows;
 
-        shadows = calculate_shadows(scene_pos, flat_normal, light_levels.y, cloud_shadows, material.sss_amount, shadow_distance_fade, sss_depth);
+        shadows = calculate_shadows(position_scene, flat_normal, light_levels.y, cloud_shadows, material.sss_amount, shadow_distance_fade, sss_depth);
 
 	#ifdef DISTANT_HORIZONS
 		if (is_dh_terrain) {
@@ -447,9 +464,9 @@ void main() {
 
 		// Diffuse lighting
 
-		scene_color = get_diffuse_lighting(
+		fragment_color = get_diffuse_lighting(
 			material,
-			scene_pos,
+			position_scene,
 			normal,
 			flat_normal,
 			bent_normal,
@@ -471,7 +488,7 @@ void main() {
 		// Specular highlight
 
 #if defined WORLD_OVERWORLD || defined WORLD_END
-		scene_color += get_specular_highlight(material, NoL, NoV, NoH, LoV, LoH) * light_color * shadows * cloud_shadows * ao;
+		fragment_color += get_specular_highlight(material, NoL, NoV, NoH, LoV, LoH) * light_color * shadows * cloud_shadows * ao;
 #endif
 
 		// Specular reflections
@@ -480,16 +497,16 @@ void main() {
 		if (material.ssr_multiplier > eps) {
 			mat3 tbn = get_tbn_matrix(normal);
 
-			scene_color += get_specular_reflections(
+			fragment_color += get_specular_reflections(
 				material,
 				tbn,
 				vec3(uv, depth),
-				view_pos,
-				world_pos,
+				position_view,
+				position_world,
 				normal,
 				flat_normal,
-				world_dir,
-				world_dir * tbn,
+				direction_world,
+				direction_world * tbn,
 				light_levels.y,
 				false
 			);
@@ -498,39 +515,58 @@ void main() {
 		// Edge highlight
 
 #ifdef EDGE_HIGHLIGHT
-		scene_color *= 1.0 + 0.5 * get_edge_highlight(scene_pos, flat_normal, depth, material_mask);
+		fragment_color *= 1.0 + 0.5 * get_edge_highlight(position_scene, flat_normal, depth, material_mask);
 #endif
 
 		// Apply fog
 
-		float view_distance = length(view_pos);
+		float view_distance = length(position_view);
 
 #ifdef BORDER_FOG
 	#if defined WORLD_OVERWORLD
-		vec3 horizon_dir = normalize(vec3(world_dir.xz, min(world_dir.y, -0.1)).xzy);
+		vec3 horizon_dir = normalize(vec3(direction_world.xz, min(direction_world.y, -0.1)).xzy);
 		vec3 horizon_color = texture(colortex4, project_sky(horizon_dir)).rgb;
 
 		float horizon_factor = linear_step(0.1, 1.0, exp(-75.0 * sqr(sun_dir.y + 0.0496)));
 			  horizon_factor = clamp01(horizon_factor + step(0.01, rainStrength));
-			  horizon_factor = max(horizon_factor, dampen(linear_step(0.15, 0.05, world_dir.y)));
+			  horizon_factor = max(horizon_factor, dampen(linear_step(0.15, 0.05, direction_world.y)));
 
 		vec3 border_fog_color = mix(atmosphere, horizon_color, sqr(horizon_factor)) * (1.0 - biome_cave);
 	#else
-		vec3 border_fog_color = texture(colortex4, project_sky(world_dir)).rgb;
+		vec3 border_fog_color = texture(colortex4, project_sky(direction_world)).rgb;
 	#endif
 
-		float border_fog = border_fog(scene_pos, world_dir);
-		scene_color = mix(border_fog_color, scene_color, border_fog);
+		float border_fog = border_fog(position_scene, direction_world);
+		fragment_color = mix(border_fog_color, fragment_color, border_fog);
 #endif
 
 		vec4 fog = common_fog(view_distance, false);
-		scene_color = scene_color * fog.a + fog.rgb;
+		fragment_color = fragment_color * fog.a + fog.rgb;
 
-#if defined WORLD_OVERWORLD && defined BLOCKY_CLOUDS
-		scene_color = scene_color * blocky_clouds.w + blocky_clouds.xyz;
+#if defined WORLD_OVERWORLD 
+		// Apply clouds in front of terrain
+
+	#ifdef BLOCKY_CLOUDS
+		fragment_color = fragment_color * blocky_clouds.w + blocky_clouds.xyz;
+	#else
+		if (sqr(clouds_apparent_distance) < length_squared(position_view)) {
+			fragment_color = fragment_color * clouds_and_aurora.w + clouds_and_aurora.xyz;
+		}
+	#endif
+
+		// Apply rainbows in front of terrain
+
+	#ifdef RAINBOWS
+		fragment_color = draw_rainbows(
+			fragment_color, 
+			direction_world, 
+			min(view_distance, mix(clouds_apparent_distance, 1e6, linear_step(1.0, 0.95, clouds_and_aurora.w)))
+		);
+	#endif
 #endif
 
 		// Apply purkinje shift
-		scene_color = purkinje_shift(scene_color, light_levels);
+
+		fragment_color = purkinje_shift(fragment_color, light_levels);
 	}
 }

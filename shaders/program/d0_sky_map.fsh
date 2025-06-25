@@ -28,6 +28,8 @@ flat in vec3 sky_color;
 flat in float aurora_amount;
 flat in mat2x3 aurora_colors;
 
+flat in float rainbow_amount;
+
 #include "/include/sky/clouds/parameters.glsl"
 flat in CloudsParameters clouds_params;
 

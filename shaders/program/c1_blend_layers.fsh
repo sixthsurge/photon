@@ -8,7 +8,7 @@
    - Solid layer
    - Translucent layer
    - Fog 
-   - Clouds
+   - Clouds in front of translucents
    - DH water 
    - Rainbow
 
@@ -35,8 +35,6 @@ flat in vec3 light_color;
 #ifdef WORLD_OVERWORLD 
 #include "/include/fog/overworld/parameters.glsl"
 flat in OverworldFogParameters fog_params;
-
-flat in float rainbow_amount;
 #endif
 
 // ------------
@@ -141,7 +139,7 @@ const bool colortex11MipmapEnabled = true;
 
 #ifdef WORLD_OVERWORLD
 #include "/include/fog/overworld/analytic.glsl"
-#include "/include/sky/rainbow.glsl"
+#include "/include/sky/clouds/sampling.glsl"
 
 #ifdef DISTANT_HORIZONS
 uniform sampler2D colortex8;
@@ -194,28 +192,6 @@ vec4 smooth_filter(sampler2D sampler, vec2 coord) {
 
 	coord = (coord - 0.5) / res;
 	return texture(sampler, coord);
-}
-
-vec4 read_clouds_and_aurora(vec2 uv, out float apparent_distance) {
-#if defined WORLD_OVERWORLD
-	// Soften clouds for new pixels
-	float pixel_age = texelFetch(colortex12, ivec2(uv * view_res * taau_render_scale), 0).y;
-	float ld = 2.0 * dampen(max0(1.0 - 0.1 * pixel_age));
-
-	apparent_distance = min_of(textureGather(colortex12, uv * taau_render_scale, 0));
-	vec4 result = textureLod(colortex11, uv * taau_render_scale, ld);
-
-	if (LIGHTNING_FLASH_UNIFORM > 0.01) {
-		float ambient_scattering = texture(colortex12, uv * taau_render_scale).z;
-		result.xyz += LIGHTNING_FLASH_UNIFORM * lightning_flash_intensity * ambient_scattering;
-	}
-
-	result.xyz *= clamp01(1.0 - blindness - darknessFactor);
-
-	return result;
-#else
-	return vec4(0.0, 0.0, 0.0, 1.0);
-#endif
 }
 
 void main() {
@@ -290,27 +266,7 @@ void main() {
 #endif
 
 	fragment_color = texture(colortex0, refracted_uv * taau_render_scale).rgb;
-
-	// Blend clouds behind translucents
-
-	float clouds_apparent_distance;
-	vec4 clouds_and_aurora = read_clouds_and_aurora(refracted_uv, clouds_apparent_distance);
-
-	if (is_sky || sqr(clouds_apparent_distance) < length_squared(back_position_view)) {
-		fragment_color = fragment_color * clouds_and_aurora.w + clouds_and_aurora.xyz;
-	}
-
 	vec3 original_color = fragment_color;
-
-	// Apply rainbows
-
-#if defined WORLD_OVERWORLD && defined RAINBOWS
-	fragment_color = draw_rainbows(
-		fragment_color, 
-		direction_world, 
-		min(is_sky ? 1e6 : view_distance, mix(clouds_apparent_distance, 1e6, linear_step(1.0, 0.95, clouds_and_aurora.w)))
-	);
-#endif
 
 	// Draw DH water
 
@@ -398,11 +354,16 @@ void main() {
 
 	// Blend clouds in front of translucents
 
+#if defined WORLD_OVERWORLD
+	float clouds_apparent_distance;
+	vec4 clouds_and_aurora = read_clouds_and_aurora(refracted_uv, clouds_apparent_distance);
+
 	if (is_translucent || is_dh_translucent) {
 		if (clouds_apparent_distance < view_distance) {
 			fragment_color = fragment_color * clouds_and_aurora.w + clouds_and_aurora.xyz;
 		}
 	}
+#endif
 
 	// Blend fog
 
