@@ -23,7 +23,7 @@ vec4 draw_crepuscular_rays(
 	const float volume_outer_radius = clouds_cumulus_radius + clouds_cumulus_thickness * 0.5;
 	vec3 extinction_coeff = 2.0 * dampen(clouds_params.crepuscular_rays_amount) * (50.0 * air_rayleigh_coefficient + 400.0 * air_mie_coefficient) * (CLOUDS_SCALE / 10.0);
 
-	const float underground_light_fade_distance = 1000.0;
+	const float underground_light_fade_distance = 100.0;
 
 	uint step_count = uint(mix(
 		step_count_horizon, 
