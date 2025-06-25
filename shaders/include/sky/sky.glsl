@@ -186,7 +186,7 @@ vec4 get_clouds_and_aurora(vec3 ray_dir, vec3 clear_sky, out float clouds_appare
 		colortex8, 
 		ray_dir, 
 		false,
-		dither
+		0.5
 	);
 	clouds_and_aurora *= crepuscular_rays.w;
 	clouds_and_aurora.rgb += crepuscular_rays.xyz;
