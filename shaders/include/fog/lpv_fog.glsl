@@ -59,7 +59,7 @@ mat2x3 get_lpv_fog_coefficients(vec3 position_world) {
 	vec3 scattering = fog_params.rayleigh_scattering_coeff * density.x 
 		+ fog_params.mie_scattering_coeff * density.y;
 
-	vec3 extinction = fog_params.rayleigh_extinction_coeff * density.x 
+	vec3 extinction = fog_params.rayleigh_scattering_coeff * density.x 
 		+ fog_params.mie_extinction_coeff * density.y;
 
 	float underground_factor = linear_step(
