@@ -60,8 +60,7 @@ void main() {
 		return;
 	}
 
-	vec2 velocity = uv - reproject(vec3(uv, depth)).xy;
-
+	vec2 velocity = uv - reproject(vec3(uv, depth)).xy;;
 	vec2 pos = uv;
 	vec2 increment = (0.5 * MOTION_BLUR_INTENSITY / float(MOTION_BLUR_SAMPLES)) * velocity;
 
