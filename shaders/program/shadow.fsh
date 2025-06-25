@@ -9,11 +9,17 @@
 --------------------------------------------------------------------------------
 */
 
+#if defined SHADOW_COLOR && defined PROGRAM_SHADOW_FALLBACK || defined PROGRAM_SHADOW_WATER
+	#define SHADOW_WRITE_SHADOWCOLOR0
+#endif
+
 #include "/include/global.glsl"
 
+#if defined SHADOW_WRITE_SHADOWCOLOR0
 layout (location = 0) out vec3 shadowcolor0_out;
 
 /* RENDERTARGETS: 0 */
+#endif
 
 in vec2 uv;
 
@@ -125,12 +131,14 @@ float get_water_caustics() {
 }
 
 void main() {
-#ifdef SHADOW_COLOR
+#if defined SHADOW_WRITE_SHADOWCOLOR0
 	if (material_mask == 1) { // Water
+		#if defined PROGRAM_SHADOW_WATER
 		vec3 biome_water_color = srgb_eotf_inv(tint) * rec709_to_working_color;
 		vec3 absorption_coeff = biome_water_coeff(biome_water_color);
 
 		shadowcolor0_out = clamp01(0.25 * exp(-absorption_coeff * distance_through_water) * get_water_caustics());
+		#endif
 	} else {
 		vec4 base_color = textureLod(tex, uv, 0);
 		if (base_color.a < 0.1) discard;
@@ -139,7 +147,7 @@ void main() {
 		shadowcolor0_out  = 0.25 * srgb_eotf_inv(shadowcolor0_out) * rec709_to_rec2020;
 		shadowcolor0_out *= step(base_color.a, 1.0 - rcp(255.0));
 	}
-#else
+#elif !defined PROGRAM_SHADOW_SOLID
 	if (texture(tex, uv).a < 0.1) discard;
 #endif
 }

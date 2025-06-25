@@ -1,12 +1,12 @@
 #if !defined INCLUDE_VERTEX_DISPLACEMENT
 #define INCLUDE_VERTEX_DISPLACEMENT
 
-#if !defined PROGRAM_GBUFFERS_TERRAIN && !defined PROGRAM_SHADOW
+#if !defined PROGRAM_GBUFFERS_TERRAIN && !(defined PROGRAM_SHADOW_FALLBACK || defined PROGRAM_SHADOW_SOLID || defined PROGRAM_SHADOW_CUTOUT)
 	#undef WAVING_PLANTS
 	#undef WAVING_LEAVES
 #endif
 
-#if !defined PROGRAM_GBUFFERS_WATER && !defined PROGRAM_SHADOW
+#if !defined PROGRAM_GBUFFERS_WATER && !(defined PROGRAM_SHADOW_FALLBACK || defined PROGRAM_SHADOW_WATER)
 	#undef WATER_DISPLACEMENT
 #endif
 
@@ -96,6 +96,7 @@ vec3 animate_vertex(vec3 world_pos, bool is_top_vertex, float skylight, uint mat
 
 #ifdef WAVING_PLANTS
 	case MATERIAL_SMALL_PLANTS:
+	case MATERIAL_OPEN_EYEBLOSSOM:
 		return world_pos + (get_wind_displacement(world_pos, wind_speed, wind_strength, false) + player_displacement) * float(is_top_vertex);
 
 	case MATERIAL_TALL_PLANTS_LOWER:

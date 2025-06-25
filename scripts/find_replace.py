@@ -3,8 +3,9 @@ import glob
 
 find = input("find: ")
 replace = input("replace with: ")
+directory = input("directory: ")
 
-paths = glob.glob("shaders/**", recursive=True) 
+paths = glob.glob(f"{directory}/**", recursive=True) 
 extensions = [".glsl", ".fsh", ".vsh", ".csh"]
 
 for path in paths:

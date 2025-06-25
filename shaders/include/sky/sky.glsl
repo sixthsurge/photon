@@ -15,6 +15,7 @@
 #include "/include/misc/lightning_flash.glsl"
 #include "/include/sky/atmosphere.glsl"
 #include "/include/sky/projection.glsl"
+#include "/include/sky/rainbow.glsl"
 #include "/include/sky/stars.glsl"
 #include "/include/utility/geometry.glsl"
 
@@ -68,55 +69,14 @@ vec3 draw_galaxy(vec3 ray_dir, out float galaxy_luminance) {
 
 	return max0(galaxy);
 }
-
 #endif
-vec4 get_clouds_and_aurora(vec3 ray_dir, vec3 clear_sky) {
-#if   defined PROGRAM_DEFERRED0
-	ivec2 texel   = ivec2(gl_FragCoord.xy);
-	      texel.x = texel.x % (sky_map_res.x - 4);
 
-	float dither = interleaved_gradient_noise(vec2(texel));
-
-	// Render clouds
-	#ifndef BLOCKY_CLOUDS
-	const vec3 air_viewer_pos = vec3(0.0, planet_radius, 0.0);
-	CloudsResult result = draw_clouds(air_viewer_pos, ray_dir, clear_sky, -1.0, dither);
-
-	// Lightning flash
-	result.scattering.rgb += LIGHTNING_FLASH_UNIFORM * lightning_flash_intensity * result.scattering.a;
-
-	#else
-	CloudsResult result = clouds_not_hit;
-	#endif
-
-	// Render aurora
-	vec3 aurora = draw_aurora(ray_dir, dither);
-
-	vec4 clouds_and_aurora = vec4(
-		result.scattering.xyz + aurora * result.transmittance,
-		result.transmittance
-	);
-
-	// Crepuscular rays
-
-	#if defined CREPUSCULAR_RAYS && !defined BLOCKY_CLOUDS
-	vec4 crepuscular_rays = draw_crepuscular_rays(
-		colortex8, 
-		ray_dir, 
-		false,
-		dither
-	);
-	clouds_and_aurora *= crepuscular_rays.w;
-	clouds_and_aurora.rgb += crepuscular_rays.xyz;
-	#endif
-
-	return clouds_and_aurora;
-#else
-	return vec4(0.0, 0.0, 0.0, 1.0);
-#endif
-}
-
-vec3 draw_sky(vec3 ray_dir, vec3 atmosphere) {
+vec3 draw_sky(
+	vec3 ray_dir, 
+	vec3 atmosphere, 
+	vec4 clouds_and_aurora, 
+	float clouds_apparent_distance
+) {
 	vec3 sky = vec3(0.0);
 
 #if defined SHADOW
@@ -139,35 +99,43 @@ vec3 draw_sky(vec3 ray_dir, vec3 atmosphere) {
 	const float galaxy_luminance = 0.0;
 #endif
 
-	// Sun, moon and stars
+	// Sun, moon stars
 
 #if defined PROGRAM_DEFERRED4
-	// Output of skytextured
 	vec3 skytextured_output = texelFetch(colortex0, ivec2(gl_FragCoord.xy), 0).rgb;
 	sky += texelFetch(colortex0, ivec2(gl_FragCoord.xy), 0).rgb;
 
-#ifdef STARS
+	// Shader sun
+	#ifndef VANILLA_SUN
+	sky += draw_sun(ray_dir);
+	#endif
+
 	// Stars
+	#ifdef STARS
 	float stars_visibility = clamp01(1.0 - dot(skytextured_output, vec3(0.33) * 256.0));
 	sky += draw_stars(celestial_dir, galaxy_luminance) * stars_visibility;
+	#endif
 #endif
 
-#ifndef VANILLA_SUN
-	// Sun
-	sky += draw_sun(ray_dir);
-#endif
-#endif
-
-	// Sky gradient
+	// Atmosphere
 
 	sky *= atmosphere_transmittance(ray_dir.y, planet_radius) * (1.0 - rainStrength);
 	sky += atmosphere;
 
-	// Clouds
+	// Clouds, aurora, crepuscular rays
 
-	vec4 clouds = get_clouds_and_aurora(ray_dir, sky);
-	sky *= clouds.a;   // transmittance
-	sky += clouds.rgb; // scattering
+	sky *= clouds_and_aurora.a;   // Transmittance
+	sky += clouds_and_aurora.rgb; // Scattering
+
+	// Rainbow
+
+	sky = draw_rainbows(
+		sky, 
+		ray_dir, 
+		mix(clouds_apparent_distance, 1e6, linear_step(1.0, 0.95, clouds_and_aurora.w))
+	);
+
+	// Cave sky fix
 
 #if !defined PROGRAM_DEFERRED0
 	// Fade lower part of sky into cave fog color when underground so that the sky isn't visible
@@ -179,6 +147,54 @@ vec3 draw_sky(vec3 ray_dir, vec3 atmosphere) {
 	return sky;
 }
 
+#if   defined PROGRAM_DEFERRED0
+vec4 get_clouds_and_aurora(vec3 ray_dir, vec3 clear_sky, out float clouds_apparent_distance) {
+	clouds_apparent_distance = 1e6;
+
+	ivec2 texel   = ivec2(gl_FragCoord.xy);
+	      texel.x = texel.x % (sky_map_res.x - 4);
+
+	float dither = interleaved_gradient_noise(vec2(texel));
+
+	// Clouds
+
+#ifndef BLOCKY_CLOUDS
+	const vec3 air_viewer_pos = vec3(0.0, planet_radius, 0.0);
+	CloudsResult result = draw_clouds(air_viewer_pos, ray_dir, clear_sky, -1.0, dither);
+
+	// Lightning flash
+	result.scattering.rgb += LIGHTNING_FLASH_UNIFORM * lightning_flash_intensity * result.scattering.a;
+#else
+	CloudsResult result = clouds_not_hit;
+#endif
+
+	clouds_apparent_distance = result.apparent_distance;
+
+	// Aurora
+
+	vec3 aurora = draw_aurora(ray_dir, dither);
+
+	vec4 clouds_and_aurora = vec4(
+		result.scattering.xyz + aurora * result.transmittance,
+		result.transmittance
+	);
+
+	// Crepuscular rays
+
+#if defined CREPUSCULAR_RAYS && !defined BLOCKY_CLOUDS
+	vec4 crepuscular_rays = draw_crepuscular_rays(
+		colortex8, 
+		ray_dir, 
+		false,
+		dither
+	);
+	clouds_and_aurora *= crepuscular_rays.w;
+	clouds_and_aurora.rgb += crepuscular_rays.xyz;
+#endif
+
+	return clouds_and_aurora;
+}
+
 vec3 draw_sky(vec3 ray_dir) {
 	vec3 atmosphere = atmosphere_scattering(
 		ray_dir, 
@@ -188,8 +204,11 @@ vec3 draw_sky(vec3 ray_dir) {
 		moon_dir,
 		true
 	);
-	return draw_sky(ray_dir, atmosphere);
+	float clouds_apparent_distance;
+	vec4 clouds_and_aurora = get_clouds_and_aurora(ray_dir, atmosphere, clouds_apparent_distance);
+	return draw_sky(ray_dir, atmosphere, clouds_and_aurora, clouds_apparent_distance);
 }
+#endif
 
 //----------------------------------------------------------------------------//
 #elif defined WORLD_NETHER

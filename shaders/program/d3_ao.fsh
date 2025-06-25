@@ -103,8 +103,12 @@ void main() {
     float depth_dh = texelFetch(dhDepthTex, view_texel, 0).x;
 	bool is_dh_terrain = is_distant_horizons_terrain(depth_mc, depth_dh);
 #else
+	#define depth_mc depth
     const bool is_dh_terrain = false;
 #endif
+
+	bool is_hand;
+	fix_hand_depth(depth_mc, is_hand);
 
 	vec3 screen_pos = vec3(uv, depth);
 	vec3 view_pos = screen_to_view_space(combined_projection_matrix_inverse, screen_pos, true);
@@ -169,6 +173,10 @@ void main() {
 		history_bent_normal.xy = history.zw * 2.0 - 1.0;
 		history_bent_normal.z  = sqrt(clamp01(1.0 - dot(history_bent_normal.xy, history_bent_normal.xy)));
 
+		// Reproject bent normal
+		history_bent_normal = history_bent_normal * mat3(gbufferPreviousModelView);
+		history_bent_normal = mat3(gbufferModelView) * history_bent_normal;
+
 		// Depth rejection
 		float view_norm = rcp_length(view_pos);
 		float NoV = abs(dot(view_normal, view_pos)) * view_norm; // NoV / sqrt(length(view_pos))
@@ -194,6 +202,10 @@ void main() {
 	} else {
 		ambient = vec4(ao, bent_normal.xy * 0.5 + 0.5);
 		ambient_history_data = vec2(0.0);
+	}
+
+	if (is_hand) {
+		ambient_history_data.x = 1.0;
 	}
 }
 

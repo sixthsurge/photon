@@ -8,3 +8,4 @@ float get_rainbow_amount(Weather weather) {
 }
 
 #endif // INCLUDE_WEATHER_RAINBOW
+

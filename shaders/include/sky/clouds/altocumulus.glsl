@@ -28,8 +28,8 @@ float clouds_altocumulus_density(vec3 pos) {
 
 	pos.xz += cameraPosition.xz * CLOUDS_SCALE + wind_velocity * world_age;
 
-	// 2D noise for base shape and coverage
 	vec4 noise = vec4(
+	// 2D noise for base shape and coverage
 		texture(noisetex, (0.000005 / CLOUDS_ALTOCUMULUS_SIZE) * pos.xz + 0.01).x, // cloud coverage
 		texture(noisetex, (0.000047 / CLOUDS_ALTOCUMULUS_SIZE) * pos.xz + 0.3).wx, // cloud shape
 		texture(noisetex, (0.0001 / CLOUDS_ALTOCUMULUS_SIZE) * pos.xz + 0.6).w // cloud detail
@@ -206,7 +206,7 @@ CloudsResult draw_altocumulus_clouds(
 		clouds_params.l1_coverage.x
 	);
 
-	float extinction_coeff = mix(0.1, 0.2, day_factor) * CLOUDS_ALTOCUMULUS_DENSITY 
+	float extinction_coeff = mix(0.08, 0.16, day_factor) * CLOUDS_ALTOCUMULUS_DENSITY 
 		* (2.0 - 1.0 * clouds_params.l1_cumulus_stratus_blend);
 	float scattering_coeff = extinction_coeff * mix(1.00, 0.75, rainStrength);
 

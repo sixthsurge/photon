@@ -99,10 +99,13 @@ vec3 get_lpv_fog_scattering(
 	vec3 ray_direction_world; float ray_length;
 	length_normalize(ray_end_world - ray_origin_world, ray_direction_world, ray_length);
 
-	// Limit ray length to voxel distance 
-	vec3 voxel_volume_center = get_voxel_volume_center(gbufferModelViewInverse[2].xyz);
-	float max_ray_length = float(VOXEL_VOLUME_SIZE) * rcp(max_of(abs(ray_direction_world)));
-	ray_length = min(ray_length, max_ray_length);
+	// Clip ray length to voxel volume
+	vec3 origin_to_center = get_voxel_volume_center(gbufferModelViewInverse[2].xyz);
+	float distance_center_to_edge = 0.5 * float(VOXEL_VOLUME_SIZE) * rcp(max_of(abs(ray_direction_world)));
+	ray_length = min(
+		ray_length, 
+		length(-origin_to_center + ray_direction_world * distance_center_to_edge)
+	);
 
 	// Geometric sample distribution
 	const float initial_step_scale = step_ratio == 1.0 

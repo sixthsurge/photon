@@ -24,6 +24,8 @@ flat out vec3 sky_color;
 flat out float aurora_amount;
 flat out mat2x3 aurora_colors;
 
+flat out float rainbow_amount;
+
 #include "/include/sky/clouds/parameters.glsl"
 flat out CloudsParameters clouds_params;
 
@@ -89,8 +91,9 @@ uniform float desert_sandstorm;
 #include "/include/sky/aurora_colors.glsl"
 #include "/include/lighting/colors/light_color.glsl"
 #include "/include/lighting/colors/weather_color.glsl"
-#include "/include/weather/fog.glsl"
 #include "/include/weather/clouds.glsl"
+#include "/include/weather/fog.glsl"
+#include "/include/weather/rainbow.glsl"
 #endif
 
 #if defined WORLD_NETHER
@@ -126,6 +129,7 @@ void main() {
 	aurora_colors = get_aurora_colors();
 
 	Weather weather = get_weather();
+	rainbow_amount = get_rainbow_amount(weather);
 	clouds_params = get_clouds_parameters(weather);
 	fog_params = get_fog_parameters(weather);
 
