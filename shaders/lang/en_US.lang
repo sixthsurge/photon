@@ -430,10 +430,6 @@ option.AIR_FOG_RAYLEIGH_FALLOFF_START     = Rayleigh Falloff Start
 option.AIR_FOG_RAYLEIGH_FALLOFF_START.comment = Altitude above sea level at which the rayleigh fog begins to decrease
 option.AIR_FOG_RAYLEIGH_FALLOFF_HALF_LIFE = Rayleigh Falloff Half-Life
 option.AIR_FOG_RAYLEIGH_FALLOFF_HALF_LIFE.comment = Altitude above the Rayleigh Falloff Start where the rayleigh fog density is halved
-option.AIR_FOG_MIE_FALLOFF_START          = Mie Falloff Start
-option.AIR_FOG_MIE_FALLOFF_START.comment  = Altitude above sea level at which the mie fog begins to decrease
-option.AIR_FOG_MIE_FALLOFF_HALF_LIFE      = Mie Falloff Half-Life
-option.AIR_FOG_MIE_FALLOFF_HALF_LIFE.comment = Altitude above the Mie Falloff Start where the mie fog density is halved
 
 option.AIR_FOG_RAYLEIGH_DENSITY        = Normal Density
 option.AIR_FOG_RAYLEIGH_R              = §4Red
@@ -470,9 +466,6 @@ option.AIR_FOG_RAYLEIGH_R_SWAMP        = §4Red
 option.AIR_FOG_RAYLEIGH_G_SWAMP        = §2Green
 option.AIR_FOG_RAYLEIGH_B_SWAMP        = §1Blue
 
-option.AIR_FOG_RAYLEIGH_FALLOFF_START     = Altitude Fade Start
-option.AIR_FOG_RAYLEIGH_FALLOFF_HALF_LIFE = Altitude Fade Half Life
-
 # Mie Fog
 option.AIR_FOG_MIE_DENSITY_MORNING     = Morning Density
 option.AIR_FOG_MIE_DENSITY_NOON        = Noon Density
@@ -480,8 +473,11 @@ option.AIR_FOG_MIE_DENSITY_EVENING     = Evening Density
 option.AIR_FOG_MIE_DENSITY_MIDNIGHT    = Midnight Density
 option.AIR_FOG_MIE_DENSITY_RAIN        = Rain Density
 option.AIR_FOG_MIE_DENSITY_BLUE_HOUR   = Dawn/Dusk Density
-option.AIR_FOG_MIE_FALLOFF_START       = Altitude Fade Start
-option.AIR_FOG_MIE_FALLOFF_HALF_LIFE   = Altitude Fade Half Life
+option.AIR_FOG_MIE_FALLOFF_START          = Altitude Fade Start
+option.AIR_FOG_MIE_FALLOFF_START.comment  = Altitude above sea level at which the mie fog begins to decrease
+option.AIR_FOG_MIE_FALLOFF_HALF_LIFE      = Altitude Fade Half Life
+option.AIR_FOG_MIE_FALLOFF_HALF_LIFE.comment = Altitude above the Mie Falloff Start where the mie fog density is halved
+
 
 # Materials settings
 
