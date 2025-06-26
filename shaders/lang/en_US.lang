@@ -698,6 +698,8 @@ option.NOISE_ON_DH_TERRAIN             = Noise on DH Terrain
 option.ENCHANTMENT_GLINT_BRIGHTNESS    = Enchantment Glint Brightness
 option.USE_SEPARATE_ENTITY_DRAWS       = Use "Separate Entity Draws"
 comment.USE_SEPARATE_ENTITY_DRAWS      = "separateEntityDraws" is an Iris feature enabling shaderpacks which use deferred-forward hybrid shading, like Photon, to correctly render translucent entities and other objects. However, it can be the cause of some issues. Expect rendering issues such as translucent entities becoming opaque if you disable this!
+option.DITHERED_TRANSLUCENCY_FALLBACK  = Dithered Translucency Fallback 
+comment.DITHERED_TRANSLUCENCY_FALLBACK = Uses dithered translucency to improve the look of objects that should be translucent but can't when separateEntityDraws is enabled. 
 
 value.DEBUG_VIEW.DEBUG_VIEW_NONE       = OFF
 value.DEBUG_VIEW.DEBUG_VIEW_SAMPLER    = Sampler
