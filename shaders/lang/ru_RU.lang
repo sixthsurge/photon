@@ -683,5 +683,5 @@ option.BOX_COLOR_R              = Красный
 option.BOX_COLOR_G              = Зеленый
 option.BOX_COLOR_B              = Синий
 option.BOX_EMISSION             = Свечение
-option.BOX_EMISSION.comment     = Увеличивает цвет контура до 1. Требуется включённое свечение.
+option.BOX_EMISSION.comment     = Повышает яркость цвета выше 1. Требуется включённое свечение.
 option.BOX_LINE_WIDTH           = Ширина линии
