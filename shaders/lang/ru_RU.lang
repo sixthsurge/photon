@@ -15,8 +15,8 @@ screen.materials                       = Материалы
 screen.water                           = Вода
 screen.post                            = Пост-обработка
 screen.misc                            = Разное
-screen.box                             = Контур блоков
 
+screen.weather                         = Система ежедневной погоды
 screen.colored_lights                  = Настройки цветного освещения
 screen.rp_settings                     = Настройки ресурс-пака
 screen.reflections                     = Отражения
@@ -26,12 +26,17 @@ screen.shadows                         = Тени
 screen.ao                              = Окружающая окклюзия
 screen.color_grading                   = Цветовая гамма
 screen.exposure                        = Экспозиция
+screen.lpv_vl                          = Освещение тумана цветным светом
+screen.box                             = Контур блоков
+screen.developer                       = Настройки разработчика
 
 screen.aurora                          = Северное сияние
 screen.clouds                          = Облака
+screen.crepuscular_rays                = Сумеречные лучи
+screen.stars                           = Звезды
 screen.clouds_cumulus                  = Настройки кучевых облаков
-screen.clouds_altocumulus              = Настройки высоко-кучевых облаков
-screen.clouds_cumulus_congestus        = Настройки мощно-кучевых облаков
+screen.clouds_altocumulus              = Настройки высококучевых облаков
+screen.clouds_cumulus_congestus        = Настройки мощнокучевых облаков
 screen.clouds_cirrus                   = Настройки перистых облаков
 screen.clouds_minecrafty               = Настройки квадратных облаков
 screen.clouds_noctilucent              = Настройки серебристых облаков
@@ -56,25 +61,12 @@ screen.fog_rlh_swamp                   = Болотный цвет
 screen.water_waves                     = Волны
 screen.water_fog_coeff                 = Коэффициенты водяного тумана
 
-screen.weather                         = Система ежедневной погоды
-screen.weather_d0                      = День 0
-screen.weather_d1                      = День 1
-screen.weather_d2                      = День 2
-screen.weather_d3                      = День 3
-screen.weather_d4                      = День 4
-screen.weather_d5                      = День 5
-screen.weather_d6                      = День 6
-screen.weather_d7                      = День 7
-screen.weather_d8                      = День 8
-screen.weather_d9                      = День 9
-screen.weather_d10                     = День 10
-screen.weather_d11                     = День 11
-
 screen.end_light_color                 = Цвет света
 screen.end_ambient_color               = Цвет окружения
 screen.nether_color                    = Статичный цвет
 
-option.INFO                            = Photon Shader
+screen.distance_view                   = Дальность обзора
+
 value.INFO.0                           = §eсделано SixthSurge
 value.INFO.1                           = §aсделано SixthSurge
 value.INFO.2                           = §bсделано SixthSurge
@@ -85,9 +77,9 @@ value.INFO.3                           = §dсделано SixthSurge
 option.WAVING_PLANTS                   = Колышущиеся растения
 option.WAVING_PLANTS.comment           = Наземные растения колышутся на ветру.\n\n Чтобы добавить блок в список колышущихся растений, откройте shaders/block.properties и добавьте его в соответствующую категорию (10016, 10017 или 10018).
 option.WAVING_LEAVES                   = Колышущиеся листья
-option.WAVING_LEAVES.comment           = Блоки из листьев развеваются на ветру.\n\nчтобы добавить блок в список блоков из развевающихся листьев, откройте shaders/block.properties и добавьте его в соответствующую категорию (10019)
+option.WAVING_LEAVES.comment           = Блоки из листьев развеваются на ветру.\n\nЧтобы добавить блок в список блоков из развевающихся листьев, откройте shaders/block.properties и добавьте его в соответствующую категорию (10019)
 option.SLANTED_RAIN                    = Косой дождь
-option.SLANTED_RAIN.comment            = Частицы хосохлёста. Делают дождь чуточку атмосфернее
+option.SLANTED_RAIN.comment            = Частицы хосохлёста. Делают дождь немного атмосфернее
 option.RAIN_OPACITY                    = Непрозрачность дождя
 option.RAIN_OPACITY.comment            = Регулировка непрозрачности частиц дождя
 option.SEA_LEVEL                       = Уровень моря
@@ -98,12 +90,21 @@ option.EDGE_HIGHLIGHT                  = Выделение краев
 option.EDGE_HIGHLIGHT.comment          = Эффект выделения краев, вдохновленный Minecraft Dungeons
 option.EDGE_HIGHLIGHT_SCALE            = Размер выделения краев
 option.EDGE_HIGHLIGHT_SCALE.comment    = Управляет толщиной выделения краев; измените это значение в соответствии с разрешением вашего пакета ресурсов
-option.MOON_PHASE_AFFECTS_BRIGHTNESS   = Фаза луны затрагивает освещение
+option.MOON_PHASE_AFFECTS_BRIGHTNESS   = Фаза луны влияет на яркость
 option.MOON_PHASE_AFFECTS_BRIGHTNESS.comment = Ночная яркость зависит от фазы Луны
 option.DESERT_SANDSTORM                = Песчаная буря в пустыне
 option.DESERT_SANDSTORM.comment        = Песчаная буря во время дождя в пустынном биоме
 option.END_GLOW                        = Свечение в крае
-option.END_GLOW.comment                = Колеблющийся эффект свечения в крае. Необходимо включенное объемное освещение
+option.END_GLOW.comment                = Колеблющийся эффект свечения в Крае. Необходимо включённое объемное освещение.
+# Weather
+option.RANDOM_WEATHER_VARIATION            = Случайная
+option.BIOME_WEATHER_VARIATION             = На основе биомов
+option.WEATHER_TEMPERATURE_BIAS            = Смещение температуры
+option.WEATHER_HUMIDITY_BIAS               = Смещение влажности 
+option.WEATHER_WIND_BIAS                   = Смещение по ветрености
+option.WEATHER_TEMPERATURE_VARIATION_SPEED = Скорость изменения температуры
+option.WEATHER_HUMIDITY_VARIATION_SPEED    = Скорость изменения влажности
+option.WEATHER_WIND_VARIATION_SPEED        = Скорость изменения ветрености
 
 # Lighting settings
 
@@ -111,11 +112,11 @@ option.COLORED_LIGHTS                  = Цветное освещение
 option.COLORED_LIGHTS.comment          = Варьирующиеся цвета освещения блоков, использующие алгоритм заливки. Необходим Iris 1.6 или новее
 option.COLORED_LIGHTS_VANILLA_LIGHTMAP_CONTRIBUTION = Вклад ванильной карты освещения
 option.HANDHELD_LIGHTING               = Свет предметов
-option.HANDHELD_LIGHTING.comment       = Предметы в руках будут освещать мир. Если цветное освещение включено, свет от предметов будет такого же цвета как и свет от блоков
+option.HANDHELD_LIGHTING.comment       = Предметы в руках будут освещать мир. Если цветное освещение включено, свет от предметов будет такого же цвета, как и свет от блоков
 option.HANDHELD_LIGHTING_INTENSITY     = Сила света предметов
 option.HANDHELD_LIGHTING_INTENSITY.comment = Регулирует яркость света от предметов
 option.AO_IN_SUNLIGHT                  = AO при солнце
-option.AO_IN_SUNLIGHT.comment          = Следует ли применять затеняющую окружающую окклюзию при прямом солнечном свете/лунном свете луны
+option.AO_IN_SUNLIGHT.comment          = Следует ли применять затеняющую окружающую окклюзию при прямом солнечном/лунном свете
 option.CLOUD_SHADOWS                   = Тени облаков
 option.CLOUD_SHADOWS.comment           = Тени, отбрасываемые облаками на землю
 option.CLOUD_SHADOWS_INTENSITY         = Интенсивность теней от облаков
@@ -142,16 +143,16 @@ option.SHADOW_PENUMBRA_SCALE           = Мягкость теней
 option.SHADOW_PENUMBRA_SCALE.comment   = Регулирует мягкость теней
 option.ENTITY_SHADOWS                  = Тени сущностей
 option.ENTITY_SHADOWS.comment          = Могут ли сущности отбрасывать тени.\nОтключите это, чтобы повысить производительность на базах с большими фермами
-option.BLOCK_ENTITY_SHADOWS            = Блокировать тени объектов
+option.BLOCK_ENTITY_SHADOWS            = Тени блочных объектов
 option.PIXELATED_SHADOWS               = Пикселизированные тени
 option.PIXELATED_SHADOWS.comment       = Тени накладываются друг на друга, перекрывая тексели, создавая пикселизированный вид
 option.PIXELATED_SHADOWS_RESOLUTION    = Разрешение пикселизированных теней
+option.SSS_STEPS                       = Шагов SSS 
+option.SSS_STEPS.comment               = Увеличьте, чтобы уменьшить количество шума на листве и других материалов с подповерхностным рассеиванием (SSS), ценой производительности.
 
 option.SHADER_AO                       = Шейдер AО
-option.SHADER_AO.comment               = Окклюзия окружающей среды, основанная на достоверности данных (GTAO). Создает мягкие тени в углах
-value.SHADER_AO.SHADER_AO_NONE         = ВЫКЛ
-value.SHADER_AO.SHADER_AO_SSAO         = SSAO
-value.SHADER_AO.SHADER_AO_GTAO         = GTAO
+option.SHADER_AO.comment               = Используемый метод окружающей окклюзии (AO). Off — без шейдерного AO. SSAO — более низкое качество, но требует меньше сэмплов/фильтрации. GTAO — лучшее качество, но требует больше сэмплов/фильтрации.
+value.SHADER_AO.SHADER_AO_NONE         = Выкл
 option.VANILLA_AO                      = Ванильный AO
 option.VANILLA_AO.comment              = Встроенная в Майнкрафт окружающая окклюзия
 option.SSAO_RADIUS                     = Радиус SSAO
@@ -202,15 +203,20 @@ option.BLOCKLIGHT_G                    = Зеленый
 option.BLOCKLIGHT_B                    = Синий
 option.BLOCKLIGHT_I                    = Сила света от блоков
 
-option.VOXEL_VOLUME_SIZE               = Размер вокселей
-option.VOXEL_VOLUME_SIZE.comment       = Высокая производительность, также зависящая от расстояния до тени
+option.VOXEL_VOLUME_SIZE               = Размер объёма вокселей
+option.VOXEL_VOLUME_SIZE.comment       = Значительное влияние на производительность, также зависит от дальности теней
 suffix.VOXEL_VOLUME_SIZE               = m
+option.VOXEL_VOLUME_CENTER             = Центр объёма вокселей
+option.VOXEL_VOLUME_CENTER.comment     = Вперёд: объём вокселей смещён вперёд от игрока, благодаря чему большая его часть попадает в поле зрения
+
+value.VOXEL_VOLUME_CENTER.VOXEL_VOLUME_CENTER_AHEAD  = Вперёд
+value.VOXEL_VOLUME_CENTER.VOXEL_VOLUME_CENTER_PLAYER = Игрок
 
 suffix.shadowMapResolution             = ²
 suffix.sunPathRotation                 = °
 
-value.shadowDistance.48.0              = 3 чанков
-value.shadowDistance.64.0              = 4 чанков
+value.shadowDistance.48.0              = 3 чанка
+value.shadowDistance.64.0              = 4 чанка
 value.shadowDistance.80.0              = 5 чанков
 value.shadowDistance.96.0              = 6 чанков
 value.shadowDistance.112.0             = 7 чанков
@@ -224,10 +230,10 @@ value.shadowDistance.224.0             = 14 чанков
 value.shadowDistance.240.0             = 15 чанков
 value.shadowDistance.256.0             = 16 чанков
 value.shadowDistance.320.0             = 20 чанков
-value.shadowDistance.384.0             = 24 чанков
-value.shadowDistance.512.0             = 32 чанков
+value.shadowDistance.384.0             = 24 чанка
+value.shadowDistance.512.0             = 32 чанка
 value.shadowDistance.768.0             = 48 чанков
-value.shadowDistance.1024.0            = 64 чанков
+value.shadowDistance.1024.0            = 64 чанка
 value.shadowDistance.2048.0            = 128 чанков
 value.shadowDistance.4096.0            = 256 чанков
 
@@ -240,9 +246,9 @@ option.MOON_ANGULAR_RADIUS             = Угол луны
 option.SKY_GROUND                      = Небо у земли
 option.SKY_GROUND.comment              = Видимая поверхность планеты за горизонтом
 option.ATMOSPHERE_SATURATION_BOOST     = Усиление насыщенности атмосферы
-comment.ATMOSPHERE_SATURATION_BOOST    = Увеличивает насыщенность цвета неба и солнечного света в зависимости от времени суток
-option.ATMOSPHERE_SATURATION_BOOST_INTENSITY = Интенсивность усиления насыщенности атмосферы
-comment.ATMOSPHERE_SATURATION_BOOST_INTENSITY = Регулирует интенсивность усиления насыщенности атмосферы
+option.ATMOSPHERE_SATURATION_BOOST.comment           = Увеличивает насыщенность цвета неба и солнечного света в зависимости от времени суток
+option.ATMOSPHERE_SATURATION_BOOST_INTENSITY         = Интенсивность усиления насыщенности атмосферы
+option.ATMOSPHERE_SATURATION_BOOST_INTENSITY.comment = Регулирует интенсивность усиления насыщенности атмосферы
 option.STARS                           = Звезды
 option.STARS.comment                   = Звезды на ночном небе. Низкое влияние на производительность
 option.STARS_INTENSITY                 = Сила звезд
@@ -253,6 +259,13 @@ option.GALAXY                          = Галактика
 option.GALAXY.comment                  = Изображение галактики в ночном небе
 option.GALAXY_INTENSITY                = Интенсивность галактики
 option.GALAXY_INTENSITY.comment        = Управляет яркостью галактики в ночном небе
+option.CREPUSCULAR_RAYS                = Включены
+option.CREPUSCULAR_RAYS_INTENSITY      = Интенсивность
+option.CREPUSCULAR_RAYS_STEPS_HORIZON  = Шагов — Горизонт
+option.CREPUSCULAR_RAYS_STEPS_ZENITH   = Шагов — Зенит
+option.LIGHTNING_FLASH                 = Вспышка молнии
+option.RAINBOWS                        = Радуги
+option.END_SUN_EFFECT                  = Эффект заходящего солнца
 
 # Clouds
 option.CLOUDS_CUMULUS                       = Кучевые облака
@@ -268,49 +281,42 @@ option.CLOUDS_CUMULUS_DENSITY               = Плотность
 option.CLOUDS_CUMULUS_COVERAGE              = Покрытие
 option.CLOUDS_CUMULUS_SIZE                  = Размер
 option.CLOUDS_CUMULUS_DETAIL_STRENGTH       = Количество деталей
-option.CLOUDS_CUMULUS_CURL_STRENGTH         = Сила шума
 option.CLOUDS_CUMULUS_WIND_SPEED            = Сила ветра
 suffix.CLOUDS_CUMULUS_ALTITUDE              = m/s
 option.CLOUDS_CUMULUS_WIND_ANGLE            = Направление ветра
 suffix.CLOUDS_CUMULUS_ALTITUDE              = °
+option.CLOUDS_CUMULUS_PRECOMPUTE_LOCAL_COVERAGE         = Предварительный расчёт локального покрытия
+option.CLOUDS_CUMULUS_PRECOMPUTE_LOCAL_COVERAGE.comment = Агрессивная оптимизация для кучевых облаков. Уменьшает максимальную дальность отрисовки облаков и может вызывать артефакты в виде искажений формы облаков при движении камеры. Отключите для скриншотов над облаками.
 
-option.CLOUDS_ALTOCUMULUS                       = Высоко-кучевые облака
+option.CLOUDS_ALTOCUMULUS                       = Высококучевые облака
 option.CLOUDS_ALTOCUMULUS.comment               = Объемные облака на средней высоте, напоминающие кучевые облака
 option.CLOUDS_ALTOCUMULUS_PRIMARY_STEPS_H       = Основные шаги - Горизонт
 option.CLOUDS_ALTOCUMULUS_PRIMARY_STEPS_Z       = Основные шаги - Зенит
 option.CLOUDS_ALTOCUMULUS_LIGHTING_STEPS        = Шагов освещения
 option.CLOUDS_ALTOCUMULUS_AMBIENT_STEPS         = Шагов окружающего освещения
 option.CLOUDS_ALTOCUMULUS_ALTITUDE              = Высота
-suffix.CLOUDS_ALTOCUMULUS_ALTITUDE              = m
 option.CLOUDS_ALTOCUMULUS_THICKNESS             = Толщина
 option.CLOUDS_ALTOCUMULUS_DENSITY               = Плотность
 option.CLOUDS_ALTOCUMULUS_COVERAGE              = Покрытие
 option.CLOUDS_ALTOCUMULUS_SIZE                  = Размер
 option.CLOUDS_ALTOCUMULUS_DETAIL_STRENGTH       = Количество деталей
-option.CLOUDS_ALTOCUMULUS_CURL_STRENGTH         = Сила шума
 option.CLOUDS_ALTOCUMULUS_WIND_SPEED            = Сила ветра
-suffix.CLOUDS_ALTOCUMULUS_ALTITUDE              = m/s
 option.CLOUDS_ALTOCUMULUS_WIND_ANGLE            = Направление ветра
-suffix.CLOUDS_ALTOCUMULUS_ALTITUDE              = °
 
-option.CLOUDS_CUMULUS_CONGESTUS                       = Мощно-кучевые облака
+option.CLOUDS_CUMULUS_CONGESTUS                       = Мощнокучевые облака
 option.CLOUDS_CUMULUS_CONGESTUS.comment               = Массивные, далекие объемные облака
 option.CLOUDS_CUMULUS_CONGESTUS_PRIMARY_STEPS_H       = Основные шаги - Горизонт
 option.CLOUDS_CUMULUS_CONGESTUS_PRIMARY_STEPS_Z       = Основные шаги - Зенит
 option.CLOUDS_CUMULUS_CONGESTUS_LIGHTING_STEPS        = Шагов освещения
 option.CLOUDS_CUMULUS_CONGESTUS_AMBIENT_STEPS         = Шагов окружающего освещения
 option.CLOUDS_CUMULUS_CONGESTUS_ALTITUDE              = Высота
-suffix.CLOUDS_CUMULUS_CONGESTUS_ALTITUDE              = m
 option.CLOUDS_CUMULUS_CONGESTUS_THICKNESS             = Толщина
 option.CLOUDS_CUMULUS_CONGESTUS_DENSITY               = Плотность
 option.CLOUDS_CUMULUS_CONGESTUS_COVERAGE              = Покрытие
 option.CLOUDS_CUMULUS_CONGESTUS_SIZE                  = Размер
 option.CLOUDS_CUMULUS_CONGESTUS_DETAIL_STRENGTH       = Количество деталей
-option.CLOUDS_CUMULUS_CONGESTUS_CURL_STRENGTH         = Сила шума
 option.CLOUDS_CUMULUS_CONGESTUS_WIND_SPEED            = Сила ветра
-suffix.CLOUDS_CUMULUS_CONGESTUS_ALTITUDE              = m/s
 option.CLOUDS_CUMULUS_CONGESTUS_WIND_ANGLE            = Направление ветра
-suffix.CLOUDS_CUMULUS_CONGESTUS_ALTITUDE              = °
 
 option.CLOUDS_NOCTILUCENT              = Серебристые облака
 
@@ -321,7 +327,7 @@ option.BLOCKY_CLOUDS_LAYER_2.comment   = Второй слой объемных 
 option.BLOCKY_CLOUDS_THICKNESS         = Толщина
 option.BLOCKY_CLOUDS_THICKNESS.comment = Регулирует толщину облаков
 option.BLOCKY_CLOUDS_ALTITUDE          = Высота
-option.BLOCKY_CLOUDS_ALTITUTE.comment  = Регулирует высоту облаков
+option.BLOCKY_CLOUDS_ALTITUDE.comment  = Регулирует высоту облаков
 option.BLOCKY_CLOUDS_ALTITUDE_2        = Высота второго слоя
 option.BLOCKY_CLOUDS_ALTITUDE_2.comment = Регулирует высоту второго слоя облаков
 option.BLOCKY_CLOUDS_ROUNDNESS         = Округлость
@@ -330,23 +336,16 @@ option.BLOCKY_CLOUDS_SHARPNESS         = Четкость
 option.BLOCKY_CLOUDS_SHARPNESS.comment = Регулирует четкость краев облаков
 
 option.CLOUDS_TEMPORAL_UPSCALING       = Временное увеличение масштаба
-option.CLOUDS_DAILY_WEATHER            = Варианты ежедневной погоды
-option.CLOUDS_DAILY_WEATHER.comment    = Облака зависят от системы ежедневной погоды
 option.CLOUDS_AERIAL_PERSPECTIVE_BOOST = Увеличение перспективы с воздуха
 option.CLOUDS_SCALE                    = Размер
 option.CLOUDS_SCALE.comment            = Применяется в качестве масштабного коэффициента ко всем облакам, чтобы придать облакам реалистичный размер и высоту, доступные во время игры. Если это значение равно 1,0, облака располагаются реалистично, а первый слой по умолчанию находится на высоте 800 блоков. Если это значение больше, то облака будут казаться меньше и располагаться ближе к земле. Это также влияет на размер теней от облаков
-suffix.CLOUDS_SCALE                    = ×
 value.CLOUDS_TEMPORAL_UPSCALING.1      = Выкл
-value.CLOUDS_TEMPORAL_UPSCALING.2      = 4×
-value.CLOUDS_TEMPORAL_UPSCALING.3      = 9×
-value.CLOUDS_TEMPORAL_UPSCALING.4      = 16×
 
 option.CLOUDS_CIRRUS                       = Перистые облака
 option.CLOUDS_CIRRUS.comment               = Плоские перистые облака
 option.CLOUDS_CIRRUS_LIGHTING_STEPS        = Шагов освещения
 option.CLOUDS_CIRRUS_AMBIENT_STEPS         = Шагов окружающего освещения
 option.CLOUDS_CIRRUS_ALTITUDE              = Высота
-suffix.CLOUDS_CIRRUS_ALTITUDE              = m
 option.CLOUDS_CIRRUS_THICKNESS             = Толщина
 option.CLOUDS_CIRRUS_DENSITY               = Плотность
 option.CLOUDS_CIRRUS_COVERAGE              = Покрытие
@@ -354,9 +353,7 @@ option.CLOUDS_CIRRUS_SIZE                  = Размер
 option.CLOUDS_CIRRUS_DETAIL_STRENGTH       = Количество деталей
 option.CLOUDS_CIRRUS_CURL_STRENGTH         = Сила шума
 option.CLOUDS_CIRRUS_WIND_SPEED            = Сила ветра
-suffix.CLOUDS_CIRRUS_ALTITUDE              = m/s
 option.CLOUDS_CIRRUS_WIND_ANGLE            = Направление ветра
-suffix.CLOUDS_CIRRUS_ALTITUDE              = °
 option.CLOUDS_CIRROCUMULUS_DENSITY         = Плотность перисто-кучевых облаков
 option.CLOUDS_CIRROCUMULUS_COVERAGE        = Покрытие перисто-кучевых облаков
 option.CLOUDS_CIRROCUMULUS_SIZE            = Размер перисто-кучевых облаков
@@ -384,30 +381,37 @@ value.AURORA_SNOW.AURORA_ALWAYS        = Всегда
 # Fog settings
 
 option.BORDER_FOG                      = Пограничный туман
-option.BORDER_FOG.comment              = Густой туман, окутывающий границы расстояния рендеринга, скрывает границы чанков
+option.BORDER_FOG.comment              = Густой туман, окутывающий границы дальности прорисовки, скрывает границы чанков
 option.CAVE_FOG                        = Пещерный туман
 option.CAVE_FOG.comment                = Легкий, слегка светящийся туман, создаваемый под землей. Это делает большие пещеры более атмосферными и помогает вам увидеть их форму
-option.BLOOMY_FOG                      = Светящийся тумане
+option.BLOOMY_FOG                      = Светящийся туман
 option.BLOOMY_FOG.comment              = Интенсивное свечение в тумане. Это создает видимость света от ярких объектов, рассеивающихся в тумане, и освещает область за ними. Практически без затрат на производительность
 option.BLOOMY_FOG_INTENSITY            = Сила светящегося тумана
 option.BLOOMY_FOG_INTENSITY.comment    = Регулирует силу "светящегося тумана"
+option.OVERWORLD_FOG_INTENSITY         = Сила тумана верхнего мира
 option.NETHER_FOG_INTENSITY            = Сила тумана нижнего мира
 option.VL                              = Объемное освещение (VL)
+option.LPV_VL.comment                  = Источники света освещают туман. Требует включённого цветного освщения! 
 option.VL.comment                      = Создает световые волны и переменную плотность тумана
 option.VL_RENDER_SCALE                 = Масштаб рендеринга VL
 option.AIR_FOG_CLOUDY_NOISE            = Облачный туман
-option.AIR_FOG_CLOUDY_NOISE.comment    = Едва заметные облачные формы в тумане лучше всего видны утром.\nтребуется объемный туман!
+option.AIR_FOG_CLOUDY_NOISE.comment    = Едва заметные облачные формы в тумане лучше всего видны утром.\nТребует включённого объемного тумана!
 option.AIR_FOG_COLORED_LIGHT_SHAFTS    = Цветные световые лучи
 option.AIR_FOG_COLORED_LIGHT_SHAFTS.comment = Световые лучи, проходящие через полупрозрачные объекты, окрашиваются в зависимости от их цвета
 
+# LPV VL
+option.LPV_VL                          = Включено
+option.LPV_VL_STEPS                    = Шагов 
+option.LPV_VL_INTENSITY_OVERWORLD      = Интенсивность на поверхности
+option.LPV_VL_INTENSITY_UNDERGROUND    = Интенсивность под землей
+option.LPV_VL_INTENSITY_NETHER         = Интенсивность в нижнем мире
+option.LPV_VL_INTENSITY_END            = Интенсивность в крае
+
+# Rayleigh Fog
 option.AIR_FOG_RAYLEIGH_FALLOFF_START     = Начало уменьшения Рэлея
 option.AIR_FOG_RAYLEIGH_FALLOFF_START.comment = Высота над уровнем моря, на которой туман Рэлея начинает уменьшаться
-option.AIR_FOG_RAYLEIGH_FALLOFF_HALF_LIFE = Двойное уменьшение Рэлея
+option.AIR_FOG_RAYLEIGH_FALLOFF_HALF_LIFE = Высота половинного ослабления Рэлея
 option.AIR_FOG_RAYLEIGH_FALLOFF_HALF_LIFE.comment = Высота над уровнем уменьшения Рэлея, где плотность рэлеевского тумана уменьшается вдвое
-option.AIR_FOG_MIE_FALLOFF_START          = Начало уменьшения Ми
-option.AIR_FOG_MIE_FALLOFF_START.comment  = Высота над уровнем моря, на которой туман Ми начинает уменьшаться
-option.AIR_FOG_MIE_FALLOFF_HALF_LIFE      = Двойное уменьшение Ми
-option.AIR_FOG_MIE_FALLOFF_HALF_LIFE.comment = Высота над уровнем уменьшения Ми, где плотность тумана Ми уменьшается вдвое
 
 option.AIR_FOG_RAYLEIGH_DENSITY        = Нормальная плотность
 option.AIR_FOG_RAYLEIGH_R              = §4Красный
@@ -444,12 +448,18 @@ option.AIR_FOG_RAYLEIGH_R_SWAMP        = §4Красный
 option.AIR_FOG_RAYLEIGH_G_SWAMP        = §2Зеленый
 option.AIR_FOG_RAYLEIGH_B_SWAMP        = §1Синий
 
+# Mie Fog
 option.AIR_FOG_MIE_DENSITY_MORNING     = Утренняя плотность
 option.AIR_FOG_MIE_DENSITY_NOON        = Дневная плотность
 option.AIR_FOG_MIE_DENSITY_EVENING     = Вечерняя плотность
 option.AIR_FOG_MIE_DENSITY_MIDNIGHT    = Ночная плотность
 option.AIR_FOG_MIE_DENSITY_RAIN        = Плотность дождя
 option.AIR_FOG_MIE_DENSITY_BLUE_HOUR   = Плотность рассвета/заката
+option.AIR_FOG_MIE_FALLOFF_START          = Начало уменьшения Ми
+option.AIR_FOG_MIE_FALLOFF_START.comment  = Высота над уровнем моря, на которой туман Ми начинает уменьшаться
+option.AIR_FOG_MIE_FALLOFF_HALF_LIFE      = Высота половинного ослабления Ми
+option.AIR_FOG_MIE_FALLOFF_HALF_LIFE.comment = Высота над уровнем уменьшения Ми, где плотность тумана Ми уменьшается вдвое
+
 
 # Materials settings
 
@@ -459,7 +469,7 @@ option.SPECULAR_MAPPING                = Отображение отражени
 option.SPECULAR_MAPPING.comment        = Следует ли использовать зеркальные карты, предоставляемые пакетом ресурсов. Включите это, если вы используете "PBR" ресурс-пак
 option.POM                             = Отображение параллаксной окклюзии
 option.TEXTURE_FORMAT                  = Формат текстур
-option.TEXTURE_FORMAT.comment          = Формат текстуры, используемый пакетом ресурсов. Большинство современных пакетов ресурсов используют lab_p_b_r, в то время как пакеты, предназначенные для работы с SEUS могут использовать OldPBR
+option.TEXTURE_FORMAT.comment          = Формат текстуры, используемый пакетом ресурсов. Большинство современных пакетов ресурсов используют lab_p_b_r, в то время как пакеты, предназначенные для работы с SEUS, могут использовать OldPBR
 option.HARDCODED_SPECULAR              = Зеркальные отражения
 option.HARDCODED_SPECULAR.comment      = Жестко запрограммированные зеркальные отражения для некоторых блоков (например, металлов)
 option.HARDCODED_EMISSION              = Свечение
@@ -474,7 +484,7 @@ option.DIRECTIONAL_LIGHTMAPS.comment   = Свет от блоков и неба 
 option.DIRECTIONAL_LIGHTMAPS_INTENSITY = Сила направленных световых карт
 option.DIRECTIONAL_LIGHTMAPS_INTENSITY.comment = Регулирует силу направленных световых карт
 option.POM_DEPTH                       = Глубина параллакса
-option.POM_DEPTH.comment               = Как глубоко отображение параллаксной окклюзии (POM) может зайти в блок
+option.POM_DEPTH.comment               = Регулирует глубину эффекта параллаксного окклюзионного отображения (POM)
 option.POM_SAMPLES                     = Образцов параллакса
 option.POM_SAMPLES.comment             = Регулирует качество POM в ущерб производительности
 option.POM_SHADOW                      = Самозатеняющийся POM
@@ -489,12 +499,6 @@ value.REFRACTION.REFRACTION_ALL        = Всё
 value.REFRACTION.REFRACTION_WATER_ONLY = Только вода
 option.REFRACTION_INTENSITY            = Интенсивность преломления
 option.REFRACTION_INTENSITY.comment    = Регулирует интенсивность преломлений на воде
-
-suffix.POM_DEPTH                       = m
-suffix.POM_DISTANCE                    = m
-
-value.TEXTURE_FORMAT.TEXTURE_FORMAT_LAB = labPBR
-value.TEXTURE_FORMAT.TEXTURE_FORMAT_OLD = Old PBR
 
 option.ENVIRONMENT_REFLECTIONS         = Отражения окружающей среды
 option.ENVIRONMENT_REFLECTIONS.comment = Отражения в пространстве экрана. Вода и блестящие блоки отражают окружающую среду. Большое влияние на производительность
@@ -547,7 +551,7 @@ option.WATER_PARALLAX.comment          = Делает волны на воде �
 option.WATER_DISPLACEMENT              = Смещение поверхности
 option.WATER_DISPLACEMENT.comment      = Подобно тому, как колышутся листья, это заставляет саму геометрию воды слегка колебаться, поэтому береговая линия кажется менее ровной
 option.WATER_WAVES_HEIGHT_VARIATION    = Вариация высоты водных волн
-comment.WATER_WAVES_HEIGHT_VARIATION   = Высота водных волн изменяется в пространстве
+WATER_WAVES_HEIGHT_VARIATION.comment   = Высота водных волн изменяется в пространстве
 
 option.WATER_ABSORPTION_R              = Поглощение красного
 option.WATER_ABSORPTION_G              = Поглощение зеленого
@@ -598,17 +602,6 @@ value.DOF_FOCUS.-1.0                   = Автоматически
 
 option.tonemap                         = Оператор тональной карты
 
-value.tonemap.academy_fit              = Academy Fit
-value.tonemap.academy_rrt              = Academy RRT
-value.tonemap.tonemap_hejl_2015        = Hejl 2015
-value.tonemap.tonemap_hejl_burgess     = Hejl-Burgess
-value.tonemap.tonemap_lottes           = Lottes
-value.tonemap.tonemap_uncharted_2      = Uncharted 2
-value.tonemap.tonemap_tech             = Tech
-value.tonemap.tonemap_ozius            = Ozius
-value.tonemap.tonemap_reinhard         = Reinhard
-value.tonemap.tonemap_reinhard_jodie   = Reinhard-Jodie
-
 # Color Grading
 
 option.GRADE_BRIGHTNESS                = Яркость
@@ -619,11 +612,9 @@ option.GRADE_ORANGE_SAT_BOOST          = Повышение насыщеннос
 option.GRADE_TEAL_SAT_BOOST            = Повышение насыщенности бирюзового цвета
 option.GRADE_GREEN_SAT_BOOST           = Повышение насыщенности зеленого цвета
 option.GRADE_GREEN_HUE_SHIFT           = Изменение зеленого оттенка
-suffix.GRADE_WHITE_BALANCE             = K
-suffix.GRADE_GREEN_HUE_SHIFT           = °
 
 option.PURKINJE_SHIFT                  = Сдвиг Пуркинье
-option.PURKINJE_SHIFT.option           = Имитирует воздействие слабого освещения на зрение человека, снижая насыщенность всех цветов и затемняя красные оттенки
+option.PURKINJE_SHIFT.comment          = Имитирует воздействие слабого освещения на зрение человека, снижая насыщенность всех цветов и затемняя красные оттенки
 option.PURKINJE_SHIFT_INTENSITY        = Сила сдвига Пуркинье
 
 # Exposure
@@ -660,39 +651,30 @@ option.CUSTOM_SKY                      = Пользовательское неб
 option.CUSTOM_SKY.comment              = Включить пользовательское небо из ресурс-паком
 option.CUSTOM_SKY_BRIGHTNESS           = Яркость пользовательского неба
 option.CUSTOM_SKY_BRIGHTNESS.comment   = Регулирует яркость пользовательского неба
+option.DH_OVERDRAW_DISTANCE            = Дальность перерисовки
+option.DH_OVERDRAW_FADE_LENGTH         = Длина затухания перерисовки
 option.NOISE_ON_DH_TERRAIN             = Шум на ландшафте DH
 option.ENCHANTMENT_GLINT_BRIGHTNESS    = Яркость мерцания зачарования
+option.USE_SEPARATE_ENTITY_DRAWS            = Использовать "Отдельную отрисовку сущностей"
+option.USE_SEPARATE_ENTITY_DRAWS.comment    = "separateEntityDraws" - функция Iris, позволяющая шейдерам с гибридным освещением (например, Photon) правильно отображать полупрозрачные сущности и объекты. Отключение может вызвать проблемы с рендерингом — полупрозрачные объекты могут стать непрозрачными!
 
 value.DEBUG_VIEW.DEBUG_VIEW_NONE       = Выкл
 value.DEBUG_VIEW.DEBUG_VIEW_SAMPLER    = Сэмплер
-value.DEBUG_VIEW.DEBUG_VIEW_WEATHER    = Погода
 value.DEBUG_VIEW.DEBUG_VIEW_HISTOGRAM  = Гистограмма
+value.DEBUG_VIEW.DEBUG_VIEW_WEATHER    = Погода
 
-value.tonemap_left.academy_fit            = Academy Fit
-value.tonemap_left.academy_rrt            = Academy RRT
-value.tonemap_left.tonemap_lottes         = Lottes
-value.tonemap_left.tonemap_hejl_2015      = Hejl 2015
-value.tonemap_left.tonemap_hejl_burgess   = Hejl-Burgess
-value.tonemap_left.tonemap_uncharted_2    = Uncharted 2
-value.tonemap_left.tonemap_tech           = Tech
-value.tonemap_left.tonemap_ozius          = Ozius
-value.tonemap_left.tonemap_reinhard       = Reinhard
-value.tonemap_left.tonemap_reinhard_jodie = Reinhard-Jodie
+# Distance View 
 
-value.tonemap_right.academy_fit            = Academy Fit
-value.tonemap_right.academy_rrt            = Academy RRT
-value.tonemap_right.tonemap_lottes         = Lottes
-value.tonemap_right.tonemap_hejl_burgess   = Hejl-Burgess
-value.tonemap_right.tonemap_hejl_2015      = Hejl 2015
-value.tonemap_right.tonemap_uncharted_2    = Uncharted 2
-value.tonemap_right.tonemap_tech           = Tech
-value.tonemap_right.tonemap_ozius          = Ozius
-value.tonemap_right.tonemap_reinhard       = Reinhard
-value.tonemap_right.tonemap_reinhard_jodie = Reinhard-Jodie
+option.DISTANCE_VIEW                   = Включена
+option.DISTANCE_VIEW_METHOD            = Метод
+option.DISTANCE_VIEW_MAX_DISTANCE      = Максимальная дальность
+
+value.DISTANCE_VIEW_METHOD.DISTANCE_VIEW_DISTANCE = Дальность
+value.DISTANCE_VIEW_METHOD.DISTANCE_VIEW_DEPTH    = Глубина
 
 # Box
 
-option.BOX_MODE                 = Контур блоков
+option.BOX_MODE                 = Режим
 option.BOX_MODE.comment         = Режим рамки выделения \n\nОтсутствует: По умолчанию \nЦвет: Пользовательский цвет \nРадуга: Необычный RGB-эффект
 value.BOX_MODE.BOX_MODE_NONE    = Отсутствует
 value.BOX_MODE.BOX_MODE_COLOR   = Цвет
@@ -701,119 +683,5 @@ option.BOX_COLOR_R              = Красный
 option.BOX_COLOR_G              = Зеленый
 option.BOX_COLOR_B              = Синий
 option.BOX_EMISSION             = Свечение
-option.BOX_EMISSION.comment     = Цвет контура до 1. Требуется свечение.
+option.BOX_EMISSION.comment     = Повышает яркость цвета выше 1. Требуется включённое свечение.
 option.BOX_LINE_WIDTH           = Ширина линии
-
-# Daily Weather System
-
-option.WEATHER_DAY                         = День
-value.WEATHER_DAY.-1                       = Случайно
-
-option.WEATHER_D0_CLOUDS_CUMULUS_MIN       = Минимальное покрытие кучевыми облаками
-option.WEATHER_D0_CLOUDS_CUMULUS_MAX       = Максимальное покрытие кучевыми облаками
-option.WEATHER_D0_CLOUDS_ALTOCUMULUS_MIN   = Минимальное покрытие кучевыми облаками
-option.WEATHER_D0_CLOUDS_ALTOCUMULUS_MAX   = Максимальное покрытие кучевыми облаками
-option.WEATHER_D0_CLOUDS_CIRRUS            = Покрытие перистыми облаками
-option.WEATHER_D0_CLOUDS_CC                = Покрытие перисто-кучевыми облаками
-option.WEATHER_D0_FOGGINESS                = Затуманенность
-option.WEATHER_D0_CLOUDS_CUMULUS_CONGESTUS_AMOUNT = Мощно-кучевые облака
-option.WEATHER_D0_CLOUDS_STRATUS_AMOUNT    = Слоистые облака
-option.WEATHER_D1_CLOUDS_CUMULUS_MIN       = Минимальное покрытие кучевыми облаками
-option.WEATHER_D1_CLOUDS_CUMULUS_MAX       = Максимальное покрытие кучевыми облаками
-option.WEATHER_D1_CLOUDS_ALTOCUMULUS_MIN   = Минимальное покрытие кучевыми облаками
-option.WEATHER_D1_CLOUDS_ALTOCUMULUS_MAX   = Максимальное покрытие кучевыми облаками
-option.WEATHER_D1_CLOUDS_CIRRUS            = Покрытие перистыми облаками
-option.WEATHER_D1_CLOUDS_CC                = Покрытие перисто-кучевыми облаками
-option.WEATHER_D1_FOGGINESS                = Затуманенность
-option.WEATHER_D1_CLOUDS_CUMULUS_CONGESTUS_AMOUNT = Мощно-кучевые облака
-option.WEATHER_D1_CLOUDS_STRATUS_AMOUNT    = Слоистые облака
-option.WEATHER_D2_CLOUDS_CUMULUS_MIN       = Минимальное покрытие кучевыми облаками
-option.WEATHER_D2_CLOUDS_CUMULUS_MAX       = Максимальное покрытие кучевыми облаками
-option.WEATHER_D2_CLOUDS_ALTOCUMULUS_MIN   = Минимальное покрытие кучевыми облаками
-option.WEATHER_D2_CLOUDS_ALTOCUMULUS_MAX   = Максимальное покрытие кучевыми облаками
-option.WEATHER_D2_CLOUDS_CIRRUS            = Покрытие перистыми облаками
-option.WEATHER_D2_CLOUDS_CC                = Покрытие перисто-кучевыми облаками
-option.WEATHER_D2_FOGGINESS                = Затуманенность
-option.WEATHER_D2_CLOUDS_CUMULUS_CONGESTUS_AMOUNT = Мощно-кучевые облака
-option.WEATHER_D2_CLOUDS_STRATUS_AMOUNT    = Слоистые облака
-option.WEATHER_D3_CLOUDS_CUMULUS_MIN       = Минимальное покрытие кучевыми облаками
-option.WEATHER_D3_CLOUDS_CUMULUS_MAX       = Максимальное покрытие кучевыми облаками
-option.WEATHER_D3_CLOUDS_ALTOCUMULUS_MIN   = Минимальное покрытие кучевыми облаками
-option.WEATHER_D3_CLOUDS_ALTOCUMULUS_MAX   = Максимальное покрытие кучевыми облаками
-option.WEATHER_D3_CLOUDS_CIRRUS            = Покрытие перистыми облаками
-option.WEATHER_D3_CLOUDS_CC                = Покрытие перисто-кучевыми облаками
-option.WEATHER_D3_FOGGINESS                = Затуманенность
-option.WEATHER_D3_CLOUDS_CUMULUS_CONGESTUS_AMOUNT = Мощно-кучевые облака
-option.WEATHER_D3_CLOUDS_STRATUS_AMOUNT    = Слоистые облака
-option.WEATHER_D4_CLOUDS_CUMULUS_MIN       = Минимальное покрытие кучевыми облаками
-option.WEATHER_D4_CLOUDS_CUMULUS_MAX       = Максимальное покрытие кучевыми облаками
-option.WEATHER_D4_CLOUDS_ALTOCUMULUS_MIN   = Минимальное покрытие кучевыми облаками
-option.WEATHER_D4_CLOUDS_ALTOCUMULUS_MAX   = Максимальное покрытие кучевыми облаками
-option.WEATHER_D4_CLOUDS_CIRRUS            = Покрытие перистыми облаками
-option.WEATHER_D4_CLOUDS_CC                = Покрытие перисто-кучевыми облаками
-option.WEATHER_D4_FOGGINESS                = Затуманенность
-option.WEATHER_D4_CLOUDS_CUMULUS_CONGESTUS_AMOUNT = Мощно-кучевые облака
-option.WEATHER_D4_CLOUDS_STRATUS_AMOUNT    = Слоистые облака
-option.WEATHER_D5_CLOUDS_CUMULUS_MIN       = Минимальное покрытие кучевыми облаками
-option.WEATHER_D5_CLOUDS_CUMULUS_MAX       = Максимальное покрытие кучевыми облаками
-option.WEATHER_D5_CLOUDS_ALTOCUMULUS_MIN   = Минимальное покрытие кучевыми облаками
-option.WEATHER_D5_CLOUDS_ALTOCUMULUS_MAX   = Максимальное покрытие кучевыми облаками
-option.WEATHER_D5_CLOUDS_CIRRUS            = Покрытие перистыми облаками
-option.WEATHER_D5_CLOUDS_CC                = Покрытие перисто-кучевыми облаками
-option.WEATHER_D5_FOGGINESS                = Затуманенность
-option.WEATHER_D5_CLOUDS_CUMULUS_CONGESTUS_AMOUNT = Мощно-кучевые облака
-option.WEATHER_D5_CLOUDS_STRATUS_AMOUNT    = Слоистые облака
-option.WEATHER_D6_CLOUDS_CUMULUS_MIN       = Минимальное покрытие кучевыми облаками
-option.WEATHER_D6_CLOUDS_CUMULUS_MAX       = Максимальное покрытие кучевыми облаками
-option.WEATHER_D6_CLOUDS_ALTOCUMULUS_MIN   = Минимальное покрытие кучевыми облаками
-option.WEATHER_D6_CLOUDS_ALTOCUMULUS_MAX   = Максимальное покрытие кучевыми облаками
-option.WEATHER_D6_CLOUDS_CIRRUS            = Покрытие перистыми облаками
-option.WEATHER_D6_CLOUDS_CC                = Покрытие перисто-кучевыми облаками
-option.WEATHER_D6_FOGGINESS                = Затуманенность
-option.WEATHER_D6_CLOUDS_CUMULUS_CONGESTUS_AMOUNT = Мощно-кучевые облака
-option.WEATHER_D6_CLOUDS_STRATUS_AMOUNT    = Слоистые облака
-option.WEATHER_D7_CLOUDS_CUMULUS_MIN       = Минимальное покрытие кучевыми облаками
-option.WEATHER_D7_CLOUDS_CUMULUS_MAX       = Максимальное покрытие кучевыми облаками
-option.WEATHER_D7_CLOUDS_ALTOCUMULUS_MIN   = Минимальное покрытие кучевыми облаками
-option.WEATHER_D7_CLOUDS_ALTOCUMULUS_MAX   = Максимальное покрытие кучевыми облаками
-option.WEATHER_D7_CLOUDS_CIRRUS            = Покрытие перистыми облаками
-option.WEATHER_D7_CLOUDS_CC                = Покрытие перисто-кучевыми облаками
-option.WEATHER_D7_FOGGINESS                = Затуманенность
-option.WEATHER_D7_CLOUDS_CUMULUS_CONGESTUS_AMOUNT = Мощно-кучевые облака
-option.WEATHER_D7_CLOUDS_STRATUS_AMOUNT    = Слоистые облака
-option.WEATHER_D8_CLOUDS_CUMULUS_MIN       = Минимальное покрытие кучевыми облаками
-option.WEATHER_D8_CLOUDS_CUMULUS_MAX       = Максимальное покрытие кучевыми облаками
-option.WEATHER_D8_CLOUDS_ALTOCUMULUS_MIN   = Минимальное покрытие кучевыми облаками
-option.WEATHER_D8_CLOUDS_ALTOCUMULUS_MAX   = Максимальное покрытие кучевыми облаками
-option.WEATHER_D8_CLOUDS_CIRRUS            = Покрытие перистыми облаками
-option.WEATHER_D8_CLOUDS_CC                = Покрытие перисто-кучевыми облаками
-option.WEATHER_D8_FOGGINESS                = Затуманенность
-option.WEATHER_D8_CLOUDS_CUMULUS_CONGESTUS_AMOUNT = Мощно-кучевые облака
-option.WEATHER_D8_CLOUDS_STRATUS_AMOUNT    = Слоистые облака
-option.WEATHER_D9_CLOUDS_CUMULUS_MIN       = Минимальное покрытие кучевыми облаками
-option.WEATHER_D9_CLOUDS_CUMULUS_MAX       = Максимальное покрытие кучевыми облаками
-option.WEATHER_D9_CLOUDS_ALTOCUMULUS_MIN   = Минимальное покрытие кучевыми облаками
-option.WEATHER_D9_CLOUDS_ALTOCUMULUS_MAX   = Максимальное покрытие кучевыми облаками
-option.WEATHER_D9_CLOUDS_CIRRUS            = Покрытие перистыми облаками
-option.WEATHER_D9_CLOUDS_CC                = Покрытие перисто-кучевыми облаками
-option.WEATHER_D9_FOGGINESS                = Затуманенность
-option.WEATHER_D9_CLOUDS_CUMULUS_CONGESTUS_AMOUNT = Мощно-кучевые облака
-option.WEATHER_D9_CLOUDS_STRATUS_AMOUNT    = Слоистые облака
-option.WEATHER_D10_CLOUDS_CUMULUS_MIN      = Минимальное покрытие кучевыми облаками
-option.WEATHER_D10_CLOUDS_CUMULUS_MAX      = Максимальное покрытие кучевыми облаками
-option.WEATHER_D10_CLOUDS_ALTOCUMULUS_MIN  = Минимальное покрытие кучевыми облаками
-option.WEATHER_D10_CLOUDS_ALTOCUMULUS_MAX  = Максимальное покрытие кучевыми облаками
-option.WEATHER_D10_CLOUDS_CIRRUS           = Покрытие перистыми облаками
-option.WEATHER_D10_CLOUDS_CC               = Покрытие перисто-кучевыми облаками
-option.WEATHER_D10_FOGGINESS               = Затуманенность
-option.WEATHER_D10_CLOUDS_CUMULUS_CONGESTUS_AMOUNT = Мощно-кучевые облака
-option.WEATHER_D10_CLOUDS_STRATUS_AMOUNT   = Слоистые облака
-option.WEATHER_D11_CLOUDS_CUMULUS_MIN      = Минимальное покрытие кучевыми облаками
-option.WEATHER_D11_CLOUDS_CUMULUS_MAX      = Максимальное покрытие кучевыми облаками
-option.WEATHER_D11_CLOUDS_ALTOCUMULUS_MIN  = Минимальное покрытие кучевыми облаками
-option.WEATHER_D11_CLOUDS_ALTOCUMULUS_MAX  = Максимальное покрытие кучевыми облаками
-option.WEATHER_D11_CLOUDS_CIRRUS           = Покрытие перистыми облаками
-option.WEATHER_D11_CLOUDS_CC               = Покрытие перисто-кучевыми облаками
-option.WEATHER_D11_FOGGINESS               = Затуманенность
-option.WEATHER_D11_CLOUDS_CUMULUS_CONGESTUS_AMOUNT = Мощно-кучевые облака
-option.WEATHER_D11_CLOUDS_STRATUS_AMOUNT   = Слоистые облака
