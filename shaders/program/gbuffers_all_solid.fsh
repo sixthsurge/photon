@@ -264,6 +264,17 @@ void main() {
 	if (base_color.a < 0.1) { discard; return; }
 #endif
 
+#if (defined PROGRAM_GBUFFERS_BLOCK || defined PROGRAM_GBUFFERS_ENTITIES || defined PROGRAM_GBUFFERS_HAND) && !(defined USE_SEPARATE_ENTITY_DRAWS && defined IS_IRIS)
+	#ifdef DITHERED_TRANSLUCENCY_FALLBACK
+	// Dithered transparency for translucent objects rendered as solid
+	float dither_pattern = r1(
+		frameCounter, 
+		texelFetch(noisetex, ivec2(gl_FragCoord.xy) & 511, 0).z
+	);
+	if (base_color.a < dither_pattern) { discard; return; }
+	#endif
+#endif
+
 #ifdef WHITE_WORLD
 	base_color.rgb = vec3(1.0);
 #endif

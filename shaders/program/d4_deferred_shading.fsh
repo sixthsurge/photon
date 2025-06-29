@@ -149,6 +149,7 @@ uniform float eye_skylight;
 
 /*
 const bool colortex5MipmapEnabled = true;
+const bool colortex11MipmapEnabled = true;
 */
 
 // ------------
