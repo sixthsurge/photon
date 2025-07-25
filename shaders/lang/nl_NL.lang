@@ -1,0 +1,756 @@
+# Profiles
+
+profile.low                            = §eLaag
+profile.medium                         = §aGemiddeld
+profile.high                           = §bHoog
+profile.ultra                          = §dUltiem
+
+# Screens
+
+screen.world                           = Wereld
+screen.lighting                        = Licht
+screen.sky                             = Lucht
+screen.fog                             = Mist
+screen.materials                       = Materialen
+screen.water                           = Water
+screen.post                            = Filters & Effecten
+screen.misc                            = Overig
+
+screen.weather                         = Weer
+screen.colored_lights                  = Gekleurde Lichtbronnen
+screen.rp_settings                     = Bronpakket-instellingen
+screen.reflections                     = Reflecties
+screen.refraction                      = Refracties
+screen.light_sources                   = Lichtbronnen
+screen.shadows                         = Schaduwen
+screen.ao                              = Omgevingsocclusie (AO)
+screen.color_grading                   = Kleurcorrectie
+screen.exposure                        = Belichting
+screen.lpv_vl                          = Gekleurde Lichtbronnen Mist-verstrooing
+screen.box                             = Selectievak
+screen.distant_horizons                = Distant Horizons
+screen.developer                       = Ontwikkelaars-opties
+
+screen.aurora                          = Aurora
+screen.wolken                          = Wolken
+screen.crepuscular_rays                = Schemerstralen
+screen.stars                           = Sterren
+screen.clouds_cumulus                  = Cumulus Instellingen
+screen.clouds_altocumulus              = Altocumulus Instellingen
+screen.clouds_cumulus_congestus        = Cumulus Congestus Instellingen
+screen.clouds_cirrus                   = Cirrus/Cirrocumulus Instellingen
+screen.clouds_minecrafty               = Blokkerige Wolken Instellingen
+screen.clouds_noctilucent              = Noctilucent Instellingen
+
+screen.fog_rlh                         = Rayleigh Mist
+screen.fog_mie                         = Mie Mist
+screen.sunlight_color                  = Zonlicht Kleur
+screen.moonlight_color                 = Maanlicht Kleur
+screen.blocklight_color                = Bloklicht Kleur
+screen.sunlight_morning                = Ochtend
+screen.sunlight_noon                   = Middag
+screen.sunlight_evening                = Avond
+screen.light_nether                    = Nether
+screen.light_end                       = End
+screen.fog_rlh_normal                  = Normale Kleur
+screen.fog_rlh_rain                    = Regenachtige Kleur
+screen.fog_rlh_arid                    = Dor/Woestijn Kleur
+screen.fog_rlh_snowy                   = Sneeuwachtige Kleur
+screen.fog_rlh_taiga                   = Taiga Kleur
+screen.fog_rlh_jungle                  = Jungle Kleur
+screen.fog_rlh_swamp                   = Moeras Kleur
+screen.water_waves                     = Water Golven
+screen.water_fog_coeff                 = Water Mist Coëfficiënten
+
+screen.end_light_color                 = Lichtkleur
+screen.end_ambient_color               = Omgevingskleur
+screen.nether_color                    = Statische Kleur
+
+screen.distance_view                   = Afstandsweergave
+
+option.INFO                            = Photon Shaders
+value.INFO.0                           = §edoor SixthSurge
+value.INFO.1                           = §adoor SixthSurge
+value.INFO.2                           = §bdoor SixthSurge
+value.INFO.3                           = §ddoor SixthSurge
+
+# World settings
+
+option.WAVING_PLANTS                   = Zwaaiende Planten
+option.WAVING_PLANTS.comment           = Laat grondplanten zoals gras wel of niet zwaaien.\n\n Om een blok te laten zwaaien moet je het blok in shaders/block.properties toevoegen aan de relevante categorie (10016, 10017 of 10018).
+option.WAVING_LEAVES                   = Waving Leaves
+option.WAVING_LEAVES.comment           = Laat bladeren wel of niet zwaaien.\n\n Om een blok te laten zwaaien moet je het blok in shaders/block.properties toevoegen aan de relevante categorie (10019).
+option.SLANTED_RAIN                    = Schuine Regen
+option.SLANTED_RAIN.comment            = Schuin vallende regendruppels. Dit ziet er vaak intenser en sfeervoller uit.
+option.RAIN_OPACITY                    = Regen Ondoorzichtigheid
+option.RAIN_OPACITY.comment            = De ondoorzichtigheid van regendruppels.
+option.SEA_LEVEL                       = Zeeniveau
+option.SEA_LEVEL.comment               = Het Y-coordinaat van de zee.\n\n-60: Platte wereld na 1.18.\n4.0: Platte wereld na 1.18.\n63: Normale wereld.
+option.SNOW_OPACITY                    = Sneeuw Ondoorzichtigheid
+option.SNOW_OPACITY.comment            = De ondoorzichtigheid van sneeuwvlokken.
+option.EDGE_HIGHLIGHT                  = Lichte Blokranden
+option.EDGE_HIGHLIGHT.comment          = Een lichte rand op blokken, geïnspireerd door Minecraft Dungeons.
+option.EDGE_HIGHLIGHT_SCALE            = Lichte Blokrand-grootte
+option.EDGE_HIGHLIGHT_SCALE.comment    = De dikte van de lichte blokranden. Dit werkt het beste als het hetzelfde als de resolutie van het geactiveerde bronpakket is.
+option.MOON_PHASE_AFFECTS_BRIGHTNESS   = Maanfase Wijzigt Belichting
+option.MOON_PHASE_AFFECTS_BRIGHTNESS.comment = Maanfase verandert de belichting tijdens nachten.
+option.DESERT_SANDSTORM                = Dor/Woestijn Zandstorm
+option.DESERT_SANDSTORM.comment        = Vervangt de droge woestijn tijdens regen met een zandstorm.
+option.END_GLOW                        = End Gloei
+option.END_GLOW.comment                = Gloeiend effect in De End. Vereist Volumetrische Mist.
+
+# Weather
+option.RANDOM_WEATHER_VARIATION            = Willekeurige Variatie
+option.BIOME_WEATHER_VARIATION             = Bioom-gebaseerde Variatie
+option.WEATHER_TEMPERATURE_BIAS            = Temperatuursaanpassing
+option.WEATHER_HUMIDITY_BIAS               = Vochtigheidsaanpassing
+option.WEATHER_WIND_BIAS                   = Winderigheidsaanpassing
+option.WEATHER_TEMPERATURE_VARIATION_SPEED = Temperatuursvariatie-snelheid
+option.WEATHER_HUMIDITY_VARIATION_SPEED    = Vochtigheidsvariatie-snelheid
+option.WEATHER_WIND_VARIATION_SPEED        = Winderigheidsvariatie-snelheid
+
+# Lighting settings
+
+option.COLORED_LIGHTS                  = Gekleurde Lichtbronnen
+option.COLORED_LIGHTS.comment          = Gekleurd bloklicht door gebruik te maken van het 'Iris Floodfill-algoritme'. Werkt niet bij Iris versies onder de 1.6.
+option.COLORED_LIGHTS_VANILLA_LIGHTMAP_CONTRIBUTION = Vanilla Lichtmap-bijdrage
+option.COLORED_LIGHTS_VANILLA_LIGHTMAP_CONTRIBUTION.comment = Gebruikt de vanilla lichtmap samen met de om sommige bugs met gekleurde lichtbronnen te voorkomen, zoals onnodig donkere omgevingsocclusie.
+option.HANDHELD_LIGHTING               = Vastgehouden Belichting
+option.HANDHELD_LIGHTING.comment       = Voorwerpen die je vasthoud werpen licht op de omgeving. Dit heeft kleur als Gekleurde Lichtbronnen aanstaat.
+option.HANDHELD_LIGHTING_INTENSITY     = Vastgehouden Belichting Felheid
+option.HANDHELD_LIGHTING_INTENSITY.comment = Wijzigt de felheid van vastgehouden belichting.
+option.AO_IN_SUNLIGHT                  = AO In Zonlicht
+option.AO_IN_SUNLIGHT.comment          = Of omgevingsocclusie wel of niet in direct zonlicht mag verschijnen.
+option.CLOUD_SHADOWS                   = Wolkschaduwen
+option.CLOUD_SHADOWS.comment           = Schaduwen die door wolken worden geworpen.
+option.CLOUD_SHADOWS_INTENSITY         = Wolkschaduw Intensiteit
+option.CLOUD_SHADOWS_INTENSITY.comment = Wijzigt de intensiteit van wolkschaduwen.
+option.SH_SKYLIGHT                     = SH Luchtlicht
+option.SH_SKYLIGHT.comment             = Gebruikt een 'Spherical Harmonics'-codering voor directioneel licht van de lucht, wat een heel natuurlijk resultaat creëert.\nDit werkt goed samen met GTAO.
+option.SSS_SHEEN                       = SSS Glans
+option.SSS_SHEEN.comment               = Creëert een glans-effect op planten en bladeren. Dit helpt planten om minder ruw tegen het glimmende gras op te laten vallen.
+option.SSS_INTENSITY.comment           = Wijzigt de felheid van 'Subsurface Scattering (SSS)'.
+option.SHADING_STRENGTH                = Belichtingsintensiteit
+option.SHADING_STRENGTH.comment        = Wijzigt de intensiteit van directe belichting. Lagere waarden maken oppervlakken die van de zon weg wijzen feller, hogere waarden maken de oppervlakken donkerder.
+
+option.SHADOW                          = Shaduw Mapping
+option.SHADOW_PCF                      = Schaduw Filtering
+option.SHADOW_COLOR                    = Gekleurde Schaduwen
+option.SHADOW_COLOR.comment            = Doorzichtige blokken werpen gekleurde schaduwen.
+option.SHADOW_VPS                      = Bijschaduwen
+option.SHADOW_VPS.comment              = Schaduwen krijgen zachtere randen naarmate de oppervlakte verder van het schaduw-werpende voorwerp is.
+option.shadowMapResolution             = Shaduwmap Resolutie
+option.shadowDistance                  = Schaduw Afstand
+option.sunPathRotation                 = Zonnepad Links/rechts Rotatie
+option.SHADOW_PENUMBRA_SCALE           = Shaduw Zachtheid
+option.SHADOW_PENUMBRA_SCALE.comment   = Wijzigt de initiële zachtheid van schaduwen en verandert hoe snel schaduwen zachter worden door Bijschaduwen.
+option.ENTITY_SHADOWS                  = Entiteit Schaduwen
+option.ENTITY_SHADOWS.comment          = Entiteiten werpen schaduwen. Dit kan de prestaties erg verminderen.
+option.BLOCK_ENTITY_SHADOWS            = Blok Entiteit Schaduwen
+option.BLOCK_ENTITY_SHADOWS.comment    = Blok entiteiten zoals kisten en banieren werpen schaduwen.
+option.PIXELATED_SHADOWS               = Gepixelde Schaduwen
+option.PIXELATED_SHADOWS.comment       = Schaduwen zijn gepixeld naar een rooster.
+option.PIXELATED_SHADOWS_RESOLUTION    = Gepixelde Schaduw Resolutie
+option.PIXELATED_SHADOWS_RESOLUTION.comment = De grootte van het Gepixelde Schaduwen rooster per blok. Een resolutie van 16 betekent dat Gepixelde Schaduwen perfect met pixels van vanilla-texturen op een lijn vallen.
+option.SSS_STEPS                       = SSS Stappen
+option.SSS_STEPS.comment               = Hogere waarden verminderen ruis maar verslechteren de prestaties.
+
+option.SHADER_AO                       = Shader AO
+option.SHADER_AO.comment               = Het AO type dat wordt gebruikt.\nSSAO: Lagere kwaliteit, maar betere prestaties.\nGTAO: Hogere kwaliteit, maar slechtere prestaties.
+value.SHADER_AO.SHADER_AO_NONE         = Uit
+value.SHADER_AO.SHADER_AO_SSAO         = SSAO
+value.SHADER_AO.SHADER_AO_GTAO         = GTAO
+option.VANILLA_AO                      = Vanilla AO
+option.VANILLA_AO.comment              = Minecraft's ingebouwde omgevingsocclusie.
+option.SSAO_RADIUS                     = SSAO Radius
+option.SSAO_RADIUS.comment             = Wijzigt de radius van SSAO. Hogere waarden zorgen ervoor dat voorwerpen verder weg omgevingsocclusie kunnen creëren.
+option.SSAO_STEPS                      = SSAO Stappen
+option.SSAO_STEPS.comment              = Wijzigt hoeveel stappen SSAO zet en vermindert het ruis in de omgevingsocclusie.
+option.GTAO_RADIUS                     = GTAO Radius
+option.GTAO_RADIUS.comment             = Wijzigt de radius van GTAO. Hogere waarden zorgen ervoor dat voorwerpen verder weg omgevingsocclusie kunnen creëren.
+option.GTAO_SLICES                     = GTAO Delen
+option.GTAO_SLICES.comment             = Wijzigt hoeveel 'slices' GTAO gebruikt. Hogere waarden verminderen ruis, maar kosten meer prestaties.
+option.GTAO_HORIZON_STEPS              = GTAO Stappen
+option.GTAO_HORIZON_STEPS.comment      = Wijzigt hoeveel stappen GTAO zet en dus hoe precies de omgevingsocclusie is.\nAls kleine voorwerpen geen omgevingsocclusie creëeren is het handig deze instelling hoger te zetten.\nMeer stappen creëert helaas ook een donkerdere omgevingsocclusie.
+
+option.SUN_NR                          = Rood
+option.SUN_NG                          = Groen
+option.SUN_NB                          = Blauw
+option.SUN_MR                          = Rood
+option.SUN_MG                          = Groen
+option.SUN_MB                          = Blauw
+option.SUN_ER                          = Rood
+option.SUN_EG                          = Groen
+option.SUN_EB                          = Blauw
+option.SUN_I                           = Zonlicht Intensiteit
+option.MOON_R                          = Rood
+option.MOON_G                          = Groen
+option.MOON_B                          = Blauw
+option.MOON_I                          = Maanlicht Intensiteit
+option.SKYLIGHT_I                      = Luchtlicht Intensiteit
+option.BOUNCED_LIGHT_I                 = Gestuiterd Zonlicht Intensiteit
+option.CAVE_LIGHTING_I                 = Grot Felheid
+option.LIGHTNING_FLASH                 = Bliksemflits
+option.NETHER_USE_BIOME_COLOR          = Gebruik Bioomkleur
+option.NETHER_I                        = Omgevingsintensiteit
+option.NETHER_S                        = Omgevingsverzadiging
+option.NETHER_R                        = Rood
+option.NETHER_G                        = Groen
+option.NETHER_B                        = Blauw
+option.END_LIGHT_R                     = Rood
+option.END_LIGHT_G                     = Groen
+option.END_LIGHT_B                     = Blauw
+option.END_LIGHT_I                     = Licht Intensiteit
+option.END_AMBIENT_R                   = Rood
+option.END_AMBIENT_G                   = Groen
+option.END_AMBIENT_B                   = Blauw
+option.END_AMBIENT_I                   = Omgevingsintensiteit
+option.BLOCKLIGHT_R                    = Rood
+option.BLOCKLIGHT_G                    = Groen
+option.BLOCKLIGHT_B                    = Blauw
+option.BLOCKLIGHT_I                    = Bloklicht Intensiteit
+
+option.VOXEL_VOLUME_SIZE               = Voxel Volume Grootte
+option.VOXEL_VOLUME_SIZE.comment       = Wijzigt hoe ver weg gekleurde lichtbronnen zichtbaar zijn.\nKost veel prestaties. Ook beïnvloed door shaduwafstand.
+suffix.VOXEL_VOLUME_SIZE               = m
+option.VOXEL_VOLUME_CENTER             = Voxel Volume Midden
+option.VOXEL_VOLUME_CENTER.comment     = Wijzigt waar het midden van het voxel volume is.\n'Voor de speler' zorgt ervoor dat er meer zichtbaar is zonder prestatiekosten door het volume voor de speler te zetten.
+
+value.VOXEL_VOLUME_CENTER.VOXEL_VOLUME_CENTER_AHEAD  = Voor de speler
+value.VOXEL_VOLUME_CENTER.VOXEL_VOLUME_CENTER_PLAYER = In de speler
+
+suffix.shadowMapResolution             = ²
+suffix.sunPathRotation                 = °
+
+value.shadowDistance.48.0              = 3 chunks
+value.shadowDistance.64.0              = 4 chunks
+value.shadowDistance.80.0              = 5 chunks
+value.shadowDistance.96.0              = 6 chunks
+value.shadowDistance.112.0             = 7 chunks
+value.shadowDistance.128.0             = 8 chunks
+value.shadowDistance.144.0             = 9 chunks
+value.shadowDistance.160.0             = 10 chunks
+value.shadowDistance.176.0             = 11 chunks
+value.shadowDistance.192.0             = 12 chunks
+value.shadowDistance.208.0             = 13 chunks
+value.shadowDistance.224.0             = 14 chunks
+value.shadowDistance.240.0             = 15 chunks
+value.shadowDistance.256.0             = 16 chunks
+value.shadowDistance.320.0             = 20 chunks
+value.shadowDistance.384.0             = 24 chunks
+value.shadowDistance.512.0             = 32 chunks
+value.shadowDistance.768.0             = 48 chunks
+value.shadowDistance.1024.0            = 64 chunks
+value.shadowDistance.2048.0            = 128 chunks
+value.shadowDistance.4096.0            = 256 chunks
+
+# Sky settings
+
+option.VANILLA_SUN                     = Vanilla Zon
+option.VANILLA_MOON                    = Vanilla Maan
+option.SUN_ANGULAR_RADIUS              = Zon Radius
+option.MOON_ANGULAR_RADIUS             = Maan Radius
+option.SKY_GROUND                      = Donkere Luchthelft
+option.SKY_GROUND.comment              = Maakt de onderste helft van de lucht donkerder, alsof er een oneindige oceaan is.
+option.ATMOSPHERE_SATURATION_BOOST     = Atmosfeer Verzadiging Boost
+option.ATMOSPHERE_SATURATION_BOOST.comment              = Verhoogt de verzadiging van de lucht en zonlicht gebaseert op de tijd van de dag.
+option.ATMOSPHERE_SATURATION_BOOST_INTENSITY            = Atmosfeer Verzadiging Boost Intensiteit
+option.ATMOSPHERE_SATURATION_BOOST_INTENSITY.comment    = verandert de intensiteit van Atmosfeer Verzadiging Boost.
+option.STARS                           = Sterren
+option.STARS.comment                   = Sterren in de nachtlucht.
+option.STARS_INTENSITY                 = Intensiteit
+option.STARS_INTENSITY.comment         = Wijzigt de felheid van de sterren.
+option.STARS_COVERAGE                  = Dekking
+option.STARS_COVERAGE.comment          = Wijzigt het aantal sterren.
+option.GALAXY                          = Sterrenstelsel
+option.GALAXY.comment                  = Sterrenstelsel-afbeelding in de nachtlucht.
+option.GALAXY_INTENSITY                = Sterrenstelsel Intensiteit
+option.GALAXY_INTENSITY.comment        = Wijzigt de felheid van het sterrenstelsel.
+option.CREPUSCULAR_RAYS                = Schemerstralen
+option.CREPUSCULAR_RAYS.comment        = Schemerstralen vanuit de lucht.
+option.CREPUSCULAR_RAYS_INTENSITY      = Intensiteit
+option.CREPUSCULAR_RAYS_STEPS_HORIZON  = Stappen - Horizon
+option.CREPUSCULAR_RAYS_STEPS_ZENITH   = Stappen - Zenit
+option.LIGHTNING_FLASH                 = Bliksemflits
+option.RAINBOWS                        = Regenbogen
+option.END_SUN_EFFECT                  = End Zon Effect
+
+# Clouds
+option.CLOUDS_CUMULUS                       = Cumulus Wolken
+option.CLOUDS_CUMULUS.comment               = Laaghangende volumetrische wolken die cumulus-wolken moeten voorstellen.
+option.CLOUDS_CUMULUS_PRIMARY_STEPS_H       = Primaire Stappen - Horizon
+option.CLOUDS_CUMULUS_PRIMARY_STEPS_Z       = Primaire Stappen - Zenit
+option.CLOUDS_CUMULUS_LIGHTING_STEPS        = Licht Stappen
+option.CLOUDS_CUMULUS_AMBIENT_STEPS         = Omgevings Stappen
+option.CLOUDS_CUMULUS_ALTITUDE              = Hoogte
+suffix.CLOUDS_CUMULUS_ALTITUDE              = m
+option.CLOUDS_CUMULUS_THICKNESS             = Dikte
+option.CLOUDS_CUMULUS_DENSITY               = Dichtheid
+option.CLOUDS_CUMULUS_COVERAGE              = Dekking
+option.CLOUDS_CUMULUS_SIZE                  = Grootte
+option.CLOUDS_CUMULUS_DETAIL_STRENGTH       = Detail Intensiteit
+option.CLOUDS_CUMULUS_WIND_SPEED            = Windsnelheid
+suffix.CLOUDS_CUMULUS_ALTITUDE              = m/s
+option.CLOUDS_CUMULUS_WIND_ANGLE            = Windrichting
+suffix.CLOUDS_CUMULUS_ALTITUDE              = °
+option.CLOUDS_CUMULUS_PRECOMPUTE_LOCAL_COVERAGE         = Bereken Dekking Van Tevoren
+option.CLOUDS_CUMULUS_PRECOMPUTE_LOCAL_COVERAGE.comment = Optimalisatie voor cumulus-wolken. Limiteert de maximale afstand van wolken en kan artefacten met morphende wolkvormen wanneer de camera beweegt. Zet dit uit wanneer je een schermopname boven de wolken maakt.
+
+option.CLOUDS_ALTOCUMULUS                       = Altocumulus Wolken
+option.CLOUDS_ALTOCUMULUS.comment               = Volumetrische wolken op gemiddelde hoogte die altocumulus-wolken moeten voorstellen.
+option.CLOUDS_ALTOCUMULUS_PRIMARY_STEPS_H       = Primaire Stappen - Horizon
+option.CLOUDS_ALTOCUMULUS_PRIMARY_STEPS_Z       = Primaire Stappen - Zenit
+option.CLOUDS_ALTOCUMULUS_LIGHTING_STEPS        = Licht Stappen
+option.CLOUDS_ALTOCUMULUS_AMBIENT_STEPS         = Omgevings Stappen
+option.CLOUDS_ALTOCUMULUS_ALTITUDE              = Hoogte
+suffix.CLOUDS_ALTOCUMULUS_ALTITUDE              = m
+option.CLOUDS_ALTOCUMULUS_THICKNESS             = Dikte
+option.CLOUDS_ALTOCUMULUS_DENSITY               = Dichtheid
+option.CLOUDS_ALTOCUMULUS_COVERAGE              = Dekking
+option.CLOUDS_ALTOCUMULUS_SIZE                  = Grootte
+option.CLOUDS_ALTOCUMULUS_DETAIL_STRENGTH       = Detail Intensiteit
+option.CLOUDS_ALTOCUMULUS_WIND_SPEED            = Windsnelheid
+suffix.CLOUDS_ALTOCUMULUS_ALTITUDE              = m/s
+option.CLOUDS_ALTOCUMULUS_WIND_ANGLE            = Windrichting
+suffix.CLOUDS_ALTOCUMULUS_ALTITUDE              = °
+
+option.CLOUDS_CUMULUS_CONGESTUS                       = Cumulus Congestus Wolken
+option.CLOUDS_CUMULUS_CONGESTUS.comment               = Gigantische en verre volumetrische wolken. Deze verdwijnen wanneer je dichtbij komt.
+option.CLOUDS_CUMULUS_CONGESTUS_PRIMARY_STEPS_H       = Primaire Stappen - Horizon
+option.CLOUDS_CUMULUS_CONGESTUS_PRIMARY_STEPS_Z       = Primaire Stappen - Zenit
+option.CLOUDS_CUMULUS_CONGESTUS_LIGHTING_STEPS        = Licht Stappen
+option.CLOUDS_CUMULUS_CONGESTUS_AMBIENT_STEPS         = Omgevings Stappen
+option.CLOUDS_CUMULUS_CONGESTUS_ALTITUDE              = Hoogte
+suffix.CLOUDS_CUMULUS_CONGESTUS_ALTITUDE              = m
+option.CLOUDS_CUMULUS_CONGESTUS_THICKNESS             = Dikte
+option.CLOUDS_CUMULUS_CONGESTUS_DENSITY               = Dichtheid
+option.CLOUDS_CUMULUS_CONGESTUS_COVERAGE              = Dekking
+option.CLOUDS_CUMULUS_CONGESTUS_SIZE                  = Grootte
+option.CLOUDS_CUMULUS_CONGESTUS_DETAIL_STRENGTH       = Detail Intensiteit
+option.CLOUDS_CUMULUS_CONGESTUS_WIND_SPEED            = Windsnelheid
+suffix.CLOUDS_CUMULUS_CONGESTUS_ALTITUDE              = m/s
+option.CLOUDS_CUMULUS_CONGESTUS_WIND_ANGLE            = Windrichting
+suffix.CLOUDS_CUMULUS_CONGESTUS_ALTITUDE              = °
+
+option.CLOUDS_NOCTILUCENT              = Noctilucent Wolken
+
+option.BLOCKY_CLOUDS                   = Blokkerige Wolken
+option.BLOCKY_CLOUDS.comment           = Vanilla-achtige volumetrische wolken. Schakelt alle andere wolktypen uit.
+option.BLOCKY_CLOUDS_LAYER_2           = Tweede Wolklaag
+option.BLOCKY_CLOUDS_LAYER_2.comment   = Een tweede laag aan blokkerige wolken. Verdubbelt de prestatiekosten van de wolken.
+option.BLOCKY_CLOUDS_THICKNESS         = Dikte
+option.BLOCKY_CLOUDS_THICKNESS.comment = Wijzigt de dikte van de wolken.
+option.BLOCKY_CLOUDS_ALTITUDE          = Hoogte
+option.BLOCKY_CLOUDS_ALTITUDE.comment  = Wijzigt de hoogte van de wolken.
+option.BLOCKY_CLOUDS_ALTITUDE_2        = Tweede Laag Hoogte
+option.BLOCKY_CLOUDS_ALTITUDE_2.comment = Wijzigt de hoogte van de tweede laag wolken.
+option.BLOCKY_CLOUDS_ROUNDNESS         = Rondheid
+option.BLOCKY_CLOUDS_ROUNDNESS.comment = De rondheid van de blokkerige wolken.
+option.BLOCKY_CLOUDS_SHARPNESS         = Sherpte
+option.BLOCKY_CLOUDS_SHARPNESS.comment = De scherpte van de blokkerige wolken.
+
+option.CLOUDS_TEMPORAL_UPSCALING       = Accumulerende Opschaling
+option.CLOUDS_TEMPORAL_UPSCALING.comment = Vermindert de prestatiekosten van de wolken enorm door middel van frame-accumulatie, maar creëert artefacten.
+option.CLOUDS_AERIAL_PERSPECTIVE_BOOST = Luchtperspectief Boost
+option.CLOUDS_SCALE                    = Grootte
+option.CLOUDS_SCALE.comment            = Wijzigt de hoogte en grootte van de wolken zodat ze bereikbaar zijn in normale gameplay. Bij een grootte van 1x is de eerste laag wolken op een hoogte van 800 blokken.
+suffix.CLOUDS_SCALE                    = ×
+value.CLOUDS_TEMPORAL_UPSCALING.1      = Uit
+value.CLOUDS_TEMPORAL_UPSCALING.2      = 4×
+value.CLOUDS_TEMPORAL_UPSCALING.3      = 9×
+value.CLOUDS_TEMPORAL_UPSCALING.4      = 16×
+
+option.CLOUDS_CIRRUS                       = Cirrus/Cirrocumulus Wolken
+option.CLOUDS_CIRRUS.comment               = Vlakke cirrus and cirrocumulus wolken
+option.CLOUDS_CIRRUS_LIGHTING_STEPS        = Licht Stappen
+option.CLOUDS_CIRRUS_AMBIENT_STEPS         = Omgevings Stappen
+option.CLOUDS_CIRRUS_ALTITUDE              = Hoogte
+suffix.CLOUDS_CIRRUS_ALTITUDE              = m
+option.CLOUDS_CIRRUS_THICKNESS             = Dikte
+option.CLOUDS_CIRRUS_DENSITY               = Cirrus Dichtheid
+option.CLOUDS_CIRRUS_COVERAGE              = Cirrus Dekking
+option.CLOUDS_CIRRUS_SIZE                  = Cirrus Grootte
+option.CLOUDS_CIRRUS_DETAIL_STRENGTH       = Cirrus Detail Intensiteit
+option.CLOUDS_CIRRUS_CURL_STRENGTH         = Cirrus Krul Intensiteit
+option.CLOUDS_CIRRUS_WIND_SPEED            = Windsnelheid
+suffix.CLOUDS_CIRRUS_ALTITUDE              = m/s
+option.CLOUDS_CIRRUS_WIND_ANGLE            = Windrichting
+suffix.CLOUDS_CIRRUS_ALTITUDE              = °
+option.CLOUDS_CIRROCUMULUS_DENSITY         = Cirrocumulus Dichtheid
+option.CLOUDS_CIRROCUMULUS_COVERAGE        = Cirrocumulus Dekking
+option.CLOUDS_CIRROCUMULUS_SIZE            = Cirrocumulus Grootte
+option.CLOUDS_CIRROCUMULUS_DETAIL_STRENGTH = Cirrocumulus Detail Intensiteit
+option.CLOUDS_CIRROCUMULUS_CURL_STRENGTH   = Cirrocumulus Krul Intensiteit
+
+option.CLOUDS_NOCTILUCENT_INTENSITY    = Intensiteit
+option.CLOUDS_NOCTILUCENT_RARITY       = Zeldzaamheid
+
+option.AURORA_NORMAL                   = Aurora In Elk Bioom
+option.AURORA_SNOW                     = Aurora In Sneeuwerige Biomen
+option.AURORA_BRIGHTNESS               = Aurora Felheid
+option.AURORA_FREQUENCY                = Aurora Frequentie
+option.AURORA_CLOUD_LIGHTING           = Wolklicht Contributie
+option.AURORA_GROUND_LIGHTING          = Grondlicht Contributie
+
+value.AURORA_NORMAL.AURORA_NEVER       = Nooit
+value.AURORA_NORMAL.AURORA_RARELY      = Zelden
+value.AURORA_NORMAL.AURORA_ALWAYS      = Altijd
+
+value.AURORA_SNOW.AURORA_NEVER         = Nooit
+value.AURORA_SNOW.AURORA_RARELY        = Zelden
+value.AURORA_SNOW.AURORA_ALWAYS        = Altijd
+
+# Fog settings
+
+option.BORDER_FOG                      = Chunk Rand Mist
+option.BORDER_FOG.comment              = Een heel dikke mist aan de randen van de render distance.
+option.CAVE_FOG                        = Grot Mist
+option.CAVE_FOG.comment                = Een lichte en licht gloeiende mist die ondergronds ontstaat. Dit zorgt voor sfeervolle en zichtbare grotten.
+option.BLOOMY_FOG                      = Mist Gloed
+option.BLOOMY_FOG.comment              = Intense gloed in de mist. Dit geeft de illusie van lichtstrooing in de mist en maakt de omgeving achter felle voorwerpen helderder.
+option.BLOOMY_FOG_INTENSITY            = Mist Gloed Intensiteit
+option.BLOOMY_FOG_INTENSITY.comment    = Wijzigt de intensiteit van Gloed Mist.
+option.OVERWORLD_FOG_INTENSITY         = Overworld Mist Intensiteit
+option.NETHER_FOG_INTENSITY            = Nether Mist Intensiteit
+option.VL                              = Volumetrische Mist
+option.LPV_VL.comment                  = Lichtbronnen belichten de mist. Vereist Gekleurde Lichtbronnen!
+option.VL.comment                      = Voegt lichtstralen en variabele mist-dichtheid toe.
+option.VL_RENDER_SCALE                 = VM Resolutie Vermenigvuldiger
+option.AIR_FOG_CLOUDY_NOISE            = Wolkerige Mist
+option.AIR_FOG_CLOUDY_NOISE.comment    = Subtiele wolkerige vormen in de mist voor een interessanter resultaat.\nVereist Volumetrische Mist!
+option.AIR_FOG_COLORED_LIGHT_SHAFTS    = Gekleurde Lichtstralen
+option.AIR_FOG_COLORED_LIGHT_SHAFTS.comment = Lichtstralen die door doorzichtige voorwerpen gaan worden gekleurd.
+
+# LPV VL
+option.LPV_VL                          = Gekleurde Lichtbronnen Mist-verstrooing
+option.LPV_VL_STEPS                    = Stappen
+option.LPV_VL_INTENSITY_OVERWORLD      = Overworld Intensiteit
+option.LPV_VL_INTENSITY_UNDERGROUND    = Underground Intensiteit
+option.LPV_VL_INTENSITY_NETHER         = Nether Intensiteit
+option.LPV_VL_INTENSITY_END            = End Intensiteit
+
+# Rayleigh Fog
+option.AIR_FOG_RAYLEIGH_FALLOFF_START     = Rayleigh Vervaging Start
+option.AIR_FOG_RAYLEIGH_FALLOFF_START.comment = Hoogte boven het zeeniveau waar de rayleigh-mist begint de vervagen.
+option.AIR_FOG_RAYLEIGH_FALLOFF_HALF_LIFE = Rayleigh Vervaging Halfwaardetijd
+option.AIR_FOG_RAYLEIGH_FALLOFF_HALF_LIFE.comment = Hoogte tussen halveringen van de dichtheid van de rayleigh-mist.
+
+option.AIR_FOG_RAYLEIGH_DENSITY        = Normale Dichtheid
+option.AIR_FOG_RAYLEIGH_R              = §4Rood
+option.AIR_FOG_RAYLEIGH_G              = §2Groen
+option.AIR_FOG_RAYLEIGH_B              = §1Blauw
+
+option.AIR_FOG_RAYLEIGH_DENSITY_RAIN   = Regen Dichtheid
+option.AIR_FOG_RAYLEIGH_R_RAIN         = §4Rood
+option.AIR_FOG_RAYLEIGH_G_RAIN         = §2Groen
+option.AIR_FOG_RAYLEIGH_B_RAIN         = §1Blauw
+
+option.AIR_FOG_RAYLEIGH_DENSITY_ARID   = Dor/Woestijn Dichtheid
+option.AIR_FOG_RAYLEIGH_R_ARID         = §4Rood
+option.AIR_FOG_RAYLEIGH_G_ARID         = §2Groen
+option.AIR_FOG_RAYLEIGH_B_ARID         = §1Blauw
+
+option.AIR_FOG_RAYLEIGH_DENSITY_SNOWY  = Sneeuwerig Dichtheid
+option.AIR_FOG_RAYLEIGH_R_SNOWY        = §4Rood
+option.AIR_FOG_RAYLEIGH_G_SNOWY        = §2Groen
+option.AIR_FOG_RAYLEIGH_B_SNOWY        = §1Blauw
+
+option.AIR_FOG_RAYLEIGH_DENSITY_TAIGA  = Taiga Dichtheid
+option.AIR_FOG_RAYLEIGH_R_TAIGA        = §4Rood
+option.AIR_FOG_RAYLEIGH_G_TAIGA        = §2Groen
+option.AIR_FOG_RAYLEIGH_B_TAIGA        = §1Blauw
+
+option.AIR_FOG_RAYLEIGH_DENSITY_JUNGLE = Jungle Dichtheid
+option.AIR_FOG_RAYLEIGH_R_JUNGLE       = §4Rood
+option.AIR_FOG_RAYLEIGH_G_JUNGLE       = §2Groen
+option.AIR_FOG_RAYLEIGH_B_JUNGLE       = §1Blauw
+
+option.AIR_FOG_RAYLEIGH_DENSITY_SWAMP  = Moeras Dichtheid
+option.AIR_FOG_RAYLEIGH_R_SWAMP        = §4Rood
+option.AIR_FOG_RAYLEIGH_G_SWAMP        = §2Groen
+option.AIR_FOG_RAYLEIGH_B_SWAMP        = §1Blauw
+
+# Mie Fog
+option.AIR_FOG_MIE_DENSITY_MORNING     = Ochtend Dichtheid
+option.AIR_FOG_MIE_DENSITY_NOON        = Middag Dichtheid
+option.AIR_FOG_MIE_DENSITY_EVENING     = Avond Dichtheid
+option.AIR_FOG_MIE_DENSITY_MIDNIGHT    = Middernacht Dichtheid
+option.AIR_FOG_MIE_DENSITY_RAIN        = Regen Dichtheid
+option.AIR_FOG_MIE_DENSITY_BLUE_HOUR   = Zonsonder/op-gang Dichtheid
+option.AIR_FOG_MIE_FALLOFF_START          = Hoogte Vervaging Start
+option.AIR_FOG_MIE_FALLOFF_START.comment  = Hoogte boven het zeeniveau waar de mie-mist begint de vervagen.
+option.AIR_FOG_MIE_FALLOFF_HALF_LIFE      = Hoogte Vervaging Halfwaardetijd
+option.AIR_FOG_MIE_FALLOFF_HALF_LIFE.comment = Hoogte tussen halveringen van de dichtheid van de mie-mist.
+
+
+# Materials settings
+
+option.NORMAL_MAPPING                  = Normal Mapping
+option.NORMAL_MAPPING.comment          = Of de shader 'normal maps' van het bronpakket moet gebruiken.
+option.SPECULAR_MAPPING                = Specular Mapping
+option.SPECULAR_MAPPING.comment        = Of de shader 'specular maps' van het bronpakket moet gebruiken.
+option.POM                             = Parralax-Occlusie Mapping
+option.POM.comment                     = Creëert een nep 3D-effect op de oppervlakte van blokken door middel van lagen.
+option.TEXTURE_FORMAT                  = Textuur-format
+option.TEXTURE_FORMAT.comment          = Het textuur-format dat het bronpakket gebruikt. De meeste moderne bronpakketten gebruiken labPBR, en oude bronpakketten gebruiken waarschijnlijk OldPBR.
+option.HARDCODED_SPECULAR              = Ingebouwde Specular
+option.HARDCODED_SPECULAR.comment      = Ingebouwde 'specular' reflecties voor sommige blokken zoals metaal.
+option.HARDCODED_EMISSION              = Ingebouwde Emissie
+option.HARDCODED_EMISSION.comment      = Ingebouwde emissie voor sommige blokken zoals fakkels.
+option.HARDCODED_SSS                   = Ingebouwde SSS
+option.HARDCODED_SSS.comment           = Ingebouwde 'subsurface scattering' voor sommige blokken zoals bladeren
+option.RAIN_PUDDLES                    = Regenplassen
+option.EMISSION_STRENGTH               = Emissie Intensiteit
+option.EMISSION_STRENGTH.comment       = verandert de intensiteit van de emissie. Dit verandert alleen de felheid van het blok zelf. Het geworpen licht blijft even fel.
+option.DIRECTIONAL_LIGHTMAPS           = Directionele Lichtmappen
+option.DIRECTIONAL_LIGHTMAPS.comment   = Zorgt ervoor dat licht reageert op de 'normal maps' van blokken. Dit creëert een nep-effect dat licht op randen in bloktexturen schijnt.
+option.DIRECTIONAL_LIGHTMAPS_INTENSITY = Directionele Lichtmappen Intensiteit
+option.DIRECTIONAL_LIGHTMAPS_INTENSITY.comment = Wijzigt de intensiteit van Directionele Lichtmappen
+option.POM_DEPTH                       = Parallax Diepte
+option.POM_DEPTH.comment               = Wijzigt hoe ver de Parralax Occlusie-Mapping in een blok kan gaan.
+option.POM_SAMPLES                     = Parallax Kwaliteit
+option.POM_SAMPLES.comment             = Wijzigt de kwaliteit van POM door meer lagen toe te voegen. Hogere waarden kosten meer prestaties!
+option.POM_SHADOW                      = POM Zelf-Beschaduwing
+option.POM_SHADOW.comment              = Zelf-beschaduwing voor POM. Vereist 'Specular Mapping'!
+option.POM_SHADOW_SAMPLES              = POM Zelf-Beschaduwing Kwaliteit
+option.POM_SHADOW_SAMPLES.comment      = Wijzigt de kwaliteit van POM Zelf-beschaduwing. Hogere waarden kosten veel meer prestaties!
+option.POM_SLOPE_NORMALS               = POM Hellingen
+option.POM_DISTANCE                    = POM Afstand
+option.REFRACTION                      = Refractie
+value.REFRACTION.REFRACTION_OFF        = Uit
+value.REFRACTION.REFRACTION_ALL        = Alles
+value.REFRACTION.REFRACTION_WATER_ONLY = Alleen Bij Water
+option.REFRACTION_INTENSITY            = Refractie Intensiteit
+option.REFRACTION_INTENSITY.comment    = Wijzigt de intensiteit van refractie bij water.
+
+suffix.POM_DEPTH                       = m
+suffix.POM_DISTANCE                    = m
+
+value.TEXTURE_FORMAT.TEXTURE_FORMAT_LAB = labPBR
+value.TEXTURE_FORMAT.TEXTURE_FORMAT_OLD = OldPBR
+
+option.ENVIRONMENT_REFLECTIONS         = Omgeving Reflecties
+option.ENVIRONMENT_REFLECTIONS.comment = Reflecties van de omgeving op oppervlakken. Reflecties kunnen alleen blokken op het scherm bevatten. Kost redelijk veel prestaties!
+option.SKY_REFLECTIONS                 = Lucht reflecties
+option.SKY_REFLECTIONS.comment         = Reflecties van de lucht op oppervlakken.
+option.SSR_ROUGHNESS_SUPPORT           = Ruwheid Ondersteuning
+option.SSR_ROUGHNESS_SUPPORT.comment   = Maakt reflecties op ruwe oppervlakken echt ruw. Kost heel veel prestaties!
+option.SSR_RAY_COUNT                   = Ray Aantal
+option.SSR_RAY_COUNT.comment           = Het aantal 'rays' gebruikt voor ruwe reflecties. Hoge waarden kosten veel meer prestaties maar verminderen ruis.
+option.SSR_INTERSECTION_STEPS_SMOOTH   = Reflectie Stappen - Glad
+option.SSR_INTERSECTION_STEPS_SMOOTH.comment = Wijzigt de maximale aftstand die gladde reflecties weergeven. Lage prestatiekosten.
+option.SSR_INTERSECTION_STEPS_ROUGH    = Reflectie Stappen - Ruw
+option.SSR_INTERSECTION_STEPS_ROUGH.comment = Wijzigt de maximale aftstand die ruwe reflecties weergeven. Lage prestatiekosten.
+option.SSR_REFINEMENT_STEPS            = Verfijning Stappen
+option.SSR_REFINEMENT_STEPS.comment    = Wijzigt de precisie en mooiheid van alle reflecties. Lage prestatiekosten.
+option.SSR_ROUGHNESS_THRESHOLD         = Ruwheid Drempelwaarde
+option.SSR_ROUGHNESS_THRESHOLD.comment = Wijzigt hoe ruw een oppervlakte volgens het bronpakket moet zijn voordat reflecties optreden.
+
+# Water settings
+
+option.WATER_CAUSTICS                  = Water Caustics
+option.WATER_CAUSTICS.comment          = Dansende lichtpatronen onderwater die de buiging van het licht door de golven moeten voorstellen.
+option.WATER_CAUSTICS_INTENSITY        = Water Caustics Intensiteit
+option.WATER_CAUSTICS.comment          = Wijzigt de felheid van Water Caustics.
+option.WATER_EDGE_HIGHLIGHT            = Water Rand Highlight
+option.WATER_EDGE_HIGHLIGHT.comment    = Witte rand waar het water het land raakt. Dit helpt soms met het water beter zichtbaar maken.
+option.WATER_EDGE_HIGHLIGHT_INTENSITY  = Water Rand Highlight Intensiteit
+option.SNELLS_WINDOW                   = Snell's Window
+option.SNELLS_WINDOW.comment           = Totale reflectie onderwater, behalve in een bol rond de speler. Kost nauwelijks prestaties.
+option.WATER_TEXTURE                   = Water Textuur
+option.WATER_TEXTURE.comment           = Hoe de shader de vanilla watertextuur moet gebruiken.\n\nUit: Geen water textuur.\nHighlights: De textuur wordt gebruikt voor highlights.\nVanilla: De textuur wordt volledig gebruikt.
+option.BIOME_WATER_COLOR               = Bioom-gekleurd Water
+option.BIOME_WATER_COLOR.comment       = Water adsorbtie houdt rekening met de kleur van het bioom.
+
+value.WATER_TEXTURE.WATER_TEXTURE_OFF                   = Uit
+value.WATER_TEXTURE.WATER_TEXTURE_HIGHLIGHT             = Highlights
+value.WATER_TEXTURE.WATER_TEXTURE_VANILLA               = Vanilla
+value.WATER_TEXTURE.WATER_TEXTURE_HIGHLIGHT_UNDERGROUND = Highlights (Alleen ondergronds)
+
+option.WATER_WAVES                     = Water Golven
+option.WATER_WAVE_ITERATIONS           = Ruis Lagen
+option.WATER_WAVE_STRENGTH             = Intensiteit
+option.WATER_WAVE_FREQUENCY            = Grootte
+option.WATER_WAVE_SPEED_STILL          = Snelheid (Stilstaand)
+option.WATER_WAVE_SPEED_FLOWING        = Snelheid (Vloeiend)
+option.WATER_WAVE_PERSISTENCE          = Vasthoudendheid
+option.WATER_WAVE_LACUNARITY           = Laag Grootte Vermenigvuldiger
+option.WATER_PARALLAX                  = Water Parallax
+option.WATER_PARALLAX.comment          = Laat golven er echt 3D uit zien.
+option.WATER_DISPLACEMENT              = Water Verplaatsing
+option.WATER_DISPLACEMENT.comment      = Verplaatst de geometrie van het water zodat de kust er minder vlak en saai uit ziet.
+option.WATER_WAVES_HEIGHT_VARIATION           = Locale Hoogte Variatie
+option.WATER_WAVES_HEIGHT_VARIATION.comment   = Een grote ruislaag om golven minder repetitief te maken.
+
+option.WATER_ABSORPTION_R              = Rood Adsorptie
+option.WATER_ABSORPTION_G              = Groen Adsorptie
+option.WATER_ABSORPTION_B              = Blauw Adsorptie
+option.WATER_SCATTERING                = Verstrooing
+
+option.WATER_ABSORPTION_R_UNDERWATER   = Rood Adsorptie - Onderwater
+option.WATER_ABSORPTION_G_UNDERWATER   = Groen Adsorptie - Onderwater
+option.WATER_ABSORPTION_B_UNDERWATER   = Blauw Adsorptie - Onderwater
+option.WATER_SCATTERING_UNDERWATER     = Verstrooing - Onderwater
+
+# Post-processing settings
+
+option.BLOOM                           = Gloed
+option.BLOOM.comment                   = Een zachte gloed rond felle voorwerpen.
+option.BLOOM_INTENSITY                 = Gloed Intensiteit
+option.BLOOM_INTENSITY.comment         = Wijzigt de intensiteit van Gloed.
+option.DOF                             = Scherptediepte (DoF)
+option.DOF.comment                     = Een focus effect, voorwerpen buiten focus worden vervaagd.
+option.DOF_INTENSITY                   = DoF Intensiteit
+option.DOF_INTENSITY.comment           = Wijzigt de intensiteit van scherptediepte.
+option.DOF_SAMPLES                     = DoF Kwaliteit
+option.DOF_SAMPLES.comment             = Wijzigt de kwaliteit van DoF, hogere waarden maken de vervaging mooier maar kosten meer prestaties.
+option.DOF_FOCUS                       = DoF Focus
+option.DOF_FOCUS.comment               = De afstand vanaf de speler waar de focus van scherptediepte ligt.
+option.MOTION_BLUR                     = Bewegingsvervaging
+option.MOTION_BLUR.comment             = Vervaagt snel bewegende voorwerpen. Dit kan lage framerates vloeiender laten lijken, maar kan ook misselijkheid veroorzaken.
+option.MOTION_BLUR_INTENSITY           = Motion Blur Intensiteit
+option.MOTION_BLUR_INTENSITY.comment   = Wijzigt de intensiteit van bewegegingsvervaging.
+option.TAA                             = TAA
+option.TAA.comment                     = 'Temporal Anti-Aliasing', gebruikt frame-accumulatie om de afbeelding soepeler en mooier te laten lijken en ruis te verminderen. Veroorzaakt soms helaas 'ghosting'.
+option.FXAA                            = FXAA
+option.FXAA.comment                    = 'Fast Approximate Anti-Aliasing', gebruikt een algoritme om randen soepeler te laten lijken. Werkt samen met TAA en werkt enorm goed voor TAAU.
+option.TAAU                            = TAA Opschaling (TAAU)
+option.TAAU.comment                    = Berekent het beeld op een lagere resolutie en schaalt het vervolgens op door midden van TAA. Dit kan prestaties verbeteren maar verliest bij lage waarden details. Vereist TAA!
+option.TAAU_RENDER_SCALE               = TAAU Schaal
+option.TAAU_RENDER_SCALE.comment       = De resolutie-vermenigvuldiger voor TAAU. Lagere waarden verbeteren prestaties maar verliezen details.
+option.CAS                             = Beeldverscherping
+option.CAS.comment                     = Maakt het beeld scherper door middel van 'Contrast-adaptive Sharpening'. Dit maakt simpelweg de randen tussen kleuren iets lichter.
+option.CAS_INTENSITY                   = Beeldverscherping Intensiteit
+option.CAS_INTENSITY.comment           = Wijzigt de intensiteit van Beeldverscherping.
+option.VIGNETTE                        = Vignette
+option.VIGNETTE.comment                = Maakt de randen van het scherm donkerder.
+option.VIGNETTE_INTENSITY              = Vignette Intensiteit
+option.VIGNETTE_INTENSITY.comment      = Wijzigt de intensiteit van Vignette.
+
+value.DOF_FOCUS.-1.0                   = Automatisch
+
+option.tonemap                         = Tonemap Operator
+
+value.tonemap.tonemap_aces_fit         = ACES Fit
+value.tonemap.tonemap_aces_full        = ACES Full
+value.tonemap.tonemap_hejl_2015        = Hejl 2015
+value.tonemap.tonemap_hejl_burgess     = Hejl-Burgess
+value.tonemap.tonemap_lottes           = Lottes
+value.tonemap.tonemap_uncharted_2      = Uncharted 2
+value.tonemap.tonemap_tech             = Tech
+value.tonemap.tonemap_ozius            = Ozius
+value.tonemap.tonemap_reinhard         = Reinhard
+value.tonemap.tonemap_reinhard_jodie   = Reinhard-Jodie
+
+# Color Grading
+
+option.GRADE_BRIGHTNESS                = Felheid
+option.GRADE_CONTRAST                  = Contrast
+option.GRADE_SATURATION                = Verzadiging
+option.GRADE_WHITE_BALANCE             = Wit Balans
+option.GRADE_ORANGE_SAT_BOOST          = Oranje Verzadiging Boost
+option.GRADE_TEAL_SAT_BOOST            = Cyaan Verzadiging Boost
+option.GRADE_GREEN_SAT_BOOST           = Groen Verzadiging Boost
+option.GRADE_GREEN_HUE_SHIFT           = Groen Tintverschuiving
+option.GRADE_GREEN_HUE_SHIFT.comment   = Verschuift de groene tinten op het scherm. Een hogere waarde maakt ze blauwer, een lagere waarde maakt ze geler.
+suffix.GRADE_WHITE_BALANCE             = K
+suffix.GRADE_GREEN_HUE_SHIFT           = °
+
+option.PURKINJE_SHIFT                  = Purkinj-effect
+option.PURKINJE_SHIFT.comment          = Simuleert het effect van duisternis op menselijk beeld, vermindert de verzadiging van elke kleur en maakt rode tinten donkerder in donker belichting.
+option.PURKINJE_SHIFT_INTENSITY        = Purkinje-effect Intensiteit
+
+# Exposure
+
+option.AUTO_EXPOSURE                         = Automatische Belichting
+option.AUTO_EXPOSURE_BIAS                    = Belichting Aanpassing
+option.AUTO_EXPOSURE_MIN                     = Minimum Belichting
+option.AUTO_EXPOSURE_MAX                     = Maximum Belichting
+option.AUTO_EXPOSURE_RATE_DIM_TO_BRIGHT      = Belichting Snelheid - Toenemend
+option.AUTO_EXPOSURE_RATE_BRIGHT_TO_DIM      = Belichting Snelheid - Afnemend
+option.MANUAL_EXPOSURE_VALUE                 = Handmatige Belichting Waarde
+option.MANUAL_EXPOSURE_USE_SCREEN_BRIGHTNESS = Gebruik Helderheids Instelling
+option.MANUAL_EXPOSURE_USE_SCREEN_BRIGHTNESS.comment = Gebruikt de helderheids instelling van vanilla minecraft om de belichting aan te passen.
+option.HISTOGRAM_BINS                        = Histogram Bins
+option.HISTOGRAM_TARGET                      = Histogram CDF Doel
+option.HISTOGRAM_TARGET.commend              = Past het doel van het Histogram aan, hogere waarden betekent een donkerdere afbeelding.
+
+value.AUTO_EXPOSURE.AUTO_EXPOSURE_SIMPLE    = Simpel
+value.AUTO_EXPOSURE.AUTO_EXPOSURE_HISTOGRAM = Histogram
+value.AUTO_EXPOSURE.AUTO_EXPOSURE_OFF       = Uit
+
+# Misc settings
+
+option.DEBUG_VIEW                      = Debug Weergave
+option.DEBUG_SAMPLER                   = Debug Sampler
+option.WHITE_WORLD                     = Witte Wereld
+option.WHITE_WORLD.comment             = Maakt (bijna?) elke textuur wit.
+option.TONEMAP_COMPARISON              = Tonemap Vergelijking
+option.TONEMAP_COMPARISON.comment      = Vergelijk twee Tonemaps, eentje links en een andere rechts.
+option.tonemap_left                    = Linker Tonemap
+option.tonemap_right                   = Rechter Tonemap
+option.FANCY_NETHER_PORTAL             = Fraai Nether Portaal
+option.FANCY_NETHER_PORTAL.comment     = Fraai nether portaal gebaseerd op het effect van Complementary Shaders. Hartelijk dank aan Emin voor toestemming om dit effect te gebruiken.
+option.CUSTOM_SKY                      = Aangepaste Lucht
+option.CUSTOM_SKY.comment              = Zet de aangepaste lucht van het bronpakket aan.
+option.CUSTOM_SKY_BRIGHTNESS           = Aangepaste Lucht Felheid
+option.CUSTOM_SKY_BRIGHTNESS.comment   = Wijzigt de felheid van de aangepaste lucht.
+option.DH_OVERDRAW_DISTANCE            = Overdraw Afstand
+option.DH_OVERDRAW_FADE_LENGTH         = Overdraw Vervagingslengte
+option.NOISE_ON_DH_TERRAIN             = Ruis Op DH Terrein
+option.ENCHANTMENT_GLINT_BRIGHTNESS    = Betoverings-glans Felheid
+option.USE_SEPARATE_ENTITY_DRAWS       = Gebruik "Separate Entity Draws"
+comment.USE_SEPARATE_ENTITY_DRAWS      = 'Seperate Entity Draws" is een Iris-feature die shaderpacks die 'deferred-forward hybrid shading' (zoals photon) gebruiken om doorzichtige voorwerpen en andere dingen goed weer te geven. Helaas kan het wat problemen veroorzaken. Verwacht dus weergave-problemen.
+option.DITHERED_TRANSLUCENCY_FALLBACK  = 'Dithered' Doorzichtigheid-fix
+comment.DITHERED_TRANSLUCENCY_FALLBACK = Gebruikt een andere manier om doorzichtigheid tóch mogelijk te maken als 'Seperate Entity Draws' aanstaat. 
+
+value.DEBUG_VIEW.DEBUG_VIEW_NONE       = Uit
+value.DEBUG_VIEW.DEBUG_VIEW_SAMPLER    = Sampler
+value.DEBUG_VIEW.DEBUG_VIEW_HISTOGRAM  = Histogram
+value.DEBUG_VIEW.DEBUG_VIEW_WEATHER    = Weer
+
+value.tonemap_left.tonemap_aces_fit       = ACES Fit
+value.tonemap_left.tonemap_aces_full      = ACES Full
+value.tonemap_left.tonemap_lottes         = Lottes
+value.tonemap_left.tonemap_hejl_2015      = Hejl 2015
+value.tonemap_left.tonemap_hejl_burgess   = Hejl-Burgess
+value.tonemap_left.tonemap_uncharted_2    = Uncharted 2
+value.tonemap_left.tonemap_tech           = Tech
+value.tonemap_left.tonemap_ozius          = Ozius
+value.tonemap_left.tonemap_reinhard       = Reinhard
+value.tonemap_left.tonemap_reinhard_jodie = Reinhard-Jodie
+
+value.tonemap_right.tonemap_aces_fit       = ACES Fit
+value.tonemap_right.tonemap_aces_full      = ACES Full
+value.tonemap_right.tonemap_lottes         = Lottes
+value.tonemap_right.tonemap_hejl_burgess   = Hejl-Burgess
+value.tonemap_right.tonemap_hejl_2015      = Hejl 2015
+value.tonemap_right.tonemap_uncharted_2    = Uncharted 2
+value.tonemap_right.tonemap_tech           = Tech
+value.tonemap_right.tonemap_ozius          = Ozius
+value.tonemap_right.tonemap_reinhard       = Reinhard
+value.tonemap_right.tonemap_reinhard_jodie = Reinhard-Jodie
+
+# Distance View 
+
+option.DISTANCE_VIEW                   = Afstandsweergave
+option.DISTANCE_VIEW_METHOD            = Methode
+option.DISTANCE_VIEW_MAX_DISTANCE      = Maximale Afstand
+suffix.DISTANCE_VIEW_MAX_DISTANCE      = m
+
+value.DISTANCE_VIEW_METHOD.DISTANCE_VIEW_DISTANCE = Afstand
+value.DISTANCE_VIEW_METHOD.DISTANCE_VIEW_DEPTH    = Diepte
+
+# Box
+
+option.BOX_MODE                 = Modus
+option.BOX_MODE.comment         = Selectievak Modus
+value.BOX_MODE.BOX_MODE_NONE    = Normaal
+value.BOX_MODE.BOX_MODE_COLOR   = Aangepaste Kleur
+value.BOX_MODE.BOX_MODE_RAINBOW = Regenboog
+option.BOX_COLOR_R              = Rood
+option.BOX_COLOR_G              = Groen
+option.BOX_COLOR_B              = Blauw
+option.BOX_EMISSION             = Emissie
+option.BOX_EMISSION.comment     = Maakt de kleur nog feller. Vereist Gloed.
+option.BOX_LINE_WIDTH           = Lijn Dikte

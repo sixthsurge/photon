@@ -9,14 +9,17 @@
 ## Acknowledgments
 
 * Menu translations: 
-  * [NakiriRuri](https://github.com/NakiriRuri) and [OrzMiku](https://github.com/Orzmiku) (Chinese)
-  * [Jmayk](https://github.com/Jmayk-dev) (Italian)
-  * [Timtaran](https://github.com/Timtaran) (Russian)
+  * [NakiriRuri](https://github.com/NakiriRuri) and [OrzMiku](https://github.com/Orzmiku) - Chinese Simplified (China; Mandarin)
+  * [ChunghwhaMC](https://github.com/ChunghwaMC) - Chinese Traditional (Taiwan; Mandarin)
+  * [Jmayk](https://github.com/Jmayk-dev) - Italian
+  * [Timtaran](https://github.com/Timtaran) - Russian
+  * sincerity - Estonian
+  * Patatagod69 - Dutch
 * [Emin](https://github.com/EminGT) - Shadow bias method from [Complementary Reimagined](https://www.complementary.dev/shaders/) (fully fixes peter panning and light leaking underground!)
 * [DrDesten](https://github.com/DrDesten) - Depth tolerance calculation for SSR (helps to prevent false reflections)
 * [Jessie](https://github.com/Jessie-LC) - f0 and f82 values for labPBR hardcoded metals
 * [Sledgehammer Games](https://www.sledgehammergames.com/) - Bloom downsampling method used in Call of Duty Advanced Warfare (described [here](http://www.iryoku.com/next-generation-post-processing-in-call-of-duty-advanced-warfare))
-* http://momentsingraphics.de/ - Blue noise texture
+* http://momentsingrapics.de/ - Blue noise texture
 * [NASA Scientific Visualization Studio](https://svs.gsfc.nasa.gov/4851) - Galaxy image
 
 ## Installation

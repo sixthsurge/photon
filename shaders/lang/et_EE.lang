@@ -1,0 +1,748 @@
+# Profiles
+
+profile.low                            = §eMadal
+profile.medium                         = §aKeskmine
+profile.high                           = §bKõrge
+profile.ultra                          = §dÜlikõrge
+
+# Screens
+
+screen.world                           = Maailm
+screen.lighting                        = Valgustus
+screen.sky                             = Taevas
+screen.fog                             = Udu
+screen.materials                       = Materjalid
+screen.water                           = Vesi
+screen.post                            = Järeltöötlus
+screen.misc                            = Muu
+
+screen.weather                         = Ilm
+screen.colored_lights                  = Värviliste tulede seaded
+screen.rp_settings                     = Ressurssipaki seaded
+screen.reflections                     = Peegeldused
+screen.refraction                      = Murdumine
+screen.light_sources                   = Valgusallikad
+screen.shadows                         = Varjud
+screen.ao                              = Ümbritsev varjutus
+screen.color_grading                   = Värvikorrektsioon
+screen.exposure                        = Valgustus
+screen.lpv_vl                          = Värviliste tulede udu hajumine
+screen.box                             = Valikukast
+screen.distant_horizons                = Kaugemad horisondid
+screen.developer                       = Arendaja valikud
+
+screen.aurora                          = Virmalised
+screen.clouds                          = Pilved
+screen.crepuscular_rays                = Kiirte valgusvihud
+screen.stars                           = Tähed
+screen.clouds_cumulus                  = Kumuluspilvede seaded
+screen.clouds_altocumulus              = Altokumuluspilvede seaded
+screen.clouds_cumulus_congestus        = Kumulus-kogumispilvede seaded
+screen.clouds_cirrus                   = Sõõrpilvede seaded
+screen.clouds_minecrafty               = Blokiste pilvede seaded
+screen.clouds_noctilucent              = Öösäravad pilved
+
+screen.fog_rlh                         = Rayleigh' udu
+screen.fog_mie                         = Mie udu
+screen.sunlight_color                  = Päikesevalguse värv
+screen.moonlight_color                 = Kuuvalguse värv
+screen.blocklight_color                = Blokkvalguse värv
+screen.sunlight_morning                = Hommik
+screen.sunlight_noon                   = Keskpäev
+screen.sunlight_evening                = Õhtu
+screen.light_nether                    = Nether
+screen.light_end                       = End
+screen.fog_rlh_normal                  = Tavaline värv
+screen.fog_rlh_rain                    = Vihmavärv
+screen.fog_rlh_arid                    = Kuiv/kõrbeline värv
+screen.fog_rlh_snowy                   = Lumine värv
+screen.fog_rlh_taiga                   = Taiga värv
+screen.fog_rlh_jungle                  = Džungli värv
+screen.fog_rlh_swamp                   = Soodes värv
+screen.water_waves                     = Veelaineid
+screen.water_fog_coeff                 = Veeudu koefitsiendid
+
+screen.end_light_color                 = Valguse värv
+screen.end_ambient_color               = Ümbritsev värv
+screen.nether_color                    = Staatiline värv
+
+screen.distance_view                   = Vaatekaugus
+
+option.INFO                            = Photon Shaders
+value.INFO.0                           = §eautor: SixthSurge
+value.INFO.1                           = §aautor: SixthSurge
+value.INFO.2                           = §bautor: SixthSurge
+value.INFO.3                           = §dautor: SixthSurge
+
+# World settings
+
+option.WAVING_PLANTS                   = Õõtsuvad taimed
+option.WAVING_PLANTS.comment           = Maapinnataimed õõtsuvad tuules.\n\nEt lisada plokk õõtsuvate taimede nimekirja, ava shaders/block.properties ja lisa see vastavasse kategooriasse (10016, 10017 või 10018)
+option.WAVING_LEAVES                   = Õõtsuvad lehed
+option.WAVING_LEAVES.comment           = Leheplokid õõtsuvad tuules.\n\nEt lisada plokk õõtsuvate leheplokkide nimekirja, ava shaders/block.properties ja lisa see kategooriasse (10019)
+option.SLANTED_RAIN                    = Kaldvihm
+option.SLANTED_RAIN.comment            = Kaldvihma osakesed. Muudab vihmase ilma veidi atmosfäärilisemaks
+option.RAIN_OPACITY                    = Vihma läbipaistvus
+option.RAIN_OPACITY.comment            = Reguleeri vihmaosakeste läbipaistvust
+option.SEA_LEVEL                       = Merepind
+option.SEA_LEVEL.comment               = Mere/pinnase y-koordinaat.\n\n-60.0: Superflat pärast 1.18 versiooni.\n4.0: Superflat enne 1.18.\n63.0: Tavaline.
+option.SNOW_OPACITY                    = Lume läbipaistvus
+option.SNOW_OPACITY.comment            = Reguleeri lumeosakeste läbipaistvust
+option.EDGE_HIGHLIGHT                  = Servade esiletõstmine
+option.EDGE_HIGHLIGHT.comment          = Servade esiletõstmise efekt, inspireeritud Minecraft Dungeonsist
+option.EDGE_HIGHLIGHT_SCALE            = Servade esiletõstmise suurus
+option.EDGE_HIGHLIGHT_SCALE.comment    = Määrab servade esiletõstmise paksuse; muuda seda vastavalt oma ressursipaki resolutsioonile
+option.MOON_PHASE_AFFECTS_BRIGHTNESS   = Kuu faas mõjutab valgustust
+option.MOON_PHASE_AFFECTS_BRIGHTNESS.comment = Öine heleduse tase sõltub kuu faasist
+option.DESERT_SANDSTORM                = Kõrbetorm
+option.DESERT_SANDSTORM.comment        = Liivatorm vihma ajal kõrbe biomis
+option.END_GLOW                        = Endi helendus
+option.END_GLOW.comment                = Võbelevalt helendav efekt Endis. Vajab ruumilist udu (Volumetric Fog)
+
+# Weather
+option.RANDOM_WEATHER_VARIATION            = Juhuslik varieeruvus
+option.BIOME_WEATHER_VARIATION             = Biomi-põhine varieeruvus
+option.WEATHER_TEMPERATURE_BIAS            = Temperatuuri nihe
+option.WEATHER_HUMIDITY_BIAS               = Niiskuse nihe
+option.WEATHER_WIND_BIAS                   = Tuulisuse nihe
+option.WEATHER_TEMPERATURE_VARIATION_SPEED = Temperatuuri muutumise kiirus
+option.WEATHER_HUMIDITY_VARIATION_SPEED    = Niiskuse muutumise kiirus
+option.WEATHER_WIND_VARIATION_SPEED        = Tuulisuse muutumise kiirus
+
+# Lighting settings
+
+option.COLORED_LIGHTS                  = Värvilised tuled
+option.COLORED_LIGHTS.comment          = Muutuvavärviline plokivalgustus, kasutades flood fill algoritmi. Vajab Iris 1.6 või uuemat
+option.COLORED_LIGHTS_VANILLA_LIGHTMAP_CONTRIBUTION = Vanilla valguskaardi panus
+option.HANDHELD_LIGHTING               = Käeshoitav valgustus
+option.HANDHELD_LIGHTING.comment       = Käeshoitavad esemed valgustavad maailma. Kui värviline valgustus on lubatud, on ka käeshoitav valgustus samade värvidega
+option.HANDHELD_LIGHTING_INTENSITY     = Käeshoitava valguse heledus
+option.HANDHELD_LIGHTING_INTENSITY.comment = Reguleerib käeshoitavate valgusallikate heledust
+option.AO_IN_SUNLIGHT                  = AO päikesevalguses
+option.AO_IN_SUNLIGHT.comment          = Kas rakendada varjutuse shaderit otsese päikese-/kuuvalguse korral
+option.CLOUD_SHADOWS                   = Pilvevarjud
+option.CLOUD_SHADOWS.comment           = Pilvede poolt maapinnale langevad varjud
+option.CLOUD_SHADOWS_INTENSITY         = Pilvevarjude intensiivsus
+option.CLOUD_SHADOWS_INTENSITY.comment = Reguleerib pilvevarjude tugevust
+option.SH_SKYLIGHT                     = SH taevalgus
+option.SH_SKYLIGHT.comment             = Kasutab sfääriliste harmoonikate kodeerimist suunatud taevalguse jaoks Overworldis, andes loomuliku tulemuse.\nTöötab hästi koos GTAO-ga
+option.SSS_SHEEN                       = SSS läige
+option.SSS_SHEEN.comment               = Peegeldav “läike” efekt taimedel ja lehtedel, aitab kõrgel rohul paremini sulanduda rohu peegeldusega
+option.SSS_INTENSITY                   = SSS heledus
+option.SSS_INTENSITY.comment           = Reguleerib nahaaluse hajumise (SSS) heledust
+option.SHADING_STRENGTH                = Varjutuse tugevus
+option.SHADING_STRENGTH.comment        = Reguleerib otsese valguse varjutuse kontrasti. Väiksem väärtus muudab päikesest eemale jäävad pinnad heledamaks; suurem väärtus muudab need tumedamaks
+
+option.SHADOW                          = Varjude kaardistamine
+option.SHADOW_PCF                      = Varjude filtreerimine
+option.SHADOW_COLOR                    = Värvilised varjud
+option.SHADOW_COLOR.comment            = Läbipaistvad plokid loovad toonitud varje
+option.SHADOW_VPS                      = Muutuvad poolvarjud
+option.SHADOW_VPS.comment              = Varjud muutuvad pehmemaks, mida kaugemal need oma allikast on
+option.shadowMapResolution             = Varjukaardi resolutsioon
+option.shadowDistance                  = Varjude kaugus
+option.sunPathRotation                 = Päikese trajektoori pööramine
+option.SHADOW_PENUMBRA_SCALE           = Varjude pehmus
+option.SHADOW_PENUMBRA_SCALE.comment   = Reguleeri varjude pehmust
+option.ENTITY_SHADOWS                  = Olendite varjud
+option.ENTITY_SHADOWS.comment          = Kas olendid saavad varju heita.\nKeela see, et parandada jõudlust suurtes farmidega baaside puhul
+option.BLOCK_ENTITY_SHADOWS            = Plokiolendite varjud
+option.PIXELATED_SHADOWS               = Pikselvarjud
+option.PIXELATED_SHADOWS.comment       = Varjud joondatakse ploki tekstuurivõrku, luues pikselliku välimuse
+option.PIXELATED_SHADOWS_RESOLUTION    = Pikselvarjude resolutsioon
+option.SSS_STEPS                       = SSS sammud
+option.SSS_STEPS.comment               = Suurenda väärtust, et vähendada müra lehestikul ja teistel SSS-iga materjalidel, jõudluse arvelt
+
+option.SHADER_AO                       = Shader AO
+option.SHADER_AO.comment               = Kasutatav AO meetod. Off – ei shader AO-d. SSAO – madalama kvaliteediga, vajab vähem näidiseid/filtreerimist. GTAO – parem kvaliteet, vajab rohkem näidiseid/filtreerimist
+value.SHADER_AO.SHADER_AO_NONE         = Väljas
+value.SHADER_AO.SHADER_AO_SSAO         = SSAO
+value.SHADER_AO.SHADER_AO_GTAO         = GTAO
+option.VANILLA_AO                      = Vanilla AO
+option.VANILLA_AO.comment              = Minecrafti sisseehitatud ümbritsev varjutus
+option.SSAO_RADIUS                     = SSAO raadius
+option.SSAO_RADIUS.comment             = Reguleerib SSAO raadiust – kaugust, mille jooksul objektid saavad teineteist varjutada
+option.SSAO_STEPS                      = SSAO sammud
+option.SSAO_STEPS.comment              = Määrab, kui müra täis SSAO välja näeb
+option.GTAO_RADIUS                     = GTAO raadius
+option.GTAO_RADIUS.comment             = Reguleerib GTAO raadiust – kaugust, mille jooksul objektid saavad teineteist varjutada
+option.GTAO_SLICES                     = GTAO viilud
+option.GTAO_SLICES.comment             = Määrab, kui müra täis GTAO välja näeb
+option.GTAO_HORIZON_STEPS              = GTAO horisondi sammud
+option.GTAO_HORIZON_STEPS.comment      = Määrab GTAO täpsuse
+
+option.SUN_NR                          = Punane
+option.SUN_NG                          = Roheline
+option.SUN_NB                          = Sinine
+option.SUN_MR                          = Punane
+option.SUN_MG                          = Roheline
+option.SUN_MB                          = Sinine
+option.SUN_ER                          = Punane
+option.SUN_EG                          = Roheline
+option.SUN_EB                          = Sinine
+option.SUN_I                           = Päikesevalguse intensiivsus
+option.MOON_R                          = Punane
+option.MOON_G                          = Roheline
+option.MOON_B                          = Sinine
+option.MOON_I                          = Kuuvalguse intensiivsus
+option.SKYLIGHT_I                      = Taevalguse intensiivsus
+option.BOUNCED_LIGHT_I                 = Peegeldunud päikesevalguse intensiivsus
+option.CAVE_LIGHTING_I                 = Koopa heleduse tase
+option.LIGHTNING_FLASH                 = Välgusähvatus
+option.NETHER_USE_BIOME_COLOR          = Kasuta biomivärvi
+option.NETHER_I                        = Ümbritsev intensiivsus
+option.NETHER_S                        = Ümbritsev küllastus
+option.NETHER_R                        = Punane
+option.NETHER_G                        = Roheline
+option.NETHER_B                        = Sinine
+option.END_LIGHT_R                     = Punane
+option.END_LIGHT_G                     = Roheline
+option.END_LIGHT_B                     = Sinine
+option.END_LIGHT_I                     = Valguse intensiivsus
+option.END_AMBIENT_R                   = Punane
+option.END_AMBIENT_G                   = Roheline
+option.END_AMBIENT_B                   = Sinine
+option.END_AMBIENT_I                   = Ümbritsev intensiivsus
+option.BLOCKLIGHT_R                    = Punane
+option.BLOCKLIGHT_G                    = Roheline
+option.BLOCKLIGHT_B                    = Sinine
+option.BLOCKLIGHT_I                    = Plokivalguse intensiivsus
+
+option.VOXEL_VOLUME_SIZE               = Vokslimaht
+option.VOXEL_VOLUME_SIZE.comment       = Kõrge jõudluse mõju, sõltub ka varjude kaugusest
+suffix.VOXEL_VOLUME_SIZE               = m
+option.VOXEL_VOLUME_CENTER             = Vokslimahu keskpunkt
+option.VOXEL_VOLUME_CENTER.comment     = Ees: vokslimaht on mängijast eespool, seega rohkem sellest on nähtav
+
+value.VOXEL_VOLUME_CENTER.VOXEL_VOLUME_CENTER_AHEAD  = Ees
+value.VOXEL_VOLUME_CENTER.VOXEL_VOLUME_CENTER_PLAYER = Mängija
+
+suffix.shadowMapResolution             = ²
+suffix.sunPathRotation                 = °
+
+value.shadowDistance.48.0              = 3 tšanki
+value.shadowDistance.64.0              = 4 tšanki
+value.shadowDistance.80.0              = 5 tšanki
+value.shadowDistance.96.0              = 6 tšanki
+value.shadowDistance.112.0             = 7 tšanki
+value.shadowDistance.128.0             = 8 tšanki
+value.shadowDistance.144.0             = 9 tšanki
+value.shadowDistance.160.0             = 10 tšanki
+value.shadowDistance.176.0             = 11 tšanki
+value.shadowDistance.192.0             = 12 tšanki
+value.shadowDistance.208.0             = 13 tšanki
+value.shadowDistance.224.0             = 14 tšanki
+value.shadowDistance.240.0             = 15 tšanki
+value.shadowDistance.256.0             = 16 tšanki
+value.shadowDistance.320.0             = 20 tšanki
+value.shadowDistance.384.0             = 24 tšanki
+value.shadowDistance.512.0             = 32 tšanki
+value.shadowDistance.768.0             = 48 tšanki
+value.shadowDistance.1024.0            = 64 tšanki
+value.shadowDistance.2048.0            = 128 tšanki
+value.shadowDistance.4096.0            = 256 tšanki
+
+# Sky settings
+
+option.VANILLA_SUN                     = Vanilla päike
+option.VANILLA_MOON                    = Vanilla kuu
+option.SUN_ANGULAR_RADIUS              = Päikese nurgaraadius
+option.MOON_ANGULAR_RADIUS             = Kuu nurgaraadius
+option.SKY_GROUND                      = Taeva pind
+option.SKY_GROUND.comment              = Nähtav planeedi pind horisondi all
+option.ATMOSPHERE_SATURATION_BOOST     = Atmosfääri küllastusvõimendus
+option.ATMOSPHERE_SATURATION_BOOST.comment              = Suurendab taeva ja päikesevalguse värviküllastust sõltuvalt kellaajast
+option.ATMOSPHERE_SATURATION_BOOST_INTENSITY            = Küllastusvõimenduse intensiivsus
+option.ATMOSPHERE_SATURATION_BOOST_INTENSITY.comment    = Reguleerib atmosfääri küllastusvõimenduse tugevust
+option.STARS                           = Lubatud
+option.STARS.comment                   = Tähed öises taevas. Madal jõudlusmõju
+option.STARS_INTENSITY                 = Heledus
+option.STARS_INTENSITY.comment         = Määrab tähtede heleduse öises taevas
+option.STARS_COVERAGE                  = Tihedus
+option.STARS_COVERAGE.comment          = Määrab tähtede arvu öises taevas
+option.GALAXY                          = Galaktika
+option.GALAXY.comment                  = Galaktika kujutis öises taevas
+option.GALAXY_INTENSITY                = Galaktika heledus
+option.GALAXY_INTENSITY.comment        = Määrab galaktika heleduse öises taevas
+option.CREPUSCULAR_RAYS                = Lubatud
+option.CREPUSCULAR_RAYS_INTENSITY      = Heledus
+option.CREPUSCULAR_RAYS_STEPS_HORIZON  = Sammude arv – horisont
+option.CREPUSCULAR_RAYS_STEPS_ZENITH   = Sammude arv – seniit
+option.LIGHTNING_FLASH                 = Välgusähvatus
+option.RAINBOWS                        = Vikerkaared
+option.END_SUN_EFFECT                  = Päikeseefekt Endis
+
+# Clouds
+option.CLOUDS_CUMULUS                       = Kumuluspilved
+option.CLOUDS_CUMULUS.comment               = Madala kõrgusega mahulised pilved, mis meenutavad kumuluspilvi
+option.CLOUDS_CUMULUS_PRIMARY_STEPS_H       = Peamised sammud – horisont
+option.CLOUDS_CUMULUS_PRIMARY_STEPS_Z       = Peamised sammud – seniit
+option.CLOUDS_CUMULUS_LIGHTING_STEPS        = Valguse sammud
+option.CLOUDS_CUMULUS_AMBIENT_STEPS         = Ümbritsevad sammud
+option.CLOUDS_CUMULUS_ALTITUDE              = Kõrgus
+suffix.CLOUDS_CUMULUS_ALTITUDE              = m
+option.CLOUDS_CUMULUS_THICKNESS             = Paksus
+option.CLOUDS_CUMULUS_DENSITY               = Tihedus
+option.CLOUDS_CUMULUS_COVERAGE              = Katvus
+option.CLOUDS_CUMULUS_SIZE                  = Suurus
+option.CLOUDS_CUMULUS_DETAIL_STRENGTH       = Detailide tugevus
+option.CLOUDS_CUMULUS_WIND_SPEED            = Tuulekiirus
+suffix.CLOUDS_CUMULUS_ALTITUDE              = m/s
+option.CLOUDS_CUMULUS_WIND_ANGLE            = Tuule suund
+suffix.CLOUDS_CUMULUS_ALTITUDE              = °
+option.CLOUDS_CUMULUS_PRECOMPUTE_LOCAL_COVERAGE         = Eelnevalt arvutatud lokaalne katvus
+option.CLOUDS_CUMULUS_PRECOMPUTE_LOCAL_COVERAGE.comment = Agressiivne optimeerimine kumuluspilvede jaoks. Vähendab maksimaalset kaugust, milleni pilvi saab kuvada, ja võib põhjustada artefakte pilvede kuju muutumisel kaamera liikumisel. Keela, kui teed ekraanipilte pilvedest kõrgemal
+
+option.CLOUDS_ALTOCUMULUS                       = Altokumuluspilved
+option.CLOUDS_ALTOCUMULUS.comment               = Keskmise kõrgusega mahulised pilved, mis meenutavad altokumuluspilvi
+option.CLOUDS_ALTOCUMULUS_PRIMARY_STEPS_H       = Peamised sammud – horisont
+option.CLOUDS_ALTOCUMULUS_PRIMARY_STEPS_Z       = Peamised sammud – seniit
+option.CLOUDS_ALTOCUMULUS_LIGHTING_STEPS        = Valguse sammud
+option.CLOUDS_ALTOCUMULUS_AMBIENT_STEPS         = Ümbritsevad sammud
+option.CLOUDS_ALTOCUMULUS_ALTITUDE              = Kõrgus
+suffix.CLOUDS_ALTOCUMULUS_ALTITUDE              = m
+option.CLOUDS_ALTOCUMULUS_THICKNESS             = Paksus
+option.CLOUDS_ALTOCUMULUS_DENSITY               = Tihedus
+option.CLOUDS_ALTOCUMULUS_COVERAGE              = Katvus
+option.CLOUDS_ALTOCUMULUS_SIZE                  = Suurus
+option.CLOUDS_ALTOCUMULUS_DETAIL_STRENGTH       = Detailide tugevus
+option.CLOUDS_ALTOCUMULUS_WIND_SPEED            = Tuulekiirus
+suffix.CLOUDS_ALTOCUMULUS_ALTITUDE              = m/s
+option.CLOUDS_ALTOCUMULUS_WIND_ANGLE            = Tuule suund
+suffix.CLOUDS_ALTOCUMULUS_ALTITUDE              = °
+
+option.CLOUDS_CUMULUS_CONGESTUS                       = Kumulus-kogumispilved
+option.CLOUDS_CUMULUS_CONGESTUS.comment               = Massiivsed, kaugemal asuvad mahulised pilved
+option.CLOUDS_CUMULUS_CONGESTUS_PRIMARY_STEPS_H       = Peamised sammud – horisont
+option.CLOUDS_CUMULUS_CONGESTUS_PRIMARY_STEPS_Z       = Peamised sammud – seniit
+option.CLOUDS_CUMULUS_CONGESTUS_LIGHTING_STEPS        = Valguse sammud
+option.CLOUDS_CUMULUS_CONGESTUS_AMBIENT_STEPS         = Ümbritsevad sammud
+option.CLOUDS_CUMULUS_CONGESTUS_ALTITUDE              = Kõrgus
+suffix.CLOUDS_CUMULUS_CONGESTUS_ALTITUDE              = m
+option.CLOUDS_CUMULUS_CONGESTUS_THICKNESS             = Paksus
+option.CLOUDS_CUMULUS_CONGESTUS_DENSITY               = Tihedus
+option.CLOUDS_CUMULUS_CONGESTUS_COVERAGE              = Katvus
+option.CLOUDS_CUMULUS_CONGESTUS_SIZE                  = Suurus
+option.CLOUDS_CUMULUS_CONGESTUS_DETAIL_STRENGTH       = Detailide tugevus
+option.CLOUDS_CUMULUS_CONGESTUS_WIND_SPEED            = Tuulekiirus
+suffix.CLOUDS_CUMULUS_CONGESTUS_ALTITUDE              = m/s
+option.CLOUDS_CUMULUS_CONGESTUS_WIND_ANGLE            = Tuule suund
+suffix.CLOUDS_CUMULUS_CONGESTUS_ALTITUDE              = °
+
+option.CLOUDS_NOCTILUCENT              = Noktilutsentsed pilved
+
+option.BLOCKY_CLOUDS                   = Plokilised pilved
+option.BLOCKY_CLOUDS.comment           = Vanilla-stiilis mahulised pilved. Selle valiku lubamine keelab kõik teised pilvetüübid
+option.BLOCKY_CLOUDS_LAYER_2           = Teine kiht
+option.BLOCKY_CLOUDS_LAYER_2.comment   = Teine kiht Minecraftilikke mahulisi pilvi! Pane tähele, et selle lubamine kahekordistab pilvede jõudlusmõju
+option.BLOCKY_CLOUDS_THICKNESS         = Kõrgus
+option.BLOCKY_CLOUDS_THICKNESS.comment = Reguleeri pilvede paksust
+option.BLOCKY_CLOUDS_ALTITUDE          = Kõrgus
+option.BLOCKY_CLOUDS_ALTITUDE.comment  = Reguleeri pilvede kõrgust
+option.BLOCKY_CLOUDS_ALTITUDE_2        = Teise kihi kõrgus
+option.BLOCKY_CLOUDS_ALTITUDE_2.comment = Reguleeri teise pilvekihi kõrgust
+option.BLOCKY_CLOUDS_ROUNDNESS         = Ümarus
+option.BLOCKY_CLOUDS_ROUNDNESS.comment = Pilve servade ümarus
+option.BLOCKY_CLOUDS_SHARPNESS         = Teravus
+option.BLOCKY_CLOUDS_SHARPNESS.comment = Pilve servade teravus
+
+option.CLOUDS_TEMPORAL_UPSCALING       = Ajutine üleskaalumine
+option.CLOUDS_AERIAL_PERSPECTIVE_BOOST = Õhuperspektiivi võimendus
+option.CLOUDS_SCALE                    = Skaala
+option.CLOUDS_SCALE.comment            = Rakendatakse skaala tegurina kõikidele pilvedele, et tuua need realistlikust suurusest ja kõrgusest mängitavale tasemele. Kui see väärtus on 1.0, on pilvede asetus realistlik (esimene kiht asub vaikimisi 800 plokki üleval). Kui väärtus on suurem, ilmuvad pilved väiksemana ja lähemal maapinnale. See mõjutab ka pilvevarjude suurust
+suffix.CLOUDS_SCALE                    = ×
+value.CLOUDS_TEMPORAL_UPSCALING.1      = Väljas
+value.CLOUDS_TEMPORAL_UPSCALING.2      = 4×
+value.CLOUDS_TEMPORAL_UPSCALING.3      = 9×
+value.CLOUDS_TEMPORAL_UPSCALING.4      = 16×
+
+option.CLOUDS_CIRRUS                       = Cirrus/Cirrokumuluspilved
+option.CLOUDS_CIRRUS.comment               = Lamedad cirrus- ja cirrokumuluspilved
+option.CLOUDS_CIRRUS_LIGHTING_STEPS        = Valguse sammud
+option.CLOUDS_CIRRUS_AMBIENT_STEPS         = Ümbritsevad sammud
+option.CLOUDS_CIRRUS_ALTITUDE              = Kõrgus
+suffix.CLOUDS_CIRRUS_ALTITUDE              = m
+option.CLOUDS_CIRRUS_THICKNESS             = Paksus
+option.CLOUDS_CIRRUS_DENSITY               = Cirruse tihedus
+option.CLOUDS_CIRRUS_COVERAGE              = Cirruse katvus
+option.CLOUDS_CIRRUS_SIZE                  = Cirruse suurus
+option.CLOUDS_CIRRUS_DETAIL_STRENGTH       = Cirruse detailide tugevus
+option.CLOUDS_CIRRUS_CURL_STRENGTH         = Cirruse lokkimise tugevus
+option.CLOUDS_CIRRUS_WIND_SPEED            = Tuulekiirus
+suffix.CLOUDS_CIRRUS_ALTITUDE              = m/s
+option.CLOUDS_CIRRUS_WIND_ANGLE            = Tuule suund
+suffix.CLOUDS_CIRRUS_ALTITUDE              = °
+option.CLOUDS_CIRROCUMULUS_DENSITY         = Cirrokumuluse tihedus
+option.CLOUDS_CIRROCUMULUS_COVERAGE        = Cirrokumuluse katvus
+option.CLOUDS_CIRROCUMULUS_SIZE            = Cirrokumuluse suurus
+option.CLOUDS_CIRROCUMULUS_DETAIL_STRENGTH = Cirrokumuluse detailide tugevus
+option.CLOUDS_CIRROCUMULUS_CURL_STRENGTH   = Cirrokumuluse lokkimise tugevus
+
+option.CLOUDS_NOCTILUCENT_INTENSITY    = Heledus
+option.CLOUDS_NOCTILUCENT_RARITY       = Haruldus
+
+option.AURORA_NORMAL                   = Virmalised igas biomis
+option.AURORA_SNOW                     = Virmalised lume biomis
+option.AURORA_BRIGHTNESS               = Virmaliste heledus
+option.AURORA_FREQUENCY                = Virmaliste sagedus
+option.AURORA_CLOUD_LIGHTING           = Pilve valguspanus
+option.AURORA_GROUND_LIGHTING          = Maapinna valguspanus
+
+value.AURORA_NORMAL.AURORA_NEVER       = Mitte kunagi
+value.AURORA_NORMAL.AURORA_RARELY      = Harva
+value.AURORA_NORMAL.AURORA_ALWAYS      = Alati
+
+value.AURORA_SNOW.AURORA_NEVER         = Mitte kunagi
+value.AURORA_SNOW.AURORA_RARELY        = Harva
+value.AURORA_SNOW.AURORA_ALWAYS        = Alati
+
+# Fog settings
+
+option.BORDER_FOG                      = Servaudu
+option.BORDER_FOG.comment              = Paks udu renderdusulatuse servadel, mis peidab tükkide piire
+option.CAVE_FOG                        = Koopaudu
+option.CAVE_FOG.comment                = Kerge, kergelt helendav udu maa all. Muudab suured koopad atmosfäärilisemaks ja aitab paremini nende kuju näha
+option.BLOOMY_FOG                      = Helendav udu
+option.BLOOMY_FOG.comment              = Intensiivne helendus udus. Tekitab mulje, nagu hele valgus hajuks udus ja valgustaks tausta. Peaaegu null jõudlusmõju
+option.BLOOMY_FOG_INTENSITY            = Helendava udu intensiivsus
+option.BLOOMY_FOG_INTENSITY.comment    = Reguleerib helendava udu tugevust
+option.OVERWORLD_FOG_INTENSITY         = Overworldi udu intensiivsus
+option.NETHER_FOG_INTENSITY            = Netheri udu intensiivsus
+option.VL                              = Mahuline udu
+option.LPV_VL.comment                  = Valgusallikad valgustavad udu. Vajab värvilist valgust!
+option.VL.comment                      = Lisab valguskiiri ja muutuvat udu tihedust
+option.VL_RENDER_SCALE                 = Mahulise udu renderdamise skaala
+option.AIR_FOG_CLOUDY_NOISE            = Pilvine udu
+option.AIR_FOG_CLOUDY_NOISE.comment    = Õrnad pilvelaadse kujuga udud, kõige paremini nähtavad hommikul.\nVajab mahulist udu!
+option.AIR_FOG_COLORED_LIGHT_SHAFTS    = Värvilised valguskiired
+option.AIR_FOG_COLORED_LIGHT_SHAFTS.comment = Läbipaistvatest objektidest läbi tulevad valguskiired värvuvad nende värvi järgi
+
+# LPV VL
+option.LPV_VL                          = Lubatud
+option.LPV_VL_STEPS                    = Sammud
+option.LPV_VL_INTENSITY_OVERWORLD      = Overworldi intensiivsus
+option.LPV_VL_INTENSITY_UNDERGROUND    = Maa-alune intensiivsus
+option.LPV_VL_INTENSITY_NETHER         = Netheri intensiivsus
+option.LPV_VL_INTENSITY_END            = Endi intensiivsus
+
+# Rayleigh Fog
+option.AIR_FOG_RAYLEIGH_FALLOFF_START     = Rayleigh hääbumise algus
+option.AIR_FOG_RAYLEIGH_FALLOFF_START.comment = Kõrgus merepinnast, kust Rayleigh udu hakkab vähenema
+option.AIR_FOG_RAYLEIGH_FALLOFF_HALF_LIFE = Rayleigh hääbumise poolväärtusaeg
+option.AIR_FOG_RAYLEIGH_FALLOFF_HALF_LIFE.comment = Kõrgus Rayleigh hääbumise algusest, kus udu tihedus väheneb poole võrra
+
+option.AIR_FOG_RAYLEIGH_DENSITY        = Tavaline tihedus
+option.AIR_FOG_RAYLEIGH_R              = §4Punane
+option.AIR_FOG_RAYLEIGH_G              = §2Roheline
+option.AIR_FOG_RAYLEIGH_B              = §1Sinine
+
+option.AIR_FOG_RAYLEIGH_DENSITY_RAIN   = Vihma tihedus
+option.AIR_FOG_RAYLEIGH_R_RAIN         = §4Punane
+option.AIR_FOG_RAYLEIGH_G_RAIN         = §2Roheline
+option.AIR_FOG_RAYLEIGH_B_RAIN         = §1Sinine
+
+option.AIR_FOG_RAYLEIGH_DENSITY_ARID   = Kuiv/kõrbe tihedus
+option.AIR_FOG_RAYLEIGH_R_ARID         = §4Punane
+option.AIR_FOG_RAYLEIGH_G_ARID         = §2Roheline
+option.AIR_FOG_RAYLEIGH_B_ARID         = §1Sinine
+
+option.AIR_FOG_RAYLEIGH_DENSITY_SNOWY  = Lumise piirkonna tihedus
+option.AIR_FOG_RAYLEIGH_R_SNOWY        = §4Punane
+option.AIR_FOG_RAYLEIGH_G_SNOWY        = §2Roheline
+option.AIR_FOG_RAYLEIGH_B_SNOWY        = §1Sinine
+
+option.AIR_FOG_RAYLEIGH_DENSITY_TAIGA  = Taiga tihedus
+option.AIR_FOG_RAYLEIGH_R_TAIGA        = §4Punane
+option.AIR_FOG_RAYLEIGH_G_TAIGA        = §2Roheline
+option.AIR_FOG_RAYLEIGH_B_TAIGA        = §1Sinine
+
+option.AIR_FOG_RAYLEIGH_DENSITY_JUNGLE = Džungli tihedus
+option.AIR_FOG_RAYLEIGH_R_JUNGLE       = §4Punane
+option.AIR_FOG_RAYLEIGH_G_JUNGLE       = §2Roheline
+option.AIR_FOG_RAYLEIGH_B_JUNGLE       = §1Sinine
+
+option.AIR_FOG_RAYLEIGH_DENSITY_SWAMP  = Soode tihedus
+option.AIR_FOG_RAYLEIGH_R_SWAMP        = §4Punane
+option.AIR_FOG_RAYLEIGH_G_SWAMP        = §2Roheline
+option.AIR_FOG_RAYLEIGH_B_SWAMP        = §1Sinine
+
+# Mie Fog
+option.AIR_FOG_MIE_DENSITY_MORNING     = Hommikune tihedus
+option.AIR_FOG_MIE_DENSITY_NOON        = Keskpäevane tihedus
+option.AIR_FOG_MIE_DENSITY_EVENING     = Õhtune tihedus
+option.AIR_FOG_MIE_DENSITY_MIDNIGHT    = Kesköö tihedus
+option.AIR_FOG_MIE_DENSITY_RAIN        = Vihma tihedus
+option.AIR_FOG_MIE_DENSITY_BLUE_HOUR   = Koit/Eha tihedus
+option.AIR_FOG_MIE_FALLOFF_START          = Kõrguse hääbumise algus
+option.AIR_FOG_MIE_FALLOFF_START.comment  = Kõrgus merepinnast, kust Mie udu hakkab vähenema
+option.AIR_FOG_MIE_FALLOFF_HALF_LIFE      = Kõrguse hääbumise poolväärtusaeg
+option.AIR_FOG_MIE_FALLOFF_HALF_LIFE.comment = Kõrgus Mie hääbumise algusest, kus udu tihedus väheneb poole võrra
+
+# Materials settings
+
+option.NORMAL_MAPPING                  = Normaalkaardistus
+option.NORMAL_MAPPING.comment          = Kas kasutada ressursipaki normaalkaarte. Lülita sisse, kui kasutad PBR‑põhist ressurssipakki
+option.SPECULAR_MAPPING                = Spekulaarkaardistus
+option.SPECULAR_MAPPING.comment        = Kas kasutada ressurssipaki spekulaarkaarte. Lülita sisse PBR‑pakiga
+option.POM                             = Parallax Occlusion Mapping
+option.TEXTURE_FORMAT                  = Tekstuuri formaat
+option.TEXTURE_FORMAT.comment          = Ressurssipaki kasutatav tekstuuriformaat. Enamik kaasaegseid pakke kasutab lab_p_b_r, samas kui SEUS‑iga töötavad võivad kasutada OldPBR
+option.HARDCODED_SPECULAR              = Kauakodeeritud spekulaarsus
+option.HARDCODED_SPECULAR.comment      = Teatud plokkide (nt metalli) spekulaarkaarte on eelnevalt kooditud
+option.HARDCODED_EMISSION              = Kauakodeeritud emissioon
+option.HARDCODED_EMISSION.comment      = Teatud plokkide (nt laternad) kiirgus on eelnevalt kooditud
+option.HARDCODED_SSS                   = Kauakodeeritud SSS
+option.HARDCODED_SSS.comment           = Teatud plokkide (nt lehed) nahaalune hajumine on eelnevalt kooditud
+option.RAIN_PUDDLES                    = Vihmavee lompide efekt
+option.EMISSION_STRENGTH               = Kiirguse tugevus
+option.EMISSION_STRENGTH.comment       = Reguleerib kiirgavate objektide nagu laternad heledust. See ei mõjuta valgust, mida nad projitseerivad, vaid ainult allika enda heledust. Mõjub ka eelnevalt kodeeritud emissioonidele
+option.DIRECTIONAL_LIGHTMAPS           = Suunatud valguskaardid
+option.DIRECTIONAL_LIGHTMAPS.comment   = Plokivalgus ja taevalgus on mõjutatud normaalkaartest. Võib põhjustada visuaalseid kõrvalekaldeid meetodi piirangute tõttu
+option.DIRECTIONAL_LIGHTMAPS_INTENSITY = Suunatud valguskaartide intensiivsus
+option.DIRECTIONAL_LIGHTMAPS_INTENSITY.comment = Reguleerib suunatud valguskaartide intensiivsust
+option.POM_DEPTH                       = Parallaksi sügavus
+option.POM_DEPTH.comment               = Kui sügavale POM võib plokki minna
+option.POM_SAMPLES                     = Parallaksi proovid
+option.POM_SAMPLES.comment             = Määrab POM‑i kvaliteedi, jõudluse arvelt
+option.POM_SHADOW                      = POM‑varjutus
+option.POM_SHADOW.comment              = POM‑i enda varjutus. Vajab spekulaarkaarte!
+option.POM_SHADOW_SAMPLES              = POM‑varjutusproovid
+option.POM_SHADOW_SAMPLES.comment      = Reguleerib Parallaksi varjude kvaliteeti, jõudluse arvelt
+option.POM_SLOPE_NORMALS               = POM‑kalle normaalkaarte
+option.POM_DISTANCE                    = POM‑kaugus
+option.REFRACTION                      = Murdumine
+value.REFRACTION.REFRACTION_OFF        = Väljas
+value.REFRACTION.REFRACTION_ALL        = Kõik
+value.REFRACTION.REFRACTION_WATER_ONLY = Ainult vesi
+option.REFRACTION_INTENSITY            = Murdumise intensiivsus
+option.REFRACTION_INTENSITY.comment    = Reguleerib murdumisefekti tugevust veepinnal
+
+suffix.POM_DEPTH                       = m
+suffix.POM_DISTANCE                    = m
+
+value.TEXTURE_FORMAT.TEXTURE_FORMAT_LAB = labPBR
+value.TEXTURE_FORMAT.TEXTURE_FORMAT_OLD = Old PBR
+
+option.ENVIRONMENT_REFLECTIONS         = Keskkonna peegeldused
+option.ENVIRONMENT_REFLECTIONS.comment = Ekraanisisesed peegeldused. Vesi ja läikivad plokid peegeldavad ümbritsevat. Suur jõudluskulu
+option.SKY_REFLECTIONS                 = Taeva peegeldused
+option.SKY_REFLECTIONS.comment         = Vesi ja läikivad plokid peegeldavad taevast
+option.SSR_ROUGHNESS_SUPPORT           = Kareduse tugi
+option.SSR_ROUGHNESS_SUPPORT.comment   = Peegeldused karedate pindade peavad olema kareduse tõttu udused. Suur jõudluskulu
+option.SSR_RAY_COUNT                   = Kiirte arv
+option.SSR_RAY_COUNT.comment           = Kiirte arv karedate pindade peegeldamiseks. Rohkem kiiri = vähem müra, aga halvem jõudlus
+option.SSR_INTERSECTION_STEPS_SMOOTH   = Ülemineku sammud – sujuv
+option.SSR_INTERSECTION_STEPS_SMOOTH.comment = Määrab sujuvate peegelduste täpsust jõudluse arvelt
+option.SSR_INTERSECTION_STEPS_ROUGH    = Ülemineku sammud – kare
+option.SSR_INTERSECTION_STEPS_ROUGH.comment = Määrab karedate peegelduste täpsust jõudluse arvelt
+option.SSR_REFINEMENT_STEPS            = Täpsustussammud
+option.SSR_REFINEMENT_STEPS.comment    = Reguleerib kõikide peegelduste täpsust jõudluse arvelt
+option.SSR_ROUGHNESS_THRESHOLD         = Kareduse lävi
+option.SSR_ROUGHNESS_THRESHOLD.comment = Määrab, kui sile pind peab olema, et peegeldused ilmuksid
+
+# Water settings
+
+option.WATER_CAUSTICS                  = Veekaustikud
+option.WATER_CAUSTICS.comment          = Liikuvad valgusmustrid vee all
+option.WATER_CAUSTICS_INTENSITY        = Veekaustikute intensiivsus
+option.WATER_CAUSTICS.comment          = Reguleerib veekaustikute heledust
+option.WATER_EDGE_HIGHLIGHT            = Veepiiride esiletõstmine
+option.WATER_EDGE_HIGHLIGHT.comment    = Valged esiletõstmised veepiiril, mis aitavad vett märgatavamaks muuta
+option.WATER_EDGE_HIGHLIGHT_INTENSITY  = Veepiiri esiletõstmise intensiivsus
+option.SNELLS_WINDOW                   = Snelli aken
+option.SNELLS_WINDOW.comment           = Täielik sisepeegeldus vee all
+option.WATER_TEXTURE                   = Veetekstuur
+option.WATER_TEXTURE.comment           = Kuidas kasutada vanilla veetekstuuri.\n\nOff – ei ühtegi tekstuuri.\nHighlights – veetekstuur lisab sära veepinnale, nagu Bedrock RTX‑is.\nVanilla – tekstuur on sama, mis muud tekstuurid
+option.BIOME_WATER_COLOR               = Biomi-veevärv
+option.BIOME_WATER_COLOR.comment       = Vee neeldumine arvestab biomi veevärvi
+
+value.WATER_TEXTURE.WATER_TEXTURE_OFF                   = Väljas
+value.WATER_TEXTURE.WATER_TEXTURE_HIGHLIGHT             = Sära
+value.WATER_TEXTURE.WATER_TEXTURE_VANILLA               = Vanilla
+value.WATER_TEXTURE.WATER_TEXTURE_HIGHLIGHT_UNDERGROUND = Sära (ainult maa all)
+
+option.WATER_WAVES                     = Lubatud
+option.WATER_WAVE_ITERATIONS           = Iteratsioonid
+option.WATER_WAVE_STRENGTH             = Tugevus
+option.WATER_WAVE_FREQUENCY            = Sagedus
+option.WATER_WAVE_SPEED_STILL          = Kiirus (seerimata)
+option.WATER_WAVE_SPEED_FLOWING        = Kiirus (voolav)
+option.WATER_WAVE_PERSISTENCE          = Püsivus
+option.WATER_WAVE_LACUNARITY           = Laikunaaridus
+option.WATER_PARALLAX                  = Veelokaalne parallaks
+option.WATER_PARALLAX.comment          = Muudab veelaineid 3D‑ks
+option.WATER_DISPLACEMENT              = Veepinnamuutus
+option.WATER_DISPLACEMENT.comment      = Sarnaselt õõtsuvate lehtedega muudab see veegeomeetriat kergelt laineliseks, muutes kaldajoone vähem tasaseks
+option.WATER_WAVES_HEIGHT_VARIATION           = Kõrguse varieerumine
+option.WATER_WAVES_HEIGHT_VARIATION.comment   = Vee lainete kõrgus varieerub ruumis
+
+option.WATER_ABSORPTION_R              = Punase neeldumine
+option.WATER_ABSORPTION_G              = Rohelise neeldumine
+option.WATER_ABSORPTION_B              = Sinise neeldumine
+option.WATER_SCATTERING                = Hajumine
+
+option.WATER_ABSORPTION_R_UNDERWATER   = Punase neeldumine – vee all
+option.WATER_ABSORPTION_G_UNDERWATER   = Rohelise neeldumine – vee all
+option.WATER_ABSORPTION_B_UNDERWATER   = Sinise neeldumine – vee all
+option.WATER_SCATTERING_UNDERWATER     = Hajumine – vee all
+
+# Post-processing settings
+
+option.BLOOM                           = Hägusus (Bloom)
+option.BLOOM.comment                   = Pehme “kumav” efekt heledate alade ja valgusallikate ümber
+option.BLOOM_INTENSITY                 = Hägususe intensiivsus
+option.BLOOM_INTENSITY.comment         = Reguleerib, kui tugevalt hägusus pilti mõjutab
+option.DOF                             = Teravussügavus (Depth of Field)
+option.DOF.comment                     = Kaamerafookuse efekt – hägustab fookusest väljas olevad alad
+option.DOF_INTENSITY                   = Teravussügavuse intensiivsus
+option.DOF_INTENSITY.comment           = Reguleerib teravussügavuse efekti tugevust
+option.DOF_SAMPLES                     = Teravussügavuse proovid
+option.DOF_SAMPLES.comment             = Proovide arv teravussügavuse jaoks. Rohkem proove = kvaliteetsem hägusus, aga suurem jõudluskulu
+option.DOF_FOCUS                       = Teravussügavuse fookus
+option.DOF_FOCUS.comment               = Teravussügavuse fookuskaugus
+option.MOTION_BLUR                     = Liikumishägusus
+option.MOTION_BLUR.comment             = Kinolik hägusus liikumisel. Võib aidata sujuvust madalal FPS‑il, aga võib tekitada liikumishaigust
+option.MOTION_BLUR_INTENSITY           = Liikumishägususe intensiivsus
+option.MOTION_BLUR_INTENSITY.comment   = Reguleerib liikumishägususe tugevust
+option.TAA                             = TAA
+option.TAA.comment                     = Ajutine antialiasing. Suurendab pildi kvaliteeti ja vähendab müra, kuid võib põhjustada ajutisi artefakte nagu virvendus ja järelkujutised. Nõutav TAAU jaoks!
+option.FXAA                            = FXAA
+option.FXAA.comment                    = Silub ääri. Töötab koos TAA‑ga, eriti liikumise ajal. Väga kasulik koos TAAU‑ga
+option.TAAU                            = TAA skaleerimine (Upscaling)
+option.TAAU.comment                    = Renderdab stseenivärvid väiksemas lahutuses ja suurendab need TAA abil. Suurendab jõudlust, kuid võib vähendada kvaliteeti ja lisada artefakte
+option.TAAU_RENDER_SCALE               = TAAU renderduse skaala
+option.TAAU_RENDER_SCALE.comment       = Skaala, mille järgi stseenivärv renderdatakse, kui TAAU on lubatud. Näiteks kui resolutsioon on 1920x1080 ja skaala on 0.75, renderdatakse see 1440x810
+option.CAS                             = Kujutise teravustamine
+option.CAS.comment                     = Teravustab lõpppilti (kontrastipõhine teravustamine)
+option.CAS_INTENSITY                   = Teravustamise intensiivsus
+option.CAS_INTENSITY.comment           = Reguleerib pilditeravustamise tugevust
+option.VIGNETTE                        = Vinjett
+option.VIGNETTE.comment                = Tumendab ekraani servi
+option.VIGNETTE_INTENSITY              = Vinjeti intensiivsus
+option.VIGNETTE_INTENSITY.comment      = Reguleerib vinjeti tugevust
+
+value.DOF_FOCUS.-1.0                   = Automaatne
+
+option.tonemap                         = Toonikaart (Tonemap operaator)
+
+value.tonemap.tonemap_aces_fit         = ACES Fit
+value.tonemap.tonemap_aces_full        = ACES Full
+value.tonemap.tonemap_hejl_2015        = Hejl 2015
+value.tonemap.tonemap_hejl_burgess     = Hejl-Burgess
+value.tonemap.tonemap_lottes           = Lottes
+value.tonemap.tonemap_uncharted_2      = Uncharted 2
+value.tonemap.tonemap_tech             = Tech
+value.tonemap.tonemap_ozius            = Ozius
+value.tonemap.tonemap_reinhard         = Reinhard
+value.tonemap.tonemap_reinhard_jodie   = Reinhard-Jodie
+
+# Color Grading
+
+option.GRADE_BRIGHTNESS                = Heledus
+option.GRADE_CONTRAST                  = Kontrast
+option.GRADE_SATURATION                = Küllastus
+option.GRADE_WHITE_BALANCE             = Valgebalanss
+option.GRADE_ORANGE_SAT_BOOST          = Oranži küllastus
+option.GRADE_TEAL_SAT_BOOST            = Türkiissinine küllastus
+option.GRADE_GREEN_SAT_BOOST           = Roheline küllastus
+option.GRADE_GREEN_HUE_SHIFT           = Roheline tooninihe
+suffix.GRADE_WHITE_BALANCE             = K
+suffix.GRADE_GREEN_HUE_SHIFT           = °
+
+option.PURKINJE_SHIFT                  = Purkinje nihkumine
+option.PURKINJE_SHIFT.comment          = Simuleerib inimese nägemise muutumist hämaras valguses: värvide kahvatus ja punaste toonide tumenemine
+option.PURKINJE_SHIFT_INTENSITY        = Purkinje nihke tugevus
+
+# Exposure
+
+option.AUTO_EXPOSURE                         = Automaatne säritus
+option.AUTO_EXPOSURE_BIAS                    = Särituse nihe
+option.AUTO_EXPOSURE_MIN                     = Minimaalne säritus
+option.AUTO_EXPOSURE_MAX                     = Maksimaalne säritus
+option.AUTO_EXPOSURE_RATE_DIM_TO_BRIGHT      = Särituse kiirus – heledamaks
+option.AUTO_EXPOSURE_RATE_BRIGHT_TO_DIM      = Särituse kiirus – tumedamaks
+option.MANUAL_EXPOSURE_VALUE                 = Käsitsi särituse väärtus
+option.MANUAL_EXPOSURE_USE_SCREEN_BRIGHTNESS = Kasuta heledusliugurit
+option.MANUAL_EXPOSURE_USE_SCREEN_BRIGHTNESS.comment = Särituse väärtus interpoleerib minimaalsete ja maksimaalsete väärtuste vahel Video Seadete heledusliuguri põhjal
+option.HISTOGRAM_BINS                        = Histogrammi vahemikud
+option.HISTOGRAM_TARGET                      = Histogrammi sihtväärtus (CDF)
+
+value.AUTO_EXPOSURE.AUTO_EXPOSURE_SIMPLE    = Lihtne
+value.AUTO_EXPOSURE.AUTO_EXPOSURE_HISTOGRAM = Histogramm
+value.AUTO_EXPOSURE.AUTO_EXPOSURE_OFF       = Väljas
+
+# Misc settings
+
+option.DEBUG_VIEW                      = Silumisvaade
+option.DEBUG_SAMPLER                   = Silumisseadistused
+option.WHITE_WORLD                     = Valge maailm
+option.WHITE_WORLD.comment             = Määrab kõik albedotekstuurid valgeks
+option.TONEMAP_COMPARISON              = Toonikaartide võrdlus
+option.TONEMAP_COMPARISON.comment      = Võrdleb kahte toonikaartide funktsiooni ekraani vasakul ja paremal poolel
+option.tonemap_left                    = Vasak toonikaart
+option.tonemap_right                   = Parem toonikaart
+option.FANCY_NETHER_PORTAL             = Efektne Netheri portaal
+option.FANCY_NETHER_PORTAL.comment     = Efektne netheri portaali efekt, inspireeritud Complementary Reimagined shaderitest (EminGT). Võib mitte töötada õigesti mõne ressursipakiga
+option.CUSTOM_SKY                      = Kohandatud taevas
+option.CUSTOM_SKY.comment              = Lülitab sisse kohandatud taeva ressursipakkidest
+option.CUSTOM_SKY_BRIGHTNESS           = Kohandatud taeva heledus
+option.CUSTOM_SKY_BRIGHTNESS.comment   = Reguleerib kohandatud taeva heledust
+option.DH_OVERDRAW_DISTANCE            = Ülekattumise kaugus
+option.DH_OVERDRAW_FADE_LENGTH         = Ülekattumise hääbumise pikkus
+option.NOISE_ON_DH_TERRAIN             = Mürastatud maastik
+option.ENCHANTMENT_GLINT_BRIGHTNESS    = Enchant‑sädeluse heledus
+option.USE_SEPARATE_ENTITY_DRAWS       = Kasuta „Separate Entity Draws“
+comment.USE_SEPARATE_ENTITY_DRAWS      = "separateEntityDraws" on Iris funktsioon, mis võimaldab shaderitel, nagu Photon, korrektselt renderdada läbipaistvaid üksusi ja objekte. Selle väljalülitamisel võib tekkida visuaalseid probleeme nagu läbipaistvate üksuste muutumine läbipaistmatuks
+option.DITHERED_TRANSLUCENCY_FALLBACK  = Varundatud dithering‑läbipaistvus
+comment.DITHERED_TRANSLUCENCY_FALLBACK = Kasutab ditheringut läbipaistvuse parandamiseks juhtudel, kus separateEntityDraws seda ei võimalda
+
+value.DEBUG_VIEW.DEBUG_VIEW_NONE       = Väljas
+value.DEBUG_VIEW.DEBUG_VIEW_SAMPLER    = Proovivaatlus
+value.DEBUG_VIEW.DEBUG_VIEW_HISTOGRAM  = Histogramm
+value.DEBUG_VIEW.DEBUG_VIEW_WEATHER    = Ilmavaade
+
+value.tonemap_left.tonemap_aces_fit       = ACES Fit
+value.tonemap_left.tonemap_aces_full      = ACES Full
+value.tonemap_left.tonemap_lottes         = Lottes
+value.tonemap_left.tonemap_hejl_2015      = Hejl 2015
+value.tonemap_left.tonemap_hejl_burgess   = Hejl‑Burgess
+value.tonemap_left.tonemap_uncharted_2    = Uncharted 2
+value.tonemap_left.tonemap_tech           = Tech
+value.tonemap_left.tonemap_ozius          = Ozius
+value.tonemap_left.tonemap_reinhard       = Reinhard
+value.tonemap_left.tonemap_reinhard_jodie = Reinhard‑Jodie
+
+value.tonemap_right.tonemap_aces_fit       = ACES Fit
+value.tonemap_right.tonemap_aces_full      = ACES Full
+value.tonemap_right.tonemap_lottes         = Lottes
+value.tonemap_right.tonemap_hejl_burgess   = Hejl‑Burgess
+value.tonemap_right.tonemap_hejl_2015      = Hejl 2015
+value.tonemap_right.tonemap_uncharted_2    = Uncharted 2
+value.tonemap_right.tonemap_tech           = Tech
+value.tonemap_right.tonemap_ozius          = Ozius
+value.tonemap_right.tonemap_reinhard       = Reinhard
+value.tonemap_right.tonemap_reinhard_jodie = Reinhard‑Jodie
+
+# Distance View
+
+option.DISTANCE_VIEW                   = Lubatud
+option.DISTANCE_VIEW_METHOD            = Meetod
+option.DISTANCE_VIEW_MAX_DISTANCE      = Maksimaalne kaugus
+suffix.DISTANCE_VIEW_MAX_DISTANCE      = m
+
+value.DISTANCE_VIEW_METHOD.DISTANCE_VIEW_DISTANCE = Kaugus
+value.DISTANCE_VIEW_METHOD.DISTANCE_VIEW_DEPTH    = Sügavus
+
+# Box
+
+option.BOX_MODE                 = Režiim
+option.BOX_MODE.comment         = Valiku kasti režiim
+value.BOX_MODE.BOX_MODE_NONE    = Vaikimisi
+value.BOX_MODE.BOX_MODE_COLOR   = Kohandatud värv
+value.BOX_MODE.BOX_MODE_RAINBOW = Vikerkaar
+option.BOX_COLOR_R              = Punane
+option.BOX_COLOR_G              = Roheline
+option.BOX_COLOR_B              = Sinine
+option.BOX_EMISSION             = Kiirgus
+option.BOX_EMISSION.comment     = Suurendab värvi intensiivsust üle 1. Nõuab bloom-efekti.
+option.BOX_LINE_WIDTH           = Joone laius
