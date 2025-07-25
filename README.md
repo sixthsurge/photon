@@ -10,7 +10,7 @@
 
 * Menu translations: 
   * [NakiriRuri](https://github.com/NakiriRuri) and [OrzMiku](https://github.com/Orzmiku) - Chinese Simplified (China; Mandarin)
-  * [ChunghwhaMC](https://github.com/ChunghwaMC) - Chinese Traditional (Taiwan; Mandarin)
+  * [ChunghwaMC](https://github.com/ChunghwaMC) - Chinese Traditional (Taiwan; Mandarin)
   * [Jmayk](https://github.com/Jmayk-dev) - Italian
   * [Timtaran](https://github.com/Timtaran) - Russian
   * sincerity - Estonian
