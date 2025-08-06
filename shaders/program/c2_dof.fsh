@@ -81,7 +81,12 @@ void main() {
 
 	for (int i = 0; i < DOF_SAMPLES; ++i) {
 		vec2 offset = vogel_disk_sample(i, DOF_SAMPLES, theta);
-		scene_color += textureLod(colortex0, clamp(vec2(uv + offset * CoC), vec2(0.0), vec2(1.0 - 2.0 * view_pixel_size * rcp(taau_render_scale))) * taau_render_scale, 0).rgb;
+		#ifdef DOF_ANAMORPHIC
+			// source: https://github.com/Miclus/Photon-GAMS/commit/ccec5510f1cb4d3ea7ad8af318564baf48839614
+            offset.y *= DOF_ANAMORPHIC_RATIO;
+	    #endif
+		vec2 sample_coord = vec2(uv + offset * CoC);
+		scene_color += textureLod(colortex0, clamp(sample_coord, vec2(0.0), vec2(1.0 - 2.0 * view_pixel_size * rcp(taau_render_scale))) * taau_render_scale, 0).rgb;
 	}
 
 	scene_color *= rcp(DOF_SAMPLES);

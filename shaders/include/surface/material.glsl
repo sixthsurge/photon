@@ -616,7 +616,10 @@ Material material_from(vec3 albedo_srgb, uint material_mask, vec3 world_pos, vec
 				} else { // 60-64
 					if (material_mask < 62u) { // 60-62
 						if (material_mask == 60u) { // 60
-
+							#ifdef HARDCODED_EMISSION
+							// Redstone wire
+							material.emission = 0.33 * albedo_sqrt;
+							#endif
 						} else { // 61
 
 						}
@@ -632,9 +635,85 @@ Material material_from(vec3 albedo_srgb, uint material_mask, vec3 world_pos, vec
 				}
 			}
 		}
+	} else if (material_mask < 96u) { // 64-96
+		if (material_mask < 80u) { // 64-80
+			if (material_mask < 72u) { // 64-72
+				if (material_mask < 68u) { // 64-68
+					if (material_mask < 66u) { // 64-66
+						if (material_mask == 64u) { // 64
+							#ifdef HARDCODED_EMISSION
+							// Nether quartz ore
+							vec3 ap1 = material.albedo * rec2020_to_ap1_unlit;
+							float l = 0.5 * (min_of(ap1) + max_of(ap1));
+							material.emission = 0.10 * material.albedo * step(0.45, l);
+							#endif
+						} else { // 65
+							#ifdef HARDCODED_EMISSION
+							// Unlit redstone ore
+							vec3 ap1 = material.albedo * rec2020_to_ap1_unlit;
+							float l = 0.5 * (min_of(ap1) + max_of(ap1));
+							float redness = ap1.r * rcp(ap1.g + ap1.b);
+							material.emission = 0.10 * material.albedo * step(0.45, redness * l);
+							#endif
+						}
+					} else { // 66-68
+						if (material_mask == 66u) { // 66
+							#ifdef HARDCODED_EMISSION
+							// Metal ore
+							vec3 ap1 = material.albedo * rec2020_to_ap1_unlit;
+							float l = 0.5 * (min_of(ap1) + max_of(ap1));
+							float yellowness = 0.33 * ap1.r * rcp(ap1.g + ap1.b) + 0.66 * ap1.g * rcp(ap1.r + ap1.b);
+							material.emission = 0.02 * material.albedo * step(0.20, yellowness * l);
+							#endif
+						} else { // 67
+							#ifdef HARDCODED_EMISSION
+							// Gold ore
+							vec3 ap1 = material.albedo * rec2020_to_ap1_unlit;
+							float l = 0.5 * (min_of(ap1) + max_of(ap1));
+							float yellowness = 0.5 * (ap1.r * rcp(ap1.g + ap1.b) + ap1.g * rcp(ap1.r + ap1.b));
+							material.emission = 0.04 * material.albedo * step(0.25, yellowness * l);
+							#endif
+						}
+					}
+				} else { // 68-72
+					if (material_mask < 70u) { // 68-70
+						if (material_mask == 68u) { // 68
+							#ifdef HARDCODED_EMISSION
+							// Emerald ore
+							vec3 ap1 = material.albedo * rec2020_to_ap1_unlit;
+							float l = 0.5 * (min_of(ap1) + max_of(ap1));
+							float greenness = ap1.g * rcp(ap1.r + ap1.b);
+							material.emission = 0.10 * material.albedo * step(0.45, greenness * l);
+							#endif
+						} else { // 69
+							#ifdef HARDCODED_EMISSION
+							// Diamond ore
+							vec3 ap1 = material.albedo * rec2020_to_ap1_unlit;
+							float l = 0.5 * (min_of(ap1) + max_of(ap1));
+							float cyanness = 0.5 * (ap1.b * rcp(ap1.r + ap1.g) + ap1.g * rcp(ap1.r + ap1.b));
+							material.emission = 0.10 * material.albedo * step(0.25, cyanness * l);
+							#endif
+						}
+					} else { // 70-72
+						if (material_mask == 70u) { // 70
+							#ifdef HARDCODED_EMISSION
+							// Lapis ore
+							vec3 ap1 = material.albedo * rec2020_to_ap1_unlit;
+							float l = 0.5 * (min_of(ap1) + max_of(ap1));
+							float blueness = ap1.b * rcp(ap1.r + ap1.g);
+							material.emission = 0.10 * material.albedo * step(0.45, blueness * l);
+							#endif
+						} else { // 71
+						}
+					}
+				}
+			} else { // 72-80
+			}
+		} else { // 80-96
+		}
 	}
 
-	if (64u <= material_mask && material_mask < 80u) {
+	if (96u <= material_mask && material_mask < 112u) {
 		// Stained glass, honey and slime
 		#ifdef HARDCODED_SPECULAR
 		material.f0 = vec3(0.04);

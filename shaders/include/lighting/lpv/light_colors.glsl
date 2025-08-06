@@ -1,7 +1,7 @@
 #if !defined INCLUDE_LIGHTING_LPV_LIGHT_COLORS
 #define INCLUDE_LIGHTING_LPV_LIGHT_COLORS
 
-const vec3[32] light_color = vec3[32](
+const vec3[64] light_color = vec3[64](
 	vec3(1.00, 1.00, 1.00) * 12.0, // Strong white light
 	vec3(1.00, 1.00, 1.00) *  6.0, // Medium white light
 	vec3(1.00, 1.00, 1.00) *  1.0, // Weak white light
@@ -30,10 +30,43 @@ const vec3[32] light_color = vec3[32](
 	vec3(0.75, 1.00, 0.83) *  6.0, // Active sculk sensor
 	vec3(1.00, 0.18, 0.10) *  3.3, // Redstone block
 	vec3(1.00, 0.50, 0.25) *  3.0, // Open eyeblossom
-	vec3(0.0), // Unused
+	vec3(1.00, 0.18, 0.10) *  0.5, // Redstone wire
 	vec3(0.0), // Unused
 	vec3(0.60, 0.10, 1.00) * 12.0, // Nether portal
-	vec3(0.0)  // End portal
+	vec3(0.0),  // End portal
+	// 32-63
+	vec3(1.00, 1.00, 1.00) * 0.33, // White glow
+	vec3(1.00, 0.00, 0.00) *  1.0, // Red glow
+	vec3(1.00, 0.50, 0.00) * 0.75, // Orange glow
+	vec3(1.00, 1.00, 0.00) *  0.5, // Yellow glow
+	vec3(0.00, 1.00, 0.00) *  1.0, // Green glow
+	vec3(0.00, 1.00, 1.00) *  0.5, // Cyan glow
+	vec3(0.00, 0.00, 1.00) *  1.0, // Blue glow
+	vec3(0.0), // Unused
+	vec3(0.0), // Unused
+	vec3(0.0), // Unused
+	vec3(0.0), // Unused
+	vec3(0.0), // Unused
+	vec3(0.0), // Unused
+	vec3(0.0), // Unused
+	vec3(0.0), // Unused
+	vec3(0.0), // Unused
+	vec3(0.0), // Unused
+	vec3(0.0), // Unused
+	vec3(0.0), // Unused
+	vec3(0.0), // Unused
+	vec3(0.0), // Unused
+	vec3(0.0), // Unused
+	vec3(0.0), // Unused
+	vec3(0.0), // Unused
+	vec3(0.0), // Unused
+	vec3(0.0), // Unused
+	vec3(0.0), // Unused
+	vec3(0.0), // Unused
+	vec3(0.0), // Unused
+	vec3(0.0), // Unused
+	vec3(0.0), // Unused
+	vec3(0.0)  // Unused
 );
 
 const vec3[16] tint_color = vec3[16](
