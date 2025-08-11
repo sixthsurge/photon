@@ -86,7 +86,7 @@ void main() {
 	material_mask = uint(mc_Entity.x - 10000.0);
 	tint          = gl_Color.rgb;
 
-#if defined COLORED_LIGHTS && !defined PROGRAM_SHADOW_ENTITIES
+#if defined COLORED_LIGHTS && !defined PROGRAM_SHADOW_ENTITIES 
 	update_voxel_map(material_mask);
 #endif
 
