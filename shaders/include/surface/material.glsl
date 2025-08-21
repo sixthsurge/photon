@@ -704,10 +704,41 @@ Material material_from(vec3 albedo_srgb, uint material_mask, vec3 world_pos, vec
 							material.emission = 0.10 * material.albedo * step(0.45, blueness * l);
 							#endif
 						} else { // 71
+							#ifdef HARDCODED_EMISSION
+							// Emerald block
+							material.emission = 0.33 * albedo_sqrt;
+							#endif
+							// Gems
+							#ifdef HARDCODED_SPECULAR
+							float smoothness = sqrt(linear_step(0.1, 0.9, hsl.z));
+							material.roughness = max(sqr(1.0 - smoothness), 0.04);
+							material.f0 = vec3(0.25);
+							material.ssr_multiplier = 1.0;
+							#endif
 						}
 					}
 				}
 			} else { // 72-80
+				if (material_mask < 76u) { // 72-76
+					if (material_mask < 74u) { // 72-74
+						if (material_mask == 72u) { // 72
+							#ifdef HARDCODED_EMISSION
+							// Lapis block
+							material.emission = 0.33 * albedo_sqrt;
+							#endif
+							// Gems
+							#ifdef HARDCODED_SPECULAR
+							float smoothness = sqrt(linear_step(0.1, 0.9, hsl.z));
+							material.roughness = max(sqr(1.0 - smoothness), 0.04);
+							material.f0 = vec3(0.25);
+							material.ssr_multiplier = 1.0;
+							#endif
+						} else { // 73
+						}
+					} else { // 74-76
+					}
+				} else { // 76-80
+				}
 			}
 		} else { // 80-96
 		}

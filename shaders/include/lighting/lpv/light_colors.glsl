@@ -39,11 +39,11 @@ const vec3[64] light_color = vec3[64](
 	vec3(1.00, 0.00, 0.00) *  1.0, // Red glow
 	vec3(1.00, 0.50, 0.00) * 0.75, // Orange glow
 	vec3(1.00, 1.00, 0.00) *  0.5, // Yellow glow
-	vec3(0.00, 1.00, 0.00) *  1.0, // Green glow
+	vec3(0.00, 1.00, 0.00) *  0.9, // Green glow
 	vec3(0.00, 1.00, 1.00) *  0.5, // Cyan glow
 	vec3(0.00, 0.00, 1.00) *  1.0, // Blue glow
-	vec3(0.0), // Unused
-	vec3(0.0), // Unused
+	vec3(0.00, 1.00, 0.00) *  3.3, // Emerald Block
+	vec3(0.00, 0.00, 1.00) *  3.3, // Lapis Block
 	vec3(0.0), // Unused
 	vec3(0.0), // Unused
 	vec3(0.0), // Unused
