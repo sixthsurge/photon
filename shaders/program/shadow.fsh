@@ -110,7 +110,7 @@ float get_water_caustics() {
 	vec3 world_pos = scene_pos + cameraPosition;
 
 	vec2 coord = -world_pos.xz;
-	vec3 normal = tbn * get_water_normal(world_pos, tbn[2], coord, flow_dir, 1.0, flowing_water);
+	vec3 normal = tbn * get_water_normal(world_pos, tbn[2], coord, flow_dir, 1.0, flowing_water) * (1 - rainStrength);
 
 	vec3 old_pos = world_pos;
 	vec3 new_pos = world_pos + refract_safe(light_dir, normal, air_n / water_n) * (distance_through_water * WATER_CAUSTICS_INTENSITY);
@@ -126,7 +126,7 @@ float get_water_caustics() {
 
 void main() {
 	if (material_mask == 1) { // Water
-		#if defined PROGRAM_SHADOW_WATER || defined PROGRAM_SHADOW_FALLBACK
+		#if defined PROGRAM_SHADOW_WATER
 		vec3 biome_water_color = srgb_eotf_inv(tint) * rec709_to_working_color;
 		vec3 absorption_coeff = biome_water_coeff(biome_water_color);
 

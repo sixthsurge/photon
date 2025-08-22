@@ -9,11 +9,6 @@
 #include "/include/utility/random.glsl"
 #include "/include/utility/rotation.glsl"
 
-#define SHADOW_PCF_STEPS_MIN           6 // [4 6 8 12 16 18 20 22 24 26 28 30 32]
-#define SHADOW_PCF_STEPS_MAX          12 // [4 6 8 12 16 18 20 22 24 26 28 30 32]
-#define SHADOW_PCF_STEPS_SCALE       1.0 // [0.0 0.2 0.4 0.6 0.8 1.0 1.2 1.4 1.6 1.8 2.0]
-#define SHADOW_BLOCKER_SEARCH_RADIUS 0.5 // [0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0]
-
 const int shadow_map_res = int(float(shadowMapResolution) * MC_SHADOW_QUALITY);
 const float shadow_map_pixel_size = rcp(float(shadow_map_res));
 

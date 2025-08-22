@@ -5,7 +5,7 @@
 
 float gerstner_wave(vec2 coord, vec2 wave_dir, float t, float noise, float wavelength) {
 	// Gerstner wave function from Belmu in #snippets, modified
-	const float g = 9.8;
+	const float g = 9.81;
 
 	float k = tau / wavelength;
 	float w = sqrt(g * k);
@@ -58,10 +58,10 @@ float get_water_height(vec2 coord, vec2 wave_dir, mat2 wave_rot, float t) {
 	// Sample noise textures first (latency hiding)
 
 	float[WATER_WAVE_ITERATIONS] wave_noise;
-	vec2 noise_coord = (coord + vec2(0.0, 0.25 * t)) * noise_frequency;
+	vec2 noise_coord = (coord + vec2(0.5, 0.5 * t)) * noise_frequency;
 	for (uint i = 0u; i < WATER_WAVE_ITERATIONS; ++i) {
 		wave_noise[i] = texture(noisetex, noise_coord).y;
-		noise_coord *= 2.5;
+		noise_coord *= 1.0 * ITERATIONS_SCALE;
 	}
 
 #ifdef WATER_WAVES_HEIGHT_VARIATION

@@ -23,7 +23,7 @@ struct Material {
 
 const Material water_material = Material(vec3(0.0), vec3(0.0), vec3(0.02), vec3(0.0), 0.002, 1.0, 0.0, 0.0, 1.0, false, false);
 
-#if TEXTURE_FORMAT == TEXTURE_FORMAT_LAB
+#if TEXTURE_FORMAT == TEXTURE_FORMAT_LAB && TEXTURE_FORMAT_INT
 void decode_specular_map(vec4 specular_map, inout Material material) {
 	// f0 and f82 values for hardcoded metals from Jessie LC (https://github.com/Jessie-LC)
 	const vec3[] metal_f0 = vec3[](
@@ -393,8 +393,14 @@ Material material_from(vec3 albedo_srgb, uint material_mask, vec3 world_pos, vec
 							material.emission = albedo_sqrt * linear_step(0.33, 0.5, hsl.z);
 							#endif
 						} else { // 27
-
-						}
+						    if (material_mask == 27u) { //27
+							    // Particles
+								vec3 ap1 = material.albedo * rec2020_to_ap1_unlit;
+								float lum = 0.5 * (min_of(ap1) + max_of(ap1));
+								float redness = ap1.r * rcp(ap1.g + ap1.b);
+								material.emission = PARTICLES_BRIGHTNESS * (1.0 * material.albedo * step(0.25, redness * 1) + 2.5 * albedo_sqrt * (0.2 + 0.8 * isolate_hue(hsl, 15.0, 15.0)) * step(0.871, hsl.y) * step(0.35, hsl.z));
+							}
+						}	
 					}
 				} else { // 28-32
 					if (material_mask < 30) { // 28-30
@@ -421,7 +427,7 @@ Material material_from(vec3 albedo_srgb, uint material_mask, vec3 world_pos, vec
 						if (material_mask == 32u) { // 32
 							#ifdef HARDCODED_EMISSION
 							// Strong white light
-							material.emission = 1.00 * albedo_sqrt * (0.1 + 0.9 * cube(hsl.z));
+							material.emission = 1.0 * (step(hsl.z, 1.2) * (1.000 - step(0.115, hsl.y))) * albedo_sqrt * (0.1 + 0.9 * cube(hsl.z));
 							#endif
 						} else { // 33
 							#ifdef HARDCODED_EMISSION
@@ -523,7 +529,7 @@ Material material_from(vec3 albedo_srgb, uint material_mask, vec3 world_pos, vec
 						} else { // 47
 							#ifdef HARDCODED_EMISSION
 							// Pink glow
-							material.emission = vec3(0.75) * isolate_hue(hsl, 310.0, 50.0);
+							material.emission = PARTICLES_BRIGHTNESS * vec3(1.0) * isolate_hue(hsl, 310.0, 50.0);
 							#endif
 						}
 					}
@@ -569,7 +575,8 @@ Material material_from(vec3 albedo_srgb, uint material_mask, vec3 world_pos, vec
 						}
 					} else { // 54-56
 						if (material_mask == 54u) { // 54
-
+							float blue = isolate_hue(hsl, 200.0, 50.0);
+                            material.emission = 1.00 * albedo_sqrt * linear_step(0.99, 1.0, blue + hsl.z); 
 						} else { // 55
 							#ifdef HARDCODED_EMISSION
 							// Amethyst cluster

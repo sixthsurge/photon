@@ -37,6 +37,7 @@ uniform float eye_skylight;
 uniform vec2 view_pixel_size;
 
 #include "/include/post_processing/tonemap_operators.glsl"
+#include "/include/post_processing/color_grading.glsl"
 #include "/include/utility/bicubic.glsl"
 #include "/include/utility/color.glsl"
 
@@ -132,44 +133,9 @@ vec3 grade_input(vec3 rgb) {
 	return rgb;
 }
 
-// Color grading applied after tone mapping
-// rgb := color in linear rec.709 [0, 1]
-vec3 grade_output(vec3 rgb) {
-	// Convert to roughly perceptual RGB for color grading
-	rgb = sqrt(rgb);
-
-	// HSL color grading inspired by Tech's color grading setup in Lux Shaders
-
-	const float orange_sat_boost = GRADE_ORANGE_SAT_BOOST;
-	const float teal_sat_boost   = GRADE_TEAL_SAT_BOOST;
-	const float green_sat_boost  = GRADE_GREEN_SAT_BOOST;
-	const float green_hue_shift  = GRADE_GREEN_HUE_SHIFT / 360.0;
-
-	vec3 hsl = rgb_to_hsl(rgb);
-
-	// Oranges
-	float orange = isolate_hue(hsl, 30.0, 20.0);
-	hsl.y *= 1.0 + orange_sat_boost * orange;
-
-	// Teals
-	float teal = isolate_hue(hsl, 210.0, 20.0);
-	hsl.y *= 1.0 + teal_sat_boost * teal;
-
-	// Greens
-	float green = isolate_hue(hsl, 90.0, 44.0);
-	hsl.x += green_hue_shift * green;
-	hsl.y *= 1.0 + green_sat_boost * green;
-
-	rgb = hsl_to_rgb(hsl);
-
-	rgb = gain(rgb, 1.05);
-
-	return sqr(rgb);
-}
-
 float vignette(vec2 uv) {
     const float vignette_size = 16.0;
-    const float vignette_intensity = 0.08 * VIGNETTE_INTENSITY;
+    const float vignette_intensity = 0.2 * VIGNETTE_INTENSITY;
 
 	float darkness_pulse = 1.0 - dampen(abs(cos(2.0 * frameTimeCounter)));
 
@@ -206,6 +172,9 @@ void main() {
 #endif
 
 	scene_color = grade_input(scene_color);
+	
+	// Apply RGB color grading
+	scene_color = apply_color_grading(scene_color);
 
 #ifdef TONEMAP_COMPARISON
 	scene_color = uv.x < 0.5 ? tonemap_left(scene_color) : tonemap_right(scene_color);
@@ -214,7 +183,6 @@ void main() {
 #endif
 
 	scene_color = clamp01(scene_color * working_to_display_color);
-	scene_color = grade_output(scene_color);
 
 #if 0 // Tonemap plot
 	const float scale = 2.0;

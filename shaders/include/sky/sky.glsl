@@ -17,7 +17,9 @@
 #include "/include/sky/projection.glsl"
 #include "/include/sky/rainbow.glsl"
 #include "/include/sky/stars.glsl"
+#include "/include/sky/shootingStars.glsl"
 #include "/include/utility/geometry.glsl"
+
 
 #if defined PROGRAM_DEFERRED0
 #include "/include/sky/clouds.glsl"
@@ -97,6 +99,11 @@ vec3 draw_sky(
 	sky += draw_galaxy(celestial_dir, galaxy_luminance);
 #else
 	const float galaxy_luminance = 0.0;
+#endif
+
+	// Shooting stars
+#if defined SHOOTING_STARS && !defined PROGRAM_DEFERRED0
+	sky = DrawShootingStars(sky, ray_dir);
 #endif
 
 	// Sun, moon stars

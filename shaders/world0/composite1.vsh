@@ -1,4 +1,4 @@
-#version 400 compatibility
+#version 430 compatibility
 #define WORLD_OVERWORLD
 #define PROGRAM_COMPOSITE1
 #define vsh

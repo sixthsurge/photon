@@ -36,6 +36,8 @@ uniform sampler2D shadowtex0;
 #include "/include/utility/color.glsl"
 #include "/include/utility/dithering.glsl"
 #include "/include/utility/text_rendering.glsl"
+#include "/include/post_processing/chromatic_aberration.glsl"
+#include "/include/post_processing/film_grain.glsl"
 
 #ifdef DISTANCE_VIEW
 uniform sampler2D depthtex0;
@@ -152,6 +154,18 @@ void main() {
 		fragment_color = catmull_rom_filter_fast_rgb(colortex0, uv, 0.6);
 	    fragment_color = display_eotf(fragment_color);
 	}
+
+#ifdef CHROMATIC_ABERRATION
+	// chromatic aberration
+	fragment_color = chromatic_aberration(colortex0, uv, CHROMATIC_ABERRATION_INTENSITY);
+	fragment_color = display_eotf(fragment_color);
+#endif
+
+#ifdef FILM_GRAIN
+	// Apply film grain
+	fragment_color = apply_film_grain(fragment_color, uv, frameTimeCounter);
+	fragment_color = clamp01(fragment_color);
+#endif
 
 	fragment_color = dither_8bit(fragment_color, bayer16(vec2(texel)));
 

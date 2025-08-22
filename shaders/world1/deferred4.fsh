@@ -1,4 +1,4 @@
-#version 400 compatibility
+#version 430 compatibility
 #define WORLD_END
 #define PROGRAM_DEFERRED4
 #define fsh

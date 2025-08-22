@@ -119,7 +119,8 @@ void main() {
 
 #if defined PROGRAM_GBUFFERS_PARTICLES
 	// Make enderman/nether portal particles glow
-	if (gl_Color.r > gl_Color.g && gl_Color.g < 0.6 && gl_Color.b > 0.4) material_mask = 47;
+    if (gl_Color.r > gl_Color.g && gl_Color.g < 0.6 && gl_Color.b > 0.4) material_mask = 47;
+    else material_mask = 27;
 #endif
 
 #if defined PROGRAM_GBUFFERS_BEACONBEAM

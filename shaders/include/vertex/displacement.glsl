@@ -25,7 +25,7 @@ uniform vec3 eyePosition;
 #if defined WATER_DISPLACEMENT
 float gerstner_wave(vec2 coord, vec2 wave_dir, float t, float noise, float wavelength) {
 	// Gerstner wave function from Belmu in #snippets, modified
-	const float g = 9.8;
+	const float g = 9.81;
 
 	float k = tau / wavelength;
 	float w = sqrt(g * k);
