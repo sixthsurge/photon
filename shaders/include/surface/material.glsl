@@ -706,7 +706,7 @@ Material material_from(vec3 albedo_srgb, uint material_mask, vec3 world_pos, vec
 						} else { // 71
 							#ifdef HARDCODED_EMISSION
 							// Emerald block
-							material.emission = 0.33 * albedo_sqrt;
+							material.emission = 0.16 * albedo_sqrt;
 							#endif
 							// Gems
 							#ifdef HARDCODED_SPECULAR
