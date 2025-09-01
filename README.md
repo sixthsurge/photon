@@ -52,7 +52,7 @@
 * Nvidia, AMD and Intel GPUs
 * Iris - version 1.5 and above
 * OptiFine - on Minecraft 1.16.5 and above
-* Photon is also compatible with [Distant Horizons](https://www.curseforge.com/minecraft/mc-mods/distant-horizons) 
+* Photon is also compatible with [Distant Horizons](https://www.curseforge.com/minecraft/mc-mods/distant-horizons) and [Voxy](https://modrinth.com/mod/voxy)
 * Apple Metal: Disable _SH Skylight_ and _Colored Shadows_
 
 ## Showcase videos

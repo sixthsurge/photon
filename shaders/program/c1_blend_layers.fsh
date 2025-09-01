@@ -161,8 +161,12 @@ vec3 blend_layers_with_fog(
 	vec3 front_position_world,
 	vec3 back_position_world,
 	bool is_translucent,
-	bool is_sky
+	bool is_sky,
+	bool front_is_hand,
+	bool back_is_hand
 ) {
+	if (back_is_hand) return background_color;
+
 	// Apply analytic fog behind translucents
 
 #if defined WORLD_OVERWORLD 
@@ -235,6 +239,11 @@ void main() {
 
 	// Space conversions
 
+	bool front_is_hand;
+	bool back_is_hand;
+	fix_hand_depth(front_depth, front_is_hand);
+	fix_hand_depth(back_depth, back_is_hand);
+
 	vec3 front_position_screen = vec3(uv, front_is_lod_terrain ? front_depth_lod : front_depth);
 	vec3 front_position_view   = screen_to_view_space(front_position_screen, true, front_is_lod_terrain);
 	vec3 front_position_scene  = view_to_scene_space(front_position_view);
@@ -298,6 +307,7 @@ void main() {
 
 	#ifdef VOXY
 			vec4 gbuffer_data = texelFetch(colortex16, texel, 0);
+			bool is_water = min_of(gbuffer_data) > eps;
 	#else
 			vec4 gbuffer_data = texelFetch(colortex1, texel, 0);
 	#endif
@@ -310,11 +320,17 @@ void main() {
 			);
 
 			vec3 tint          = vec3(data[0], data[1].x);
-			uint material_mask = uint(255.0 * data[1].y);
 			vec3 flat_normal   = decode_unit_vector(data[2]);
 			vec2 light_levels  = data[3];
 
-			if (material_mask == MATERIAL_WATER) { // Water
+	#ifdef DISTANT_HORIZONS
+			uint material_mask = uint(255.0 * data[1].y);
+			bool is_water = material_mask == MATERIAL_WATER;
+	#else 
+			float water_alpha = data[1].y;
+	#endif
+
+			if (is_water) { // Water
 				vec4 water_color = draw_distant_water(
 					lod_position_screen,
 					lod_position_view,
@@ -326,6 +342,11 @@ void main() {
 					length_knowing_direction(cameraPosition - lod_position_world, direction_world),
 					length_knowing_direction(lod_position_world - back_position_world, direction_world)
 				);
+
+	#ifdef VOXY
+				// Account for darkening by alpha of water surface
+				//water_color *= 8.0;
+	#endif
 
 				fragment_color = fragment_color * (1.0 - water_color.a) + water_color.rgb;
 			}
@@ -345,7 +366,9 @@ void main() {
 		front_position_world,
 		back_position_world,
 		is_translucent,
-		is_sky
+		is_sky,
+		front_is_hand,
+		back_is_hand
 	);
 
 	// Border fog 

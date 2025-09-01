@@ -37,6 +37,11 @@
 	#define LOD_MOD_ACTIVE
 #endif
 
+#if defined VOXY && defined DISTANT_HORIZONS
+	// Cancel Voxy DH emulation
+	#undef DISTANT_HORIZONS
+#endif
+
 // Settings
 
 #include "/settings.glsl"

@@ -1,0 +1,8 @@
+#if !defined INCLUDE_LIGHTING_SHADOWS_SSRT_SHADOWS
+#define INCLUDE_LIGHTING_SHADOWS_SSRT_SHADOWS
+
+bool raymarch_depth_buffer_shadow() {
+
+}
+
+#endif // INCLUDE_LIGHTING_SHADOWS_SSRT_SHADOWS
