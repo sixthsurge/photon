@@ -60,9 +60,9 @@ bool get_rain_puddles(
 	albedo *= 1.0 - puddle_darkening_factor * puddle;
 
 	// Replace material with puddle material
-	f0             = max(f0, mix(f0, vec3(puddle_f0), puddle));
-	roughness      = puddle_roughness;
-	ssr_multiplier = max(ssr_multiplier, puddle);
+	f0 = mix(f0, vec3(puddle_f0), puddle);
+	roughness = mix(roughness, puddle_roughness, puddle);
+	ssr_multiplier = mix(ssr_multiplier, 1.0, puddle);
 
 	// Ripple animation
 	const float h = 0.1;
