@@ -39,7 +39,11 @@ vec4 draw_distant_water(
 
 	// Water absorption approx (must match gbuffers_water)
 
-	vec3 biome_water_color = srgb_eotf_inv(1.45 * tint.rgb) * rec709_to_working_color;
+#ifdef DISTANT_HORIZONS
+	tint.rgb *= 1.45;
+#endif
+
+	vec3 biome_water_color = srgb_eotf_inv(tint.rgb) * rec709_to_working_color;
 	vec3 absorption_coeff = biome_water_coeff(biome_water_color);
 
 	mat2x3 water_fog = water_fog_simple(

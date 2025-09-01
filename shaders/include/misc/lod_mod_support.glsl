@@ -91,6 +91,7 @@
     #define combined_depth_tex                 depthtex1
 #endif
 
+
 bool is_lod_terrain(float depth, float depth_lod) {
     return depth >= 1.0 && depth_lod < 1.0;
 }

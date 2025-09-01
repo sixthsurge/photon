@@ -1,8 +1,11 @@
 #include "/include/global.glsl"
 #include "/include/utility/encoding.glsl"
 
-layout (location = 0) out vec4 gbuffer_data_0;
+// voxy.json is preprocessed all together; include guard must be removed so this file can be used
+// in voxy_translucent
+#undef INCLUDE_UTILITY_ENCODING
 
+layout (location = 0) out vec4 gbuffer_data_0;
 
 /*
 struct VoxyFragmentParameters {
@@ -27,7 +30,7 @@ void voxy_emitFragment(VoxyFragmentParameters parameters) {
 		uint((parameters.face >> 1) == 1)
 	) * (float(int(parameters.face) & 1) * 2.0 - 1.0);
 
-	uint material_mask = 0u;
+	uint material_mask = parameters.customId - 10000u;
 
 	gbuffer_data_0.x  = pack_unorm_2x8(base_color.rg);
 	gbuffer_data_0.y  = pack_unorm_2x8(base_color.b, clamp01(float(material_mask) * rcp(255.0)));

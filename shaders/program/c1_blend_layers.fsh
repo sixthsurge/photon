@@ -44,8 +44,6 @@ flat in OverworldFogParameters fog_params;
 uniform sampler2D noisetex;
 
 uniform sampler2D colortex0;  // scene color
-uniform sampler2D colortex1;  // gbuffer 0
-uniform sampler2D colortex2;  // gbuffer 1
 uniform sampler2D colortex3;  // refraction data
 uniform sampler2D colortex4;  // sky map
 uniform sampler2D colortex5;  // scene history
@@ -61,6 +59,14 @@ uniform sampler2D shadowcolor0;
 uniform sampler2D shadowtex0;
 #endif
 uniform sampler2D shadowtex1;
+#endif
+
+#ifdef DH 
+uniform sampler2D colortex1;  // distant water gbuffer 
+#endif
+
+#ifdef VOXY 
+uniform sampler2D colortex16; // distant water gbuffer 0
 #endif
 
 uniform sampler2D depthtex0;
@@ -210,7 +216,7 @@ void main() {
 
 #ifdef LOD_MOD_ACTIVE
     float front_depth_lod   = texelFetch(lod_depth_tex, texel, 0).x;
-    float back_depth_lod    = texelFetch(lod_depth_tex_solid, texel, 0).x;
+	float back_depth_lod    = texelFetch(lod_depth_tex_solid, texel, 0).x;
 
     bool front_is_lod_terrain = is_lod_terrain(front_depth, front_depth_lod);
     bool back_is_lod_terrain = is_lod_terrain(back_depth, back_depth_lod);
@@ -290,7 +296,11 @@ void main() {
 
 			// Unpack gbuffer data
 
+	#ifdef VOXY
+			vec4 gbuffer_data = texelFetch(colortex16, texel, 0);
+	#else
 			vec4 gbuffer_data = texelFetch(colortex1, texel, 0);
+	#endif
 
 			mat4x2 data = mat4x2(
 				unpack_unorm_2x8(gbuffer_data.x),
