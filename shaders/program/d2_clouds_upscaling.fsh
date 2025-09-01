@@ -260,7 +260,7 @@ void main() {
 	// Work out whether the history should be invalidated
 	bool disocclusion = clamp01(previous_uv) != previous_uv;
 		 disocclusion = disocclusion || (history_depth < 1.0 && distance_to_terrain_squared < sqr(closest_distance));
-		 disocclusion = disocclusion || (depth == 1.0 && history_depth == 1.0);
+		 disocclusion = disocclusion || (depth == 1.0 && history_depth != 1.0);
 		 disocclusion = disocclusion || history_depth == 0.0; // Signals hand
 		 disocclusion = disocclusion || any(isnan(history));
 	     disocclusion = disocclusion || world_age_changed;
