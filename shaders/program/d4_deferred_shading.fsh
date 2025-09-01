@@ -446,11 +446,23 @@ void main() {
 		float shadow_distance_fade;
 		vec3 shadows;
 
-        shadows = calculate_shadows(position_scene, flat_normal, light_levels.y, cloud_shadows, material.sss_amount, shadow_distance_fade, sss_depth);
+		if (!is_lod) {
+			shadows = calculate_shadows(
+				position_scene, 
+				flat_normal, 
+				light_levels.y, 
+				cloud_shadows, 
+				material.sss_amount, 
+				shadow_distance_fade, 
+				sss_depth
+			);
+		}
 
 	#ifdef LOD_MOD_ACTIVE
 		if (is_lod) {
+			shadows = vec3(lightmap_shadows(light_levels.y, NoL));
 			shadow_distance_fade = 1.0;
+			sss_depth = 0.0;
 		}
 	#endif
 #else
