@@ -163,7 +163,7 @@ const bool colortex11MipmapEnabled = true;
 #include "/include/lighting/diffuse_lighting.glsl"
 #include "/include/lighting/shadows/sampling.glsl"
 #include "/include/lighting/specular_lighting.glsl"
-#include "/include/misc/distant_horizons.glsl"
+#include "/include/misc/lod_mod_support.glsl"
 #include "/include/surface/edge_highlight.glsl"
 #include "/include/surface/material.glsl"
 #include "/include/misc/purkinje_shift.glsl"
@@ -195,7 +195,7 @@ void main() {
 
 	// Sample textures
 
-	float depth         = texelFetch(combined_depth_buffer, texel, 0).x;
+	float depth         = texelFetch(combined_depth_tex, texel, 0).x;
 	vec4 gbuffer_data_0 = texelFetch(colortex1, texel, 0);
 #if defined NORMAL_MAPPING || defined SPECULAR_MAPPING
 	vec4 gbuffer_data_1 = texelFetch(colortex2, texel, 0);
@@ -204,14 +204,14 @@ void main() {
 	vec4 overlays       = texelFetch(colortex3, texel, 0);
 #endif
 
-    // Check for Distant Horizons terrain
+    // Check for LoD terrain
 
-#ifdef DISTANT_HORIZONS
+#ifdef LOD_MOD_ACTIVE
     float depth_mc = texelFetch(depthtex1, texel, 0).x;
-    float depth_dh = texelFetch(dhDepthTex, texel, 0).x;
-	bool is_dh_terrain = is_distant_horizons_terrain(depth_mc, depth_dh);
+    float depth_lod = texelFetch(lod_depth_tex_solid, texel, 0).x;
+	bool is_lod = is_lod_terrain(depth_mc, depth_lod);
 #else
-    const bool is_dh_terrain = false;
+    const bool is_lod = false;
 	#define depth_mc depth
 #endif
 
@@ -345,8 +345,8 @@ void main() {
 		vec3 normal = flat_normal;
         bool parallax_shadow = false;
 
-#ifdef DISTANT_HORIZONS
-		if (!is_dh_terrain) {
+#ifdef LOD_MOD_ACTIVE
+		if (!is_lod) {
 #endif
 
 	#ifdef NORMAL_MAPPING
@@ -360,7 +360,7 @@ void main() {
 		parallax_shadow = gbuffer_data_1.z >= 0.5;
 	#endif
 
-#ifdef DISTANT_HORIZONS
+#ifdef LOD_MOD_ACTIVE
 		}
 #endif
 
@@ -448,8 +448,8 @@ void main() {
 
         shadows = calculate_shadows(position_scene, flat_normal, light_levels.y, cloud_shadows, material.sss_amount, shadow_distance_fade, sss_depth);
 
-	#ifdef DISTANT_HORIZONS
-		if (is_dh_terrain) {
+	#ifdef LOD_MOD_ACTIVE
+		if (is_lod) {
 			shadow_distance_fade = 1.0;
 		}
 	#endif

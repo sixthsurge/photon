@@ -2,7 +2,7 @@
 #define INCLUDE_LIGHTING_SPECULAR_LIGHTING
 
 #include "/include/lighting/bsdf.glsl"
-#include "/include/misc/distant_horizons.glsl"
+#include "/include/misc/lod_mod_support.glsl"
 #include "/include/surface/material.glsl"
 #include "/include/misc/raytracer.glsl"
 #include "/include/sky/projection.glsl"
@@ -272,7 +272,7 @@ vec3 get_specular_reflections(
 	float alpha_squared = material.roughness * material.roughness;
 	float dither = r1(frameCounter, texelFetch(noisetex, ivec2(gl_FragCoord.xy) & 511, 0).b);
 
-#ifdef DISTANT_HORIZONS
+#ifdef LOD_MOD_ACTIVE
 	// Convert screen depth to combined depth
 	screen_pos = view_to_screen_space(SSRT_PROJECTION_MATRIX, view_pos, true);
 #endif

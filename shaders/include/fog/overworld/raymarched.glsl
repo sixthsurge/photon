@@ -4,6 +4,7 @@
 #include "/include/fog/overworld/constants.glsl"
 #include "/include/lighting/cloud_shadows.glsl"
 #include "/include/lighting/shadows/distortion.glsl"
+#include "/include/misc/lod_mod_support.glsl"
 #include "/include/sky/atmosphere.glsl"
 #include "/include/utility/encoding.glsl"
 #include "/include/utility/phase_functions.glsl"
@@ -62,8 +63,8 @@ mat2x3 raymarch_air_fog(vec3 world_start_pos, vec3 world_end_pos, bool sky, floa
 		distance_to_volume_end = world_dir.y < 0.0 ? distance_to_upper_plane : -1.0;
 	}
 
-#ifdef DISTANT_HORIZONS
-    float fog_end = float(dhRenderDistance);
+#ifdef LOD_MOD_ACTIVE
+    float fog_end = float(lod_render_distance);
 #else
     float fog_end = far;
 #endif

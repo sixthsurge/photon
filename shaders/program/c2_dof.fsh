@@ -42,7 +42,7 @@ uniform int frameCounter;
 uniform vec2 view_pixel_size;
 uniform vec2 taa_offset;
 
-#include "/include/misc/distant_horizons.glsl"
+#include "/include/misc/lod_mod_support.glsl"
 #include "/include/utility/random.glsl"
 #include "/include/utility/sampling.glsl"
 #include "/include/utility/space_conversion.glsl"
@@ -52,13 +52,13 @@ void main() {
 
 	float depth = texelFetch(depthtex0, texel, 0).x;
 
-#ifdef DISTANT_HORIZONS
-	float depth_dh = texelFetch(dhDepthTex, texel, 0).x;
+#ifdef LOD_MOD_ACTIVE
+	float depth_lod = texelFetch(lod_depth_tex, texel, 0).x;
 
-	if (is_distant_horizons_terrain(depth, depth_dh)) {
+	if (is_lod_terrain(depth, depth_lod)) {
 		depth = view_to_screen_space_depth(
 			gbufferProjection,
-			screen_to_view_space_depth(dhProjectionInverse, depth_dh)
+			screen_to_view_space_depth(dhProjectionInverse, depth_lod)
 		);
 	}
 #endif

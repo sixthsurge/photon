@@ -1,15 +1,16 @@
 #if !defined INCLUDE_MISC_RAYTRACER
 #define INCLUDE_MISC_RAYTRACER
 
+#include "/include/misc/lod_mod_support.glsl"
 #include "/include/utility/geometry.glsl"
 #include "/include/utility/space_conversion.glsl"
 
-#if defined SSRT_DH 
-	#define SSRT_DEPTH_SAMPLER             dhDepthTex1
-	#define SSRT_PROJECTION_MATRIX         dhProjection
-	#define SSRT_PROJECTION_MATRIX_INVERSE dhProjectionInverse
+#if defined SSRT_LOD 
+	#define SSRT_DEPTH_SAMPLER             lod_depth_tex_solid
+	#define SSRT_PROJECTION_MATRIX         lod_projection_matrix
+	#define SSRT_PROJECTION_MATRIX_INVERSE lod_projection_matrix_inverse
 #else 
-	#define SSRT_DEPTH_SAMPLER             combined_depth_buffer
+	#define SSRT_DEPTH_SAMPLER             combined_depth_tex
 	#define SSRT_PROJECTION_MATRIX         combined_projection_matrix
 	#define SSRT_PROJECTION_MATRIX_INVERSE combined_projection_matrix_inverse
 #endif
@@ -43,7 +44,7 @@ bool raymarch_depth_buffer(
 	// Intersection loop
 
 	for (int i = 0; i < intersection_step_count; ++i, ray_pos += ray_step) {
-#ifdef DISTANT_HORIZONS
+#ifdef LOD_MOD_ACTIVE
 		if (ray_pos.z < 0.0) continue;
 #endif
 		if (clamp01(ray_pos) != ray_pos) return false;

@@ -2,6 +2,7 @@
 #define INCLUDE_FOG_AIR_FOG_ANALYTIC
 
 #include "/include/fog/overworld/constants.glsl"
+#include "/include/misc/lod_mod_support.glsl"
 #include "/include/sky/atmosphere.glsl"
 #include "/include/utility/phase_functions.glsl"
 	
@@ -23,8 +24,8 @@ vec2 air_fog_analytic_airmass(vec3 ray_origin_world, vec3 ray_direction_world, f
 }
 
 mat2x3 air_fog_analytic(vec3 ray_origin_world, vec3 ray_end_world, bool sky, float skylight, float shadow) {
-#ifdef DISTANT_HORIZONS
-    float fog_end = float(dhRenderDistance);
+#ifdef LOD_MOD_ACTIVE
+    float fog_end = float(lod_render_distance);
 #else
     float fog_end = far;
 #endif

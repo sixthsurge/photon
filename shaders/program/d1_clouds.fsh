@@ -119,7 +119,7 @@ uniform float biome_humidity;
 #endif
 #endif
 
-#include "/include/misc/distant_horizons.glsl"
+#include "/include/misc/lod_mod_support.glsl"
 #include "/include/utility/checkerboard.glsl"
 #include "/include/utility/random.glsl"
 #include "/include/utility/space_conversion.glsl"
@@ -154,23 +154,23 @@ void main() {
 	vec3 screen_pos = vec3(new_uv, depth_max);
 	vec3 view_pos = screen_to_view_space(screen_pos, false);
 
-	// Distant Horizons support
-#ifdef DISTANT_HORIZONS
-	float depth_dh = depth_max_4x4(dhDepthTex);
-	bool is_dh_terrain = is_distant_horizons_terrain(depth_max, depth_dh);
+	// LoD terrain support
+#ifdef LOD_MOD_ACTIVE
+	float depth_lod = depth_max_4x4(lod_depth_tex_solid);
+	bool is_lod = is_lod_terrain(depth_max, depth_lod);
 
-	if (is_dh_terrain) {
-		screen_pos = vec3(new_uv, depth_dh);
+	if (is_lod) {
+		screen_pos = vec3(new_uv, depth_lod);
 		view_pos = screen_to_view_space(screen_pos, false, true);
 	}
 #else
-	const bool is_dh_terrain = false;
+	const bool is_lod = false;
 #endif
 
 	vec3 ray_origin = vec3(0.0, CLOUDS_SCALE * (eyeAltitude - SEA_LEVEL) + planet_radius, 0.0) + CLOUDS_SCALE * gbufferModelViewInverse[3].xyz;
 	vec3 ray_dir    = mat3(gbufferModelViewInverse) * normalize(view_pos);
 
-	float distance_to_terrain = (depth_max == 1.0 && !is_dh_terrain)
+	float distance_to_terrain = (depth_max == 1.0 && !is_lod)
 		? -1.0
 		: length(view_pos) * CLOUDS_SCALE;
 
@@ -216,4 +216,3 @@ void main() {
 	clouds.xyz += draw_aurora(ray_dir, dither) * clouds.w;
 #endif
 }
-

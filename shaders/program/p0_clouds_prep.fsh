@@ -81,16 +81,13 @@ const vec3 sun_color  = vec3(0.0);
 const vec3 moon_color = vec3(0.0);
 const vec3 sky_color  = vec3(0.0);
 
-#ifdef DISTANT_HORIZONS
-uniform int dhRenderDistance;
-#endif
-
 #ifndef IS_IRIS 
     #define sun_dir sun_dir_fixed 
     #define moon_dir moon_dir_fixed
     #define light_dir light_dir_fixed
 #endif
 
+#include "/include/misc/lod_mod_support.glsl"
 #include "/include/lighting/cloud_shadows.glsl"
 #include "/include/sky/clouds/coverage_map.glsl"
 

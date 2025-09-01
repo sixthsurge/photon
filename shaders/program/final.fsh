@@ -51,7 +51,7 @@ uniform vec2 taa_offset;
 uniform float near;
 uniform float far;
 
-#include "/include/misc/distant_horizons.glsl"
+#include "/include/misc/lod_mod_support.glsl"
 #include "/include/utility/space_conversion.glsl"
 #endif
 
@@ -172,15 +172,15 @@ void main() {
 
 	bool is_sky = depth == 1.0;
 
-	#ifdef DISTANT_HORIZONS
-    float depth_dh = texelFetch(dhDepthTex, texel, 0).x;
-	bool is_dh_terrain = is_distant_horizons_terrain(depth, depth_dh);
+	#ifdef LOD_MOD_ACTIVE
+    float depth_lod = texelFetch(lod_depth_tex, texel, 0).x;
+	bool is_lod = is_lod_terrain(depth, depth_lod);
 
-	if (is_dh_terrain) {
-		position_view = screen_to_view_space(dhProjectionInverse, vec3(uv, depth_dh), true);
+	if (is_lod) {
+		position_view = screen_to_view_space(dhProjectionInverse, vec3(uv, depth_lod), true);
 	}
 
-	is_sky = is_sky && depth_dh == 1.0;
+	is_sky = is_sky && depth_lod == 1.0;
 	#endif
 
 	#if DISTANCE_VIEW_METHOD == DISTANCE_VIEW_DISTANCE

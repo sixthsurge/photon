@@ -62,7 +62,7 @@ uniform bool world_age_changed;
 // ------------
 
 #define TEMPORAL_REPROJECTION
-#include "/include/misc/distant_horizons.glsl"
+#include "/include/misc/lod_mod_support.glsl"
 #include "/include/utility/bicubic.glsl"
 #include "/include/utility/dithering.glsl"
 #include "/include/utility/encoding.glsl"
@@ -87,7 +87,7 @@ void main() {
 
 	if (clamp(view_texel, ivec2(0), ivec2(view_res)) != view_texel) { return; }
 
-	float depth = texelFetch(combined_depth_buffer, view_texel, 0).x;
+	float depth = texelFetch(combined_depth_tex, view_texel, 0).x;
 
 #ifndef NORMAL_MAPPING
 	vec4 gbuffer_data = texelFetch(colortex1, view_texel, 0);
@@ -98,13 +98,13 @@ void main() {
 
     // Distant Horizons support
 
-#ifdef DISTANT_HORIZONS
+#ifdef LOD_MOD_ACTIVE
     float depth_mc = texelFetch(depthtex1, view_texel, 0).x;
-    float depth_dh = texelFetch(dhDepthTex, view_texel, 0).x;
-	bool is_dh_terrain = is_distant_horizons_terrain(depth_mc, depth_dh);
+    float depth_lod = texelFetch(lod_depth_tex_solid, view_texel, 0).x;
+	bool is_lod = is_lod_terrain(depth_mc, depth_lod);
 #else
 	#define depth_mc depth
-    const bool is_dh_terrain = false;
+    const bool is_lod = false;
 #endif
 
 	bool is_hand;
@@ -125,8 +125,8 @@ void main() {
 #ifdef NORMAL_MAPPING
 	vec3 world_normal = decode_unit_vector(gbuffer_data.xy);
 
-	#ifdef DISTANT_HORIZONS
-	if (is_dh_terrain) {
+	#ifdef LOD_MOD_ACTIVE
+	if (is_lod) {
 		vec4 gbuffer_data_0 = texelFetch(colortex1, view_texel, 0);
 		world_normal = decode_unit_vector(unpack_unorm_2x8(gbuffer_data_0.z));
 	}
@@ -152,7 +152,7 @@ void main() {
 	ao.y = 0.0;
 	bent_normal = view_normal;
 #elif SHADER_AO == SHADER_AO_GTAO
-	ao = compute_gtao(screen_pos, view_pos, view_normal, dither, is_dh_terrain, bent_normal);
+	ao = compute_gtao(screen_pos, view_pos, view_normal, dither, is_lod, bent_normal);
 #endif
 
 	// Temporal accumulation
@@ -208,4 +208,3 @@ void main() {
 		ambient_history_data.x = 1.0;
 	}
 }
-

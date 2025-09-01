@@ -1,0 +1,16 @@
+{
+    "version": 1,
+    "opaqueDrawBuffers": [1,2],
+    "translucentDrawBuffers": [0],
+    "blending": { -1: "off" }, 
+    "uniforms": [], 
+    "samplers": [], 
+    "opaquePatchData":[" 
+        #define WORLD_OVERWORLD
+        #include "/program/voxy_solid.glsl"
+    "],
+    "translucentPatchData":[" 
+        #define WORLD_OVERWORLD
+        #include "/program/voxy_translucent.glsl"
+    "]
+}

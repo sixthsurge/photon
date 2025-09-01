@@ -51,7 +51,7 @@ float compute_ssao(
 		);
 
 		ivec2 texel = ivec2(sample_uv * view_res * taau_render_scale + 0.5);
-		float depth = texelFetch(combined_depth_buffer, texel, 0).x;
+		float depth = texelFetch(combined_depth_tex, texel, 0).x;
 
 		if (depth == 1.0 || depth < hand_depth || depth == position_screen.z) continue;
 
@@ -72,4 +72,3 @@ float compute_ssao(
 }
 
 #endif // INCLUDE_LIGHTING_AO_SSAO
-

@@ -1,16 +1,9 @@
 #if !defined INCLUDE_UTILITY_SPACE_CONVERSION
 #define INCLUDE_UTILITY_SPACE_CONVERSION
 
-#ifdef DISTANT_HORIZONS
-uniform mat4 dhProjection;
-uniform mat4 dhProjectionInverse;
-uniform mat4 dhPreviousProjection;
-uniform mat4 dhPreviousProjectionInverse;
+#include "/include/misc/lod_mod_support.glsl"
 
-uniform float dhNearPlane;
-uniform float dhFarPlane;
-#endif
-
+// NB 2025-09-01 avoid the following functions, linearise using projection matrices
 // https://wiki.shaderlabs.org/wiki/Shader_tricks#Linearizing_depth
 float linearize_depth(float near, float far, float depth) {
 	return (near * far) / (depth * (near - far) + far);
@@ -74,10 +67,10 @@ vec3 view_to_screen_space(vec3 view_pos, bool handle_jitter) {
     return view_to_screen_space(gbufferProjection, view_pos, handle_jitter);
 }
 
-vec3 screen_to_view_space(vec3 screen_pos, bool handle_jitter, bool is_dh_terrain) {
-#ifdef DISTANT_HORIZONS
-    mat4 projection_matrix_inverse = is_dh_terrain
-        ? dhProjectionInverse
+vec3 screen_to_view_space(vec3 screen_pos, bool handle_jitter, bool is_lod_terrain) {
+#ifdef LOD_MOD_ACTIVE
+    mat4 projection_matrix_inverse = is_lod_terrain
+        ? lod_projection_matrix_inverse
         : gbufferProjectionInverse;
 
     return screen_to_view_space(projection_matrix_inverse, screen_pos, handle_jitter);
@@ -86,10 +79,10 @@ vec3 screen_to_view_space(vec3 screen_pos, bool handle_jitter, bool is_dh_terrai
 #endif
 }
 
-vec3 view_to_screen_space(vec3 view_pos, bool handle_jitter, bool is_dh_terrain) {
-#ifdef DISTANT_HORIZONS
-    mat4 projection_matrix = is_dh_terrain
-        ? dhProjection
+vec3 view_to_screen_space(vec3 view_pos, bool handle_jitter, bool is_lod_terrain) {
+#ifdef LOD_MOD_ACTIVE
+    mat4 projection_matrix = is_lod_terrain
+        ? lod_projection_matrix
         : gbufferProjection;
 
     return view_to_screen_space(projection_matrix, view_pos, handle_jitter);
@@ -124,10 +117,10 @@ mat3 get_tbn_matrix(vec3 normal) {
 }
 
 #if defined TEMPORAL_REPROJECTION
-vec3 reproject_scene_space(vec3 scene_pos, bool hand, bool is_dh_terrain) {
-#ifdef DISTANT_HORIZONS
-    mat4 previous_projection_matrix = is_dh_terrain
-        ? dhPreviousProjection
+vec3 reproject_scene_space(vec3 scene_pos, bool hand, bool is_lod_terrain) {
+#ifdef LOD_MOD_ACTIVE
+    mat4 previous_projection_matrix = is_lod_terrain
+        ? lod_previous_projection_matrix
         : gbufferPreviousProjection;
 #else
     mat4 previous_projection_matrix = gbufferPreviousProjection;
@@ -143,13 +136,13 @@ vec3 reproject_scene_space(vec3 scene_pos, bool hand, bool is_dh_terrain) {
 	return previous_pos * 0.5 + 0.5;
 }
 
-vec3 reproject(vec3 screen_pos, bool is_dh_terrain) {
-	vec3 pos = screen_to_view_space(screen_pos, false, is_dh_terrain);
+vec3 reproject(vec3 screen_pos, bool is_lod_terrain) {
+	vec3 pos = screen_to_view_space(screen_pos, false, is_lod_terrain);
 	     pos = view_to_scene_space(pos);
 
 	bool hand = screen_pos.z < hand_depth;
 
-	return reproject_scene_space(pos, hand, is_dh_terrain);
+	return reproject_scene_space(pos, hand, is_lod_terrain);
 }
 vec3 reproject(vec3 screen_pos) {
     return reproject(screen_pos, false);

@@ -51,10 +51,6 @@ uniform sampler2D shadowcolor0;
 #endif
 #endif
 
-#ifdef DISTANT_HORIZONS
-uniform sampler2D dhDepthTex;
-#endif
-
 uniform mat4 gbufferModelView;
 uniform mat4 gbufferModelViewInverse;
 uniform mat4 gbufferProjection;
@@ -64,10 +60,6 @@ uniform mat4 shadowModelView;
 uniform mat4 shadowModelViewInverse;
 uniform mat4 shadowProjection;
 uniform mat4 shadowProjectionInverse;
-
-#ifdef DISTANT_HORIZONS
-uniform int dhRenderDistance;
-#endif
 
 uniform vec3 cameraPosition;
 
@@ -119,6 +111,7 @@ uniform float time_midnight;
 
 #include "/include/fog/water_fog_vl.glsl"
 
+#include "/include/misc/lod_mod_support.glsl"
 #include "/include/utility/encoding.glsl"
 #include "/include/utility/random.glsl"
 #include "/include/utility/space_conversion.glsl"
@@ -138,24 +131,24 @@ void main() {
 	float depth1        = texelFetch(depthtex1, view_texel, 0).x;
 	vec4 gbuffer_data_0 = texelFetch(colortex1, view_texel, 0);
 
-#ifdef DISTANT_HORIZONS
+#ifdef LOD_MOD_ACTIVE
     mat4 projection_matrix, projection_matrix_inverse;
-    bool is_dh_terrain;
-	float dh_depth = texelFetch(dhDepthTex, view_texel, 0).x;
+    bool is_lod;
+	float depth_lod = texelFetch(lod_depth_tex, view_texel, 0).x;
 
     if (depth0 == 1.0) {
-        is_dh_terrain = true;
-        depth0 = dh_depth;
-        depth1 = dh_depth;
-        projection_matrix = dhProjection;
-        projection_matrix_inverse = dhProjectionInverse;
+        is_lod = true;
+        depth0 = depth_lod;
+        depth1 = depth_lod;
+        projection_matrix = lod_projection_matrix;
+        projection_matrix_inverse = lod_projection_matrix_inverse;
     } else {
-        is_dh_terrain = false;
+        is_lod = false;
         projection_matrix = gbufferProjection;
         projection_matrix_inverse = gbufferProjectionInverse;
     }
 #else
-    #define is_dh_terrain             false
+    #define is_lod             false
     #define projection_matrix         gbufferProjection
     #define projection_matrix_inverse gbufferProjectionInverse
 #endif

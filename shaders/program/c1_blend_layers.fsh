@@ -9,7 +9,7 @@
    - Translucent layer
    - Fog 
    - Clouds in front of translucents
-   - DH water 
+   - LoD water 
    - Rainbow
 
 --------------------------------------------------------------------------------
@@ -121,11 +121,11 @@ uniform float time_midnight;
 //   Includes
 // ------------
 
-#define SSRT_DH
+#define SSRT_LOD
 #define TEMPORAL_REPROJECTION
 
 #include "/include/fog/simple_fog.glsl"
-#include "/include/misc/distant_horizons.glsl"
+#include "/include/misc/lod_mod_support.glsl"
 #include "/include/misc/lightning_flash.glsl"
 #include "/include/misc/material_masks.glsl"
 #include "/include/utility/color.glsl"
@@ -137,7 +137,7 @@ uniform float time_midnight;
 #include "/include/fog/overworld/analytic.glsl"
 #include "/include/sky/clouds/sampling.glsl"
 
-#ifdef DISTANT_HORIZONS
+#ifdef LOD_MOD_ACTIVE
 uniform sampler2D colortex8;
 uniform mat4 shadowModelViewInverse;
 
@@ -145,7 +145,7 @@ uniform mat4 shadowModelViewInverse;
 #endif
 #endif
 
-#ifdef DISTANT_HORIZONS
+#ifdef LOD_MOD_ACTIVE
 #include "/include/misc/distant_water.glsl"
 #endif
 
@@ -208,34 +208,34 @@ void main() {
 
 	// Distant Horizons support
 
-#ifdef DISTANT_HORIZONS
-    float front_depth_dh   = texelFetch(dhDepthTex, texel, 0).x;
-    float back_depth_dh    = texelFetch(dhDepthTex1, texel, 0).x;
+#ifdef LOD_MOD_ACTIVE
+    float front_depth_lod   = texelFetch(lod_depth_tex, texel, 0).x;
+    float back_depth_lod    = texelFetch(lod_depth_tex_solid, texel, 0).x;
 
-    bool front_is_dh_terrain = is_distant_horizons_terrain(front_depth, front_depth_dh);
-    bool back_is_dh_terrain = is_distant_horizons_terrain(back_depth, back_depth_dh);
+    bool front_is_lod_terrain = is_lod_terrain(front_depth, front_depth_lod);
+    bool back_is_lod_terrain = is_lod_terrain(back_depth, back_depth_lod);
 
-	bool is_dh_translucent = front_depth_dh != back_depth_dh;
+	bool is_translucent_lod = front_depth_lod != back_depth_lod;
 #else
-	#define front_depth_dh      front_depth
-	#define back_depth_dh       back_depth
-	#define front_is_dh_terrain false
-	#define back_is_dh_terrain  false
-	#define is_dh_translucent   false
+	#define front_depth_lod      front_depth
+	#define back_depth_lod       back_depth
+	#define front_is_lod_terrain false
+	#define back_is_lod_terrain  false
+	#define is_translucent_lod   false
 #endif
 
 	bool is_translucent = front_depth != back_depth;
-	bool is_sky = back_depth == 1.0 && back_depth_dh == 1.0;
+	bool is_sky = back_depth == 1.0 && back_depth_lod == 1.0;
 
 	// Space conversions
 
-	vec3 front_position_screen = vec3(uv, front_is_dh_terrain ? front_depth_dh : front_depth);
-	vec3 front_position_view   = screen_to_view_space(front_position_screen, true, front_is_dh_terrain);
+	vec3 front_position_screen = vec3(uv, front_is_lod_terrain ? front_depth_lod : front_depth);
+	vec3 front_position_view   = screen_to_view_space(front_position_screen, true, front_is_lod_terrain);
 	vec3 front_position_scene  = view_to_scene_space(front_position_view);
 	vec3 front_position_world  = front_position_scene + cameraPosition;
 
-	vec3 back_position_screen  = vec3(uv, back_is_dh_terrain ? back_depth_dh : back_depth);
-	vec3 back_position_view    = screen_to_view_space(back_position_screen, true, back_is_dh_terrain);
+	vec3 back_position_screen  = vec3(uv, back_is_lod_terrain ? back_depth_lod : back_depth);
+	vec3 back_position_view    = screen_to_view_space(back_position_screen, true, back_is_lod_terrain);
 	vec3 back_position_world   = view_to_scene_space(back_position_view) + cameraPosition;
 
 	vec3 direction_world; float view_distance;
@@ -264,28 +264,28 @@ void main() {
 	fragment_color = texture(colortex0, refracted_uv * taau_render_scale).rgb;
 	vec3 original_color = fragment_color;
 
-	// Draw DH water
+	// Draw LoD water
 
-#if defined DISTANT_HORIZONS
-	if (front_depth_dh != back_depth_dh) {
-		// if there is a layer of DH water behind the translucent layer, these 
+#if defined LOD_MOD_ACTIVE
+	if (front_depth_lod != back_depth_lod) {
+		// if there is a layer of LoD water behind the translucent layer, these 
 		// will store the position of that layer
-		vec3 dh_position_screen = front_position_screen;
-		vec3 dh_position_view   = front_position_view;
-		vec3 dh_position_world  = front_position_world;
+		vec3 lod_position_screen = front_position_screen;
+		vec3 lod_position_view   = front_position_view;
+		vec3 lod_position_world  = front_position_world;
 
-		// detect whether translucent DH terrain may be behind the translucent layer
+		// detect whether translucent LoD terrain may be behind the translucent layer
 		float z_mc = screen_to_view_space_depth(gbufferProjectionInverse, front_depth);
-		float z_dh = screen_to_view_space_depth(dhProjectionInverse, front_depth_dh);
+		float z_lod = screen_to_view_space_depth(lod_projection_matrix_inverse, front_depth_lod);
 
 		const float error_margin = 1.0;
-		bool dh_behind_translucent = z_dh > z_mc + error_margin && back_depth == 1.0;
+		bool lod_behind_translucent = z_lod > z_mc + error_margin && back_depth == 1.0;
 
-		if (front_is_dh_terrain || dh_behind_translucent) {
-			if (dh_behind_translucent) {
-				dh_position_screen = vec3(uv, front_depth_dh);
-				dh_position_view = screen_to_view_space(dhProjectionInverse, dh_position_screen, true);
-				dh_position_world = view_to_scene_space(dh_position_view) + cameraPosition;
+		if (front_is_lod_terrain || lod_behind_translucent) {
+			if (lod_behind_translucent) {
+				lod_position_screen = vec3(uv, front_depth_lod);
+				lod_position_view = screen_to_view_space(lod_projection_matrix_inverse, lod_position_screen, true);
+				lod_position_world = view_to_scene_space(lod_position_view) + cameraPosition;
 			}
 
 			// Unpack gbuffer data
@@ -306,22 +306,22 @@ void main() {
 
 			if (material_mask == MATERIAL_WATER) { // Water
 				vec4 water_color = draw_distant_water(
-					dh_position_screen,
-					dh_position_view,
-					dh_position_world,
+					lod_position_screen,
+					lod_position_view,
+					lod_position_world,
 					direction_world,
 					flat_normal,
 					tint,
 					light_levels,
-					length_knowing_direction(cameraPosition - dh_position_world, direction_world),
-					length_knowing_direction(dh_position_world - back_position_world, direction_world)
+					length_knowing_direction(cameraPosition - lod_position_world, direction_world),
+					length_knowing_direction(lod_position_world - back_position_world, direction_world)
 				);
 
 				fragment_color = fragment_color * (1.0 - water_color.a) + water_color.rgb;
 			}
 
-			back_position_world = dh_behind_translucent
-				? dh_position_world
+			back_position_world = lod_behind_translucent
+				? lod_position_world
 				: back_position_world;
 		}
 	}
@@ -354,7 +354,7 @@ void main() {
 	float clouds_apparent_distance;
 	vec4 clouds_and_aurora = read_clouds_and_aurora(refracted_uv, clouds_apparent_distance);
 
-	if (is_translucent || is_dh_translucent) {
+	if (is_translucent || is_translucent_lod) {
 		if (clouds_apparent_distance < view_distance) {
 			fragment_color = fragment_color * clouds_and_aurora.w + clouds_and_aurora.xyz;
 		}

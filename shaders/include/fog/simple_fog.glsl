@@ -2,6 +2,7 @@
 #define INCLUDE_FOG_SIMPLE_FOG
 
 #include "/include/lighting/colors/blocklight_color.glsl"
+#include "/include/misc/lod_mod_support.glsl"
 #include "/include/sky/projection.glsl"
 #include "/include/utility/bicubic.glsl"
 #include "/include/utility/color.glsl"
@@ -31,20 +32,16 @@ const float darkness_fog_density = 2.0;
 
 const float nether_bloomy_fog_density = 0.25 * nether_fog_density;
 
-#ifdef DISTANT_HORIZONS
-uniform int dhRenderDistance;
-#endif
-
 float spherical_fog(float view_dist, float fog_start_distance, float fog_density) {
 	return exp2(-fog_density * max0(view_dist - fog_start_distance));
 }
 
 float border_fog(vec3 scene_pos, vec3 world_dir) {
-#ifndef DISTANT_HORIZONS
+#ifndef LOD_MOD_ACTIVE
 	float fog = cubic_length(scene_pos.xz) / far;
 	      fog = exp2(-8.0 * pow8(fog));
 #else
-    float fog = length(scene_pos.xz) / float(dhRenderDistance);
+    float fog = length(scene_pos.xz) / float(lod_render_distance);
           fog = exp2(-2.4 * sqr(fog));
 #endif
 

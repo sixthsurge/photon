@@ -31,6 +31,12 @@
 	#define f16mat4x4 mat4x4
 #endif
 
+// LoD mod detection
+
+#if defined DISTANT_HORIZONS || defined VOXY 
+	#define LOD_MOD_ACTIVE
+#endif
+
 // Settings
 
 #include "/settings.glsl"

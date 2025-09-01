@@ -18,7 +18,7 @@ vec4 draw_distant_water(
 ) {
 	vec4 water_color = vec4(0.0);
 
-	// Use hardcoded TBN matrix pointing upwards that is the same for DH water and regular water
+	// Use hardcoded TBN matrix pointing upwards that is the same for LoD water and regular water
 	const mat3 tbn = mat3(
 		vec3(1.0, 0.0, 0.0),
 		vec3(0.0, 0.0, 1.0),

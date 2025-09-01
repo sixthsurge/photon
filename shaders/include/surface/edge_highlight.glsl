@@ -25,7 +25,7 @@ float edge_highlight_check(
 
 	// Sample depth and gbuffer data
 	ivec2 texel = ivec2(sample_pos.xy * view_res * taau_render_scale);
-	float sample_depth = texelFetch(combined_depth_buffer, texel, 0).x;
+	float sample_depth = texelFetch(combined_depth_tex, texel, 0).x;
 	float sample_data  = texelFetch(colortex1, texel, 0).z;
 
 	// Test for depth discontinuity
