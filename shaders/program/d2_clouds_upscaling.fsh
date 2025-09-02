@@ -246,7 +246,7 @@ void main() {
 	vec3 history_data = texture(colortex12, previous_uv_clamped * taau_render_scale).xyz;
 
 	// Depth at the previous position
-	float history_depth = 1.0 - min_of(textureGather(colortex14, previous_uv_clamped, 0));
+	float history_depth = 1.0 - max_of(textureGather(colortex14, previous_uv_clamped, 0));
 
 	// Get distance to terrain in the previous frame
 	float distance_to_terrain_squared = length_squared(

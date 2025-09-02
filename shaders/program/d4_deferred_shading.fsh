@@ -130,6 +130,7 @@ uniform float darknessFactor;
 uniform vec3 light_dir;
 uniform vec3 sun_dir;
 uniform vec3 moon_dir;
+uniform vec3 view_light_dir;
 
 uniform vec2 view_res;
 uniform vec2 view_pixel_size;
@@ -162,6 +163,7 @@ const bool colortex11MipmapEnabled = true;
 #include "/include/fog/simple_fog.glsl"
 #include "/include/lighting/diffuse_lighting.glsl"
 #include "/include/lighting/shadows/sampling.glsl"
+#include "/include/lighting/shadows/ssrt_shadows.glsl"
 #include "/include/lighting/specular_lighting.glsl"
 #include "/include/misc/lod_mod_support.glsl"
 #include "/include/surface/edge_highlight.glsl"
@@ -474,6 +476,24 @@ void main() {
 #if defined POM && defined POM_SHADOW && (defined SPECULAR_MAPPING || defined NORMAL_MAPPING)
 		shadows *= float(!parallax_shadow);
 #endif
+
+		float dither = texelFetch(noisetex, texel & 511, 0).b;
+			  dither = r1(frameCounter, dither);
+
+		bool ssrt_shadow = raymarch_shadow(
+			lod_depth_tex_solid,
+			lod_projection_matrix,
+			lod_projection_matrix_inverse,
+			vec3(uv, depth_lod),
+			position_view,
+			view_light_dir,
+			material.sss_amount > eps,
+			dither,
+			sss_depth
+		);
+		//fragment_color = vec3(!ssrt_shadow) * step(0.0, NoL);
+		shadow_distance_fade = 0.0;
+		shadows *= float(!ssrt_shadow);
 
 		// Diffuse lighting
 

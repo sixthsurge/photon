@@ -55,7 +55,8 @@ const vec2[32] blue_noise_disk = vec2[](
 
 // Fake, lightmap-based shadows for outside of the shadow range or when shadows are disabled
 float lightmap_shadows(float skylight, float NoL) {
-	return smoothstep(13.5 / 15.0, 14.5 / 15.0, skylight);
+	//return smoothstep(13.5 / 15.0, 14.5 / 15.0, skylight);
+	return 1.0;
 }
 
 #ifdef SHADOW

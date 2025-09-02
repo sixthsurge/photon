@@ -100,15 +100,15 @@ Material get_water_material(
 
 void voxy_emitFragment(VoxyFragmentParameters parameters) {
 	// Clip to TAAU viewport
-
 	vec2 coord = gl_FragCoord.xy * view_pixel_size * rcp(taau_render_scale);
 
 #if defined TAA && defined TAAU
 	if (clamp01(coord) != coord) discard;
 #endif
 
-	float depth1 = texelFetch(depthtex1, ivec2(gl_FragCoord.xy), 0).x;
-	float depth1_lod = texelFetch(vxDepthTexOpaque, ivec2(gl_FragCoord.xy), 0).x;
+	// Get the depth of the solid layer behind this fragment (used for edge highlight effect)
+
+	float lod_depth_behind = texelFetch(vxDepthTexOpaque, ivec2(gl_FragCoord.xy), 0).x;
 
 	// Get light colors
 
@@ -140,14 +140,9 @@ void voxy_emitFragment(VoxyFragmentParameters parameters) {
 
 	vec3 dir_world = normalize(pos_scene - gbufferModelViewInverse[3].xyz);
 
-	// Get back position
+	// Get distance to the solid layer behind this fragment
 
-	vec3 back_pos_view = screen_to_view_space(vec3(coord, depth1), true);
-
-	if (is_lod_terrain(depth1, depth1_lod)) {
-		back_pos_view = screen_to_view_space(vec3(coord, depth1_lod), true, true);
-	}
-
+	vec3 back_pos_view = screen_to_view_space(vxProjInv, vec3(coord, lod_depth_behind), true);
 	float layer_dist = distance(pos_view, back_pos_view);
 
 	// Get material
@@ -179,17 +174,17 @@ void voxy_emitFragment(VoxyFragmentParameters parameters) {
 	// Encode water data 
 
 	if (material_mask == MATERIAL_WATER) {
-		gbuffer_data.x  = pack_unorm_2x8(parameters.tinting.rg);
-		gbuffer_data.y  = pack_unorm_2x8(parameters.tinting.b, alpha);
-		gbuffer_data.z  = pack_unorm_2x8(encode_unit_vector(normal));
-		gbuffer_data.w  = pack_unorm_2x8(parameters.lightMap);
+		gbuffer_data.x = pack_unorm_2x8(parameters.tinting.rg);
+		gbuffer_data.y = pack_unorm_2x8(parameters.tinting.b, alpha);
+		gbuffer_data.z = pack_unorm_2x8(encode_unit_vector(normal));
+		gbuffer_data.w = pack_unorm_2x8(parameters.lightMap);
 	} else {
 		gbuffer_data = vec4(0.0);
 	}
 
 	// Early exit if albedo is zero
 
-	if (max_of(material.albedo) < eps) {
+	if (max_of(material.albedo * alpha) < eps) {
 		fragment_color = vec4(0.0);
 		return;
 	}

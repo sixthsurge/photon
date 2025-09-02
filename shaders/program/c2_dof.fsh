@@ -58,7 +58,7 @@ void main() {
 	if (is_lod_terrain(depth, depth_lod)) {
 		depth = view_to_screen_space_depth(
 			gbufferProjection,
-			screen_to_view_space_depth(dhProjectionInverse, depth_lod)
+			screen_to_view_space_depth(lod_projection_matrix_inverse, depth_lod)
 		);
 	}
 #endif
