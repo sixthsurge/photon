@@ -65,5 +65,6 @@
     "translucentPatchData":[" 
         #define WORLD_OVERWORLD
         #include "/program/voxy_translucent.glsl"
-    "]
+    "],
+    "taaOffset": "{ return taa_offset; }"
 }

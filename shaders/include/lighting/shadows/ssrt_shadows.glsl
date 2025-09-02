@@ -17,8 +17,6 @@ bool raymarch_shadow(
 	const uint step_count = 10;
 	const float step_ratio = 2.0; // geometric sample distribution
 
-	if (ray_dir_view.z > 0.0 && ray_dir_view.z >= -ray_origin_view.z) return false;
-
 	vec3 ray_dir_screen = normalize(
 		view_to_screen_space(projection_matrix, ray_origin_view + ray_dir_view, true) - ray_origin_screen
 	);
