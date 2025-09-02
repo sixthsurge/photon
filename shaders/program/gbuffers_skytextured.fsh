@@ -72,14 +72,27 @@ void main() {
 	} else {
 	 	// Moon
 #ifdef VANILLA_MOON
-		// Cut out the moon itself (discard the halo around it) and flip moon texture along the
-		// diagonal
-		offset = fract(vec2(4.0, 2.0) * uv);
-		new_uv = new_uv + vec2(0.25, 0.5) * ((1.0 - offset.yx) - offset);
-		offset = offset * 2.0 - 1.0;
-		if (max_of(abs(offset)) > 0.25) discard;
+        // Tile coordinates for moon phase
+        vec2 tile_size = vec2(0.25, 0.5);
+        vec2 tile_offset = vec2(mod(float(moonPhase), 4.0), float(moonPhase) >= 4.0 ? 1.0 : 0.0);
+        tile_offset *= tile_size;
+        vec2 local_uv = fract(vec2(4.0, 2.0) * uv);
+        vec2 offset = local_uv - 0.5;
 
-		frag_color = texture(gtexture, new_uv).rgb * vec3(MOON_R, MOON_G, MOON_B);
+        // Rotate uv
+        float angle = radians(135.0);
+        mat2 rot = mat2(cos(angle), sin(angle), -sin(angle), cos(angle));
+        offset = rot * offset;
+        local_uv = 0.5 + offset;
+
+        // Clamp to avoid bleeding
+        const float margin = 0.001;
+        local_uv = clamp(local_uv, vec2(margin), vec2(1.0 - margin));
+
+        // Map back to correct tile
+        new_uv = tile_offset + local_uv * tile_size;
+
+        frag_color = texture(gtexture, new_uv).rgb * vec3(MOON_R, MOON_G, MOON_B);
 #else
 		// Shader moon
 		const float angle      = 0.7;
