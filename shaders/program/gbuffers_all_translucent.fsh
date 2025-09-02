@@ -161,7 +161,7 @@ uniform vec4 entityColor;
 
 #include "/include/fog/simple_fog.glsl"
 #include "/include/lighting/diffuse_lighting.glsl"
-#include "/include/lighting/shadows/sampling.glsl"
+#include "/include/lighting/shadows/pcss.glsl"
 #include "/include/lighting/specular_lighting.glsl"
 #include "/include/misc/lod_mod_support.glsl"
 #include "/include/surface/material.glsl"
@@ -499,9 +499,17 @@ void main() {
 #endif
 
 #if defined SHADOW && (defined WORLD_OVERWORLD || defined WORLD_END)
-	float sss_depth;
-	float shadow_distance_fade;
-	vec3 shadows = calculate_shadows(position_scene, tbn[2], adjusted_light_levels.y, cloud_shadows, material.sss_amount, shadow_distance_fade, sss_depth);
+	float sss_depth = 0.0;
+	float shadow_distance_fade = 0.0;
+	vec3 shadows = shadow_pcss(
+		position_scene, 
+		tbn[2], 
+		adjusted_light_levels.y, 
+		cloud_shadows, 
+		material.sss_amount, 
+		shadow_distance_fade,
+		sss_depth
+	);
 #else
 	#define sss_depth 0.0
 	#define shadow_distance_fade 0.0

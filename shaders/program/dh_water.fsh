@@ -145,7 +145,7 @@ uniform vec4 entityColor;
 
 #include "/include/fog/simple_fog.glsl"
 #include "/include/lighting/diffuse_lighting.glsl"
-#include "/include/lighting/shadows/sampling.glsl"
+#include "/include/lighting/shadows/pcss.glsl"
 #include "/include/lighting/specular_lighting.glsl"
 #include "/include/misc/lod_mod_support.glsl"
 #include "/include/surface/material.glsl"

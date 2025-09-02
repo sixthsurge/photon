@@ -20,7 +20,7 @@ layout (location = 1) out vec4 colortex3_clear;
 
 /* RENDERTARGETS: 0,3 */
 #endif
-
+ 
 in vec2 uv;
 
 flat in vec3 ambient_color;
@@ -162,8 +162,8 @@ const bool colortex11MipmapEnabled = true;
 
 #include "/include/fog/simple_fog.glsl"
 #include "/include/lighting/diffuse_lighting.glsl"
-#include "/include/lighting/shadows/sampling.glsl"
-#include "/include/lighting/shadows/ssrt_shadows.glsl"
+#include "/include/lighting/shadows/pcss.glsl"
+#include "/include/lighting/shadows/ssrt.glsl"
 #include "/include/lighting/specular_lighting.glsl"
 #include "/include/misc/lod_mod_support.glsl"
 #include "/include/surface/edge_highlight.glsl"
@@ -428,7 +428,7 @@ void main() {
 			bent_normal = normal;
 		}
 
-		// Shadows
+		// Calculate lighting dot products
 
 		float NoL = dot(normal, light_dir);
 		float NoV = clamp01(dot(normal, -direction_world));
@@ -437,63 +437,119 @@ void main() {
 		float NoH = (NoL + NoV) * halfway_norm;
 		float LoH = LoV * halfway_norm + halfway_norm;
 
+		// Cloud shadows
+		
 #if defined WORLD_OVERWORLD && defined CLOUD_SHADOWS
 		float cloud_shadows = get_cloud_shadows(colortex8, position_scene);
 #else
 		const float cloud_shadows = 1.0;
 #endif
 
-#if defined SHADOW && (defined WORLD_OVERWORLD || defined WORLD_END)
-		float sss_depth;
-		float shadow_distance_fade;
-		vec3 shadows;
+		// Shadows
 
-		if (!is_lod) {
-			shadows = calculate_shadows(
+#if defined WORLD_OVERWORLD || defined WORLD_END
+		vec3 shadows = vec3(0.0);
+		float shadow_distance_fade = 0.0;
+		float sss_depth = 0.0;
+
+		if (NoL > 1e-3 || material.sss_amount > 1e-3) {
+			// Calculate near shadows
+			float shadow_distance_fade = 0.0;
+			vec3 shadow_near = vec3(0.0);
+			float shadow_distant = 0.0;
+			float sss_depth_near = 0.0;
+			float sss_depth_distant = 0.0;
+
+	#ifdef SHADOW
+			shadow_near = shadow_pcss(
 				position_scene, 
 				flat_normal, 
 				light_levels.y, 
 				cloud_shadows, 
 				material.sss_amount, 
-				shadow_distance_fade, 
-				sss_depth
+				shadow_distance_fade,
+				sss_depth_near
 			);
-		}
-
-	#ifdef LOD_MOD_ACTIVE
-		if (is_lod) {
-			shadows = vec3(lightmap_shadows(light_levels.y, NoL));
-			shadow_distance_fade = 1.0;
-			sss_depth = 0.0;
-		}
+	#else 
+			shadow_near = vec3(get_lightmap_shadows(light_levels.y));
 	#endif
-#else
-		vec3 shadows = vec3(sqrt(ao) * pow8(light_levels.y));
-		#define sss_depth 0.0
-		#define shadow_distance_fade 0.0
+
+			// Calculate distant shadows
+	#ifdef SHADOW_SSRT
+			if (shadow_distance_fade >= eps) {
+				//fragment_color = vec3(1,0,0);
+				//return;
+
+				float dither = texelFetch(noisetex, texel & 511, 0).b;
+					  dither = r1(frameCounter, dither);
+
+		#ifdef LOD_MOD_ACTIVE 
+				// Which depth map to raymarch depends on distance 
+				// Closer fragments: use combined depth texture (so MC terrain can cast)
+				// Further fragments: use LoD depth texture (maximise precision)
+
+				bool raymarch_combined_depth = length_squared(position_view) < sqr(far + 32.0); // heuristic of 2 chunks overlap
+
+				bool ssrt_shadow = raymarch_shadow(
+					raymarch_combined_depth 
+						? combined_depth_tex 
+						: lod_depth_tex_solid,
+					raymarch_combined_depth
+						? combined_projection_matrix
+						: lod_projection_matrix,
+					raymarch_combined_depth
+						? combined_projection_matrix_inverse
+						: lod_projection_matrix_inverse,
+					vec3(
+						uv, 
+						raymarch_combined_depth ? depth : depth_lod
+					),
+					position_view,
+					view_light_dir,
+					material.sss_amount > eps,
+					dither,
+					sss_depth_distant
+				);
+		#else
+				bool ssrt_shadow = raymarch_shadow(
+					depthtex1,
+					gbufferProjection,
+					gbufferProjectionInverse,
+					vec3(uv, depth),
+					position_view,
+					view_light_dir,
+					material.sss_amount > eps,
+					dither,
+					sss_depth_distant
+				);
+		#endif
+
+				shadow_distant = float(!ssrt_shadow) * get_lightmap_light_leak_prevention(light_levels.y);
+			}
+	#else
+			shadow_distant = get_lightmap_shadows(light_levels.y);
+	#endif
+
+			shadows = mix(
+				shadow_near,
+				vec3(shadow_distant),
+				clamp01(shadow_distance_fade)
+			);
+
+			sss_depth = mix(
+				sss_depth_near,
+				sss_depth_distant,
+				clamp01(shadow_distance_fade)
+			);
+
+			if (light_levels.y < 0.1) sss_depth = -1.0; // SSS leak prevention
+
+			// Apply parallax shadow
+	#if defined POM && defined POM_SHADOW && (defined SPECULAR_MAPPING || defined NORMAL_MAPPING)
+			shadows *= float(!parallax_shadow);
+	#endif
+		}
 #endif
-
-#if defined POM && defined POM_SHADOW && (defined SPECULAR_MAPPING || defined NORMAL_MAPPING)
-		shadows *= float(!parallax_shadow);
-#endif
-
-		float dither = texelFetch(noisetex, texel & 511, 0).b;
-			  dither = r1(frameCounter, dither);
-
-		bool ssrt_shadow = raymarch_shadow(
-			lod_depth_tex_solid,
-			lod_projection_matrix,
-			lod_projection_matrix_inverse,
-			vec3(uv, depth_lod),
-			position_view,
-			view_light_dir,
-			material.sss_amount > eps,
-			dither,
-			sss_depth
-		);
-		//fragment_color = vec3(!ssrt_shadow) * step(0.0, NoL);
-		shadow_distance_fade = 0.0;
-		shadows *= float(!ssrt_shadow);
 
 		// Diffuse lighting
 
@@ -511,7 +567,11 @@ void main() {
 #ifdef CLOUD_SHADOWS
 			cloud_shadows,
 #endif
+#ifdef SHADOW_SSRT 
+			0.0,
+#else
 			shadow_distance_fade,
+#endif
 			NoL,
 			NoV,
 			NoH,

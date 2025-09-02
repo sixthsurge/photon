@@ -69,7 +69,7 @@ bool raymarch_shadow(
 	}
 
 	exit_pos = screen_to_view_space(projection_matrix_inverse, exit_pos, true);
-	sss_depth = hit_after_sss ? -1.0 : 0.25 * distance(ray_origin_view, exit_pos);
+	sss_depth = hit_after_sss ? -1.0 : max0(distance(ray_origin_view, exit_pos) * 0.2);
 
 	return hit;
 }

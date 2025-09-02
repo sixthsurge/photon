@@ -66,5 +66,5 @@
         #define WORLD_OVERWORLD
         #include "/program/voxy_translucent.glsl"
     "],
-    "taaOffset": "{ return taa_offset; }"
+    "taaOffset": "{ return 0.66 * taa_offset; }"
 }

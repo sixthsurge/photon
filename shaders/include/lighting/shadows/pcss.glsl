@@ -1,18 +1,14 @@
 #if !defined INCLUDE_LIGHTING_SHADOWS
 #define INCLUDE_LIGHTING_SHADOWS
 
-#if defined WORLD_OVERWORLD || defined WORLD_END
+#if defined SHADOW && (defined WORLD_OVERWORLD || defined WORLD_END)
 
+#include "/include/lighting/shadows/common.glsl"
 #include "/include/lighting/shadows/distortion.glsl"
 #include "/include/utility/color.glsl"
 #include "/include/utility/dithering.glsl"
 #include "/include/utility/random.glsl"
 #include "/include/utility/rotation.glsl"
-
-#define SHADOW_PCF_STEPS_MIN           6 // [4 6 8 12 16 18 20 22 24 26 28 30 32]
-#define SHADOW_PCF_STEPS_MAX          12 // [4 6 8 12 16 18 20 22 24 26 28 30 32]
-#define SHADOW_PCF_STEPS_SCALE       1.0 // [0.0 0.2 0.4 0.6 0.8 1.0 1.2 1.4 1.6 1.8 2.0]
-#define SHADOW_BLOCKER_SEARCH_RADIUS 0.5 // [0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0]
 
 const int shadow_map_res = int(float(shadowMapResolution) * MC_SHADOW_QUALITY);
 const float shadow_map_pixel_size = rcp(float(shadow_map_res));
@@ -53,13 +49,6 @@ const vec2[32] blue_noise_disk = vec2[](
 	vec2( 0.826922,  0.001024)
 );
 
-// Fake, lightmap-based shadows for outside of the shadow range or when shadows are disabled
-float lightmap_shadows(float skylight, float NoL) {
-	//return smoothstep(13.5 / 15.0, 14.5 / 15.0, skylight);
-	return 1.0;
-}
-
-#ifdef SHADOW
 vec2 blocker_search(vec3 scene_pos, float dither, bool has_sss) {
 	uint step_count = has_sss ? SSS_STEPS : 3;
 
@@ -195,20 +184,18 @@ vec3 shadow_pcf(
 	return shadow * color;
 }
 
-vec3 calculate_shadows(
+vec3 shadow_pcss(
 	vec3 scene_pos,
 	vec3 flat_normal,
 	float skylight,
 	float cloud_shadows,
-	inout float sss_amount,
-	out float distance_fade,
-	out float sss_depth
+	float sss_amount,
+	inout float distance_fade,
+	inout float sss_depth
 ) {
 	sss_depth = 0.0;
-	distance_fade = 0.0;
 
 	float NoL = dot(flat_normal, light_dir);
-	if (NoL < 1e-3 && sss_amount < 1e-3) return vec3(0.0);
 
 	vec3 bias = get_shadow_bias(scene_pos, flat_normal, NoL, skylight);
 
@@ -228,29 +215,19 @@ vec3 calculate_shadows(
 	vec3 shadow_clip_pos = project_ortho(shadowProjection, shadow_view_pos);
 	vec3 shadow_screen_pos = distort_shadow_space(shadow_clip_pos) * 0.5 + 0.5;
 
-	distance_fade = pow32(
-		max(
-			max_of(abs(shadow_screen_pos.xy * 2.0 - 1.0)),
-			mix(
-				1.0, 0.55, 
-				linear_step(0.33, 0.8, light_dir.y)
-			) * length_squared(scene_pos.xz) * rcp(shadowDistance * shadowDistance)
-		)
-	);
+	distance_fade = get_shadow_distance_fade(scene_pos, shadow_screen_pos);
 
-	float distant_shadow = lightmap_shadows(skylight, NoL);
-	if (distance_fade >= 1.0) return vec3(distant_shadow);
+	if (distance_fade >= 1.0) { return vec3(0.0); }
 
 	float dither = interleaved_gradient_noise(gl_FragCoord.xy, frameCounter);
 
 #ifdef SHADOW_VPS
 	vec2 blocker_search_result = blocker_search(scene_pos, dither, sss_amount > eps);
 
-	// SSS depth computed together with blocker depth
-	sss_depth = mix(blocker_search_result.y, sss_depth, distance_fade);
+	sss_depth = blocker_search_result.y;
 
 	if (NoL < 1e-3) return vec3(0.0); // now we can exit early for SSS blocks
-	if (blocker_search_result.x < eps) return vec3((1.0 - distance_fade) + distance_fade * distant_shadow); // blocker search empty handed => no occluders
+	if (blocker_search_result.x < eps) return vec3(1.0); // blocker search empty handed => no occluders
 
 	float penumbra_size  = 16.0 * SHADOW_PENUMBRA_SCALE * (shadow_screen_pos.z - blocker_search_result.x) / blocker_search_result.x;
 	      penumbra_size *= 5.0 - 4.0 * cloud_shadows; // Increase penumbra radius inside cloud shadows, nice overcast look
@@ -286,24 +263,8 @@ vec3 calculate_shadows(
 	vec3 shadow = shadow_basic(shadow_screen_pos);
 #endif
 
-	return mix(shadow, vec3(distant_shadow), clamp01(distance_fade));
+	return shadow;
 }
-#else
-vec3 calculate_shadows(
-	vec3 scene_pos,
-	vec3 flat_normal,
-	float skylight,
-	float cloud_shadows,
-	float sss_amount,
-	out float distance_fade,
-	out float sss_depth
-) {
-	distance_fade = 0.0;
-	sss_depth = 0.0;
-	return vec3(cloud_shadows);
-}
-#endif
-
 #endif
 
 #endif // INCLUDE_LIGHTING_SHADOWS
