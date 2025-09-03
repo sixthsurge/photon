@@ -54,6 +54,7 @@ uniform float near;
 uniform float far;
 uniform float eyeAltitude;
 
+uniform int moonPhase;
 uniform int frameCounter;
 uniform float frameTime;
 
@@ -189,7 +190,11 @@ void main() {
 		: view_to_screen_space_depth(combined_projection_matrix, depth_linear);
 
 	if (depth >= 1.0 && !is_lod) {
+		// Sky
 		combined_depth = 1.0;
+	} else if (is_hand) {
+		// 0 signals hand
+		combined_depth = 0.0;
 	}
 #else 
 	const bool is_lod = false;

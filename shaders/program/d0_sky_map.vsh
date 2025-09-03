@@ -46,6 +46,7 @@ uniform float wetness;
 
 uniform int worldTime;
 uniform int worldDay;
+uniform int moonPhase;
 uniform float sunAngle;
 
 uniform int frameCounter;

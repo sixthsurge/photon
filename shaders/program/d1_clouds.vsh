@@ -33,6 +33,7 @@ uniform sampler3D depthtex0; // atmospheric scattering LUT
 
 uniform int worldTime;
 uniform int worldDay;
+uniform int moonPhase;
 uniform float sunAngle;
 
 uniform int frameCounter;

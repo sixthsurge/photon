@@ -10,7 +10,7 @@ float get_shadow_distance_fade(vec3 scene_pos, vec3 shadow_screen_pos) {
 		pow32(
 			max(
 				max_of(abs(shadow_screen_pos.xy * 2.0 - 1.0)),
-				length_squared(scene_pos.xz) * rcp(sqr(effective_shadow_distance)) 
+				length_squared(scene_pos) * rcp(sqr(effective_shadow_distance)) 
 			)
 		)
 	);

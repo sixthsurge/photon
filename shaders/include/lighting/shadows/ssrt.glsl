@@ -14,14 +14,16 @@ bool raymarch_shadow(
 	float dither,
 	out float sss_depth
 ) {
-	const uint step_count = 10;
+	const uint step_count = uint(SHADOW_SSRT_STEPS);
 	const float step_ratio = 2.0; // geometric sample distribution
+	const float z_tolerance = 10.0; // assumed thickness in blocks
 
 	vec3 ray_dir_screen = normalize(
 		view_to_screen_space(projection_matrix, ray_origin_view + ray_dir_view, true) - ray_origin_screen
 	);
 
 	float ray_length = min_of(abs(sign(ray_dir_screen) - ray_origin_screen) / max(abs(ray_dir_screen), eps));
+	      ray_length = min(ray_length, max(0.1, exp(-max0(length(ray_origin_view) * 0.025 - 1.0))));
 
 	const float initial_step_scale = step_ratio == 1.0 
 		? rcp(float(step_count)) 
@@ -41,8 +43,6 @@ bool raymarch_shadow(
 		vec3 dithered_pos = ray_pos + dither * ray_step;
 		ray_pos += ray_step;
 
-		float depth_tolerance = 4.0 * max(abs(ray_step.z) * 3.0, 0.02 / sqr(ray_origin_view.z)); // from DrDesten <3
-
 #ifdef LOD_MOD_ACTIVE
 		if (dithered_pos.z < 0.0) continue;
 #endif
@@ -50,7 +50,10 @@ bool raymarch_shadow(
 
 		float depth = texelFetch(depth_sampler, ivec2(dithered_pos.xy * view_res * taau_render_scale), 0).x;
 
-		bool inside = depth < dithered_pos.z && abs(depth_tolerance - (dithered_pos.z - depth)) < depth_tolerance;
+		float z_ray = screen_to_view_space_depth(projection_matrix_inverse, dithered_pos.z);
+		float z_sample = screen_to_view_space_depth(projection_matrix_inverse, depth);
+
+		bool inside = depth != 0.0 && depth < dithered_pos.z && abs(z_tolerance - (z_ray - z_sample)) < z_tolerance;
 		hit = inside || hit;
 
 		if (sss_raymarch) {

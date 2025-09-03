@@ -162,6 +162,7 @@ const bool colortex11MipmapEnabled = true;
 
 #include "/include/fog/simple_fog.glsl"
 #include "/include/lighting/diffuse_lighting.glsl"
+#include "/include/lighting/shadows/common.glsl"
 #include "/include/lighting/shadows/pcss.glsl"
 #include "/include/lighting/shadows/ssrt.glsl"
 #include "/include/lighting/specular_lighting.glsl"
@@ -237,7 +238,6 @@ void main() {
 		moon_color, 
 		moon_dir, 
 		/* use_klein_nishina_phase */ depth == 1.0 
-			&& !(sunAngle > 0.5 && any(equal(ivec3(moonPhase), ivec3(3, 4, 5)))) 
 	);
 
 	// Read clouds/aurora/crepuscular rays
@@ -449,12 +449,11 @@ void main() {
 
 #if defined WORLD_OVERWORLD || defined WORLD_END
 		vec3 shadows = vec3(0.0);
-		float shadow_distance_fade = 0.0;
+		float shadow_distance_fade = 1.0;
 		float sss_depth = 0.0;
 
 		if (NoL > 1e-3 || material.sss_amount > 1e-3) {
 			// Calculate near shadows
-			float shadow_distance_fade = 0.0;
 			vec3 shadow_near = vec3(0.0);
 			float shadow_distant = 0.0;
 			float sss_depth_near = 0.0;
@@ -470,8 +469,6 @@ void main() {
 				shadow_distance_fade,
 				sss_depth_near
 			);
-	#else 
-			shadow_near = vec3(get_lightmap_shadows(light_levels.y));
 	#endif
 
 			// Calculate distant shadows
@@ -483,12 +480,16 @@ void main() {
 				float dither = texelFetch(noisetex, texel & 511, 0).b;
 					  dither = r1(frameCounter, dither);
 
+				// Slightly randomise ray direction to create soft shadows
+				vec2 hash = hash2(gl_FragCoord.xy);
+				vec3 ray_dir = normalize(view_light_dir + 0.03 * uniform_sphere_sample(hash));
+
 		#ifdef LOD_MOD_ACTIVE 
 				// Which depth map to raymarch depends on distance 
 				// Closer fragments: use combined depth texture (so MC terrain can cast)
 				// Further fragments: use LoD depth texture (maximise precision)
 
-				bool raymarch_combined_depth = length_squared(position_view) < sqr(far + 32.0); // heuristic of 2 chunks overlap
+				bool raymarch_combined_depth = length_squared(position_view) < sqr(far + 64.0); // heuristic of 4 chunks overlap
 
 				bool ssrt_shadow = raymarch_shadow(
 					raymarch_combined_depth 
@@ -505,7 +506,7 @@ void main() {
 						raymarch_combined_depth ? depth : depth_lod
 					),
 					position_view,
-					view_light_dir,
+					ray_dir,
 					material.sss_amount > eps,
 					dither,
 					sss_depth_distant
@@ -550,6 +551,7 @@ void main() {
 	#endif
 		}
 #endif
+		//fragment_color=vec3(shadows);return;
 
 		// Diffuse lighting
 

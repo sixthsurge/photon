@@ -127,7 +127,7 @@ vec3 get_diffuse_lighting(
 
 	// Sunlight/moonlight
 
-#ifdef SHADOW
+#if defined SHADOW || defined SHADOW_SSRT
 	vec3 diffuse = vec3(lift(max0(NoL), 0.25 * rcp(SHADING_STRENGTH)) * (1.0 - 0.5 * material.sss_amount));
 	vec3 bounced = 0.033 * (1.0 - shadows) * (1.0 - 0.1 * max0(normal.y)) * pow1d5(ao + eps) * pow4(light_levels.y) * BOUNCED_LIGHT_I;
 	vec3 sss = sss_approx(material.albedo, material.sss_amount, material.sheen_amount, mix(sss_depth, 0.0, shadow_distance_fade), LoV, shadows.x) * float(!sss_blocked);

@@ -124,10 +124,13 @@ void main() {
 			moon_shadow = 1.0 - linear_step(a * 0.6 - 0.12, a * 0.6 + 0.12, offset.y); break;
 		}
 
+		float edge_glow = sqr(sqr(sqr(dist)));
+
 		frag_color = max(
-			moon_shadow * lit_color,
-			0.5 * glow_color * (0.2 + 0.1 * pulse(dist, 0.95, 0.3)) // Moon glow
-		) * (0.25 + 0.75 * moon_texture);
+			moon_shadow * lit_color * (1.0 + 2.0 * edge_glow),
+			0.5 * glow_color * (0.1 + 0.1 * edge_glow)
+		) * (0.2 + 0.8 * moon_texture);
+
 
 		if (dist > 1.0) {
 			discard;

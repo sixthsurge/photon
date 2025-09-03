@@ -75,6 +75,7 @@ uniform float near;
 uniform float far;
 
 uniform int worldTime;
+uniform int moonPhase;
 uniform float sunAngle;
 
 uniform int frameCounter;

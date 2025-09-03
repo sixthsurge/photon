@@ -58,6 +58,21 @@ float atmosphere_mie_phase(float nu, bool use_klein_nishina_phase) {
 		: henyey_greenstein_phase(nu, air_mie_g);
 }
 
+float atmosphere_mie_phase_moon(float nu, bool use_klein_nishina_phase) {
+	// Blend between HG and KN based on moon phase
+	// Idea and implementation from Foozey (modified)
+
+	float t = float(moonPhase) / 4.0;
+	t = t > 1.0 ? 2.0 - t : t;
+	t = sqr(1.0 - t) * 0.95 + 0.05;
+
+	return mix(
+		henyey_greenstein_phase(nu, air_mie_g),
+		klein_nishina_phase(nu, air_mie_energy_parameter),
+		t * float(use_klein_nishina_phase)
+	);
+}
+
 // Post-processing applied to the atmosphere color
 vec3 atmosphere_post_processing(vec3 atmosphere) {
 	// Atmosphere saturation boost
@@ -319,7 +334,7 @@ vec3 atmosphere_scattering(
 	vec3 scattering_mm = texture(ATMOSPHERE_SCATTERING_LUT, uv_mm).rgb;
 
 	float mie_phase_sun  = atmosphere_mie_phase(nu_sun, use_klein_nishina_phase);
-	float mie_phase_moon = atmosphere_mie_phase(nu_moon, use_klein_nishina_phase);
+	float mie_phase_moon = atmosphere_mie_phase_moon(nu_moon, use_klein_nishina_phase);
 
 	vec3 atmosphere = (scattering_sc + scattering_sm * mie_phase_sun)  * sun_color
 	     + (scattering_mc + scattering_mm * mie_phase_moon) * moon_color;

@@ -36,6 +36,8 @@ uniform float sunAngle;
 uniform int frameCounter;
 uniform float frameTimeCounter;
 
+uniform int moonPhase;
+
 uniform vec3 light_dir;
 uniform vec3 sun_dir;
 uniform vec3 moon_dir;
