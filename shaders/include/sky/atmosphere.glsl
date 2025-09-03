@@ -52,6 +52,26 @@ const mat3x3 air_extinction_coefficients = mat3x3(air_rayleigh_coefficient, air_
 
 uniform float atmosphere_saturation_boost_amount;
 
+float getMoonBlend() {
+	// Map moonPhase 0 → 1.0 (KN), 4 → 0.0 (HG) then symmetrically back up to 1.0 at 8.
+	float t = float(moonPhase) / 4.0;
+	t = (t > 1.0) ? (2.0 - t) : t;
+	t = 1.0 - t;
+
+	// Bias towards 0 near quarters (~0.1 instead of 0.25)
+	float bias_strength = 0.66;
+	t = pow(t, 1.0 + bias_strength);
+
+	return t;
+}
+
+float atmosphere_mie_phase(float nu) {
+	float kn = klein_nishina_phase(nu, air_mie_energy_parameter);
+	float hg = henyey_greenstein_phase(nu, air_mie_g);
+	float blend = getMoonBlend();
+	return mix(hg, kn, blend);
+}
+
 float atmosphere_mie_phase(float nu, bool use_klein_nishina_phase) {
 	return use_klein_nishina_phase
 		? klein_nishina_phase(nu, air_mie_energy_parameter)
@@ -319,7 +339,7 @@ vec3 atmosphere_scattering(
 	vec3 scattering_mm = texture(ATMOSPHERE_SCATTERING_LUT, uv_mm).rgb;
 
 	float mie_phase_sun  = atmosphere_mie_phase(nu_sun, use_klein_nishina_phase);
-	float mie_phase_moon = atmosphere_mie_phase(nu_moon, use_klein_nishina_phase);
+	float mie_phase_moon = atmosphere_mie_phase(nu_moon);
 
 	vec3 atmosphere = (scattering_sc + scattering_sm * mie_phase_sun)  * sun_color
 	     + (scattering_mc + scattering_mm * mie_phase_moon) * moon_color;

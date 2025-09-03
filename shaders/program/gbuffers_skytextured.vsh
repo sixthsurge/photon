@@ -36,13 +36,15 @@ uniform float time_noon;
 uniform float time_sunset;
 uniform float time_midnight;
 
+uniform int moonPhase;
+
 #include "/include/lighting/colors/light_color.glsl"
 
 void main() {
 	sun_color = get_sun_exposure() * get_sun_tint();
 	moon_color = get_moon_exposure() * get_moon_tint();
 
-	uv   = mat2(gl_TextureMatrix[0]) * gl_MultiTexCoord0.xy + gl_TextureMatrix[0][3].xy;
+	uv = mat2(gl_TextureMatrix[0]) * gl_MultiTexCoord0.xy + gl_TextureMatrix[0][3].xy;
 	tint = gl_Color.rgb;
 
 	view_pos = transform(gl_ModelViewMatrix, gl_Vertex.xyz);

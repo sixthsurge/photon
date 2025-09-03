@@ -107,6 +107,8 @@ uniform float time_midnight;
 uniform float biome_cave;
 uniform float biome_may_snow;
 
+uniform int moonPhase;
+
 // ------------
 //   Includes
 // ------------

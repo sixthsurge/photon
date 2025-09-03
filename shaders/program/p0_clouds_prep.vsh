@@ -62,6 +62,7 @@ uniform float biome_humidity;
 
 uniform float desert_sandstorm;
 
+uniform int moonPhase;
 
 #include "/include/weather/clouds.glsl"
 

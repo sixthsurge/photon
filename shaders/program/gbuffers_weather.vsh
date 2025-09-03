@@ -29,6 +29,8 @@ uniform int frameCounter;
 uniform vec2 taa_offset;
 uniform vec2 view_pixel_size;
 
+uniform int moonPhase;
+
 void main() {
 	uv = mat2(gl_TextureMatrix[0]) * gl_MultiTexCoord0.xy + gl_TextureMatrix[0][3].xy;
 

@@ -34,6 +34,8 @@ uniform vec2 view_pixel_size;
 
 uniform float biome_may_snow;
 
+uniform int moonPhase;
+
 #include "/include/lighting/colors/weather_color.glsl"
 #include "/include/utility/encoding.glsl"
 

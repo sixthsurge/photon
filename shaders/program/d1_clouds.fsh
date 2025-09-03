@@ -98,6 +98,8 @@ uniform float biome_may_snow;
 uniform float biome_temperature;
 uniform float biome_humidity;
 
+uniform int moonPhase;
+
 // ------------
 //   Includes
 // ------------

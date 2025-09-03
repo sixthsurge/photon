@@ -58,6 +58,8 @@ uniform float time_midnight;
 
 uniform float desert_sandstorm;
 
+uniform int moonPhase;
+
 #if defined WORLD_OVERWORLD
 #include "/include/sky/projection.glsl"
 #include "/include/weather/fog.glsl"
