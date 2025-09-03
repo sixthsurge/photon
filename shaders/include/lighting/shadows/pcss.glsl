@@ -184,7 +184,7 @@ vec3 shadow_pcf(
 	return shadow * color;
 }
 
-vec3 shadow_pcss(
+vec3 get_filtered_shadows(
 	vec3 scene_pos,
 	vec3 flat_normal,
 	float skylight,

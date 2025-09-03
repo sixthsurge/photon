@@ -1,6 +1,9 @@
 #if !defined INCLUDE_LIGHTING_SHADOWS_SSRT_SHADOWS
 #define INCLUDE_LIGHTING_SHADOWS_SSRT_SHADOWS
 
+#include "/include/lighting/shadows/common.glsl"
+#include "/include/utility/random.glsl"
+#include "/include/utility/sampling.glsl"
 #include "/include/utility/space_conversion.glsl"
 
 bool raymarch_shadow(
@@ -75,6 +78,67 @@ bool raymarch_shadow(
 	sss_depth = hit_after_sss ? -1.0 : max0(distance(ray_origin_view, exit_pos) * 0.2);
 
 	return hit;
+}
+
+float get_screen_space_shadows(
+	vec2 position_screen_xy,
+	vec3 position_view,
+	float depth, 
+	float depth_lod,
+	float skylight,
+	bool has_sss,
+	inout float sss_depth
+) {
+	// Dithering for ray offset
+	float dither = texelFetch(noisetex, ivec2(gl_FragCoord.xy) & 511, 0).b;
+		  dither = r1(frameCounter, dither);
+
+	// Slightly randomise ray direction to create soft shadows
+	vec2 hash = hash2(gl_FragCoord.xy);
+	vec3 ray_dir = normalize(view_light_dir + 0.03 * uniform_sphere_sample(hash));
+
+#ifdef LOD_MOD_ACTIVE 
+	// Which depth map to raymarch depends on distance 
+	// Closer fragments: use combined depth texture (so MC terrain can cast)
+	// Further fragments: use LoD depth texture (maximise precision)
+
+	bool raymarch_combined_depth = length_squared(position_view) < sqr(far + 64.0); // heuristic of 4 chunks overlap
+
+	bool hit = raymarch_shadow(
+		raymarch_combined_depth 
+			? combined_depth_tex 
+			: lod_depth_tex_solid,
+		raymarch_combined_depth
+			? combined_projection_matrix
+			: lod_projection_matrix,
+		raymarch_combined_depth
+			? combined_projection_matrix_inverse
+			: lod_projection_matrix_inverse,
+		vec3(
+			position_screen_xy, 
+			raymarch_combined_depth ? depth : depth_lod
+		),
+		position_view,
+		ray_dir,
+		has_sss,
+		dither,
+		sss_depth
+	);
+#else
+	bool hit = raymarch_shadow(
+		depthtex1,
+		gbufferProjection,
+		gbufferProjectionInverse,
+		vec3(position_screen_xy, depth),
+		position_view,
+		view_light_dir,
+		has_sss,
+		dither,
+		sss_depth
+	);
+#endif
+
+	return float(!hit) * get_lightmap_light_leak_prevention(skylight);
 }
 
 #endif // INCLUDE_LIGHTING_SHADOWS_SSRT_SHADOWS

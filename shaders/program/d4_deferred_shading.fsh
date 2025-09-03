@@ -459,8 +459,8 @@ void main() {
 			float sss_depth_near = 0.0;
 			float sss_depth_distant = 0.0;
 
-	#ifdef SHADOW
-			shadow_near = shadow_pcss(
+#ifdef SHADOW
+			shadow_near = get_filtered_shadows(
 				position_scene, 
 				flat_normal, 
 				light_levels.y, 
@@ -469,67 +469,24 @@ void main() {
 				shadow_distance_fade,
 				sss_depth_near
 			);
-	#endif
+#endif
 
 			// Calculate distant shadows
-	#ifdef SHADOW_SSRT
 			if (shadow_distance_fade >= eps) {
-				//fragment_color = vec3(1,0,0);
-				//return;
-
-				float dither = texelFetch(noisetex, texel & 511, 0).b;
-					  dither = r1(frameCounter, dither);
-
-				// Slightly randomise ray direction to create soft shadows
-				vec2 hash = hash2(gl_FragCoord.xy);
-				vec3 ray_dir = normalize(view_light_dir + 0.03 * uniform_sphere_sample(hash));
-
-		#ifdef LOD_MOD_ACTIVE 
-				// Which depth map to raymarch depends on distance 
-				// Closer fragments: use combined depth texture (so MC terrain can cast)
-				// Further fragments: use LoD depth texture (maximise precision)
-
-				bool raymarch_combined_depth = length_squared(position_view) < sqr(far + 64.0); // heuristic of 4 chunks overlap
-
-				bool ssrt_shadow = raymarch_shadow(
-					raymarch_combined_depth 
-						? combined_depth_tex 
-						: lod_depth_tex_solid,
-					raymarch_combined_depth
-						? combined_projection_matrix
-						: lod_projection_matrix,
-					raymarch_combined_depth
-						? combined_projection_matrix_inverse
-						: lod_projection_matrix_inverse,
-					vec3(
-						uv, 
-						raymarch_combined_depth ? depth : depth_lod
-					),
+#ifdef SHADOW_SSRT
+				shadow_distant = get_screen_space_shadows(
+					uv,
 					position_view,
-					ray_dir,
+					depth,
+					depth_lod,
+					light_levels.y,
 					material.sss_amount > eps,
-					dither,
 					sss_depth_distant
 				);
-		#else
-				bool ssrt_shadow = raymarch_shadow(
-					depthtex1,
-					gbufferProjection,
-					gbufferProjectionInverse,
-					vec3(uv, depth),
-					position_view,
-					view_light_dir,
-					material.sss_amount > eps,
-					dither,
-					sss_depth_distant
-				);
-		#endif
-
-				shadow_distant = float(!ssrt_shadow) * get_lightmap_light_leak_prevention(light_levels.y);
+#else
+				shadow_distant = get_lightmap_shadows(light_levels.y);
+#endif
 			}
-	#else
-			shadow_distant = get_lightmap_shadows(light_levels.y);
-	#endif
 
 			shadows = mix(
 				shadow_near,
@@ -543,15 +500,12 @@ void main() {
 				clamp01(shadow_distance_fade)
 			);
 
-			if (light_levels.y < 0.1) sss_depth = -1.0; // SSS leak prevention
-
 			// Apply parallax shadow
 	#if defined POM && defined POM_SHADOW && (defined SPECULAR_MAPPING || defined NORMAL_MAPPING)
 			shadows *= float(!parallax_shadow);
 	#endif
 		}
 #endif
-		//fragment_color=vec3(shadows);return;
 
 		// Diffuse lighting
 

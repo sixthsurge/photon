@@ -1,4 +1,7 @@
 {
+    "unusedString": "
+    #include "/settings.glsl"
+    ",
     "version": 1,
     "excludeLodsFromVanillaDepth": true,
     "opaqueDrawBuffers": [1],
@@ -66,5 +69,14 @@
         #define WORLD_OVERWORLD
         #include "/program/voxy_translucent.glsl"
     "],
-    "taaOffset": "{ return 0.66 * taa_offset; }"
+#ifdef TAAU 
+    "renderScale": [TAAU_RENDER_SCALE, TAAU_RENDER_SCALE],
+#endif
+    "taaOffset": "{ 
+#ifndef TAAU 
+        return 0.66 * taa_offset; 
+#else 
+        return taa_offset;
+#endif
+    }"
 }

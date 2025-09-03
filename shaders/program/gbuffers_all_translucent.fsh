@@ -501,7 +501,7 @@ void main() {
 #if defined SHADOW && (defined WORLD_OVERWORLD || defined WORLD_END)
 	float sss_depth = 0.0;
 	float shadow_distance_fade = 0.0;
-	vec3 shadows = shadow_pcss(
+	vec3 shadows = get_filtered_shadows(
 		position_scene, 
 		tbn[2], 
 		adjusted_light_levels.y, 

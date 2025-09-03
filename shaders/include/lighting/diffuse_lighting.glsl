@@ -120,7 +120,7 @@ vec3 get_diffuse_lighting(
 	float directional_lighting = (0.9 + 0.1 * normal.x) * (0.8 + 0.2 * abs(flat_normal.y)) + 2.0 * ambient_sss * material.sss_amount; 
 
 	// Negative SSS depth => SSS blocked by occluder (SSRT SSS)
-	bool sss_blocked = sss_depth < 0.0;
+	bool sss_blocked = sss_depth < 0.0 || light_levels.y < 0.1;
 	sss_depth = max0(sss_depth);
 
 #if defined WORLD_OVERWORLD || defined WORLD_END
