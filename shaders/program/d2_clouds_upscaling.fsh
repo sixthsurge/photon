@@ -179,7 +179,7 @@ void main() {
 
 #ifdef LOD_MOD_ACTIVE
 	// Check for LoD terrain
-	float depth_lod = texelFetch(lod_depth_tex_solid, dst_texel, 0).x;
+	float depth_lod = texelFetch(lod_depth_tex, dst_texel, 0).x;
 	bool is_lod = is_lod_terrain(depth, depth_lod);
 
 	float depth_linear    = screen_to_view_space_depth(gbufferProjectionInverse, depth);

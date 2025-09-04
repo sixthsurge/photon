@@ -61,7 +61,7 @@ uniform sampler2D shadowtex0;
 uniform sampler2D shadowtex1;
 #endif
 
-#ifdef DH 
+#ifdef DISTANT_HORIZONS
 uniform sampler2D colortex1;  // distant water gbuffer 
 #endif
 

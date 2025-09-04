@@ -44,6 +44,8 @@ flat in OverworldFogParameters fog_params;
 uniform sampler2D noisetex;
 
 uniform sampler2D colortex4; // Sky map, lighting colors
+uniform sampler2D colortex5; // Scene history
+uniform sampler2D colortex7; // Volumetric fog scattering
 
 #ifdef CLOUD_SHADOWS
 uniform sampler2D colortex8; // Cloud shadow map

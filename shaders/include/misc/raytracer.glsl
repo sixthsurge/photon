@@ -6,7 +6,7 @@
 #include "/include/utility/space_conversion.glsl"
 
 #if defined SSRT_LOD 
-	#define SSRT_DEPTH_SAMPLER             lod_depth_tex_solid
+	#define SSRT_DEPTH_SAMPLER             lod_depth_tex
 	#define SSRT_PROJECTION_MATRIX         lod_projection_matrix
 	#define SSRT_PROJECTION_MATRIX_INVERSE lod_projection_matrix_inverse
 #else 

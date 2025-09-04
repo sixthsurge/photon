@@ -107,7 +107,7 @@ float get_screen_space_shadows(
 	bool hit = raymarch_shadow(
 		raymarch_combined_depth 
 			? combined_depth_tex 
-			: lod_depth_tex_solid,
+			: lod_depth_tex,
 		raymarch_combined_depth
 			? combined_projection_matrix
 			: lod_projection_matrix,
