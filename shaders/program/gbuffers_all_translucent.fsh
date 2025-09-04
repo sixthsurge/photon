@@ -29,8 +29,6 @@ in vec3 position_view;
 in vec3 position_scene;
 in vec4 tint;
 
-flat in vec3 light_color;
-flat in vec3 ambient_color;
 flat in uint material_mask;
 flat in mat3 tbn;
 
@@ -140,6 +138,8 @@ uniform float time_midnight;
 uniform int entityId;
 uniform vec4 entityColor;
 #endif
+
+vec3 light_color, ambient_color;
 
 // ------------
 //   Includes
@@ -332,6 +332,15 @@ void main() {
 
 #if defined TAA && defined TAAU
 	if (clamp01(coord) != coord) discard;
+#endif
+
+	// Get light colors
+
+	light_color   = texelFetch(colortex4, ivec2(191, 0), 0).rgb;
+#if defined WORLD_OVERWORLD && defined SH_SKYLIGHT
+	ambient_color = texelFetch(colortex4, ivec2(191, 11), 0).rgb;
+#else
+	ambient_color = texelFetch(colortex4, ivec2(191, 1), 0).rgb;
 #endif
 
 	// Space conversions

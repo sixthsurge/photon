@@ -22,7 +22,7 @@ uniform vec3 eyePosition;
 #define eyePosition cameraPosition
 #endif
 
-#if defined WATER_DISPLACEMENT
+#ifdef WATER_DISPLACEMENT
 float gerstner_wave(vec2 coord, vec2 wave_dir, float t, float noise, float wavelength) {
 	// Gerstner wave function from Belmu in #snippets, modified
 	const float g = 9.8;
@@ -44,6 +44,14 @@ float get_water_displacement(vec3 world_pos, float skylight) {
 
 	float wave = gerstner_wave(world_pos.xy * wave_frequency, wave_dir, frameTimeCounter * wave_speed, 0.0, wavelength);
 	      wave = (wave * 0.05 - 0.025) * (skylight * 0.9 + 0.1);
+
+#ifdef LOD_MOD_ACTIVE 
+	// Attenuate displacement towards the edge of the render distance, to prevent seam between 
+	// vanilla and LoD terrain
+	float fade = cubic_length(world_pos.xz - cameraPosition.xz) / far;
+
+	wave *= exp2(-8.0 * cube(fade));;
+#endif
 
 	return wave;
 }

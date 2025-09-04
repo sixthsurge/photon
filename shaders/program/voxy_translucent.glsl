@@ -99,12 +99,7 @@ Material get_water_material(
 }
 
 void voxy_emitFragment(VoxyFragmentParameters parameters) {
-	// Clip to TAAU viewport
 	vec2 coord = gl_FragCoord.xy * view_pixel_size * rcp(taau_render_scale);
-
-#if defined TAA && defined TAAU
-	if (clamp01(coord) != coord) discard;
-#endif
 
 	// Get the depth of the solid layer behind this fragment (used for edge highlight effect)
 

@@ -1,6 +1,11 @@
 {
     "unusedString": "
-    #include "/settings.glsl"
+        // voxy.json is run through the Iris preprocessor, so we can include settings.glsl to be 
+        // to use shader settings this file.
+        // However, since settings.glsl also contains GLSL code (not preprocessor directives), we 
+        // can't include it directly into the JSON as it would cause syntax errors, so it is 
+        // wrapped in a unused string field.
+        #include "/settings.glsl"
     ",
     "version": 1,
     "excludeLodsFromVanillaDepth": true,
@@ -61,6 +66,18 @@
         "depthtex0",
         "depthtex1"
     ], 
+#ifdef TAA 
+    "taaOffset": "{ 
+    #ifdef TAAU 
+        return taa_offset;
+    #else 
+        return taa_offset * 0.66; 
+    #endif
+    }",
+#endif
+#ifdef TAAU 
+    "renderScale": [TAAU_RENDER_SCALE, TAAU_RENDER_SCALE],
+#endif
     "opaquePatchData":[" 
         #define WORLD_OVERWORLD
         #include "/program/voxy_solid.glsl"
@@ -68,15 +85,5 @@
     "translucentPatchData":[" 
         #define WORLD_OVERWORLD
         #include "/program/voxy_translucent.glsl"
-    "],
-#ifdef TAAU 
-    "renderScale": [TAAU_RENDER_SCALE, TAAU_RENDER_SCALE],
-#endif
-    "taaOffset": "{ 
-#ifndef TAAU 
-        return 0.66 * taa_offset; 
-#else 
-        return taa_offset;
-#endif
-    }"
+    "]
 }

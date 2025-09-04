@@ -89,6 +89,8 @@
     #define combined_projection_matrix         gbufferProjection
     #define combined_projection_matrix_inverse gbufferProjectionInverse
     #define combined_depth_tex                 depthtex1
+ 
+    #define sample_depth_texture texture
 #endif
 
 

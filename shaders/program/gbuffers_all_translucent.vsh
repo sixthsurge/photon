@@ -18,8 +18,6 @@ out vec3 position_view;
 out vec3 position_scene;
 out vec4 tint;
 
-flat out vec3 light_color;
-flat out vec3 ambient_color;
 flat out uint material_mask;
 flat out mat3 tbn;
 
@@ -48,8 +46,6 @@ attribute vec2 mc_midTexCoord;
 // ------------
 
 uniform sampler2D noisetex;
-
-uniform sampler2D colortex4; // Sky map, lighting colors, sky SH
 
 uniform mat4 gbufferModelView;
 uniform mat4 gbufferModelViewInverse;
@@ -128,13 +124,6 @@ void main() {
 	tint          = gl_Color;
 	material_mask = get_material_mask();
 	tbn           = get_tbn_matrix();
-
-	light_color   = texelFetch(colortex4, ivec2(191, 0), 0).rgb;
-#if defined WORLD_OVERWORLD && defined SH_SKYLIGHT
-	ambient_color = texelFetch(colortex4, ivec2(191, 11), 0).rgb;
-#else
-	ambient_color = texelFetch(colortex4, ivec2(191, 1), 0).rgb;
-#endif
 
 	bool is_top_vertex = uv.y < mc_midTexCoord.y;
 

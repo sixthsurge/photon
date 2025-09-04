@@ -50,7 +50,7 @@ void main() {
 
 	// Discard fragments that aren't part of a bloom tile
 
-	if (clamp(texel.y, bounds_min.y, bounds_max.y) != texel.y || tile_index > 5) discard;
+	if (clamp(texel.y, bounds_min.y, bounds_max.y) != texel.y || tile_index > 5) { discard; return; }
 
 	// Horizontal 9-tap gaussian blur
 
