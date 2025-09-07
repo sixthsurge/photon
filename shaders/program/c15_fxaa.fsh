@@ -30,7 +30,7 @@ const float subpixel_quality  = 0.75;
 
 float get_luma(vec3 rgb) {
 	const vec3 luminance_weights_r_709 = vec3(0.2126, 0.7152, 0.0722);
-	return sqrt(dot(rgb, luminance_weights_r_709));
+	return dot(rgb, luminance_weights_r_709);
 }
 
 float min_of(float a, float b, float c, float d, float e) {
@@ -224,9 +224,8 @@ void main() {
 
 	// Full weighted average of the luma over the 3x3 neighborhood
 	float luma_average = rcp(12.0) * (2.0 * (luma_horizontal + luma_vertical) + luma_left_corners + luma_right_corners);
-
-	// Ratio of the delta between the global average and the center luma, over the luma range in the 3x3 neighborhood
-	float sub_pixel_offset_1 = clamp01(abs(luma_average - luma) / luma_range);
+	float luma_range_safe = max(luma_range, 1e-4);
+	float sub_pixel_offset_1 = clamp01(abs(luma_average - luma) / luma_range_safe);
 	float sub_pixel_offset_2 = (-2.0 * sub_pixel_offset_1 + 3.0) * sub_pixel_offset_1 * sub_pixel_offset_1;
 
 	// Compute a sub-pixel offset based on this delta.

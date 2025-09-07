@@ -282,6 +282,7 @@ void main() {
 
 	float pixel_age = texelFetch(colortex5, ivec2(previous_uv * view_res), 0).a;
 	      pixel_age = max0(pixel_age * float(clamp01(previous_uv) == previous_uv) + 1.0);
+	      pixel_age = clamp(pixel_age, 1.0, 120.0);
 
 	// Distance factor to favour responsiveness closer to the camera and image stability further 
 	// away
@@ -291,6 +292,7 @@ void main() {
 	// time taken to converge when upscaling
 	float blend_weight = mix(0.35, 0.10, distance_factor);
 	float alpha = max(1.0 / pixel_age, blend_weight);
+	alpha = clamp(alpha, 0.0, 0.95);
 
 #ifndef TAAU
 	// Native resolution TAA
@@ -347,6 +349,14 @@ void main() {
 	result = vec4(current_color, pixel_age * offcenter_rejection);
 #else // TAA disabled
 	result = texelFetch(colortex0, texel, 0);
+#endif
+
+#ifdef TAA
+	float current_luma = dot(current_color, vec3(0.2126, 0.7152, 0.0722));
+	float history_luma = dot(history_color, vec3(0.2126, 0.7152, 0.0722));
+	float luma_diff = abs(current_luma - history_luma) / max(0.001, max(current_luma, history_luma));
+	float luma_rejection = smoothstep(0.05, 0.25, luma_diff);
+	alpha = mix(alpha, 1.0, luma_rejection);
 #endif
 
 	// Store exposure in the alpha component of the bottom left texel of the history buffer
