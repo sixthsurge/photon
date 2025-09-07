@@ -149,14 +149,15 @@ vec3 shadow_pcf(
 		uv /= get_distortion_factor(uv);
 		uv  = uv * 0.5 + 0.5;
 
-		ivec2 texel = ivec2(uv * shadow_map_res);
+	   ivec2 texel = ivec2(uv * shadow_map_res);
 
-		float depth = texelFetch(shadowtex0, texel, 0).x;
+	   float depth  = texelFetch(shadowtex0, texel, 0).x;
+        
+	   vec3 color = texelFetch(shadowcolor0, texel, 0).rgb;
+	   float translucent = texelFetch(shadowcolor1, texel, 0).w;
+		   color = mix(vec3(1.0), 4.0 * color, step(depth, shadow_screen_pos_translucent.z) * translucent);
 
-		vec3 color = texelFetch(shadowcolor0, texel, 0).rgb;
-		     color = mix(vec3(1.0), 4.0 * color, step(depth, shadow_screen_pos_translucent.z));
-
-		float weight = step(eps, max_of(color));
+	   float weight = step(eps, max_of(color));
 
 		color_sum += color * weight;
 		weight_sum += weight;

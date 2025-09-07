@@ -12,17 +12,17 @@
 #include "/include/global.glsl"
 
 layout (location = 0) out vec3 shadowcolor0_out;
+layout (location = 1) out vec4 shadowcolor1_out;
 
-/* RENDERTARGETS: 0 */
+/* RENDERTARGETS: 0,1 */
 
 in vec2 uv;
 
 flat in uint material_mask;
 flat in vec3 tint;
 
-#ifdef WATER_CAUSTICS
 in vec3 scene_pos;
-#endif
+flat in float sky_lightmap;
 
 // ------------
 //   Uniforms
@@ -55,6 +55,8 @@ uniform vec3 light_dir;
 
 #include "/include/surface/water_normal.glsl"
 #include "/include/utility/color.glsl"
+#include "/include/utility/encoding.glsl"
+#include "/include/lighting/shadows/distortion.glsl"
 
 const float air_n = 1.000293; // for 0°C and 1 atm
 const float water_n = 1.333;  // for 20°C
@@ -131,13 +133,29 @@ void main() {
 		vec3 absorption_coeff = biome_water_coeff(biome_water_color);
 
 		shadowcolor0_out = clamp01(0.25 * exp(-absorption_coeff * distance_through_water) * get_water_caustics());
+
+		// For water, store upward normal and a water mask in .w
+		vec3 world_n = vec3(0.0, 1.0, 0.0);
+		vec2 enc = encode_unit_vector(world_n);
+		shadowcolor1_out = vec4(enc, clamp01(sky_lightmap), 1.0);
 		#endif
 	} else {
 		vec4 base_color = textureLod(tex, uv, 0);
 		if (base_color.a < 0.1) discard;
 
-		shadowcolor0_out  = mix(vec3(1.0), base_color.rgb * tint, base_color.a);
-		shadowcolor0_out  = 0.25 * srgb_eotf_inv(shadowcolor0_out) * rec709_to_rec2020;
-		shadowcolor0_out *= step(base_color.a, 1.0 - rcp(255.0));
+	shadowcolor0_out  = mix(vec3(1.0), base_color.rgb * tint, base_color.a);
+	shadowcolor0_out  = 0.25 * srgb_eotf_inv(shadowcolor0_out) * rec709_to_rec2020;
+
+		// Reconstruct a flat normal in world space using derivatives of scene_pos
+		vec3 dpdx = dFdx(scene_pos);
+		vec3 dpdy = dFdy(scene_pos);
+		vec3 world_n = normalize(cross(dpdx, dpdy));
+		// Ensure the normal faces the light to reduce flips
+		world_n = faceforward(world_n, -light_dir, world_n);
+
+	vec2 enc = encode_unit_vector(world_n);
+	// Mark translucent samples (for colored shadows/RSM masking)
+	float translucent = step(base_color.a, 1.0 - rcp(255.0));
+	shadowcolor1_out = vec4(enc, clamp01(sky_lightmap), translucent);
 	}
 }
