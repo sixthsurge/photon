@@ -138,7 +138,7 @@ const float wetnessHalflife         = 70.0;
 
   #define RSM
   #define RSM_SAMPLES 16 // [4 8 12 16 24 32]
-  #define RSM_RADIUS 8.0 // [2.0 4.0 6.0 8.0 10.0 12.0]
+  #define RSM_RADIUS 2.0 // [2.0 4.0 6.0 8.0 10.0 12.0]
   #define RSM_BRIGHTNESS 1.00 // [0.25 0.50 0.75 1.00 1.25 1.50 1.75 2.00 2.25 2.50 2.75 3.00]
 
 // Ambient Occlusion
