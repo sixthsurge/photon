@@ -497,22 +497,26 @@ void main() {
 
 		// Indirect diffuse (RSM)
 
-#if defined RSM && defined SHADOW && defined SHADOW_COLOR && (defined WORLD_OVERWORLD || defined WORLD_END)
-	// Use per-pixel RNG (not the tiled noise texture) to avoid imprinting the noise pattern
-	uint rsm_rng = uint(texel.x) * 1973 + uint(texel.y) * 9277 + uint(frameCounter) * 26699 + 911;
-	vec2 rsm_noise = rand_next_vec2(rsm_rng);
-	vec3 rsm = calculate_rsm(position_scene, flat_normal, light_levels.y, rsm_noise);
-#ifdef TAA
-	// Simple neighborhood clamp to reduce sparkles when TAA is enabled
-	vec3 rsm_00 = rsm;
-	vec3 rsm_10 = calculate_rsm(view_to_scene_space(screen_to_view_space(combined_projection_matrix_inverse, vec3(uv + vec2(view_pixel_size.x, 0.0), depth), true)), flat_normal, light_levels.y, rsm_noise);
-	vec3 rsm_01 = calculate_rsm(view_to_scene_space(screen_to_view_space(combined_projection_matrix_inverse, vec3(uv + vec2(0.0, view_pixel_size.y), depth), true)), flat_normal, light_levels.y, rsm_noise);
-	vec3 rsm_11 = calculate_rsm(view_to_scene_space(screen_to_view_space(combined_projection_matrix_inverse, vec3(uv + view_pixel_size, depth), true)), flat_normal, light_levels.y, rsm_noise);
-	rsm = (rsm_00 + rsm_10 + rsm_01 + rsm_11) * 0.25;
-#endif
+#if defined RSM && defined SHADOW && defined SHADOW_COLOR && (defined WORLD_OVERWORLD)
+	#if defined WORLD_OVERWORLD
+	if (sun_dir.y > 0.0) {
+	#endif
+		uint rsm_rng = uint(texel.x) * 1973 + uint(texel.y) * 9277 + uint(frameCounter) * 26699 + 911;
+		vec2 rsm_noise = rand_next_vec2(rsm_rng);
+		vec3 rsm = calculate_rsm(position_scene, flat_normal, light_levels.y, rsm_noise);
+	#ifdef TAA
+		vec3 rsm_00 = rsm;
+		vec3 rsm_10 = calculate_rsm(view_to_scene_space(screen_to_view_space(combined_projection_matrix_inverse, vec3(uv + vec2(view_pixel_size.x, 0.0), depth), true)), flat_normal, light_levels.y, rsm_noise);
+		vec3 rsm_01 = calculate_rsm(view_to_scene_space(screen_to_view_space(combined_projection_matrix_inverse, vec3(uv + vec2(0.0, view_pixel_size.y), depth), true)), flat_normal, light_levels.y, rsm_noise);
+		vec3 rsm_11 = calculate_rsm(view_to_scene_space(screen_to_view_space(combined_projection_matrix_inverse, vec3(uv + view_pixel_size, depth), true)), flat_normal, light_levels.y, rsm_noise);
+		rsm = (rsm_00 + rsm_10 + rsm_01 + rsm_11) * 0.25;
+	#endif
 		rsm *= light_color;
 		rsm *= material.albedo * ao * cloud_shadows * (1.0 - shadow_distance_fade);
 		fragment_color += rsm;
+	#if defined WORLD_OVERWORLD
+	}
+	#endif
 #endif
 
 		// Specular reflections

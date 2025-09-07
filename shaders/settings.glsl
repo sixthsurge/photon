@@ -126,9 +126,9 @@ const float wetnessHalflife         = 70.0;
 //#define PIXELATED_SHADOWS
   #define PIXELATED_SHADOWS_RESOLUTION 16 // [4 8 16 32 64 128 256]
   #define SSS_STEPS 12 // [4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24]
-  #define SHADOW_PCF_STEPS_MIN          8 // [4 6 8 12 16 18 20 22 24 26 28 30 32]
-  #define SHADOW_PCF_STEPS_MAX          16 // [4 6 8 12 16 18 20 22 24 26 28 30 32]
-  #define SHADOW_PCF_STEPS_SCALE       1.0 // [0.0 0.2 0.4 0.6 0.8 1.0 1.2 1.4 1.6 1.8 2.0]
+  #define SHADOW_PCF_STEPS_MIN 8 // [4 6 8 12 16 18 20 22 24 26 28 30 32]
+  #define SHADOW_PCF_STEPS_MAX 16 // [4 6 8 12 16 18 20 22 24 26 28 30 32]
+  #define SHADOW_PCF_STEPS_SCALE 1.0 // [0.0 0.2 0.4 0.6 0.8 1.0 1.2 1.4 1.6 1.8 2.0]
   #define SHADOW_BLOCKER_SEARCH_RADIUS 0.5 // [0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0]
 
   #define SHADOW_DEPTH_SCALE 0.2
