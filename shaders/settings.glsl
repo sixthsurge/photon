@@ -134,6 +134,13 @@ const float wetnessHalflife         = 70.0;
   #define SHADOW_DEPTH_SCALE 0.2
   #define SHADOW_DISTORTION 0.85
 
+// RSM
+
+  #define RSM
+  #define RSM_SAMPLES 16 // [4 8 12 16 24 32]
+  #define RSM_RADIUS 8.0 // [2.0 4.0 6.0 8.0 10.0 12.0]
+  #define RSM_BRIGHTNESS 1.00 // [0.25 0.50 0.75 1.00 1.25 1.50 1.75 2.00 2.25 2.50 2.75 3.00]
+
 // Ambient Occlusion
 
   #define SHADER_AO_NONE 0 
@@ -563,11 +570,6 @@ const float wetnessHalflife         = 70.0;
   #define DEBUG_VIEW DEBUG_VIEW_NONE // [DEBUG_VIEW_NONE DEBUG_VIEW_SAMPLER DEBUG_VIEW_HISTOGRAM DEBUG_VIEW_WEATHER]
   #define DEBUG_SAMPLER colortex1 // [colortex1 colortex2 colortex3 colortex4 colortex5 colortex6 colortex7 colortex8 colortex9 colortex10 colortex11 colortex12 colortex13 colortex14 colortex15 depthtex0 depthtex1 depthtex2 shadowtex0 shadowtex1 shadowcolor0 shadowcolor1]
 
-// Indirect diffuse via RSM
-  #define RSM // [RSM]
-  #define RSM_SAMPLES 16 // [4 8 12 16 24 32]
-  #define RSM_RADIUS 8.0 // [2.0 4.0 6.0 8.0 10.0 12.0]
-  #define RSM_BRIGHTNESS 1.0 // [0.25 0.5 0.75 1.0 1.25 1.5 2.0]
 //#define WHITE_WORLD
 //#define TONEMAP_COMPARISON
   #define tonemap_left tonemap_lottes // [tonemap_aces_fit tonemap_aces_full tonemap_lottes tonemap_hejl_burgess tonemap_tech tonemap_uncharted_2 tonemap_ozius tonemap_reinhard tonemap_reinhard_jodie]
