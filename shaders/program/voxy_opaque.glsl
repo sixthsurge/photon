@@ -1,25 +1,7 @@
 #include "/include/global.glsl"
 #include "/include/utility/encoding.glsl"
 
-// voxy.json is preprocessed all together; include guard must be removed so this file can be used
-// in voxy_translucent
-#undef SETTINGS_INCLUDED
-#undef INCLUDE_UTILITY_ENCODING
-
 layout (location = 0) out vec4 gbuffer_data_0;
-
-/*
-struct VoxyFragmentParameters {
-    vec4 sampledColour;
-    vec2 tile;
-    vec2 uv;
-    uint face;
-    uint modelId;
-    vec2 lightMap;
-    vec4 tinting;
-    uint customId; // Same as iris's modelId
-};
-*/
 
 void voxy_emitFragment(VoxyFragmentParameters parameters) {
 	// Get base properties

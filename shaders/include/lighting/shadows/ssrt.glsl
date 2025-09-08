@@ -84,7 +84,9 @@ float get_screen_space_shadows(
 	vec2 position_screen_xy,
 	vec3 position_view,
 	float depth, 
+#ifdef LOD_MOD_ACTIVE
 	float depth_lod,
+#endif
 	float skylight,
 	bool has_sss,
 	inout float sss_depth
@@ -103,27 +105,41 @@ float get_screen_space_shadows(
 	// Further fragments: use LoD depth texture (maximise precision)
 
 	bool raymarch_combined_depth = length_squared(position_view) < sqr(far + 64.0); // heuristic of 4 chunks overlap
+	bool hit;
 
-	bool hit = raymarch_shadow(
-		raymarch_combined_depth 
-			? combined_depth_tex 
-			: lod_depth_tex,
-		raymarch_combined_depth
-			? combined_projection_matrix
-			: lod_projection_matrix,
-		raymarch_combined_depth
-			? combined_projection_matrix_inverse
-			: lod_projection_matrix_inverse,
-		vec3(
-			position_screen_xy, 
-			raymarch_combined_depth ? depth : depth_lod
-		),
-		position_view,
-		ray_dir,
-		has_sss,
-		dither,
-		sss_depth
-	);
+	/*
+	#ifdef MC_GL_KHR_shader_subgroup
+	// Using subgroup ops, we make sure that if any fragments in a warp are raymarching the 
+	// combined depth buffer, they all do, to avoid divergent branches.
+	raymarch_combined_depth = subgroupAny(raymarch_combined_depth);
+	#endif
+	*/
+
+	if (raymarch_combined_depth) {
+		hit = raymarch_shadow(
+			combined_depth_tex,
+			combined_projection_matrix,
+			combined_projection_matrix_inverse,
+			vec3(position_screen_xy, depth),
+			position_view,
+			ray_dir,
+			has_sss,
+			dither,
+			sss_depth
+		);
+	} else {
+		hit = raymarch_shadow(
+			lod_depth_tex ,
+			lod_projection_matrix,
+			lod_projection_matrix_inverse,
+			vec3(position_screen_xy, depth_lod),
+			position_view,
+			ray_dir,
+			has_sss,
+			dither,
+			sss_depth
+		);
+	}
 #else
 	bool hit = raymarch_shadow(
 		depthtex1,

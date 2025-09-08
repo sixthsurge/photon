@@ -1,0 +1,83 @@
+{
+    "unusedString": "
+        // voxy.json is run through the Iris preprocessor, so we can include settings.glsl to be 
+        // to use shader settings this file.
+        // However, since settings.glsl also contains GLSL code (not preprocessor directives), we 
+        // can't include it directly into the JSON as it would cause syntax errors, so it is 
+        // wrapped in a unused string field.
+        #include "/settings.glsl"
+    ",
+    "version": 1,
+    "excludeLodsFromVanillaDepth": true,
+    "opaqueDrawBuffers": [1],
+    "translucentDrawBuffers": [13, 16],
+    "blending": { 
+        -1: "off", 
+        0: "ONE ONE_MINUS_SRC_ALPHA ONE ONE_MINUS_SRC_ALPHA" 
+    }, 
+#ifdef TAA 
+    "taaOffset": "{ 
+    #ifdef TAAU 
+        return taa_offset;
+    #else 
+        return taa_offset * 0.66; 
+    #endif
+    }",
+    "useViewportDims": true,
+#endif
+#ifdef TAAU 
+    "renderScale": [TAAU_RENDER_SCALE, TAAU_RENDER_SCALE],
+#endif
+    "uniforms": [
+        "gbufferModelView",
+        "gbufferModelViewInverse",
+        "gbufferProjection",
+        "gbufferProjectionInverse",
+        "gbufferPreviousModelView",
+        "gbufferPreviousProjection",
+        "shadowModelView",
+        "shadowModelViewInverse",
+        "shadowProjection",
+        "shadowProjectionInverse",
+        "cameraPosition",
+        "previousCameraPosition",
+        "near",
+        "far",
+        "frameTimeCounter",
+        "sunAngle",
+        "rainStrength",
+        "wetness",
+        "worldTime",
+        "moonPhase",
+        "frameCounter",
+        "isEyeInWater",
+        "blindness",
+        "nightVision",
+        "darknessFactor",
+        "eyeAltitude",
+        "light_dir",
+        "sun_dir",
+        "moon_dir",
+        "view_res",
+        "view_pixel_size",
+        "taa_offset",
+        "eye_skylight",
+        "biome_cave",
+        "biome_may_rain",
+        "biome_may_snow",
+        "time_sunrise",
+        "time_noon",
+        "time_sunset",
+        "time_midnight"
+    ], 
+    "samplers": [
+        "noisetex",
+        "colortex4", 
+        "colortex5",
+        "colortex7",
+        "colortex8", 
+        "depthtex0",
+        "depthtex1"
+    ]
+}
+

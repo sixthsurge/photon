@@ -1,4 +1,9 @@
-// Enable half-precision floating point types
+// Extensions
+
+/*
+#ifdef MC_GL_KHR_shader_subgroup
+	#extension GL_KHR_shader_subgroup_vote : enable
+#endif
 
 #ifdef USE_HALF_PRECISION_FP
 	#if defined MC_GL_AMD_gpu_shader_half_float 
@@ -9,6 +14,7 @@
 		#define HAS_F16
 	#endif
 #endif
+*/
 
 #ifdef HAS_F16 
 	#define f16       float16_t

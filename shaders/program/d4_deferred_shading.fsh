@@ -478,7 +478,9 @@ void main() {
 					uv,
 					position_view,
 					depth,
+#ifdef LOD_MOD_ACTIVE
 					depth_lod,
+#endif
 					light_levels.y,
 					material.sss_amount > eps,
 					sss_depth_distant
