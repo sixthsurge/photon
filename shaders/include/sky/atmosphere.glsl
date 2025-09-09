@@ -54,21 +54,19 @@ uniform float atmosphere_saturation_boost_amount;
 
 float atmosphere_mie_phase(float nu, bool use_klein_nishina_phase) {
 	return use_klein_nishina_phase
-		? klein_nishina_phase(nu, air_mie_energy_parameter)
+		? klein_nishina_phase_area(nu,air_mie_energy_parameter,pi*moon_angular_radius)
 		: henyey_greenstein_phase(nu, air_mie_g);
 }
 
 float atmosphere_mie_phase_moon(float nu, bool use_klein_nishina_phase) {
 	// Blend between HG and KN based on moon phase
 	// Idea and implementation from Foozey (modified)
-
 	float t = float(moonPhase) / 4.0;
 	t = t > 1.0 ? 2.0 - t : t;
 	t = sqr(1.0 - t) * 0.95 + 0.05;
-
 	return mix(
 		henyey_greenstein_phase(nu, air_mie_g),
-		klein_nishina_phase(nu, air_mie_energy_parameter),
+		klein_nishina_phase_area(nu, air_mie_energy_parameter,pi*moon_angular_radius),
 		t * float(use_klein_nishina_phase)
 	);
 }
