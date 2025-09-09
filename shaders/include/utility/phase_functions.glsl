@@ -36,8 +36,9 @@ float klein_nishina_phase(float nu, float e) {
 }
 
 float klein_nishina_phase_area(float nu, float e, float radius) {
-    float radius_eff=max(radius,0.05);//Prevent divide by 0 and fix really small moons (angular_size <= 0.2)
-    float energy_scale = e / (3000.0 *3.0);// use 3000 because its the prior default energy to give artistic control, scale down by 3 as artistic control and to offset the clamping
+	//quick and dirty area light approximation by xyber
+    float radius_eff=max(radius,0.05);//Prevent divide by 0 and fix small sizes (angular_size <= 0.2)
+    float energy_scale = e / (6000.0);// use 6000 because its the prior default energy to give artistic control, scaled down by 2 as artistic control and to offset the clamping
     float e_area = energy_scale / (1.0 - cos(radius_eff)); //calculate percieved "energy" due to area 
     float cosr = cos(radius);
     float sinr = sin(radius);
