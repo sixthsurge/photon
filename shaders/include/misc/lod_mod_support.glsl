@@ -39,6 +39,7 @@
     #define combined_depth_tex                 colortex15
     #define lod_depth_tex                      dhDepthTex
     #define lod_depth_tex_solid                dhDepthTex1
+    #define lod_depth_tex_scale                taau_render_scale
     #define lod_projection_matrix              dhProjection
     #define lod_projection_matrix_inverse      dhProjectionInverse
     #define lod_previous_projection_matrix     dhPreviousProjection
@@ -79,6 +80,7 @@
     #define combined_depth_tex                 colortex15
     #define lod_depth_tex                      vxDepthTexTrans
     #define lod_depth_tex_solid                vxDepthTexOpaque
+    #define lod_depth_tex_scale                1.0
     #define lod_projection_matrix              vxProj
     #define lod_projection_matrix_inverse      vxProjInv
     #define lod_previous_projection_matrix     vxProjPrev
@@ -92,7 +94,6 @@
  
     #define sample_depth_texture texture
 #endif
-
 
 bool is_lod_terrain(float depth, float depth_lod) {
     return depth >= 1.0 && depth_lod < 1.0;

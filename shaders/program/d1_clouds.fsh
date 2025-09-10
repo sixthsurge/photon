@@ -127,11 +127,11 @@ uniform float biome_humidity;
 
 const int checkerboard_area = CLOUDS_TEMPORAL_UPSCALING * CLOUDS_TEMPORAL_UPSCALING;
 
-float depth_max_4x4(sampler2D depth_sampler) {
-	vec4 depth_samples_0 = textureGather(depth_sampler, uv * taau_render_scale + vec2( 2.0 * view_pixel_size.x,  2.0 * view_pixel_size.y));
-	vec4 depth_samples_1 = textureGather(depth_sampler, uv * taau_render_scale + vec2(-2.0 * view_pixel_size.x,  2.0 * view_pixel_size.y));
-	vec4 depth_samples_2 = textureGather(depth_sampler, uv * taau_render_scale + vec2( 2.0 * view_pixel_size.x, -2.0 * view_pixel_size.y));
-	vec4 depth_samples_3 = textureGather(depth_sampler, uv * taau_render_scale + vec2(-2.0 * view_pixel_size.x, -2.0 * view_pixel_size.y));
+float depth_max_4x4(sampler2D depth_sampler, float scale) {
+	vec4 depth_samples_0 = textureGather(depth_sampler, uv * scale + vec2( 2.0 * view_pixel_size.x,  2.0 * view_pixel_size.y));
+	vec4 depth_samples_1 = textureGather(depth_sampler, uv * scale + vec2(-2.0 * view_pixel_size.x,  2.0 * view_pixel_size.y));
+	vec4 depth_samples_2 = textureGather(depth_sampler, uv * scale + vec2( 2.0 * view_pixel_size.x, -2.0 * view_pixel_size.y));
+	vec4 depth_samples_3 = textureGather(depth_sampler, uv * scale + vec2(-2.0 * view_pixel_size.x, -2.0 * view_pixel_size.y));
 
 	return max(
 		max(max_of(depth_samples_0), max_of(depth_samples_1)),
@@ -150,14 +150,14 @@ void main() {
 	vec2 new_uv = vec2(checkerboard_pos) / vec2(view_res) * rcp(float(taau_render_scale));
 
 	// Get maximum depth from area covered by this fragment
-	float depth_max = depth_max_4x4(depthtex1);
+	float depth_max = depth_max_4x4(depthtex1, taau_render_scale);
 
 	vec3 screen_pos = vec3(new_uv, depth_max);
 	vec3 view_pos = screen_to_view_space(screen_pos, false);
 
 	// LoD terrain support
 #ifdef LOD_MOD_ACTIVE
-	float depth_lod = depth_max_4x4(lod_depth_tex_solid);
+	float depth_lod = depth_max_4x4(lod_depth_tex_solid, lod_depth_tex_scale);
 	bool is_lod = is_lod_terrain(depth_max, depth_lod);
 
 	if (is_lod) {
