@@ -27,7 +27,7 @@
 #endif
 #endif
 
-const float sun_luminance  = 40.0; // luminance of sun disk
+const float sun_luminance  = rcp(cone_angle_to_solid_angle(sun_angular_radius)); // luminance of sun disk
 const float moon_luminance = 10.0; // luminance of moon disk
 
 vec3 draw_sun(vec3 ray_dir) {
