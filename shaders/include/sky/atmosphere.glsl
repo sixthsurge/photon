@@ -341,8 +341,8 @@ vec3 atmosphere_scattering(
 	vec3 scattering_mc = texture(ATMOSPHERE_SCATTERING_LUT, uv_mc).rgb;
 	vec3 scattering_mm = texture(ATMOSPHERE_SCATTERING_LUT, uv_mm).rgb;
 
-	float mie_phase_sun  = atmosphere_mie_phase_sun(nu_sun);
-	float mie_phase_moon = atmosphere_mie_phase_moon(nu_moon);
+	vec3 mie_phase_sun  = atmosphere_mie_phase_sun(nu_sun);
+	vec3 mie_phase_moon = atmosphere_mie_phase_moon(nu_moon);
 
 	vec3 atmosphere = (scattering_sc + scattering_sm * mie_phase_sun)  * sun_color
 	     + (scattering_mc + scattering_mm * mie_phase_moon) * moon_color;
