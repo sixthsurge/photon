@@ -58,17 +58,27 @@ float atmosphere_mie_phase(float nu, bool use_klein_nishina_phase) {
 		: henyey_greenstein_phase(nu, air_mie_g);
 }
 
-float atmosphere_mie_phase_moon(float nu, bool use_klein_nishina_phase) {
-	// Blend between HG and KN based on moon phase
-	// Idea and implementation from Foozey (modified)
+vec3 atmosphere_mie_phase_sun(float nu) {
+	float r=nvidia_phase_area(nu,0.85,1.0,sun_angular_radius);
+	float g=nvidia_phase_area(nu,0.86,1.0,sun_angular_radius);
+	float b=nvidia_phase_area(nu,0.87,1.0,sun_angular_radius);
+	vec3 nvidiaRGB=vec3(r,g,b);
+	return nvidiaRGB*0.2; //artistic scale
+}
+
+
+vec3 atmosphere_mie_phase_moon(float nu) {
+	float moonIntensity=1.02;
+	
 	float t = float(moonPhase) / 4.0;
 	t = t > 1.0 ? 2.0 - t : t;
-	t = sqr(1.0 - t) * 0.95 + 0.05;
-	return mix(
-		henyey_greenstein_phase(nu, air_mie_g),
-		klein_nishina_phase_area(nu, air_mie_energy_parameter,pi*moon_angular_radius),
-		t * float(use_klein_nishina_phase)
-	);
+	t = sqr(1.0 - t) * 0.04 + 0.96;//small phase difference 
+	
+	float r=nvidia_phase_area(nu,0.895*t,1.0,2*moon_angular_radius);
+	float g=nvidia_phase_area(nu,0.90*t,1.0,2*moon_angular_radius);
+	float b=nvidia_phase_area(nu,0.905*t,1.0,2*moon_angular_radius);
+	vec3 nvidiaRGB=vec3(r,g,b);
+	return nvidiaRGB*moonIntensity;
 }
 
 // Post-processing applied to the atmosphere color
@@ -331,8 +341,8 @@ vec3 atmosphere_scattering(
 	vec3 scattering_mc = texture(ATMOSPHERE_SCATTERING_LUT, uv_mc).rgb;
 	vec3 scattering_mm = texture(ATMOSPHERE_SCATTERING_LUT, uv_mm).rgb;
 
-	float mie_phase_sun  = atmosphere_mie_phase(nu_sun, use_klein_nishina_phase);
-	float mie_phase_moon = atmosphere_mie_phase_moon(nu_moon, use_klein_nishina_phase);
+	float mie_phase_sun  = atmosphere_mie_phase_sun(nu_sun);
+	float mie_phase_moon = atmosphere_mie_phase_moon(nu_moon);
 
 	vec3 atmosphere = (scattering_sc + scattering_sm * mie_phase_sun)  * sun_color
 	     + (scattering_mc + scattering_mm * mie_phase_moon) * moon_color;
