@@ -59,16 +59,17 @@ vec2 curl2D(vec2 coord) {
 
 float clouds_phase_single(float cos_theta) { // Single scattering phase function
 	float forwards_a = klein_nishina_phase(cos_theta, 2600.0); // this gives a nice glow very close to the sun
-	float forwards_b = henyey_greenstein_phase(cos_theta, 0.8); 
+	float forwards_b = nvidia_phase(cos_theta, 0.7,10.0); 
 
 	return 0.8 * max(forwards_a, forwards_b)               // forwards lobe (max'ing them is completely nonsensical but it looks nice)
-	     + 0.2 * henyey_greenstein_phase(cos_theta, -0.2); // backwards lobe
+	     + 0.2 * nvidia_phase(cos_theta, -0.2,0.1); // backwards lobe
 }
 
 float clouds_phase_multi(float cos_theta, vec3 g) { // Multiple scattering phase function
-	return 0.65 * henyey_greenstein_phase(cos_theta,  g.x)  // forwards lobe
-	     + 0.10 * henyey_greenstein_phase(cos_theta,  g.y)  // forwards peak
-	     + 0.25 * henyey_greenstein_phase(cos_theta, -g.z); // backwards lobe
+	//the droplet size should be adjusted based on cloudtype, will be added later
+	return 0.65 * nvidia_phase(cos_theta,  g.x,10.0)  // forwards lobe
+	     + 0.10 * nvidia_phase(cos_theta,  g.y,10.0)  // forwards peak
+	     + 0.25 * nvidia_phase(cos_theta, -g.z,10.0); // backwards lobe
 }
 
 float clouds_powder_effect(float density, float cos_theta) {
