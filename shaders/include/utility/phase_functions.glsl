@@ -36,18 +36,15 @@ float klein_nishina_phase(float nu, float e) {
 }
 
 float klein_nishina_phase_area(float nu, float e, float radius) {
-	//quick and dirty area light approximation by xyber
-    float radius_eff=max(radius,0.05);//Prevent divide by 0 and fix small sizes (angular_size <= 0.2)
-    float energy_scale = e / (6000.0);// use 6000 because its the prior default energy to give artistic control, scaled down by 2 as artistic control and to offset the clamping
-    float e_area = energy_scale / (1.0 - cos(radius_eff)); //calculate percieved "energy" due to area 
-    float cosr = cos(radius);
-    float sinr = sin(radius);
+    float radius_eff=max(radius,eps);//Prevent divide by 0 
+    float cosr = cos(radius_eff);
+    float sinr = sin(radius_eff);
     // shifted cosine with clamp to avoid dark hole
     float mu = nu * cosr + sqrt(max(0.0, 1.0 - nu * nu)) * sinr;
     if (nu > cosr) {
         mu = 1.0; // keep center bright
     }
-    return e_area / (tau * (e_area - e_area * mu + 1.0) * log(2.0 * e_area + 1.0));
+    return e / (tau * (e - e * mu + 1.0) * log(2.0 * e + 1.0));
 }
 
 float nvidia_phase(float nu, float g, float a){
