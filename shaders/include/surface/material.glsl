@@ -393,7 +393,28 @@ Material material_from(vec3 albedo_srgb, uint material_mask, vec3 world_pos, vec
 							material.emission = albedo_sqrt * linear_step(0.33, 0.5, hsl.z);
 							#endif
 						} else { // 27
+							// Copper
+							#ifdef HARDCODED_SPECULAR
+							vec3 hsl = rgb_to_hsl(albedo_srgb);
+        
+							material.roughness = 0.5;
+							material.f0 = vec3(0.01);
+							material.ssr_multiplier = 1.0;
+							
+							// Check oxidized parts (blue-green hues)
+							float is_oxidized = step(0.25, 
+        						max(
+            						isolate_hue(hsl, 120.0, 90.0),  // Green range
+            						isolate_hue(hsl, 180.0, 60.0)   // Blue range
+        						)
+    						);
+							if (is_oxidized > 0.5) {
+								material.roughness = 0.7;
+       							material.f0 = vec3(0.015);
+								material.ssr_multiplier = 1.0;
 
+							}
+							#endif
 						}
 					}
 				} else { // 28-32
@@ -616,7 +637,10 @@ Material material_from(vec3 albedo_srgb, uint material_mask, vec3 world_pos, vec
 				} else { // 60-64
 					if (material_mask < 62u) { // 60-62
 						if (material_mask == 60u) { // 60
-
+						#ifdef HARDCODED_EMISSION
+							// Copper torch and lanterns
+							material.emission = 0.05 * albedo_sqrt;
+							#endif
 						} else { // 61
 
 						}
