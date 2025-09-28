@@ -31,7 +31,7 @@ const vec3[32] light_color = vec3[32](
 	vec3(1.00, 0.18, 0.10) *  3.3, // Redstone block
 	vec3(1.00, 0.50, 0.25) *  3.0, // Open eyeblossom
 	vec3(0.85, 1.3, 1.0) *  3.9, // Copper torch and lanterns
-	vec3(0.0), // Unused
+	vec3(1.00, 0.57, 0.30) *  8.0, // Copper Bulbs
 	vec3(0.60, 0.10, 1.00) * 12.0, // Nether portal
 	vec3(0.0)  // End portal
 );

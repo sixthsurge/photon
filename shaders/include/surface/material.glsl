@@ -468,7 +468,7 @@ Material material_from(vec3 albedo_srgb, uint material_mask, vec3 world_pos, vec
 						if (material_mask == 36u) { // 36
 							#ifdef HARDCODED_EMISSION
 							// Medium golden light
-							material.emission  = 0.85 * albedo_sqrt * linear_step(0.78, 0.85, hsl.z);
+							material.emission  = 0.85 * albedo_sqrt * linear_step(0.78, 0.85, hsl.z); 
 							#endif
 						} else { // 37
 							#ifdef HARDCODED_EMISSION
@@ -637,12 +637,27 @@ Material material_from(vec3 albedo_srgb, uint material_mask, vec3 world_pos, vec
 				} else { // 60-64
 					if (material_mask < 62u) { // 60-62
 						if (material_mask == 60u) { // 60
-						#ifdef HARDCODED_EMISSION
+							#ifdef HARDCODED_EMISSION
 							// Copper torch and lanterns
 							material.emission = 0.05 * albedo_sqrt;
 							#endif
 						} else { // 61
-
+							#ifdef HARDCODED_EMISSION
+							// Medium golden light
+							float orange_yellow = max(
+								isolate_hue(hsl, 30.0, 15.0),
+								max(
+									isolate_hue(hsl, 45.0, 15.0),
+									isolate_hue(hsl, 60.0, 15.0)
+								)
+							);
+							
+							if (orange_yellow > 0.5 && hsl.z > 0.65) {
+								material.emission = 0.85 * albedo_sqrt * linear_step(0.3, 0.7, hsl.z) * orange_yellow;
+							} else {
+								material.emission = vec3(0.0);
+							}
+							#endif
 						}
 					} else { // 62-64
 						if (material_mask == 62u) { // 62
