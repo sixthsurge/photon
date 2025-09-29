@@ -445,6 +445,11 @@ void main() {
 		const float cloud_shadows = 1.0;
 #endif
 
+#if defined WORLD_NETHER
+    vec3 shadows = vec3(0.0);
+    float sss_depth = 0.0;
+#endif
+
 		// Shadows
 
 #if defined WORLD_OVERWORLD || defined WORLD_END
