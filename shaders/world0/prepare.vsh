@@ -1,6 +1,6 @@
 #version 400 compatibility
 
-#define vsh 
+#define vsh
 #define PROGRAM_PREPARE
 #define WORLD_OVERWORLD
 
