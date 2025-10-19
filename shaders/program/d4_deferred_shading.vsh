@@ -97,35 +97,35 @@ uniform float time_midnight;
 #include "/include/utility/spherical_harmonics.glsl"
 
 void main() {
-	uv = gl_MultiTexCoord0.xy;
+    uv = gl_MultiTexCoord0.xy;
 
-	light_color   = texelFetch(colortex4, ivec2(191, 0), 0).rgb;
-	ambient_color = texelFetch(colortex4, ivec2(191, 1), 0).rgb;
+    light_color = texelFetch(colortex4, ivec2(191, 0), 0).rgb;
+    ambient_color = texelFetch(colortex4, ivec2(191, 1), 0).rgb;
 
 #if defined WORLD_OVERWORLD
-	Weather weather = get_weather();
+    Weather weather = get_weather();
 
-	sun_color = get_sun_exposure() * get_sun_tint();
-	moon_color = get_moon_exposure() * get_moon_tint();
-	fog_params = get_fog_parameters(weather);
+    sun_color = get_sun_exposure() * get_sun_tint();
+    moon_color = get_moon_exposure() * get_moon_tint();
+    fog_params = get_fog_parameters(weather);
 
-	#ifdef SH_SKYLIGHT
-	// Sample sky SH
-	sky_sh[0]   = texelFetch(colortex4, ivec2(191, 2), 0).rgb;
-	sky_sh[1]   = texelFetch(colortex4, ivec2(191, 3), 0).rgb;
-	sky_sh[2]   = texelFetch(colortex4, ivec2(191, 4), 0).rgb;
-	sky_sh[3]   = texelFetch(colortex4, ivec2(191, 5), 0).rgb;
-	sky_sh[4]   = texelFetch(colortex4, ivec2(191, 6), 0).rgb;
-	sky_sh[5]   = texelFetch(colortex4, ivec2(191, 7), 0).rgb;
-	sky_sh[6]   = texelFetch(colortex4, ivec2(191, 8), 0).rgb;
-	sky_sh[7]   = texelFetch(colortex4, ivec2(191, 9), 0).rgb;
-	sky_sh[8]   = texelFetch(colortex4, ivec2(191, 10), 0).rgb;
-	skylight_up = texelFetch(colortex4, ivec2(191, 11), 0).rgb;
-	#endif
-
-	rainbow_amount = get_rainbow_amount(weather);
+#ifdef SH_SKYLIGHT
+    // Sample sky SH
+    sky_sh[0] = texelFetch(colortex4, ivec2(191, 2), 0).rgb;
+    sky_sh[1] = texelFetch(colortex4, ivec2(191, 3), 0).rgb;
+    sky_sh[2] = texelFetch(colortex4, ivec2(191, 4), 0).rgb;
+    sky_sh[3] = texelFetch(colortex4, ivec2(191, 5), 0).rgb;
+    sky_sh[4] = texelFetch(colortex4, ivec2(191, 6), 0).rgb;
+    sky_sh[5] = texelFetch(colortex4, ivec2(191, 7), 0).rgb;
+    sky_sh[6] = texelFetch(colortex4, ivec2(191, 8), 0).rgb;
+    sky_sh[7] = texelFetch(colortex4, ivec2(191, 9), 0).rgb;
+    sky_sh[8] = texelFetch(colortex4, ivec2(191, 10), 0).rgb;
+    skylight_up = texelFetch(colortex4, ivec2(191, 11), 0).rgb;
 #endif
 
-	vec2 vertex_pos = gl_Vertex.xy * taau_render_scale;
-	gl_Position = vec4(vertex_pos * 2.0 - 1.0, 0.0, 1.0);
+    rainbow_amount = get_rainbow_amount(weather);
+#endif
+
+    vec2 vertex_pos = gl_Vertex.xy * taau_render_scale;
+    gl_Position = vec4(vertex_pos * 2.0 - 1.0, 0.0, 1.0);
 }

@@ -64,19 +64,19 @@ uniform float desert_sandstorm;
 #endif
 
 void main() {
-	uv = gl_MultiTexCoord0.xy;
+    uv = gl_MultiTexCoord0.xy;
 
-	light_color   = texelFetch(colortex4, ivec2(191, 0), 0).rgb;
+    light_color = texelFetch(colortex4, ivec2(191, 0), 0).rgb;
 #if defined WORLD_OVERWORLD && defined SH_SKYLIGHT
-	ambient_color = texelFetch(colortex4, ivec2(191, 11), 0).rgb;
+    ambient_color = texelFetch(colortex4, ivec2(191, 11), 0).rgb;
 #else
-	ambient_color = texelFetch(colortex4, ivec2(191, 1), 0).rgb;
+    ambient_color = texelFetch(colortex4, ivec2(191, 1), 0).rgb;
 #endif
 
 #if defined WORLD_OVERWORLD
-	fog_params = get_fog_parameters(get_weather());
+    fog_params = get_fog_parameters(get_weather());
 #endif
 
-	vec2 vertex_pos = gl_Vertex.xy;
-	gl_Position = vec4(vertex_pos * 2.0 - 1.0, 0.0, 1.0);
+    vec2 vertex_pos = gl_Vertex.xy;
+    gl_Position = vec4(vertex_pos * 2.0 - 1.0, 0.0, 1.0);
 }

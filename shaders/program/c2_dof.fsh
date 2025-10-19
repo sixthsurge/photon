@@ -11,7 +11,7 @@
 
 #include "/include/global.glsl"
 
-layout (location = 0) out vec3 scene_color;
+layout(location = 0) out vec3 scene_color;
 
 /* RENDERTARGETS: 0 */
 
@@ -48,45 +48,58 @@ uniform vec2 taa_offset;
 #include "/include/utility/space_conversion.glsl"
 
 void main() {
-	ivec2 texel = ivec2(gl_FragCoord.xy);
+    ivec2 texel = ivec2(gl_FragCoord.xy);
 
-	float depth = texelFetch(depthtex0, texel, 0).x;
+    float depth = texelFetch(depthtex0, texel, 0).x;
 
 #ifdef LOD_MOD_ACTIVE
-	float depth_lod = texelFetch(lod_depth_tex, texel, 0).x;
+    float depth_lod = texelFetch(lod_depth_tex, texel, 0).x;
 
-	if (is_lod_terrain(depth, depth_lod)) {
-		depth = view_to_screen_space_depth(
-			gbufferProjection,
-			screen_to_view_space_depth(lod_projection_matrix_inverse, depth_lod)
-		);
-	}
+    if (is_lod_terrain(depth, depth_lod)) {
+        depth = view_to_screen_space_depth(
+            gbufferProjection,
+            screen_to_view_space_depth(lod_projection_matrix_inverse, depth_lod)
+        );
+    }
 #endif
 
-	if (depth < hand_depth) {
-		scene_color = texelFetch(colortex0, texel, 0).rgb;
-		return;
-	};
+    if (depth < hand_depth) {
+        scene_color = texelFetch(colortex0, texel, 0).rgb;
+        return;
+    };
 
-	// Calculate vogel disk rotation
-	float theta  = texelFetch(noisetex, texel & 511, 0).b;
-	      theta  = r1(frameCounter, theta);
-	      theta *= tau;
+    // Calculate vogel disk rotation
+    float theta = texelFetch(noisetex, texel & 511, 0).b;
+    theta = r1(frameCounter, theta);
+    theta *= tau;
 
-	// Calculate circle of confusion
-	float focus = DOF_FOCUS < 0.0 ? centerDepthSmooth : view_to_screen_space_depth(gbufferProjection, DOF_FOCUS);
-	vec2 CoC = min(abs(depth - focus), 0.1) * (DOF_INTENSITY * 0.2 / 1.37) * vec2(1.0, aspectRatio) * gbufferProjection[1][1];
+    // Calculate circle of confusion
+    float focus = DOF_FOCUS < 0.0
+        ? centerDepthSmooth
+        : view_to_screen_space_depth(gbufferProjection, DOF_FOCUS);
+    vec2 CoC = min(abs(depth - focus), 0.1) * (DOF_INTENSITY * 0.2 / 1.37) *
+        vec2(1.0, aspectRatio) * gbufferProjection[1][1];
 
-	scene_color = vec3(0.0);
+    scene_color = vec3(0.0);
 
-	for (int i = 0; i < DOF_SAMPLES; ++i) {
-		vec2 offset = vogel_disk_sample(i, DOF_SAMPLES, theta);
-		scene_color += textureLod(colortex0, clamp(vec2(uv + offset * CoC), vec2(0.0), vec2(1.0 - 2.0 * view_pixel_size * rcp(taau_render_scale))) * taau_render_scale, 0).rgb;
-	}
+    for (int i = 0; i < DOF_SAMPLES; ++i) {
+        vec2 offset = vogel_disk_sample(i, DOF_SAMPLES, theta);
+        scene_color +=
+            textureLod(
+                colortex0,
+                clamp(
+                    vec2(uv + offset * CoC),
+                    vec2(0.0),
+                    vec2(1.0 - 2.0 * view_pixel_size * rcp(taau_render_scale))
+                ) * taau_render_scale,
+                0
+            )
+                .rgb;
+    }
 
-	scene_color *= rcp(DOF_SAMPLES);
+    scene_color *= rcp(DOF_SAMPLES);
 }
 
-#ifndef DOF 
-	#error "This program should be disabled if Depth of Field is disabled"
+#ifndef DOF
+#error "This program should be disabled if Depth of Field is disabled"
 #endif

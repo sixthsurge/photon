@@ -11,8 +11,10 @@
 
 #include "/include/global.glsl"
 
-layout (location = 0) out vec4 fragment_color;
-layout (location = 1) out vec4 gbuffer_data; // albedo, block ID, flat normal, light levels
+layout(location = 0) out vec4 fragment_color;
+layout(
+    location = 1
+) out vec4 gbuffer_data; // albedo, block ID, flat normal, light levels
 
 /* RENDERTARGETS: 0,1 */
 
@@ -32,7 +34,7 @@ flat in vec2 atlas_tile_offset;
 flat in vec2 atlas_tile_scale;
 #endif
 
-#if defined WORLD_OVERWORLD 
+#if defined WORLD_OVERWORLD
 #include "/include/fog/overworld/parameters.glsl"
 flat in OverworldFogParameters fog_params;
 #endif
@@ -134,11 +136,12 @@ uniform vec4 entityColor;
 #define TEMPORAL_REPROJECTION
 
 #ifdef SHADOW_COLOR
-	#undef SHADOW_COLOR
+#undef SHADOW_COLOR
 #endif
 
-#if defined PROGRAM_GBUFFERS_TEXTURED || defined PROGRAM_GBUFFERS_PARTICLES_TRANSLUCENT
-	#define NO_NORMAL
+#if defined PROGRAM_GBUFFERS_TEXTURED || \
+    defined PROGRAM_GBUFFERS_PARTICLES_TRANSLUCENT
+#define NO_NORMAL
 #endif
 
 #ifdef DIRECTIONAL_LIGHTMAPS
@@ -162,123 +165,135 @@ uniform vec4 entityColor;
 #endif
 
 void main() {
-	// Clip to TAAU viewport
+    // Clip to TAAU viewport
 
-	vec2 coord = gl_FragCoord.xy * view_pixel_size * rcp(taau_render_scale);
+    vec2 coord = gl_FragCoord.xy * view_pixel_size * rcp(taau_render_scale);
 
 #if defined TAA && defined TAAU
-	if (clamp01(coord) != coord) discard;
+    if (clamp01(coord) != coord) {
+        discard;
+    }
 #endif
 
     // Overdraw fade
 
-    float dh_fade_start_distance = max0(far - DH_OVERDRAW_DISTANCE - DH_OVERDRAW_FADE_LENGTH);
+    float dh_fade_start_distance =
+        max0(far - DH_OVERDRAW_DISTANCE - DH_OVERDRAW_FADE_LENGTH);
     float dh_fade_end_distance = max0(far - DH_OVERDRAW_DISTANCE);
     float view_distance = length(scene_pos);
 
     float dither = interleaved_gradient_noise(gl_FragCoord.xy, frameCounter);
-    float fade = smoothstep(dh_fade_start_distance, dh_fade_end_distance, view_distance);
+    float fade =
+        smoothstep(dh_fade_start_distance, dh_fade_end_distance, view_distance);
 
     if (dither > fade) {
         discard;
         return;
     }
 
-	// Encode gbuffer data
+    // Encode gbuffer data
 
-	gbuffer_data.x  = pack_unorm_2x8(tint.rg);
-	gbuffer_data.y  = pack_unorm_2x8(tint.b, clamp01(((is_water == 1) ? rcp(255.0) : 0.0)));
-	gbuffer_data.z  = pack_unorm_2x8(encode_unit_vector(normal));
-	gbuffer_data.w  = pack_unorm_2x8(dither_8bit(light_levels, 0.5));
+    gbuffer_data.x = pack_unorm_2x8(tint.rg);
+    gbuffer_data.y =
+        pack_unorm_2x8(tint.b, clamp01(((is_water == 1) ? rcp(255.0) : 0.0)));
+    gbuffer_data.z = pack_unorm_2x8(encode_unit_vector(normal));
+    gbuffer_data.w = pack_unorm_2x8(dither_8bit(light_levels, 0.5));
 
-	if (is_water == 1.0) {
-		fragment_color = vec4(0.0);
-		return;
-	}
+    if (is_water == 1.0) {
+        fragment_color = vec4(0.0);
+        return;
+    }
 
-	// Space conversions
+    // Space conversions
 
-	float back_depth_mc = texelFetch(depthtex0, ivec2(gl_FragCoord.xy), 0).x;
-	float back_depth_dh = texelFetch(dhDepthTex1, ivec2(gl_FragCoord.xy), 0).x;
-	bool back_is_dh_terrain = is_lod_terrain(back_depth_mc, back_depth_dh);
+    float back_depth_mc = texelFetch(depthtex0, ivec2(gl_FragCoord.xy), 0).x;
+    float back_depth_dh = texelFetch(dhDepthTex1, ivec2(gl_FragCoord.xy), 0).x;
+    bool back_is_dh_terrain = is_lod_terrain(back_depth_mc, back_depth_dh);
 
-	// Prevent water behind terrain from rendering on top of it
-	float dh_depth_linear = screen_to_view_space_depth(dhProjectionInverse, gl_FragCoord.z);
-	float mc_depth_linear = screen_to_view_space_depth(gbufferProjectionInverse, back_depth_mc);
+    // Prevent water behind terrain from rendering on top of it
+    float dh_depth_linear =
+        screen_to_view_space_depth(dhProjectionInverse, gl_FragCoord.z);
+    float mc_depth_linear =
+        screen_to_view_space_depth(gbufferProjectionInverse, back_depth_mc);
 
-	if (mc_depth_linear < dh_depth_linear && back_depth_mc != 1.0) { discard; return; }
+    if (mc_depth_linear < dh_depth_linear && back_depth_mc != 1.0) {
+        discard;
+        return;
+    }
 
-	vec3 world_pos = scene_pos + cameraPosition;
-	vec3 world_dir = normalize(scene_pos - gbufferModelViewInverse[3].xyz);
+    vec3 world_pos = scene_pos + cameraPosition;
+    vec3 world_dir = normalize(scene_pos - gbufferModelViewInverse[3].xyz);
 
-	vec3 view_back_pos = back_is_dh_terrain
-		? screen_to_view_space(vec3(coord, back_depth_dh), true, true)
-		: screen_to_view_space(vec3(coord, back_depth_mc), true, false);
-	vec3 scene_back_pos = view_to_scene_space(view_back_pos);
+    vec3 view_back_pos = back_is_dh_terrain
+        ? screen_to_view_space(vec3(coord, back_depth_dh), true, true)
+        : screen_to_view_space(vec3(coord, back_depth_mc), true, false);
+    vec3 scene_back_pos = view_to_scene_space(view_back_pos);
 
-	float layer_dist = length(scene_pos - scene_back_pos); // distance to solid layer along view ray
+    float layer_dist = length(
+        scene_pos - scene_back_pos
+    ); // distance to solid layer along view ray
 
-	// Get material and normal
+    // Get material and normal
 
-	Material material; 
-	fragment_color = tint;
+    Material material;
+    fragment_color = tint;
 
-	vec2 adjusted_light_levels = light_levels;
-	material = material_from(
-		fragment_color.rgb,
-		0u,
-		world_pos,
-		normal,
-		adjusted_light_levels
-	);
+    vec2 adjusted_light_levels = light_levels;
+    material = material_from(
+        fragment_color.rgb,
+        0u,
+        world_pos,
+        normal,
+        adjusted_light_levels
+    );
 
-	// Shadows
+    // Shadows
 
 #ifndef NO_NORMAL
-	float NoL = dot(normal, light_dir);
+    float NoL = dot(normal, light_dir);
 #else
-	float NoL = 1.0;
+    float NoL = 1.0;
 #endif
-	float NoV = clamp01(dot(normal, -world_dir));
-	float LoV = dot(light_dir, -world_dir);
-	float halfway_norm = inversesqrt(2.0 * LoV + 2.0);
-	float NoH = (NoL + NoV) * halfway_norm;
-	float LoH = LoV * halfway_norm + halfway_norm;
+    float NoV = clamp01(dot(normal, -world_dir));
+    float LoV = dot(light_dir, -world_dir);
+    float halfway_norm = inversesqrt(2.0 * LoV + 2.0);
+    float NoH = (NoL + NoV) * halfway_norm;
+    float LoH = LoV * halfway_norm + halfway_norm;
 
-	vec3 shadows = vec3(pow8(light_levels.y));
-	#define sss_depth 0.0
-	#define shadow_distance_fade 0.0
+    vec3 shadows = vec3(pow8(light_levels.y));
+#define sss_depth 0.0
+#define shadow_distance_fade 0.0
 
 #ifdef CLOUD_SHADOWS
-	float cloud_shadows = get_cloud_shadows(colortex8, scene_pos);
-	shadows *= cloud_shadows;
+    float cloud_shadows = get_cloud_shadows(colortex8, scene_pos);
+    shadows *= cloud_shadows;
 #endif
 
-	fragment_color.rgb = get_diffuse_lighting(
-		material,
-		scene_pos,
-		normal,
-		normal,
-		normal,
-		shadows,
-		light_levels,
-		1.0,
-		0.0,
-		sss_depth,
+    fragment_color.rgb = get_diffuse_lighting(
+        material,
+        scene_pos,
+        normal,
+        normal,
+        normal,
+        shadows,
+        light_levels,
+        1.0,
+        0.0,
+        sss_depth,
 #ifdef CLOUD_SHADOWS
-		cloud_shadows,
+        cloud_shadows,
 #endif
-		shadow_distance_fade,
-		NoL,
-		NoV,
-		NoH,
-		LoV
-	);
+        shadow_distance_fade,
+        NoL,
+        NoV,
+        NoH,
+        LoV
+    );
 
-	// Apply fog
+    // Apply fog
 
-	vec4 fog = common_fog(length(scene_pos), false);
-	fragment_color.rgb = fragment_color.rgb * fog.a + fog.rgb;
+    vec4 fog = common_fog(length(scene_pos), false);
+    fragment_color.rgb = fragment_color.rgb * fog.a + fog.rgb;
 
-	fragment_color.a *= border_fog(scene_pos, world_dir);
+    fragment_color.a *= border_fog(scene_pos, world_dir);
 }

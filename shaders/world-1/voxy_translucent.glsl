@@ -1,3 +1,2 @@
-#define WORLD_NETHER 
+#define WORLD_NETHER
 #include "/program/voxy_translucent.glsl"
-

@@ -11,7 +11,7 @@
 
 #include "/include/global.glsl"
 
-layout (location = 0) out vec4 frag_color;
+layout(location = 0) out vec4 frag_color;
 
 /* RENDERTARGETS: 13 */
 
@@ -43,18 +43,21 @@ const uint snow_flag = 254u;
 
 void main() {
 #if defined TAA && defined TAAU
-	vec2 coord = gl_FragCoord.xy * view_pixel_size * rcp(taau_render_scale);
-	if (clamp01(coord) != coord) discard;
+    vec2 coord = gl_FragCoord.xy * view_pixel_size * rcp(taau_render_scale);
+    if (clamp01(coord) != coord) {
+        discard;
+    }
 #endif
 
-	vec4 base_color = texture(gtexture, uv);
-	if (base_color.a < 0.1) discard;
+    vec4 base_color = texture(gtexture, uv);
+    if (base_color.a < 0.1) {
+        discard;
+    }
 
-	bool is_rain = (abs(base_color.r - base_color.b) > eps);
+    bool is_rain = (abs(base_color.r - base_color.b) > eps);
 
-	frag_color = is_rain
-		? vec4(get_rain_color(), RAIN_OPACITY * base_color.a) * tint
-		: vec4(get_snow_color(), SNOW_OPACITY * base_color.a) * tint;
-	frag_color.rgb *= frag_color.a;
+    frag_color = is_rain
+        ? vec4(get_rain_color(), RAIN_OPACITY * base_color.a) * tint
+        : vec4(get_snow_color(), SNOW_OPACITY * base_color.a) * tint;
+    frag_color.rgb *= frag_color.a;
 }
-
