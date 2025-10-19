@@ -32,17 +32,14 @@ const float sun_luminance =
 const float moon_luminance = 10.0; // luminance of moon disk
 
 vec3 draw_sun(vec3 ray_dir) {
-    float nu = dot(ray_dir, sun_dir);
-
-    // Limb darkening model from
-    // http://www.physics.hmc.edu/faculty/esin/a101/limbdarkening.pdf
-    const vec3 alpha = vec3(0.429, 0.522, 0.614);
-    float center_to_edge = max0(sun_angular_radius - fast_acos(nu));
-    vec3 limb_darkening =
-        pow(vec3(1.0 - sqr(1.0 - center_to_edge)), 0.5 * alpha);
-
-    return sun_luminance * sun_color * step(0.0, center_to_edge) *
-        limb_darkening;
+	//use very strong forward scattering to get a realistic sun edge, also abuses numerical instability to get good flares
+	float energy=9000.1;
+	float nu = dot(ray_dir, sun_dir);
+	float r=klein_nishina_phase_area(nu,0.79*energy,sun_angular_radius);
+	float g=klein_nishina_phase_area(nu,1.0*energy,sun_angular_radius);
+	float b=klein_nishina_phase_area(nu,1.22*energy,sun_angular_radius);
+	vec3 phase = vec3(r,g,b);
+	return phase*sun_color*pi/360.0;
 }
 
 #ifdef GALAXY
