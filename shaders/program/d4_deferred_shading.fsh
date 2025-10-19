@@ -540,6 +540,10 @@ void main() {
             shadows *= float(!parallax_shadow);
 #endif
         }
+#else 
+        const vec3 shadows = vec3(1.0);
+        const float shadow_distance_fade = 1.0;
+        const float sss_depth = 0.0;
 #endif
 
         // Diffuse lighting
