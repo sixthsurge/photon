@@ -59,6 +59,7 @@ bool is_voxelized(uint block_id, bool vertex_at_grid_corner) {
     bool is_transparent_block = block_id == 1u || // Water
         block_id == 18u || // Transparent metal objects
         block_id == 28u || // Transparent copper objects
+        block_id == 30u || // Transparent wood objects
         block_id == 80u; // Miscellaneous transparent
 
     bool is_light_emitting_block = 32u <= block_id && block_id < 64u;

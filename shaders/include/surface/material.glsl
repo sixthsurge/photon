@@ -501,10 +501,20 @@ Material material_from(
                             }
 #endif
                         } else { // 29
+// Wood
+#ifdef HARDCODED_SPECULAR
+                            float smoothness = 0.25 * linear_step(0.4, 0.8, hsl.z);
+                            material.roughness = max(sqr(1.0 - smoothness), 0.4);
+                            material.f0 = vec3(0.03);
+#endif
                         }
                     } else { // 30-32
                         if (material_mask == 30u) { // 30
-
+#ifdef HARDCODED_SPECULAR
+                            float smoothness = 0.25 * linear_step(0.4, 0.8, hsl.z);
+                            material.roughness = max(sqr(1.0 - smoothness), 0.4);
+                            material.f0 = vec3(0.03);
+#endif
                         } else { // 31
                         }
                     }
