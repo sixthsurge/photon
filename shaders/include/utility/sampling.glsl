@@ -1,7 +1,7 @@
 #if !defined INCLUDE_UTILITY_SAMPLING
 #define INCLUDE_UTILITY_SAMPLING
 
-vec2 vogel_disk_sample(int step_index, int step_count, float rotation) {
+vec2 vogel_disc_sample(int step_index, int step_count, float rotation) {
     const float golden_angle = 2.4;
 
     float r = sqrt(step_index + 0.5) / sqrt(float(step_count));
