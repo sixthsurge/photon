@@ -3,14 +3,21 @@
 
 #include "voxelization.glsl"
 
-bool is_emitter(uint block_id) { return 32u <= block_id && block_id < 64u; }
+bool is_emitter(uint block_id) { return 32u <= block_id && block_id < 64u || 81u <= block_id && block_id <= 96u; }
 
 bool is_translucent(uint block_id) { return 64u <= block_id && block_id < 80u; }
 
 vec3 get_emitted_light(uint block_id) {
     if (is_emitter(block_id)) {
-        return texelFetch(light_data_sampler, ivec2(int(block_id) - 32, 0), 0)
-            .rgb;
+        int light_index;
+        if (block_id >= 32u && block_id < 64u) {
+            light_index = int(block_id) - 32;
+        } else if (block_id >= 81u && block_id <= 96u) {
+            light_index = int(block_id) - 81 + 32;
+        } else {
+            return vec3(0.0);
+        }
+        return texelFetch(light_data_sampler, ivec2(light_index, 0), 0).rgb;
     } else {
         return vec3(0.0);
     }

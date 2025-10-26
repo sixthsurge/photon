@@ -822,6 +822,12 @@ Material material_from(
 #endif
     }
 
+    if (81u <= material_mask && material_mask < 113u) {
+// Light Emitters
+#ifdef HARDCODED_EMISSION
+        material.emission = vec3(0.5);
+#endif
+        }
     return material;
 }
 
