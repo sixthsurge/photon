@@ -22,7 +22,7 @@ bool raymarch_depth_buffer(
     float dither,
     uint intersection_step_count,
     uint refinement_step_count,
-    out vec3 hit_pos
+    out vec3 ray_pos
 ) {
     if (view_dir.z > 0.0 && view_dir.z >= -view_pos.z) {
         return false;
@@ -43,8 +43,7 @@ bool raymarch_depth_buffer(
     float step_length = ray_length * rcp(float(intersection_step_count));
 
     vec3 ray_step = screen_dir * step_length;
-    vec3 ray_pos =
-        screen_pos + dither * ray_step + length(view_pixel_size) * screen_dir;
+    ray_pos = screen_pos + dither * ray_step + length(view_pixel_size) * screen_dir;
 
     float depth_tolerance =
         max(abs(ray_step.z) * 3.0, 0.02 / sqr(view_pos.z)); // from DrDesten <3
@@ -73,7 +72,6 @@ bool raymarch_depth_buffer(
         if (depth < ray_pos.z &&
             abs(depth_tolerance - (ray_pos.z - depth)) < depth_tolerance) {
             hit = true;
-            hit_pos = ray_pos;
             break;
         }
     }
@@ -91,16 +89,16 @@ bool raymarch_depth_buffer(
 
         float depth = texelFetch(
                           SSRT_DEPTH_SAMPLER,
-                          ivec2(hit_pos.xy * view_res * taau_render_scale),
+                          ivec2(ray_pos.xy * view_res * taau_render_scale),
                           0
         )
                           .x;
 
-        if (depth < hit_pos.z &&
-            abs(depth_tolerance - (hit_pos.z - depth)) < depth_tolerance) {
-            hit_pos -= ray_step;
+        if (depth < ray_pos.z &&
+            abs(depth_tolerance - (ray_pos.z - depth)) < depth_tolerance) {
+            ray_pos -= ray_step;
         } else {
-            hit_pos += ray_step;
+            ray_pos += ray_step;
         }
 
         final_depth = depth;
