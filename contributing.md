@@ -1,10 +1,5 @@
-## on pull requests
+## Contribution guide
 
-Please don't PR full features or stylistic changes; I much prefer that people fork the project for 
-these things.
-This is because it's uncomfortable for me to say no but I don't want people to do these things for 
-me because I want to do them myself.
-Even if your implementation of something is far better than I could come up with, I'd still rather 
-it not be in Photon because it's my project after all.
-That said, I certainly appreciate pull requests for translations, small fixes or block mappings.
-However I may ignore your pull request for a long time.
+- Code contributions to help improve Photon are very appreciated, however: **please** ask me (sixthsurge) **before** you start working on a major contribution (e.g. new feature or stylistic change) and be wary that I am very picky when it comes to accepting code so I may decide not to accept it anway. This is to avoid upset in the situation where you spend a long time working on something and I decide not to merge it.
+- As for smaller changes like bug fixes, `block.properties` additions or translations, these will likely be accepted anyway.
+- Use the #development channel in my Discord server to discuss potential or ongoing development.
