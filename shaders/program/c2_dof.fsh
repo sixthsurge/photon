@@ -83,7 +83,7 @@ void main() {
     scene_color = vec3(0.0);
 
     for (int i = 0; i < DOF_SAMPLES; ++i) {
-        vec2 offset = vogel_disk_sample(i, DOF_SAMPLES, theta);
+        vec2 offset = vogel_disc_sample(i, DOF_SAMPLES, theta);
         scene_color +=
             textureLod(
                 colortex0,

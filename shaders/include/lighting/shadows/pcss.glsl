@@ -9,49 +9,13 @@
 #include "/include/utility/dithering.glsl"
 #include "/include/utility/random.glsl"
 #include "/include/utility/rotation.glsl"
+#include "/include/utility/sampling.glsl"
 
 const int shadow_map_res = int(float(shadowMapResolution) * MC_SHADOW_QUALITY);
 const float shadow_map_pixel_size = rcp(float(shadow_map_res));
 
-// This kernel is progressive: any sample count will return an even spread of
-// points
-const vec2[32] blue_noise_disk = vec2[](
-    vec2(0.478712, 0.875764),
-    vec2(-0.337956, -0.793959),
-    vec2(-0.955259, -0.028164),
-    vec2(0.864527, 0.325689),
-    vec2(0.209342, -0.395657),
-    vec2(-0.106779, 0.672585),
-    vec2(0.156213, 0.235113),
-    vec2(-0.413644, -0.082856),
-    vec2(-0.415667, 0.323909),
-    vec2(0.141896, -0.939980),
-    vec2(0.954932, -0.182516),
-    vec2(-0.766184, 0.410799),
-    vec2(-0.434912, -0.458845),
-    vec2(0.415242, -0.078724),
-    vec2(0.728335, -0.491777),
-    vec2(-0.058086, -0.066401),
-    vec2(0.202990, 0.686837),
-    vec2(-0.808362, -0.556402),
-    vec2(0.507386, -0.640839),
-    vec2(-0.723494, -0.229240),
-    vec2(0.489740, 0.317826),
-    vec2(-0.622663, 0.765301),
-    vec2(-0.010640, 0.929347),
-    vec2(0.663146, 0.647618),
-    vec2(-0.096674, -0.413835),
-    vec2(0.525945, -0.321063),
-    vec2(-0.122533, 0.366019),
-    vec2(0.195235, -0.687983),
-    vec2(-0.563203, 0.098748),
-    vec2(0.418563, 0.561335),
-    vec2(-0.378595, 0.800367),
-    vec2(0.826922, 0.001024)
-);
-
 vec2 blocker_search(vec3 scene_pos, float dither, bool has_sss) {
-    uint step_count = has_sss ? SSS_STEPS : 3;
+    int step_count = has_sss ? SSS_STEPS : 3;
 
     vec3 shadow_view_pos = transform(shadowModelView, scene_pos);
     vec3 shadow_clip_pos = project_ortho(shadowProjection, shadow_view_pos);
@@ -59,14 +23,14 @@ vec2 blocker_search(vec3 scene_pos, float dither, bool has_sss) {
 
     float radius = SHADOW_BLOCKER_SEARCH_RADIUS * shadowProjection[0].x *
         (0.5 + 0.5 * linear_step(0.2, 0.4, light_dir.y));
-    mat2 rotate_and_scale = get_rotation_matrix(tau * dither) * radius;
 
     float depth_sum = 0.0;
     float weight_sum = 0.0;
     float depth_sum_sss = 0.0;
 
-    for (uint i = 0; i < step_count; ++i) {
-        vec2 uv = shadow_clip_pos.xy + rotate_and_scale * blue_noise_disk[i];
+    for (int i = 0; i < step_count; ++i) {
+        vec2 offset = vogel_disc_sample(i, step_count, dither * tau) * radius;
+        vec2 uv = shadow_clip_pos.xy + offset;
         uv /= get_distortion_factor(uv);
         uv = uv * 0.5 + 0.5;
 
@@ -121,11 +85,9 @@ vec3 shadow_pcf(
     float filter_radius = max(penumbra_size, min_filter_radius);
     float filter_scale = sqr(filter_radius / min_filter_radius);
 
-    uint step_count =
-        uint(SHADOW_PCF_STEPS_MIN + SHADOW_PCF_STEPS_SCALE * filter_scale);
+    int step_count =
+        int(SHADOW_PCF_STEPS_MIN + SHADOW_PCF_STEPS_SCALE * filter_scale);
     step_count = min(step_count, SHADOW_PCF_STEPS_MAX);
-
-    mat2 rotate_and_scale = get_rotation_matrix(tau * dither) * filter_radius;
 
     float shadow = 0.0;
 
@@ -133,8 +95,8 @@ vec3 shadow_pcf(
     float weight_sum = 0.0;
 
     // perform first 4 iterations and filter shadow color
-    for (uint i = 0; i < 4; ++i) {
-        vec2 offset = rotate_and_scale * blue_noise_disk[i];
+    for (int i = 0; i < 4; ++i) {
+        vec2 offset = vogel_disc_sample(i, step_count, dither * tau) * filter_radius;
 
         vec2 uv = shadow_clip_pos.xy + offset;
         uv /= get_distortion_factor(uv);
@@ -175,8 +137,8 @@ vec3 shadow_pcf(
     }
 
     // perform remaining iterations
-    for (uint i = 4; i < step_count; ++i) {
-        vec2 offset = rotate_and_scale * blue_noise_disk[i];
+    for (int i = 4; i < step_count; ++i) {
+        vec2 offset = vogel_disc_sample(i, step_count, dither * tau) * filter_radius;
 
         vec2 uv = shadow_clip_pos.xy + offset;
         uv /= get_distortion_factor(uv);
@@ -240,7 +202,8 @@ vec3 get_filtered_shadows(
         return vec3(0.0);
     }
 
-    float dither = interleaved_gradient_noise(gl_FragCoord.xy, frameCounter);
+    float dither = texelFetch(noisetex, ivec2(gl_FragCoord.xy) & 511, 0).b;
+          dither = r1(frameCounter, dither);
 
 #ifdef SHADOW_VPS
     vec2 blocker_search_result =

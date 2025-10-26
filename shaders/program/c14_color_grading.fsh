@@ -17,6 +17,10 @@ layout(location = 0) out vec3 scene_color;
 
 in vec2 uv;
 
+#if GRADE_WHITE_BALANCE != 6500
+flat in mat3 white_balance_matrix;
+#endif
+
 // ------------
 //   Uniforms
 // ------------
@@ -116,18 +120,14 @@ vec3 grade_input(vec3 rgb) {
     float lum = dot(rgb, luminance_weights);
     rgb = max0(mix(vec3(lum), rgb, saturation));
 
+    // White balance 
 #if GRADE_WHITE_BALANCE != 6500
-    // White balance (slow)
-    vec3 src_xyz = blackbody(float(GRADE_WHITE_BALANCE)) * rec2020_to_xyz;
-    vec3 dst_xyz = blackbody(6500.0) * rec2020_to_xyz;
-    mat3 cat = get_chromatic_adaptation_matrix(src_xyz, dst_xyz);
-
     rgb = rgb * rec2020_to_xyz;
-    rgb = rgb * cat;
+    rgb = rgb * white_balance_matrix;
     rgb = rgb * xyz_to_rec2020;
+#endif
 
     rgb = max0(rgb);
-#endif
 
     return rgb;
 }
