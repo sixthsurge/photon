@@ -62,7 +62,7 @@ bool is_voxelized(uint block_id, bool vertex_at_grid_corner) {
         block_id == 30u || // Transparent wood objects
         block_id == 80u; // Miscellaneous transparent
 
-    bool is_light_emitting_block = (32u <= block_id && block_id < 64u) || (81u <= block_id && block_id <= 96u);
+    bool is_light_emitting_block = (32u <= block_id && block_id < 64u) || (81u <= block_id && block_id < 113u);
 
     return (vertex_at_grid_corner || is_light_emitting_block) && is_terrain &&
         !is_transparent_block;

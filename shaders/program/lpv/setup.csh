@@ -24,7 +24,7 @@ void main() {
     imageStore(
         light_data_img,
         ivec2(index, 0),
-        vec4(light_color[clamp(index, 0u, 64u)], 0.0)
+        vec4(light_color[clamp(index, 0u, 63u)], 0.0)
     );
     imageStore(
         light_data_img,
