@@ -256,9 +256,9 @@ option.MOON_ANGULAR_RADIUS             = Raggio Angolare Luna
 option.SKY_GROUND                      = Terreno Sotto L'orizzonte
 option.SKY_GROUND.comment              = Superfice del pianeta visibile sotto l'orizzonte
 option.ATMOSPHERE_SATURATION_BOOST     = Aumento Saturazione Atmosferica
-comment.ATMOSPHERE_SATURATION_BOOST    = Aumenta la saturazione del cielo e del colore della luce solare secondo l'ora del giorno
+comment.ATMOSPHERE_SATURATION_BOOST.comment    = Aumenta la saturazione del cielo e del colore della luce solare secondo l'ora del giorno
 option.ATMOSPHERE_SATURATION_BOOST_INTENSITY = Aumento Intensità Saturazione Atmosferica
-comment.ATMOSPHERE_SATURATION_BOOST_INTENSITY = Modifica l'Intensità dell'Aumento di Saturazione Atmosferica
+comment.ATMOSPHERE_SATURATION_BOOST_INTENSITY.comment = Modifica l'Intensità dell'Aumento di Saturazione Atmosferica
 option.STARS                           = Stelle
 option.STARS.comment                   = Presenza delle stelle nel cielo notturno. Impatto performance basso
 option.STARS_INTENSITY                 = Intensità
@@ -297,7 +297,7 @@ suffix.CLOUDS_CUMULUS_ALTITUDE              = m/s
 option.CLOUDS_CUMULUS_WIND_ANGLE            = Angolo Vento
 suffix.CLOUDS_CUMULUS_ALTITUDE              = °
 option.CLOUDS_CUMULUS_PRECOMPUTE_LOCAL_COVERAGE = Copertura Locale Precompilata
-comment.CLOUDS_CUMULUS_PRECOMPUTE_LOCAL_COVERAGE = Ottimizzazione aggressiva per i cumuli. Riduce la distanza massima in cui le nuvole possono generarsi e può creare artefatti quando la camera si muove. Disabilita per fare foto alle nuvole da sopra
+option.CLOUDS_CUMULUS_PRECOMPUTE_LOCAL_COVERAGE.comment = Ottimizzazione aggressiva per i cumuli. Riduce la distanza massima in cui le nuvole possono generarsi e può creare artefatti quando la camera si muove. Disabilita per fare foto alle nuvole da sopra
 
 option.CLOUDS_ALTOCUMULUS                       = Nuvole Altocumulus
 option.CLOUDS_ALTOCUMULUS.comment               = Nuvole volumetriche di media altitudine fatte per assomigliare a nuvole Altocumulus
@@ -415,15 +415,13 @@ option.BLOOMY_FOG_INTENSITY            = Intensità aura nebbiosa
 option.BLOOMY_FOG_INTENSITY.comment    = Modifica l'intensità dell'aura nebbiosa
 option.OVERWORLD_FOG_INTENSITY         = Intensità Nebbia nell'ambiente esterno
 option.NETHER_FOG_INTENSITY            = Intensità Nebbia nel Nether
-option.COLORED_LIGHT_SHAFTS            = Fasci luminosi colorati
-option.COLORED_LIGHT_SHAFTS.comment    = I Fasci luminosi non saranno solo bianchi
+option.AIR_FOG_LIGHT_SHAFTS            = Fasci luminosi colorati
+option.AIR_FOG_LIGHT_SHAFTS.comment    = I Fasci luminosi non saranno solo bianchi e dipenderanno dal materale che attraversano
 option.VL                              = Volumetria
 option.VL.comment                      = Aggiunge il calcolo volumetrico per la luce che favorisce la formazione dei raggi di luce in presenza di nebbia e foschia
 option.VL_RENDER_SCALE                 = Scala Render Volumetrico
 option.AIR_FOG_CLOUDY_NOISE            = Foschia nuvolosa
 option.AIR_FOG_CLOUDY_NOISE.comment    = Foschia a bassa quota, meglio visibile la mattina.\nRichiede Volumetria!
-option.AIR_FOG_COLORosso_LIGHT_SHAFTS  = Raggi di Luce Colorati
-option.AIR_FOG_COLORosso_LIGHT_SHAFTS.comment = Raggi di luce che trapassano oggetti trasparenti colorati per poi colorarsi a loro volta
 
 # LPV VL
 
@@ -587,7 +585,7 @@ option.WATER_PARALLAX.comment          = Rende le onde tridimensionali
 option.WATER_DISPLACEMENT              = Spostamento Acqua
 option.WATER_DISPLACEMENT.comment      = Simile a come funzionano le foglie ondulanti, fa muovere l'acqua leggermente in mondo ondulato così che la linea di costa risulti meno piatta
 option.WATER_WAVES_HEIGHT_VARIATION    = Variazioni Altezza Onde
-comment.WATER_WAVES_HEIGHT_VARIATION   = L'altezza delle onde negli specchi d'acqua varierà
+option.WATER_WAVES_HEIGHT_VARIATION.comment   = L'altezza delle onde negli specchi d'acqua varierà
 
 option.WATER_ABSORPTION_R              = Assorbimento Rosso
 option.WATER_ABSORPTION_G              = Assorbimento Verde
