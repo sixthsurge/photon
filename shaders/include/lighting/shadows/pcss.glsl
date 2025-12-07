@@ -199,7 +199,7 @@ vec3 get_filtered_shadows(
     distance_fade = get_shadow_distance_fade(scene_pos, shadow_screen_pos);
 
     if (distance_fade >= 1.0) {
-        return vec3(0.0);
+        return vec3(1.0);
     }
 
     float dither = texelFetch(noisetex, ivec2(gl_FragCoord.xy) & 511, 0).b;
