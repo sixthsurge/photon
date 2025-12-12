@@ -166,7 +166,7 @@ vec3 blend_layers_with_fog(
     bool back_is_hand
 ) {
     if (back_is_hand) {
-        return background_color;
+        return background_color * (1.0 - translucent_color.a) + translucent_color.rgb;
     }
 
     // Apply analytic fog behind translucents
