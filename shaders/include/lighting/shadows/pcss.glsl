@@ -140,7 +140,7 @@ vec3 shadow_pcf(
                 4.0 * color,
                 step(depth, shadow_screen_pos_translucent.z));
 
-        float weight = step(eps, max_of(color));
+        float weight = 1.0;
 
         color_sum += color * weight;
         weight_sum += weight;
