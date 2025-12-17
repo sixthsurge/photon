@@ -350,7 +350,7 @@ void main() {
         uint overlay_id = uint(255.0 * overlays.a);
         albedo = overlay_id == 0u ? albedo + overlays.rgb
                                   : albedo; // enchantment glint
-        albedo = overlay_id == 1u ? 2.0 * albedo * overlays.rgb
+        albedo = overlay_id == 1u && !is_hand ? 2.0 * albedo * overlays.rgb
                                   : albedo; // damage overlay
 #endif
 
