@@ -13,11 +13,7 @@
 
 layout(location = 0) out vec4 frag_color;
 
-#ifdef IS_IRIS
-/* RENDERTARGETS: 13 */
-#else
 /* RENDERTARGETS: 3 */
-#endif
 
 in vec2 uv;
 

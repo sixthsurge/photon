@@ -71,7 +71,7 @@ vec3 get_bloom(out vec3 fog_bloom) {
 
         vec2 tile_coord = uv * tile_scale + tile_offset;
 
-        vec3 tile = bicubic_filter(colortex0, tile_coord).rgb;
+        vec3 tile = texture(colortex0, tile_coord).rgb;
 
         tile_sum += tile * weight;
         weight_sum += weight;
