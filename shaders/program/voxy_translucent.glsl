@@ -5,6 +5,14 @@
 #undef SHADOW
 #endif
 
+#ifdef HANDHELD_LIGHTING
+#undef HANDHELD_LIGHTING
+#endif
+
+#ifdef SHADOW_SSRT
+#undef SHADOW_SSRT
+#endif
+
 #ifdef COLORED_LIGHTS
 #undef COLORED_LIGHTS
 #endif
