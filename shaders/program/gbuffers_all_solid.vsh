@@ -93,7 +93,7 @@ uniform int currentRenderedItemId;
 #include "/include/vertex/utility.glsl"
 
 void main() {
-    uv = gl_MultiTexCoord0.xy;
+    uv = (gl_TextureMatrix[0] * gl_MultiTexCoord0).xy;
     light_levels = clamp01(gl_MultiTexCoord1.xy * rcp(240.0));
     tint = gl_Color;
     material_mask = get_material_mask();
