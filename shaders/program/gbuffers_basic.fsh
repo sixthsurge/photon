@@ -82,7 +82,6 @@ void main() {
     }
 #endif
 
-#if defined IS_IRIS && defined USE_SEPARATE_ENTITY_DRAWS
     scene_color.rgb = srgb_eotf_inv(base_color.rgb) * rec709_to_working_color;
     // see note in function
     scene_color.a = fixup_translucent(tint.a);
@@ -90,7 +89,6 @@ void main() {
     if (renderStage == MC_RENDER_STAGE_OUTLINE) {
         scene_color.rgb *= 1.0 + BOX_EMISSION;
     }
-#endif
 
     vec2 encoded_normal = encode_unit_vector(normal);
 
