@@ -123,7 +123,7 @@ float get_water_caustics() {
             tbn[2],
             coord,
             flow_dir,
-            1.0,
+            1.0 - rainStrength,
             flowing_water
         );
 
