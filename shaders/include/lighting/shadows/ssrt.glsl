@@ -160,7 +160,7 @@ float get_screen_space_shadows(
             lod_depth_tex,
             lod_projection_matrix,
             lod_projection_matrix_inverse,
-            vec3(position_screen_xy, depth_lod),
+            vec3(position_screen_xy, depth),
             position_view,
             ray_dir,
             has_sss,
