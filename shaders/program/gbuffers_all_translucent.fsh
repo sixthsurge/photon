@@ -278,8 +278,7 @@ vec4 water_absorption_approx(
     );
 
     float brightness_control = 1.0 - exp(-0.33 * layer_dist);
-    brightness_control =
-        (1.0 - light_levels.y) + brightness_control * light_levels.y;
+    brightness_control *= max(light_levels.x, light_levels.y);
 
     return vec4(
         color.rgb +
