@@ -126,7 +126,7 @@ float get_water_caustics() {
 
 void main() {
 	if (material_mask == 1) { // Water
-		#if defined PROGRAM_SHADOW_WATER || defined PROGRAM_SHADOW_FALLBACK
+		#if defined PROGRAM_SHADOW_WATER
 		vec3 biome_water_color = srgb_eotf_inv(tint) * rec709_to_working_color;
 		vec3 absorption_coeff = biome_water_coeff(biome_water_color);
 
