@@ -123,11 +123,15 @@ uniform int currentRenderedItemId;
 #endif
 
 void main() {
-	uv            = mat2(gl_TextureMatrix[0]) * gl_MultiTexCoord0.xy + gl_TextureMatrix[0][3].xy;  // Faster method breaks on Intel for some reason, thanks to ilux-git for finding this!
-	light_levels  = clamp01(gl_MultiTexCoord1.xy * rcp(240.0));
-	tint          = gl_Color;
-	material_mask = get_material_mask();
-	tbn           = get_tbn_matrix();
+#if defined PROGRAM_GBUFFERS_PARTICLES_TRANSLUCENT && defined IS_IRIS
+    uv = gl_MultiTexCoord0.xy;
+#else
+    uv = mat2(gl_TextureMatrix[0]) * gl_MultiTexCoord0.xy + gl_TextureMatrix[0][3].xy;
+#endif
+    light_levels  = clamp01(gl_MultiTexCoord1.xy * rcp(240.0));
+    tint          = gl_Color;
+    material_mask = get_material_mask();
+    tbn           = get_tbn_matrix();
 
 	light_color   = texelFetch(colortex4, ivec2(191, 0), 0).rgb;
 #if defined WORLD_OVERWORLD && defined SH_SKYLIGHT
