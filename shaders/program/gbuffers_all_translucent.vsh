@@ -21,7 +21,7 @@ out vec4 tint;
 flat out vec3 light_color;
 flat out vec3 ambient_color;
 flat out uint material_mask;
-flat out mat3 tbn;
+out mat3 tbn;
 
 #if defined PROGRAM_GBUFFERS_WATER
 out vec2 atlas_tile_coord;

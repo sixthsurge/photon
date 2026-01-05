@@ -32,7 +32,7 @@ in vec4 tint;
 flat in vec3 light_color;
 flat in vec3 ambient_color;
 flat in uint material_mask;
-flat in mat3 tbn;
+in mat3 tbn;
 
 #if defined PROGRAM_GBUFFERS_WATER
 in vec2 atlas_tile_coord;
