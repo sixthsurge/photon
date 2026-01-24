@@ -84,7 +84,7 @@ vec4 draw_moon(vec3 ray_dir) {
 	float light_angle = 0.125 * tau * float(moonPhase);
 	vec3 left_dir = normalize(cross(vec3(0.0, 1.0, 0.0), ray_dir));
 	vec3 light_dir = cos(light_angle) * -ray_dir + sin(light_angle) * left_dir;
-    float moon_shadow = dampen(dampen(max0(dot(moon_normal, light_dir))));
+    float moon_shadow = dampen(max0(dot(moon_normal, light_dir)));
 
     float edge_glow = sqr(sqr(sqr(dist)));
 
