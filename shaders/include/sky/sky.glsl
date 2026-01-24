@@ -32,14 +32,15 @@ const float sun_luminance =
 const float moon_luminance = 10.0; // luminance of moon disk
 
 vec3 draw_sun(vec3 ray_dir) {
-	//use very strong forward scattering to get a realistic sun edge, also abuses numerical instability to get good flares
-	float energy=9000.1;
-	float nu = dot(ray_dir, sun_dir);
-	float r=klein_nishina_phase_area(nu,0.79*energy,sun_angular_radius);
-	float g=klein_nishina_phase_area(nu,1.0*energy,sun_angular_radius);
-	float b=klein_nishina_phase_area(nu,1.22*energy,sun_angular_radius);
-	vec3 phase = vec3(r,g,b);
-	return phase*sun_color*pi/360.0;
+    // use very strong forward scattering to get a realistic sun edge, also
+    // abuses numerical instability to get good flares
+    float energy = 9000.1;
+    float nu = dot(ray_dir, sun_dir);
+    float r = klein_nishina_phase_area(nu, 0.79 * energy, sun_angular_radius);
+    float g = klein_nishina_phase_area(nu, 1.0 * energy, sun_angular_radius);
+    float b = klein_nishina_phase_area(nu, 1.22 * energy, sun_angular_radius);
+    vec3 phase = vec3(r, g, b);
+    return phase * sun_color * pi / 360.0;
 }
 
 vec3 draw_moon(vec3 ray_dir) {
@@ -81,18 +82,17 @@ vec3 draw_moon(vec3 ray_dir) {
             break;
 
         case 1: // Waning gibbous
-            moon_shadow = 1.0 -
-                linear_step(a * 0.6 - 0.12, a * 0.6 + 0.12, -offset.y);
+            moon_shadow =
+                1.0 - linear_step(a * 0.6 - 0.12, a * 0.6 + 0.12, -offset.y);
             break;
 
         case 2: // Last quarter
-            moon_shadow = 1.0 -
-                linear_step(a * 0.1 - 0.15, a * 0.1 + 0.15, -offset.y);
+            moon_shadow =
+                1.0 - linear_step(a * 0.1 - 0.15, a * 0.1 + 0.15, -offset.y);
             break;
 
         case 3: // Waning crescent
-            moon_shadow =
-                linear_step(a * 0.5 - 0.12, a * 0.5 + 0.12, offset.y);
+            moon_shadow = linear_step(a * 0.5 - 0.12, a * 0.5 + 0.12, offset.y);
             break;
 
         case 4: // New moon

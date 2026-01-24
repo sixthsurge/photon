@@ -43,7 +43,8 @@ bool raymarch_depth_buffer(
     float step_length = ray_length * rcp(float(intersection_step_count));
 
     vec3 ray_step = screen_dir * step_length;
-    ray_pos = screen_pos + dither * ray_step + length(view_pixel_size) * screen_dir;
+    ray_pos =
+        screen_pos + dither * ray_step + length(view_pixel_size) * screen_dir;
 
     float depth_tolerance =
         max(abs(ray_step.z) * 3.0, 0.02 / sqr(view_pos.z)); // from DrDesten <3

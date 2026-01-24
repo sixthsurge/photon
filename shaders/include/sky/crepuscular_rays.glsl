@@ -53,7 +53,7 @@ vec4 draw_crepuscular_rays(
     if (
         dists.y < 0.0 // volume not intersected
                       //|| planet_intersected && r < clouds_cumulus_radius //
-                      //planet blocking clouds
+                      // planet blocking clouds
         || is_terrain // terrain blocking clouds
     ) {
         return vec4(vec3(0.0), 1.0);

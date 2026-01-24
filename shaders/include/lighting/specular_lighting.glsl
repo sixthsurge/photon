@@ -189,7 +189,8 @@ vec3 get_sky_reflection(vec3 ray_dir, float skylight, vec3 hit_pos) {
     bool hit_sky = clamp01(hit_pos.xy) == hit_pos.xy && hit_pos.z >= 1.0;
     float skylight_falloff =
         hit_sky ? 1.0 : pow12(linear_step(0.0, 0.75, skylight));
-    return bicubic_filter(colortex4, project_sky(ray_dir)).rgb * skylight_falloff;
+    return bicubic_filter(colortex4, project_sky(ray_dir)).rgb *
+        skylight_falloff;
 #else
     return texture(colortex4, project_sky(ray_dir)).rgb;
 #endif

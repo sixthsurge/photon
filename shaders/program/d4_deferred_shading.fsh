@@ -350,8 +350,9 @@ void main() {
         uint overlay_id = uint(255.0 * overlays.a);
         albedo = overlay_id == 0u ? albedo + overlays.rgb
                                   : albedo; // enchantment glint
-        albedo = overlay_id == 1u && !is_hand ? 2.0 * albedo * overlays.rgb
-                                  : albedo; // damage overlay
+        albedo = overlay_id == 1u && !is_hand
+            ? 2.0 * albedo * overlays.rgb
+            : albedo; // damage overlay
 #endif
 
         // Get material and normal
@@ -540,7 +541,7 @@ void main() {
             shadows *= float(!parallax_shadow);
 #endif
         }
-#else 
+#else
         const vec3 shadows = vec3(1.0);
         const float shadow_distance_fade = 1.0;
         const float sss_depth = 0.0;

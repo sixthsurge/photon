@@ -55,8 +55,8 @@ void main() {
     tint = gl_Color.rgb;
 
 #if MC_VERSION >= 12111
-    uv_mid = mat2(gl_TextureMatrix[0]) * mc_midTexCoord +
-        gl_TextureMatrix[0][3].xy;
+    uv_mid =
+        mat2(gl_TextureMatrix[0]) * mc_midTexCoord + gl_TextureMatrix[0][3].xy;
 #endif
 
     view_pos = transform(gl_ModelViewMatrix, gl_Vertex.xyz);

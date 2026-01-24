@@ -153,7 +153,9 @@ void main() {
 
         shadowcolor0_out = clamp(
             0.25 * exp(-absorption_coeff * distance_through_water) *
-            get_water_caustics(), rcp(255.0) /* 0 is reserved */, 1.0
+                get_water_caustics(),
+            rcp(255.0) /* 0 is reserved */,
+            1.0
         );
 #endif
     } else {

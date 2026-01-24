@@ -11,7 +11,6 @@
 #include "/include/utility/rotation.glsl"
 #include "/include/utility/sampling.glsl"
 
-
 const ivec2[9] blur_kernel_offsets_3x3 = ivec2[9](
     ivec2(-1, -1),
     ivec2(0, -1),
@@ -74,7 +73,8 @@ vec3 shadow_basic(vec3 shadow_screen_pos) {
 
     vec3 averageColor = vec3(0.0);
     for (int i = 0; i < 9; ++i) {
-        averageColor += texelFetch(shadowcolor0, texel + blur_kernel_offsets_3x3[i], 0).rgb;
+        averageColor +=
+            texelFetch(shadowcolor0, texel + blur_kernel_offsets_3x3[i], 0).rgb;
     }
     // hide sunlight seams between colored shadow and opaque shadows
     weight *= step(eps, max_of(averageColor));
@@ -116,7 +116,8 @@ vec3 shadow_pcf(
 
     // perform first 4 iterations and filter shadow color
     for (int i = 0; i < 4; ++i) {
-        vec2 offset = vogel_disc_sample(i, step_count, dither * tau) * filter_radius;
+        vec2 offset =
+            vogel_disc_sample(i, step_count, dither * tau) * filter_radius;
 
         vec2 uv = shadow_clip_pos.xy + offset;
         uv /= get_distortion_factor(uv);
@@ -158,7 +159,8 @@ vec3 shadow_pcf(
 
     // perform remaining iterations
     for (int i = 4; i < step_count; ++i) {
-        vec2 offset = vogel_disc_sample(i, step_count, dither * tau) * filter_radius;
+        vec2 offset =
+            vogel_disc_sample(i, step_count, dither * tau) * filter_radius;
 
         vec2 uv = shadow_clip_pos.xy + offset;
         uv /= get_distortion_factor(uv);
@@ -223,7 +225,7 @@ vec3 get_filtered_shadows(
     }
 
     float dither = texelFetch(noisetex, ivec2(gl_FragCoord.xy) & 511, 0).b;
-          dither = r1(frameCounter, dither);
+    dither = r1(frameCounter, dither);
 
 #ifdef SHADOW_VPS
     vec2 blocker_search_result =

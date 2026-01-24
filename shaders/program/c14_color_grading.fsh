@@ -120,7 +120,7 @@ vec3 grade_input(vec3 rgb) {
     float lum = dot(rgb, luminance_weights);
     rgb = max0(mix(vec3(lum), rgb, saturation));
 
-    // White balance 
+    // White balance
 #if GRADE_WHITE_BALANCE != 6500
     rgb = rgb * rec2020_to_xyz;
     rgb = rgb * white_balance_matrix;
