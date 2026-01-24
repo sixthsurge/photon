@@ -75,7 +75,7 @@ float atmosphere_mie_phase(float nu, bool use_klein_nishina_phase) {
         ? klein_nishina_phase_area(
               nu,
               air_mie_energy_parameter,
-              pi * moon_angular_radius
+              moon_angular_radius
           )
         : henyey_greenstein_phase(nu, air_mie_g);
 }
