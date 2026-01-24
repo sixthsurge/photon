@@ -43,7 +43,7 @@ vec3 draw_sun(vec3 ray_dir) {
     return phase * sun_color * pi / 360.0;
 }
 
-vec3 draw_moon(vec3 ray_dir) {
+vec4 draw_moon(vec3 ray_dir) {
     const float angle = 0.7;
     const mat2 rot = mat2(cos(angle), sin(angle), -sin(angle), cos(angle));
 
@@ -55,7 +55,7 @@ vec3 draw_moon(vec3 ray_dir) {
     // Cut out the moon disc.
     float MoV = dot(ray_dir, moon_dir);
     if (MoV < cos(moon_angular_radius)) {
-        return vec3(0.0);
+        return vec4(0.0);
     }
 
     // Find distance from center to edge.
@@ -68,60 +68,31 @@ vec3 draw_moon(vec3 ray_dir) {
     vec3 bitangent = normalize(cross(tangent, moon_dir));
     mat3 tbn = mat3(tangent, bitangent, moon_dir);
 
-    // Vector from ray dir to moon dir
+    // Vector from ray dir to moon dir.
     vec2 offset = ((ray_dir - sun_dir) * tbn).xy;
-    float moon_shadow = 1.0;
-    float a = sqrt(1.0 - offset.x * offset.x);
+    offset = fract(offset + 0.5);
 
     vec3 noise = texture(noisetex, 2.0 * offset).xyz;
     float moon_texture =
         pow1d5(noise.x) * 0.75 + 0.6 * cube(noise.y) - 0.1 * noise.z;
 
-    switch (moonPhase) {
-        case 0: // Full moon
-            break;
+    // Find the distance to the moon if it were 1 unit away, and its normal.
+    float moon_dist = intersect_sphere(-moon_dir, ray_dir, moon_angular_radius).x;
+    vec3 moon_normal = normalize(ray_dir * moon_dist - moon_dir);
 
-        case 1: // Waning gibbous
-            moon_shadow =
-                1.0 - linear_step(a * 0.6 - 0.12, a * 0.6 + 0.12, -offset.y);
-            break;
-
-        case 2: // Last quarter
-            moon_shadow =
-                1.0 - linear_step(a * 0.1 - 0.15, a * 0.1 + 0.15, -offset.y);
-            break;
-
-        case 3: // Waning crescent
-            moon_shadow = linear_step(a * 0.5 - 0.12, a * 0.5 + 0.12, offset.y);
-            break;
-
-        case 4: // New moon
-            moon_shadow = 0.0;
-            break;
-
-        case 5: // Waxing crescent
-            moon_shadow =
-                linear_step(a * 0.6 - 0.12, a * 0.5 + 0.12, -offset.y);
-            break;
-
-        case 6: // First quarter
-            moon_shadow =
-                linear_step(a * 0.1 - 0.15, a * 0.1 + 0.15, -offset.y);
-            break;
-
-        case 7: // Waxing gibbous
-            moon_shadow =
-                1.0 - linear_step(a * 0.6 - 0.12, a * 0.6 + 0.12, offset.y);
-            break;
-    }
+	// Get light direction which orbits around moon
+	float light_angle = 0.125 * tau * float(moonPhase);
+	vec3 left_dir = normalize(cross(vec3(0.0, 1.0, 0.0), ray_dir));
+	vec3 light_dir = cos(light_angle) * -ray_dir + sin(light_angle) * left_dir;
+    float moon_shadow = dampen(dampen(max0(dot(moon_normal, light_dir))));
 
     float edge_glow = sqr(sqr(sqr(dist)));
 
-    vec3 color = max(moon_shadow * lit_color * (1.0 + 2.0 * edge_glow),
+    vec3 color = max(moon_shadow * lit_color * (1.0 + 4.0 * edge_glow),
                      0.5 * glow_color * (0.1 + 0.1 * edge_glow)) *
         (0.2 + 0.8 * moon_texture);
     color = moon_luminance * sqr(color);
-    return color;
+    return vec4(color, 1.0);
 }
 
 #ifdef GALAXY
@@ -187,6 +158,13 @@ vec3 draw_sky(
         texelFetch(colortex0, ivec2(gl_FragCoord.xy), 0).rgb;
     sky += texelFetch(colortex0, ivec2(gl_FragCoord.xy), 0).rgb;
 
+#ifdef STARS
+    // Stars
+    float stars_visibility =
+        clamp01(1.0 - dot(skytextured_output, vec3(0.33) * 256.0));
+    sky += draw_stars(celestial_dir, galaxy_luminance) * stars_visibility;
+#endif
+
 #ifndef VANILLA_SUN
     // Shader sun
     sky += draw_sun(ray_dir);
@@ -194,14 +172,9 @@ vec3 draw_sky(
 
 #ifndef VANILLA_MOON
     // Shader moon
-    sky += draw_moon(ray_dir);
-#endif
-
-#ifdef STARS
-    // Stars
-    float stars_visibility =
-        clamp01(1.0 - dot(skytextured_output, vec3(0.33) * 256.0));
-    sky += draw_stars(celestial_dir, galaxy_luminance) * stars_visibility;
+    vec4 moon = draw_moon(ray_dir);
+    sky *= 1.0 - moon.a;
+    sky += moon.rgb;
 #endif
 #endif
 
