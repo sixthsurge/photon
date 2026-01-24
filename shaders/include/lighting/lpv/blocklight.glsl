@@ -34,7 +34,9 @@ vec3 get_lpv_blocklight(vec3 scene_pos, vec3 normal, vec3 mc_blocklight, float a
 
 #ifdef COLORED_LIGHTS_VANILLA_LIGHTMAP_CONTRIBUTION
 		float vanilla_lightmap_contribution = exp2(-4.0 * dot(lpv_blocklight, luminance_weights_rec2020));
-		lpv_blocklight += mc_blocklight * vanilla_lightmap_contribution;
+		lpv_blocklight += 
+			mix(vec3(dot(mc_blocklight, luminance_weights_rec2020)), mc_blocklight, 0.5) * mc_blocklight * 0.5
+			* vanilla_lightmap_contribution;
 #endif
 
 		// Darkness effect
