@@ -1,14 +1,14 @@
 {
     "unusedString":
         "
-// voxy.json is run through the Iris preprocessor, so we can include
-// settings.glsl to be to use shader settings this file. However, since
-// settings.glsl also contains GLSL code (not preprocessor directives), we can't
-// include it directly into the JSON as it would cause syntax errors, so it is
-// wrapped in a unused string field.
-#include "/settings.glsl"
+            // voxy.json is run through the Iris preprocessor, so we can include
+            // settings.glsl to be to use shader settings this file. However, since
+            // settings.glsl also contains GLSL code (not preprocessor directives), we can't
+            // include it directly into the JSON as it would cause syntax errors, so it is
+            // wrapped in a unused string field.
+            #include "/settings.glsl"
         ",
-        "version": 1,
+    "version": 1,
     "excludeLodsFromVanillaDepth": true,
     "opaqueDrawBuffers": [
         1

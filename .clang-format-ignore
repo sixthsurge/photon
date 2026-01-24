@@ -1,2 +1,3 @@
 shaders/settings.glsl
 shaders/include/buffers.glsl
+shaders/program/voxy.json

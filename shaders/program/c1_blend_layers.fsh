@@ -219,11 +219,22 @@ void main() {
     vec3 fog_scattering = smooth_filter(colortex7, uv).rgb;
 #endif
 
-    // Distant Horizons support
+    // LoD mod support
 
 #ifdef LOD_MOD_ACTIVE
     float front_depth_lod = texelFetch(lod_depth_tex, texel, 0).x;
     float back_depth_lod = texelFetch(lod_depth_tex_solid, texel, 0).x;
+
+    // Fix Voxy translucents appearing in front of entities.
+    float z_vanilla =
+        screen_to_view_space_depth(gbufferProjectionInverse, back_depth);
+    float z_lod = screen_to_view_space_depth(
+        lod_projection_matrix_inverse,
+        front_depth_lod
+    );
+    if (front_depth_lod < (1.0 - eps) && z_vanilla < z_lod) {
+        translucent_color = vec4(0.0);
+    }
 
     bool front_is_lod_terrain = is_lod_terrain(front_depth, front_depth_lod);
     bool back_is_lod_terrain = is_lod_terrain(back_depth, back_depth_lod);
