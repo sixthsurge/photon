@@ -430,7 +430,7 @@ void main() {
         );
 
 #ifdef WATER_WAVES
-        if (abs(normal.y) > eps) {
+        if (true) {
             vec3 flat_normal = tbn[2];
 
 #ifdef LOD_MOD_ACTIVE
@@ -452,9 +452,16 @@ void main() {
 
             vec2 coord = -(world_pos * tbn_fixed).xy;
 
-            bool flowing_water = abs(flat_normal.y) < 0.99;
-            vec2 flow_dir =
-                flowing_water ? normalize(flat_normal.xz) : vec2(0.0);
+            bool vertical_side = abs(flat_normal.y) < eps;
+            bool flowing_water = abs(flat_normal.y) < 0.99 || vertical_side;
+
+            vec2 flow_dir = vec2(0.0);
+            if (vertical_side) {
+                // Calculate downward direction in tangent space.
+                flow_dir = (vec3(0.0, 1.0, 0.0) * tbn_fixed).xy;
+            } else {
+                flow_dir = flowing_water ? normalize(flat_normal.xz) : vec2(0.0);
+            }
 
 #ifdef WATER_PARALLAX
             vec3 direction_tangent = direction_world * tbn_fixed;
