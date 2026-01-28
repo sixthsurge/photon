@@ -3,12 +3,44 @@
 
 #include "voxelization.glsl"
 
-bool is_emitter(uint block_id) { return 32u <= block_id && block_id < 64u; }
+bool is_emitter(uint block_id) {
+	return (32u <= block_id && block_id < 64u) || (80u < block_id && block_id < 96u);
+}
 
-bool is_translucent(uint block_id) { return 64u <= block_id && block_id < 80u; }
+bool is_translucent(uint block_id) {
+	return 64u <= block_id && block_id < 80u;
+}
 
 vec3 get_emitted_light(uint block_id) {
     if (is_emitter(block_id)) {
+
+	// If this light is glowing ores (81–96) - @lechixy
+	if (block_id >= 81u) {
+		int idx = int(block_id - 81u);
+		const vec3[16] new_colors = vec3[16](
+			vec3(0.60, 0.90, 1.00) * 1.00, // Weak diamond light
+			vec3(0.00, 1.00, 0.40) * 1.00, // Weak emerald light
+			vec3(0.10, 0.10, 0.12) * 1.00, // Weak coal light
+			vec3(1.00, 0.10, 0.10) * 1.00, // Weak redstone light
+			vec3(0.15, 0.30, 1.00) * 1.00, // Weak lapis lazuli light
+			vec3(1.00, 0.85, 0.90) * 1.00, // Weak quartz light
+			vec3(0.40, 0.20, 0.15) * 6.00, // Medium netherite light
+			vec3(1.00, 0.85, 0.25) * 1.00, // Weak golden light
+			vec3(0.95, 0.60, 0.20) * 1.00, // Weak copper light
+			vec3(0.90, 0.75, 0.55) * 1.00, // Weak iron light
+				
+			// This colors are empty
+			vec3(1.00, 0.10, 0.10), // bright red
+			vec3(0.20, 1.00, 0.80), // turquoise
+			vec3(0.50, 0.40, 1.00), // lavender
+			vec3(1.00, 0.70, 0.10), // orange
+			vec3(0.70, 1.00, 0.70), // pastel green
+			vec3(0.40, 0.40, 0.40)  // dim gray
+		);
+			
+		return new_colors[idx % 16];
+	}
+
         return texelFetch(light_data_sampler, ivec2(int(block_id) - 32, 0), 0)
             .rgb;
     } else {

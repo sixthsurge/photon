@@ -811,6 +811,12 @@ Material material_from(
                 }
             }
         }
+    // If this materials are glowing ores - @lechixy
+    } else if((material_mask > 80u) && (material_mask < 91u)) {
+	#ifdef HARDCODED_EMISSION
+	// Weak white light
+	material.emission = 0.2 * albedo_sqrt * (0.1 + 0.9 * pow4(hsl.z));
+	#endif
     }
 
     if (64u <= material_mask && material_mask < 80u) {
