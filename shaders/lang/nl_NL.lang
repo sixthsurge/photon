@@ -174,7 +174,7 @@ option.GTAO_RADIUS.comment             = Wijzigt de radius van GTAO. Hogere waar
 option.GTAO_SLICES                     = GTAO Delen
 option.GTAO_SLICES.comment             = Wijzigt hoeveel 'slices' GTAO gebruikt. Hogere waarden verminderen ruis, maar kosten meer prestaties.
 option.GTAO_HORIZON_STEPS              = GTAO Stappen
-option.GTAO_HORIZON_STEPS.comment      = Wijzigt hoeveel stappen GTAO zet en dus hoe precies de omgevingsocclusie is.\nAls kleine voorwerpen geen omgevingsocclusie creëeren is het handig deze instelling hoger te zetten.\nMeer stappen zorgt ook een donkerdere omgevingsocclusie.
+option.GTAO_HORIZON_STEPS.comment      = Wijzigt hoeveel stappen GTAO zet en dus hoe precies de omgevingsocclusie is.\nAls kleine voorwerpen geen omgevingsocclusie creëeren is het handig deze instelling hoger te zetten.\nMeer stappen zorgt ook voor een donkerdere omgevingsocclusie.
 
 option.SUN_NR                          = Rood
 option.SUN_NG                          = Groen
