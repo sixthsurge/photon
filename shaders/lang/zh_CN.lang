@@ -28,6 +28,8 @@ screen.color_grading                   = 颜色分级
 screen.exposure                        = 曝光
 screen.lpv_vl                          = 彩色光源雾气散射
 screen.box                             = 选择框
+screen.distant_horizons                = Distant Horizons 
+screen.developer                       = 开发者选项
 
 screen.aurora                          = 极光
 screen.clouds                          = 云层
@@ -128,11 +130,13 @@ option.SSS_SHEEN                       = 次表面散射光泽
 option.SSS_SHEEN.comment               = 在植物和树叶上的高光光泽效果, 有助于高草丛和其他事物更好地和草地高光效果混合.
 option.SSS_INTENSITY                   = 次表面散射强度
 option.SSS_INTENSITY.comment           = 调节次表面散射(SSS)亮度.
-option.SHADING_STRENGTH                = 阴影强度
-option.SHADING_STRENGTH.comment        = 调节直接照明着色对比度. 调低本选项数值会使面向太阳的未处于阴影遮蔽中的面更亮, 反之变暗.
+option.SHADING_STRENGTH                = 阴影着色
+option.SHADING_STRENGTH.comment        = 调节直接光照的着色对比度. 减小此选项会使背对太阳且不在阴影中的面变亮; 增大则变暗.
 
 option.SHADOW                          = 阴影图
 option.SHADOW_PCF                      = 阴影过滤
+option.SHADOW_SSRT                     = SSRT 远处阴影
+option.SHADOW_SSRT_STEPS               = SSRT 阴影步数
 option.SHADOW_COLOR                    = 阴影着色
 option.SHADOW_COLOR.comment            = 使半透明方块可投射有色的阴影.
 option.SHADOW_VPS                      = 可变半阴影
@@ -423,14 +427,11 @@ option.LPV_VL_INTENSITY_UNDERGROUND    = 强度 - 地下
 option.LPV_VL_INTENSITY_NETHER         = 强度 - 下界
 option.LPV_VL_INTENSITY_END            = 强度 - 末地
 
+# Rayleigh Fog
 option.AIR_FOG_RAYLEIGH_FALLOFF_START     = 瑞利 - 雾气消散起始位置
 option.AIR_FOG_RAYLEIGH_FALLOFF_START.comment = 瑞利雾气开始消散的海拔高度.
 option.AIR_FOG_RAYLEIGH_FALLOFF_HALF_LIFE = 瑞利 - 雾气密度减半位置
 option.AIR_FOG_RAYLEIGH_FALLOFF_HALF_LIFE.comment = 从瑞利雾气消散起始位置开始后雾气密度减半所需的高度.
-option.AIR_FOG_MIE_FALLOFF_START          = 米氏 - 渐消起始位置
-option.AIR_FOG_MIE_FALLOFF_START.comment  = 米氏雾气开始消散的海拔高度.
-option.AIR_FOG_MIE_FALLOFF_HALF_LIFE      = 米氏 - 渐消中部位置
-option.AIR_FOG_MIE_FALLOFF_HALF_LIFE.comment = 从米氏雾气消散起始位置开始后雾气密度减半所需的高度.
 
 option.AIR_FOG_RAYLEIGH_DENSITY        = 雾气正常浓度
 option.AIR_FOG_RAYLEIGH_R              = §4红色比重
@@ -467,12 +468,18 @@ option.AIR_FOG_RAYLEIGH_R_SWAMP        = §4红色比重
 option.AIR_FOG_RAYLEIGH_G_SWAMP        = §2绿色比重
 option.AIR_FOG_RAYLEIGH_B_SWAMP        = §1蓝色比重
 
+# Mie Fog
 option.AIR_FOG_MIE_DENSITY_MORNING     = 清晨密度
 option.AIR_FOG_MIE_DENSITY_NOON        = 正午密度
 option.AIR_FOG_MIE_DENSITY_EVENING     = 傍晚密度
 option.AIR_FOG_MIE_DENSITY_MIDNIGHT    = 午夜密度
 option.AIR_FOG_MIE_DENSITY_RAIN        = 雨天密度
 option.AIR_FOG_MIE_DENSITY_BLUE_HOUR   = 黎明/黄昏 密度
+option.AIR_FOG_MIE_FALLOFF_START          = 米氏 - 渐消起始位置
+option.AIR_FOG_MIE_FALLOFF_START.comment  = 米氏雾气开始消散的海拔高度.
+option.AIR_FOG_MIE_FALLOFF_HALF_LIFE      = 米氏 - 渐消中部位置
+option.AIR_FOG_MIE_FALLOFF_HALF_LIFE.comment = 从米氏雾气消散起始位置开始后雾气密度减半所需的高度.
+
 
 # Materials settings
 
@@ -683,10 +690,14 @@ option.CUSTOM_SKY                      = 自定义天空
 option.CUSTOM_SKY.comment              = 启用对资源包自定义天空的支持.
 option.CUSTOM_SKY_BRIGHTNESS           = 自定义天空亮度
 option.CUSTOM_SKY_BRIGHTNESS.comment   = 自定义天空的亮度.
+option.DH_OVERDRAW_DISTANCE            = DH 过度绘制距离
+option.DH_OVERDRAW_FADE_LENGTH         = DH 过度绘制淡出长度
 option.NOISE_ON_DH_TERRAIN             = DH 地形噪声
 option.ENCHANTMENT_GLINT_BRIGHTNESS    = 附魔闪光亮度
-option.USE_SEPARATE_ENTITY_DRAWS       = "分离绘制实体"
+option.USE_SEPARATE_ENTITY_DRAWS       = 使用 "分离绘制实体"
 option.USE_SEPARATE_ENTITY_DRAWS.comment = "分离绘制实体" 是 Iris 的一个功能: 对使用延迟-前向混合渲染的光影启用, 比如说 Photon, 用来使半透明实体和其他对象正确渲染. 但这个功能也会导致一些问题的出现. 禁用此功能可能会导致渲染问题, 例如半透明实体会变得不透明!
+option.DITHERED_TRANSLUCENCY_FALLBACK  = 抖动半透明回退
+option.DITHERED_TRANSLUCENCY_FALLBACK.comment = 使用抖动半透明以改善那些在开启分离绘制实体时无法正常透明的对象外观. 
 
 value.DEBUG_VIEW.DEBUG_VIEW_NONE       = 关
 value.DEBUG_VIEW.DEBUG_VIEW_SAMPLER    = 采样器
@@ -739,20 +750,11 @@ option.BOX_EMISSION             = 框线发光
 option.BOX_EMISSION.comment     = 框线发光强度. 需要启用泛光.
 option.BOX_LINE_WIDTH           = 框线宽度
 
-#additional comment
+# Additional Comments
 
-#world
-#lighting
-option.BLOCK_ENTITY_SHADOWS.comment=决定方块实体是否能投射阴影. 在生存世界中有大量箱子时请禁用本选项来提升性能.
+# Lighting settings
+option.SHADOW_SSRT.comment             = 远处物体的阴影是否使用屏幕空间光线追踪 (SSRT).
+option.BLOCK_ENTITY_SHADOWS.comment    = 决定方块实体是否能投射阴影. 在生存世界中有大量箱子时请禁用本选项来提升性能.
 
-#sky
-#fog
-#materials
-#water
-#post
-#misc
-option.BOX_LINE_WIDTH.comment=选择框的框线宽度.
-
-option.BOX_COLOR_R.comment=红色.
-option.BOX_COLOR_G.comment=绿色.
-option.BOX_COLOR_B.comment=蓝色.
+# Box
+option.BOX_LINE_WIDTH.comment          = 选择框的框线宽度.
