@@ -434,7 +434,7 @@ void main() {
         vec4 ambient_upscaled;
         float weight_sum = w00 + w10 + w01 + w11;
 
-        if (weight_sum != 0.0) {
+        if (abs(weight_sum) > eps) {
             ambient_upscaled = ambient_00 * w00 + ambient_10 * w10 +
                 ambient_01 * w01 + ambient_11 * w11;
 
