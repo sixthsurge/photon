@@ -33,6 +33,7 @@ uniform sampler3D depthtex0; // atmospheric scattering LUT
 
 uniform int worldTime;
 uniform int worldDay;
+uniform int moonPhase;
 uniform float sunAngle;
 
 uniform int frameCounter;
@@ -83,30 +84,36 @@ uniform float desert_sandstorm;
 #endif
 
 void main() {
-	uv = gl_MultiTexCoord0.xy;
+    uv = gl_MultiTexCoord0.xy;
 
 #if defined WORLD_OVERWORLD
-	sun_color = get_sun_exposure() * get_sun_tint();
-	moon_color = get_moon_exposure() * get_moon_tint();
+    sun_color = get_sun_exposure() * get_sun_tint();
+    moon_color = get_moon_exposure() * get_moon_tint();
 
-	const vec3 sky_dir = normalize(vec3(0.0, 1.0, -0.8)); // don't point direcly upwards to avoid the sun halo when the sun path rotation is 0
-	sky_color = atmosphere_scattering(sky_dir, sun_color, sun_dir, moon_color, moon_dir, /* use_klein_nishina_phase */ false);
-	sky_color = (tau * 1.13) * sky_color;
-	sky_color = mix(sky_color, tau * get_weather_color(), rainStrength);
+    const vec3 sky_dir = normalize(
+        vec3(0.0, 1.0, -0.8)
+    ); // don't point direcly upwards to avoid the sun halo when the sun path
+       // rotation is 0
+    sky_color = atmosphere_scattering(
+        sky_dir,
+        sun_color,
+        sun_dir,
+        moon_color,
+        moon_dir,
+        /* use_klein_nishina_phase */ false
+    );
+    sky_color = (tau * 1.13) * sky_color;
+    sky_color = mix(sky_color, tau * get_weather_color(), rainStrength);
 
-	aurora_amount = get_aurora_amount();
-	aurora_colors = get_aurora_colors();
+    aurora_amount = get_aurora_amount();
+    aurora_colors = get_aurora_colors();
 
-	clouds_params = get_clouds_parameters(get_weather());
+    clouds_params = get_clouds_parameters(get_weather());
 
-	sky_color += aurora_amount * AURORA_CLOUD_LIGHTING * mix(
-		aurora_colors[0], 
-		aurora_colors[1], 
-		0.25
-	);
+    sky_color += aurora_amount * AURORA_CLOUD_LIGHTING *
+        mix(aurora_colors[0], aurora_colors[1], 0.25);
 #endif
 
-	vec2 vertex_pos = gl_Vertex.xy * taau_render_scale;
-	gl_Position = vec4(vertex_pos * 2.0 - 1.0, 0.0, 1.0);
+    vec2 vertex_pos = gl_Vertex.xy * taau_render_scale;
+    gl_Position = vec4(vertex_pos * 2.0 - 1.0, 0.0, 1.0);
 }
-

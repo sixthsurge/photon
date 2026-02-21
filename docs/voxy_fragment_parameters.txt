@@ -1,0 +1,10 @@
+struct VoxyFragmentParameters {
+    vec4 sampledColour;
+    vec2 tile;
+    vec2 uv;
+    uint face;
+    uint modelId;
+    vec2 lightMap;
+    vec4 tinting;
+    uint customId; // Same as iris's modelId
+};

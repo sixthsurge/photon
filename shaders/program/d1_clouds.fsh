@@ -11,8 +11,8 @@
 
 #include "/include/global.glsl"
 
-layout (location = 0) out vec4 clouds;
-layout (location = 1) out vec2 clouds_data;
+layout(location = 0) out vec4 clouds;
+layout(location = 1) out vec2 clouds_data;
 
 /* RENDERTARGETS: 9,10 */
 
@@ -61,6 +61,7 @@ uniform float near;
 uniform float far;
 
 uniform int worldTime;
+uniform int moonPhase;
 uniform float sunAngle;
 
 uniform int frameCounter;
@@ -106,7 +107,7 @@ uniform float biome_humidity;
 #define MIE_PHASE_CLAMP
 
 #ifdef CLOUDS_CUMULUS_PRECOMPUTE_LOCAL_COVERAGE
-	#define CLOUDS_USE_LOCAL_COVERAGE_MAP
+#define CLOUDS_USE_LOCAL_COVERAGE_MAP
 #endif
 
 #if defined WORLD_OVERWORLD
@@ -119,101 +120,127 @@ uniform float biome_humidity;
 #endif
 #endif
 
-#include "/include/misc/distant_horizons.glsl"
+#include "/include/misc/lod_mod_support.glsl"
 #include "/include/utility/checkerboard.glsl"
 #include "/include/utility/random.glsl"
 #include "/include/utility/space_conversion.glsl"
 
-const int checkerboard_area = CLOUDS_TEMPORAL_UPSCALING * CLOUDS_TEMPORAL_UPSCALING;
+const int checkerboard_area =
+    CLOUDS_TEMPORAL_UPSCALING * CLOUDS_TEMPORAL_UPSCALING;
 
-float depth_max_4x4(sampler2D depth_sampler) {
-	vec4 depth_samples_0 = textureGather(depth_sampler, uv * taau_render_scale + vec2( 2.0 * view_pixel_size.x,  2.0 * view_pixel_size.y));
-	vec4 depth_samples_1 = textureGather(depth_sampler, uv * taau_render_scale + vec2(-2.0 * view_pixel_size.x,  2.0 * view_pixel_size.y));
-	vec4 depth_samples_2 = textureGather(depth_sampler, uv * taau_render_scale + vec2( 2.0 * view_pixel_size.x, -2.0 * view_pixel_size.y));
-	vec4 depth_samples_3 = textureGather(depth_sampler, uv * taau_render_scale + vec2(-2.0 * view_pixel_size.x, -2.0 * view_pixel_size.y));
+float depth_max_4x4(sampler2D depth_sampler, float scale) {
+    vec4 depth_samples_0 = textureGather(
+        depth_sampler,
+        uv * scale + vec2(2.0 * view_pixel_size.x, 2.0 * view_pixel_size.y)
+    );
+    vec4 depth_samples_1 = textureGather(
+        depth_sampler,
+        uv * scale + vec2(-2.0 * view_pixel_size.x, 2.0 * view_pixel_size.y)
+    );
+    vec4 depth_samples_2 = textureGather(
+        depth_sampler,
+        uv * scale + vec2(2.0 * view_pixel_size.x, -2.0 * view_pixel_size.y)
+    );
+    vec4 depth_samples_3 = textureGather(
+        depth_sampler,
+        uv * scale + vec2(-2.0 * view_pixel_size.x, -2.0 * view_pixel_size.y)
+    );
 
-	return max(
-		max(max_of(depth_samples_0), max_of(depth_samples_1)),
-		max(max_of(depth_samples_2), max_of(depth_samples_3))
-	);
+    return max(
+        max(max_of(depth_samples_0), max_of(depth_samples_1)),
+        max(max_of(depth_samples_2), max_of(depth_samples_3))
+    );
 }
 
 void main() {
-	ivec2 texel = ivec2(gl_FragCoord.xy);
+    ivec2 texel = ivec2(gl_FragCoord.xy);
 
-	clouds = vec4(0.0, 0.0, 0.0, 1.0);
+    clouds = vec4(0.0, 0.0, 0.0, 1.0);
 
 #if defined WORLD_OVERWORLD
-	ivec2 checkerboard_pos = CLOUDS_TEMPORAL_UPSCALING * texel + clouds_checkerboard_offsets[frameCounter % checkerboard_area];
+    ivec2 checkerboard_pos = CLOUDS_TEMPORAL_UPSCALING * texel +
+        clouds_checkerboard_offsets[frameCounter % checkerboard_area];
 
-	vec2 new_uv = vec2(checkerboard_pos) / vec2(view_res) * rcp(float(taau_render_scale));
+    vec2 new_uv =
+        vec2(checkerboard_pos) / vec2(view_res) * rcp(float(taau_render_scale));
 
-	// Get maximum depth from area covered by this fragment
-	float depth_max = depth_max_4x4(depthtex1);
+    // Get maximum depth from area covered by this fragment
+    float depth_max = depth_max_4x4(depthtex1, taau_render_scale);
 
-	vec3 screen_pos = vec3(new_uv, depth_max);
-	vec3 view_pos = screen_to_view_space(screen_pos, false);
+    vec3 screen_pos = vec3(new_uv, depth_max);
+    vec3 view_pos = screen_to_view_space(screen_pos, false);
 
-	// Distant Horizons support
-#ifdef DISTANT_HORIZONS
-	float depth_dh = depth_max_4x4(dhDepthTex);
-	bool is_dh_terrain = is_distant_horizons_terrain(depth_max, depth_dh);
+    // LoD terrain support
+#ifdef LOD_MOD_ACTIVE
+    float depth_lod = depth_max_4x4(lod_depth_tex_solid, lod_depth_tex_scale);
+    bool is_lod = is_lod_terrain(depth_max, depth_lod);
 
-	if (is_dh_terrain) {
-		screen_pos = vec3(new_uv, depth_dh);
-		view_pos = screen_to_view_space(screen_pos, false, true);
-	}
+    if (is_lod) {
+        screen_pos = vec3(new_uv, depth_lod);
+        view_pos = screen_to_view_space(screen_pos, false, true);
+    }
 #else
-	const bool is_dh_terrain = false;
+    const bool is_lod = false;
 #endif
 
-	vec3 ray_origin = vec3(0.0, CLOUDS_SCALE * (eyeAltitude - SEA_LEVEL) + planet_radius, 0.0) + CLOUDS_SCALE * gbufferModelViewInverse[3].xyz;
-	vec3 ray_dir    = mat3(gbufferModelViewInverse) * normalize(view_pos);
+    vec3 ray_origin =
+        vec3(
+            0.0,
+            CLOUDS_SCALE * (eyeAltitude - SEA_LEVEL) + planet_radius,
+            0.0
+        ) +
+        CLOUDS_SCALE * gbufferModelViewInverse[3].xyz;
+    vec3 ray_dir = mat3(gbufferModelViewInverse) * normalize(view_pos);
 
-	float distance_to_terrain = (depth_max == 1.0 && !is_dh_terrain)
-		? -1.0
-		: length(view_pos) * CLOUDS_SCALE;
+    float distance_to_terrain =
+        (depth_max == 1.0 && !is_lod) ? -1.0 : length(view_pos) * CLOUDS_SCALE;
 
-	vec3 clear_sky = atmosphere_scattering(ray_dir, sun_color, sun_dir, moon_color, moon_dir, /* use_klein_nishina_phase */ false);
+    vec3 clear_sky = atmosphere_scattering(
+        ray_dir,
+        sun_color,
+        sun_dir,
+        moon_color,
+        moon_dir,
+        /* use_klein_nishina_phase */ false
+    );
 
-	float dither = texelFetch(noisetex, ivec2(checkerboard_pos & 511), 0).b;
-	      dither = r1(frameCounter / checkerboard_area, dither);
+    float dither = texelFetch(noisetex, ivec2(checkerboard_pos & 511), 0).b;
+    dither = r1(frameCounter / checkerboard_area, dither);
 
 #ifndef BLOCKY_CLOUDS
-	CloudsResult result = draw_clouds(
-		ray_origin,
-		ray_dir,
-		clear_sky,
-		distance_to_terrain,
-		dither
-	);
+    CloudsResult result = draw_clouds(
+        ray_origin,
+        ray_dir,
+        clear_sky,
+        distance_to_terrain,
+        dither
+    );
 
-	clouds.xyz    = result.scattering.xyz;
-	clouds.w      = result.transmittance;
-	clouds_data.x = result.apparent_distance * rcp(CLOUDS_SCALE);
-	clouds_data.y = result.scattering.w;
+    clouds.xyz = result.scattering.xyz;
+    clouds.w = result.transmittance;
+    clouds_data.x = result.apparent_distance * rcp(CLOUDS_SCALE);
+    clouds_data.y = result.scattering.w;
 #else
-	clouds        = vec4(0.0, 0.0, 0.0, 1.0);
-	clouds_data.x = 1e6;
-	clouds_data.y = 0.0;
+    clouds = vec4(0.0, 0.0, 0.0, 1.0);
+    clouds_data.x = 1e6;
+    clouds_data.y = 0.0;
 #endif
 
-	// Crepuscular rays 
+    // Crepuscular rays
 
 #if defined CREPUSCULAR_RAYS && !defined BLOCKY_CLOUDS
-	vec4 crepuscular_rays = draw_crepuscular_rays(
-		colortex8, 
-		ray_dir, 
-		distance_to_terrain > 0.0,
-		dither
-	);
-	clouds *= crepuscular_rays.w;
-	clouds.rgb += crepuscular_rays.xyz;
+    vec4 crepuscular_rays = draw_crepuscular_rays(
+        colortex8,
+        ray_dir,
+        distance_to_terrain > 0.0,
+        dither
+    );
+    clouds *= crepuscular_rays.w;
+    clouds.rgb += crepuscular_rays.xyz;
 #endif
 
-	// Aurora
+    // Aurora
 
-	clouds.xyz += draw_aurora(ray_dir, dither) * clouds.w;
+    clouds.xyz += draw_aurora(ray_dir, dither) * clouds.w;
 #endif
 }
-

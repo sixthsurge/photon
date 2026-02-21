@@ -36,6 +36,8 @@ uniform float sunAngle;
 uniform int frameCounter;
 uniform float frameTimeCounter;
 
+uniform int moonPhase;
+
 uniform vec3 light_dir;
 uniform vec3 sun_dir;
 uniform vec3 moon_dir;
@@ -62,34 +64,37 @@ uniform float biome_humidity;
 
 uniform float desert_sandstorm;
 
-
 #include "/include/weather/clouds.glsl"
 
 #ifndef IS_IRIS
-// `sunPosition` fix by Builderb0y 
+// `sunPosition` fix by Builderb0y
 vec3 calculate_sun_direction() {
-	const vec2 sun_rotation_data = vec2(cos(sunPathRotation * 0.01745329251994), -sin(sunPathRotation * 0.01745329251994));
+    const vec2 sun_rotation_data = vec2(
+        cos(sunPathRotation * 0.01745329251994),
+        -sin(sunPathRotation * 0.01745329251994)
+    );
 
-	float ang = fract(worldTime / 24000.0 - 0.25);
-	ang = (ang + (cos(ang * 3.14159265358979) * -0.5 + 0.5 - ang) / 3.0) * 6.28318530717959; //0-2pi, rolls over from 2pi to 0 at noon.
+    float ang = fract(worldTime / 24000.0 - 0.25);
+    ang = (ang + (cos(ang * 3.14159265358979) * -0.5 + 0.5 - ang) / 3.0) *
+        6.28318530717959; // 0-2pi, rolls over from 2pi to 0 at noon.
 
-	return normalize(vec3(-sin(ang), cos(ang) * sun_rotation_data));
+    return normalize(vec3(-sin(ang), cos(ang) * sun_rotation_data));
 }
 #endif
 
 void main() {
-	uv = gl_MultiTexCoord0.xy;
+    uv = gl_MultiTexCoord0.xy;
 
-	Weather weather = get_weather();
-	clouds_params = get_clouds_parameters(weather);
+    Weather weather = get_weather();
+    clouds_params = get_clouds_parameters(weather);
 
 #ifndef IS_IRIS
-	sun_dir_fixed = calculate_sun_direction();
-	moon_dir_fixed = -sun_dir_fixed;
-	light_dir_fixed = sunAngle < 0.5 ? sun_dir_fixed : moon_dir_fixed;
+    sun_dir_fixed = calculate_sun_direction();
+    moon_dir_fixed = -sun_dir_fixed;
+    light_dir_fixed = sunAngle < 0.5 ? sun_dir_fixed : moon_dir_fixed;
 #endif
 
-	gl_Position = vec4(gl_Vertex.xy * 2.0 - 1.0, 0.0, 1.0);
+    gl_Position = vec4(gl_Vertex.xy * 2.0 - 1.0, 0.0, 1.0);
 }
 
 #ifndef CLOUD_SHADOWS

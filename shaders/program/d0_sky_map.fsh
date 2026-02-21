@@ -11,7 +11,7 @@
 
 #include "/include/global.glsl"
 
-layout (location = 0) out vec3 sky_map;
+layout(location = 0) out vec3 sky_map;
 
 /* RENDERTARGETS: 4 */
 
@@ -75,6 +75,7 @@ uniform float near;
 uniform float far;
 
 uniform int worldTime;
+uniform int moonPhase;
 uniform float sunAngle;
 
 uniform int frameCounter;
@@ -85,8 +86,6 @@ uniform float eyeAltitude;
 uniform float rainStrength;
 uniform float blindness;
 uniform float darknessFactor;
-
-uniform int dhRenderDistance;
 
 uniform vec3 light_dir;
 uniform vec3 sun_dir;
@@ -115,7 +114,7 @@ uniform float biome_may_snow;
 #define CLOUDS_USE_LOCAL_COVERAGE_MAP
 
 #ifdef CLOUDS_CUMULUS_PRECOMPUTE_LOCAL_COVERAGE
-	#define CLOUDS_USE_LOCAL_COVERAGE_MAP
+#define CLOUDS_USE_LOCAL_COVERAGE_MAP
 #endif
 
 #if defined WORLD_OVERWORLD
@@ -123,39 +122,38 @@ uniform float biome_may_snow;
 #include "/include/sky/aurora.glsl"
 #endif
 
-#include "/include/sky/sky.glsl"
 #include "/include/sky/projection.glsl"
+#include "/include/sky/sky.glsl"
 
 void main() {
-	ivec2 texel = ivec2(gl_FragCoord.xy);
+    ivec2 texel = ivec2(gl_FragCoord.xy);
 
-	if (texel.x == sky_map_res.x) { // Store lighting colors
-		sky_map = vec3(0.0);
-		switch (texel.y) {
-		case 0:
-			sky_map = light_color;
-			break;
+    if (texel.x == sky_map_res.x) { // Store lighting colors
+        sky_map = vec3(0.0);
+        switch (texel.y) {
+            case 0:
+                sky_map = light_color;
+                break;
 
-		case 1:
-			sky_map = ambient_color;
-			break;
-		}
-	} else { // Draw sky map
-		vec3 ray_dir = unproject_sky(uv);
+            case 1:
+                sky_map = ambient_color;
+                break;
+        }
+    } else { // Draw sky map
+        vec3 ray_dir = unproject_sky(uv);
 
-		sky_map = draw_sky(ray_dir);
+        sky_map = draw_sky(ray_dir);
 
 #if defined WORLD_OVERWORLD
-		// Apply analytic fog over sky
-		mat2x3 fog = air_fog_analytic(
-			cameraPosition,
-			cameraPosition + ray_dir,
-			true,
-			eye_skylight,
-			1.0
-		);
-		sky_map = sky_map * fog[1] + fog[0];
+        // Apply analytic fog over sky
+        mat2x3 fog = air_fog_analytic(
+            cameraPosition,
+            cameraPosition + ray_dir,
+            true,
+            eye_skylight,
+            1.0
+        );
+        sky_map = sky_map * fog[1] + fog[0];
 #endif
-	}
+    }
 }
-

@@ -11,8 +11,8 @@
 
 #include "/include/global.glsl"
 
-layout (location = 0) out vec3 fog_transmittance;
-layout (location = 1) out vec3 fog_scattering;
+layout(location = 0) out vec3 fog_transmittance;
+layout(location = 1) out vec3 fog_scattering;
 
 /* RENDERTARGETS: 6,7 */
 
@@ -51,10 +51,6 @@ uniform sampler2D shadowcolor0;
 #endif
 #endif
 
-#ifdef DISTANT_HORIZONS
-uniform sampler2D dhDepthTex;
-#endif
-
 uniform mat4 gbufferModelView;
 uniform mat4 gbufferModelViewInverse;
 uniform mat4 gbufferProjection;
@@ -64,10 +60,6 @@ uniform mat4 shadowModelView;
 uniform mat4 shadowModelViewInverse;
 uniform mat4 shadowProjection;
 uniform mat4 shadowProjectionInverse;
-
-#ifdef DISTANT_HORIZONS
-uniform int dhRenderDistance;
-#endif
 
 uniform vec3 cameraPosition;
 
@@ -85,6 +77,7 @@ uniform float frameTimeCounter;
 
 uniform int isEyeInWater;
 uniform int worldTime;
+uniform int moonPhase;
 uniform int frameCounter;
 
 uniform float world_age;
@@ -118,12 +111,12 @@ uniform float time_midnight;
 #endif
 
 #include "/include/fog/water_fog_vl.glsl"
-
+#include "/include/misc/lod_mod_support.glsl"
 #include "/include/utility/encoding.glsl"
 #include "/include/utility/random.glsl"
 #include "/include/utility/space_conversion.glsl"
 
-#if defined LPV_VL && defined COLORED_LIGHTS 
+#if defined LPV_VL && defined COLORED_LIGHTS
 uniform sampler3D light_sampler_a;
 uniform sampler3D light_sampler_b;
 
@@ -131,97 +124,112 @@ uniform sampler3D light_sampler_b;
 #endif
 
 void main() {
-	ivec2 fog_texel  = ivec2(gl_FragCoord.xy);
-	ivec2 view_texel = ivec2(gl_FragCoord.xy * taau_render_scale * rcp(VL_RENDER_SCALE));
+    ivec2 fog_texel = ivec2(gl_FragCoord.xy);
+    ivec2 view_texel =
+        ivec2(gl_FragCoord.xy * taau_render_scale * rcp(VL_RENDER_SCALE));
 
-	float depth0        = texelFetch(depthtex0, view_texel, 0).x;
-	float depth1        = texelFetch(depthtex1, view_texel, 0).x;
-	vec4 gbuffer_data_0 = texelFetch(colortex1, view_texel, 0);
+    float depth0 = texelFetch(depthtex0, view_texel, 0).x;
+    float depth1 = texelFetch(depthtex1, view_texel, 0).x;
+    vec4 gbuffer_data_0 = texelFetch(colortex1, view_texel, 0);
 
-#ifdef DISTANT_HORIZONS
+#ifdef LOD_MOD_ACTIVE
     mat4 projection_matrix, projection_matrix_inverse;
-    bool is_dh_terrain;
-	float dh_depth = texelFetch(dhDepthTex, view_texel, 0).x;
+    bool is_lod;
+    float depth_lod = texelFetch(lod_depth_tex, view_texel, 0).x;
 
     if (depth0 == 1.0) {
-        is_dh_terrain = true;
-        depth0 = dh_depth;
-        depth1 = dh_depth;
-        projection_matrix = dhProjection;
-        projection_matrix_inverse = dhProjectionInverse;
+        is_lod = true;
+        depth0 = depth_lod;
+        depth1 = depth_lod;
+        projection_matrix = lod_projection_matrix;
+        projection_matrix_inverse = lod_projection_matrix_inverse;
     } else {
-        is_dh_terrain = false;
+        is_lod = false;
         projection_matrix = gbufferProjection;
         projection_matrix_inverse = gbufferProjectionInverse;
     }
 #else
-    #define is_dh_terrain             false
-    #define projection_matrix         gbufferProjection
-    #define projection_matrix_inverse gbufferProjectionInverse
+#define is_lod false
+#define projection_matrix gbufferProjection
+#define projection_matrix_inverse gbufferProjectionInverse
 #endif
 
-	float skylight = unpack_unorm_2x8(gbuffer_data_0.w).y;
+    float skylight = unpack_unorm_2x8(gbuffer_data_0.w).y;
 
-	vec3 view_pos  = screen_to_view_space(projection_matrix_inverse, vec3(uv, depth0), true);
-	vec3 scene_pos = view_to_scene_space(view_pos);
-	vec3 world_pos = scene_pos + cameraPosition;
+    vec3 view_pos =
+        screen_to_view_space(projection_matrix_inverse, vec3(uv, depth0), true);
+    vec3 scene_pos = view_to_scene_space(view_pos);
+    vec3 world_pos = scene_pos + cameraPosition;
 
-	vec3 view_back_pos  = screen_to_view_space(vec3(uv, depth1), true);
-	vec3 scene_back_pos = view_to_scene_space(view_back_pos);
-	vec3 world_back_pos = scene_back_pos + cameraPosition;
+    vec3 view_back_pos = screen_to_view_space(vec3(uv, depth1), true);
+    vec3 scene_back_pos = view_to_scene_space(view_back_pos);
+    vec3 world_back_pos = scene_back_pos + cameraPosition;
 
-	float dither = texelFetch(noisetex, fog_texel & 511, 0).b;
-	      dither = r1(frameCounter, dither);
+    float dither = texelFetch(noisetex, fog_texel & 511, 0).b;
+    dither = r1(frameCounter, dither);
 
-	vec3 world_start_pos = gbufferModelViewInverse[3].xyz + cameraPosition;
-	vec3 world_end_pos   = world_pos;
+    vec3 world_start_pos = gbufferModelViewInverse[3].xyz + cameraPosition;
+    vec3 world_end_pos = world_pos;
 
-	// Volumetric lighting
+    // Volumetric lighting
 
 #if defined VL
-	switch (isEyeInWater) {
-		case 0:
-			#if defined WORLD_OVERWORLD
-			mat2x3 fog = raymarch_air_fog(world_start_pos, world_end_pos, depth0 == 1.0, skylight, dither);
-			#elif defined WORLD_NETHER
-			mat2x3 fog = mat2x3(vec3(0.0), vec3(1.0));
-			#elif defined WORLD_END
-			mat2x3 fog = raymarch_end_fog(world_start_pos, world_end_pos, depth0 == 1.0, dither);
-			#endif
-
-			fog_scattering    = fog[0];
-			fog_transmittance = fog[1];
-
-			break;
-
-		case 1:
-			mat2x3 water_fog = raymarch_water_fog(world_start_pos, world_end_pos, depth0 == 1.0, dither);
-
-			fog_scattering    = water_fog[0];
-			fog_transmittance = water_fog[1];
-
-			break;
-
-		default:
-			fog_scattering    = vec3(0.0);
-			fog_transmittance = vec3(1.0);
-
-			break;
-
-		// Prevent potential game crash due to empty switch statement
-		case -1:
-			break;
-	}
-#else 
-	fog_scattering = vec3(0.0);
-	fog_transmittance = vec3(1.0);
+    switch (isEyeInWater) {
+        case 0:
+#if defined WORLD_OVERWORLD
+            mat2x3 fog = raymarch_air_fog(
+                world_start_pos,
+                world_end_pos,
+                depth0 == 1.0,
+                skylight,
+                dither
+            );
+#elif defined WORLD_NETHER
+            mat2x3 fog = mat2x3(vec3(0.0), vec3(1.0));
+#elif defined WORLD_END
+            mat2x3 fog = raymarch_end_fog(
+                world_start_pos,
+                world_end_pos,
+                depth0 == 1.0,
+                dither
+            );
 #endif
 
-#if defined LPV_VL && defined COLORED_LIGHTS 
-	fog_scattering += get_lpv_fog_scattering(
-		world_start_pos,
-		world_end_pos,
-		dither
-	);
+            fog_scattering = fog[0];
+            fog_transmittance = fog[1];
+
+            break;
+
+        case 1:
+            mat2x3 water_fog = raymarch_water_fog(
+                world_start_pos,
+                world_end_pos,
+                depth0 == 1.0,
+                dither
+            );
+
+            fog_scattering = water_fog[0];
+            fog_transmittance = water_fog[1];
+
+            break;
+
+        default:
+            fog_scattering = vec3(0.0);
+            fog_transmittance = vec3(1.0);
+
+            break;
+
+        // Prevent potential game crash due to empty switch statement
+        case -1:
+            break;
+    }
+#else
+    fog_scattering = vec3(0.0);
+    fog_transmittance = vec3(1.0);
+#endif
+
+#if defined LPV_VL && defined COLORED_LIGHTS
+    fog_scattering +=
+        get_lpv_fog_scattering(world_start_pos, world_end_pos, dither);
 #endif
 }

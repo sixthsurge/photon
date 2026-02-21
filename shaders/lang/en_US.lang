@@ -134,7 +134,9 @@ option.SHADING_STRENGTH                = Shading Strength
 option.SHADING_STRENGTH.comment        = Adjusts the contrast of direct light shading. Reducing this option makes faces facing away from the sun that aren't in shadow brighter; increasing it makes them darker
 
 option.SHADOW                          = Shadow Mapping
-option.SHADOW_PCF                      = Shadow Filtering
+option.SHADOW_PCF                      = Shadow Map Filtering
+option.SHADOW_SSRT                     = SSRT Distant Shadows
+option.SHADOW_SSRT_STEPS               = SSRT Shadow Steps
 option.SHADOW_COLOR                    = Colored Shadows
 option.SHADOW_COLOR.comment            = Translucent blocks cast tinted shadows
 option.SHADOW_VPS                      = Variable Penumbra Shadows
