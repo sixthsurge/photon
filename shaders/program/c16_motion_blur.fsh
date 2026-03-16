@@ -23,7 +23,7 @@ in vec2 uv;
 
 uniform sampler2D colortex0; // Scene color
 
-uniform sampler2D depthtex0;
+uniform sampler2D depthtex1;
 
 uniform mat4 gbufferModelView;
 uniform mat4 gbufferModelViewInverse;
@@ -53,7 +53,7 @@ void main() {
     ivec2 texel = ivec2(gl_FragCoord.xy);
     ivec2 view_texel = ivec2(gl_FragCoord.xy * taau_render_scale);
 
-    float depth = texelFetch(depthtex0, view_texel, 0).x;
+    float depth = texelFetch(depthtex1, view_texel, 0).x;
 
     if (depth < hand_depth) {
         scene_color = texelFetch(colortex0, texel, 0).rgb;
@@ -74,7 +74,7 @@ void main() {
         ivec2 view_tap = ivec2(pos * view_res * taau_render_scale);
 
         vec3 color = texelFetch(colortex0, tap, 0).rgb;
-        float depth = texelFetch(depthtex0, view_tap, 0).x;
+        float depth = texelFetch(depthtex1, view_tap, 0).x;
         float weight = (clamp01(pos) == pos && depth > hand_depth) ? 1.0 : 0.0;
 
         color_sum += color * weight;
