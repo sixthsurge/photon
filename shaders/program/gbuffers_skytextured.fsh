@@ -46,7 +46,17 @@ const float moon_luminance = 10.0;
 
 void main() {
     vec2 new_uv = uv;
-    vec2 offset;
+    vec2 offset = uv * 2.0 - 1.0;
+    bool is_sun = renderStage == MC_RENDER_STAGE_SUN;
+    bool is_moon = renderStage == MC_RENDER_STAGE_MOON;
+
+    if (!is_sun && !is_moon && renderStage != MC_RENDER_STAGE_CUSTOM_SKY) {
+        // Older Iris builds could leave skytextured sun/moon geometry on the
+        // same stage, so fall back to the historical direction test only when
+        // the explicit stage is unavailable.
+        is_sun = dot(view_pos, view_sun_dir) > 0.0;
+        is_moon = !is_sun;
+    }
 
     if (renderStage == MC_RENDER_STAGE_CUSTOM_SKY) {
 #ifdef CUSTOM_SKY
@@ -56,17 +66,13 @@ void main() {
 #else
         frag_color = vec3(0.0);
 #endif
-    } else if (dot(view_pos, view_sun_dir) > 0.0) {
+    } else if (is_sun) {
         // Sun
-
-        // NB: not using renderStage to distinguish sun and moon because it's
-        // broken in Iris for Minecraft 1.21.4
 
         // Cut out the sun itself (discard the halo around it)
         if (max_of(abs(offset)) > 0.25) {
             discard;
         }
-        offset = uv * 2.0 - 1.0;
 
 #ifdef VANILLA_SUN
         frag_color = texture(gtexture, new_uv).rgb;
@@ -76,7 +82,7 @@ void main() {
 #else
         frag_color = vec3(0.0);
 #endif
-    } else {
+    } else if (is_moon) {
         // Moon
 #ifdef VANILLA_MOON
         frag_color =
@@ -87,5 +93,7 @@ void main() {
 #else
         frag_color = vec3(0.0);
 #endif
+    } else {
+        frag_color = vec3(0.0);
     }
 }
