@@ -226,6 +226,7 @@ void main() {
     float back_depth_lod = texelFetch(lod_depth_tex_solid, texel, 0).x;
 
     // Fix Voxy translucents appearing in front of entities.
+#ifdef VOXY
     float z_vanilla =
         screen_to_view_space_depth(gbufferProjectionInverse, back_depth);
     float z_lod = screen_to_view_space_depth(
@@ -235,6 +236,7 @@ void main() {
     if (front_depth_lod < (1.0 - eps) && z_vanilla < z_lod) {
         translucent_color = vec4(0.0);
     }
+#endif
 
     bool front_is_lod_terrain = is_lod_terrain(front_depth, front_depth_lod);
     bool back_is_lod_terrain = is_lod_terrain(back_depth, back_depth_lod);
