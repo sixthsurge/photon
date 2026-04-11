@@ -233,7 +233,7 @@ void main() {
         lod_projection_matrix_inverse,
         front_depth_lod
     );
-    if (front_depth_lod < (1.0 - eps) && z_vanilla < z_lod) {
+    if (front_depth_lod < 1.0 && z_vanilla < z_lod && front_depth == back_depth) {
         translucent_color = vec4(0.0);
     }
 #endif
