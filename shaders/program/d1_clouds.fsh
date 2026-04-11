@@ -172,7 +172,7 @@ void main() {
 
     // LoD terrain support
 #ifdef LOD_MOD_ACTIVE
-    float depth_lod = depth_max_4x4(lod_depth_tex_solid, lod_depth_tex_scale);
+    float depth_lod = depth_max_4x4(lod_depth_tex, lod_depth_tex_scale);
     bool is_lod = is_lod_terrain(depth_max, depth_lod);
 
     if (is_lod) {
