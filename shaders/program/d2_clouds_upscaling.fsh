@@ -257,7 +257,7 @@ void main() {
     if (depth != 1.0) {
         float view_distance_squared =
             length_squared(screen_to_view_space(vec3(uv, depth), true));
-        if (view_distance_squared < sqr(closest_distance) && !is_hand) {
+        if (view_distance_squared < sqr(closest_distance) || is_hand) {
             clouds_history = current;
             clouds_data.x = 1e6; // apparent distance
             clouds_data.y = 0.0; // pixel age
