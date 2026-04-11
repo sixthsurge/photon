@@ -161,7 +161,11 @@ float get_screen_space_shadows(
             lod_projection_matrix,
             lod_projection_matrix_inverse,
             vec3(position_screen_xy, depth_lod),
-            position_view,
+            screen_to_view_space(
+                lod_projection_matrix_inverse,
+                vec3(position_screen_xy, depth_lod),
+                true
+            ),
             ray_dir,
             has_sss,
             dither,
