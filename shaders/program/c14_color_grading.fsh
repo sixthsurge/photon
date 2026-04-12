@@ -173,12 +173,13 @@ float vignette(vec2 uv) {
 
     float darkness_pulse = 1.0 - dampen(abs(cos(2.0 * frameTimeCounter)));
 
-    float vignette =
-        vignette_size * (uv.x * uv.y - uv.x) * (uv.x * uv.y - uv.y);
-    vignette =
-        pow(vignette,
-            vignette_intensity + 0.1 * biome_cave + 0.3 * blindness +
-                0.2 * darkness_pulse * darknessFactor);
+    float vignette
+        = vignette_size * (uv.x * uv.y - uv.x) * (uv.x * uv.y - uv.y);
+    vignette = pow(
+        vignette,
+        vignette_intensity + 0.1 * biome_cave + 0.3 * blindness
+            + 0.2 * darkness_pulse * darknessFactor
+    );
 
     return vignette;
 }
@@ -199,10 +200,11 @@ void main() {
 
 #ifdef BLOOMY_FOG
     float fog_transmittance = texture(colortex3, uv * taau_render_scale).x;
-    scene_color =
-        mix(fog_bloom,
-            scene_color,
-            pow(fog_transmittance, BLOOMY_FOG_INTENSITY));
+    scene_color = mix(
+        fog_bloom,
+        scene_color,
+        pow(fog_transmittance, BLOOMY_FOG_INTENSITY)
+    );
 #endif
 #endif
 
@@ -215,8 +217,8 @@ void main() {
     scene_color = grade_input(scene_color);
 
 #ifdef TONEMAP_COMPARISON
-    scene_color =
-        uv.x < 0.5 ? tonemap_left(scene_color) : tonemap_right(scene_color);
+    scene_color
+        = uv.x < 0.5 ? tonemap_left(scene_color) : tonemap_right(scene_color);
 #else
     scene_color = tonemap(scene_color);
 #endif

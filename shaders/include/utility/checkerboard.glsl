@@ -3,8 +3,8 @@
 
 const ivec2[2] checkerboard_offsets_2x1 = ivec2[2](ivec2(0, 0), ivec2(1, 0));
 
-const ivec2[4] checkerboard_offsets_2x2 =
-    ivec2[4](ivec2(0, 0), ivec2(1, 1), ivec2(1, 0), ivec2(0, 1));
+const ivec2[4] checkerboard_offsets_2x2
+    = ivec2[4](ivec2(0, 0), ivec2(1, 1), ivec2(1, 0), ivec2(0, 1));
 
 const ivec2[8] checkerboard_offsets_4x2 = ivec2[8](
     ivec2(0, 0),

@@ -75,8 +75,8 @@ vec3 calculate_sun_direction() {
     );
 
     float ang = fract(worldTime / 24000.0 - 0.25);
-    ang = (ang + (cos(ang * 3.14159265358979) * -0.5 + 0.5 - ang) / 3.0) *
-        6.28318530717959; // 0-2pi, rolls over from 2pi to 0 at noon.
+    ang = (ang + (cos(ang * 3.14159265358979) * -0.5 + 0.5 - ang) / 3.0)
+        * 6.28318530717959; // 0-2pi, rolls over from 2pi to 0 at noon.
 
     return normalize(vec3(-sin(ang), cos(ang) * sun_rotation_data));
 }

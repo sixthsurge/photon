@@ -83,8 +83,8 @@ uniform int blockEntityId;
 uniform int entityId;
 #endif
 
-#if (defined PROGRAM_GBUFFERS_ENTITIES || defined PROGRAM_GBUFFERS_HAND) && \
-    defined IS_IRIS
+#if (defined PROGRAM_GBUFFERS_ENTITIES || defined PROGRAM_GBUFFERS_HAND) \
+    && defined IS_IRIS
 uniform int currentRenderedItemId;
 #endif
 
@@ -103,8 +103,8 @@ void main() {
     vanilla_ao = gl_Color.a < 0.1
         ? 1.0
         : gl_Color.a; // fixes models where vanilla ao breaks (eg lecterns)
-    vanilla_ao =
-        material_mask == 5 ? 1.0 : vanilla_ao; // no vanilla ao on leaves
+    vanilla_ao
+        = material_mask == 5 ? 1.0 : vanilla_ao; // no vanilla ao on leaves
     tint.a = 1.0;
 
 #ifdef POM
@@ -159,8 +159,8 @@ void main() {
     vec4 clip_pos = project(gl_ProjectionMatrix, view_pos);
 
 #if defined TAA && defined TAAU
-    clip_pos.xy = clip_pos.xy * taau_render_scale +
-        clip_pos.w * (taau_render_scale - 1.0);
+    clip_pos.xy = clip_pos.xy * taau_render_scale
+        + clip_pos.w * (taau_render_scale - 1.0);
     clip_pos.xy += taa_offset * clip_pos.w;
 #elif defined TAA
     clip_pos.xy += taa_offset * clip_pos.w * 0.66;

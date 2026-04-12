@@ -10,9 +10,9 @@
 bool clouds_early_exit(CloudsResult result, float r, float layer_radius) {
     bool has_congestus = clouds_params.cumulus_congestus_blend > eps;
 
-    return result.transmittance < 1e-3 && r < layer_radius &&
-        (result.apparent_distance < clouds_cumulus_congestus_distance ||
-         !has_congestus);
+    return result.transmittance < 1e-3 && r < layer_radius
+        && (result.apparent_distance < clouds_cumulus_congestus_distance
+            || !has_congestus);
 }
 
 CloudsResult draw_clouds(
@@ -63,22 +63,24 @@ CloudsResult draw_clouds(
         );
 
         // fade existing clouds into congestus
-        float distance_fade =
-            mix(1.0,
-                result_cu_con.transmittance,
-                linear_step(
-                    0.75,
-                    1.0,
-                    result.apparent_distance *
-                        rcp(clouds_cumulus_congestus_distance)
-                ));
+        float distance_fade = mix(
+            1.0,
+            result_cu_con.transmittance,
+            linear_step(
+                0.75,
+                1.0,
+                result.apparent_distance
+                    * rcp(clouds_cumulus_congestus_distance)
+            )
+        );
         result.scattering *= distance_fade;
-        result.transmittance +=
-            (1.0 - result.transmittance) * (1.0 - distance_fade);
-        result.apparent_distance =
-            mix(result_cu_con.apparent_distance,
-                result.apparent_distance,
-                distance_fade);
+        result.transmittance
+            += (1.0 - result.transmittance) * (1.0 - distance_fade);
+        result.apparent_distance = mix(
+            result_cu_con.apparent_distance,
+            result.apparent_distance,
+            distance_fade
+        );
 
         result = blend_layers(result, result_cu_con);
         if (result.transmittance < 1e-3) {
@@ -102,8 +104,8 @@ CloudsResult draw_clouds(
 #endif
 
 #ifdef CLOUDS_NOCTILUCENT
-    vec4 result_nlc =
-        draw_noctilucent_clouds(air_viewer_pos, ray_dir, clear_sky);
+    vec4 result_nlc
+        = draw_noctilucent_clouds(air_viewer_pos, ray_dir, clear_sky);
     result.scattering.rgb += result_nlc.xyz * result.transmittance;
     result.transmittance *= result_nlc.w;
 #endif

@@ -24,36 +24,36 @@ float compute_ssao(
 ) {
     mat3 tbn_matrix = get_tbn_matrix(normal_view);
 
-    mat2 sample_matrix = SSAO_RADIUS *
-        mat2(clamp_length(
-                 view_to_screen_space(
-                     combined_projection_matrix,
-                     position_view + tbn_matrix[0],
-                     true
-                 )
-                         .xy -
-                     position_screen.xy,
-                 0.0,
-                 SSAO_MAX_RADIUS_SCREEN
-             ),
-             clamp_length(
-                 view_to_screen_space(
-                     combined_projection_matrix,
-                     position_view + tbn_matrix[1],
-                     true
-                 )
-                         .xy -
-                     position_screen.xy,
-                 0.0,
-                 SSAO_MAX_RADIUS_SCREEN
-             ));
+    mat2 sample_matrix = SSAO_RADIUS
+        * mat2(clamp_length(
+                   view_to_screen_space(
+                       combined_projection_matrix,
+                       position_view + tbn_matrix[0],
+                       true
+                   )
+                           .xy
+                       - position_screen.xy,
+                   0.0,
+                   SSAO_MAX_RADIUS_SCREEN
+               ),
+               clamp_length(
+                   view_to_screen_space(
+                       combined_projection_matrix,
+                       position_view + tbn_matrix[1],
+                       true
+                   )
+                           .xy
+                       - position_screen.xy,
+                   0.0,
+                   SSAO_MAX_RADIUS_SCREEN
+               ));
 
     float ao = 0.0;
 
     for (int i = 0; i < SSAO_STEPS; ++i) {
         vec2 sample_uv = clamp01(
-            position_screen.xy +
-            sample_matrix * get_ssao_sample_offset(i, dither)
+            position_screen.xy
+            + sample_matrix * get_ssao_sample_offset(i, dither)
         );
 
         ivec2 texel = ivec2(sample_uv * view_res * taau_render_scale + 0.5);
@@ -63,13 +63,13 @@ float compute_ssao(
             continue;
         }
 
-        vec3 offset_view =
-            screen_to_view_space(
-                combined_projection_matrix_inverse,
-                vec3(sample_uv, depth),
-                true
-            ) -
-            position_view;
+        vec3 offset_view
+            = screen_to_view_space(
+                  combined_projection_matrix_inverse,
+                  vec3(sample_uv, depth),
+                  true
+              )
+            - position_view;
 
         float rlen = rcp_length(offset_view);
         float cos_theta = clamp01(dot(offset_view, normal_view) * rlen);

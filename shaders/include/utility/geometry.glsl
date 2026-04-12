@@ -28,8 +28,8 @@ vec2 intersect_sphere(float mu, float r, float sphere_radius) {
 
 vec2 intersect_sphere(vec3 ray_origin, vec3 ray_dir, float sphere_radius) {
     float b = dot(ray_origin, ray_dir);
-    float discriminant =
-        sqr(b) - dot(ray_origin, ray_origin) + sqr(sphere_radius);
+    float discriminant
+        = sqr(b) - dot(ray_origin, ray_origin) + sqr(sphere_radius);
 
     if (discriminant < 0.0) {
         return vec2(-1.0);
@@ -72,10 +72,10 @@ vec2 intersect_spherical_shell(
     float inner_sphere_radius,
     float outer_sphere_radius
 ) {
-    vec2 inner_sphere_dists =
-        intersect_sphere(ray_origin, ray_dir, inner_sphere_radius);
-    vec2 outer_sphere_dists =
-        intersect_sphere(ray_origin, ray_dir, outer_sphere_radius);
+    vec2 inner_sphere_dists
+        = intersect_sphere(ray_origin, ray_dir, inner_sphere_radius);
+    vec2 outer_sphere_dists
+        = intersect_sphere(ray_origin, ray_dir, outer_sphere_radius);
 
     bool inner_sphere_intersected = inner_sphere_dists.y >= 0.0;
     bool outer_sphere_intersected = outer_sphere_dists.y >= 0.0;

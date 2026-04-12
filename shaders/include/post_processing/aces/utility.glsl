@@ -21,11 +21,20 @@ mat3 get_chromatic_adaptation_matrix(vec3 src_xyz, vec3 dst_xyz) {
     vec3 dst_lms = dst_xyz * bradford_cone_response;
     vec3 quotient = dst_lms / src_lms;
 
-    mat3 von_kries =
-        mat3(quotient.x, 0.0, 0.0, 0.0, quotient.y, 0.0, 0.0, 0.0, quotient.z);
+    mat3 von_kries = mat3(
+        quotient.x,
+        0.0,
+        0.0,
+        0.0,
+        quotient.y,
+        0.0,
+        0.0,
+        0.0,
+        quotient.z
+    );
 
-    return (bradford_cone_response * von_kries) *
-        inverse(bradford_cone_response); // please invert at compile time
+    return (bradford_cone_response * von_kries)
+        * inverse(bradford_cone_response); // please invert at compile time
 }
 
 float log10(float x) { return log(x) * rcp(log(10.0)); }
@@ -65,8 +74,8 @@ float rgb_to_hue(vec3 rgb) {
         return float(0.0);
     }
 
-    float hue = (360.0 / tau) *
-        atan(2.0 * rgb.r - rgb.g - rgb.b, sqrt(3.0) * (rgb.g - rgb.b));
+    float hue = (360.0 / tau)
+        * atan(2.0 * rgb.r - rgb.g - rgb.b, sqrt(3.0) * (rgb.g - rgb.b));
 
     if (hue < 0.0) {
         hue += 360.0;
@@ -81,8 +90,8 @@ float rgb_to_yc(vec3 rgb) {
     const float yc_radius_weight = 1.75;
 
     float chroma = sqrt(
-        rgb.b * (rgb.b - rgb.g) + rgb.g * (rgb.g - rgb.r) +
-        rgb.r * (rgb.r - rgb.b)
+        rgb.b * (rgb.b - rgb.g) + rgb.g * (rgb.g - rgb.r)
+        + rgb.r * (rgb.r - rgb.b)
     );
 
     return rcp(3.0) * (rgb.r + rgb.g + rgb.b + yc_radius_weight * chroma);

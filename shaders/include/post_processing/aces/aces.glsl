@@ -62,8 +62,8 @@ float cubic_basis_shaper(float x, const float width) {
         vec4(1.0, 4.0, 1.0, 0.0) / 6.0
     );
 
-    float knots[5] =
-        float[](-0.5 * width, -0.25 * width, 0.0, 0.25 * width, 0.5 * width);
+    float knots[5]
+        = float[](-0.5 * width, -0.25 * width, 0.0, 0.25 * width, 0.5 * width);
 
     float knot_coord = (x - knots[0]) * 4.0 / width;
     uint i = 3 - uint(clamp(knot_coord, 0.0, 3.0));
@@ -75,8 +75,8 @@ float cubic_basis_shaper(float x, const float width) {
 
     vec4 monomials = vec4(f * f * f, f * f, f, 1.0);
 
-    float y = monomials[0] * M[0][i] + monomials[1] * M[1][i] +
-        monomials[2] * M[2][i] + monomials[3] * M[3][i];
+    float y = monomials[0] * M[0][i] + monomials[1] * M[1][i]
+        + monomials[2] * M[2][i] + monomials[3] * M[3][i];
 
     return 1.5 * y;
 }
@@ -112,9 +112,9 @@ vec3 rrt_sweeteners(vec3 aces) {
     float centered_hue = center_hue(hue, rrt_red_hue);
     float hue_weight = cubic_basis_shaper_fit(centered_hue, rrt_red_width);
 
-    aces.r = aces.r +
-        hue_weight * saturation * (rrt_red_pivot - aces.r) *
-            (1.0 - rrt_red_scale);
+    aces.r = aces.r
+        + hue_weight * saturation * (rrt_red_pivot - aces.r)
+            * (1.0 - rrt_red_scale);
 
     // ACES to RGB rendering space
     vec3 rgb_pre = max0(aces) * ap0_to_ap1;

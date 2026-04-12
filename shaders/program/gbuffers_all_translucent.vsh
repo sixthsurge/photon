@@ -97,8 +97,8 @@ uniform float time_midnight;
 
 uniform float desert_sandstorm;
 
-#if defined PROGRAM_GBUFFERS_ENTITIES_TRANSLUCENT || \
-    defined PROGRAM_GBUFFERS_LIGHTNING
+#if defined PROGRAM_GBUFFERS_ENTITIES_TRANSLUCENT \
+    || defined PROGRAM_GBUFFERS_LIGHTNING
 uniform int entityId;
 #endif
 
@@ -106,9 +106,10 @@ uniform int entityId;
 uniform int blockEntityId;
 #endif
 
-#if (defined PROGRAM_GBUFFERS_ENTITIES_TRANSLUCENT || \
-     defined PROGRAM_GBUFFERS_HAND_WATER) && \
-    defined IS_IRIS
+#if ( \
+    defined PROGRAM_GBUFFERS_ENTITIES_TRANSLUCENT \
+    || defined PROGRAM_GBUFFERS_HAND_WATER \
+) && defined IS_IRIS
 uniform int currentRenderedItemId;
 #endif
 
@@ -132,8 +133,8 @@ void main() {
 
     bool is_top_vertex = uv.y < mc_midTexCoord.y;
 
-    position_scene =
-        transform(gl_ModelViewMatrix, gl_Vertex.xyz); // To view space
+    position_scene
+        = transform(gl_ModelViewMatrix, gl_Vertex.xyz); // To view space
     position_scene = view_to_scene_space(position_scene); // To scene space
     position_scene = position_scene + cameraPosition; // To world space
     position_scene = animate_vertex(
@@ -149,8 +150,8 @@ void main() {
 
     if (material_mask == 62) {
         // Nether portal
-        position_tangent =
-            (position_scene - gbufferModelViewInverse[3].xyz) * tbn;
+        position_tangent
+            = (position_scene - gbufferModelViewInverse[3].xyz) * tbn;
 
         // (from fayer3)
         vec2 uv_minus_mid = uv - mc_midTexCoord;
@@ -165,8 +166,8 @@ void main() {
 
     // Ender Dragon death beam check from Euphoria Patches by SpacEagle17, used
     // with permission https://www.euphoriapatches.com/
-    bool is_dragon_death_beam =
-        entityId == 0 && (tint.a < 0.2 || tint.a == 1.0);
+    bool is_dragon_death_beam
+        = entityId == 0 && (tint.a < 0.2 || tint.a == 1.0);
 
     if (is_dragon_death_beam) {
         material_mask = MATERIAL_DRAGON_BEAM;
@@ -207,8 +208,8 @@ void main() {
     vec4 position_clip = project(gl_ProjectionMatrix, position_view);
 
 #if defined TAA && defined TAAU
-    position_clip.xy = position_clip.xy * taau_render_scale +
-        position_clip.w * (taau_render_scale - 1.0);
+    position_clip.xy = position_clip.xy * taau_render_scale
+        + position_clip.w * (taau_render_scale - 1.0);
     position_clip.xy += taa_offset * position_clip.w;
 #elif defined TAA
     position_clip.xy += taa_offset * position_clip.w * 0.66;

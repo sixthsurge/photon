@@ -8,8 +8,8 @@
 float clouds_noctilucent_density(vec2 coord, vec3 ray_dir) {
     coord *= 0.25;
 
-    vec2 curl = curl2D(0.00002 * coord) * 0.5 + curl2D(0.00004 * coord) * 0.25 +
-        curl2D(0.00008 * coord) * 0.125;
+    vec2 curl = curl2D(0.00002 * coord) * 0.5 + curl2D(0.00004 * coord) * 0.25
+        + curl2D(0.00008 * coord) * 0.125;
 
     float density = dampen(texture(noisetex, 0.000001 * coord + 0.02 * curl).y);
 
@@ -18,9 +18,9 @@ float clouds_noctilucent_density(vec2 coord, vec3 ray_dir) {
     float curl_strength = 0.05;
 
     for (int i = 0; i < 4; ++i) {
-        float detail =
-            texture(noisetex, coord * detail_frequency + curl * curl_strength)
-                .y;
+        float detail
+            = texture(noisetex, coord * detail_frequency + curl * curl_strength)
+                  .y;
 
         density += detail * detail_amplitude;
 
@@ -29,10 +29,10 @@ float clouds_noctilucent_density(vec2 coord, vec3 ray_dir) {
         curl_strength *= 4.0;
     }
 
-    float highlight =
-        dampen(texture(noisetex, 0.000004 * coord + 0.02 * curl).y);
-    highlight -=
-        (1.0 - texture(noisetex, 0.000014 * coord + 0.05 * curl).y) * 0.15;
+    float highlight
+        = dampen(texture(noisetex, 0.000004 * coord + 0.02 * curl).y);
+    highlight
+        -= (1.0 - texture(noisetex, 0.000014 * coord + 0.05 * curl).y) * 0.15;
 
     density += 2.0 * pow8(max0(highlight));
 
@@ -60,16 +60,21 @@ vec4 draw_noctilucent_clouds(
 
     float r = length(air_viewer_pos);
 
-    vec2 dists =
-        intersect_sphere(air_viewer_pos, ray_dir, clouds_noctilucent_radius);
-    bool planet_intersected =
-        intersect_sphere(air_viewer_pos, ray_dir, min(r - 10.0, planet_radius))
-            .y >= 0.0;
+    vec2 dists
+        = intersect_sphere(air_viewer_pos, ray_dir, clouds_noctilucent_radius);
+    bool planet_intersected
+        = intersect_sphere(
+              air_viewer_pos,
+              ray_dir,
+              min(r - 10.0, planet_radius)
+          )
+              .y
+        >= 0.0;
 
     if (
         dists.y < 0.0 // sphere not intersected
-        || planet_intersected &&
-            r < clouds_noctilucent_radius // planet blocking clouds
+        || planet_intersected
+            && r < clouds_noctilucent_radius // planet blocking clouds
     ) {
         return vec4(0.0, 0.0, 0.0, 1.0);
     }

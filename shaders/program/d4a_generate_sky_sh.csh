@@ -81,21 +81,21 @@ void main() {
     float skylight_boost = get_skylight_boost();
 
     vec3 direction = uniform_hemisphere_sample(vec3(0.0, 1.0, 0.0), r2(int(i)));
-    vec3 radiance =
-        texture(colortex4, project_sky(direction)).rgb * skylight_boost;
+    vec3 radiance
+        = texture(colortex4, project_sky(direction)).rgb * skylight_boost;
 #ifdef MC_GL_RENDERER_INTEL
     mat3 coeff = sh_coeff_order_2(direction);
 
     for (uint band = 0u; band < 9u; ++band) {
-        shared_memory[i][band] = radiance * coeff[band / 3u][band % 3u] *
-            (tau / float(sample_count));
+        shared_memory[i][band] = radiance * coeff[band / 3u][band % 3u]
+            * (tau / float(sample_count));
     }
 #else
     float[9] coeff = sh_coeff_order_2(direction);
 
     for (uint band = 0u; band < 9u; ++band) {
-        shared_memory[i][band] =
-            radiance * coeff[band] * (tau / float(sample_count));
+        shared_memory[i][band]
+            = radiance * coeff[band] * (tau / float(sample_count));
     }
 #endif
     barrier();
@@ -150,11 +150,14 @@ for (uint stride = sample_count / 2u; stride > 0u; stride /= 2u) {
             sh.f2[band] = shared_memory[0][band + 3u];
             sh.f3[band] = shared_memory[0][band + 6u];
         }
-        vec3 irradiance_up =
-            sh_evaluate_irradiance(sh, vec3(0.0, 1.0, 0.0), 1.0);
+        vec3 irradiance_up
+            = sh_evaluate_irradiance(sh, vec3(0.0, 1.0, 0.0), 1.0);
 #else
-        vec3 irradiance_up =
-            sh_evaluate_irradiance(shared_memory[0], vec3(0.0, 1.0, 0.0), 1.0);
+        vec3 irradiance_up = sh_evaluate_irradiance(
+            shared_memory[0],
+            vec3(0.0, 1.0, 0.0),
+            1.0
+        );
 #endif
         imageStore(colorimg4, ivec2(191, 2 + 9), vec4(irradiance_up, 0.0));
     }

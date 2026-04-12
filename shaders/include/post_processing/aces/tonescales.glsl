@@ -68,13 +68,14 @@ float segmented_spline_c5_fwd(float x) {
     float log_y;
 
     if (log_x <= params.log_min_point.x) {
-        log_y = log_x * params.slope_low +
-            (params.log_min_point.y -
-             params.slope_low * params.log_min_point.x);
-    } else if (log_x > params.log_min_point.x &&
-               log_x < params.log_mid_point.x) {
-        float knot_coord = 3.0 * (log_x - params.log_min_point.x) /
-            (params.log_mid_point.x - params.log_min_point.x);
+        log_y = log_x * params.slope_low
+            + (params.log_min_point.y
+               - params.slope_low * params.log_min_point.x);
+    } else if (
+        log_x > params.log_min_point.x && log_x < params.log_mid_point.x
+    ) {
+        float knot_coord = 3.0 * (log_x - params.log_min_point.x)
+            / (params.log_mid_point.x - params.log_min_point.x);
         uint i = uint(knot_coord);
         float f = fract(knot_coord);
 
@@ -87,10 +88,11 @@ float segmented_spline_c5_fwd(float x) {
         vec3 monomials = vec3(f * f, f, 1.0);
 
         log_y = dot(monomials, M * cf);
-    } else if (log_x >= params.log_mid_point.x &&
-               log_x <= params.log_max_point.x) {
-        float knot_coord = 3.0 * (log_x - params.log_mid_point.x) /
-            (params.log_max_point.x - params.log_mid_point.x);
+    } else if (
+        log_x >= params.log_mid_point.x && log_x <= params.log_max_point.x
+    ) {
+        float knot_coord = 3.0 * (log_x - params.log_mid_point.x)
+            / (params.log_max_point.x - params.log_mid_point.x);
         uint i = uint(knot_coord);
         float f = fract(knot_coord);
 
@@ -104,9 +106,9 @@ float segmented_spline_c5_fwd(float x) {
 
         log_y = dot(monomials, M * cf);
     } else {
-        log_y = log_x * params.slope_high +
-            (params.log_max_point.y -
-             params.slope_high * params.log_max_point.x);
+        log_y = log_x * params.slope_high
+            + (params.log_max_point.y
+               - params.slope_high * params.log_max_point.x);
     }
 
     return pow(10.0, log_y);
@@ -156,13 +158,14 @@ float segmented_spline_c9_fwd(float x) {
     float log_y;
 
     if (log_x <= params.log_min_point.x) {
-        log_y = log_x * params.slope_low +
-            (params.log_min_point.y -
-             params.slope_low * params.log_min_point.x);
-    } else if ((log_x > params.log_min_point.x) &&
-               (log_x < params.log_mid_point.x)) {
-        float knot_coord = 7.0 * (log_x - params.log_min_point.x) /
-            (params.log_mid_point.x - params.log_min_point.x);
+        log_y = log_x * params.slope_low
+            + (params.log_min_point.y
+               - params.slope_low * params.log_min_point.x);
+    } else if (
+        (log_x > params.log_min_point.x) && (log_x < params.log_mid_point.x)
+    ) {
+        float knot_coord = 7.0 * (log_x - params.log_min_point.x)
+            / (params.log_mid_point.x - params.log_min_point.x);
         uint i = uint(knot_coord);
         float f = fract(knot_coord);
 
@@ -175,10 +178,11 @@ float segmented_spline_c9_fwd(float x) {
         vec3 monomials = vec3(f * f, f, 1.0);
 
         log_y = dot(monomials, M * cf);
-    } else if ((log_x >= params.log_mid_point.x) &&
-               (log_x <= params.log_max_point.x)) {
-        float knot_coord = 7.0 * (log_x - params.log_mid_point.x) /
-            (params.log_max_point.x - params.log_mid_point.x);
+    } else if (
+        (log_x >= params.log_mid_point.x) && (log_x <= params.log_max_point.x)
+    ) {
+        float knot_coord = 7.0 * (log_x - params.log_mid_point.x)
+            / (params.log_max_point.x - params.log_mid_point.x);
         uint i = uint(knot_coord);
         float f = fract(knot_coord);
 
@@ -192,9 +196,9 @@ float segmented_spline_c9_fwd(float x) {
 
         log_y = dot(monomials, M * cf);
     } else {
-        log_y = log_x * params.slope_high +
-            (params.log_max_point.y -
-             params.slope_high * params.log_max_point.x);
+        log_y = log_x * params.slope_high
+            + (params.log_max_point.y
+               - params.slope_high * params.log_max_point.x);
     }
 
     return pow(10.0, log_y);

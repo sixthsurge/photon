@@ -1,15 +1,17 @@
 #if !defined INCLUDE_VERTEX_DISPLACEMENT
 #define INCLUDE_VERTEX_DISPLACEMENT
 
-#if !defined PROGRAM_GBUFFERS_TERRAIN && \
-    !(defined PROGRAM_SHADOW_FALLBACK || defined PROGRAM_SHADOW_SOLID || \
-      defined PROGRAM_SHADOW_CUTOUT)
+#if !defined PROGRAM_GBUFFERS_TERRAIN \
+    && !( \
+        defined PROGRAM_SHADOW_FALLBACK || defined PROGRAM_SHADOW_SOLID \
+        || defined PROGRAM_SHADOW_CUTOUT \
+    )
 #undef WAVING_PLANTS
 #undef WAVING_LEAVES
 #endif
 
-#if !defined PROGRAM_GBUFFERS_WATER && \
-    !(defined PROGRAM_SHADOW_FALLBACK || defined PROGRAM_SHADOW_WATER)
+#if !defined PROGRAM_GBUFFERS_WATER \
+    && !(defined PROGRAM_SHADOW_FALLBACK || defined PROGRAM_SHADOW_WATER)
 #undef WATER_DISPLACEMENT
 #endif
 
@@ -91,16 +93,16 @@ vec3 get_wind_displacement(
 
     float t = wind_speed * frameTimeCounter;
 
-    float gust_amount =
-        texture(noisetex, 0.05 * (world_pos.xz + wind_dir * t)).y;
+    float gust_amount
+        = texture(noisetex, 0.05 * (world_pos.xz + wind_dir * t)).y;
     gust_amount *= gust_amount;
 
     vec3 gust = vec3(wind_dir * gust_amount, 0.1 * gust_amount).xzy;
 
-    world_pos = 32.0 * world_pos + 3.0 * t +
-        vec3(0.0, golden_angle, 2.0 * golden_angle);
-    vec3 wobble = sin(world_pos) + 0.5 * sin(2.0 * world_pos) +
-        0.25 * sin(4.0 * world_pos);
+    world_pos = 32.0 * world_pos + 3.0 * t
+        + vec3(0.0, golden_angle, 2.0 * golden_angle);
+    vec3 wobble = sin(world_pos) + 0.5 * sin(2.0 * world_pos)
+        + 0.25 * sin(4.0 * world_pos);
 
     if (is_tall_plant_top_vertex) {
         gust *= 2.0;
@@ -122,13 +124,13 @@ vec3 animate_vertex(
 
     // Displace plants close to the player
     vec3 to_player = eyePosition - world_pos;
-    vec3 player_displacement =
-        vec3(
-            -6.0 * to_player.xz *
-                exp2(-length(to_player * vec3(6.0, 2.0, 6.0))),
-            0.0
+    vec3 player_displacement
+        = vec3(
+              -6.0 * to_player.xz
+                  * exp2(-length(to_player * vec3(6.0, 2.0, 6.0))),
+              0.0
         )
-            .xzy;
+              .xzy;
 
     switch (material_mask) {
 #ifdef WATER_DISPLACEMENT
@@ -140,42 +142,42 @@ vec3 animate_vertex(
 #ifdef WAVING_PLANTS
         case MATERIAL_SMALL_PLANTS:
         case MATERIAL_OPEN_EYEBLOSSOM:
-            return world_pos +
-                (get_wind_displacement(
-                     world_pos,
-                     wind_speed,
-                     wind_strength,
-                     false
-                 ) +
-                 player_displacement) *
-                float(is_top_vertex);
+            return world_pos
+                + (get_wind_displacement(
+                       world_pos,
+                       wind_speed,
+                       wind_strength,
+                       false
+                   )
+                   + player_displacement)
+                * float(is_top_vertex);
 
         case MATERIAL_TALL_PLANTS_LOWER:
-            return world_pos +
-                (get_wind_displacement(
-                     world_pos,
-                     wind_speed,
-                     wind_strength,
-                     false
-                 ) +
-                 player_displacement) *
-                float(is_top_vertex);
+            return world_pos
+                + (get_wind_displacement(
+                       world_pos,
+                       wind_speed,
+                       wind_strength,
+                       false
+                   )
+                   + player_displacement)
+                * float(is_top_vertex);
 
         case MATERIAL_TALL_PLANTS_UPPER:
-            return world_pos +
-                (get_wind_displacement(
-                     world_pos,
-                     wind_speed,
-                     wind_strength,
-                     is_top_vertex
-                 ) +
-                 player_displacement);
+            return world_pos
+                + (get_wind_displacement(
+                       world_pos,
+                       wind_speed,
+                       wind_strength,
+                       is_top_vertex
+                   )
+                   + player_displacement);
 #endif
 
 #ifdef WAVING_LEAVES
         case MATERIAL_LEAVES:
-            return world_pos +
-                get_wind_displacement(
+            return world_pos
+                + get_wind_displacement(
                        world_pos,
                        wind_speed,
                        wind_strength * 0.5,

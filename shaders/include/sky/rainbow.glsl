@@ -34,8 +34,8 @@ const float rainbow_start_distance = 500.0;
 const float rainbow_end_distance = 600.0;
 
 vec3 draw_single_rainbow(float view_angle, float start_angle, float end_angle) {
-    float rainbow_progress =
-        linear_step_unclamped(start_angle, end_angle, view_angle);
+    float rainbow_progress
+        = linear_step_unclamped(start_angle, end_angle, view_angle);
 
     if (clamp01(rainbow_progress) != rainbow_progress) {
         return vec3(0.0);
@@ -47,11 +47,11 @@ vec3 draw_single_rainbow(float view_angle, float start_angle, float end_angle) {
             i
         );
 
-    vec3 rainbow_color_lab =
-        mix(rainbow_colors_lab[int(i)], rainbow_colors_lab[int(i + 1)], f);
+    vec3 rainbow_color_lab
+        = mix(rainbow_colors_lab[int(i)], rainbow_colors_lab[int(i + 1)], f);
     vec3 rainbow_color = max0(lab_to_xyz(rainbow_color_lab) * xyz_to_rec2020);
-    float rainbow_intensity =
-        rainbow_progress - rainbow_progress * dampen(rainbow_progress);
+    float rainbow_intensity
+        = rainbow_progress - rainbow_progress * dampen(rainbow_progress);
 
     return rainbow_color * rainbow_intensity;
 }
@@ -83,17 +83,17 @@ vec3 draw_rainbows(
         second_rainbow_middle_angle + second_rainbow_thickness * 0.5
     );
 
-    vec3 transmittance_approx =
-        mix(vec3(1.0, 0.75, 0.5), vec3(1.0), dampen(max0(direction_world.y)));
+    vec3 transmittance_approx
+        = mix(vec3(1.0, 0.75, 0.5), vec3(1.0), dampen(max0(direction_world.y)));
 
-    vec3 rainbow_color = light_color * 0.1 *
-        (3.0 * first_rainbow + 0.5 * second_rainbow) *
-        sqr(transmittance_approx);
-    float rainbow_fade = rainbow_amount *
-        smoothstep(rainbow_start_distance,
-                   rainbow_end_distance,
-                   view_distance) *
-        smoothstep(0.0, 0.05, direction_world.y);
+    vec3 rainbow_color = light_color * 0.1
+        * (3.0 * first_rainbow + 0.5 * second_rainbow)
+        * sqr(transmittance_approx);
+    float rainbow_fade = rainbow_amount
+        * smoothstep(rainbow_start_distance,
+                     rainbow_end_distance,
+                     view_distance)
+        * smoothstep(0.0, 0.05, direction_world.y);
     ;
 
     return fragment_color + rainbow_color * rainbow_fade;

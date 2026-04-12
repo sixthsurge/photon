@@ -34,13 +34,13 @@ mat2x3 get_lpv_fog_coefficients(vec3 position_world) {
         // Underwater
 
         const float density_mul = 8.0;
-        const vec3 absorption_coeff = density_mul *
-            vec3(WATER_ABSORPTION_R_UNDERWATER,
-                 WATER_ABSORPTION_G_UNDERWATER,
-                 WATER_ABSORPTION_B_UNDERWATER) *
-            rec709_to_working_color;
-        const vec3 scattering_coeff =
-            density_mul * vec3(WATER_SCATTERING_UNDERWATER);
+        const vec3 absorption_coeff = density_mul
+            * vec3(WATER_ABSORPTION_R_UNDERWATER,
+                   WATER_ABSORPTION_G_UNDERWATER,
+                   WATER_ABSORPTION_B_UNDERWATER)
+            * rec709_to_working_color;
+        const vec3 scattering_coeff
+            = density_mul * vec3(WATER_SCATTERING_UNDERWATER);
         const vec3 extinction_coeff = absorption_coeff + scattering_coeff;
 
         return mat2x3(scattering_coeff, extinction_coeff);
@@ -56,18 +56,18 @@ mat2x3 get_lpv_fog_coefficients(vec3 position_world) {
     const vec3 overworld_fog_min_scattering = overworld_fog_min_extinction;
 
     // Overworld underground extinction and scattering
-    const vec3 underground_fog_extinction =
-        vec3(0.025) * LPV_VL_INTENSITY_UNDERGROUND;
+    const vec3 underground_fog_extinction
+        = vec3(0.025) * LPV_VL_INTENSITY_UNDERGROUND;
     const vec3 underground_fog_scattering = underground_fog_extinction * 0.95;
     const float underground_fog_fade_length = 20.0;
 
     vec2 density = overworld_fog_density_no_noise(position_world);
 
-    vec3 scattering = fog_params.rayleigh_scattering_coeff * density.x +
-        fog_params.mie_scattering_coeff * density.y;
+    vec3 scattering = fog_params.rayleigh_scattering_coeff * density.x
+        + fog_params.mie_scattering_coeff * density.y;
 
-    vec3 extinction = fog_params.rayleigh_scattering_coeff * density.x +
-        fog_params.mie_extinction_coeff * density.y;
+    vec3 extinction = fog_params.rayleigh_scattering_coeff * density.x
+        + fog_params.mie_extinction_coeff * density.y;
 
     float underground_factor = linear_step(
         SEA_LEVEL,
@@ -112,10 +112,10 @@ vec3 get_lpv_fog_scattering(
     );
 
     // Clip ray length to voxel volume
-    vec3 origin_to_center =
-        get_voxel_volume_center(gbufferModelViewInverse[2].xyz);
-    float distance_center_to_edge =
-        0.5 * float(VOXEL_VOLUME_SIZE) * rcp(max_of(abs(ray_direction_world)));
+    vec3 origin_to_center
+        = get_voxel_volume_center(gbufferModelViewInverse[2].xyz);
+    float distance_center_to_edge = 0.5 * float(VOXEL_VOLUME_SIZE)
+        * rcp(max_of(abs(ray_direction_world)));
     ray_length = min(
         ray_length,
         length(
@@ -135,26 +135,25 @@ vec3 get_lpv_fog_scattering(
     vec3 transmittance = vec3(1.0);
 
     for (uint i = 0u; i < step_count; ++i) {
-        vec3 dithered_position_world =
-            ray_position_world + ray_direction_world * (dither * step_length);
+        vec3 dithered_position_world
+            = ray_position_world + ray_direction_world * (dither * step_length);
 
         // Greater density further from the camera
-        float distance_factor = 0.1 +
-            0.9 *
-                clamp01(
-                    length_squared(dithered_position_world - cameraPosition) *
-                    rcp(32.0 * 32.0)
+        float distance_factor = 0.1
+            + 0.9
+                * clamp01(
+                    length_squared(dithered_position_world - cameraPosition)
+                    * rcp(32.0 * 32.0)
                 );
 
         vec3 light = sqrt(sample_lpv(dithered_position_world));
         light *= sqrt(sqrt(light));
-        mat2x3 coefficients =
-            get_lpv_fog_coefficients(dithered_position_world) * step_length *
-            distance_factor; // scattering, extinction
+        mat2x3 coefficients = get_lpv_fog_coefficients(dithered_position_world)
+            * step_length * distance_factor; // scattering, extinction
 
         vec3 step_transmittance = exp(-coefficients[1]);
-        vec3 step_transmitted_fraction =
-            (1.0 - step_transmittance) / max(coefficients[1], eps);
+        vec3 step_transmitted_fraction
+            = (1.0 - step_transmittance) / max(coefficients[1], eps);
 
         vec3 visible_scattering = step_transmitted_fraction * transmittance;
 
@@ -165,8 +164,8 @@ vec3 get_lpv_fog_scattering(
         step_length *= step_ratio;
     }
 
-    return inscattered_light * isotropic_phase *
-        clamp01(1.0 - blindness - darknessFactor);
+    return inscattered_light * isotropic_phase
+        * clamp01(1.0 - blindness - darknessFactor);
 }
 
 #endif // INCLUDE_FOG_LPV_FOG

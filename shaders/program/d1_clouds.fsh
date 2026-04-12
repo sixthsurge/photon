@@ -125,8 +125,8 @@ uniform float biome_humidity;
 #include "/include/utility/random.glsl"
 #include "/include/utility/space_conversion.glsl"
 
-const int checkerboard_area =
-    CLOUDS_TEMPORAL_UPSCALING * CLOUDS_TEMPORAL_UPSCALING;
+const int checkerboard_area
+    = CLOUDS_TEMPORAL_UPSCALING * CLOUDS_TEMPORAL_UPSCALING;
 
 float depth_max_4x4(sampler2D depth_sampler, float scale) {
     vec4 depth_samples_0 = textureGather(
@@ -158,11 +158,11 @@ void main() {
     clouds = vec4(0.0, 0.0, 0.0, 1.0);
 
 #if defined WORLD_OVERWORLD
-    ivec2 checkerboard_pos = CLOUDS_TEMPORAL_UPSCALING * texel +
-        clouds_checkerboard_offsets[frameCounter % checkerboard_area];
+    ivec2 checkerboard_pos = CLOUDS_TEMPORAL_UPSCALING * texel
+        + clouds_checkerboard_offsets[frameCounter % checkerboard_area];
 
-    vec2 new_uv =
-        vec2(checkerboard_pos) / vec2(view_res) * rcp(float(taau_render_scale));
+    vec2 new_uv = vec2(checkerboard_pos) / vec2(view_res)
+        * rcp(float(taau_render_scale));
 
     // Get maximum depth from area covered by this fragment
     float depth_max = depth_max_4x4(depthtex1, taau_render_scale);
@@ -183,17 +183,18 @@ void main() {
     const bool is_lod = false;
 #endif
 
-    vec3 ray_origin =
-        vec3(
-            0.0,
-            CLOUDS_SCALE * (eyeAltitude - SEA_LEVEL) + planet_radius,
-            0.0
-        ) +
-        CLOUDS_SCALE * gbufferModelViewInverse[3].xyz;
+    vec3 ray_origin
+        = vec3(
+              0.0,
+              CLOUDS_SCALE * (eyeAltitude - SEA_LEVEL) + planet_radius,
+              0.0
+          )
+        + CLOUDS_SCALE * gbufferModelViewInverse[3].xyz;
     vec3 ray_dir = mat3(gbufferModelViewInverse) * normalize(view_pos);
 
-    float distance_to_terrain =
-        (depth_max == 1.0 && !is_lod) ? -1.0 : length(view_pos) * CLOUDS_SCALE;
+    float distance_to_terrain = (depth_max == 1.0 && !is_lod)
+        ? -1.0
+        : length(view_pos) * CLOUDS_SCALE;
 
     vec3 clear_sky = atmosphere_scattering(
         ray_dir,

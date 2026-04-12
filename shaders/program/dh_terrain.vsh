@@ -35,8 +35,8 @@ void main() {
         (gl_TextureMatrix[1] * gl_MultiTexCoord1).xy
     );
     color = gl_Color.rgb;
-    normal =
-        mat3(gbufferModelViewInverse) * (mat3(gl_ModelViewMatrix) * gl_Normal);
+    normal = mat3(gbufferModelViewInverse)
+        * (mat3(gl_ModelViewMatrix) * gl_Normal);
 
 // Prevent compile error on older versions of Iris
 #ifndef DH_BLOCK_GRASS
@@ -97,8 +97,8 @@ void main() {
     vec4 clip_pos = dhProjection * vec4(pos, 1.0);
 
 #if defined TAA && defined TAAU
-    clip_pos.xy = clip_pos.xy * taau_render_scale +
-        clip_pos.w * (taau_render_scale - 1.0);
+    clip_pos.xy = clip_pos.xy * taau_render_scale
+        + clip_pos.w * (taau_render_scale - 1.0);
     clip_pos.xy += taa_offset * clip_pos.w;
 #elif defined TAA
     clip_pos.xy += taa_offset * clip_pos.w * 0.66;

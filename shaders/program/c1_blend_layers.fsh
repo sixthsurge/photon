@@ -166,7 +166,8 @@ vec3 blend_layers_with_fog(
     bool back_is_hand
 ) {
     if (back_is_hand) {
-        return background_color * (1.0 - translucent_color.a) + translucent_color.rgb;
+        return background_color * (1.0 - translucent_color.a)
+            + translucent_color.rgb;
     }
 
     // Apply analytic fog behind translucents
@@ -185,8 +186,8 @@ vec3 blend_layers_with_fog(
     }
 #endif
 
-    return background_color * (1.0 - translucent_color.a) +
-        translucent_color.rgb;
+    return background_color * (1.0 - translucent_color.a)
+        + translucent_color.rgb;
 }
 
 // https://iquilezles.org/www/articles/texture/texture.htm
@@ -227,13 +228,14 @@ void main() {
 
     // Fix Voxy translucents appearing in front of entities.
 #ifdef VOXY
-    float z_vanilla =
-        screen_to_view_space_depth(gbufferProjectionInverse, back_depth);
+    float z_vanilla
+        = screen_to_view_space_depth(gbufferProjectionInverse, back_depth);
     float z_lod = screen_to_view_space_depth(
         lod_projection_matrix_inverse,
         front_depth_lod
     );
-    if (front_depth_lod < 1.0 && z_vanilla < z_lod && front_depth == back_depth) {
+    if (front_depth_lod < 1.0 && z_vanilla < z_lod
+        && front_depth == back_depth) {
         translucent_color = vec4(0.0);
     }
 #endif
@@ -260,19 +262,22 @@ void main() {
     fix_hand_depth(front_depth, front_is_hand);
     fix_hand_depth(back_depth, back_is_hand);
 
-    vec3 front_position_screen =
-        vec3(uv, front_is_lod_terrain ? front_depth_lod : front_depth);
-    vec3 front_position_view =
-        screen_to_view_space(front_position_screen, true, front_is_lod_terrain);
+    vec3 front_position_screen
+        = vec3(uv, front_is_lod_terrain ? front_depth_lod : front_depth);
+    vec3 front_position_view = screen_to_view_space(
+        front_position_screen,
+        true,
+        front_is_lod_terrain
+    );
     vec3 front_position_scene = view_to_scene_space(front_position_view);
     vec3 front_position_world = front_position_scene + cameraPosition;
 
-    vec3 back_position_screen =
-        vec3(uv, back_is_lod_terrain ? back_depth_lod : back_depth);
-    vec3 back_position_view =
-        screen_to_view_space(back_position_screen, true, back_is_lod_terrain);
-    vec3 back_position_world =
-        view_to_scene_space(back_position_view) + cameraPosition;
+    vec3 back_position_screen
+        = vec3(uv, back_is_lod_terrain ? back_depth_lod : back_depth);
+    vec3 back_position_view
+        = screen_to_view_space(back_position_screen, true, back_is_lod_terrain);
+    vec3 back_position_world
+        = view_to_scene_space(back_position_view) + cameraPosition;
 
     vec3 direction_world;
     float view_distance;
@@ -294,14 +299,14 @@ void main() {
             unsplit_2x8(refraction_data.zw) * 2.0 - 1.0
         );
 
-        refracted_uv = uv +
-            normal_tangent.xy * rcp(max(view_distance, 1.0)) *
-                min(layer_dist, 8.0) * (0.1 * REFRACTION_INTENSITY);
+        refracted_uv = uv
+            + normal_tangent.xy * rcp(max(view_distance, 1.0))
+                * min(layer_dist, 8.0) * (0.1 * REFRACTION_INTENSITY);
 
         // Make sure the refracted fragment is behind the fragment position
         float depth_refracted = texture(depthtex1, refracted_uv).x;
-        refracted_uv =
-            mix(refracted_uv, uv, float(depth_refracted < front_depth));
+        refracted_uv
+            = mix(refracted_uv, uv, float(depth_refracted < front_depth));
     }
 #endif
 
@@ -320,16 +325,16 @@ void main() {
 
         // detect whether translucent LoD terrain may be behind the translucent
         // layer
-        float z_mc =
-            screen_to_view_space_depth(gbufferProjectionInverse, front_depth);
+        float z_mc
+            = screen_to_view_space_depth(gbufferProjectionInverse, front_depth);
         float z_lod = screen_to_view_space_depth(
             lod_projection_matrix_inverse,
             front_depth_lod
         );
 
         const float error_margin = 1.0;
-        bool lod_behind_translucent =
-            z_lod > z_mc + error_margin && back_depth == 1.0;
+        bool lod_behind_translucent
+            = z_lod > z_mc + error_margin && back_depth == 1.0;
 
         if (front_is_lod_terrain || lod_behind_translucent) {
             if (lod_behind_translucent) {
@@ -339,8 +344,8 @@ void main() {
                     lod_position_screen,
                     true
                 );
-                lod_position_world =
-                    view_to_scene_space(lod_position_view) + cameraPosition;
+                lod_position_world
+                    = view_to_scene_space(lod_position_view) + cameraPosition;
             }
 
             // Unpack gbuffer data
@@ -394,8 +399,8 @@ void main() {
                 // water_color *= 8.0;
 #endif
 
-                fragment_color =
-                    fragment_color * (1.0 - water_color.a) + water_color.rgb;
+                fragment_color
+                    = fragment_color * (1.0 - water_color.a) + water_color.rgb;
             }
 
             back_position_world = lod_behind_translucent
@@ -421,23 +426,24 @@ void main() {
     // Border fog
 
 #ifdef BORDER_FOG
-    fragment_color =
-        mix(original_color,
-            fragment_color,
-            border_fog(front_position_scene, direction_world));
+    fragment_color = mix(
+        original_color,
+        fragment_color,
+        border_fog(front_position_scene, direction_world)
+    );
 #endif
 
     // Blend clouds in front of translucents
 
 #if defined WORLD_OVERWORLD
     float clouds_apparent_distance;
-    vec4 clouds_and_aurora =
-        read_clouds_and_aurora(refracted_uv, clouds_apparent_distance);
+    vec4 clouds_and_aurora
+        = read_clouds_and_aurora(refracted_uv, clouds_apparent_distance);
 
     if (is_translucent || is_translucent_lod) {
         if (clouds_apparent_distance < view_distance) {
-            fragment_color =
-                fragment_color * clouds_and_aurora.w + clouds_and_aurora.xyz;
+            fragment_color
+                = fragment_color * clouds_and_aurora.w + clouds_and_aurora.xyz;
         }
     }
 #endif
@@ -450,8 +456,8 @@ void main() {
     fragment_color = fragment_color * fog_transmittance + fog_scattering;
 
 #ifdef BLOOMY_FOG
-    bloomy_fog =
-        clamp01(dot(fog_transmittance, vec3(luminance_weights_rec2020)));
+    bloomy_fog
+        = clamp01(dot(fog_transmittance, vec3(luminance_weights_rec2020)));
     bloomy_fog = isEyeInWater == 1.0 ? sqrt(bloomy_fog) : bloomy_fog;
 #endif
 #endif
@@ -495,8 +501,8 @@ void main() {
         fragment_color += analytic_fog[0];
 
 #ifdef BLOOMY_FOG
-        bloomy_fog =
-            clamp01(dot(fog_transmittance, vec3(luminance_weights_rec2020)));
+        bloomy_fog
+            = clamp01(dot(fog_transmittance, vec3(luminance_weights_rec2020)));
         bloomy_fog = isEyeInWater == 1.0 ? sqrt(bloomy_fog) : bloomy_fog;
 #endif
 #else
@@ -509,13 +515,13 @@ void main() {
 
 #ifdef BLOOMY_FOG
 #if defined WORLD_NETHER
-    bloomy_fog =
-        spherical_fog(
-            view_distance,
-            nether_fog_start,
-            nether_bloomy_fog_density
-        ) * 0.33 +
-        0.67;
+    bloomy_fog
+        = spherical_fog(
+              view_distance,
+              nether_fog_start,
+              nether_bloomy_fog_density
+          ) * 0.33
+        + 0.67;
 #elif defined WORLD_END
     bloomy_fog = bloomy_fog * 0.5 + 0.5;
 #endif

@@ -17,8 +17,8 @@ uint fix_material_mask() {
 
     // Warped stems
     if (19 <= material_mask && material_mask < 22) {
-        bool is_lit = !is_top_face ||
-            any(
+        bool is_lit = !is_top_face
+            || any(
                 lessThan(vec4(uv_local, 1.0 - uv_local), vec4(rcp(16.0) - 1e-3))
             );
         return is_lit ? 22u : 0u;
@@ -26,8 +26,8 @@ uint fix_material_mask() {
 
     // Crimson stems
     if (23 <= material_mask && material_mask < 26) {
-        bool is_lit = !is_top_face ||
-            any(
+        bool is_lit = !is_top_face
+            || any(
                 lessThan(vec4(uv_local, 1.0 - uv_local), vec4(rcp(16.0) - 1e-3))
             );
         return is_lit ? 26u : 0u;

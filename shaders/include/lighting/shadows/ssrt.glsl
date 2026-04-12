@@ -26,17 +26,18 @@ bool raymarch_shadow(
             projection_matrix,
             ray_origin_view + ray_dir_view,
             true
-        ) -
-        ray_origin_screen
+        )
+        - ray_origin_screen
     );
 
     float ray_length = min_of(
-        abs(sign(ray_dir_screen) - ray_origin_screen) /
-        max(abs(ray_dir_screen), eps)
+        abs(sign(ray_dir_screen) - ray_origin_screen)
+        / max(abs(ray_dir_screen), eps)
     );
-    ray_length =
-        min(ray_length,
-            max(0.1, exp(-max0(length(ray_origin_view) * 0.025 - 1.0))));
+    ray_length = min(
+        ray_length,
+        max(0.1, exp(-max0(length(ray_origin_view) * 0.025 - 1.0)))
+    );
 
     const float initial_step_scale = step_ratio == 1.0
         ? rcp(float(step_count))
@@ -76,11 +77,11 @@ bool raymarch_shadow(
             projection_matrix_inverse,
             dithered_pos.z
         );
-        float z_sample =
-            screen_to_view_space_depth(projection_matrix_inverse, depth);
+        float z_sample
+            = screen_to_view_space_depth(projection_matrix_inverse, depth);
 
-        bool inside = depth != 0.0 && depth < dithered_pos.z &&
-            abs(z_tolerance - (z_ray - z_sample)) < z_tolerance;
+        bool inside = depth != 0.0 && depth < dithered_pos.z
+            && abs(z_tolerance - (z_ray - z_sample)) < z_tolerance;
         hit = inside || hit;
 
         if (sss_raymarch) {
@@ -99,8 +100,8 @@ bool raymarch_shadow(
     }
 
     exit_pos = screen_to_view_space(projection_matrix_inverse, exit_pos, true);
-    sss_depth =
-        hit_after_sss ? -1.0 : max0(distance(ray_origin_view, exit_pos) * 0.2);
+    sss_depth = hit_after_sss ? -1.0
+                              : max0(distance(ray_origin_view, exit_pos) * 0.2);
 
     return hit;
 }
@@ -122,16 +123,16 @@ float get_screen_space_shadows(
 
     // Slightly randomise ray direction to create soft shadows
     vec2 hash = hash2(gl_FragCoord.xy);
-    vec3 ray_dir =
-        normalize(view_light_dir + 0.03 * uniform_sphere_sample(hash));
+    vec3 ray_dir
+        = normalize(view_light_dir + 0.03 * uniform_sphere_sample(hash));
 
 #ifdef LOD_MOD_ACTIVE
     // Which depth map to raymarch depends on distance
     // Closer fragments: use combined depth texture (so MC terrain can cast)
     // Further fragments: use LoD depth texture (maximise precision)
 
-    bool raymarch_combined_depth = length_squared(position_view) <
-        sqr(far + 64.0); // heuristic of 4 chunks overlap
+    bool raymarch_combined_depth = length_squared(position_view)
+        < sqr(far + 64.0); // heuristic of 4 chunks overlap
     bool hit;
 
     /*

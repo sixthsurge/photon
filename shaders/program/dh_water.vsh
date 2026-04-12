@@ -94,8 +94,8 @@ void main() {
         (gl_TextureMatrix[1] * gl_MultiTexCoord1).xy
     );
     tint = gl_Color;
-    normal =
-        mat3(gbufferModelViewInverse) * (mat3(gl_ModelViewMatrix) * gl_Normal);
+    normal = mat3(gbufferModelViewInverse)
+        * (mat3(gl_ModelViewMatrix) * gl_Normal);
 
     light_color = texelFetch(colortex4, ivec2(191, 0), 0).rgb;
 #if defined WORLD_OVERWORLD && defined SH_SKYLIGHT
@@ -117,8 +117,8 @@ void main() {
     vec4 clip_pos = dhProjection * vec4(pos, 1.0);
 
 #if defined TAA && defined TAAU
-    clip_pos.xy = clip_pos.xy * taau_render_scale +
-        clip_pos.w * (taau_render_scale - 1.0);
+    clip_pos.xy = clip_pos.xy * taau_render_scale
+        + clip_pos.w * (taau_render_scale - 1.0);
     clip_pos.xy += taa_offset * clip_pos.w;
 #elif defined TAA
     clip_pos.xy += taa_offset * clip_pos.w * 0.66;

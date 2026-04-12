@@ -32,11 +32,11 @@ void water_waves_setup(
     const float wave_speed_flowing = 0.7 * WATER_WAVE_SPEED_FLOWING;
     const float wave_angle = 30.0 * degree;
 
-    t = (flowing_water ? wave_speed_flowing : wave_speed_still) *
-        frameTimeCounter;
+    t = (flowing_water ? wave_speed_flowing : wave_speed_still)
+        * frameTimeCounter;
 
-    wave_dir =
-        flowing_water ? flow_dir : vec2(cos(wave_angle), sin(wave_angle));
+    wave_dir
+        = flowing_water ? flow_dir : vec2(cos(wave_angle), sin(wave_angle));
     wave_rot = flowing_water
         ? mat2(1.0)
         : mat2(
@@ -69,8 +69,8 @@ float get_water_height(vec2 coord, vec2 wave_dir, mat2 wave_rot, float t) {
     // Reciprical of sum of amplitudes of all waves
     // This is a geometric series with initial value of 1 and common ratio of
     // `persistence`
-    const float amplitude_normalization_factor = (1.0 - persistence) /
-        (1.0 - pow(persistence, float(WATER_WAVE_ITERATIONS)));
+    const float amplitude_normalization_factor = (1.0 - persistence)
+        / (1.0 - pow(persistence, float(WATER_WAVE_ITERATIONS)));
 
     // Sample noise textures first (latency hiding)
 
@@ -82,13 +82,13 @@ float get_water_height(vec2 coord, vec2 wave_dir, mat2 wave_rot, float t) {
     }
 
 #ifdef WATER_WAVES_HEIGHT_VARIATION
-    float height_variation_noise =
-        texture(
-            noisetex,
-            (coord + vec2(0.0, height_variation_scroll_speed * t)) *
-                height_variation_frequency
+    float height_variation_noise
+        = texture(
+              noisetex,
+              (coord + vec2(0.0, height_variation_scroll_speed * t))
+                  * height_variation_frequency
         )
-            .y;
+              .y;
 #endif
 
     // Calculate wave height
@@ -107,8 +107,8 @@ float get_water_height(vec2 coord, vec2 wave_dir, mat2 wave_rot, float t) {
                       t,
                       wave_noise[i] * noise_strength,
                       wave_length
-                  ) *
-            amplitude;
+                  )
+            * amplitude;
 
         amplitude *= persistence;
         frequency *= lacunarity;
@@ -118,10 +118,11 @@ float get_water_height(vec2 coord, vec2 wave_dir, mat2 wave_rot, float t) {
     }
 
 #ifdef WATER_WAVES_HEIGHT_VARIATION
-    height *=
-        max(min_height,
-            height_variation_noise * height_variation_scale +
-                height_variation_offset);
+    height *= max(
+        min_height,
+        height_variation_noise * height_variation_scale
+            + height_variation_offset
+    );
 #endif
 
     return height * amplitude_normalization_factor;
@@ -179,8 +180,8 @@ vec2 get_water_parallax_coord(
     float t;
     water_waves_setup(flowing_water, flow_dir, wave_dir, wave_rot, t);
 
-    vec2 ray_step = tangent_dir.xy * rcp(-tangent_dir.z) * parallax_depth *
-        rcp(float(step_count));
+    vec2 ray_step = tangent_dir.xy * rcp(-tangent_dir.z) * parallax_depth
+        * rcp(float(step_count));
 
     float depth_value = get_water_height(coord, wave_dir, wave_rot, t);
     float depth_march = 0.0;

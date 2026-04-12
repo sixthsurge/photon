@@ -25,20 +25,20 @@ float compute_maximum_horizon_angle(
 
     float max_cos_theta = -1.0;
 
-    vec2 ray_step =
-        (view_to_screen_space(
-             view_pos + view_slice_dir * step_size,
-             true,
-             is_lod
-         ) -
-         screen_pos)
-            .xy;
-    vec2 ray_pos = screen_pos.xy +
-        ray_step * (dither + max_of(view_pixel_size) * rcp_length(ray_step));
+    vec2 ray_step
+        = (view_to_screen_space(
+               view_pos + view_slice_dir * step_size,
+               true,
+               is_lod
+           )
+           - screen_pos)
+              .xy;
+    vec2 ray_pos = screen_pos.xy
+        + ray_step * (dither + max_of(view_pixel_size) * rcp_length(ray_step));
 
     for (int i = 0; i < GTAO_HORIZON_STEPS; ++i, ray_pos += ray_step) {
-        ivec2 texel =
-            ivec2(clamp01(ray_pos) * view_res * taau_render_scale - 0.5);
+        ivec2 texel
+            = ivec2(clamp01(ray_pos) * view_res * taau_render_scale - 0.5);
         float depth = texelFetch(combined_depth_tex, texel, 0).x;
 
         if (depth == 1.0 || depth < hand_depth || depth == screen_pos.z) {
@@ -49,8 +49,8 @@ float compute_maximum_horizon_angle(
                           combined_projection_matrix_inverse,
                           vec3(ray_pos, depth),
                           true
-                      ) -
-            view_pos;
+                      )
+            - view_pos;
 
         float len_sq = length_squared(offset);
         float norm = inversesqrt(len_sq);
@@ -90,8 +90,10 @@ vec2 compute_gtao(
 
     // Reduce AO radius very close up, makes some screen-space artifacts less
     // obvious
-    float ao_radius =
-        max(0.25 + 0.75 * smoothstep(0.0, 81.0, length_squared(view_pos)), 0.5);
+    float ao_radius = max(
+        0.25 + 0.75 * smoothstep(0.0, 81.0, length_squared(view_pos)),
+        0.5
+    );
 
     // Increase AO radius for LoD terrain (looks nice)
 #ifdef LOD_MOD_ACTIVE
@@ -139,16 +141,16 @@ vec2 compute_gtao(
 
         ambient_sss += max0(max_horizon_angles.y - half_pi) * rcp_pi;
 
-        max_horizon_angles = gamma +
-            clamp(vec2(-1.0, 1.0) * max_horizon_angles - gamma,
-                  -half_pi,
-                  half_pi);
-        ao +=
-            integrate_arc(max_horizon_angles, gamma, cos_gamma) * len_sq * norm;
+        max_horizon_angles = gamma
+            + clamp(vec2(-1.0, 1.0) * max_horizon_angles - gamma,
+                    -half_pi,
+                    half_pi);
+        ao += integrate_arc(max_horizon_angles, gamma, cos_gamma) * len_sq
+            * norm;
 
         float bent_angle = dot(max_horizon_angles, vec2(0.5));
-        bent_normal +=
-            viewer_dir * cos(bent_angle) + ortho_dir * sin(bent_angle);
+        bent_normal
+            += viewer_dir * cos(bent_angle) + ortho_dir * sin(bent_angle);
     }
 
     const float albedo = 0.2; // albedo of surroundings (for multibounce approx)

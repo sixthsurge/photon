@@ -78,24 +78,26 @@ vec4 common_fog(float view_dist, const bool sky) {
     fog.a *= snow_fog;
 
     // Blindness fog
-    fog *=
-        mix(1.0,
-            spherical_fog(
-                view_dist,
-                blindness_fog_start,
-                blindness * blindness_fog_density
-            ),
-            blindness);
+    fog *= mix(
+        1.0,
+        spherical_fog(
+            view_dist,
+            blindness_fog_start,
+            blindness * blindness_fog_density
+        ),
+        blindness
+    );
 
     // Darkness fog
-    fog *=
-        mix(1.0,
-            spherical_fog(
-                view_dist,
-                darkness_fog_start,
-                darknessFactor * darkness_fog_density
-            ),
-            darknessFactor);
+    fog *= mix(
+        1.0,
+        spherical_fog(
+            view_dist,
+            darkness_fog_start,
+            darknessFactor * darkness_fog_density
+        ),
+        darknessFactor
+    );
 
 #if defined WORLD_OVERWORLD && defined CAVE_FOG
     // Cave fog
@@ -110,8 +112,8 @@ vec4 common_fog(float view_dist, const bool sky) {
 
 #if defined WORLD_NETHER
     // Nether fog
-    float nether_fog =
-        spherical_fog(view_dist, nether_fog_start, nether_fog_density);
+    float nether_fog
+        = spherical_fog(view_dist, nether_fog_start, nether_fog_density);
     fog.rgb += ambient_color - ambient_color * nether_fog;
     fog.a *= nether_fog;
 #endif
@@ -163,27 +165,27 @@ float common_fog_alpha(float view_dist, bool sky) {
 
 // Water fog
 
-const vec3 water_absorption_coeff =
-    vec3(WATER_ABSORPTION_R, WATER_ABSORPTION_G, WATER_ABSORPTION_B) *
-    rec709_to_working_color;
+const vec3 water_absorption_coeff
+    = vec3(WATER_ABSORPTION_R, WATER_ABSORPTION_G, WATER_ABSORPTION_B)
+    * rec709_to_working_color;
 
 vec3 biome_water_coeff(vec3 biome_water_color) {
     const float density_scale = 0.15;
     const float biome_color_contribution = 0.33;
 
-    const vec3 base_absorption_coeff =
-        vec3(WATER_ABSORPTION_R, WATER_ABSORPTION_G, WATER_ABSORPTION_B) *
-        rec709_to_working_color;
-    const vec3 forest_absorption_coeff =
-        -density_scale * log(vec3(0.1245, 0.1797, 0.7108));
+    const vec3 base_absorption_coeff
+        = vec3(WATER_ABSORPTION_R, WATER_ABSORPTION_G, WATER_ABSORPTION_B)
+        * rec709_to_working_color;
+    const vec3 forest_absorption_coeff
+        = -density_scale * log(vec3(0.1245, 0.1797, 0.7108));
 
 #ifdef BIOME_WATER_COLOR
-    vec3 biome_absorption_coeff =
-        -density_scale * log(biome_water_color + eps) - forest_absorption_coeff;
+    vec3 biome_absorption_coeff = -density_scale * log(biome_water_color + eps)
+        - forest_absorption_coeff;
 
     return max0(
-        base_absorption_coeff +
-        biome_absorption_coeff * biome_color_contribution
+        base_absorption_coeff
+        + biome_absorption_coeff * biome_color_contribution
     );
 #else
     return base_absorption_coeff;
@@ -208,25 +210,25 @@ mat2x3 water_fog_simple(
     // Multiple scattering approximation from Jessie
     vec3 scattering_albedo = scattering_coeff / extinction_coeff;
     vec3 multiple_scattering_factor = 0.84 * scattering_albedo;
-    vec3 multiple_scattering_energy =
-        multiple_scattering_factor / (1.0 - multiple_scattering_factor);
+    vec3 multiple_scattering_energy
+        = multiple_scattering_factor / (1.0 - multiple_scattering_factor);
 
     // Minimum distance so that water is always easily visible
     dist = max(dist, 2.0 - 1.0 * skylight_factor);
 
     vec3 light_ambient = ambient_color * light_levels.y;
-    light_ambient +=
-        1.41 * blocklight_color * blocklight_scale * sqr(light_levels.x);
+    light_ambient
+        += 1.41 * blocklight_color * blocklight_scale * sqr(light_levels.x);
 
     vec3 transmittance = exp(-extinction_coeff * dist);
 
-    vec3 scattering = light_color * exp(-extinction_coeff * sss_depth) *
-        smoothstep(0.0, 0.25, light_levels.y); // direct lighting
-    scattering *= 0.7 * henyey_greenstein_phase(LoV, 0.4) +
-        0.3 * isotropic_phase; // phase function for direct lighting
+    vec3 scattering = light_color * exp(-extinction_coeff * sss_depth)
+        * smoothstep(0.0, 0.25, light_levels.y); // direct lighting
+    scattering *= 0.7 * henyey_greenstein_phase(LoV, 0.4)
+        + 0.3 * isotropic_phase; // phase function for direct lighting
     scattering += light_ambient * isotropic_phase; // ambient lighting
-    scattering *= (1.0 - transmittance) * scattering_coeff /
-        extinction_coeff; // scattering integral
+    scattering *= (1.0 - transmittance) * scattering_coeff
+        / extinction_coeff; // scattering integral
     scattering *= 1.0 + multiple_scattering_energy; // multiple scattering
 
     return mat2x3(scattering, transmittance);

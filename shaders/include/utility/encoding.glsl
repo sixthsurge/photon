@@ -38,10 +38,10 @@ vec3 decode_unit_vector(vec2 e) {
 
 vec4 encode_rgbe8(vec3 rgb) {
     float exponent_part = floor(log2(max_of(vec4(rgb, exp2(-127.0)))));
-    vec3 mantissa_part =
-        clamp((128.0 / 255.0) * exp2(-exponent_part) * rgb, 0.0, 1.0);
-    exponent_part =
-        clamp(exponent_part * (1.0 / 255.0) + (127.0 / 255.0), 0.0, 1.0);
+    vec3 mantissa_part
+        = clamp((128.0 / 255.0) * exp2(-exponent_part) * rgb, 0.0, 1.0);
+    exponent_part
+        = clamp(exponent_part * (1.0 / 255.0) + (127.0 / 255.0), 0.0, 1.0);
 
     return vec4(mantissa_part, exponent_part);
 }

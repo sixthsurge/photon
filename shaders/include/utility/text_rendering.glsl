@@ -176,8 +176,8 @@ void print_line() {
 }
 
 void print_char(uint character) {
-    ivec2 pos = text.frag_pos - text.text_pos -
-        space_size * text.char_pos * ivec2(1, -1) + ivec2(0, space_size.y);
+    ivec2 pos = text.frag_pos - text.text_pos
+        - space_size * text.char_pos * ivec2(1, -1) + ivec2(0, space_size.y);
 
     uint index = uint(char_width - pos.x + pos.y * char_width + 1);
 
@@ -188,10 +188,11 @@ void print_char(uint character) {
 
     // Draw character
     if (clamp(pos, ivec2(0), char_size - 1) == pos) {
-        text.result =
-            mix(text.result,
-                text.fg_col,
-                text.fg_col.a * float(character >> index & 1u));
+        text.result = mix(
+            text.result,
+            text.fg_col,
+            text.fg_col.a * float(character >> index & 1u)
+        );
     }
 
     // Advance to next character
@@ -289,8 +290,8 @@ void print_float(float value) {
         float i, f = modf(abs(value), i);
 
         uint integral_part = uint(i);
-        uint fractional_part =
-            uint(f * pow(float(text.base), float(text.fp_precision)));
+        uint fractional_part
+            = uint(f * pow(float(text.base), float(text.fp_precision)));
 
         print_unsigned_int(integral_part);
         print_char(_dot);

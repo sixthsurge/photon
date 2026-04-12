@@ -25,8 +25,8 @@ uniform sampler2D colortex0;
 
 uniform vec2 view_res;
 
-const float[5] binomial_weights_9 =
-    float[5](0.2734375, 0.21875, 0.109375, 0.03125, 0.00390625);
+const float[5] binomial_weights_9
+    = float[5](0.2734375, 0.21875, 0.109375, 0.03125, 0.00390625);
 
 void main() {
     ivec2 texel = ivec2(gl_FragCoord.xy);
@@ -44,8 +44,8 @@ void main() {
 
     // Apply padding around bloom tiles
 
-    if (clamp(texel.y, bounds_min.y, bounds_max.y) != texel.y ||
-        tile_index > 5) {
+    if (clamp(texel.y, bounds_min.y, bounds_max.y) != texel.y
+        || tile_index > 5) {
         // Get index of closest tile
         int closest_tile = (uv.y < 0.66)
             ? int(0.5 * a + 0.25) * 2
@@ -55,8 +55,8 @@ void main() {
         float closest_scale = bloom_tile_scale(closest_tile);
         vec2 closest_offset = bloom_tile_offset(closest_tile);
         ivec2 closest_bounds_min = ivec2(view_res * closest_offset + 1);
-        ivec2 closest_bounds_max =
-            ivec2(view_res * (closest_offset + closest_scale) - 1);
+        ivec2 closest_bounds_max
+            = ivec2(view_res * (closest_offset + closest_scale) - 1);
 
         // Clamp to closest tile
         bloom_tiles = texelFetch(
@@ -76,8 +76,8 @@ void main() {
 
     for (int i = -4; i <= 4; ++i) {
         ivec2 pos = texel + ivec2(0, i);
-        float weight = binomial_weights_9[abs(i)] *
-            float(clamp(pos.y, bounds_min.y + 2, bounds_max.y - 2) == pos.y);
+        float weight = binomial_weights_9[abs(i)]
+            * float(clamp(pos.y, bounds_min.y + 2, bounds_max.y - 2) == pos.y);
         bloom_tiles += texelFetch(colortex0, pos, 0).rgb * weight;
         weight_sum += weight;
     }

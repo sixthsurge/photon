@@ -23,8 +23,9 @@ vec2 air_fog_density(vec3 world_pos) {
 #ifdef AIR_FOG_CLOUDY_NOISE
     const vec3 wind = 0.0003 * vec3(1.0, 0.0, 0.7);
 
-    float noise =
-        texture(noisetex, 0.001 * world_pos.xz + wind.xz * frameTimeCounter).w;
+    float noise
+        = texture(noisetex, 0.001 * world_pos.xz + wind.xz * frameTimeCounter)
+              .w;
 
     density.y *= 4.0 * sqr(noise);
 #endif
@@ -46,24 +47,24 @@ mat2x3 raymarch_air_fog(
     float ray_length = length_sq * norm;
     world_dir *= norm;
 
-    vec3 shadow_start_pos =
-        transform(shadowModelView, world_start_pos - cameraPosition);
+    vec3 shadow_start_pos
+        = transform(shadowModelView, world_start_pos - cameraPosition);
     shadow_start_pos = project_ortho(shadowProjection, shadow_start_pos);
 
     vec3 shadow_dir = mat3(shadowModelView) * world_dir;
     shadow_dir = diagonal(shadowProjection).xyz * shadow_dir;
 
-    float distance_to_lower_plane =
-        (air_fog_volume_bottom - eyeAltitude) / world_dir.y;
-    float distance_to_upper_plane =
-        (air_fog_volume_top - eyeAltitude) / world_dir.y;
+    float distance_to_lower_plane
+        = (air_fog_volume_bottom - eyeAltitude) / world_dir.y;
+    float distance_to_upper_plane
+        = (air_fog_volume_top - eyeAltitude) / world_dir.y;
     float distance_to_volume_start, distance_to_volume_end;
 
     if (eyeAltitude < air_fog_volume_bottom) {
         // Below volume
         distance_to_volume_start = distance_to_lower_plane;
-        distance_to_volume_end =
-            world_dir.y < 0.0 ? -1.0 : distance_to_upper_plane;
+        distance_to_volume_end
+            = world_dir.y < 0.0 ? -1.0 : distance_to_upper_plane;
     } else if (eyeAltitude < air_fog_volume_top) {
         // Inside volume
         distance_to_volume_start = 0.0;
@@ -73,8 +74,8 @@ mat2x3 raymarch_air_fog(
     } else {
         // Above volume
         distance_to_volume_start = distance_to_upper_plane;
-        distance_to_volume_end =
-            world_dir.y < 0.0 ? distance_to_upper_plane : -1.0;
+        distance_to_volume_end
+            = world_dir.y < 0.0 ? distance_to_upper_plane : -1.0;
     }
 
 #ifdef LOD_MOD_ACTIVE
@@ -98,12 +99,12 @@ mat2x3 raymarch_air_fog(
     float step_length = ray_length * rcp(float(step_count));
 
     vec3 world_step = world_dir * step_length;
-    vec3 world_pos = world_start_pos +
-        world_dir * (distance_to_volume_start + step_length * dither);
+    vec3 world_pos = world_start_pos
+        + world_dir * (distance_to_volume_start + step_length * dither);
 
     vec3 shadow_step = shadow_dir * step_length;
-    vec3 shadow_pos = shadow_start_pos +
-        shadow_dir * (distance_to_volume_start + step_length * dither);
+    vec3 shadow_pos = shadow_start_pos
+        + shadow_dir * (distance_to_volume_start + step_length * dither);
 
     vec3 transmittance = vec3(1.0);
 
@@ -122,10 +123,10 @@ mat2x3 raymarch_air_fog(
 #ifdef AIR_FOG_COLORED_LIGHT_SHAFTS
         float depth0 = texelFetch(shadowtex0, shadow_texel, 0).x;
         float depth1 = texelFetch(shadowtex1, shadow_texel, 0).x;
-        vec3 color =
-            clamp01(texelFetch(shadowcolor0, shadow_texel, 0).rgb * 4.0);
-        float color_weight =
-            step(depth0, shadow_screen_pos.z) * step(eps, max_of(color));
+        vec3 color
+            = clamp01(texelFetch(shadowcolor0, shadow_texel, 0).rgb * 4.0);
+        float color_weight
+            = step(depth0, shadow_screen_pos.z) * step(eps, max_of(color));
 
         color = color * color_weight + (1.0 - color_weight);
 
@@ -136,8 +137,8 @@ mat2x3 raymarch_air_fog(
 #else
         float depth1 = texelFetch(shadowtex1, shadow_texel, 0).x;
         float shadow = step(
-            float(clamp01(shadow_screen_pos) == shadow_screen_pos) *
-                shadow_screen_pos.z,
+            float(clamp01(shadow_screen_pos) == shadow_screen_pos)
+                * shadow_screen_pos.z,
             depth1
         );
 #endif
@@ -147,12 +148,12 @@ mat2x3 raymarch_air_fog(
 
         vec2 density = air_fog_density(world_pos) * step_length;
 
-        vec3 step_optical_depth =
-            fog_params.rayleigh_scattering_coeff * density.x +
-            fog_params.mie_extinction_coeff * density.y;
+        vec3 step_optical_depth
+            = fog_params.rayleigh_scattering_coeff * density.x
+            + fog_params.mie_extinction_coeff * density.y;
         vec3 step_transmittance = exp(-step_optical_depth);
-        vec3 step_transmitted_fraction =
-            (1.0 - step_transmittance) / max(step_optical_depth, eps);
+        vec3 step_transmitted_fraction
+            = (1.0 - step_transmittance) / max(step_optical_depth, eps);
 
         vec3 visible_scattering = step_transmitted_fraction * transmittance;
 
@@ -176,8 +177,8 @@ mat2x3 raymarch_air_fog(
     }
 
     float LoV = dot(world_dir, light_dir);
-    float mie_phase = 0.7 * henyey_greenstein_phase(LoV, 0.5) +
-        0.3 * henyey_greenstein_phase(LoV, -0.2);
+    float mie_phase = 0.7 * henyey_greenstein_phase(LoV, 0.5)
+        + 0.3 * henyey_greenstein_phase(LoV, -0.2);
 
     /*
     // Single scattering
@@ -197,12 +198,12 @@ mat2x3 raymarch_air_fog(
     scattering += 2.0 * light_sky * vec2(isotropic_phase) * ambient_color;
 
     for (int i = 0; i < 4; ++i) {
-        float mie_phase = 0.7 * henyey_greenstein_phase(LoV, 0.5 * anisotropy) +
-            0.3 * henyey_greenstein_phase(LoV, -0.2 * anisotropy);
+        float mie_phase = 0.7 * henyey_greenstein_phase(LoV, 0.5 * anisotropy)
+            + 0.3 * henyey_greenstein_phase(LoV, -0.2 * anisotropy);
 
-        scattering += scatter_amount *
-            (light_sun * vec2(isotropic_phase, mie_phase)) * light_color *
-            (1.0 - 0.9 * rainStrength);
+        scattering += scatter_amount
+            * (light_sun * vec2(isotropic_phase, mie_phase)) * light_color
+            * (1.0 - 0.9 * rainStrength);
 
         scatter_amount *= 0.5;
         anisotropy *= 0.7;
@@ -212,8 +213,8 @@ mat2x3 raymarch_air_fog(
     scattering *= clamp01(1.0 - blindness - darknessFactor);
 
     // Artifically brighten fog in the early morning and evening (looks nice)
-    float evening_glow =
-        0.75 * linear_step(0.05, 1.0, exp(-300.0 * sqr(sun_dir.y + 0.02)));
+    float evening_glow
+        = 0.75 * linear_step(0.05, 1.0, exp(-300.0 * sqr(sun_dir.y + 0.02)));
     scattering += scattering * evening_glow;
 
     return mat2x3(scattering, transmittance);

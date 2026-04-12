@@ -43,8 +43,8 @@ vec2 perlin_gradient(vec2 coord) {
     float v3 = dot(g3, f - vec2(1.0, 1.0));
 
     return vec2(
-        g0 + u.x * (g1 - g0) + u.y * (g2 - g0) +
-        u.x * u.y * (g0 - g1 - g2 + g3) + // d/dx
+        g0 + u.x * (g1 - g0) + u.y * (g2 - g0) + u.x * u.y * (g0 - g1 - g2 + g3)
+        + // d/dx
         du * (u.yx * (v0 - v1 - v2 + v3) + vec2(v1, v2) - v0) // d/dy
     );
 }
@@ -61,9 +61,10 @@ float clouds_phase_single(float cos_theta) { // Single scattering phase function
     ); // this gives a nice glow very close to the sun
     float forwards_b = henyey_greenstein_phase(cos_theta, 0.8);
 
-    return 0.8 *
-        max(forwards_a, forwards_b) // forwards lobe (max'ing them is completely
-                                    // nonsensical but it looks nice)
+    return 0.8
+        * max(forwards_a,
+              forwards_b) // forwards lobe (max'ing them is completely
+                          // nonsensical but it looks nice)
         + 0.2 * henyey_greenstein_phase(cos_theta, -0.2); // backwards lobe
 }
 
@@ -94,8 +95,8 @@ vec3 clouds_aerial_perspective(
     vec3 air_transmittance;
 
 #if CLOUDS_AERIAL_PERSPECTIVE_BOOST != 0
-    ray_end =
-        mix(ray_origin, ray_end, float(1 << CLOUDS_AERIAL_PERSPECTIVE_BOOST));
+    ray_end
+        = mix(ray_origin, ray_end, float(1 << CLOUDS_AERIAL_PERSPECTIVE_BOOST));
 #endif
 
     if (length_squared(ray_origin) < length_squared(ray_end)) {
@@ -111,12 +112,13 @@ vec3 clouds_aerial_perspective(
     }
 
     // Blend to rain color during rain
-    clear_sky =
-        mix(clear_sky,
-            sky_color * rcp(tau),
-            rainStrength * mix(1.0, 0.9, time_sunrise + time_sunset));
-    air_transmittance =
-        mix(air_transmittance, vec3(air_transmittance.x), 0.8 * rainStrength);
+    clear_sky = mix(
+        clear_sky,
+        sky_color * rcp(tau),
+        rainStrength * mix(1.0, 0.9, time_sunrise + time_sunset)
+    );
+    air_transmittance
+        = mix(air_transmittance, vec3(air_transmittance.x), 0.8 * rainStrength);
 
     return mix(
         (1.0 - clouds_transmittance) * clear_sky,
@@ -130,8 +132,8 @@ CloudsResult blend_layers(CloudsResult old, CloudsResult new) {
 
     vec4 scattering_behind = new_in_front ? old.scattering : new.scattering;
     vec4 scattering_in_front = new_in_front ? new.scattering : old.scattering;
-    float transmittance_in_front =
-        new_in_front ? new.transmittance : old.transmittance;
+    float transmittance_in_front
+        = new_in_front ? new.transmittance : old.transmittance;
 
     return CloudsResult(
         scattering_in_front + transmittance_in_front * scattering_behind,

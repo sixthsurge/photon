@@ -77,8 +77,8 @@ void main() {
         );
 #endif
 
-        adjusted_light_levels.x =
-            clamp01(adjusted_light_levels.x + BOX_EMISSION);
+        adjusted_light_levels.x
+            = clamp01(adjusted_light_levels.x + BOX_EMISSION);
     }
 #endif
 

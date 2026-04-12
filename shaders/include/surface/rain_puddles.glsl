@@ -9,20 +9,20 @@ float get_ripple_height(vec2 coord) {
     const vec2 ripple_dir_0 = vec2(3.0, 4.0) / 5.0;
     const vec2 ripple_dir_1 = vec2(-5.0, -12.0) / 13.0;
 
-    float ripple_noise_1 =
-        texture(
-            noisetex,
-            coord * ripple_frequency +
-                frameTimeCounter * ripple_speed * ripple_dir_0
+    float ripple_noise_1
+        = texture(
+              noisetex,
+              coord * ripple_frequency
+                  + frameTimeCounter * ripple_speed * ripple_dir_0
         )
-            .y;
-    float ripple_noise_2 =
-        texture(
-            noisetex,
-            coord * ripple_frequency +
-                frameTimeCounter * ripple_speed * ripple_dir_1
+              .y;
+    float ripple_noise_2
+        = texture(
+              noisetex,
+              coord * ripple_frequency
+                  + frameTimeCounter * ripple_speed * ripple_dir_1
         )
-            .y;
+              .y;
 
     return mix(ripple_noise_1, ripple_noise_2, 0.5);
 }
@@ -31,12 +31,12 @@ float get_puddle_noise(vec3 world_pos, vec3 flat_normal, vec2 light_levels) {
     const float puddle_frequency = 0.025;
 
     float puddle = texture(noisetex, world_pos.xz * puddle_frequency).w;
-    puddle = linear_step(0.45, 0.55, puddle) * wetness * biome_may_rain *
-        step(0.99, flat_normal.y);
+    puddle = linear_step(0.45, 0.55, puddle) * wetness * biome_may_rain
+        * step(0.99, flat_normal.y);
 
     // Prevent puddles from appearing indoors
-    puddle *= (1.0 - cube(light_levels.x)) *
-        linear_step(14.0 / 15.0, 1.0, light_levels.y);
+    puddle *= (1.0 - cube(light_levels.x))
+        * linear_step(14.0 / 15.0, 1.0, light_levels.y);
 
     return puddle;
 }
@@ -62,8 +62,8 @@ bool get_rain_puddles(
     const float puddle_darkening_factor = 0.33;
     const float puddle_darkening_factor_porous = 0.67;
 
-    if (wetness < 0.0 || biome_may_rain < 0.0 ||
-        material_mask == MATERIAL_LEAVES) {
+    if (wetness < 0.0 || biome_may_rain < 0.0
+        || material_mask == MATERIAL_LEAVES) {
         return false;
     }
 
@@ -90,12 +90,12 @@ bool get_rain_puddles(
     float ripple2 = get_ripple_height(world_pos.xz + vec2(0.0, h));
 
     vec3 ripple_normal = vec3(ripple1 - ripple0, ripple2 - ripple0, h);
-    ripple_normal.xy *=
-        0.05 *
-        smoothstep(
-            0.0,
-            0.1,
-            abs(dot(flat_normal, normalize(world_pos - cameraPosition)))
+    ripple_normal.xy
+        *= 0.05
+        * smoothstep(
+               0.0,
+               0.1,
+               abs(dot(flat_normal, normalize(world_pos - cameraPosition)))
         );
     ripple_normal = normalize(ripple_normal);
     ripple_normal = ripple_normal.xzy; // convert to world space

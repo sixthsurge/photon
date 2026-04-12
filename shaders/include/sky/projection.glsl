@@ -16,9 +16,9 @@ vec2 project_sky(vec3 direction) {
 
     vec2 coord;
     coord.x = azimuth_angle * (1.0 / tau);
-    coord.y = 0.5 +
-        0.5 * sign(altitude_angle) *
-            sqrt(2.0 * rcp_pi * abs(altitude_angle)); // Section 5.3
+    coord.y = 0.5
+        + 0.5 * sign(altitude_angle)
+            * sqrt(2.0 * rcp_pi * abs(altitude_angle)); // Section 5.3
 
     // Padding
     const float pad_amount = 2.0;
@@ -41,8 +41,8 @@ vec3 unproject_sky(vec2 coord) {
     coord.x = fract(coord.x * mul + add);
 
     // Non-linear mapping of altitude angle (See section 5.3 of the paper)
-    coord.y =
-        (coord.y < 0.5) ? -sqr(1.0 - 2.0 * coord.y) : sqr(2.0 * coord.y - 1.0);
+    coord.y = (coord.y < 0.5) ? -sqr(1.0 - 2.0 * coord.y)
+                              : sqr(2.0 * coord.y - 1.0);
 
     float azimuth_angle = coord.x * tau - pi;
     float altitude_angle = coord.y * half_pi;

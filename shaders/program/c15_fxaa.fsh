@@ -23,8 +23,8 @@ uniform sampler2D colortex0;
 uniform vec2 view_pixel_size;
 
 const int max_iterations = 12;
-const float[12] quality =
-    float[12](1.0, 1.0, 1.0, 1.0, 1.0, 1.5, 2.0, 2.0, 2.0, 2.0, 4.0, 8.0);
+const float[12] quality
+    = float[12](1.0, 1.0, 1.0, 1.0, 1.0, 1.5, 2.0, 2.0, 2.0, 2.0, 4.0, 8.0);
 
 const float edge_threshold_min = 0.0312;
 const float edge_threshold_max = 0.125;
@@ -106,12 +106,12 @@ void main() {
 
     // Compute an estimation of the gradient along the horizontal and vertical
     // axis.
-    float edge_horizontal = abs(-2.0 * luma_l + luma_left_corners) +
-        abs(-2.0 * luma + luma_vertical) * 2.0 +
-        abs(-2.0 * luma_r + luma_right_corners);
-    float edge_vertical = abs(-2.0 * luma_u + luma_up_corners) +
-        abs(-2.0 * luma + luma_horizontal) * 2.0 +
-        abs(-2.0 * luma_d + luma_down_corners);
+    float edge_horizontal = abs(-2.0 * luma_l + luma_left_corners)
+        + abs(-2.0 * luma + luma_vertical) * 2.0
+        + abs(-2.0 * luma_r + luma_right_corners);
+    float edge_vertical = abs(-2.0 * luma_u + luma_up_corners)
+        + abs(-2.0 * luma + luma_horizontal) * 2.0
+        + abs(-2.0 * luma_d + luma_down_corners);
 
     // Is the local edge horizontal or vertical?
     bool is_horizontal = edge_horizontal >= edge_vertical;
@@ -245,9 +245,8 @@ void main() {
 
     // If the luma at center is smaller than at its neighbour, the delta luma at
     // each end should be positive (same variation)
-    bool correct_variation =
-        ((is_direction_1 ? luma_end_1 : luma_end_2) < 0.0) !=
-        is_luma_center_smaller;
+    bool correct_variation = ((is_direction_1 ? luma_end_1 : luma_end_2) < 0.0)
+        != is_luma_center_smaller;
 
     // If the luma variation is incorrect, do not offset
     float final_offset = correct_variation ? pixel_offset : 0.0;
@@ -255,19 +254,19 @@ void main() {
     // Subpixel antialiasing
 
     // Full weighted average of the luma over the 3x3 neighborhood
-    float luma_average = rcp(12.0) *
-        (2.0 * (luma_horizontal + luma_vertical) + luma_left_corners +
-         luma_right_corners);
+    float luma_average = rcp(12.0)
+        * (2.0 * (luma_horizontal + luma_vertical) + luma_left_corners
+           + luma_right_corners);
 
     // Ratio of the delta between the global average and the center luma, over
     // the luma range in the 3x3 neighborhood
     float sub_pixel_offset_1 = clamp01(abs(luma_average - luma) / luma_range);
-    float sub_pixel_offset_2 = (-2.0 * sub_pixel_offset_1 + 3.0) *
-        sub_pixel_offset_1 * sub_pixel_offset_1;
+    float sub_pixel_offset_2 = (-2.0 * sub_pixel_offset_1 + 3.0)
+        * sub_pixel_offset_1 * sub_pixel_offset_1;
 
     // Compute a sub-pixel offset based on this delta.
-    float sub_pixel_offset_final =
-        sub_pixel_offset_2 * sub_pixel_offset_2 * subpixel_quality;
+    float sub_pixel_offset_final
+        = sub_pixel_offset_2 * sub_pixel_offset_2 * subpixel_quality;
 
     // Pick the biggest of the two offsets.
     final_offset = max(final_offset, sub_pixel_offset_final);

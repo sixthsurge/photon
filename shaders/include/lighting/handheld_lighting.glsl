@@ -29,15 +29,15 @@ vec3 get_handheld_light_color(int held_item_id, int held_item_light_value) {
         return vec3(0.0);
     }
 #else
-    return (blocklight_color * blocklight_scale * rcp(15.0)) *
-        held_item_light_value;
+    return (blocklight_color * blocklight_scale * rcp(15.0))
+        * held_item_light_value;
 #endif
 }
 
 float get_handheld_light_falloff(vec3 scene_pos, float ao) {
     float falloff = lift(rcp(dot(scene_pos, scene_pos) + 1.0), 1.2);
-    return falloff * mix(ao, 1.0, falloff * falloff) *
-        HANDHELD_LIGHTING_INTENSITY;
+    return falloff * mix(ao, 1.0, falloff * falloff)
+        * HANDHELD_LIGHTING_INTENSITY;
 }
 
 vec3 get_handheld_lighting(vec3 scene_pos, float ao) {
@@ -46,9 +46,10 @@ vec3 get_handheld_lighting(vec3 scene_pos, float ao) {
     scene_pos += relativeEyePosition;
 #endif
 
-    vec3 light_color =
-        max(get_handheld_light_color(heldItemId, heldBlockLightValue),
-            get_handheld_light_color(heldItemId2, heldBlockLightValue2));
+    vec3 light_color = max(
+        get_handheld_light_color(heldItemId, heldBlockLightValue),
+        get_handheld_light_color(heldItemId2, heldBlockLightValue2)
+    );
 
     float falloff = get_handheld_light_falloff(scene_pos, ao);
 

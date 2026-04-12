@@ -12,8 +12,8 @@ float linearize_depth(float near, float far, float depth) {
 float linearize_depth(float depth) { return linearize_depth(near, far, depth); }
 
 float reverse_linear_depth(float near, float far, float linear_z) {
-    return (far + near) / (far - near) +
-        (2.0 * far * near) / (linear_z * (far - near));
+    return (far + near) / (far - near)
+        + (2.0 * far * near) / (linear_z * (far - near));
 }
 
 float reverse_linear_depth(float linear_z) {
@@ -115,8 +115,8 @@ vec3 view_to_screen_space(
     bool is_lod_terrain
 ) {
 #ifdef LOD_MOD_ACTIVE
-    mat4 projection_matrix =
-        is_lod_terrain ? lod_projection_matrix : gbufferProjection;
+    mat4 projection_matrix
+        = is_lod_terrain ? lod_projection_matrix : gbufferProjection;
 
     return view_to_screen_space(projection_matrix, view_pos, handle_jitter);
 #else
@@ -126,8 +126,8 @@ vec3 view_to_screen_space(
 
 float screen_to_view_space_depth(mat4 projection_matrix_inverse, float depth) {
     depth = depth * 2.0 - 1.0;
-    vec2 zw = depth * projection_matrix_inverse[2].zw +
-        projection_matrix_inverse[3].zw;
+    vec2 zw = depth * projection_matrix_inverse[2].zw
+        + projection_matrix_inverse[3].zw;
     return -zw.x / zw.y;
 }
 
@@ -162,11 +162,11 @@ vec3 reproject_scene_space(vec3 scene_pos, bool hand, bool is_lod_terrain) {
     mat4 previous_projection_matrix = gbufferPreviousProjection;
 #endif
 
-    vec3 camera_offset =
-        hand ? vec3(0.0) : cameraPosition - previousCameraPosition;
+    vec3 camera_offset
+        = hand ? vec3(0.0) : cameraPosition - previousCameraPosition;
 
-    vec3 previous_pos =
-        transform(gbufferPreviousModelView, scene_pos + camera_offset);
+    vec3 previous_pos
+        = transform(gbufferPreviousModelView, scene_pos + camera_offset);
     previous_pos = project_and_divide(previous_projection_matrix, previous_pos);
 
     return previous_pos * 0.5 + 0.5;
@@ -184,8 +184,8 @@ vec3 reproject(vec3 screen_pos, bool is_lod_terrain) {
 vec3 reproject(vec3 screen_pos) { return reproject(screen_pos, false); }
 
 vec3 reproject(vec3 screen_pos, sampler2D velocity_sampler) {
-    vec3 velocity =
-        texelFetch(velocity_sampler, ivec2(screen_pos.xy * view_res), 0).xyz;
+    vec3 velocity
+        = texelFetch(velocity_sampler, ivec2(screen_pos.xy * view_res), 0).xyz;
 
     if (max_of(abs(velocity)) < eps) {
         return reproject(screen_pos);

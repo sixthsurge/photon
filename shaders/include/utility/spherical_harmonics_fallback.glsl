@@ -49,9 +49,9 @@ struct sh3 {
 vec3 sh_evaluate(sh3 f, vec3 direction) {
     mat3 coeff = sh_coeff_order_2(direction);
 
-    return coeff[0].x * f.f1[0] + coeff[0].y * f.f1[1] + coeff[0].z * f.f1[2] +
-        coeff[1].x * f.f2[0] + coeff[1].y * f.f2[1] + coeff[1].z * f.f2[2] +
-        coeff[2].x * f.f3[0] + coeff[2].y * f.f3[1] + coeff[2].z * f.f3[2];
+    return coeff[0].x * f.f1[0] + coeff[0].y * f.f1[1] + coeff[0].z * f.f1[2]
+        + coeff[1].x * f.f2[0] + coeff[1].y * f.f2[1] + coeff[1].z * f.f2[2]
+        + coeff[2].x * f.f3[0] + coeff[2].y * f.f3[1] + coeff[2].z * f.f3[2];
 }
 
 // Convolve SH using circularly symmetric kernel
@@ -73,11 +73,11 @@ vec3 sh_evaluate_convolved(sh3 f, vec3 kernel, vec3 direction) {
     vec3 mul = k * kernel;
     mat3 coeff = sh_coeff_order_2(direction);
 
-    return coeff[0].x * f.f1[0] * mul.x + coeff[0].y * f.f1[1] * mul.y +
-        coeff[0].z * f.f1[2] * mul.y + coeff[1].x * f.f2[0] * mul.y +
-        coeff[1].y * f.f2[1] * mul.z + coeff[1].z * f.f2[2] * mul.z +
-        coeff[2].x * f.f3[0] * mul.z + coeff[2].y * f.f3[1] * mul.z +
-        coeff[2].z * f.f3[2] * mul.z;
+    return coeff[0].x * f.f1[0] * mul.x + coeff[0].y * f.f1[1] * mul.y
+        + coeff[0].z * f.f1[2] * mul.y + coeff[1].x * f.f2[0] * mul.y
+        + coeff[1].y * f.f2[1] * mul.z + coeff[1].z * f.f2[2] * mul.z
+        + coeff[2].x * f.f3[0] * mul.z + coeff[2].y * f.f3[1] * mul.z
+        + coeff[2].z * f.f3[2] * mul.z;
 }
 
 // https://www.activision.com/cdn/research/Practical_Real_Time_Strategies_for_Accurate_Indirect_Occlusion_NEW%20VERSION_COLOR.pdf
@@ -89,10 +89,10 @@ vec3 sh_evaluate_irradiance(sh3 sh, vec3 bent_normal, float visibility) {
     // Zonal harmonics expansion of visibility cone
     vec3 kernel;
     kernel.x = (sqrt(1.0 * pi) / 2.0) * aperture_angle_sin_sq;
-    kernel.y = (sqrt(3.0 * pi) / 3.0) *
-        (1.0 - aperture_angle_cos_sq * sqrt(aperture_angle_cos_sq));
-    kernel.z = (sqrt(5.0 * pi) / 16.0) * aperture_angle_sin_sq *
-        (2.0 + 6.0 * aperture_angle_cos_sq);
+    kernel.y = (sqrt(3.0 * pi) / 3.0)
+        * (1.0 - aperture_angle_cos_sq * sqrt(aperture_angle_cos_sq));
+    kernel.z = (sqrt(5.0 * pi) / 16.0) * aperture_angle_sin_sq
+        * (2.0 + 6.0 * aperture_angle_cos_sq);
 
     return sh_evaluate_convolved(sh, kernel, bent_normal);
 }

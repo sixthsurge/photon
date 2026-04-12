@@ -139,8 +139,8 @@ uniform vec4 entityColor;
 #undef SHADOW_COLOR
 #endif
 
-#if defined PROGRAM_GBUFFERS_TEXTURED || \
-    defined PROGRAM_GBUFFERS_PARTICLES_TRANSLUCENT
+#if defined PROGRAM_GBUFFERS_TEXTURED \
+    || defined PROGRAM_GBUFFERS_PARTICLES_TRANSLUCENT
 #define NO_NORMAL
 #endif
 
@@ -177,14 +177,17 @@ void main() {
 
     // Overdraw fade
 
-    float dh_fade_start_distance =
-        max0(far - DH_OVERDRAW_DISTANCE - DH_OVERDRAW_FADE_LENGTH);
+    float dh_fade_start_distance
+        = max0(far - DH_OVERDRAW_DISTANCE - DH_OVERDRAW_FADE_LENGTH);
     float dh_fade_end_distance = max0(far - DH_OVERDRAW_DISTANCE);
     float view_distance = length(scene_pos);
 
     float dither = interleaved_gradient_noise(gl_FragCoord.xy, frameCounter);
-    float fade =
-        smoothstep(dh_fade_start_distance, dh_fade_end_distance, view_distance);
+    float fade = smoothstep(
+        dh_fade_start_distance,
+        dh_fade_end_distance,
+        view_distance
+    );
 
     if (dither > fade) {
         discard;
@@ -194,8 +197,8 @@ void main() {
     // Encode gbuffer data
 
     gbuffer_data.x = pack_unorm_2x8(tint.rg);
-    gbuffer_data.y =
-        pack_unorm_2x8(tint.b, clamp01(((is_water == 1) ? rcp(255.0) : 0.0)));
+    gbuffer_data.y
+        = pack_unorm_2x8(tint.b, clamp01(((is_water == 1) ? rcp(255.0) : 0.0)));
     gbuffer_data.z = pack_unorm_2x8(encode_unit_vector(normal));
     gbuffer_data.w = pack_unorm_2x8(dither_8bit(light_levels, 0.5));
 
@@ -211,10 +214,10 @@ void main() {
     bool back_is_dh_terrain = is_lod_terrain(back_depth_mc, back_depth_dh);
 
     // Prevent water behind terrain from rendering on top of it
-    float dh_depth_linear =
-        screen_to_view_space_depth(dhProjectionInverse, gl_FragCoord.z);
-    float mc_depth_linear =
-        screen_to_view_space_depth(gbufferProjectionInverse, back_depth_mc);
+    float dh_depth_linear
+        = screen_to_view_space_depth(dhProjectionInverse, gl_FragCoord.z);
+    float mc_depth_linear
+        = screen_to_view_space_depth(gbufferProjectionInverse, back_depth_mc);
 
     if (mc_depth_linear < dh_depth_linear && back_depth_mc != 1.0) {
         discard;

@@ -20,8 +20,8 @@ vec4 draw_distant_water(
 
     // Use hardcoded TBN matrix pointing upwards that is the same for LoD water
     // and regular water
-    const mat3 tbn =
-        mat3(vec3(1.0, 0.0, 0.0), vec3(0.0, 0.0, 1.0), vec3(0.0, 1.0, 0.0));
+    const mat3 tbn
+        = mat3(vec3(1.0, 0.0, 0.0), vec3(0.0, 0.0, 1.0), vec3(0.0, 1.0, 0.0));
 
     // Common fog
 
@@ -30,8 +30,8 @@ vec4 draw_distant_water(
     // Cloud shadows
 
 #if defined WORLD_OVERWORLD && defined CLOUD_SHADOWS
-    float cloud_shadows =
-        get_cloud_shadows(colortex8, position_world - cameraPosition);
+    float cloud_shadows
+        = get_cloud_shadows(colortex8, position_world - cameraPosition);
 #else
     const float cloud_shadows = 1.0;
 #endif
@@ -56,11 +56,11 @@ vec4 draw_distant_water(
     );
 
     float brightness_control = 1.0 - exp(-0.33 * layer_distance);
-    brightness_control =
-        (1.0 - light_levels.y) + brightness_control * light_levels.y;
+    brightness_control
+        = (1.0 - light_levels.y) + brightness_control * light_levels.y;
 
-    water_color.rgb = water_fog[0] * (1.0 + 6.0 * sqr(water_fog[1])) *
-        brightness_control * fog_visibility;
+    water_color.rgb = water_fog[0] * (1.0 + 6.0 * sqr(water_fog[1]))
+        * brightness_control * fog_visibility;
     water_color.a = 1.0 - water_fog[1].x;
 
     // Get water wave normal
@@ -73,8 +73,8 @@ vec4 draw_distant_water(
 #ifdef WATER_WAVES
     if (flat_normal.y > eps) {
         vec2 coord = -(water_surface_pos * tbn).xy;
-        normal = tbn *
-            get_water_normal(
+        normal = tbn
+            * get_water_normal(
                      water_surface_pos,
                      flat_normal,
                      coord,
@@ -95,30 +95,30 @@ vec4 draw_distant_water(
     float NoH = (NoL + NoV) * halfway_norm;
     float LoH = LoV * halfway_norm + halfway_norm;
 
-    water_color.rgb +=
-        get_specular_highlight(water_material, NoL, NoV, NoH, LoV, LoH) *
-        light_color * cloud_shadows * fog_visibility;
+    water_color.rgb
+        += get_specular_highlight(water_material, NoL, NoV, NoH, LoV, LoH)
+        * light_color * cloud_shadows * fog_visibility;
 #endif
 
     // Specular reflections
 
 #if defined ENVIRONMENT_REFLECTIONS || defined SKY_REFLECTIONS
     mat3 new_tbn = get_tbn_matrix(normal);
-    water_color.rgb +=
-        get_specular_reflections(
-            water_material,
-            new_tbn,
-            position_screen,
-            position_view,
-            position_world,
-            normal,
-            flat_normal,
-            direction_world,
-            direction_world * new_tbn,
-            light_levels.y,
-            true
-        ) *
-        fog_visibility;
+    water_color.rgb
+        += get_specular_reflections(
+               water_material,
+               new_tbn,
+               position_screen,
+               position_view,
+               position_world,
+               normal,
+               flat_normal,
+               direction_world,
+               direction_world * new_tbn,
+               light_levels.y,
+               true
+           )
+        * fog_visibility;
 #endif
 
     // Purkinje shift

@@ -276,8 +276,8 @@ void main() {
     ivec2 texel = ivec2(gl_FragCoord.xy);
 
     if (abs(MC_RENDER_QUALITY - 1.0) < 0.01) {
-        fragment_color =
-            cas_filter(colortex0, texel, CAS_INTENSITY * 2.0 - 1.0);
+        fragment_color
+            = cas_filter(colortex0, texel, CAS_INTENSITY * 2.0 - 1.0);
     } else {
         fragment_color = catmull_rom_filter_fast_rgb(colortex0, uv, 0.6);
         fragment_color = display_eotf(fragment_color);
@@ -295,12 +295,12 @@ void main() {
 #endif
 
 #ifdef DISTANCE_VIEW
-    float depth =
-        texelFetch(depthtex0, ivec2(uv * view_res * taau_render_scale), 0).x;
+    float depth
+        = texelFetch(depthtex0, ivec2(uv * view_res * taau_render_scale), 0).x;
 
     vec3 position_screen = vec3(uv, depth);
-    vec3 position_view =
-        screen_to_view_space(gbufferProjectionInverse, position_screen, true);
+    vec3 position_view
+        = screen_to_view_space(gbufferProjectionInverse, position_screen, true);
 
     bool is_sky = depth == 1.0;
 

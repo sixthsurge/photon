@@ -13,8 +13,8 @@ void voxy_emitFragment(VoxyFragmentParameters parameters) {
                       uint((parameters.face >> 1) == 2),
                       uint((parameters.face >> 1) == 0),
                       uint((parameters.face >> 1) == 1)
-                  ) *
-        (float(int(parameters.face) & 1) * 2.0 - 1.0);
+                  )
+        * (float(int(parameters.face) & 1) * 2.0 - 1.0);
 
     uint material_mask = max(parameters.customId - 10000u, 0u);
 

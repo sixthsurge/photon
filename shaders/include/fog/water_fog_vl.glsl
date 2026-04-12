@@ -21,13 +21,13 @@ mat2x3 raymarch_water_fog(
     const vec2 caustics_dir_0 = vec2(cos(0.5), sin(0.5));
     const vec2 caustics_dir_1 = vec2(cos(3.0), sin(3.0));
 
-    const vec3 absorption_coeff =
-        vec3(
-            WATER_ABSORPTION_R_UNDERWATER,
-            WATER_ABSORPTION_G_UNDERWATER,
-            WATER_ABSORPTION_B_UNDERWATER
-        ) *
-        rec709_to_working_color;
+    const vec3 absorption_coeff
+        = vec3(
+              WATER_ABSORPTION_R_UNDERWATER,
+              WATER_ABSORPTION_G_UNDERWATER,
+              WATER_ABSORPTION_B_UNDERWATER
+          )
+        * rec709_to_working_color;
     const vec3 scattering_coeff = vec3(WATER_SCATTERING_UNDERWATER);
     const vec3 extinction_coeff = absorption_coeff + scattering_coeff;
 
@@ -41,8 +41,8 @@ mat2x3 raymarch_water_fog(
     }
 
     // Adjust step count based on ray length
-    uint step_count =
-        uint(float(min_step_count) + step_count_growth * ray_length);
+    uint step_count
+        = uint(float(min_step_count) + step_count_growth * ray_length);
     step_count = min(step_count, max_step_count);
 
     float step_length = ray_length * rcp(float(step_count));
@@ -87,52 +87,53 @@ mat2x3 raymarch_water_fog(
         float depth0 = texelFetch(shadowtex0, shadow_texel, 0).x;
         float depth1 = texelFetch(shadowtex1, shadow_texel, 0).x;
         float shadow = step(
-            float(clamp01(shadow_screen_pos) == shadow_screen_pos) *
-                shadow_screen_pos.z,
+            float(clamp01(shadow_screen_pos) == shadow_screen_pos)
+                * shadow_screen_pos.z,
             depth1
         );
 
         // Calculate sunlight transmittance through the volume
-        float distance_traveled = abs(depth0 - shadow_screen_pos.z) *
-            -shadowProjectionInverse[2].z * rcp(SHADOW_DEPTH_SCALE);
+        float distance_traveled = abs(depth0 - shadow_screen_pos.z)
+            * -shadowProjectionInverse[2].z * rcp(SHADOW_DEPTH_SCALE);
 
         // Guess the transmittance to sky using trigonometry
         float distance_traveled_sky = distance_traveled * light_dir.y;
-        distance_traveled_sky =
-            min(distance_traveled_sky,
-                15.0 - 15.0 * eye_skylight + max0(eyeAltitude - world_pos.y));
+        distance_traveled_sky = min(
+            distance_traveled_sky,
+            15.0 - 15.0 * eye_skylight + max0(eyeAltitude - world_pos.y)
+        );
 #else
 #define shadow 1.0
 #define distance_traveled 0.0
-        float distance_traveled_sky =
-            15.0 - 15.0 * eye_skylight + max0(eyeAltitude - world_pos.y);
+        float distance_traveled_sky
+            = 15.0 - 15.0 * eye_skylight + max0(eyeAltitude - world_pos.y);
 #endif
 
-        vec3 light_transmittance =
-            exp(-extinction_coeff * distance_traveled) * shadow;
+        vec3 light_transmittance
+            = exp(-extinction_coeff * distance_traveled) * shadow;
         vec3 sky_transmittance = exp(-extinction_coeff * distance_traveled_sky);
 
         // Caustics pattern to create underwater light shafts
-        float caustics = 0.67 *
-            texture(noisetex, (caustics_pos + caustics_dir_0 * t) * 0.02).y;
-        caustics += 0.33 *
-            texture(noisetex, (caustics_pos + caustics_dir_1 * t) * 0.04).y;
+        float caustics = 0.67
+            * texture(noisetex, (caustics_pos + caustics_dir_0 * t) * 0.02).y;
+        caustics += 0.33
+            * texture(noisetex, (caustics_pos + caustics_dir_1 * t) * 0.04).y;
         caustics = linear_step(0.4, 0.5, caustics) + 0.15;
 
         float anisotropy = 1.0;
         float scattering_amount = 1.0;
         for (uint i = 0u; i < multiple_scattering_iterations; ++i) {
-            float mie_phase =
-                0.7 * henyey_greenstein_phase(LoV, 0.5 * anisotropy) +
-                0.3 * isotropic_phase;
+            float mie_phase
+                = 0.7 * henyey_greenstein_phase(LoV, 0.5 * anisotropy)
+                + 0.3 * isotropic_phase;
 
             // Sunlight/moonlight
-            scattering += light_color * caustics * mie_phase *
-                light_transmittance * transmittance * scattering_amount;
+            scattering += light_color * caustics * mie_phase
+                * light_transmittance * transmittance * scattering_amount;
 
             // Skylight
-            scattering += ambient_color * isotropic_phase * transmittance *
-                scattering_amount * sky_transmittance;
+            scattering += ambient_color * isotropic_phase * transmittance
+                * scattering_amount * sky_transmittance;
 
             anisotropy *= 0.5;
             scattering_amount *= 0.5;
@@ -143,8 +144,8 @@ mat2x3 raymarch_water_fog(
         transmittance *= step_transmittance;
     }
 
-    scattering *=
-        (1.0 - step_transmittance) * scattering_coeff / extinction_coeff;
+    scattering
+        *= (1.0 - step_transmittance) * scattering_coeff / extinction_coeff;
     transmittance = pow(transmittance, vec3(0.75));
 
     return mat2x3(scattering, transmittance);

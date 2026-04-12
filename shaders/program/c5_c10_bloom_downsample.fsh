@@ -43,65 +43,89 @@ uniform sampler2D colortex0;
 
 void main() {
     vec2 pad_amount = 3.0 * view_pixel_size * rcp(src_tile_scale);
-    vec2 uv_src = clamp(uv, pad_amount, 1.0 - pad_amount) * src_tile_scale +
-        src_tile_offset;
+    vec2 uv_src = clamp(uv, pad_amount, 1.0 - pad_amount) * src_tile_scale
+        + src_tile_offset;
 
     // 6x6 downsampling filter made from overlapping 4x4 box kernels
     // As described in "Next Generation Post-Processing in Call of Duty Advanced
     // Warfare"
-    bloom_tile =
-        textureLod(SRC_SAMPLER, uv_src + vec2(0.0, 0.0) * view_pixel_size, 0)
-            .rgb *
-        0.125;
+    bloom_tile
+        = textureLod(SRC_SAMPLER, uv_src + vec2(0.0, 0.0) * view_pixel_size, 0)
+              .rgb
+        * 0.125;
 
-    bloom_tile +=
-        textureLod(SRC_SAMPLER, uv_src + vec2(1.0, 1.0) * view_pixel_size, 0)
-            .rgb *
-        0.125;
-    bloom_tile +=
-        textureLod(SRC_SAMPLER, uv_src + vec2(-1.0, 1.0) * view_pixel_size, 0)
-            .rgb *
-        0.125;
-    bloom_tile +=
-        textureLod(SRC_SAMPLER, uv_src + vec2(1.0, -1.0) * view_pixel_size, 0)
-            .rgb *
-        0.125;
-    bloom_tile +=
-        textureLod(SRC_SAMPLER, uv_src + vec2(-1.0, -1.0) * view_pixel_size, 0)
-            .rgb *
-        0.125;
+    bloom_tile
+        += textureLod(SRC_SAMPLER, uv_src + vec2(1.0, 1.0) * view_pixel_size, 0)
+               .rgb
+        * 0.125;
+    bloom_tile += textureLod(
+                      SRC_SAMPLER,
+                      uv_src + vec2(-1.0, 1.0) * view_pixel_size,
+                      0
+                  )
+                      .rgb
+        * 0.125;
+    bloom_tile += textureLod(
+                      SRC_SAMPLER,
+                      uv_src + vec2(1.0, -1.0) * view_pixel_size,
+                      0
+                  )
+                      .rgb
+        * 0.125;
+    bloom_tile += textureLod(
+                      SRC_SAMPLER,
+                      uv_src + vec2(-1.0, -1.0) * view_pixel_size,
+                      0
+                  )
+                      .rgb
+        * 0.125;
 
-    bloom_tile +=
-        textureLod(SRC_SAMPLER, uv_src + vec2(2.0, 0.0) * view_pixel_size, 0)
-            .rgb *
-        0.0625;
-    bloom_tile +=
-        textureLod(SRC_SAMPLER, uv_src + vec2(-2.0, 0.0) * view_pixel_size, 0)
-            .rgb *
-        0.0625;
-    bloom_tile +=
-        textureLod(SRC_SAMPLER, uv_src + vec2(0.0, 2.0) * view_pixel_size, 0)
-            .rgb *
-        0.0625;
-    bloom_tile +=
-        textureLod(SRC_SAMPLER, uv_src + vec2(0.0, -2.0) * view_pixel_size, 0)
-            .rgb *
-        0.0625;
+    bloom_tile
+        += textureLod(SRC_SAMPLER, uv_src + vec2(2.0, 0.0) * view_pixel_size, 0)
+               .rgb
+        * 0.0625;
+    bloom_tile += textureLod(
+                      SRC_SAMPLER,
+                      uv_src + vec2(-2.0, 0.0) * view_pixel_size,
+                      0
+                  )
+                      .rgb
+        * 0.0625;
+    bloom_tile
+        += textureLod(SRC_SAMPLER, uv_src + vec2(0.0, 2.0) * view_pixel_size, 0)
+               .rgb
+        * 0.0625;
+    bloom_tile += textureLod(
+                      SRC_SAMPLER,
+                      uv_src + vec2(0.0, -2.0) * view_pixel_size,
+                      0
+                  )
+                      .rgb
+        * 0.0625;
 
-    bloom_tile +=
-        textureLod(SRC_SAMPLER, uv_src + vec2(2.0, 2.0) * view_pixel_size, 0)
-            .rgb *
-        0.03125;
-    bloom_tile +=
-        textureLod(SRC_SAMPLER, uv_src + vec2(-2.0, 2.0) * view_pixel_size, 0)
-            .rgb *
-        0.03125;
-    bloom_tile +=
-        textureLod(SRC_SAMPLER, uv_src + vec2(2.0, -2.0) * view_pixel_size, 0)
-            .rgb *
-        0.03125;
-    bloom_tile +=
-        textureLod(SRC_SAMPLER, uv_src + vec2(-2.0, -2.0) * view_pixel_size, 0)
-            .rgb *
-        0.03125;
+    bloom_tile
+        += textureLod(SRC_SAMPLER, uv_src + vec2(2.0, 2.0) * view_pixel_size, 0)
+               .rgb
+        * 0.03125;
+    bloom_tile += textureLod(
+                      SRC_SAMPLER,
+                      uv_src + vec2(-2.0, 2.0) * view_pixel_size,
+                      0
+                  )
+                      .rgb
+        * 0.03125;
+    bloom_tile += textureLod(
+                      SRC_SAMPLER,
+                      uv_src + vec2(2.0, -2.0) * view_pixel_size,
+                      0
+                  )
+                      .rgb
+        * 0.03125;
+    bloom_tile += textureLod(
+                      SRC_SAMPLER,
+                      uv_src + vec2(-2.0, -2.0) * view_pixel_size,
+                      0
+                  )
+                      .rgb
+        * 0.03125;
 }

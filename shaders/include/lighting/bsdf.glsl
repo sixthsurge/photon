@@ -14,9 +14,9 @@ float distribution_ggx(float NoH_sq, float alpha_sq) {
 }
 
 float v1_smith_ggx(float cos_theta, float alpha_sq) {
-    return 1.0 /
-        (cos_theta +
-         sqrt((-cos_theta * alpha_sq + cos_theta) * cos_theta + alpha_sq));
+    return 1.0
+        / (cos_theta
+           + sqrt((-cos_theta * alpha_sq + cos_theta) * cos_theta + alpha_sq));
 }
 
 float v2_smith_ggx(float NoL, float NoV, float alpha_sq) {
@@ -42,8 +42,8 @@ vec3 fresnel_dielectric_n(float cos_theta, float n) {
     float b = g + cos_theta;
 
     return vec3(
-        0.5 * sqr(a / b) *
-        (1.0 + sqr((b * cos_theta - 1.0) / (a * cos_theta + 1.0)))
+        0.5 * sqr(a / b)
+        * (1.0 + sqr((b * cos_theta - 1.0) / (a * cos_theta + 1.0)))
     );
 }
 
@@ -76,13 +76,13 @@ vec3 diffuse_hammon(
 
     float fresnel_nl = fresnel_dielectric(max(NoL, 1e-2), f0).x;
     float fresnel_nv = fresnel_dielectric(max(NoV, 1e-2), f0).x;
-    float energy_conservation_factor =
-        1.0 - (4.0 * sqrt(f0) + 5.0 * f0 * f0) * (1.0 / 9.0);
+    float energy_conservation_factor
+        = 1.0 - (4.0 * sqrt(f0) + 5.0 * f0 * f0) * (1.0 / 9.0);
 
-    float single_rough =
-        max0(facing) * (-0.2 * facing + 0.45) * (1.0 / NoH + 2.0);
-    float single_smooth =
-        (1.0 - fresnel_nl) * (1.0 - fresnel_nv) / energy_conservation_factor;
+    float single_rough
+        = max0(facing) * (-0.2 * facing + 0.45) * (1.0 / NoH + 2.0);
+    float single_smooth
+        = (1.0 - fresnel_nl) * (1.0 - fresnel_nv) / energy_conservation_factor;
 
     float single = mix(single_smooth, single_rough, roughness) * rcp_pi;
     float multi = 0.1159 * roughness;

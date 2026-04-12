@@ -91,30 +91,30 @@ vec4 catmull_rom_filter(sampler2D sampler, vec2 coord, out float confidence) {
     tex_pos_12 *= view_pixel_size;
 
     vec4 result = vec4(0.0);
-    result +=
-        texture(sampler, vec2(tex_pos_0.x, tex_pos_0.y), 0.0) * w0.x * w0.y;
-    result +=
-        texture(sampler, vec2(tex_pos_12.x, tex_pos_0.y), 0.0) * w12.x * w0.y;
-    result +=
-        texture(sampler, vec2(tex_pos_3.x, tex_pos_0.y), 0.0) * w3.x * w0.y;
+    result
+        += texture(sampler, vec2(tex_pos_0.x, tex_pos_0.y), 0.0) * w0.x * w0.y;
+    result += texture(sampler, vec2(tex_pos_12.x, tex_pos_0.y), 0.0) * w12.x
+        * w0.y;
+    result
+        += texture(sampler, vec2(tex_pos_3.x, tex_pos_0.y), 0.0) * w3.x * w0.y;
 
-    result +=
-        texture(sampler, vec2(tex_pos_0.x, tex_pos_12.y), 0.0) * w0.x * w12.y;
-    result +=
-        texture(sampler, vec2(tex_pos_12.x, tex_pos_12.y), 0.0) * w12.x * w12.y;
-    result +=
-        texture(sampler, vec2(tex_pos_3.x, tex_pos_12.y), 0.0) * w3.x * w12.y;
+    result += texture(sampler, vec2(tex_pos_0.x, tex_pos_12.y), 0.0) * w0.x
+        * w12.y;
+    result += texture(sampler, vec2(tex_pos_12.x, tex_pos_12.y), 0.0) * w12.x
+        * w12.y;
+    result += texture(sampler, vec2(tex_pos_3.x, tex_pos_12.y), 0.0) * w3.x
+        * w12.y;
 
-    result +=
-        texture(sampler, vec2(tex_pos_0.x, tex_pos_3.y), 0.0) * w0.x * w3.y;
-    result +=
-        texture(sampler, vec2(tex_pos_12.x, tex_pos_3.y), 0.0) * w12.x * w3.y;
-    result +=
-        texture(sampler, vec2(tex_pos_3.x, tex_pos_3.y), 0.0) * w3.x * w3.y;
+    result
+        += texture(sampler, vec2(tex_pos_0.x, tex_pos_3.y), 0.0) * w0.x * w3.y;
+    result += texture(sampler, vec2(tex_pos_12.x, tex_pos_3.y), 0.0) * w12.x
+        * w3.y;
+    result
+        += texture(sampler, vec2(tex_pos_3.x, tex_pos_3.y), 0.0) * w3.x * w3.y;
 
     // Calculate confidence-of-quality factor using UE method (maximum weight)
-    confidence = max_of(vec4(w0.x, w1.x, w2.x, w3.x)) *
-        max_of(vec4(w0.y, w1.y, w2.y, w3.y));
+    confidence = max_of(vec4(w0.x, w1.x, w2.x, w3.x))
+        * max_of(vec4(w0.y, w1.y, w2.y, w3.y));
 
     return result;
 }
@@ -142,8 +142,8 @@ vec4 catmull_rom_filter_fast(
 
     vec2 w0 = -sharpness * f3 + 2.0 * sharpness * f2 - sharpness * f;
     vec2 w1 = (2.0 - sharpness) * f3 - (3.0 - sharpness) * f2 + 1.0;
-    vec2 w2 =
-        -(2.0 - sharpness) * f3 + (3.0 - 2.0 * sharpness) * f2 + sharpness * f;
+    vec2 w2 = -(2.0 - sharpness) * f3 + (3.0 - 2.0 * sharpness) * f2
+        + sharpness * f;
     vec2 w3 = sharpness * f3 - sharpness * f2;
 
     vec2 w12 = w1 + w2;
@@ -159,10 +159,10 @@ vec4 catmull_rom_filter_fast(
     float l3 = w3.x * w12.y;
     float l4 = w12.x * w3.y;
 
-    vec4 color = texture(sampler, vec2(tc12.x, tc0.y)) * l0 +
-        texture(sampler, vec2(tc0.x, tc12.y)) * l1 + center_color * l2 +
-        texture(sampler, vec2(tc3.x, tc12.y)) * l3 +
-        texture(sampler, vec2(tc12.x, tc3.y)) * l4;
+    vec4 color = texture(sampler, vec2(tc12.x, tc0.y)) * l0
+        + texture(sampler, vec2(tc0.x, tc12.y)) * l1 + center_color * l2
+        + texture(sampler, vec2(tc3.x, tc12.y)) * l3
+        + texture(sampler, vec2(tc12.x, tc3.y)) * l4;
 
     return color / (l0 + l1 + l2 + l3 + l4);
 }
@@ -183,8 +183,8 @@ vec3 catmull_rom_filter_fast_rgb(
 
     vec2 w0 = -sharpness * f3 + 2.0 * sharpness * f2 - sharpness * f;
     vec2 w1 = (2.0 - sharpness) * f3 - (3.0 - sharpness) * f2 + 1.0;
-    vec2 w2 =
-        -(2.0 - sharpness) * f3 + (3.0 - 2.0 * sharpness) * f2 + sharpness * f;
+    vec2 w2 = -(2.0 - sharpness) * f3 + (3.0 - 2.0 * sharpness) * f2
+        + sharpness * f;
     vec2 w3 = sharpness * f3 - sharpness * f2;
 
     vec2 w12 = w1 + w2;
@@ -194,12 +194,12 @@ vec3 catmull_rom_filter_fast_rgb(
     vec2 tc0 = view_pixel_size * (center_position - 1.0);
     vec2 tc3 = view_pixel_size * (center_position + 2.0);
 
-    vec4 color =
-        vec4(texture(sampler, vec2(tc12.x, tc0.y)).rgb, 1.0) * (w12.x * w0.y) +
-        vec4(texture(sampler, vec2(tc0.x, tc12.y)).rgb, 1.0) * (w0.x * w12.y) +
-        vec4(center_color, 1.0) * (w12.x * w12.y) +
-        vec4(texture(sampler, vec2(tc3.x, tc12.y)).rgb, 1.0) * (w3.x * w12.y) +
-        vec4(texture(sampler, vec2(tc12.x, tc3.y)).rgb, 1.0) * (w12.x * w3.y);
+    vec4 color
+        = vec4(texture(sampler, vec2(tc12.x, tc0.y)).rgb, 1.0) * (w12.x * w0.y)
+        + vec4(texture(sampler, vec2(tc0.x, tc12.y)).rgb, 1.0) * (w0.x * w12.y)
+        + vec4(center_color, 1.0) * (w12.x * w12.y)
+        + vec4(texture(sampler, vec2(tc3.x, tc12.y)).rgb, 1.0) * (w3.x * w12.y)
+        + vec4(texture(sampler, vec2(tc12.x, tc3.y)).rgb, 1.0) * (w12.x * w3.y);
 
     return color.rgb / color.a;
 }

@@ -61,11 +61,11 @@ void main() {
     );
 
     vec4 line_pos_start = vec4(vaPosition, 1.0);
-    line_pos_start =
-        projectionMatrix * view_scale * modelViewMatrix * line_pos_start;
+    line_pos_start
+        = projectionMatrix * view_scale * modelViewMatrix * line_pos_start;
     vec4 line_pos_end = vec4(vaPosition + vaNormal, 1.0);
-    line_pos_end =
-        projectionMatrix * view_scale * modelViewMatrix * line_pos_end;
+    line_pos_end
+        = projectionMatrix * view_scale * modelViewMatrix * line_pos_end;
 
     vec3 ndc1 = line_pos_start.xyz / line_pos_start.w;
     vec3 ndc2 = line_pos_end.xyz / line_pos_end.w;
@@ -74,9 +74,9 @@ void main() {
 
     vec2 line_offset =
 #if BOX_LINE_WIDTH != 2
-        vec2(-line_screen_dir.y, line_screen_dir.x) * view_pixel_size *
-        ((renderStage == MC_RENDER_STAGE_OUTLINE) ? float(BOX_LINE_WIDTH)
-                                                  : 2.0);
+        vec2(-line_screen_dir.y, line_screen_dir.x) * view_pixel_size
+        * ((renderStage == MC_RENDER_STAGE_OUTLINE) ? float(BOX_LINE_WIDTH)
+                                                    : 2.0);
 #else
         vec2(-line_screen_dir.y, line_screen_dir.x) * view_pixel_size * 2.0;
 #endif
@@ -101,8 +101,8 @@ void main() {
 #endif
 
 #if defined TAA && defined TAAU
-    clip_pos.xy = clip_pos.xy * taau_render_scale +
-        clip_pos.w * (taau_render_scale - 1.0);
+    clip_pos.xy = clip_pos.xy * taau_render_scale
+        + clip_pos.w * (taau_render_scale - 1.0);
     clip_pos.xy += taa_offset * clip_pos.w;
 #elif defined TAA
     clip_pos.xy += taa_offset * clip_pos.w * 0.66;

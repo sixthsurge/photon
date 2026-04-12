@@ -76,25 +76,25 @@ Material get_water_material(
 
     // Water texture
 
-#if WATER_TEXTURE == WATER_TEXTURE_HIGHLIGHT || \
-    WATER_TEXTURE == WATER_TEXTURE_HIGHLIGHT_UNDERGROUND
+#if WATER_TEXTURE == WATER_TEXTURE_HIGHLIGHT \
+    || WATER_TEXTURE == WATER_TEXTURE_HIGHLIGHT_UNDERGROUND
     float texture_highlight = dampen(
-        0.5 * sqr(linear_step(0.63, 1.0, sampled_color.r)) +
-        0.03 * sampled_color.r
+        0.5 * sqr(linear_step(0.63, 1.0, sampled_color.r))
+        + 0.03 * sampled_color.r
     );
 #if WATER_TEXTURE == WATER_TEXTURE_HIGHLIGHT_UNDERGROUND
     texture_highlight *= 1.0 - cube(linear_step(0.0, 0.5, light_levels.y));
 #endif
 
     sampled_color *= tint;
-    material.albedo =
-        clamp01(0.5 * exp(-2.0 * water_absorption_coeff) * texture_highlight);
+    material.albedo
+        = clamp01(0.5 * exp(-2.0 * water_absorption_coeff) * texture_highlight);
     material.roughness += 0.3 * texture_highlight;
     alpha += texture_highlight;
 #elif WATER_TEXTURE == WATER_TEXTURE_VANILLA
     sampled_color *= tint;
-    material.albedo = srgb_eotf_inv(sampled_color.rgb * sampled_color.a) *
-        rec709_to_working_color;
+    material.albedo = srgb_eotf_inv(sampled_color.rgb * sampled_color.a)
+        * rec709_to_working_color;
     alpha = sampled_color.a;
 #endif
 
@@ -103,21 +103,21 @@ Material get_water_material(
 #ifdef WATER_EDGE_HIGHLIGHT
     float dist = layer_dist * max(abs(dir_world.y), eps);
 
-#if WATER_TEXTURE == WATER_TEXTURE_HIGHLIGHT || \
-    WATER_TEXTURE == WATER_TEXTURE_HIGHLIGHT_UNDERGROUND
-    float edge_highlight =
-        cube(max0(1.0 - 2.0 * dist)) * (1.0 + 8.0 * texture_highlight);
+#if WATER_TEXTURE == WATER_TEXTURE_HIGHLIGHT \
+    || WATER_TEXTURE == WATER_TEXTURE_HIGHLIGHT_UNDERGROUND
+    float edge_highlight
+        = cube(max0(1.0 - 2.0 * dist)) * (1.0 + 8.0 * texture_highlight);
 #else
     float edge_highlight = cube(max0(1.0 - 2.0 * dist));
 #endif
-    edge_highlight *= WATER_EDGE_HIGHLIGHT_INTENSITY * max0(normal.y) *
-        (1.0 - 0.5 * sqr(light_levels.y));
+    edge_highlight *= WATER_EDGE_HIGHLIGHT_INTENSITY * max0(normal.y)
+        * (1.0 - 0.5 * sqr(light_levels.y));
     ;
 
-    material.albedo += 0.1 * edge_highlight /
-        mix(1.0,
-            max(dot(ambient_color, luminance_weights_rec2020), 0.5),
-            light_levels.y);
+    material.albedo += 0.1 * edge_highlight
+        / mix(1.0,
+              max(dot(ambient_color, luminance_weights_rec2020), 0.5),
+              light_levels.y);
     material.albedo = clamp01(material.albedo);
     alpha += edge_highlight;
 #endif
@@ -131,8 +131,8 @@ void voxy_emitFragment(VoxyFragmentParameters parameters) {
     // Get the depth of the solid layer behind this fragment (used for edge
     // highlight effect)
 
-    float lod_depth_behind =
-        texelFetch(vxDepthTexOpaque, ivec2(gl_FragCoord.xy), 0).x;
+    float lod_depth_behind
+        = texelFetch(vxDepthTexOpaque, ivec2(gl_FragCoord.xy), 0).x;
 
     // Get light colors
 
@@ -152,8 +152,8 @@ void voxy_emitFragment(VoxyFragmentParameters parameters) {
                       uint((parameters.face >> 1) == 2),
                       uint((parameters.face >> 1) == 0),
                       uint((parameters.face >> 1) == 1)
-                  ) *
-        (float(int(parameters.face) & 1) * 2.0 - 1.0);
+                  )
+        * (float(int(parameters.face) & 1) * 2.0 - 1.0);
 
     uint material_mask = max(parameters.customId - 10000u, 0u);
 
@@ -167,8 +167,8 @@ void voxy_emitFragment(VoxyFragmentParameters parameters) {
 
     // Get distance to the solid layer behind this fragment
 
-    vec3 back_pos_view =
-        screen_to_view_space(vxProjInv, vec3(coord, lod_depth_behind), true);
+    vec3 back_pos_view
+        = screen_to_view_space(vxProjInv, vec3(coord, lod_depth_behind), true);
     float layer_dist = distance(pos_view, back_pos_view);
 
     // Get material

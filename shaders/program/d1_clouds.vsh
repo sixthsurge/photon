@@ -110,8 +110,8 @@ void main() {
 
     clouds_params = get_clouds_parameters(get_weather());
 
-    sky_color += aurora_amount * AURORA_CLOUD_LIGHTING *
-        mix(aurora_colors[0], aurora_colors[1], 0.25);
+    sky_color += aurora_amount * AURORA_CLOUD_LIGHTING
+        * mix(aurora_colors[0], aurora_colors[1], 0.25);
 #endif
 
     vec2 vertex_pos = gl_Vertex.xy * taau_render_scale;

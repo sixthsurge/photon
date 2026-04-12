@@ -230,8 +230,8 @@ void main() {
     );
     vec3 position_scene = view_to_scene_space(position_view);
     vec3 position_world = position_scene + cameraPosition;
-    vec3 direction_world =
-        normalize(position_scene - gbufferModelViewInverse[3].xyz);
+    vec3 direction_world
+        = normalize(position_scene - gbufferModelViewInverse[3].xyz);
 
 #if defined WORLD_OVERWORLD
     // Atmosphere
@@ -248,8 +248,8 @@ void main() {
     // Read clouds/aurora/crepuscular rays
 
     float clouds_apparent_distance;
-    vec4 clouds_and_aurora =
-        read_clouds_and_aurora(uv, clouds_apparent_distance);
+    vec4 clouds_and_aurora
+        = read_clouds_and_aurora(uv, clouds_apparent_distance);
 
     // Blocky clouds
 
@@ -282,8 +282,8 @@ void main() {
 #endif
 
     float new_alpha = sqr(sqr(blocky_clouds.a));
-    blocky_clouds.rgb +=
-        atmosphere * (1.0 - new_alpha) * (blocky_clouds.a - new_alpha);
+    blocky_clouds.rgb
+        += atmosphere * (1.0 - new_alpha) * (blocky_clouds.a - new_alpha);
     blocky_clouds.a = new_alpha;
 #endif
 #endif
@@ -418,12 +418,14 @@ void main() {
 
 #define depth_weight(reversed_depth) \
     exp2( \
-        -10.0 * \
-        abs(screen_to_view_space_depth( \
+        -10.0 \
+        * abs( \
+            screen_to_view_space_depth( \
                 combined_projection_matrix_inverse, \
                 1.0 - reversed_depth \
-            ) - \
-            lin_z) \
+            ) \
+            - lin_z \
+        ) \
     )
         float w00 = depth_weight(ambient_depth_00) * (1.0 - f.x) * (1.0 - f.y);
         float w10 = depth_weight(ambient_depth_10) * (f.x - f.x * f.y);
@@ -435,8 +437,8 @@ void main() {
         float weight_sum = w00 + w10 + w01 + w11;
 
         if (abs(weight_sum) > eps) {
-            ambient_upscaled = ambient_00 * w00 + ambient_10 * w10 +
-                ambient_01 * w01 + ambient_11 * w11;
+            ambient_upscaled = ambient_00 * w00 + ambient_10 * w10
+                + ambient_01 * w01 + ambient_11 * w11;
 
             ambient_upscaled *= rcp(weight_sum);
         } else {
@@ -448,8 +450,8 @@ void main() {
 
         vec3 bent_normal;
         bent_normal.xy = ambient_upscaled.zw * 2.0 - 1.0;
-        bent_normal.z =
-            sqrt(clamp01(1.0 - dot(bent_normal.xy, bent_normal.xy)));
+        bent_normal.z
+            = sqrt(clamp01(1.0 - dot(bent_normal.xy, bent_normal.xy)));
         bent_normal = mat3(gbufferModelViewInverse) * bent_normal;
 
         // Sense check bent normal
@@ -525,19 +527,21 @@ void main() {
 #endif
             }
 
-            shadows =
-                mix(shadow_near,
-                    vec3(shadow_distant),
-                    clamp01(shadow_distance_fade));
+            shadows = mix(
+                shadow_near,
+                vec3(shadow_distant),
+                clamp01(shadow_distance_fade)
+            );
 
-            sss_depth =
-                mix(sss_depth_near,
-                    sss_depth_distant,
-                    clamp01(shadow_distance_fade));
+            sss_depth = mix(
+                sss_depth_near,
+                sss_depth_distant,
+                clamp01(shadow_distance_fade)
+            );
 
             // Apply parallax shadow
-#if defined POM && defined POM_SHADOW && \
-    (defined SPECULAR_MAPPING || defined NORMAL_MAPPING)
+#if defined POM && defined POM_SHADOW \
+    && (defined SPECULAR_MAPPING || defined NORMAL_MAPPING)
             shadows *= float(!parallax_shadow);
 #endif
         }
@@ -577,9 +581,9 @@ void main() {
         // Specular highlight
 
 #if defined WORLD_OVERWORLD || defined WORLD_END
-        fragment_color +=
-            get_specular_highlight(material, NoL, NoV, NoH, LoV, LoH) *
-            light_color * shadows * cloud_shadows * ao;
+        fragment_color
+            += get_specular_highlight(material, NoL, NoV, NoH, LoV, LoH)
+            * light_color * shadows * cloud_shadows * ao;
 #endif
 
         // Specular reflections
@@ -606,9 +610,9 @@ void main() {
         // Edge highlight
 
 #ifdef EDGE_HIGHLIGHT
-        fragment_color *= 1.0 +
-            0.5 *
-                get_edge_highlight(
+        fragment_color *= 1.0
+            + 0.5
+                * get_edge_highlight(
                     position_scene,
                     flat_normal,
                     depth,
@@ -627,19 +631,20 @@ void main() {
         );
         vec3 horizon_color = texture(colortex4, project_sky(horizon_dir)).rgb;
 
-        float horizon_factor =
-            linear_step(0.1, 1.0, exp(-75.0 * sqr(sun_dir.y + 0.0496)));
+        float horizon_factor
+            = linear_step(0.1, 1.0, exp(-75.0 * sqr(sun_dir.y + 0.0496)));
         horizon_factor = clamp01(horizon_factor + step(0.01, rainStrength));
-        horizon_factor =
-            max(horizon_factor,
-                dampen(linear_step(0.15, 0.05, direction_world.y)));
+        horizon_factor = max(
+            horizon_factor,
+            dampen(linear_step(0.15, 0.05, direction_world.y))
+        );
 
-        vec3 border_fog_color =
-            mix(atmosphere, horizon_color, sqr(horizon_factor)) *
-            (1.0 - biome_cave);
+        vec3 border_fog_color
+            = mix(atmosphere, horizon_color, sqr(horizon_factor))
+            * (1.0 - biome_cave);
 #else
-        vec3 border_fog_color =
-            texture(colortex4, project_sky(direction_world)).rgb;
+        vec3 border_fog_color
+            = texture(colortex4, project_sky(direction_world)).rgb;
 #endif
 
         float border_fog = border_fog(position_scene, direction_world);
@@ -656,8 +661,8 @@ void main() {
         fragment_color = fragment_color * blocky_clouds.w + blocky_clouds.xyz;
 #else
         if (sqr(clouds_apparent_distance) < length_squared(position_view)) {
-            fragment_color =
-                fragment_color * clouds_and_aurora.w + clouds_and_aurora.xyz;
+            fragment_color
+                = fragment_color * clouds_and_aurora.w + clouds_and_aurora.xyz;
         }
 #endif
 

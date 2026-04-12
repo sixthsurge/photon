@@ -33,8 +33,8 @@ vec2 blocker_search(vec3 scene_pos, float dither, bool has_sss) {
     vec3 shadow_clip_pos = project_ortho(shadowProjection, shadow_view_pos);
     float ref_z = shadow_clip_pos.z * (SHADOW_DEPTH_SCALE * 0.5) + 0.5;
 
-    float radius = SHADOW_BLOCKER_SEARCH_RADIUS * shadowProjection[0].x *
-        (0.5 + 0.5 * linear_step(0.2, 0.4, light_dir.y));
+    float radius = SHADOW_BLOCKER_SEARCH_RADIUS * shadowProjection[0].x
+        * (0.5 + 0.5 * linear_step(0.2, 0.4, light_dir.y));
 
     float depth_sum = 0.0;
     float weight_sum = 0.0;
@@ -55,8 +55,8 @@ vec2 blocker_search(vec3 scene_pos, float dither, bool has_sss) {
     }
 
     float blocker_depth = weight_sum == 0.0 ? 0.0 : depth_sum / weight_sum;
-    float sss_depth = -shadowProjectionInverse[2].z * depth_sum_sss *
-        rcp(SHADOW_DEPTH_SCALE * float(step_count));
+    float sss_depth = -shadowProjectionInverse[2].z * depth_sum_sss
+        * rcp(SHADOW_DEPTH_SCALE * float(step_count));
 
     return vec2(blocker_depth, sss_depth);
 }
@@ -73,8 +73,9 @@ vec3 shadow_basic(vec3 shadow_screen_pos) {
 
     vec3 averageColor = vec3(0.0);
     for (int i = 0; i < 9; ++i) {
-        averageColor +=
-            texelFetch(shadowcolor0, texel + blur_kernel_offsets_3x3[i], 0).rgb;
+        averageColor
+            += texelFetch(shadowcolor0, texel + blur_kernel_offsets_3x3[i], 0)
+                   .rgb;
     }
     // hide sunlight seams between colored shadow and opaque shadows
     weight *= step(eps, max_of(averageColor));
@@ -105,8 +106,8 @@ vec3 shadow_pcf(
     float filter_radius = max(penumbra_size, min_filter_radius);
     float filter_scale = sqr(filter_radius / min_filter_radius);
 
-    int step_count =
-        int(SHADOW_PCF_STEPS_MIN + SHADOW_PCF_STEPS_SCALE * filter_scale);
+    int step_count
+        = int(SHADOW_PCF_STEPS_MIN + SHADOW_PCF_STEPS_SCALE * filter_scale);
     step_count = min(step_count, SHADOW_PCF_STEPS_MAX);
 
     float shadow = 0.0;
@@ -116,8 +117,8 @@ vec3 shadow_pcf(
 
     // perform first 4 iterations and filter shadow color
     for (int i = 0; i < 4; ++i) {
-        vec2 offset =
-            vogel_disc_sample(i, step_count, dither * tau) * filter_radius;
+        vec2 offset
+            = vogel_disc_sample(i, step_count, dither * tau) * filter_radius;
 
         vec2 uv = shadow_clip_pos.xy + offset;
         uv /= get_distortion_factor(uv);
@@ -136,10 +137,11 @@ vec3 shadow_pcf(
         float depth = texelFetch(shadowtex0, texel, 0).x;
 
         vec3 color = texelFetch(shadowcolor0, texel, 0).rgb;
-        color =
-            mix(vec3(1.0),
-                4.0 * color,
-                step(depth, shadow_screen_pos_translucent.z));
+        color = mix(
+            vec3(1.0),
+            4.0 * color,
+            step(depth, shadow_screen_pos_translucent.z)
+        );
 
         float weight = 1.0;
 
@@ -159,8 +161,8 @@ vec3 shadow_pcf(
 
     // perform remaining iterations
     for (int i = 4; i < step_count; ++i) {
-        vec2 offset =
-            vogel_disc_sample(i, step_count, dither * tau) * filter_radius;
+        vec2 offset
+            = vogel_disc_sample(i, step_count, dither * tau) * filter_radius;
 
         vec2 uv = shadow_clip_pos.xy + offset;
         uv /= get_distortion_factor(uv);
@@ -172,8 +174,8 @@ vec3 shadow_pcf(
     float rcp_steps = rcp(float(step_count));
 
     // sharpening for small penumbra sizes
-    float sharpening_threshold =
-        0.4 * max0((min_filter_radius - penumbra_size) / min_filter_radius);
+    float sharpening_threshold
+        = 0.4 * max0((min_filter_radius - penumbra_size) / min_filter_radius);
     shadow = linear_step(
         sharpening_threshold,
         1.0 - sharpening_threshold,
@@ -200,21 +202,21 @@ vec3 get_filtered_shadows(
 
     // Light leaking prevention from Complementary Reimagined, used with
     // permission
-    vec3 edge_factor =
-        0.1 - 0.2 * fract(scene_pos + cameraPosition + flat_normal * 0.01);
+    vec3 edge_factor
+        = 0.1 - 0.2 * fract(scene_pos + cameraPosition + flat_normal * 0.01);
     edge_factor -= edge_factor * skylight;
 
 #ifdef PIXELATED_SHADOWS
     // Snap position to the nearest block texel
     const float pixel_scale = float(PIXELATED_SHADOWS_RESOLUTION);
     scene_pos = scene_pos + cameraPosition;
-    scene_pos = floor(scene_pos * pixel_scale + 0.01) * rcp(pixel_scale) +
-        (0.5 / pixel_scale);
+    scene_pos = floor(scene_pos * pixel_scale + 0.01) * rcp(pixel_scale)
+        + (0.5 / pixel_scale);
     scene_pos = scene_pos - cameraPosition;
 #endif
 
-    vec3 shadow_view_pos =
-        transform(shadowModelView, scene_pos + bias + edge_factor);
+    vec3 shadow_view_pos
+        = transform(shadowModelView, scene_pos + bias + edge_factor);
     vec3 shadow_clip_pos = project_ortho(shadowProjection, shadow_view_pos);
     vec3 shadow_screen_pos = distort_shadow_space(shadow_clip_pos) * 0.5 + 0.5;
 
@@ -228,8 +230,8 @@ vec3 get_filtered_shadows(
     dither = r1(frameCounter, dither);
 
 #ifdef SHADOW_VPS
-    vec2 blocker_search_result =
-        blocker_search(scene_pos, dither, sss_amount > eps);
+    vec2 blocker_search_result
+        = blocker_search(scene_pos, dither, sss_amount > eps);
 
     sss_depth = blocker_search_result.y;
 
@@ -240,17 +242,17 @@ vec3 get_filtered_shadows(
         return vec3(1.0); // blocker search empty handed => no occluders
     }
 
-    float penumbra_size = 16.0 * SHADOW_PENUMBRA_SCALE *
-        (shadow_screen_pos.z - blocker_search_result.x) /
-        blocker_search_result.x;
-    penumbra_size *=
-        5.0 - 4.0 * cloud_shadows; // Increase penumbra radius inside cloud
-                                   // shadows, nice overcast look
+    float penumbra_size = 16.0 * SHADOW_PENUMBRA_SCALE
+        * (shadow_screen_pos.z - blocker_search_result.x)
+        / blocker_search_result.x;
+    penumbra_size
+        *= 5.0 - 4.0 * cloud_shadows; // Increase penumbra radius inside cloud
+                                      // shadows, nice overcast look
     penumbra_size = min(penumbra_size, SHADOW_BLOCKER_SEARCH_RADIUS);
     penumbra_size *= shadowProjection[0].x;
 #else
-    float penumbra_size =
-        sqrt(0.5) * shadow_map_pixel_size * SHADOW_PENUMBRA_SCALE;
+    float penumbra_size
+        = sqrt(0.5) * shadow_map_pixel_size * SHADOW_PENUMBRA_SCALE;
 
     // Increase blur radius to approximate subsurface scattering
     penumbra_size *= 1.0 + 7.0 * sss_amount;
@@ -260,12 +262,12 @@ vec3 get_filtered_shadows(
     // Calculate position without light leaking fix applied, for colored shadow
     // Applying light leaking fix to translucent shadows causes artifacts on
     // water caustics
-    vec3 shadow_view_pos_translucent =
-        transform(shadowModelView, scene_pos + bias);
-    vec3 shadow_clip_pos_translucent =
-        project_ortho(shadowProjection, shadow_view_pos_translucent);
-    vec3 shadow_screen_pos_translucent =
-        distort_shadow_space(shadow_clip_pos_translucent) * 0.5 + 0.5;
+    vec3 shadow_view_pos_translucent
+        = transform(shadowModelView, scene_pos + bias);
+    vec3 shadow_clip_pos_translucent
+        = project_ortho(shadowProjection, shadow_view_pos_translucent);
+    vec3 shadow_screen_pos_translucent
+        = distort_shadow_space(shadow_clip_pos_translucent) * 0.5 + 0.5;
 #endif
 
 #ifdef SHADOW_PCF

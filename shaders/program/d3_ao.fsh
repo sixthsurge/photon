@@ -85,8 +85,8 @@ const float ao_render_scale = 0.5;
 
 void main() {
     ivec2 texel = ivec2(gl_FragCoord.xy);
-    ivec2 view_texel =
-        ivec2(gl_FragCoord.xy * (taau_render_scale / ao_render_scale));
+    ivec2 view_texel
+        = ivec2(gl_FragCoord.xy * (taau_render_scale / ao_render_scale));
 
     if (clamp(view_texel, ivec2(0), ivec2(view_res)) != view_texel) {
         return;
@@ -180,8 +180,9 @@ void main() {
     const float depth_rejection_strength = 16.0;
     const float offcenter_rejection_strength = 0.25;
 
-    vec4 history =
-        max0(catmull_rom_filter_fast(colortex6, previous_screen_pos.xy, 0.65));
+    vec4 history = max0(
+        catmull_rom_filter_fast(colortex6, previous_screen_pos.xy, 0.65)
+    );
     vec2 history_data = max0(texture(colortex14, previous_screen_pos.xy).xy);
 
     if (clamp01(previous_screen_pos.xy) == previous_screen_pos.xy) {
@@ -196,14 +197,14 @@ void main() {
         );
 
         // Reproject bent normal
-        history_bent_normal =
-            history_bent_normal * mat3(gbufferPreviousModelView);
+        history_bent_normal
+            = history_bent_normal * mat3(gbufferPreviousModelView);
         history_bent_normal = mat3(gbufferModelView) * history_bent_normal;
 
         // Depth rejection
         float view_norm = rcp_length(view_pos);
-        float NoV = abs(dot(view_normal, view_pos)) *
-            view_norm; // NoV / sqrt(length(view_pos))
+        float NoV = abs(dot(view_normal, view_pos))
+            * view_norm; // NoV / sqrt(length(view_pos))
         float z0 = screen_to_view_space_depth(
             combined_projection_matrix_inverse,
             depth
@@ -212,21 +213,23 @@ void main() {
             combined_projection_matrix_inverse,
             history_depth
         );
-        float depth_weight =
-            exp2(-abs(z0 - z1) * depth_rejection_strength * NoV * view_norm);
+        float depth_weight
+            = exp2(-abs(z0 - z1) * depth_rejection_strength * NoV * view_norm);
 
         // Offcenter rejection from Jessie, which is originally by Zombye
         // Reduces blur in motion
-        vec2 pixel_offset = 1.0 -
-            abs(2.0 *
-                    fract(view_res * ao_render_scale * previous_screen_pos.xy) -
-                1.0);
-        float offcenter_rejection = sqrt(pixel_offset.x * pixel_offset.y) *
-                offcenter_rejection_strength +
-            (1.0 - offcenter_rejection_strength);
+        vec2 pixel_offset = 1.0
+            - abs(2.0
+                      * fract(
+                          view_res * ao_render_scale * previous_screen_pos.xy
+                      )
+                  - 1.0);
+        float offcenter_rejection = sqrt(pixel_offset.x * pixel_offset.y)
+                * offcenter_rejection_strength
+            + (1.0 - offcenter_rejection_strength);
 
-        pixel_age *=
-            depth_weight * offcenter_rejection * float(history_depth != 1.0);
+        pixel_age
+            *= depth_weight * offcenter_rejection * float(history_depth != 1.0);
 
         // Blend with history
         float history_weight = pixel_age / (pixel_age + 1.0);

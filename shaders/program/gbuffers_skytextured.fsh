@@ -71,16 +71,16 @@ void main() {
 #ifdef VANILLA_SUN
         frag_color = texture(gtexture, new_uv).rgb;
         frag_color = srgb_eotf_inv(frag_color) * rec709_to_working_color;
-        frag_color *= dot(frag_color, luminance_weights) *
-            (sunlight_color * vanilla_sun_luminance) * sun_color;
+        frag_color *= dot(frag_color, luminance_weights)
+            * (sunlight_color * vanilla_sun_luminance) * sun_color;
 #else
         frag_color = vec3(0.0);
 #endif
     } else {
         // Moon
 #ifdef VANILLA_MOON
-        frag_color =
-            texture(gtexture, new_uv).rgb * vec3(MOON_R, MOON_G, MOON_B);
+        frag_color
+            = texture(gtexture, new_uv).rgb * vec3(MOON_R, MOON_G, MOON_B);
 
         frag_color = srgb_eotf_inv(frag_color) * rec709_to_working_color;
         frag_color *= sunlight_color * moon_luminance;

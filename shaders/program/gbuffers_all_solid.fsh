@@ -138,8 +138,8 @@ vec3 draw_end_portal() {
     const int layer_count = 8; // Number of layers
     const float depth_scale = 0.33; // Apparent distance between layers
     const float depth_fade = 0.5; // How quickly the layers fade to black
-    const float threshold =
-        0.99; // Threshold for the "stars". Lower values mean more stars appear
+    const float threshold = 0.99; // Threshold for the "stars". Lower values
+                                  // mean more stars appear
     const float twinkle_speed = 0.4; // How fast the stars appear to twinkle
     const float twinkle_amount = 0.04; // How many twinkling stars appear
     const vec3 color0 = pow(vec3(0.80, 0.90, 0.99), vec3(2.2));
@@ -178,8 +178,8 @@ vec3 draw_end_portal() {
 
         // Make layers drift over time
         float angle = i * golden_angle;
-        vec2 drift =
-            0.033 * vec2(cos(angle), sin(angle)) * frameTimeCounter * r1(i);
+        vec2 drift
+            = 0.033 * vec2(cos(angle), sin(angle)) * frameTimeCounter * r1(i);
 
         // Snap tangent_pos to a grid and calculate a seed for the RNG
         ivec2 grid_pos = ivec2((tangent_pos + drift) * 32.0 + layer_offset);
@@ -190,9 +190,9 @@ vec3 draw_end_portal() {
 
         // Twinkling animation
         float twinkle_offset = tau * random.w;
-        random.x *= 1.0 -
-            twinkle_amount *
-                cos(frameTimeCounter * twinkle_speed + twinkle_offset);
+        random.x *= 1.0
+            - twinkle_amount
+                * cos(frameTimeCounter * twinkle_speed + twinkle_offset);
 
         // Stomp all values below threshold to zero
         float intensity = pow8(linear_step(threshold, 1.0, random.x));
@@ -204,12 +204,12 @@ vec3 draw_end_portal() {
         // Fade away with depth
         float fade = exp2(-depth_fade * float(i));
 
-        result += color * intensity *
-            exp2(-3.0 * (1.0 - fade) * (1.0 - color)) * fade;
+        result += color * intensity * exp2(-3.0 * (1.0 - fade) * (1.0 - color))
+            * fade;
 
         // Step along the view ray
-        tangent_pos +=
-            tangent_dir * depth_scale * gbufferProjection[1][1] * rcp(1.37);
+        tangent_pos
+            += tangent_dir * depth_scale * gbufferProjection[1][1] * rcp(1.37);
 
         if (random.x > threshold) {
             break;
@@ -241,11 +241,11 @@ void main() {
 #if defined PROGRAM_GBUFFERS_TERRAIN && defined POM
     float view_distance = length(tangent_pos);
 
-    bool has_pom =
-        view_distance < POM_DISTANCE; // Only calculate POM for close terrain
-    has_pom = has_pom &&
-        material_mask !=
-            MATERIAL_LAVA; // Do not calculate POM for water or lava
+    bool has_pom
+        = view_distance < POM_DISTANCE; // Only calculate POM for close terrain
+    has_pom = has_pom
+        && material_mask
+            != MATERIAL_LAVA; // Do not calculate POM for water or lava
 
     vec3 tangent_dir = -normalize(tangent_pos);
     mat2 uv_gradient = mat2(dFdx(uv), dFdy(uv));
@@ -307,14 +307,16 @@ void main() {
     }
 #endif
 
-#if (defined PROGRAM_GBUFFERS_BLOCK || defined PROGRAM_GBUFFERS_ENTITIES || \
-     defined PROGRAM_GBUFFERS_HAND) && \
-    !(defined USE_SEPARATE_ENTITY_DRAWS && defined IS_IRIS)
+#if ( \
+    defined PROGRAM_GBUFFERS_BLOCK || defined PROGRAM_GBUFFERS_ENTITIES \
+    || defined PROGRAM_GBUFFERS_HAND \
+) && !(defined USE_SEPARATE_ENTITY_DRAWS && defined IS_IRIS)
 #ifdef DITHERED_TRANSLUCENCY_FALLBACK
     // Dithered transparency for translucent objects rendered as solid
-    float dither_pattern =
-        r1(frameCounter,
-           texelFetch(noisetex, ivec2(gl_FragCoord.xy) & 511, 0).z);
+    float dither_pattern = r1(
+        frameCounter,
+        texelFetch(noisetex, ivec2(gl_FragCoord.xy) & 511, 0).z
+    );
     if (base_color.a < dither_pattern) {
         discard;
         return;
@@ -335,8 +337,8 @@ void main() {
     const float vanilla_ao_lift = 0.0;
 #endif
 
-    base_color.rgb *= lift(vanilla_ao, vanilla_ao_lift) * vanilla_ao_strength +
-        (1.0 - vanilla_ao_strength);
+    base_color.rgb *= lift(vanilla_ao, vanilla_ao_lift) * vanilla_ao_strength
+        + (1.0 - vanilla_ao_strength);
 #endif
 
 #if defined PROGRAM_GBUFFERS_ENTITIES
@@ -394,8 +396,8 @@ void main() {
         clamp01(float(material_mask) * rcp(255.0))
     );
     gbuffer_data_0.z = pack_unorm_2x8(encode_unit_vector(flat_normal));
-    gbuffer_data_0.w =
-        pack_unorm_2x8(dither_8bit(adjusted_light_levels, dither));
+    gbuffer_data_0.w
+        = pack_unorm_2x8(dither_8bit(adjusted_light_levels, dither));
 
 #ifdef NORMAL_MAPPING
     gbuffer_data_1.xy = encode_unit_vector(detailed_normal);
@@ -406,8 +408,8 @@ void main() {
     // Pack parallax shadow in alpha component of specular map
     // Specular map alpha >= 0.5 => parallax shadow
     specular_map.a *= step(specular_map.a, 0.999);
-    specular_map.a =
-        clamp01(specular_map.a * 0.5 + 0.5 * float(parallax_shadow));
+    specular_map.a
+        = clamp01(specular_map.a * 0.5 + 0.5 * float(parallax_shadow));
 #endif
 
     gbuffer_data_1.z = pack_unorm_2x8(specular_map.xy);

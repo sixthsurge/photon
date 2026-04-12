@@ -9,13 +9,13 @@
 float quartic_length(vec2 v) { return sqrt(sqrt(pow4(v.x) + pow4(v.y))); }
 
 float get_distortion_factor(vec2 shadow_clip_pos) {
-    return quartic_length(shadow_clip_pos) * SHADOW_DISTORTION +
-        (1.0 - SHADOW_DISTORTION);
+    return quartic_length(shadow_clip_pos) * SHADOW_DISTORTION
+        + (1.0 - SHADOW_DISTORTION);
 }
 
 vec3 distort_shadow_space(vec3 shadow_clip_pos, float distortion_factor) {
-    return shadow_clip_pos *
-        vec3(vec2(rcp(distortion_factor)), SHADOW_DEPTH_SCALE);
+    return shadow_clip_pos
+        * vec3(vec2(rcp(distortion_factor)), SHADOW_DEPTH_SCALE);
 }
 
 vec3 distort_shadow_space(vec3 shadow_clip_pos) {
@@ -24,8 +24,8 @@ vec3 distort_shadow_space(vec3 shadow_clip_pos) {
 }
 
 vec3 undistort_shadow_space(vec3 shadow_clip_pos) {
-    shadow_clip_pos.xy *=
-        (1.0 - SHADOW_DISTORTION) / (1.0 - quartic_length(shadow_clip_pos.xy));
+    shadow_clip_pos.xy *= (1.0 - SHADOW_DISTORTION)
+        / (1.0 - quartic_length(shadow_clip_pos.xy));
     shadow_clip_pos.z *= rcp(SHADOW_DEPTH_SCALE);
     return shadow_clip_pos;
 }
@@ -39,8 +39,8 @@ vec3 get_shadow_bias(vec3 scene_pos, vec3 normal, float NoL, float skylight) {
 #endif
 
     // Shadow bias without peter-panning
-    return 0.25 * normal * clamp01(0.12 + 0.01 * length(scene_pos)) *
-        (2.0 - clamp01(NoL));
+    return 0.25 * normal * clamp01(0.12 + 0.01 * length(scene_pos))
+        * (2.0 - clamp01(NoL));
 }
 
 #endif // INCLUDE_LIGHTING_DISTORTION

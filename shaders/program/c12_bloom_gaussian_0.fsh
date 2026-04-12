@@ -25,8 +25,8 @@ uniform sampler2D colortex0;
 
 uniform vec2 view_res;
 
-const float[5] binomial_weights_9 =
-    float[5](0.2734375, 0.21875, 0.109375, 0.03125, 0.00390625);
+const float[5] binomial_weights_9
+    = float[5](0.2734375, 0.21875, 0.109375, 0.03125, 0.00390625);
 
 void main() {
     ivec2 texel = ivec2(gl_FragCoord.xy);
@@ -43,8 +43,8 @@ void main() {
 
     // Discard fragments that aren't part of a bloom tile
 
-    if (clamp(texel.y, bounds_min.y, bounds_max.y) != texel.y ||
-        tile_index > 5) {
+    if (clamp(texel.y, bounds_min.y, bounds_max.y) != texel.y
+        || tile_index > 5) {
         discard;
         return;
     }
@@ -56,8 +56,8 @@ void main() {
 
     for (int i = -4; i <= 4; ++i) {
         ivec2 pos = texel + ivec2(i, 0);
-        float weight = binomial_weights_9[abs(i)] *
-            float(clamp(pos.x, bounds_min.x + 2, bounds_max.x - 2) == pos.x);
+        float weight = binomial_weights_9[abs(i)]
+            * float(clamp(pos.x, bounds_min.x + 2, bounds_max.x - 2) == pos.x);
         bloom_tiles += texelFetch(colortex0, pos, 0).rgb * weight;
         weight_sum += weight;
     }

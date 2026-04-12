@@ -125,8 +125,8 @@ uniform sampler3D light_sampler_b;
 
 void main() {
     ivec2 fog_texel = ivec2(gl_FragCoord.xy);
-    ivec2 view_texel =
-        ivec2(gl_FragCoord.xy * taau_render_scale * rcp(VL_RENDER_SCALE));
+    ivec2 view_texel
+        = ivec2(gl_FragCoord.xy * taau_render_scale * rcp(VL_RENDER_SCALE));
 
     float depth0 = texelFetch(depthtex0, view_texel, 0).x;
     float depth1 = texelFetch(depthtex1, view_texel, 0).x;
@@ -156,8 +156,11 @@ void main() {
 
     float skylight = unpack_unorm_2x8(gbuffer_data_0.w).y;
 
-    vec3 view_pos =
-        screen_to_view_space(projection_matrix_inverse, vec3(uv, depth0), true);
+    vec3 view_pos = screen_to_view_space(
+        projection_matrix_inverse,
+        vec3(uv, depth0),
+        true
+    );
     vec3 scene_pos = view_to_scene_space(view_pos);
     vec3 world_pos = scene_pos + cameraPosition;
 
@@ -229,7 +232,7 @@ void main() {
 #endif
 
 #if defined LPV_VL && defined COLORED_LIGHTS
-    fog_scattering +=
-        get_lpv_fog_scattering(world_start_pos, world_end_pos, dither);
+    fog_scattering
+        += get_lpv_fog_scattering(world_start_pos, world_end_pos, dither);
 #endif
 }

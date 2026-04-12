@@ -13,17 +13,18 @@ struct Weather {
 };
 
 float weather_temperature() {
-    const float temperature_variation_speed =
-        0.37 * golden_ratio * rcp(600.0) * WEATHER_TEMPERATURE_VARIATION_SPEED;
+    const float temperature_variation_speed = 0.37 * golden_ratio * rcp(600.0)
+        * WEATHER_TEMPERATURE_VARIATION_SPEED;
     const float random_temperature_min = 0.0;
     const float random_temperature_max = 1.0;
     const float biome_temperature_influence = 0.1;
 
 #ifdef RANDOM_WEATHER_VARIATION
-    float temperature =
-        mix(random_temperature_min,
-            random_temperature_max,
-            noise_1d(world_age * temperature_variation_speed + 2.5));
+    float temperature = mix(
+        random_temperature_min,
+        random_temperature_max,
+        noise_1d(world_age * temperature_variation_speed + 2.5)
+    );
 #else
     float temperature = 0.5;
 #endif
@@ -35,8 +36,8 @@ float weather_temperature() {
     // Biome-based variation
 
 #ifdef BIOME_WEATHER_VARIATION
-    temperature *=
-        1.0 + (biome_temperature - 0.6) * biome_temperature_influence;
+    temperature
+        *= 1.0 + (biome_temperature - 0.6) * biome_temperature_influence;
 #endif
 
     // User adjustment
@@ -47,17 +48,18 @@ float weather_temperature() {
 }
 
 float weather_humidity() {
-    const float humidity_variation_speed =
-        0.37 * golden_ratio * rcp(600.0) * WEATHER_HUMIDITY_VARIATION_SPEED;
+    const float humidity_variation_speed
+        = 0.37 * golden_ratio * rcp(600.0) * WEATHER_HUMIDITY_VARIATION_SPEED;
     const float random_humidity_min = 0.2;
     const float random_humidity_max = 0.8;
     const float biome_humidity_influence = 0.1;
 
 #ifdef RANDOM_WEATHER_VARIATION
-    float humidity =
-        mix(random_humidity_min,
-            random_humidity_max,
-            noise_1d(world_age * humidity_variation_speed + 46.618));
+    float humidity = mix(
+        random_humidity_min,
+        random_humidity_max,
+        noise_1d(world_age * humidity_variation_speed + 46.618)
+    );
 #else
     float humidity = 0.5;
 #endif
@@ -80,16 +82,17 @@ float weather_humidity() {
 }
 
 float weather_wind() {
-    const float wind_variation_speed =
-        0.5 * golden_ratio * rcp(600.0) * WEATHER_WIND_VARIATION_SPEED;
+    const float wind_variation_speed
+        = 0.5 * golden_ratio * rcp(600.0) * WEATHER_WIND_VARIATION_SPEED;
     const float random_wind_min = 0.0;
     const float random_wind_max = 1.0;
 
 #ifdef RANDOM_WEATHER_VARIATION
-    float wind =
-        mix(random_wind_min,
-            random_wind_max,
-            noise_1d(world_age * wind_variation_speed + 83.236));
+    float wind = mix(
+        random_wind_min,
+        random_wind_max,
+        noise_1d(world_age * wind_variation_speed + 83.236)
+    );
 #else
     float wind = 0.5;
 #endif

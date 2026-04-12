@@ -45,49 +45,49 @@ vec3 gather_light(sampler3D light_sampler, ivec3 pos) {
 
     const float center_weight = 1.05;
 
-    return (texelFetch(light_sampler, pos, 0).rgb * center_weight +
-            texelFetch(
-                light_sampler,
-                clamp_to_voxel_volume(pos + face_offsets[0]),
-                0
+    return (texelFetch(light_sampler, pos, 0).rgb * center_weight
+            + texelFetch(
+                  light_sampler,
+                  clamp_to_voxel_volume(pos + face_offsets[0]),
+                  0
             )
-                .xyz +
-            texelFetch(
-                light_sampler,
-                clamp_to_voxel_volume(pos + face_offsets[1]),
-                0
+                  .xyz
+            + texelFetch(
+                  light_sampler,
+                  clamp_to_voxel_volume(pos + face_offsets[1]),
+                  0
             )
-                .xyz +
-            texelFetch(
-                light_sampler,
-                clamp_to_voxel_volume(pos + face_offsets[2]),
-                0
+                  .xyz
+            + texelFetch(
+                  light_sampler,
+                  clamp_to_voxel_volume(pos + face_offsets[2]),
+                  0
             )
-                .xyz +
-            texelFetch(
-                light_sampler,
-                clamp_to_voxel_volume(pos + face_offsets[3]),
-                0
+                  .xyz
+            + texelFetch(
+                  light_sampler,
+                  clamp_to_voxel_volume(pos + face_offsets[3]),
+                  0
             )
-                .xyz +
-            texelFetch(
-                light_sampler,
-                clamp_to_voxel_volume(pos + face_offsets[4]),
-                0
+                  .xyz
+            + texelFetch(
+                  light_sampler,
+                  clamp_to_voxel_volume(pos + face_offsets[4]),
+                  0
             )
-                .xyz +
-            texelFetch(
-                light_sampler,
-                clamp_to_voxel_volume(pos + face_offsets[5]),
-                0
+                  .xyz
+            + texelFetch(
+                  light_sampler,
+                  clamp_to_voxel_volume(pos + face_offsets[5]),
+                  0
             )
-                .xyz) *
-        rcp(7.0 * center_weight);
+                  .xyz)
+        * rcp(7.0 * center_weight);
 }
 
 void update_lpv(writeonly image3D light_img, sampler3D light_sampler) {
-    vec3 current_center =
-        get_voxel_volume_center(gbufferModelViewInverse[2].xyz);
+    vec3 current_center
+        = get_voxel_volume_center(gbufferModelViewInverse[2].xyz);
     vec3 previous_center = get_voxel_volume_center(vec3(
         gbufferPreviousModelView[0].z,
         gbufferPreviousModelView[1].z,
@@ -96,8 +96,8 @@ void update_lpv(writeonly image3D light_img, sampler3D light_sampler) {
 
     ivec3 pos = ivec3(gl_GlobalInvocationID);
     ivec3 previous_pos = ivec3(
-        vec3(pos) - floor(previousCameraPosition) + floor(cameraPosition) -
-        current_center + previous_center
+        vec3(pos) - floor(previousCameraPosition) + floor(cameraPosition)
+        - current_center + previous_center
     );
 
     uint block_id = texelFetch(voxel_sampler, pos, 0).x;

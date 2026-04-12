@@ -59,11 +59,11 @@ vec3 tonemap_lottes(vec3 rgb) {
     const vec3 mid_in = vec3(0.26); // Fixed midpoint x
     const vec3 mid_out = vec3(0.32); // Fixed midput y
 
-    const vec3 b = (-pow(mid_in, a) + pow(hdr_max, a) * mid_out) /
-        ((pow(hdr_max, a * d) - pow(mid_in, a * d)) * mid_out);
-    const vec3 c = (pow(hdr_max, a * d) * pow(mid_in, a) -
-                    pow(hdr_max, a) * pow(mid_in, a * d) * mid_out) /
-        ((pow(hdr_max, a * d) - pow(mid_in, a * d)) * mid_out);
+    const vec3 b = (-pow(mid_in, a) + pow(hdr_max, a) * mid_out)
+        / ((pow(hdr_max, a * d) - pow(mid_in, a * d)) * mid_out);
+    const vec3 c = (pow(hdr_max, a * d) * pow(mid_in, a)
+                    - pow(hdr_max, a) * pow(mid_in, a * d) * mid_out)
+        / ((pow(hdr_max, a * d) - pow(mid_in, a * d)) * mid_out);
 
     return pow(rgb, a) / (pow(rgb, a * d) * b + c);
 }
@@ -77,9 +77,9 @@ vec3 tonemap_uncharted_2_partial(vec3 rgb) {
     const float e = 0.02;
     const float f = 0.30;
 
-    return ((rgb * (a * rgb + (c * b)) + (d * e)) /
-            (rgb * (a * rgb + b) + d * f)) -
-        e / f;
+    return ((rgb * (a * rgb + (c * b)) + (d * e))
+            / (rgb * (a * rgb + b) + d * f))
+        - e / f;
 }
 
 vec3 tonemap_uncharted_2(vec3 rgb) {

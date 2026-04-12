@@ -21,8 +21,8 @@ float edge_highlight_check(
 ) {
     // Calculate sample position in screen space
     vec3 sample_pos = scene_to_view_space(center_pos + offset);
-    sample_pos =
-        view_to_screen_space(combined_projection_matrix, sample_pos, true);
+    sample_pos
+        = view_to_screen_space(combined_projection_matrix, sample_pos, true);
 
     // Sample depth and gbuffer data
     ivec2 texel = ivec2(sample_pos.xy * view_res * taau_render_scale);
@@ -31,23 +31,24 @@ float edge_highlight_check(
 
     // Test for depth discontinuity
     sample_depth = linearize_depth_fast(sample_depth);
-    float expected_depth =
-        center_depth + dot(depth_gradient, sample_pos.xy - uv);
+    float expected_depth
+        = center_depth + dot(depth_gradient, sample_pos.xy - uv);
     float depth_edge = float(
-        abs(sample_depth - expected_depth) > 0.25 * rcp_NoV &&
-        expected_depth < sample_depth
+        abs(sample_depth - expected_depth) > 0.25 * rcp_NoV
+        && expected_depth < sample_depth
     );
 
     // Test for normal discontinuity
     vec3 sample_normal = decode_unit_vector(unpack_unorm_2x8(sample_data));
     float normal_edge = float(
-        abs(dot(center_normal, sample_normal)) < 0.99 &&
-        dot(sample_normal, normalize(offset)) > 0.01
+        abs(dot(center_normal, sample_normal)) < 0.99
+        && dot(sample_normal, normalize(offset)) > 0.01
     );
 
-    return (depth_edge + normal_edge) *
-        float(clamp01(sample_pos) == sample_pos) *
-        float(has_edge_highlight(sample_normal) || center_depth < sample_depth);
+    return (depth_edge + normal_edge) * float(clamp01(sample_pos) == sample_pos)
+        * float(
+               has_edge_highlight(sample_normal) || center_depth < sample_depth
+        );
 }
 
 float get_edge_highlight(

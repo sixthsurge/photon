@@ -35,8 +35,8 @@ float get_cloud_shadows(sampler2D cloud_shadow_map, vec3 scene_pos) {
 #ifndef CLOUD_SHADOWS
     return 1.0;
 #else
-    vec2 cloud_shadow_pos = project_cloud_shadow_map(scene_pos) *
-        vec2(cloud_shadow_res) / vec2(textureSize(cloud_shadow_map, 0));
+    vec2 cloud_shadow_pos = project_cloud_shadow_map(scene_pos)
+        * vec2(cloud_shadow_res) / vec2(textureSize(cloud_shadow_map, 0));
 
     if (clamp01(cloud_shadow_pos) != cloud_shadow_pos) {
         return 1.0;
@@ -45,18 +45,18 @@ float get_cloud_shadows(sampler2D cloud_shadow_map, vec3 scene_pos) {
     // fade out cloud shadows when:
     //  - the fragment is above the cloud layer
     //  - the sun is near the horizon
-    float r =
-        planet_radius + (scene_pos.y + eyeAltitude - SEA_LEVEL) * CLOUDS_SCALE;
-    float altitude_fraction =
-        linear_step(clouds_cumulus_radius, clouds_cumulus_top_radius, r);
-    float cloud_shadow_fade =
-        smoothstep(0.05, 0.15, light_dir.y) * clamp01(1.0 - altitude_fraction);
+    float r = planet_radius
+        + (scene_pos.y + eyeAltitude - SEA_LEVEL) * CLOUDS_SCALE;
+    float altitude_fraction
+        = linear_step(clouds_cumulus_radius, clouds_cumulus_top_radius, r);
+    float cloud_shadow_fade = smoothstep(0.05, 0.15, light_dir.y)
+        * clamp01(1.0 - altitude_fraction);
 
     float cloud_shadow = bicubic_filter(cloud_shadow_map, cloud_shadow_pos).x;
     cloud_shadow = cloud_shadow * cloud_shadow_fade + (1.0 - cloud_shadow_fade);
 
-    return cloud_shadow * CLOUD_SHADOWS_INTENSITY +
-        (1.0 - CLOUD_SHADOWS_INTENSITY);
+    return cloud_shadow * CLOUD_SHADOWS_INTENSITY
+        + (1.0 - CLOUD_SHADOWS_INTENSITY);
 #endif
 }
 
@@ -69,10 +69,9 @@ float get_cloud_shadows(sampler2D cloud_shadow_map, vec3 scene_pos) {
 vec2 render_cloud_shadow_map(vec2 uv) {
     // Transform position from scene-space to clouds-space
     vec3 ray_origin = unproject_cloud_shadow_map(uv);
-    ray_origin =
-        vec3(ray_origin.xz, ray_origin.y + eyeAltitude - SEA_LEVEL).xzy *
-            CLOUDS_SCALE +
-        vec3(0.0, planet_radius, 0.0);
+    ray_origin = vec3(ray_origin.xz, ray_origin.y + eyeAltitude - SEA_LEVEL).xzy
+            * CLOUDS_SCALE
+        + vec3(0.0, planet_radius, 0.0);
 
     vec3 pos;
     float t, density, extinction_coeff;
@@ -92,15 +91,16 @@ vec2 render_cloud_shadow_map(vec2 uv) {
     pos = ray_origin + light_dir * t;
     distance_fade = exp2(-distance_fade_strength * length(pos.xy));
     density = clouds_cumulus_density(pos);
-    shadow *=
-        exp(-1.00 * distance_fade * extinction_coeff *
-            clouds_cumulus_thickness * rcp(abs(light_dir.y) + eps) * density);
+    shadow *= exp(
+        -1.00 * distance_fade * extinction_coeff * clouds_cumulus_thickness
+        * rcp(abs(light_dir.y) + eps) * density
+    );
     shadow_cumulus_only = shadow;
 #endif
 
 #ifdef CLOUDS_ALTOCUMULUS
-    extinction_coeff = mix(0.05, 0.1, day_factor) * CLOUDS_ALTOCUMULUS_DENSITY *
-        (1.0 - 0.33 * rainStrength);
+    extinction_coeff = mix(0.05, 0.1, day_factor) * CLOUDS_ALTOCUMULUS_DENSITY
+        * (1.0 - 0.33 * rainStrength);
     t = intersect_sphere(
             ray_origin,
             light_dir,
@@ -110,10 +110,10 @@ vec2 render_cloud_shadow_map(vec2 uv) {
     pos = ray_origin + light_dir * t;
     distance_fade = exp2(-distance_fade_strength * length(pos.xy));
     density = clouds_altocumulus_density(pos);
-    shadow *=
-        exp(-1.00 * distance_fade * extinction_coeff *
-            clouds_altocumulus_thickness * rcp(abs(light_dir.y) + eps) *
-            density);
+    shadow *= exp(
+        -1.00 * distance_fade * extinction_coeff * clouds_altocumulus_thickness
+        * rcp(abs(light_dir.y) + eps) * density
+    );
 #endif
 
 #ifdef CLOUDS_CIRRUS
@@ -121,11 +121,11 @@ vec2 render_cloud_shadow_map(vec2 uv) {
     pos = ray_origin + light_dir * t;
     distance_fade = exp2(-distance_fade_strength * length(pos.xy));
     density = clouds_cirrus_density(pos.xz, 0.5);
-    shadow *=
-        exp(-1.00 * distance_fade * clouds_cirrus_extinction_coeff *
-            clouds_cirrus_thickness * rcp(abs(light_dir.y) + eps) * density) *
-            0.5 +
-        0.5;
+    shadow *= exp(-1.00 * distance_fade * clouds_cirrus_extinction_coeff
+                  * clouds_cirrus_thickness * rcp(abs(light_dir.y) + eps)
+                  * density)
+            * 0.5
+        + 0.5;
 #endif
 
     return vec2(shadow, shadow_cumulus_only);
