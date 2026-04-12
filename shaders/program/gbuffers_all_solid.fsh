@@ -86,6 +86,8 @@ uniform vec2 taa_offset;
 
 uniform vec3 light_dir;
 
+uniform float alphaTestRef;
+
 #if defined PROGRAM_GBUFFERS_ENTITIES
 uniform int entityId;
 uniform vec4 entityColor;
@@ -294,12 +296,12 @@ void main() {
     if (material_mask == MATERIAL_LIGHTNING_BOLT) {
         base_color = vec4(1.0);
     }
-    if (base_color.a < 0.1 && material_mask != MATERIAL_BOAT) {
+    if (base_color.a < alphaTestRef && material_mask != MATERIAL_BOAT) {
         discard;
         return;
     } // Save transparent quad in boats, which masks out water
 #elif !defined PROGRAM_GBUFFERS_TERRAIN_SOLID
-    if (base_color.a < 0.1) {
+    if (base_color.a < alphaTestRef) {
         discard;
         return;
     }
