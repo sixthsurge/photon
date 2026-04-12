@@ -63,8 +63,8 @@ float blocky_clouds_density(
     float altitude_fraction,
     float layer_offset
 ) {
-    const float wind_angle = 30.0 * degree;
-    const vec2 wind_velocity = 0.33 * vec2(cos(wind_angle), sin(wind_angle));
+    const float wind_angle = BLOCKY_CLOUDS_WIND_ANGLE * degree;
+    const vec2 wind_velocity = BLOCKY_CLOUDS_WIND_SPEED * vec2(cos(wind_angle), sin(wind_angle));
 
     const float roundness =
         0.5 * BLOCKY_CLOUDS_ROUNDNESS; // Controls the roundness of the clouds
@@ -78,14 +78,14 @@ float blocky_clouds_density(
 
     // Minecraft cloud noise
 
-    float density = texture_soft(depthtex2, world_pos.xz * 0.00018, roundness);
+    float density = texture_soft(depthtex2, world_pos.xz * rcp(BLOCKY_CLOUDS_SIZE * 5000), roundness);
 
     // Adjust density
     density *= linear_step(0.0, roundness, altitude_fraction);
     density *= linear_step(0.0, roundness, 1.0 - altitude_fraction);
     density = linear_step(sharpness, 1.0 - sharpness, density);
 
-    return clamp01(density);
+    return clamp01(density) * BLOCKY_CLOUDS_DENSITY;
 }
 
 float blocky_clouds_optical_depth(
@@ -168,8 +168,8 @@ vec4 raymarch_blocky_clouds(
     float layer_altitude,
     float dither
 ) {
-    const uint primary_steps = 12;
-    const uint lighting_steps = 4;
+    const uint primary_steps = BLOCKY_CLOUDS_PRIMARY_STEPS;
+    const uint lighting_steps = BLOCKY_CLOUDS_LIGHTING_STEPS;
     const float max_ray_length = 512;
     const float min_transmittance = 0.075;
 
@@ -242,7 +242,7 @@ vec4 raymarch_blocky_clouds(
     light_color *= 1.0 - rainStrength;
 
     float cos_theta = dot(world_dir, light_dir);
-    float bounced_light = 0.0;
+    float bounced_light = BLOCKY_CLOUDS_BOTTOMLIGHT;
 
     mat2x3 light_colors = mat2x3(light_color, ambient_color);
 
@@ -322,8 +322,14 @@ vec4 raymarch_blocky_clouds(
         ? 1.0
         : exp(-0.002 * distance_sum / distance_weight_sum);
 
-    scattering *=
+    #ifdef BLOCKY_CLOUDS_ATMOSPHERIC_SCATTERING
+        scattering *=
         distance_fade * mix(vec3(1.0, 0.66, 0.50), vec3(1.0), distance_fade);
+    #else
+        scattering *= distance_fade;
+    #endif
+    scattering *= BLOCKY_CLOUDS_BRIGHTNESS;
+
     transmittance = mix(1.0, transmittance, distance_fade);
 
     return vec4(scattering, transmittance);
