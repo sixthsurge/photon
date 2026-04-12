@@ -283,6 +283,14 @@ void main() {
     //--//
 
     vec4 base_color = read_tex(gtexture) * tint;
+float alpha_test = base_color.a;
+vec2 alpha_uv = uv;
+#ifdef PARALLAX_MAPPING
+    alpha_uv = parallax_uv;
+#endif
+ivec2 _ts0 = textureSize(gtexture, 0);
+ivec2 _p0  = ivec2(clamp(alpha_uv, 0.0, 0.999999) * vec2(_ts0));
+alpha_test = texelFetch(gtexture, _p0, 0).a * tint.a;
 #ifdef NORMAL_MAPPING
     vec3 normal_map = read_tex(normals).xyz;
 #endif
@@ -293,13 +301,14 @@ void main() {
 #if defined PROGRAM_GBUFFERS_ENTITIES
     if (material_mask == MATERIAL_LIGHTNING_BOLT) {
         base_color = vec4(1.0);
+        alpha_test = 1.0;
     }
-    if (base_color.a < 0.1 && material_mask != MATERIAL_BOAT) {
+    if (alpha_test < 0.1 && material_mask != MATERIAL_BOAT) {
         discard;
         return;
     } // Save transparent quad in boats, which masks out water
 #elif !defined PROGRAM_GBUFFERS_TERRAIN_SOLID
-    if (base_color.a < 0.1) {
+    if (alpha_test < 0.1) {
         discard;
         return;
     }
@@ -313,7 +322,7 @@ void main() {
     float dither_pattern =
         r1(frameCounter,
            texelFetch(noisetex, ivec2(gl_FragCoord.xy) & 511, 0).z);
-    if (base_color.a < dither_pattern) {
+    if (alpha_test < dither_pattern) {
         discard;
         return;
     }
