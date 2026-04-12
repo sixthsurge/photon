@@ -86,7 +86,7 @@ uniform vec2 taa_offset;
 
 uniform vec3 light_dir;
 
-uniform float alphaTestRef;
+uniform float alphaTestRef = 0.1;
 
 #if defined PROGRAM_GBUFFERS_ENTITIES
 uniform int entityId;
