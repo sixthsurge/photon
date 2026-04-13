@@ -655,8 +655,6 @@ option.DH_OVERDRAW_DISTANCE            = Дальность перерисовк
 option.DH_OVERDRAW_FADE_LENGTH         = Длина затухания перерисовки
 option.NOISE_ON_DH_TERRAIN             = Шум на ландшафте DH
 option.ENCHANTMENT_GLINT_BRIGHTNESS    = Яркость мерцания зачарования
-option.USE_SEPARATE_ENTITY_DRAWS            = Использовать "Отдельную отрисовку сущностей"
-option.USE_SEPARATE_ENTITY_DRAWS.comment    = "separateEntityDraws" - функция Iris, позволяющая шейдерам с гибридным освещением (например, Photon) правильно отображать полупрозрачные сущности и объекты. Отключение может вызвать проблемы с рендерингом — полупрозрачные объекты могут стать непрозрачными!
 
 value.DEBUG_VIEW.DEBUG_VIEW_NONE       = Выкл
 value.DEBUG_VIEW.DEBUG_VIEW_SAMPLER    = Сэмплер

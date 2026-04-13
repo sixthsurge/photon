@@ -691,8 +691,6 @@ option.DH_OVERDRAW_DISTANCE            = Ülekattumise kaugus
 option.DH_OVERDRAW_FADE_LENGTH         = Ülekattumise hääbumise pikkus
 option.NOISE_ON_DH_TERRAIN             = Mürastatud maastik
 option.ENCHANTMENT_GLINT_BRIGHTNESS    = Enchant‑sädeluse heledus
-option.USE_SEPARATE_ENTITY_DRAWS       = Kasuta „Separate Entity Draws“
-comment.USE_SEPARATE_ENTITY_DRAWS      = "separateEntityDraws" on Iris funktsioon, mis võimaldab shaderitel, nagu Photon, korrektselt renderdada läbipaistvaid üksusi ja objekte. Selle väljalülitamisel võib tekkida visuaalseid probleeme nagu läbipaistvate üksuste muutumine läbipaistmatuks
 option.DITHERED_TRANSLUCENCY_FALLBACK  = Varundatud dithering‑läbipaistvus
 comment.DITHERED_TRANSLUCENCY_FALLBACK = Kasutab ditheringut läbipaistvuse parandamiseks juhtudel, kus separateEntityDraws seda ei võimalda
 

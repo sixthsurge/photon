@@ -694,8 +694,6 @@ option.DH_OVERDRAW_DISTANCE            = DH 过度绘制距离
 option.DH_OVERDRAW_FADE_LENGTH         = DH 过度绘制淡出长度
 option.NOISE_ON_DH_TERRAIN             = DH 地形噪声
 option.ENCHANTMENT_GLINT_BRIGHTNESS    = 附魔闪光亮度
-option.USE_SEPARATE_ENTITY_DRAWS       = 使用 "分离绘制实体"
-option.USE_SEPARATE_ENTITY_DRAWS.comment = "分离绘制实体" 是 Iris 的一个功能: 对使用延迟-前向混合渲染的光影启用, 比如说 Photon, 用来使半透明实体和其他对象正确渲染. 但这个功能也会导致一些问题的出现. 禁用此功能可能会导致渲染问题, 例如半透明实体会变得不透明!
 option.DITHERED_TRANSLUCENCY_FALLBACK  = 抖动半透明回退
 option.DITHERED_TRANSLUCENCY_FALLBACK.comment = 使用抖动半透明以改善那些在开启分离绘制实体时无法正常透明的对象外观. 
 
