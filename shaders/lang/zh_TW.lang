@@ -692,8 +692,6 @@ option.DH_OVERDRAW_DISTANCE            = 過繪距離
 option.DH_OVERDRAW_FADE_LENGTH         = 過繪淡出長度
 option.NOISE_ON_DH_TERRAIN             = 地平線地形雜訊
 option.ENCHANTMENT_GLINT_BRIGHTNESS    = 附魔光澤亮度
-option.USE_SEPARATE_ENTITY_DRAWS       = 使用「獨立實體渲染」
-comment.USE_SEPARATE_ENTITY_DRAWS      = Iris 功能:支援混合前向/延遲渲染 Shader，但可能導致半透明實體變實體
 option.DITHERED_TRANSLUCENCY_FALLBACK  = 交錯半透明備援
 comment.DITHERED_TRANSLUCENCY_FALLBACK = 以交錯方式繪製半透明物，改善部分無法正常渲染的場景 
 

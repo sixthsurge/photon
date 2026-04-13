@@ -692,8 +692,6 @@ option.CUSTOM_SKY_BRIGHTNESS           = Luminosità Cielo Custom
 option.CUSTOM_SKY_BRIGHTNESS.comment   = Modifica la luminosità del cielo Custom
 option.NOISE_ON_DH_TERRAIN             = Rumore visivo nel terreno DH
 option.ENCHANTMENT_GLINT_BRIGHTNESS    = Luminosità luccicantezza Incantamenti
-option.USE_SEPARATE_ENTITY_DRAWS       = Usa "Generazione Entità Separate"
-comment.USE_SEPARATE_ENTITY_DRAWS      = "Generazione Entità Separate" è una funzione di Iris utilizzata dalle shaderpack, Come Photon, per renderizzare correttamente oggetti trasparenti. eppure può causare vari problemi. Aspettati problemi di entità transparenti opache se disattivi questa funzione!
 
 value.DEBUG_VIEW.DEBUG_VIEW_NONE       = OFF
 value.DEBUG_VIEW.DEBUG_VIEW_SAMPLER    = Sampler
