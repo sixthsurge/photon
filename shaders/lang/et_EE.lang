@@ -689,8 +689,6 @@ option.CUSTOM_SKY.comment              = Lülitab sisse kohandatud taeva ressurs
 option.CUSTOM_SKY_BRIGHTNESS           = Kohandatud taeva heledus
 option.CUSTOM_SKY_BRIGHTNESS.comment   = Reguleerib kohandatud taeva heledust
 option.ENCHANTMENT_GLINT_BRIGHTNESS    = Enchant‑sädeluse heledus
-option.USE_SEPARATE_ENTITY_DRAWS       = Kasuta „Separate Entity Draws“
-comment.USE_SEPARATE_ENTITY_DRAWS      = "separateEntityDraws" on Iris funktsioon, mis võimaldab shaderitel, nagu Photon, korrektselt renderdada läbipaistvaid üksusi ja objekte. Selle väljalülitamisel võib tekkida visuaalseid probleeme nagu läbipaistvate üksuste muutumine läbipaistmatuks
 option.DITHERED_TRANSLUCENCY_FALLBACK  = Varundatud dithering‑läbipaistvus
 comment.DITHERED_TRANSLUCENCY_FALLBACK = Kasutab ditheringut läbipaistvuse parandamiseks juhtudel, kus separateEntityDraws seda ei võimalda
 

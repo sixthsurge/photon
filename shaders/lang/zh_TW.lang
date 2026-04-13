@@ -690,8 +690,6 @@ option.CUSTOM_SKY.comment              = 啟用資源包自訂天空
 option.CUSTOM_SKY_BRIGHTNESS           = 自訂天空亮度
 option.CUSTOM_SKY_BRIGHTNESS.comment   = 調整自訂天空亮度
 option.ENCHANTMENT_GLINT_BRIGHTNESS    = 附魔光澤亮度
-option.USE_SEPARATE_ENTITY_DRAWS       = 使用「獨立實體渲染」
-comment.USE_SEPARATE_ENTITY_DRAWS      = Iris 功能:支援混合前向/延遲渲染 Shader，但可能導致半透明實體變實體
 option.DITHERED_TRANSLUCENCY_FALLBACK  = 交錯半透明備援
 comment.DITHERED_TRANSLUCENCY_FALLBACK = 以交錯方式繪製半透明物，改善部分無法正常渲染的場景 
 

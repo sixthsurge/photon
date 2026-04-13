@@ -690,8 +690,6 @@ option.CUSTOM_SKY.comment              = Activa cielos personalizados de los paq
 option.CUSTOM_SKY_BRIGHTNESS           = Brillo del cielo personalizado
 option.CUSTOM_SKY_BRIGHTNESS.comment   = Ajusta el brillo del cielo personalizado
 option.ENCHANTMENT_GLINT_BRIGHTNESS    = Brillo del resplandor de encantamiento
-option.USE_SEPARATE_ENTITY_DRAWS       = Usar "Dibujado Separado de Entidades"
-comment.USE_SEPARATE_ENTITY_DRAWS      = "separateEntityDraws" es una función de Iris que permite a los shaderpacks que usan sombreado híbrido diferido-adelantado, como Photon, renderizar correctamente entidades translúcidas y otros objetos. Sin embargo, puede causar algunos problemas. ¡Si desactivas esta opción, espera problemas de renderizado como que las entidades translúcidas se vuelvan opacas!
 option.DITHERED_TRANSLUCENCY_FALLBACK  = Reserva de translucidez con dithering 
 comment.DITHERED_TRANSLUCENCY_FALLBACK = Usa translucidez con dithering para mejorar el aspecto de los objetos que deberían ser translúcidos pero no pueden serlo cuando está habilitado "separateEntityDraws". 
 

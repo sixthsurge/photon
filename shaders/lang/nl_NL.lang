@@ -699,8 +699,6 @@ option.CUSTOM_SKY.comment              = Zet de aangepaste lucht van het bronpak
 option.CUSTOM_SKY_BRIGHTNESS           = Aangepaste Lucht Felheid
 option.CUSTOM_SKY_BRIGHTNESS.comment   = Wijzigt de felheid van de aangepaste lucht.
 option.ENCHANTMENT_GLINT_BRIGHTNESS    = Betoverings-glans Felheid
-option.USE_SEPARATE_ENTITY_DRAWS       = Gebruik "Separate Entity Draws"
-comment.USE_SEPARATE_ENTITY_DRAWS      = 'Seperate Entity Draws" is een Iris-feature die shaderpacks die 'deferred-forward hybrid shading' (zoals photon) gebruiken om doorzichtige voorwerpen en andere dingen goed weer te geven. Helaas kan het wat problemen veroorzaken. Verwacht dus weergave-problemen.
 option.DITHERED_TRANSLUCENCY_FALLBACK  = 'Dithered' Doorzichtigheid-fix
 comment.DITHERED_TRANSLUCENCY_FALLBACK = Gebruikt een andere manier om doorzichtigheid tóch mogelijk te maken als 'Seperate Entity Draws' aanstaat. 
 
