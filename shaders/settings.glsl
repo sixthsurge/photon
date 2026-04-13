@@ -577,6 +577,29 @@ const float wetnessHalflife         = 70.0;
   #define DH_OVERDRAW_FADE_LENGTH 16.0 // [0.0 1.0 2.0 3.0 4.0 5.0 6.0 7.0 8.0 9.0 10.0 11.0 12.0 13.0 14.0 15.0 16.0 17.0 18.0 19.0 20.0 21.0 22.0 23.0 24.0 25.0 26.0 27.0 28.0 29.0 30.0 31.0 32.0 33.0 34.0 35.0 36.0 37.0 38.0 39.0 40.0 41.0 42.0 43.0 44.0 45.0 46.0 47.0 48.0 49.0 50.0 51.0 52.0 53.0 54.0 55.0 56.0 57.0 58.0 59.0 60.0 61.0 62.0 63.0 64.0]
   #define NOISE_ON_DH_TERRAIN // High-frequency noise on Distant Horizons terrain
 
+// Photonics
+// Photonics uses PH_ for its own defines, so use PHO instead
+
+  #define PHO_ENABLED
+  #define PHO_LIGHTING_MODE SIMPLE // [SIMPLE RESTIR]
+
+  #define PHO_ALPHA_MODE BLOCK // [NONE BLOCK VOXEL]
+  #define PHO_MAX_LIGHTS 1000 // [250 300 350 500 550 700 750 1000 1500 2000 2500 3000 3500 4000]
+  #define PHO_GLINT_STRENGTH 0.2 // [0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0]
+  #define PHO_TWO_HANDHELD_RAYS
+
+  #define PHO_SHARP_MAX_SAMPLES 20 // [5 10 20 25 30 35 40 45 50 55 60 65 70 75 80 85 90 95 100]
+
+// ReSTIR settings
+
+  #define PHO_RS_INITIAL_SAMPLES 32 // [1 2 4 8 16 32]
+  #define PHO_RS_SPR_SAMPLES 5 // [0 1 2 3 4 5 6 7 8 9 10]
+  #define PHO_RS_SPR_RADIUS 10 // [5 10 15 20 25 30]
+  #define PHO_RS_ACCUMULATION 32 // [1 2 4 8 16 32 48 64]
+  #define PHO_RS_DENOISER_PASSES 5 // [0 1 2 3 4 5]
+  #define PHO_RS_SOFT_SHADOWS
+//#define PHO_RS_COMBINED_GI
+
 // The settings parser only detects boolean options which are used with
 // #ifdef; it doesn't look for #if defined or other settings usages (e.g in
 // shaders.properties) so these are "decoy" usages of various settings so
@@ -625,6 +648,18 @@ const float wetnessHalflife         = 70.0;
 #endif
 
 #ifdef CREPUSCULAR_RAYS 
+#endif
+
+#ifdef PHO_ENABLED
+#endif
+
+#ifdef PHO_TWO_HANDHELD_RAYS
+#endif
+
+#ifdef PHO_RS_SOFT_SHADOWS
+#endif
+
+#ifdef PHO_RS_COMBINED_GI
 #endif
 
 // Not available on OF
