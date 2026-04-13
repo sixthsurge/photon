@@ -51,8 +51,8 @@ void load_fragment_variables(out vec3 albedo, out vec3 world_pos, out vec3 world
 #endif
 
 // Avoids calculating skylight irradiance when its not used
-#if defined PH_LIGHTING_PASS
-#if defined OVERWORLD && defined SH_SKYLIGHT && defined PH_RESTIR_COMBINED_GI
+#if defined PH_LIGHTING_PASS && defined OVERWORLD
+#if defined SH_SKYLIGHT
     vec3 sky_sh[9] = vec3[9](
         texelFetch(colortex4, ivec2(191, 2), 0).rgb,
         texelFetch(colortex4, ivec2(191, 3), 0).rgb,
@@ -65,7 +65,17 @@ void load_fragment_variables(out vec3 albedo, out vec3 world_pos, out vec3 world
         texelFetch(colortex4, ivec2(191, 10), 0).rgb
     );
 
+#ifdef MC_GL_RENDERER_INTEL
+    sh3 sky_sh_compat;
+    for (uint band = 0u; band < 3u; ++band) {
+        sky_sh_compat.f1[band] = sky_sh[band];
+        sky_sh_compat.f2[band] = sky_sh[band + 3u];
+        sky_sh_compat.f3[band] = sky_sh[band + 6u];
+    }
+    indirect_light_color = sh_evaluate_irradiance(sky_sh_compat, vec3(0f), 1f);
+#else
     indirect_light_color = sh_evaluate_irradiance(sky_sh, vec3(0f), 1f);
+#endif
 #else
     indirect_light_color = mix(texelFetch(colortex4, ivec2(191, 1), 0).rgb, vec3(1f), 0.5);
 #endif
