@@ -52,6 +52,11 @@
 
 #include "/settings.glsl"
 
+// Photonics shorthand, 'PHOTONICS' is always defined by Photonics when it's installed
+#if defined PHOTONICS && defined PHO_ENABLED
+#define PHO_IN_USE
+#endif
+
 // Compatibility fixes
 
 #if MC_VERSION < 11700

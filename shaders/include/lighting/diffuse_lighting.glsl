@@ -24,6 +24,10 @@
 #undef CLOUD_SHADOWS
 #endif
 
+#if defined PHOTONICS_DIFFUSE
+#include "/photonics/ph_samplers.glsl"
+#endif
+
 const float sss_density = 14.0;
 const float sss_scale = 5.0 * SSS_INTENSITY;
 const float night_vision_scale = 1.5;
@@ -118,6 +122,38 @@ vec3 sss_approx(
 }
 #endif
 
+vec3 get_block_lighting(
+    vec3 scene_pos,
+    vec3 flat_normal,
+    vec2 light_levels,
+    float ao,
+    float directional_lighting
+) {
+    vec3 lighting = vec3(0f);
+
+    float blocklight_falloff
+        = get_blocklight_falloff(light_levels.x, light_levels.y, ao);
+    vec3 mc_blocklight = (blocklight_falloff * directional_lighting)
+        * (blocklight_scale * blocklight_color);
+
+#ifdef COLORED_LIGHTS
+    lighting += get_lpv_blocklight(
+        scene_pos,
+        flat_normal,
+        mc_blocklight,
+        ao * directional_lighting
+    );
+#else
+    lighting += mc_blocklight;
+#endif
+
+#ifdef HANDHELD_LIGHTING
+    lighting += get_handheld_lighting(scene_pos, ao);
+#endif
+
+    return lighting;
+}
+
 vec3 get_diffuse_lighting(
     Material material,
     vec3 scene_pos,
@@ -133,6 +169,9 @@ vec3 get_diffuse_lighting(
     float cloud_shadows,
 #endif
     float shadow_distance_fade,
+#ifdef PHOTONICS_DIFFUSE
+    bool is_lod,
+#endif
     float NoL,
     float NoV,
     float NoH,
@@ -254,24 +293,25 @@ vec3 get_diffuse_lighting(
 
     // Blocklight
 
-    float blocklight_falloff
-        = get_blocklight_falloff(light_levels.x, light_levels.y, ao);
-    vec3 mc_blocklight = (blocklight_falloff * directional_lighting)
-        * (blocklight_scale * blocklight_color);
+#if defined PHOTONICS_DIFFUSE
+    if (!is_lod) {
+        vec3 blocklight = vec3(0f);
 
-#ifdef COLORED_LIGHTS
-    lighting += get_lpv_blocklight(
-        scene_pos,
-        flat_normal,
-        mc_blocklight,
-        ao * directional_lighting
-    );
-#else
-    lighting += mc_blocklight;
-#endif
+        blocklight += sample_photonics_direct(uv);
 
 #ifdef HANDHELD_LIGHTING
-    lighting += get_handheld_lighting(scene_pos, ao);
+        blocklight += sample_photonics_handheld(uv);
+#endif
+
+        blocklight *= blocklight_scale;
+        blocklight *= BLOCKLIGHT_I;
+
+        lighting+= blocklight;
+    } else {
+        lighting += get_block_lighting(scene_pos, flat_normal, light_levels, ao, directional_lighting);
+    }
+#else
+    lighting += get_block_lighting(scene_pos, flat_normal, light_levels, ao, directional_lighting);
 #endif
 
     lighting += material.emission * emission_scale;
