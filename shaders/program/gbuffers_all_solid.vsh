@@ -34,6 +34,10 @@ out float vanilla_ao;
 out vec2 uv_local;
 #endif
 
+#if defined PROGRAM_GBUFFERS_VOXELS
+out vec3 block_normal;
+#endif
+
 // --------------
 //   Attributes
 // --------------
@@ -98,6 +102,10 @@ void main() {
     tint = gl_Color;
     material_mask = get_material_mask();
     tbn = get_tbn_matrix();
+
+#if defined PROGRAM_GBUFFERS_VOXELS
+    block_normal = gl_Normal;
+#endif
 
 #if defined PROGRAM_GBUFFERS_TERRAIN
     vanilla_ao = gl_Color.a < 0.1
