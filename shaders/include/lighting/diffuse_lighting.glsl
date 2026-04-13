@@ -26,6 +26,11 @@
 
 #if defined PHOTONICS_DIFFUSE
 #include "/photonics/ph_samplers.glsl"
+
+#ifndef PHO_RS_COMBINED_GI
+uniform sampler2D radiosity_indirect;
+#endif
+
 #endif
 
 const float sss_density = 14.0;
@@ -154,6 +159,48 @@ vec3 get_block_lighting(
     return lighting;
 }
 
+vec3 get_sky_lighting(
+    Material material,
+    vec3 bent_normal,
+    vec2 light_levels,
+    float ao,
+    float ambient_sss
+) {
+    vec3 lighting = vec3(0f);
+
+#if defined WORLD_OVERWORLD && defined PROGRAM_DEFERRED4 && defined SH_SKYLIGHT
+#ifdef MC_GL_RENDERER_INTEL
+    sh3 sky_sh_compat;
+    for (uint band = 0u; band < 3u; ++band) {
+        sky_sh_compat.f1[band] = sky_sh[band];
+        sky_sh_compat.f2[band] = sky_sh[band + 3u];
+        sky_sh_compat.f3[band] = sky_sh[band + 6u];
+    }
+    vec3 skylight = sh_evaluate_irradiance(sky_sh_compat, bent_normal, ao);
+#else
+    vec3 skylight = sh_evaluate_irradiance(sky_sh, bent_normal, ao);
+#endif
+    skylight = mix(skylight_up, skylight, sqr(light_levels.y));
+#else
+    vec3 skylight = ambient_color * ao;
+    vec3 skylight_up = skylight;
+#endif
+
+    // Skylight SSS
+    skylight = mix(skylight, 0.5 * skylight_up * ao, material.sss_amount);
+    skylight += ambient_sss * skylight_up * material.sss_amount * 2.0;
+
+#if defined WORLD_NETHER
+    // Brighten + desaturate nether ambient
+    skylight = 16.0 * directional_lighting
+        * mix(skylight, vec3(dot(skylight, luminance_weights_rec2020)), 0.5);
+#endif
+
+    lighting += skylight * get_skylight_falloff(light_levels.y);
+
+    return lighting;
+}
+
 vec3 get_diffuse_lighting(
     Material material,
     vec3 scene_pos,
@@ -205,8 +252,22 @@ vec3 get_diffuse_lighting(
         lift(max0(NoL), 0.25 * rcp(SHADING_STRENGTH))
         * (1.0 - 0.5 * material.sss_amount)
     );
-    vec3 bounced = 0.033 * (1.0 - shadows) * (1.0 - 0.1 * max0(normal.y))
+
+// Disable bounced lighting with Photonics
+#if defined PHOTONICS_DIFFUSE
+    #define include_bounced is_lod
+#else
+    #define include_bounced true
+#endif
+
+    vec3 bounced;
+    if (include_bounced) {
+        bounced = 0.033 * (1.0 - shadows) * (1.0 - 0.1 * max0(normal.y))
         * pow1d5(ao + eps) * pow4(light_levels.y) * BOUNCED_LIGHT_I;
+    } else {
+        bounced = vec3(0f);
+    }
+
     vec3 sss = sss_approx(
                    material.albedo,
                    material.sss_amount,
@@ -261,35 +322,20 @@ vec3 get_diffuse_lighting(
 
     // Skylight
 
-#if defined WORLD_OVERWORLD && defined PROGRAM_DEFERRED4 && defined SH_SKYLIGHT
-#ifdef MC_GL_RENDERER_INTEL
-    sh3 sky_sh_compat;
-    for (uint band = 0u; band < 3u; ++band) {
-        sky_sh_compat.f1[band] = sky_sh[band];
-        sky_sh_compat.f2[band] = sky_sh[band + 3u];
-        sky_sh_compat.f3[band] = sky_sh[band + 6u];
+#if defined PHOTONICS_DIFFUSE
+    if (is_lod) {
+        lighting += get_sky_lighting(material, bent_normal, light_levels, ao, ambient_sss);
+    } else {
+// When combined gi is enabled
+// Photonics includes gi in the result of sample_photonics_direct
+#ifndef PHO_RS_COMBINED_GI
+        lighting += texture2D(radiosity_indirect, uv).xyz * SKYLIGHT_I;
+#endif
     }
-    vec3 skylight = sh_evaluate_irradiance(sky_sh_compat, bent_normal, ao);
+
 #else
-    vec3 skylight = sh_evaluate_irradiance(sky_sh, bent_normal, ao);
+    lighting += get_sky_lighting(material, bent_normal, light_levels, ao, ambient_sss);
 #endif
-    skylight = mix(skylight_up, skylight, sqr(light_levels.y));
-#else
-    vec3 skylight = ambient_color * ao;
-    vec3 skylight_up = skylight;
-#endif
-
-    // Skylight SSS
-    skylight = mix(skylight, 0.5 * skylight_up * ao, material.sss_amount);
-    skylight += ambient_sss * skylight_up * material.sss_amount * 2.0;
-
-#if defined WORLD_NETHER
-    // Brighten + desaturate nether ambient
-    skylight = 16.0 * directional_lighting
-        * mix(skylight, vec3(dot(skylight, luminance_weights_rec2020)), 0.5);
-#endif
-
-    lighting += skylight * get_skylight_falloff(light_levels.y);
 
     // Blocklight
 
@@ -303,10 +349,8 @@ vec3 get_diffuse_lighting(
         blocklight += sample_photonics_handheld(uv);
 #endif
 
-        blocklight *= blocklight_scale;
-        blocklight *= BLOCKLIGHT_I;
-
-        lighting+= blocklight;
+        // BLOCKLIGHT_I is applied in /photonics/modifiers/modify_lights.glsl
+        lighting+= blocklight * blocklight_scale;
     } else {
         lighting += get_block_lighting(scene_pos, flat_normal, light_levels, ao, directional_lighting);
     }

@@ -659,9 +659,6 @@ const float wetnessHalflife         = 70.0;
 #ifdef PHO_RS_SOFT_SHADOWS
 #endif
 
-#ifdef PHO_RS_COMBINED_GI
-#endif
-
 // Not available on OF
 #ifndef IS_IRIS
     #undef USE_SEPARATE_ENTITY_DRAWS
