@@ -698,9 +698,6 @@ option.CUSTOM_SKY                      = Aangepaste Lucht
 option.CUSTOM_SKY.comment              = Zet de aangepaste lucht van het bronpakket aan.
 option.CUSTOM_SKY_BRIGHTNESS           = Aangepaste Lucht Felheid
 option.CUSTOM_SKY_BRIGHTNESS.comment   = Wijzigt de felheid van de aangepaste lucht.
-option.DH_OVERDRAW_DISTANCE            = Overdraw Afstand
-option.DH_OVERDRAW_FADE_LENGTH         = Overdraw Vervagingslengte
-option.NOISE_ON_DH_TERRAIN             = Ruis Op DH Terrein
 option.ENCHANTMENT_GLINT_BRIGHTNESS    = Betoverings-glans Felheid
 option.USE_SEPARATE_ENTITY_DRAWS       = Gebruik "Separate Entity Draws"
 comment.USE_SEPARATE_ENTITY_DRAWS      = 'Seperate Entity Draws" is een Iris-feature die shaderpacks die 'deferred-forward hybrid shading' (zoals photon) gebruiken om doorzichtige voorwerpen en andere dingen goed weer te geven. Helaas kan het wat problemen veroorzaken. Verwacht dus weergave-problemen.
@@ -757,3 +754,9 @@ option.BOX_COLOR_B              = Blauw
 option.BOX_EMISSION             = Emissie
 option.BOX_EMISSION.comment     = Maakt de kleur nog feller. Vereist Gloed.
 option.BOX_LINE_WIDTH           = Lijn Dikte
+
+# Distant Horizons
+
+option.DH_OVERDRAW_DISTANCE    = Overdraw Afstand
+option.DH_OVERDRAW_FADE_LENGTH = Overdraw Vervagingslengte
+option.NOISE_ON_DH_TERRAIN     = Ruis Op DH Terrein

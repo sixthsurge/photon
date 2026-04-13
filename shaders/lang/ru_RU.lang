@@ -651,9 +651,6 @@ option.CUSTOM_SKY                      = Пользовательское неб
 option.CUSTOM_SKY.comment              = Включить пользовательское небо из ресурс-паком
 option.CUSTOM_SKY_BRIGHTNESS           = Яркость пользовательского неба
 option.CUSTOM_SKY_BRIGHTNESS.comment   = Регулирует яркость пользовательского неба
-option.DH_OVERDRAW_DISTANCE            = Дальность перерисовки
-option.DH_OVERDRAW_FADE_LENGTH         = Длина затухания перерисовки
-option.NOISE_ON_DH_TERRAIN             = Шум на ландшафте DH
 option.ENCHANTMENT_GLINT_BRIGHTNESS    = Яркость мерцания зачарования
 option.USE_SEPARATE_ENTITY_DRAWS            = Использовать "Отдельную отрисовку сущностей"
 option.USE_SEPARATE_ENTITY_DRAWS.comment    = "separateEntityDraws" - функция Iris, позволяющая шейдерам с гибридным освещением (например, Photon) правильно отображать полупрозрачные сущности и объекты. Отключение может вызвать проблемы с рендерингом — полупрозрачные объекты могут стать непрозрачными!
@@ -685,3 +682,9 @@ option.BOX_COLOR_B              = Синий
 option.BOX_EMISSION             = Свечение
 option.BOX_EMISSION.comment     = Повышает яркость цвета выше 1. Требуется включённое свечение.
 option.BOX_LINE_WIDTH           = Ширина линии
+
+# Distant Horizons
+
+option.DH_OVERDRAW_DISTANCE    = Дальность перерисовки
+option.DH_OVERDRAW_FADE_LENGTH = Длина затухания перерисовки
+option.NOISE_ON_DH_TERRAIN     = Шум на ландшафте DH

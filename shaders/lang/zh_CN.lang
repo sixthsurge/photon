@@ -28,8 +28,9 @@ screen.color_grading                   = 颜色分级
 screen.exposure                        = 曝光
 screen.lpv_vl                          = 彩色光源雾气散射
 screen.box                             = 选择框
-screen.distant_horizons                = Distant Horizons 
 screen.developer                       = 开发者选项
+
+screen.distant_horizons                = Distant Horizons
 
 screen.aurora                          = 极光
 screen.clouds                          = 云层
@@ -690,9 +691,6 @@ option.CUSTOM_SKY                      = 自定义天空
 option.CUSTOM_SKY.comment              = 启用对资源包自定义天空的支持.
 option.CUSTOM_SKY_BRIGHTNESS           = 自定义天空亮度
 option.CUSTOM_SKY_BRIGHTNESS.comment   = 自定义天空的亮度.
-option.DH_OVERDRAW_DISTANCE            = DH 过度绘制距离
-option.DH_OVERDRAW_FADE_LENGTH         = DH 过度绘制淡出长度
-option.NOISE_ON_DH_TERRAIN             = DH 地形噪声
 option.ENCHANTMENT_GLINT_BRIGHTNESS    = 附魔闪光亮度
 option.USE_SEPARATE_ENTITY_DRAWS       = 使用 "分离绘制实体"
 option.USE_SEPARATE_ENTITY_DRAWS.comment = "分离绘制实体" 是 Iris 的一个功能: 对使用延迟-前向混合渲染的光影启用, 比如说 Photon, 用来使半透明实体和其他对象正确渲染. 但这个功能也会导致一些问题的出现. 禁用此功能可能会导致渲染问题, 例如半透明实体会变得不透明!
@@ -758,3 +756,9 @@ option.BLOCK_ENTITY_SHADOWS.comment    = 决定方块实体是否能投射阴影
 
 # Box
 option.BOX_LINE_WIDTH.comment          = 选择框的框线宽度.
+
+# Distant Horizons
+
+option.DH_OVERDRAW_DISTANCE    = DH 过度绘制距离
+option.DH_OVERDRAW_FADE_LENGTH = DH 过度绘制淡出长度
+option.NOISE_ON_DH_TERRAIN     = DH 地形噪声

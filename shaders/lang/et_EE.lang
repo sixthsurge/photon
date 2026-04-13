@@ -28,8 +28,9 @@ screen.color_grading                   = Värvikorrektsioon
 screen.exposure                        = Valgustus
 screen.lpv_vl                          = Värviliste tulede udu hajumine
 screen.box                             = Valikukast
-screen.distant_horizons                = Kaugemad horisondid
 screen.developer                       = Arendaja valikud
+
+screen.distant_horizons                = Kaugemad horisondid
 
 screen.aurora                          = Virmalised
 screen.clouds                          = Pilved
@@ -687,9 +688,6 @@ option.CUSTOM_SKY                      = Kohandatud taevas
 option.CUSTOM_SKY.comment              = Lülitab sisse kohandatud taeva ressursipakkidest
 option.CUSTOM_SKY_BRIGHTNESS           = Kohandatud taeva heledus
 option.CUSTOM_SKY_BRIGHTNESS.comment   = Reguleerib kohandatud taeva heledust
-option.DH_OVERDRAW_DISTANCE            = Ülekattumise kaugus
-option.DH_OVERDRAW_FADE_LENGTH         = Ülekattumise hääbumise pikkus
-option.NOISE_ON_DH_TERRAIN             = Mürastatud maastik
 option.ENCHANTMENT_GLINT_BRIGHTNESS    = Enchant‑sädeluse heledus
 option.USE_SEPARATE_ENTITY_DRAWS       = Kasuta „Separate Entity Draws“
 comment.USE_SEPARATE_ENTITY_DRAWS      = "separateEntityDraws" on Iris funktsioon, mis võimaldab shaderitel, nagu Photon, korrektselt renderdada läbipaistvaid üksusi ja objekte. Selle väljalülitamisel võib tekkida visuaalseid probleeme nagu läbipaistvate üksuste muutumine läbipaistmatuks
@@ -746,3 +744,9 @@ option.BOX_COLOR_B              = Sinine
 option.BOX_EMISSION             = Kiirgus
 option.BOX_EMISSION.comment     = Suurendab värvi intensiivsust üle 1. Nõuab bloom-efekti.
 option.BOX_LINE_WIDTH           = Joone laius
+
+# Distant Horizons
+
+option.DH_OVERDRAW_DISTANCE    = Ülekattumise kaugus
+option.DH_OVERDRAW_FADE_LENGTH = Ülekattumise hääbumise pikkus
+option.NOISE_ON_DH_TERRAIN     = Mürastatud maastik
