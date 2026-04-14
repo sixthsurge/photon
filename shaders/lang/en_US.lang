@@ -113,7 +113,6 @@ option.WEATHER_WIND_VARIATION_SPEED        = Windiness Variation Speed
 
 option.COLORED_LIGHTS                  = Colored Lights
 option.COLORED_LIGHTS.comment          = Variable-color block lighting using flood fill algorithm. Requires Iris 1.6 or above
-option.COLORED_LIGHTS_VANILLA_LIGHTMAP_CONTRIBUTION = Vanilla Lightmap Contribution
 option.HANDHELD_LIGHTING               = Handheld Lighting
 option.HANDHELD_LIGHTING.comment       = Handheld items cast light on the world. If coloured lighting is enabled the handheld lighting will be coloured like the lights themselves
 option.HANDHELD_LIGHTING_INTENSITY     = Handheld Lighting Intensity
@@ -210,11 +209,17 @@ option.BLOCKLIGHT_G                    = §aGreen
 option.BLOCKLIGHT_B                    = §9Blue
 option.BLOCKLIGHT_I                    = Blocklight Intensity
 
-option.VOXEL_VOLUME_SIZE               = Voxel Volume Size
-option.VOXEL_VOLUME_SIZE.comment       = High performance impact, also affected by shadow distance
-suffix.VOXEL_VOLUME_SIZE               = m³
-option.VOXEL_VOLUME_CENTER             = Voxel Volume Center
-option.VOXEL_VOLUME_CENTER.comment     = Ahead: voxel volume is centered in front of the player, meaning that more of it is visible
+option.COLORED_LIGHTS_VANILLA_LIGHTMAP_CONTRIBUTION                 = Vanilla Lightmap Contribution
+option.COLORED_LIGHTS_VANILLA_LIGHTMAP_CONTRIBUTION_FALLOFF         = Contribution Falloff
+option.COLORED_LIGHTS_VANILLA_LIGHTMAP_CONTRIBUTION_FALLOFF.comment = Changes the vanilla lightmap contribution's falloff.\nSquared: Lighting is brighter at the source and diminishes quickly.\nLinear: Lighting is soft and travels further from the source
+option.VOXEL_VOLUME_SIZE                                            = Voxel Volume Size
+option.VOXEL_VOLUME_SIZE.comment                                    = Adjusts the size of the volume in which colored lighting is calculated. High performance impact, also affected by shadow distance
+suffix.VOXEL_VOLUME_SIZE                                            = m³
+option.VOXEL_VOLUME_CENTER                                          = Voxel Volume Center
+option.VOXEL_VOLUME_CENTER.comment                                  = Ahead: voxel volume is centered in front of the player, meaning that more of it is visible
+
+value.option.COLORED_LIGHTS_VANILLA_LIGHTMAP_CONTRIBUTION_FALLOFF.COLORED_LIGHTS_VANILLA_LIGHTMAP_CONTRIBUTION_FALLOFF_SQUARED = Squared
+value.option.COLORED_LIGHTS_VANILLA_LIGHTMAP_CONTRIBUTION_FALLOFF.COLORED_LIGHTS_VANILLA_LIGHTMAP_CONTRIBUTION_FALLOFF_Linear  = Linear
 
 value.VOXEL_VOLUME_CENTER.VOXEL_VOLUME_CENTER_AHEAD  = Ahead
 value.VOXEL_VOLUME_CENTER.VOXEL_VOLUME_CENTER_PLAYER = Player
