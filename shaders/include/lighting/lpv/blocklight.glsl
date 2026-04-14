@@ -42,7 +42,7 @@ vec3 get_lpv_blocklight(
 #ifdef COLORED_LIGHTS_VANILLA_LIGHTMAP_CONTRIBUTION
         float vanilla_lightmap_contribution
             = exp2(-4.0 * dot(lpv_blocklight, luminance_weights_rec2020));
-#if COLORED_LIGHTS_VANILLA_LIGHTMAP_CONTRIBUTION_MODE == COLORED_LIGHTS_VANILLA_LIGHTMAP_CONTRIBUTION_MODE_SQUARED
+#if COLORED_LIGHTS_VANILLA_LIGHTMAP_CONTRIBUTION_FALLOFF == COLORED_LIGHTS_VANILLA_LIGHTMAP_CONTRIBUTION_FALLOFF_SQUARED
         lpv_blocklight
             += mix(vec3(dot(mc_blocklight, luminance_weights_rec2020)),
                    mc_blocklight,
