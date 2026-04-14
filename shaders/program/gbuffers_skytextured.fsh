@@ -18,7 +18,7 @@ layout(location = 0) out vec3 frag_color;
 in vec2 uv;
 in vec3 view_pos;
 
-#if MC_VERSION >= 12111
+#if MC_VERSION >= 260100
 in vec2 uv_mid;
 #endif
 
