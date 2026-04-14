@@ -160,6 +160,10 @@ const bool colortex11MipmapEnabled = true;
 #define ATMOSPHERE_SCATTERING_LUT depthtex0
 #define TEMPORAL_REPROJECTION
 
+#ifdef PHO_IN_USE
+#define PHOTONICS_DIFFUSE
+#endif
+
 #include "/include/fog/simple_fog.glsl"
 #include "/include/lighting/diffuse_lighting.glsl"
 #include "/include/lighting/shadows/common.glsl"
@@ -571,6 +575,9 @@ void main() {
             0.0,
 #else
             shadow_distance_fade,
+#endif
+#ifdef PHOTONICS_DIFFUSE
+            is_lod,
 #endif
             NoL,
             NoV,

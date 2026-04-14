@@ -690,7 +690,6 @@ option.CUSTOM_SKY                      = Cielo personalizzato (Custom)
 option.CUSTOM_SKY.comment              = Attiva il cielo personalizzato delle resource packs
 option.CUSTOM_SKY_BRIGHTNESS           = Luminosità Cielo Custom
 option.CUSTOM_SKY_BRIGHTNESS.comment   = Modifica la luminosità del cielo Custom
-option.NOISE_ON_DH_TERRAIN             = Rumore visivo nel terreno DH
 option.ENCHANTMENT_GLINT_BRIGHTNESS    = Luminosità luccicantezza Incantamenti
 
 value.DEBUG_VIEW.DEBUG_VIEW_NONE       = OFF
@@ -743,3 +742,7 @@ option.BOX_COLOR_B              = Blu
 option.BOX_EMISSION             = Emissione
 option.BOX_EMISSION.comment     = Scala i colori dopo 1. Richiede aura (bloom).
 option.BOX_LINE_WIDTH           = Larghezza Linea
+
+# Distant Horizons
+
+option.NOISE_ON_DH_TERRAIN = Rumore visivo nel terreno DH

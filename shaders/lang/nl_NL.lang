@@ -698,9 +698,6 @@ option.CUSTOM_SKY                      = Aangepaste Lucht
 option.CUSTOM_SKY.comment              = Zet de aangepaste lucht van het bronpakket aan.
 option.CUSTOM_SKY_BRIGHTNESS           = Aangepaste Lucht Felheid
 option.CUSTOM_SKY_BRIGHTNESS.comment   = Wijzigt de felheid van de aangepaste lucht.
-option.DH_OVERDRAW_DISTANCE            = Overdraw Afstand
-option.DH_OVERDRAW_FADE_LENGTH         = Overdraw Vervagingslengte
-option.NOISE_ON_DH_TERRAIN             = Ruis Op DH Terrein
 option.ENCHANTMENT_GLINT_BRIGHTNESS    = Betoverings-glans Felheid
 option.DITHERED_TRANSLUCENCY_FALLBACK  = 'Dithered' Doorzichtigheid-fix
 comment.DITHERED_TRANSLUCENCY_FALLBACK = Gebruikt een andere manier om doorzichtigheid tóch mogelijk te maken als 'Seperate Entity Draws' aanstaat. 
@@ -755,3 +752,9 @@ option.BOX_COLOR_B              = Blauw
 option.BOX_EMISSION             = Emissie
 option.BOX_EMISSION.comment     = Maakt de kleur nog feller. Vereist Gloed.
 option.BOX_LINE_WIDTH           = Lijn Dikte
+
+# Distant Horizons
+
+option.DH_OVERDRAW_DISTANCE    = Overdraw Afstand
+option.DH_OVERDRAW_FADE_LENGTH = Overdraw Vervagingslengte
+option.NOISE_ON_DH_TERRAIN     = Ruis Op DH Terrein

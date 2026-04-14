@@ -28,8 +28,9 @@ screen.color_grading                   = 調色
 screen.exposure                        = 曝光
 screen.lpv_vl                          = 有色光霧散射
 screen.box                             = 選擇框
-screen.distant_horizons                = 遙遠地平線 
 screen.developer                       = 開發者選項
+
+screen.distant_horizons                = 遙遠地平線 
 
 screen.aurora                          = 極光
 screen.clouds                          = 雲
@@ -688,9 +689,6 @@ option.CUSTOM_SKY                      = 自訂天空
 option.CUSTOM_SKY.comment              = 啟用資源包自訂天空
 option.CUSTOM_SKY_BRIGHTNESS           = 自訂天空亮度
 option.CUSTOM_SKY_BRIGHTNESS.comment   = 調整自訂天空亮度
-option.DH_OVERDRAW_DISTANCE            = 過繪距離
-option.DH_OVERDRAW_FADE_LENGTH         = 過繪淡出長度
-option.NOISE_ON_DH_TERRAIN             = 地平線地形雜訊
 option.ENCHANTMENT_GLINT_BRIGHTNESS    = 附魔光澤亮度
 option.DITHERED_TRANSLUCENCY_FALLBACK  = 交錯半透明備援
 comment.DITHERED_TRANSLUCENCY_FALLBACK = 以交錯方式繪製半透明物，改善部分無法正常渲染的場景 
@@ -745,3 +743,9 @@ option.BOX_COLOR_B              = 藍色
 option.BOX_EMISSION             = 發光
 option.BOX_EMISSION.comment     = 顏色可超過1，需要開啟泛光
 option.BOX_LINE_WIDTH           = 線寬
+
+# Distant Horizons
+
+option.DH_OVERDRAW_DISTANCE    = 過繪距離
+option.DH_OVERDRAW_FADE_LENGTH = 過繪淡出長度
+option.NOISE_ON_DH_TERRAIN     = 地平線地形雜訊
