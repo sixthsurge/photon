@@ -776,24 +776,31 @@ option.NOISE_ON_DH_TERRAIN      = Noise on DH Terrain
 
 option.PHO_ENABLED              = Use Photonics
 option.PHO_LIGHTING_MODE        = Lighting Mode
+option.PHO_LIGHTING_MODE.comment = The lighting algorithm Photonics uses for lighting.\n\nSharp - A very simple lighting algorithm with no noise, but a limited number of lights (Max Samples)\nReSTIR - Uses ReSTIR for lighting, supports an unlimited (Max Lights) number of lights, but may be noisy in certain areas.
 value.PHO_LIGHTING_MODE.SIMPLE  = Sharp
 value.PHO_LIGHTING_MODE.RESTIR  = ReSTIR
 option.PHO_ALPHA_MODE           = Transparency Mode
+option.PHO_ALPHA_MODE.comment   = Changes how Photonics deals with transparent voxels. \n\nOpaque - Treats transparent voxels as opaque\nPer Block - Uses the first transparent voxel, then skips the rest of the block\nPer Voxel - Uses every transparent voxel in a block (HEAVY PERFORMANCE IMPACT)
 value.PHO_ALPHA_MODE.NONE       = Opaque
 value.PHO_ALPHA_MODE.BLOCK      = Per Block
 value.PHO_ALPHA_MODE.VOXEL      = Per Voxel
 option.PHO_MAX_LIGHTS           = Max Lights
+option.PHO_MAX_LIGHTS.comment   = The max number of traced lights that can be loaded
 option.PHO_GLINT_STRENGTH       = Enchantment Glint Strength
+option.PHO_GLINT_STRENGTH.comment = The strength of enchanted items in handheld lighting
 value.PHO_GLINT_STRENGTH.0      = Off
 option.PHO_TWO_HANDHELD_RAYS    = Separate Handheld Rays
+option.PHO_TWO_HANDHELD_RAYS.comment = Whether both handheld lights should cast shadows. When disabled only one shadow will be cast
 option.PHO_SHARP_MAX_SAMPLES    = Max Samples
 option.PHO_RS_INITIAL_SAMPLES   = Initial Samples
 option.PHO_RS_SPR_SAMPLES       = Spatial Reuse Samples
 value.PHO_RS_SPR_SAMPLES.0      = Off
 option.PHO_RS_SPR_RADIUS        = Spatial Reuse Radius
 option.PHO_RS_ACCUMULATION      = Accumulation Frames
+option.PHO_RS_ACCUMULATION.comment = The max number of frames ReSTIR uses for accumulation. Lower values will cause lighting to be more responsive, at the cost of more noise.
 option.PHO_RS_DENOISER_PASSES   = Denoiser Passes
 option.PHO_RS_SOFT_SHADOWS      = Soft Shadows
 option.PHO_RS_COMBINED_GI       = Include Skylight GI
+option.PHO_RS_COMBINED_GI.comment = Whether Gi should be ran through ReSTIR's denoiser instead of its usual path. \nResults in much sharper Gi, at the cost of performance.
 
 
