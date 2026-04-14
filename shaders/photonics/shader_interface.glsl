@@ -101,5 +101,5 @@ vec2 get_taa_jitter() {
 
 bool is_in_world() {
     //Photonics bug! depthtex0 is inheirted from d0_sky_map
-    return texelFetch(depthtex1, ivec2(gl_FragCoord.xy * view_pixel_size), 0).x <= 0.99999f;
+    return texelFetch(depthtex1, ivec2(gl_FragCoord.xy), 0).x <= 0.99999f;
 }
