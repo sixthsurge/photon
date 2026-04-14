@@ -617,7 +617,7 @@ const float wetnessHalflife         = 70.0;
 #ifdef CREPUSCULAR_RAYS 
 #endif
 
-#if MC_VERSION >= 12111
+#if MC_VERSION >= 260100
   #define USE_SEPARATE_ENTITY_DRAWS
 #endif
 
