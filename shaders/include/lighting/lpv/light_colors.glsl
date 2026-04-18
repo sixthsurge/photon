@@ -1,7 +1,7 @@
 #if !defined INCLUDE_LIGHTING_LPV_LIGHT_COLORS
 #define INCLUDE_LIGHTING_LPV_LIGHT_COLORS
 
-const vec3[32] light_color = vec3[32](
+const vec3[64] light_color = vec3[64](
     vec3(1.00, 1.00, 1.00) * 12.0, // Strong white light
     vec3(1.00, 1.00, 1.00) * 6.0, // Medium white light
     vec3(1.00, 1.00, 1.00) * 1.0, // Weak white light
@@ -33,7 +33,39 @@ const vec3[32] light_color = vec3[32](
     vec3(0.85, 1.3, 1.0) * 3.9, // Copper torch and lanterns
     vec3(1.00, 0.57, 0.30) * 8.0, // Copper Bulbs
     vec3(0.60, 0.10, 1.00) * 12.0, // Nether portal
-    vec3(0.0) // End portal
+    vec3(0.0), // End portal
+    vec3(1.00, 1.00, 1.00) * 16.0, // White
+    vec3(0.70, 0.70, 0.70) * 16.0, // Light Gray
+    vec3(0.35, 0.35, 0.35) * 16.0, // Gray
+    vec3(0.10, 0.10, 0.10) * 16.0, // Black
+    vec3(0.60, 0.30, 0.05) * 16.0, // Brown
+    vec3(1.00, 0.00, 0.00) * 16.0, // Red
+    vec3(1.00, 0.50, 0.00) * 16.0, // Orange
+    vec3(1.00, 1.00, 0.00) * 16.0, // Yellow
+    vec3(0.50, 1.00, 0.00) * 16.0, // Lime
+    vec3(0.00, 1.00, 0.00) * 16.0, // Green
+    vec3(0.00, 1.00, 1.00) * 16.0, // Cyan
+    vec3(0.00, 0.50, 1.00) * 16.0, // Light Blue
+    vec3(0.00, 0.00, 1.00) * 16.0, // Blue
+    vec3(0.50, 0.00, 1.00) * 16.0, // Purple
+    vec3(1.00, 0.00, 1.00) * 16.0, // Magenta
+    vec3(1.00, 0.50, 1.00) * 16.0, // Pink
+    vec3(1.00, 1.00, 1.00) * 1.0, // Unused
+    vec3(1.00, 1.00, 1.00) * 1.0, // Unused
+    vec3(1.00, 1.00, 1.00) * 1.0, // Unused
+    vec3(1.00, 1.00, 1.00) * 1.0, // Unused
+    vec3(1.00, 1.00, 1.00) * 1.0, // Unused
+    vec3(1.00, 1.00, 1.00) * 1.0, // Unused
+    vec3(1.00, 1.00, 1.00) * 1.0, // Unused
+    vec3(1.00, 1.00, 1.00) * 1.0, // Unused
+    vec3(1.00, 1.00, 1.00) * 1.0, // Unused
+    vec3(1.00, 1.00, 1.00) * 1.0, // Unused
+    vec3(1.00, 1.00, 1.00) * 1.0, // Unused
+    vec3(1.00, 1.00, 1.00) * 1.0, // Unused
+    vec3(1.00, 1.00, 1.00) * 1.0, // Unused
+    vec3(1.00, 1.00, 1.00) * 1.0, // Unused
+    vec3(1.00, 1.00, 1.00) * 1.0, // Unused
+    vec3(1.00, 1.00, 1.00) * 1.0 // Unused
 );
 
 const vec3[16] tint_color = vec3[16](

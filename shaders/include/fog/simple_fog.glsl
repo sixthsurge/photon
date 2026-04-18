@@ -44,6 +44,7 @@ float border_fog(vec3 scene_pos, vec3 world_dir) {
 #ifndef LOD_MOD_ACTIVE
     float fog = cubic_length(scene_pos.xz) / far;
     fog = exp2(-8.0 * pow8(fog));
+    float vertical_cutoff_distance = far;
 #else
     float fog = length(scene_pos.xz) / float(lod_render_distance);
     fog = exp2(-2.4 * sqr(fog));
@@ -52,6 +53,10 @@ float border_fog(vec3 scene_pos, vec3 world_dir) {
 #if defined WORLD_OVERWORLD || defined WORLD_END
     fog = mix(fog, 1.0, 0.75 * dampen(linear_step(0.0, 0.2, world_dir.y)));
 #endif
+
+    // Apply vertical cutoff: fade out fog based on render distance
+    float vertical_cutoff = linear_step(-vertical_cutoff_distance, -vertical_cutoff_distance + 16.0, scene_pos.y);
+    fog *= vertical_cutoff;
 
     return fog;
 }
