@@ -4,6 +4,10 @@
 
 <p align = "center">A gameplay-focused shader pack for Minecraft</p>
 
+> **This is a patched fork of Photon Shaders with full [Physics Mod](https://minecraftphysicsmod.com/) compatibility.**
+> Includes fixes for Physics Mod's custom water and object interactions to render correctly with Photon's pipeline.
+> Based on the original [Photon](https://github.com/sixthsurge/photon) by sixthsurge.
+
 ![Screenshot](docs/images/rainbow.png)
 
 ## Acknowledgments
