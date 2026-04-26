@@ -1,4 +1,6 @@
 #version 400 compatibility
 #define WORLD_OVERWORLD
+#define BLOOM_TILE_INDEX 1
 #define fsh
-#include "/program/c17_copy_ao.fsh"
+#include "/program/c14_c18_bloom_upsample.fsh"
+

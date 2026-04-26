@@ -164,7 +164,8 @@ vec3 get_sky_lighting(
     vec3 bent_normal,
     vec2 light_levels,
     float ao,
-    float ambient_sss
+    float ambient_sss,
+    float directional_lighting
 ) {
     vec3 lighting = vec3(0f);
 
@@ -327,7 +328,8 @@ vec3 get_diffuse_lighting(
             bent_normal,
             light_levels,
             ao,
-            ambient_sss
+            ambient_sss,
+            directional_lighting
         );
     } else {
 // When combined gi is enabled
@@ -343,7 +345,8 @@ vec3 get_diffuse_lighting(
         bent_normal,
         light_levels,
         ao,
-        ambient_sss
+        ambient_sss,
+        directional_lighting
     );
 #endif
 
