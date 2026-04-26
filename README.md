@@ -10,7 +10,7 @@
 >
 > See [CHANGELOG.md](CHANGELOG.md) for a full list of changes from the original.
 
-![Screenshot](docs/images/rainbow.png)
+![Screenshot](docs/images/oceanphysics.png)
 
 ## Acknowledgments
 
