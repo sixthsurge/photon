@@ -3,7 +3,7 @@
 
   Photon Shader by SixthSurge
 
-  program/c5_c10_bloom_downsample
+  program/c14_c18_bloom_upsample.fsh
   Progressively upsample bloom tiles
   You must define BLOOM_TILE_INDEX before including this file
 
@@ -36,7 +36,8 @@ uniform sampler2D colortex0;
 void main() {
     ivec2 texel = ivec2(gl_FragCoord.xy);
 
-    vec2 uv_src = uv * src_tile_scale
+    vec2 pad_amount = 3.0 * view_pixel_size * rcp(tile_scale);
+    vec2 uv_src = clamp(uv, pad_amount, 1.0 - pad_amount) * src_tile_scale
         + src_tile_offset;
 
     const float src_weight = mix(0.25, 0.90, 0.5 * BLOOM_SPREAD);

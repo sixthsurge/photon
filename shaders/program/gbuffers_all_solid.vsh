@@ -17,7 +17,7 @@ out vec3 scene_pos;
 out vec4 tint;
 
 flat out uint material_mask;
-flat out mat3 tbn;
+out mat3 tbn;
 
 #if defined POM
 out vec2 atlas_tile_coord;

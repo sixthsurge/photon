@@ -3,7 +3,7 @@
 
   Photon Shader by SixthSurge
 
-  program/c5_c10_bloom_downsample
+  program/c14_c18_bloom_upsample.vsh
   Progressively upsample bloom tiles
   You must define BLOOM_TILE_INDEX before including this file
 

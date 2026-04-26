@@ -47,7 +47,10 @@ uniform vec2 view_pixel_size;
 vec3 get_bloom() {
     // Upsample last bloom tile. 
 
-    return texture(colortex0, uv * 0.5).rgb;
+    vec2 pad_amount = 6.0 * view_pixel_size;
+    vec2 uv_src = clamp(uv, pad_amount, 1.0 - pad_amount) * 0.5;
+
+    return texture(colortex0, uv_src).rgb;
 }
 
 // Color grading
