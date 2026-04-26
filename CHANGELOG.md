@@ -6,6 +6,11 @@ All changes relative to the original [Photon Shaders](https://github.com/sixthsu
 
 ## [Unreleased] — 2026-04-26
 
+### Upstream Synced (2026-04-26)
+- **Vertical Fog Cutoff** (upstream `08d81f5`) — adds vertical fog cutoff below render distance to hide underground chunk borders
+- **Correct color setting bars** (upstream `960d2e8`) — fixes `▋` → `▍` bar character in 58 RGB color slider labels (sun, moon, blocklight, skylight)
+- Skipped `b9c1986` (Colorwheel PR #566) — our native implementation is architecturally superior
+
 ### Added
 
 #### Physics Mod Support
