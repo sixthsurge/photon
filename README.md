@@ -1,12 +1,14 @@
 <br><br>
 
-<h1 align = "center">Photon Shaders</h1>
+<h1 align = "center">Photon Shaders — Reimagined</h1>
 
-<p align = "center">A gameplay-focused shader pack for Minecraft</p>
+<p align = "center">A gameplay-focused shader pack for Minecraft — extended with Physics Mod and Colorwheel support</p>
 
-> **This is a patched fork of Photon Shaders with full [Physics Mod](https://minecraftphysicsmod.com/) and [Colorwheel](https://github.com/djefrey/Colorwheel) compatibility.**
-> Includes fixes for Physics Mod's custom water and object interactions, and native Colorwheel support for Flywheel-based mods (e.g. Create).
-> Based on the original [Photon](https://github.com/sixthsurge/photon) by sixthsurge.
+> **This is a custom fork of [Photon Shaders](https://github.com/sixthsurge/photon) by sixthsurge.**
+> Extended with full [Physics Mod](https://minecraftphysicsmod.com/) compatibility and native [Colorwheel](https://github.com/djefrey/Colorwheel) support for Flywheel-based mods (e.g. Create).
+> Colorwheel is **optional** — the shader works normally without it.
+>
+> See [CHANGELOG.md](CHANGELOG.md) for a full list of changes from the original.
 
 ![Screenshot](docs/images/rainbow.png)
 
@@ -31,29 +33,40 @@
 
 ## Installation
 
-* Photon can be used with [Iris](https://irisshaders.dev/download) (recommended) or [OptiFine](https://optifine.net/home)
-* Iris is a modern shader loader with far better performance, mod compatibility and developer features than OptiFine. Some features (Colored Lighting) will only work on Iris
-* Once you have your preferred shader loader installed, simply place the downloaded zip file in your `.minecraft/shaderpacks` folder
+* Place the downloaded zip file in your `.minecraft/shaderpacks` folder
+* Requires [Iris](https://irisshaders.dev/download) 1.5+ (recommended) or [Oculus](https://www.curseforge.com/minecraft/mc-mods/oculus) on Forge
+* OptiFine is also supported on Minecraft 1.16.5 and above
+
+### Optional: Physics Mod
+* Install [Physics Mod](https://minecraftphysicsmod.com/) — ocean waves and object physics will render correctly with Photon's pipeline automatically
+
+### Optional: Colorwheel (Create mod support)
+* Install [Colorwheel](https://github.com/djefrey/Colorwheel) to enable proper shading for Flywheel-based mods (e.g. [Create](https://modrinth.com/mod/create/))
+* No Colorwheel Patcher needed — native `clrwl_*` programs are built in
+* Forge 1.20.1: `colorwheel-forge-1.2.4+mc1.20.1.jar`
+* NeoForge 1.21.1: `colorwheel-neoforge-1.2.4+mc1.21.1.jar`
 
 ## Building
 
-Requires **JDK 21** and **Gradle** (wrapper included).
-
 ```bash
-# Open your Terminal
-Open it in a Location where you want to clone the repository
-
 # Clone the repo
 git clone https://github.com/realBritakee/photon.git
+cd photon
 
-# Pack as Zip
-tar -a -c -f "Photon_1.3b x Physicsmod.zip" "shaders" "LICENSE"
+# Pack as Zip (Linux/WSL)
+python3 -c "
+import zipfile, os
+with zipfile.ZipFile('Photon Shaders - Reimagined.zip', 'w', zipfile.ZIP_DEFLATED) as zf:
+    for root, dirs, files in os.walk('shaders'):
+        for f in files: zf.write(os.path.join(root, f))
+    zf.write('LICENSE')
+"
 ```
-
 
 ## Features
 * Native [Colorwheel](https://github.com/djefrey/Colorwheel) support — Flywheel-based mods (e.g. [Create](https://modrinth.com/mod/create/)) render correctly with full Photon shading and shadows
-* Fully revamped sky, lighting and water 
+* Full [Physics Mod](https://minecraftphysicsmod.com/) ocean support — realistic wave physics rendered correctly in the deferred pipeline
+* Fully revamped sky, lighting and water
 * Detailed clouds with many layers and cloud types
 * Immersive weather system providing different skies each day
 * Voxel-based colored lighting (enabled with Ultra profile, requires Iris)
@@ -69,23 +82,26 @@ tar -a -c -f "Photon_1.3b x Physicsmod.zip" "shaders" "LICENSE"
 
 ## Compatibility
 ### GPU vendors
-* Nvidia 
-* AMD 
-* Intel 
-* **_NOT_** Apple Metal
-  * You may be able to get the shader pack to work by disabling some settings: try _SH Skylight_ and _Colored Shadows_.
+* Nvidia
+* AMD
+* Intel
+* **_NOT_** Apple Metal — may work with _SH Skylight_ and _Colored Shadows_ disabled
+
 ### Shader loaders
-* Iris - version 1.5 and above
-* OptiFine - on Minecraft 1.16.5 and above
-* Photon is also compatible with [Distant Horizons](https://www.curseforge.com/minecraft/mc-mods/distant-horizons)
-* Native [Colorwheel](https://github.com/djefrey/Colorwheel) support for Flywheel 1.0 mods — no Colorwheel Patcher needed
-  * Forge 1.20.1: use `colorwheel-forge-1.2.4+mc1.20.1.jar`
-  * NeoForge 1.21.1: use `colorwheel-neoforge-1.2.4+mc1.21.1.jar`
-* Apple Metal: Disable _SH Skylight_ and _Colored Shadows_
+* Iris 1.5+ (recommended)
+* Oculus (Forge)
+* OptiFine — Minecraft 1.16.5 and above
+
 ### Special mod support
 * [Distant Horizons](https://www.curseforge.com/minecraft/mc-mods/distant-horizons)
 * [Voxy](https://modrinth.com/mod/voxy)
 * [Photonics](https://modrinth.com/mod/photonics)
+* [Physics Mod](https://minecraftphysicsmod.com/) ✅
+* [Create](https://modrinth.com/mod/create/) via [Colorwheel](https://github.com/djefrey/Colorwheel) ✅
+
+## Changelog
+
+See [CHANGELOG.md](CHANGELOG.md) for a full list of changes from the original Photon Shaders.
 
 ## Showcase videos
 
