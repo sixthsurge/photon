@@ -32,10 +32,21 @@
 * Iris is a modern shader loader with far better performance, mod compatibility and developer features than OptiFine. Some features (Colored Lighting) will only work on Iris
 * Once you have your preferred shader loader installed, simply place the downloaded zip file in your `.minecraft/shaderpacks` folder
 
-### Downloads
-* [Releases](https://modrinth.com/shader/photon-shader/versions) (recommended)
-* [Stable](https://github.com/sixthsurge/photon/archive/refs/heads/iris-stable.zip)
-* [Unstable](https://github.com/sixthsurge/photon/archive/refs/heads/iris-unstable.zip)
+## Building
+
+Requires **JDK 21** and **Gradle** (wrapper included).
+
+```bash
+# Open your Terminal
+Open it in a Location where you want to clone the repository
+
+# Clone the repo
+git clone https://github.com/realBritakee/photon.git
+
+# Pack as Zip
+tar -a -c -f "Photon_1.3b x Physicsmod.zip" "shaders" "LICENSE"
+```
+
 
 ## Features
 * Fully revamped sky, lighting and water 
@@ -78,8 +89,3 @@
 	<p> by VIPUL
 	<br><br>
 </div>
-
-## Community
-
-- For questions, suggestions and news regarding this shader pack, head to my [discord server](https://discord.gg/ngEW66HScd)
-- You can also [give me money](https://ko-fi.com/sixthsurge) if you want to 
