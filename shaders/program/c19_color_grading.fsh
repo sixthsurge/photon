@@ -50,7 +50,7 @@ vec3 get_bloom() {
     vec2 pad_amount = 6.0 * view_pixel_size;
     vec2 uv_src = clamp(uv, pad_amount, 1.0 - pad_amount) * 0.5;
 
-    return texture(colortex0, uv_src).rgb;
+    return BLOOM_UPSAMPLING_FILTER(colortex0, uv_src).rgb;
 }
 
 // Color grading

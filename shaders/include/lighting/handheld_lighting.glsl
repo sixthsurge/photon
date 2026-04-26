@@ -35,7 +35,7 @@ vec3 get_handheld_light_color(int held_item_id, int held_item_light_value) {
 }
 
 float get_handheld_light_falloff(vec3 scene_pos, float ao) {
-    float falloff = lift(rcp(dot(scene_pos, scene_pos) + 1.0), 1.2);
+    float falloff = lift(rcp(dot(scene_pos, scene_pos) + 1.0), 3.0);
     return falloff * mix(ao, 1.0, falloff * falloff)
         * HANDHELD_LIGHTING_INTENSITY;
 }

@@ -33,6 +33,8 @@ const vec2 src_tile_offset = bloom_tile_offset(BLOOM_TILE_INDEX + 1);
 uniform sampler2D colortex0;
 #define SRC_SAMPLER colortex0
 
+#include "/include/utility/bicubic.glsl"
+
 void main() {
     ivec2 texel = ivec2(gl_FragCoord.xy);
 
@@ -42,6 +44,6 @@ void main() {
 
     const float src_weight = mix(0.25, 0.90, 0.5 * BLOOM_SPREAD);
     bloom_tile = texelFetch(SRC_SAMPLER, texel, 0).rgb * (1.0 - src_weight); // Destination tile.
-    bloom_tile += textureLod(SRC_SAMPLER, uv_src, 0).rgb * src_weight; // Source tile.
+    bloom_tile += BLOOM_UPSAMPLING_FILTER(SRC_SAMPLER, uv_src).rgb * src_weight; // Source tile.
 }
 

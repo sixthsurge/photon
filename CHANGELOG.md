@@ -29,6 +29,8 @@ All changes relative to the original [Photon Shaders](https://github.com/sixthsu
 ### Fixed
 
 - **[Bloom] Fix edge bleeding** (upstream `31b57c6a2b`) — added UV clamping (`pad_amount`) in `c14_c18_bloom_upsample.fsh` and `c19_color_grading.fsh` to prevent bloom from bleeding at tile edges
+- **[Bloom] Bloom upsampling filter setting** (upstream `29ab67fbf4`) — new `BLOOM_UPSAMPLING_FILTER` option (Bilinear / Bicubic) in post-processing menu; bicubic uses `bicubic.glsl` for smoother bloom
+- **Boost handheld lighting + enable by default** (upstream `a4d96bb0be`) — falloff exponent raised from `1.2` to `3.0`, `HANDHELD_LIGHTING` enabled by default
 - **Shader fails to load on 1.21.1 with Iris** — removed `flat` interpolation qualifier from `tbn` varying in `gbuffers_all_solid.vsh/.fsh`; upstream Colorwheel PR #566 reintroduced this, causing a GLSL link error across all separate entity draw programs
 
 ### Changed
