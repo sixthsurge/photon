@@ -4,8 +4,8 @@
 
 <p align = "center">A gameplay-focused shader pack for Minecraft</p>
 
-> **This is a patched fork of Photon Shaders with full [Physics Mod](https://minecraftphysicsmod.com/) compatibility.**
-> Includes fixes for Physics Mod's custom water and object interactions to render correctly with Photon's pipeline.
+> **This is a patched fork of Photon Shaders with full [Physics Mod](https://minecraftphysicsmod.com/) and [Colorwheel](https://github.com/djefrey/Colorwheel) compatibility.**
+> Includes fixes for Physics Mod's custom water and object interactions, and native Colorwheel support for Flywheel-based mods (e.g. Create).
 > Based on the original [Photon](https://github.com/sixthsurge/photon) by sixthsurge.
 
 ![Screenshot](docs/images/rainbow.png)
@@ -49,6 +49,7 @@ tar -a -c -f "Photon_1.3b x Physicsmod.zip" "shaders" "LICENSE"
 
 
 ## Features
+* Native [Colorwheel](https://github.com/djefrey/Colorwheel) support — Flywheel-based mods (e.g. [Create](https://modrinth.com/mod/create/)) render correctly with full Photon shading and shadows
 * Fully revamped sky, lighting and water 
 * Detailed clouds with many layers and cloud types
 * Immersive weather system providing different skies each day
@@ -67,7 +68,10 @@ tar -a -c -f "Photon_1.3b x Physicsmod.zip" "shaders" "LICENSE"
 * Nvidia, AMD and Intel GPUs
 * Iris - version 1.5 and above
 * OptiFine - on Minecraft 1.16.5 and above
-* Photon is also compatible with [Distant Horizons](https://www.curseforge.com/minecraft/mc-mods/distant-horizons) 
+* Photon is also compatible with [Distant Horizons](https://www.curseforge.com/minecraft/mc-mods/distant-horizons)
+* Native [Colorwheel](https://github.com/djefrey/Colorwheel) support for Flywheel 1.0 mods — no Colorwheel Patcher needed
+  * Forge 1.20.1: use `colorwheel-forge-1.2.4+mc1.20.1.jar`
+  * NeoForge 1.21.1: use `colorwheel-neoforge-1.2.4+mc1.21.1.jar`
 * Apple Metal: Disable _SH Skylight_ and _Colored Shadows_
 
 ## Showcase videos
