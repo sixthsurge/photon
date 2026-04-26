@@ -52,15 +52,16 @@
 # Clone the repo
 git clone https://github.com/realBritakee/photon.git
 cd photon
+```
 
-# Pack as Zip (Linux/WSL)
-python3 -c "
-import zipfile, os
-with zipfile.ZipFile('Photon Shaders - Reimagined.zip', 'w', zipfile.ZIP_DEFLATED) as zf:
-    for root, dirs, files in os.walk('shaders'):
-        for f in files: zf.write(os.path.join(root, f))
-    zf.write('LICENSE')
-"
+**Windows (PowerShell)**
+```powershell
+tar -a -c -f "Photon Shaders - Reimagined.zip" "shaders" "LICENSE"
+```
+
+**Linux / WSL**
+```bash
+zip -r "Photon Shaders - Reimagined.zip" shaders/ LICENSE
 ```
 
 ## Features

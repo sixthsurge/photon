@@ -244,9 +244,10 @@ WavePixelData physics_wavePixel(const in vec2 position, const in float factor, c
 
 #include "/include/fog/simple_fog.glsl"
 #include "/include/lighting/diffuse_lighting.glsl"
-#include "/include/lighting/shadows/sampling.glsl"
+
+#include "/include/lighting/shadows/pcss.glsl"
 #include "/include/lighting/specular_lighting.glsl"
-#include "/include/misc/distant_horizons.glsl"
+#include "/include/misc/lod_mod_support.glsl"
 #include "/include/surface/material.glsl"
 #include "/include/misc/material_masks.glsl"
 #include "/include/misc/purkinje_shift.glsl"
@@ -337,7 +338,7 @@ void main() {
 
 #ifdef DISTANT_HORIZONS
     float depth1_dh = texelFetch(dhDepthTex1, ivec2(gl_FragCoord.xy), 0).x;
-    if (is_distant_horizons_terrain(depth1, depth1_dh)) {
+    if (is_lod_terrain(depth1, depth1_dh)) {
         view_back_pos = screen_to_view_space(vec3(coord, depth1_dh), true, true);
     }
 #endif
@@ -376,7 +377,7 @@ void main() {
 #if defined SHADOW && defined WORLD_END
     float sss_depth;
     float shadow_distance_fade;
-    vec3 shadows = calculate_shadows(position_scene, tbn[2], adjusted_light_levels.y, cloud_shadows, material.sss_amount, shadow_distance_fade, sss_depth);
+    vec3 shadows = get_filtered_shadows(position_scene, tbn[2], adjusted_light_levels.y, cloud_shadows, material.sss_amount, shadow_distance_fade, sss_depth);
 #else
     #define sss_depth 0.0
     #define shadow_distance_fade 0.0
