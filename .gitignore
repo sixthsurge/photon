@@ -1,5 +1,0 @@
-# Local build artifacts
-*.zip
-
-# PR description (local only, not for upstream)
-PULLREQUEST.md
