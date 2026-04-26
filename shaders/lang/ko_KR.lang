@@ -1,0 +1,766 @@
+# Profiles
+
+profile.low                            = §e낮음
+profile.medium                         = §a중간
+profile.high                           = §b높음
+profile.ultra                          = §d울트라
+
+# Screens
+
+screen.world                           = 월드
+screen.lighting                        = 조명
+screen.sky                             = 하늘
+screen.fog                             = 안개
+screen.materials                       = 재질
+screen.water                           = 물
+screen.post                            = 후처리
+screen.misc                            = 기타
+
+screen.weather                         = 날씨
+screen.colored_lights                  = 유색 조명 설정
+screen.rp_settings                     = 리소스팩 설정
+screen.reflections                     = 반사
+screen.refraction                      = 굴절
+screen.light_sources                   = 광원
+screen.shadows                         = 그림자
+screen.ao                              = 주변광 차폐 (AO)
+screen.color_grading                   = 색 보정
+screen.exposure                        = 노출
+screen.lpv_vl                          = 유색 조명 안개 산란
+screen.box                             = 선택 상자
+screen.distant_horizons                = Distant Horizons
+screen.developer                       = 개발자 옵션
+
+screen.aurora                          = 오로라
+screen.clouds                          = 구름
+screen.crepuscular_rays                = 부채살 빛 (박명광, 틴들 현상)
+screen.stars                           = 별
+screen.clouds_cumulus                  = 적운 설정
+screen.clouds_altocumulus              = 고적운 설정
+screen.clouds_cumulus_congestus        = 웅대적운 설정
+screen.clouds_cirrus                   = 권운/권적운 설정
+screen.clouds_minecrafty               = 블록형 구름 설정
+screen.clouds_noctilucent              = 야광운 설정
+
+screen.fog_rlh                         = 레일리 안개
+screen.fog_mie                         = 미 산란 안개
+screen.sunlight_color                  = 햇빛 색상
+screen.moonlight_color                 = 달빛 색상
+screen.blocklight_color                = 블록 조명 색상
+screen.sunlight_morning                = 아침
+screen.sunlight_noon                   = 정오
+screen.sunlight_evening                = 저녁
+screen.light_nether                    = 네더
+screen.light_end                       = 엔드
+screen.fog_rlh_normal                  = 일반 색상
+screen.fog_rlh_rain                    = 비 색상
+screen.fog_rlh_arid                    = 건조/사막 색상
+screen.fog_rlh_snowy                   = 설원 색상
+screen.fog_rlh_taiga                   = 타이가 색상
+screen.fog_rlh_jungle                  = 정글 색상
+screen.fog_rlh_swamp                   = 늪 색상
+screen.water_waves                     = 물결
+screen.water_fog_coeff                 = 수중 안개 계수
+
+screen.end_light_color                 = 조명 색상
+screen.end_ambient_color               = 주변광 색상
+screen.nether_color                    = 고정 색상
+
+screen.distance_view                   = 거리 뷰
+
+option.INFO                            = Photon Shaders
+value.INFO.0                           = §e제작: SixthSurge
+value.INFO.1                           = §a제작: SixthSurge
+value.INFO.2                           = §b제작: SixthSurge
+value.INFO.3                           = §d제작: SixthSurge
+
+# World settings
+
+option.WAVING_PLANTS                   = 흔들리는 식물
+option.WAVING_PLANTS.comment           = 지면 식물이 바람에 흔들립니다.\n\n흔들리는 식물 목록에 블록을 추가하려면 shaders/block.properties 파일을 열고 해당 카테고리(10016, 10017 또는 10018)에 추가하세요
+option.WAVING_LEAVES                   = 흔들리는 나뭇잎
+option.WAVING_LEAVES.comment           = 나뭇잎 블록이 바람에 흔들립니다.\n\n흔들리는 나뭇잎 블록 목록에 블록을 추가하려면 shaders/block.properties 파일을 열고 해당 카테고리(10019)에 추가하세요
+option.SLANTED_RAIN                    = 기울어진 비
+option.SLANTED_RAIN.comment            = 비 입자가 기울어져 내립니다. 비 오는 날씨를 조금 더 분위기 있게 만듭니다
+option.RAIN_OPACITY                    = 비 불투명도
+option.RAIN_OPACITY.comment            = 비 입자의 불투명도를 조절합니다
+option.SEA_LEVEL                       = 해수면
+option.SEA_LEVEL.comment               = 바다/지면의 y 좌표입니다.\n\n-60.0: 1.18 이후 슈퍼플랫.\n4.0: 1.18 이전 슈퍼플랫.\n63.0: 일반.
+option.SNOW_OPACITY                    = 눈 불투명도
+option.SNOW_OPACITY.comment            = 눈 입자의 불투명도를 조절합니다
+option.EDGE_HIGHLIGHT                  = 가장자리 강조
+option.EDGE_HIGHLIGHT.comment          = 마인크래프트 던전스에서 영감을 받은 가장자리 강조 효과
+option.EDGE_HIGHLIGHT_SCALE            = 가장자리 강조 크기
+option.EDGE_HIGHLIGHT_SCALE.comment    = 가장자리 강조의 두께를 조절합니다. 사용 중인 리소스팩 해상도에 맞게 조정하세요
+option.MOON_PHASE_AFFECTS_BRIGHTNESS   = 달의 위상이 조명에 영향
+option.MOON_PHASE_AFFECTS_BRIGHTNESS.comment = 밤 시간의 밝기가 달의 위상에 따라 달라집니다
+option.DESERT_SANDSTORM                = 사막 모래폭풍
+option.DESERT_SANDSTORM.comment        = 사막 생물균계에서 비가 올 때 모래폭풍이 발생합니다
+option.END_GLOW                        = 엔드 발광 효과
+option.END_GLOW.comment                = 엔드에서 일렁이는 발광 효과. 볼류메트릭 안개가 필요합니다
+
+# Weather
+option.RANDOM_WEATHER_VARIATION            = 무작위 변화
+option.BIOME_WEATHER_VARIATION             = 생물균계 기반 변화
+option.WEATHER_TEMPERATURE_BIAS            = 온도 편향
+option.WEATHER_HUMIDITY_BIAS               = 습도 편향
+option.WEATHER_WIND_BIAS                   = 바람 편향
+option.WEATHER_TEMPERATURE_VARIATION_SPEED = 온도 변화 속도
+option.WEATHER_HUMIDITY_VARIATION_SPEED    = 습도 변화 속도
+option.WEATHER_WIND_VARIATION_SPEED        = 바람 변화 속도
+
+# Lighting settings
+
+option.COLORED_LIGHTS                  = 유색 조명
+option.COLORED_LIGHTS.comment          = 플러드 필 알고리즘을 사용한 가변 색상 블록 조명. Iris 1.6 이상이 필요합니다
+option.COLORED_LIGHTS_VANILLA_LIGHTMAP_CONTRIBUTION = 바닐라 라이트맵 기여도
+option.HANDHELD_LIGHTING               = 손에 든 조명
+option.HANDHELD_LIGHTING.comment       = 손에 든 아이템이 월드에 빛을 비춥니다. 유색 조명이 활성화되어 있으면 손에 든 조명도 해당 광원의 색상으로 표시됩니다
+option.HANDHELD_LIGHTING_INTENSITY     = 손에 든 조명 강도
+option.HANDHELD_LIGHTING_INTENSITY.comment = 손에 든 광원의 밝기를 조절합니다
+option.AO_IN_SUNLIGHT                  = 햇빛 아래 AO
+option.AO_IN_SUNLIGHT.comment          = 직사광선/달빛 아래에서 셰이더 주변광 차폐를 적용할지 여부
+option.CLOUD_SHADOWS                   = 구름 그림자
+option.CLOUD_SHADOWS.comment           = 구름이 지면에 드리우는 그림자
+option.CLOUD_SHADOWS_INTENSITY         = 구름 그림자 강도
+option.CLOUD_SHADOWS_INTENSITY.comment = 구름 그림자의 강도를 조절합니다
+option.SH_SKYLIGHT                     = SH 하늘빛
+option.SH_SKYLIGHT.comment             = 오버월드에서 방향성 하늘빛을 구면 조화 함수로 인코딩하여 매우 자연스러운 결과를 제공합니다.\nGTAO와 함께 사용하면 효과적입니다
+option.SSS_SHEEN                       = SSS 광택
+option.SSS_SHEEN.comment               = 식물과 나뭇잎의 반사 "광택" 효과. 키 큰 풀 등이 잔디의 반사와 더 잘 어우러지도록 돕습니다
+option.SSS_INTENSITY                   = SSS 강도
+option.SSS_INTENSITY.comment           = 표면하 산란(SSS)의 밝기를 조절합니다
+option.SHADING_STRENGTH                = 음영 강도
+option.SHADING_STRENGTH.comment        = 직접광 음영의 대비를 조절합니다. 이 옵션을 낮추면 그림자 안에 있지 않으면서 태양을 등진 면이 밝아지고, 높이면 어두워집니다
+
+option.SHADOW                          = 그림자 매핑
+option.SHADOW_PCF                      = 그림자 맵 필터링
+option.SHADOW_SSRT                     = SSRT 원거리 그림자
+option.SHADOW_SSRT_STEPS               = SSRT 그림자 단계
+option.SHADOW_COLOR                    = 유색 그림자
+option.SHADOW_COLOR.comment            = 반투명 블록이 색조가 입혀진 그림자를 드리웁니다
+option.SHADOW_VPS                      = 가변 반영(Penumbra) 그림자
+option.SHADOW_VPS.comment              = 광원에서 멀어질수록 그림자가 부드러워집니다
+option.shadowMapResolution             = 그림자 해상도
+option.shadowDistance                  = 그림자 거리
+option.sunPathRotation                 = 태양 경로 회전
+option.SHADOW_PENUMBRA_SCALE           = 그림자 부드러움
+option.SHADOW_PENUMBRA_SCALE.comment   = 그림자의 부드러움을 조절합니다
+option.ENTITY_SHADOWS                  = 엔티티 그림자
+option.ENTITY_SHADOWS.comment          = 엔티티가 그림자를 드리울 수 있는지 여부.\n대규모 농장이 있는 서바이벌 베이스에서 성능을 향상시키려면 비활성화하세요
+option.BLOCK_ENTITY_SHADOWS            = 블록 엔티티 그림자
+option.PIXELATED_SHADOWS               = 픽셀화된 그림자
+option.PIXELATED_SHADOWS.comment       = 그림자가 블록 텍셀에 맞춰져 픽셀화된 모습을 연출합니다
+option.PIXELATED_SHADOWS_RESOLUTION    = 픽셀화된 그림자 해상도
+option.SSS_STEPS                       = SSS 단계
+option.SSS_STEPS.comment               = 값을 높이면 SSS가 적용된 식물이나 기타 재질의 노이즈가 줄어들지만 성능 비용이 발생합니다.
+
+option.SHADER_AO                       = 셰이더 AO
+option.SHADER_AO.comment               = 사용할 AO 방식입니다. 끔 - 셰이더 AO 없음. SSAO - 품질은 낮지만 샘플/필터링이 적게 필요함. GTAO - 품질은 좋지만 더 많은 샘플/필터링이 필요함
+value.SHADER_AO.SHADER_AO_NONE         = 끔
+value.SHADER_AO.SHADER_AO_SSAO         = SSAO
+value.SHADER_AO.SHADER_AO_GTAO         = GTAO
+option.VANILLA_AO                      = 바닐라 AO
+option.VANILLA_AO.comment              = 마인크래프트 내장 주변광 차폐
+option.SSAO_RADIUS                     = SSAO 반경
+option.SSAO_RADIUS.comment             = SSAO의 반경을 조절합니다. 오브젝트가 서로 가려질 수 있는 거리입니다
+option.SSAO_STEPS                      = SSAO 단계
+option.SSAO_STEPS.comment              = SSAO가 얼마나 노이즈가 많게 보일지 조절합니다
+option.GTAO_RADIUS                     = GTAO 반경
+option.GTAO_RADIUS.comment             = GTAO의 반경을 조절합니다. 오브젝트가 서로 가려질 수 있는 거리입니다
+option.GTAO_SLICES                     = GTAO 슬라이스
+option.GTAO_SLICES.comment             = GTAO가 얼마나 노이즈가 많게 보일지 조절합니다
+option.GTAO_HORIZON_STEPS              = GTAO 수평선 단계
+option.GTAO_HORIZON_STEPS.comment      = GTAO의 정확도를 조절합니다
+
+option.SUN_NR                          = §c빨강
+option.SUN_NG                          = §a초록
+option.SUN_NB                          = §9파랑
+option.SUN_MR                          = §c빨강
+option.SUN_MG                          = §a초록
+option.SUN_MB                          = §9파랑
+option.SUN_ER                          = §c빨강
+option.SUN_EG                          = §a초록
+option.SUN_EB                          = §9파랑
+option.SUN_I                           = 햇빛 강도
+option.MOON_R                          = §c빨강
+option.MOON_G                          = §a초록
+option.MOON_B                          = §9파랑
+option.MOON_I                          = 달빛 강도
+option.SKYLIGHT_I                      = 하늘빛 강도
+option.BOUNCED_LIGHT_I                 = 반사된 햇빛 강도
+option.CAVE_LIGHTING_I                 = 동굴 밝기
+option.LIGHTNING_FLASH                 = 번개 섬광
+option.NETHER_USE_BIOME_COLOR          = 생물균계 색상 사용
+option.NETHER_I                        = 주변광 강도
+option.NETHER_S                        = 주변광 채도
+option.NETHER_R                        = §c빨강
+option.NETHER_G                        = §a초록
+option.NETHER_B                        = §9파랑
+option.END_LIGHT_R                     = §c빨강
+option.END_LIGHT_G                     = §a초록
+option.END_LIGHT_B                     = §9파랑
+option.END_LIGHT_I                     = 조명 강도
+option.END_AMBIENT_R                   = §c빨강
+option.END_AMBIENT_G                   = §a초록
+option.END_AMBIENT_B                   = §9파랑
+option.END_AMBIENT_I                   = 주변광 강도
+option.BLOCKLIGHT_R                    = §c빨강
+option.BLOCKLIGHT_G                    = §a초록
+option.BLOCKLIGHT_B                    = §9파랑
+option.BLOCKLIGHT_I                    = 블록 조명 강도
+
+option.VOXEL_VOLUME_SIZE               = 복셀 볼륨 크기
+option.VOXEL_VOLUME_SIZE.comment       = 성능에 큰 영향을 미치며, 그림자 거리의 영향도 받습니다
+suffix.VOXEL_VOLUME_SIZE               = m³
+option.VOXEL_VOLUME_CENTER             = 복셀 볼륨 중심
+option.VOXEL_VOLUME_CENTER.comment     = 전방: 복셀 볼륨이 플레이어 앞쪽을 중심으로 배치되어 더 많은 영역이 보이게 됩니다
+
+value.VOXEL_VOLUME_CENTER.VOXEL_VOLUME_CENTER_AHEAD  = 전방
+value.VOXEL_VOLUME_CENTER.VOXEL_VOLUME_CENTER_PLAYER = 플레이어
+
+suffix.shadowMapResolution             = ²
+suffix.sunPathRotation                 = °
+
+value.shadowDistance.48.0              = 3 청크
+value.shadowDistance.64.0              = 4 청크
+value.shadowDistance.80.0              = 5 청크
+value.shadowDistance.96.0              = 6 청크
+value.shadowDistance.112.0             = 7 청크
+value.shadowDistance.128.0             = 8 청크
+value.shadowDistance.144.0             = 9 청크
+value.shadowDistance.160.0             = 10 청크
+value.shadowDistance.176.0             = 11 청크
+value.shadowDistance.192.0             = 12 청크
+value.shadowDistance.208.0             = 13 청크
+value.shadowDistance.224.0             = 14 청크
+value.shadowDistance.240.0             = 15 청크
+value.shadowDistance.256.0             = 16 청크
+value.shadowDistance.320.0             = 20 청크
+value.shadowDistance.384.0             = 24 청크
+value.shadowDistance.512.0             = 32 청크
+value.shadowDistance.768.0             = 48 청크
+value.shadowDistance.1024.0            = 64 청크
+value.shadowDistance.2048.0            = 128 청크
+value.shadowDistance.4096.0            = 256 청크
+
+# Sky settings
+
+option.VANILLA_SUN                     = 바닐라 태양
+option.VANILLA_MOON                    = 바닐라 달
+option.SUN_ANGULAR_RADIUS              = 태양 각반경
+option.MOON_ANGULAR_RADIUS             = 달 각반경
+option.SKY_GROUND                      = 하늘 지면
+option.SKY_GROUND.comment              = 수평선 아래로 보이는 행성 표면
+option.ATMOSPHERE_SATURATION_BOOST                      = 대기 채도 증폭
+option.ATMOSPHERE_SATURATION_BOOST.comment              = 시간대에 따라 하늘과 햇빛 색상의 채도를 높입니다
+option.ATMOSPHERE_SATURATION_BOOST_INTENSITY            = 대기 채도 증폭 강도
+option.ATMOSPHERE_SATURATION_BOOST_INTENSITY.comment    = 대기 채도 증폭의 강도를 조절합니다
+option.STARS                           = 활성화
+option.STARS.comment                   = 밤하늘의 별. 성능 영향 적음
+option.STARS_INTENSITY                 = 강도
+option.STARS_INTENSITY.comment         = 밤하늘 별의 밝기를 조절합니다
+option.STARS_COVERAGE                  = 범위
+option.STARS_COVERAGE.comment          = 밤하늘 별의 개수를 조절합니다
+option.GALAXY                          = 은하수
+option.GALAXY.comment                  = 밤하늘의 은하수 이미지
+option.GALAXY_INTENSITY                = 은하수 강도
+option.GALAXY_INTENSITY.comment        = 밤하늘 은하수의 밝기를 조절합니다
+option.CREPUSCULAR_RAYS                = 활성화
+option.CREPUSCULAR_RAYS_INTENSITY      = 강도
+option.CREPUSCULAR_RAYS_STEPS_HORIZON  = 단계 수 - 수평선
+option.CREPUSCULAR_RAYS_STEPS_ZENITH   = 단계 수 - 천정
+option.LIGHTNING_FLASH                 = 번개 섬광
+option.RAINBOWS                        = 무지개
+option.END_SUN_EFFECT                  = 엔드 태양 효과
+
+# Clouds
+option.CLOUDS_CUMULUS                       = 적운
+option.CLOUDS_CUMULUS.comment               = 적운을 닮게 만든 저고도 볼류메트릭 구름
+option.CLOUDS_CUMULUS_PRIMARY_STEPS_H       = 기본 단계 - 수평선
+option.CLOUDS_CUMULUS_PRIMARY_STEPS_Z       = 기본 단계 - 천정
+option.CLOUDS_CUMULUS_LIGHTING_STEPS        = 조명 단계
+option.CLOUDS_CUMULUS_AMBIENT_STEPS         = 주변광 단계
+option.CLOUDS_CUMULUS_ALTITUDE              = 고도
+suffix.CLOUDS_CUMULUS_ALTITUDE              = m
+option.CLOUDS_CUMULUS_THICKNESS             = 두께
+option.CLOUDS_CUMULUS_DENSITY               = 밀도
+option.CLOUDS_CUMULUS_COVERAGE              = 범위
+option.CLOUDS_CUMULUS_SIZE                  = 크기
+option.CLOUDS_CUMULUS_DETAIL_STRENGTH       = 세부 강도
+option.CLOUDS_CUMULUS_WIND_SPEED            = 풍속
+suffix.CLOUDS_CUMULUS_WIND_SPEED            = m/s
+option.CLOUDS_CUMULUS_WIND_ANGLE            = 풍향
+suffix.CLOUDS_CUMULUS_WIND_ANGLE            = °
+option.CLOUDS_CUMULUS_PRECOMPUTE_LOCAL_COVERAGE         = 로컬 범위 사전 계산
+option.CLOUDS_CUMULUS_PRECOMPUTE_LOCAL_COVERAGE.comment = 적운의 강력한 최적화 옵션입니다. 구름이 그려지는 최대 거리를 줄이며, 카메라가 움직일 때 구름 모양이 변형되는 아티팩트가 발생할 수 있습니다. 구름 위에서 스크린샷을 찍을 때는 비활성화하세요
+
+option.CLOUDS_ALTOCUMULUS                       = 고적운
+option.CLOUDS_ALTOCUMULUS.comment               = 고적운을 닮게 만든 중고도 볼류메트릭 구름
+option.CLOUDS_ALTOCUMULUS_PRIMARY_STEPS_H       = 기본 단계 - 수평선
+option.CLOUDS_ALTOCUMULUS_PRIMARY_STEPS_Z       = 기본 단계 - 천정
+option.CLOUDS_ALTOCUMULUS_LIGHTING_STEPS        = 조명 단계
+option.CLOUDS_ALTOCUMULUS_AMBIENT_STEPS         = 주변광 단계
+option.CLOUDS_ALTOCUMULUS_ALTITUDE              = 고도
+suffix.CLOUDS_ALTOCUMULUS_ALTITUDE              = m
+option.CLOUDS_ALTOCUMULUS_THICKNESS             = 두께
+option.CLOUDS_ALTOCUMULUS_DENSITY               = 밀도
+option.CLOUDS_ALTOCUMULUS_COVERAGE              = 범위
+option.CLOUDS_ALTOCUMULUS_SIZE                  = 크기
+option.CLOUDS_ALTOCUMULUS_DETAIL_STRENGTH       = 세부 강도
+option.CLOUDS_ALTOCUMULUS_WIND_SPEED            = 풍속
+suffix.CLOUDS_ALTOCUMULUS_WIND_SPEED            = m/s
+option.CLOUDS_ALTOCUMULUS_WIND_ANGLE            = 풍향
+suffix.CLOUDS_ALTOCUMULUS_WIND_ANGLE            = °
+
+option.CLOUDS_CUMULUS_CONGESTUS                       = 웅대적운
+option.CLOUDS_CUMULUS_CONGESTUS.comment               = 거대하고 멀리 있는 볼류메트릭 구름
+option.CLOUDS_CUMULUS_CONGESTUS_PRIMARY_STEPS_H       = 기본 단계 - 수평선
+option.CLOUDS_CUMULUS_CONGESTUS_PRIMARY_STEPS_Z       = 기본 단계 - 천정
+option.CLOUDS_CUMULUS_CONGESTUS_LIGHTING_STEPS        = 조명 단계
+option.CLOUDS_CUMULUS_CONGESTUS_AMBIENT_STEPS         = 주변광 단계
+option.CLOUDS_CUMULUS_CONGESTUS_ALTITUDE              = 고도
+suffix.CLOUDS_CUMULUS_CONGESTUS_ALTITUDE              = m
+option.CLOUDS_CUMULUS_CONGESTUS_THICKNESS             = 두께
+option.CLOUDS_CUMULUS_CONGESTUS_DENSITY               = 밀도
+option.CLOUDS_CUMULUS_CONGESTUS_COVERAGE              = 범위
+option.CLOUDS_CUMULUS_CONGESTUS_SIZE                  = 크기
+option.CLOUDS_CUMULUS_CONGESTUS_DETAIL_STRENGTH       = 세부 강도
+option.CLOUDS_CUMULUS_CONGESTUS_WIND_SPEED            = 풍속
+suffix.CLOUDS_CUMULUS_CONGESTUS_WIND_SPEED            = m/s
+option.CLOUDS_CUMULUS_CONGESTUS_WIND_ANGLE            = 풍향
+suffix.CLOUDS_CUMULUS_CONGESTUS_WIND_ANGLE            = °
+
+option.CLOUDS_NOCTILUCENT               = 야광운
+
+option.BLOCKY_CLOUDS                     = 블록형 구름
+option.BLOCKY_CLOUDS.comment             = 바닐라 스타일의 볼류메트릭 구름. 이 옵션을 활성화하면 다른 모든 구름 유형이 비활성화됩니다
+option.BLOCKY_CLOUDS_LAYER_2             = 두 번째 레이어
+option.BLOCKY_CLOUDS_LAYER_2.comment     = 두 번째 레이어의 마인크래프트 스타일 볼류메트릭 구름입니다! 이 옵션을 활성화하면 구름의 성능 부담이 두 배가 됩니다
+option.BLOCKY_CLOUDS_THICKNESS           = 높이
+option.BLOCKY_CLOUDS_THICKNESS.comment   = 구름의 두께를 조절합니다
+option.BLOCKY_CLOUDS_ALTITUDE            = 고도
+option.BLOCKY_CLOUDS_ALTITUDE.comment    = 구름의 높이를 조절합니다
+suffix.BLOCKY_CLOUDS_ALTITUDE            = m
+option.BLOCKY_CLOUDS_ALTITUDE_2          = 두 번째 레이어 고도
+option.BLOCKY_CLOUDS_ALTITUDE_2.comment  = 두 번째 레이어 구름의 높이를 조절합니다
+suffix.BLOCKY_CLOUDS_ALTITUDE_2          = m
+option.BLOCKY_CLOUDS_ROUNDNESS           = 둥글기
+option.BLOCKY_CLOUDS_ROUNDNESS.comment   = 구름 가장자리의 둥글기
+option.BLOCKY_CLOUDS_SHARPNESS           = 선명도
+option.BLOCKY_CLOUDS_SHARPNESS.comment   = 구름 가장자리의 선명도
+option.BLOCKY_CLOUDS_PRIMARY_STEPS       = 기본 단계
+option.BLOCKY_CLOUDS_LIGHTING_STEPS      = 조명 단계
+option.BLOCKY_CLOUDS_DENSITY             = 밀도
+option.BLOCKY_CLOUDS_DENSITY.comment     = 구름의 밀도를 조절합니다. 값이 높을수록 노이즈가 증가합니다
+option.BLOCKY_CLOUDS_BRIGHTNESS          = 밝기
+option.BLOCKY_CLOUDS_BOTTOMLIGHT         = 하단 밝기
+option.BLOCKY_CLOUDS_BOTTOMLIGHT.comment = 구름 아랫면의 밝기를 높입니다
+option.BLOCKY_CLOUDS_SIZE                = 크기
+option.BLOCKY_CLOUDS_ATMOSPHERIC_SCATTERING         = 대기 산란
+option.BLOCKY_CLOUDS_ATMOSPHERIC_SCATTERING.comment = 활성화 시 구름에 약간의 붉은 색조를 입힙니다. 이 효과는 거리가 멀어질수록 증가합니다
+option.BLOCKY_CLOUDS_WIND_SPEED          = 풍속
+suffix.BLOCKY_CLOUDS_WIND_SPEED          = m/s
+option.BLOCKY_CLOUDS_WIND_ANGLE          = 풍향
+suffix.BLOCKY_CLOUDS_WIND_ANGLE          = °
+
+option.CLOUDS_TEMPORAL_UPSCALING       = 시간적 업스케일링
+option.CLOUDS_AERIAL_PERSPECTIVE_BOOST = 대기 원근법 증폭
+option.CLOUDS_SCALE                    = 스케일
+option.CLOUDS_SCALE.comment            = 모든 구름에 적용되는 스케일 배율로, 현실적인 크기와 고도의 구름을 게임 플레이 중 접근 가능한 고도로 낮춰줍니다. 값이 1.0이면 구름이 현실적으로 배치되어 첫 번째 레이어가 기본적으로 800블록 위에 있습니다. 값이 더 높으면 구름이 더 작아 보이고 지면에 더 가까이 형성됩니다. 이 옵션은 구름 그림자의 크기에도 영향을 미칩니다
+suffix.CLOUDS_SCALE                    = ×
+value.CLOUDS_TEMPORAL_UPSCALING.1      = 끔
+value.CLOUDS_TEMPORAL_UPSCALING.2      = 4×
+value.CLOUDS_TEMPORAL_UPSCALING.3      = 9×
+value.CLOUDS_TEMPORAL_UPSCALING.4      = 16×
+
+option.CLOUDS_CIRRUS                       = 권운/권적운
+option.CLOUDS_CIRRUS.comment               = 평면형 권운 및 권적운
+option.CLOUDS_CIRRUS_LIGHTING_STEPS        = 조명 단계
+option.CLOUDS_CIRRUS_AMBIENT_STEPS         = 주변광 단계
+option.CLOUDS_CIRRUS_ALTITUDE              = 고도
+suffix.CLOUDS_CIRRUS_ALTITUDE              = m
+option.CLOUDS_CIRRUS_THICKNESS             = 두께
+option.CLOUDS_CIRRUS_DENSITY               = 권운 밀도
+option.CLOUDS_CIRRUS_COVERAGE              = 권운 범위
+option.CLOUDS_CIRRUS_SIZE                  = 권운 크기
+option.CLOUDS_CIRRUS_DETAIL_STRENGTH       = 권운 세부 강도
+option.CLOUDS_CIRRUS_CURL_STRENGTH         = 권운 컬 강도
+option.CLOUDS_CIRRUS_WIND_SPEED            = 풍속
+suffix.CLOUDS_CIRRUS_WIND_SPEED            = m/s
+option.CLOUDS_CIRRUS_WIND_ANGLE            = 풍향
+suffix.CLOUDS_CIRRUS_WIND_ANGLE            = °
+option.CLOUDS_CIRROCUMULUS_DENSITY         = 권적운 밀도
+option.CLOUDS_CIRROCUMULUS_COVERAGE        = 권적운 범위
+option.CLOUDS_CIRROCUMULUS_SIZE            = 권적운 크기
+option.CLOUDS_CIRROCUMULUS_DETAIL_STRENGTH = 권적운 세부 강도
+option.CLOUDS_CIRROCUMULUS_CURL_STRENGTH   = 권적운 컬 강도
+
+option.CLOUDS_NOCTILUCENT_INTENSITY    = 강도
+option.CLOUDS_NOCTILUCENT_RARITY       = 희귀도
+
+option.AURORA_NORMAL                   = 모든 생물균계의 오로라
+option.AURORA_SNOW                     = 설원 생물균계의 오로라
+option.AURORA_BRIGHTNESS               = 오로라 밝기
+option.AURORA_FREQUENCY                = 오로라 빈도
+option.AURORA_CLOUD_LIGHTING           = 구름 조명 기여도
+option.AURORA_GROUND_LIGHTING          = 지면 조명 기여도
+
+value.AURORA_NORMAL.AURORA_NEVER       = 나타나지 않음
+value.AURORA_NORMAL.AURORA_RARELY      = 드물게
+value.AURORA_NORMAL.AURORA_ALWAYS      = 항상
+
+value.AURORA_SNOW.AURORA_NEVER         = 나타나지 않음
+value.AURORA_SNOW.AURORA_RARELY        = 드물게
+value.AURORA_SNOW.AURORA_ALWAYS        = 항상
+
+# Fog settings
+
+option.BORDER_FOG                           = 경계 안개
+option.BORDER_FOG.comment                   = 렌더 거리 가장자리에 짙은 안개가 껴서 청크 경계를 숨깁니다
+option.CAVE_FOG                             = 동굴 안개
+option.CAVE_FOG.comment                     = 지하에 적용되는 약간 빛나는 가벼운 안개입니다. 큰 동굴을 훨씬 분위기 있게 만들고 동굴의 형태를 파악하기 쉽게 해줍니다
+option.BLOOMY_FOG                           = 블룸 안개
+option.BLOOMY_FOG.comment                   = 안개 속의 강한 블룸 효과입니다. 밝은 물체에서 나온 빛이 안개 속에서 산란되어 그 뒤쪽 영역을 비추는 듯한 모습을 연출합니다. 성능 비용이 거의 없습니다
+option.BLOOMY_FOG_INTENSITY                 = 블룸 안개 강도
+option.BLOOMY_FOG_INTENSITY.comment         = "블룸 안개"의 강도를 조절합니다
+option.OVERWORLD_FOG_INTENSITY              = 오버월드 안개 강도
+option.NETHER_FOG_INTENSITY                 = 네더 안개 강도
+option.VL                                   = 볼류메트릭 안개
+option.LPV_VL.comment                       = 광원이 안개를 비춥니다. 유색 조명이 필요합니다!
+option.VL.comment                           = 빛줄기(광축)와 가변 안개 밀도를 추가합니다
+option.VL_RENDER_SCALE                      = VL 렌더 스케일
+option.AIR_FOG_CLOUDY_NOISE                 = 구름 모양 안개
+option.AIR_FOG_CLOUDY_NOISE.comment         = 안개 속 은은한 구름 모양. 아침에 가장 잘 보입니다.\n볼류메트릭 안개가 필요합니다!
+option.AIR_FOG_COLORED_LIGHT_SHAFTS         = 유색 빛줄기
+option.AIR_FOG_COLORED_LIGHT_SHAFTS.comment = 반투명 물체를 통과하는 빛줄기가 해당 물체의 색상으로 물들게 합니다
+
+# LPV VL
+option.LPV_VL                          = 활성화
+option.LPV_VL_STEPS                    = 단계
+option.LPV_VL_INTENSITY_OVERWORLD      = 오버월드 강도
+option.LPV_VL_INTENSITY_UNDERGROUND    = 지하 강도
+option.LPV_VL_INTENSITY_NETHER         = 네더 강도
+option.LPV_VL_INTENSITY_END            = 엔드 강도
+
+# Rayleigh Fog
+option.AIR_FOG_RAYLEIGH_FALLOFF_START             = 레일리 감쇠 시작
+option.AIR_FOG_RAYLEIGH_FALLOFF_START.comment     = 레일리 안개가 감소하기 시작하는 해수면 위 고도
+option.AIR_FOG_RAYLEIGH_FALLOFF_HALF_LIFE         = 레일리 감쇠 반감기
+option.AIR_FOG_RAYLEIGH_FALLOFF_HALF_LIFE.comment = 레일리 감쇠 시작점 위로 레일리 안개 밀도가 절반이 되는 고도
+
+option.AIR_FOG_RAYLEIGH_DENSITY        = 일반 밀도
+option.AIR_FOG_RAYLEIGH_R              = §c빨강
+option.AIR_FOG_RAYLEIGH_G              = §a초록
+option.AIR_FOG_RAYLEIGH_B              = §9파랑
+
+option.AIR_FOG_RAYLEIGH_DENSITY_RAIN   = 비 밀도
+option.AIR_FOG_RAYLEIGH_R_RAIN         = §c빨강
+option.AIR_FOG_RAYLEIGH_G_RAIN         = §a초록
+option.AIR_FOG_RAYLEIGH_B_RAIN         = §9파랑
+
+option.AIR_FOG_RAYLEIGH_DENSITY_ARID   = 건조/사막 밀도
+option.AIR_FOG_RAYLEIGH_R_ARID         = §c빨강
+option.AIR_FOG_RAYLEIGH_G_ARID         = §a초록
+option.AIR_FOG_RAYLEIGH_B_ARID         = §9파랑
+
+option.AIR_FOG_RAYLEIGH_DENSITY_SNOWY  = 설원 밀도
+option.AIR_FOG_RAYLEIGH_R_SNOWY        = §c빨강
+option.AIR_FOG_RAYLEIGH_G_SNOWY        = §a초록
+option.AIR_FOG_RAYLEIGH_B_SNOWY        = §9파랑
+
+option.AIR_FOG_RAYLEIGH_DENSITY_TAIGA  = 타이가 밀도
+option.AIR_FOG_RAYLEIGH_R_TAIGA        = §c빨강
+option.AIR_FOG_RAYLEIGH_G_TAIGA        = §a초록
+option.AIR_FOG_RAYLEIGH_B_TAIGA        = §9파랑
+
+option.AIR_FOG_RAYLEIGH_DENSITY_JUNGLE = 정글 밀도
+option.AIR_FOG_RAYLEIGH_R_JUNGLE       = §c빨강
+option.AIR_FOG_RAYLEIGH_G_JUNGLE       = §a초록
+option.AIR_FOG_RAYLEIGH_B_JUNGLE       = §9파랑
+
+option.AIR_FOG_RAYLEIGH_DENSITY_SWAMP  = 늪 밀도
+option.AIR_FOG_RAYLEIGH_R_SWAMP        = §c빨강
+option.AIR_FOG_RAYLEIGH_G_SWAMP        = §a초록
+option.AIR_FOG_RAYLEIGH_B_SWAMP        = §9파랑
+
+# Mie Fog
+option.AIR_FOG_MIE_DENSITY_MORNING           = 아침 밀도
+option.AIR_FOG_MIE_DENSITY_NOON              = 정오 밀도
+option.AIR_FOG_MIE_DENSITY_EVENING           = 저녁 밀도
+option.AIR_FOG_MIE_DENSITY_MIDNIGHT          = 자정 밀도
+option.AIR_FOG_MIE_DENSITY_RAIN              = 비 밀도
+option.AIR_FOG_MIE_DENSITY_BLUE_HOUR         = 새벽/황혼 밀도
+option.AIR_FOG_MIE_FALLOFF_START             = 고도 감쇠 시작
+option.AIR_FOG_MIE_FALLOFF_START.comment     = 미 산란 안개가 감소하기 시작하는 해수면 위 고도
+option.AIR_FOG_MIE_FALLOFF_HALF_LIFE         = 고도 감쇠 반감기
+option.AIR_FOG_MIE_FALLOFF_HALF_LIFE.comment = 미 감쇠 시작점 위로 미 산란 안개 밀도가 절반이 되는 고도
+
+
+# Materials settings
+
+option.NORMAL_MAPPING                  = 노멀 매핑
+option.NORMAL_MAPPING.comment          = 리소스팩에서 제공하는 노멀 맵을 사용할지 여부입니다. "PBR" 리소스팩을 사용 중이라면 활성화하세요
+option.SPECULAR_MAPPING                = 반사 매핑
+option.SPECULAR_MAPPING.comment        = 리소스팩에서 제공하는 반사 맵을 사용할지 여부입니다. "PBR" 리소스팩을 사용 중이라면 활성화하세요
+option.POM                             = 시차 차폐 매핑 (POM)
+option.TEXTURE_FORMAT                  = 텍스처 형식
+option.TEXTURE_FORMAT.comment          = 리소스팩에서 사용하는 텍스처 형식입니다. 대부분의 최신 리소스팩은 lab_p_b_r을 사용하며, SEUS용으로 설계된 팩은 OldPBR을 사용할 수 있습니다.
+option.HARDCODED_SPECULAR              = 하드코딩된 반사
+option.HARDCODED_SPECULAR.comment      = 일부 블록(예: 금속)에 대한 하드코딩된 반사
+option.HARDCODED_EMISSION              = 하드코딩된 발광
+option.HARDCODED_EMISSION.comment      = 일부 블록(예: 횃불)에 대한 하드코딩된 발광
+option.HARDCODED_SSS                   = 하드코딩된 SSS
+option.HARDCODED_SSS.comment           = 일부 블록(예: 나뭇잎)에 대한 하드코딩된 표면하 산란
+option.RAIN_PUDDLES                    = 빗물 웅덩이
+option.EMISSION_STRENGTH               = 발광 강도
+option.EMISSION_STRENGTH.comment       = 횃불 등 발광 물체의 밝기를 조절합니다. 이 옵션은 방출되는 빛의 밝기에는 영향을 주지 않으며, 오직 광원 자체의 밝기에만 영향을 줍니다. 하드코딩된 발광에도 적용됩니다
+option.DIRECTIONAL_LIGHTMAPS           = 방향성 라이트맵
+option.DIRECTIONAL_LIGHTMAPS.comment   = 블록 조명과 하늘빛이 노멀 맵의 영향을 받게 합니다. 방식의 한계로 인해 일부 시각적 문제가 발생할 수 있습니다
+option.DIRECTIONAL_LIGHTMAPS_INTENSITY = 방향성 라이트맵 강도
+option.DIRECTIONAL_LIGHTMAPS_INTENSITY.comment = 방향성 라이트맵의 강도를 조절합니다
+option.POM_DEPTH                       = 시차 깊이
+option.POM_DEPTH.comment               = POM이 블록 안쪽으로 얼마나 깊이 들어갈 수 있는지
+option.POM_SAMPLES                     = 시차 샘플
+option.POM_SAMPLES.comment             = 성능을 대가로 POM의 품질을 조절합니다
+option.POM_SHADOW                      = POM 자체 그림자
+option.POM_SHADOW.comment              = POM의 자체 그림자 효과. 반사 매핑이 필요합니다!
+option.POM_SHADOW_SAMPLES              = POM 자체 그림자 샘플
+option.POM_SHADOW_SAMPLES.comment      = 성능을 대가로 시차 그림자의 품질을 조절합니다
+option.POM_SLOPE_NORMALS               = POM 경사 노멀
+option.POM_DISTANCE                    = POM 거리
+option.REFRACTION                      = 굴절
+value.REFRACTION.REFRACTION_OFF        = 끔
+value.REFRACTION.REFRACTION_ALL        = 전부
+value.REFRACTION.REFRACTION_WATER_ONLY = 물만
+option.REFRACTION_INTENSITY            = 굴절 강도
+option.REFRACTION_INTENSITY.comment    = 물 표면의 굴절 강도를 조절합니다
+
+suffix.POM_DEPTH                       = m
+suffix.POM_DISTANCE                    = m
+
+value.TEXTURE_FORMAT.TEXTURE_FORMAT_LAB = labPBR
+value.TEXTURE_FORMAT.TEXTURE_FORMAT_OLD = Old PBR
+
+option.ENVIRONMENT_REFLECTIONS         = 환경 반사
+option.ENVIRONMENT_REFLECTIONS.comment = 스크린 스페이스 반사. 물과 반짝이는 블록이 주변 환경을 반사하게 합니다. 성능에 큰 영향이 있습니다
+option.SKY_REFLECTIONS                 = 하늘 반사
+option.SKY_REFLECTIONS.comment         = 물과 반짝이는 블록이 하늘을 반사하게 합니다
+option.SSR_ROUGHNESS_SUPPORT           = 거칠기 지원
+option.SSR_ROUGHNESS_SUPPORT.comment   = 거친 표면의 반사가 실제로 거칠게 보이도록 합니다. 성능에 큰 영향이 있습니다
+option.SSR_RAY_COUNT                   = 광선 수
+option.SSR_RAY_COUNT.comment           = 거친 반사에 사용되는 광선의 수입니다. 광선 수가 많을수록 노이즈는 줄지만 성능이 저하됩니다
+option.SSR_INTERSECTION_STEPS_SMOOTH   = 교차 단계 - 매끄러움
+option.SSR_INTERSECTION_STEPS_SMOOTH.comment = 성능을 대가로 매끄러운 반사의 정확도를 조절합니다
+option.SSR_INTERSECTION_STEPS_ROUGH    = 교차 단계 - 거침
+option.SSR_INTERSECTION_STEPS_ROUGH.comment = 성능을 대가로 거친 반사의 정확도를 조절합니다
+option.SSR_REFINEMENT_STEPS            = 정제 단계
+option.SSR_REFINEMENT_STEPS.comment    = 성능을 대가로 모든 반사의 정확도를 조절합니다
+option.SSR_ROUGHNESS_THRESHOLD         = 거칠기 임계값
+option.SSR_ROUGHNESS_THRESHOLD.comment = 반사가 나타나기 위해 표면이 얼마나 매끄러워야 하는지 조절합니다
+
+# Water settings
+
+option.WATER_CAUSTICS                  = 물 커스틱
+option.WATER_CAUSTICS.comment          = 물속에서 춤추는 빛의 패턴
+option.WATER_CAUSTICS_INTENSITY        = 물 커스틱 강도
+option.WATER_CAUSTICS.comment          = 물 커스틱의 밝기를 조절합니다
+option.WATER_EDGE_HIGHLIGHT            = 물 가장자리 강조
+option.WATER_EDGE_HIGHLIGHT.comment    = 물이 지형과 만나는 부분에 흰색 강조를 추가합니다. 일부 상황에서 물을 더 잘 보이게 합니다
+option.WATER_EDGE_HIGHLIGHT_INTENSITY  = 물 가장자리 강조 강도
+option.SNELLS_WINDOW                   = 스넬의 창 (Snell's Window)
+option.SNELLS_WINDOW.comment           = 수중에서의 전반사 효과
+option.WATER_TEXTURE                   = 물 텍스처
+option.WATER_TEXTURE.comment           = 바닐라 물 텍스처 사용 방식입니다.\n\n끔 - 물 텍스처 없음.\n하이라이트: Bedrock RTX에서처럼 물 텍스처가 물에 하이라이트를 추가합니다.\n바닐라: 물 텍스처가 다른 텍스처처럼 사용됩니다
+option.BIOME_WATER_COLOR               = 생물균계 물 색상
+option.BIOME_WATER_COLOR.comment       = 물의 흡수가 생물균계의 물 색상을 반영합니다
+
+value.WATER_TEXTURE.WATER_TEXTURE_OFF                   = 끔
+value.WATER_TEXTURE.WATER_TEXTURE_HIGHLIGHT             = 하이라이트
+value.WATER_TEXTURE.WATER_TEXTURE_VANILLA               = 바닐라
+value.WATER_TEXTURE.WATER_TEXTURE_HIGHLIGHT_UNDERGROUND = 하이라이트 (지하만)
+
+option.WATER_WAVES                     = 활성화
+option.WATER_WAVE_ITERATIONS           = 반복 횟수
+option.WATER_WAVE_STRENGTH             = 강도
+option.WATER_WAVE_FREQUENCY            = 빈도
+option.WATER_WAVE_SPEED_STILL          = 속도 (고요함)
+option.WATER_WAVE_SPEED_FLOWING        = 속도 (흐름)
+option.WATER_WAVE_PERSISTENCE          = 지속성
+option.WATER_WAVE_LACUNARITY           = 간극성 (Lacunarity)
+option.WATER_PARALLAX                  = 물 시차
+option.WATER_PARALLAX.comment          = 물결이 입체적으로 보이게 합니다
+option.WATER_DISPLACEMENT              = 물 변위
+option.WATER_DISPLACEMENT.comment      = 흔들리는 나뭇잎과 유사하게, 물의 지오메트리 자체가 약간 흔들리게 하여 해안선이 덜 평평하게 보이도록 합니다
+option.WATER_WAVES_HEIGHT_VARIATION           = 국지적 높이 변화
+option.WATER_WAVES_HEIGHT_VARIATION.comment   = 물결의 높이가 공간에 따라 달라집니다
+
+option.WATER_ABSORPTION_R              = 빨강 흡수
+option.WATER_ABSORPTION_G              = 초록 흡수
+option.WATER_ABSORPTION_B              = 파랑 흡수
+option.WATER_SCATTERING                = 산란
+
+option.WATER_ABSORPTION_R_UNDERWATER   = 빨강 흡수 - 수중
+option.WATER_ABSORPTION_G_UNDERWATER   = 초록 흡수 - 수중
+option.WATER_ABSORPTION_B_UNDERWATER   = 파랑 흡수 - 수중
+option.WATER_SCATTERING_UNDERWATER     = 산란 - 수중
+
+# Post-processing settings
+
+option.BLOOM                           = 블룸 (Bloom)
+option.BLOOM.comment                   = 밝은 영역과 광원 주변의 부드러운 "발광" 효과
+option.BLOOM_INTENSITY                 = 블룸 강도
+option.BLOOM_INTENSITY.comment         = 블룸이 최종 이미지에 얼마나 영향을 미치는지 조절합니다
+option.DOF                             = 피사계 심도 (Depth of Field)
+option.DOF.comment                     = 카메라 초점 효과 - 초점에서 벗어난 영역을 흐리게 만듭니다
+option.DOF_INTENSITY                   = 피사계 심도 강도
+option.DOF_INTENSITY.comment           = 피사계 심도의 강도를 조절합니다
+option.DOF_SAMPLES                     = 피사계 심도 샘플
+option.DOF_SAMPLES.comment             = 피사계 심도에 사용되는 샘플 수입니다. 샘플 수가 많을수록 흐림 품질은 좋아지지만 성능 부담이 커집니다
+option.DOF_FOCUS                       = 피사계 심도 초점
+option.DOF_FOCUS.comment               = 피사계 심도의 초점 거리
+option.MOTION_BLUR                     = 모션 블러
+option.MOTION_BLUR.comment             = 영화적인 움직임 흐림 효과. 낮은 프레임 레이트를 부드럽게 하는 데도 유용하지만 멀미를 유발할 수 있습니다
+option.MOTION_BLUR_INTENSITY           = 모션 블러 강도
+option.MOTION_BLUR_INTENSITY.comment   = 모션 블러의 강도를 조절합니다
+option.TAA                             = TAA
+option.TAA.comment                     = 시간적 안티에일리어싱. 이미지 품질과 노이즈 수준을 크게 개선하지만, 깜빡임이나 잔상 같은 시간적 아티팩트가 생길 수 있습니다. TAA 업스케일링에 필요합니다!
+option.FXAA                            = FXAA
+option.FXAA.comment                    = 가장자리를 부드럽게 합니다. TAA와 함께 작동하며, 특히 움직임 중에 도움이 됩니다. TAAU와 함께 사용하면 매우 유용합니다
+option.TAAU                            = TAA 업스케일링
+option.TAAU.comment                    = scene_color를 낮은 해상도로 렌더링한 후 TAA로 업스케일합니다. 성능을 크게 향상시키지만, 이미지 품질이 낮아지고 시간적 아티팩트가 증가할 수 있습니다
+option.TAAU_RENDER_SCALE               = TAAU 렌더 스케일
+option.TAAU_RENDER_SCALE.comment       = TAA 업스케일링이 활성화된 경우 scene_color가 렌더링되는 해상도 배율입니다. 원래 해상도가 1920x1080이고 TAAU 렌더 스케일이 0.75(기본값)이면 scene_color는 1440x810으로 렌더링됩니다
+option.CAS                             = 이미지 샤프닝
+option.CAS.comment                     = 최종 이미지를 선명하게 합니다 (대비 적응형 샤프닝)
+option.CAS_INTENSITY                   = 이미지 샤프닝 강도
+option.CAS_INTENSITY.comment           = 이미지 샤프닝이 이미지에 미치는 효과를 조절합니다
+option.VIGNETTE                        = 비네팅
+option.VIGNETTE.comment                = 화면 가장자리를 어둡게 합니다
+option.VIGNETTE_INTENSITY              = 비네팅 강도
+option.VIGNETTE_INTENSITY.comment      = 비네팅의 강도를 조절합니다
+
+value.DOF_FOCUS.-1.0                   = 자동
+
+option.tonemap                         = 톤매핑 연산자
+
+value.tonemap.tonemap_aces_fit         = ACES Fit
+value.tonemap.tonemap_aces_full        = ACES Full
+value.tonemap.tonemap_hejl_2015        = Hejl 2015
+value.tonemap.tonemap_hejl_burgess     = Hejl-Burgess
+value.tonemap.tonemap_lottes           = Lottes
+value.tonemap.tonemap_uncharted_2      = Uncharted 2
+value.tonemap.tonemap_tech             = Tech
+value.tonemap.tonemap_ozius            = Ozius
+value.tonemap.tonemap_reinhard         = Reinhard
+value.tonemap.tonemap_reinhard_jodie   = Reinhard-Jodie
+
+# Color Grading
+
+option.GRADE_BRIGHTNESS                = 밝기
+option.GRADE_CONTRAST                  = 대비
+option.GRADE_SATURATION                = 채도
+option.GRADE_WHITE_BALANCE             = 화이트 밸런스
+option.GRADE_ORANGE_SAT_BOOST          = 주황 채도 증폭
+option.GRADE_TEAL_SAT_BOOST            = 청록 채도 증폭
+option.GRADE_GREEN_SAT_BOOST           = 초록 채도 증폭
+option.GRADE_GREEN_HUE_SHIFT           = 초록 색조 이동
+suffix.GRADE_WHITE_BALANCE             = K
+suffix.GRADE_GREEN_HUE_SHIFT           = °
+
+option.PURKINJE_SHIFT                  = 푸르킨예 효과
+option.PURKINJE_SHIFT.comment          = 어두운 환경에서 인간 시야에 미치는 효과를 시뮬레이션합니다. 모든 색의 채도를 낮추고 붉은 색조를 어둡게 만듭니다
+option.PURKINJE_SHIFT_INTENSITY        = 푸르킨예 효과 강도
+
+# Exposure
+
+option.AUTO_EXPOSURE                         = 자동 노출
+option.AUTO_EXPOSURE_BIAS                    = 노출 편향
+option.AUTO_EXPOSURE_MIN                     = 최소 노출
+option.AUTO_EXPOSURE_MAX                     = 최대 노출
+option.AUTO_EXPOSURE_RATE_DIM_TO_BRIGHT      = 노출 변화 속도 - 증가
+option.AUTO_EXPOSURE_RATE_BRIGHT_TO_DIM      = 노출 변화 속도 - 감소
+option.MANUAL_EXPOSURE_VALUE                 = 수동 노출 값
+option.MANUAL_EXPOSURE_USE_SCREEN_BRIGHTNESS = 밝기 슬라이더 사용
+option.MANUAL_EXPOSURE_USE_SCREEN_BRIGHTNESS.comment = 비디오 설정 메뉴의 밝기 슬라이더를 기반으로 노출 값이 최소 노출과 최대 노출 사이에서 보간됩니다
+option.HISTOGRAM_BINS                        = 히스토그램 구간 수
+option.HISTOGRAM_TARGET                      = 히스토그램 목표 CDF 값
+
+value.AUTO_EXPOSURE.AUTO_EXPOSURE_SIMPLE    = 단순
+value.AUTO_EXPOSURE.AUTO_EXPOSURE_HISTOGRAM = 히스토그램
+value.AUTO_EXPOSURE.AUTO_EXPOSURE_OFF       = 끔
+
+# Misc settings
+
+option.DEBUG_VIEW                      = 디버그 뷰
+option.DEBUG_SAMPLER                   = 디버그 샘플러
+option.WHITE_WORLD                     = 백색 월드
+option.WHITE_WORLD.comment             = 모든 알베도 텍스처를 흰색으로 설정합니다
+option.TONEMAP_COMPARISON              = 톤매핑 비교
+option.TONEMAP_COMPARISON.comment      = 화면의 왼쪽과 오른쪽 절반에 두 가지 톤매핑 함수를 비교 표시합니다
+option.tonemap_left                    = 왼쪽 톤매핑
+option.tonemap_right                   = 오른쪽 톤매핑
+option.FANCY_NETHER_PORTAL             = 화려한 네더 포탈
+option.FANCY_NETHER_PORTAL.comment     = EminGT의 Complementary Reimagined Shaders에서 영감을 받은 화려한 네더 포탈 효과입니다. 아이디어를 사용할 수 있게 해주신 Emin께 감사드립니다! 일부 리소스팩에서는 제대로 작동하지 않을 수 있습니다
+option.CUSTOM_SKY                      = 사용자 지정 하늘
+option.CUSTOM_SKY.comment              = 리소스팩의 사용자 지정 하늘을 활성화합니다
+option.CUSTOM_SKY_BRIGHTNESS           = 사용자 지정 하늘 밝기
+option.CUSTOM_SKY_BRIGHTNESS.comment   = 사용자 지정 하늘의 밝기를 조절합니다
+option.DH_OVERDRAW_DISTANCE            = 오버드로우 거리
+option.DH_OVERDRAW_FADE_LENGTH         = 오버드로우 페이드 길이
+option.NOISE_ON_DH_TERRAIN             = DH 지형 노이즈
+option.ENCHANTMENT_GLINT_BRIGHTNESS    = 인챈트 광택 밝기
+option.DITHERED_TRANSLUCENCY_FALLBACK  = 디더링 반투명 폴백
+comment.DITHERED_TRANSLUCENCY_FALLBACK = separateEntityDraws가 활성화되어 반투명 처리가 불가능한 경우, 디더링 반투명을 사용하여 반투명으로 보여야 할 오브젝트의 외관을 개선합니다.
+
+value.DEBUG_VIEW.DEBUG_VIEW_NONE       = 끔
+value.DEBUG_VIEW.DEBUG_VIEW_SAMPLER    = 샘플러
+value.DEBUG_VIEW.DEBUG_VIEW_HISTOGRAM  = 히스토그램
+value.DEBUG_VIEW.DEBUG_VIEW_WEATHER    = 날씨
+
+value.tonemap_left.tonemap_aces_fit       = ACES Fit
+value.tonemap_left.tonemap_aces_full      = ACES Full
+value.tonemap_left.tonemap_lottes         = Lottes
+value.tonemap_left.tonemap_hejl_2015      = Hejl 2015
+value.tonemap_left.tonemap_hejl_burgess   = Hejl-Burgess
+value.tonemap_left.tonemap_uncharted_2    = Uncharted 2
+value.tonemap_left.tonemap_tech           = Tech
+value.tonemap_left.tonemap_ozius          = Ozius
+value.tonemap_left.tonemap_reinhard       = Reinhard
+value.tonemap_left.tonemap_reinhard_jodie = Reinhard-Jodie
+
+value.tonemap_right.tonemap_aces_fit       = ACES Fit
+value.tonemap_right.tonemap_aces_full      = ACES Full
+value.tonemap_right.tonemap_lottes         = Lottes
+value.tonemap_right.tonemap_hejl_burgess   = Hejl-Burgess
+value.tonemap_right.tonemap_hejl_2015      = Hejl 2015
+value.tonemap_right.tonemap_uncharted_2    = Uncharted 2
+value.tonemap_right.tonemap_tech           = Tech
+value.tonemap_right.tonemap_ozius          = Ozius
+value.tonemap_right.tonemap_reinhard       = Reinhard
+value.tonemap_right.tonemap_reinhard_jodie = Reinhard-Jodie
+
+# Distance View 
+
+option.DISTANCE_VIEW                   = 활성화
+option.DISTANCE_VIEW_METHOD            = 방식
+option.DISTANCE_VIEW_MAX_DISTANCE      = 최대 거리
+suffix.DISTANCE_VIEW_MAX_DISTANCE      = m
+
+value.DISTANCE_VIEW_METHOD.DISTANCE_VIEW_DISTANCE = 거리
+value.DISTANCE_VIEW_METHOD.DISTANCE_VIEW_DEPTH    = 깊이
+
+# Box
+
+option.BOX_MODE                 = 모드
+option.BOX_MODE.comment         = 선택 상자 모드
+value.BOX_MODE.BOX_MODE_NONE    = 기본
+value.BOX_MODE.BOX_MODE_COLOR   = 사용자 지정 색상
+value.BOX_MODE.BOX_MODE_RAINBOW = 무지개
+option.BOX_COLOR_R              = 빨강
+option.BOX_COLOR_G              = 초록
+option.BOX_COLOR_B              = 파랑
+option.BOX_EMISSION             = 발광
+option.BOX_EMISSION.comment     = 색상을 1 이상으로 스케일합니다. 블룸이 필요합니다.
+option.BOX_LINE_WIDTH           = 선 굵기
+

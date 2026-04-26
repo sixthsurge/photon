@@ -17,10 +17,13 @@
   * [ChunghwaMC](https://github.com/ChunghwaMC) - Chinese Traditional (Taiwan; Mandarin)
   * [Jmayk](https://github.com/Jmayk-dev) - Italian
   * [Timtaran](https://github.com/Timtaran) - Russian
+  * [shihyeon](https://github.com/shihyeon) - Korean
+  * [DVRKHz](https://github.com/DVRKHz) - Spanish
+  * [Patatagod69](https://github.com/PatataNL) - Dutch
   * sincerity - Estonian
-  * Patatagod69 - Dutch
 * [Emin](https://github.com/EminGT) - Shadow bias method from [Complementary Reimagined](https://www.complementary.dev/shaders/) (fully fixes peter panning and light leaking underground!)
 * [DrDesten](https://github.com/DrDesten) - Depth tolerance calculation for SSR (helps to prevent false reflections)
+* [Essentuan](https://github.com/Essentuan) - Photonics mod support
 * [Jessie](https://github.com/Jessie-LC) - f0 and f82 values for labPBR hardcoded metals
 * [Sledgehammer Games](https://www.sledgehammergames.com/) - Bloom downsampling method used in Call of Duty Advanced Warfare (described [here](http://www.iryoku.com/next-generation-post-processing-in-call-of-duty-advanced-warfare))
 * http://momentsingrapics.de/ - Blue noise texture
@@ -65,7 +68,13 @@ tar -a -c -f "Photon_1.3b x Physicsmod.zip" "shaders" "LICENSE"
 * Full labPBR resource pack support
 
 ## Compatibility
-* Nvidia, AMD and Intel GPUs
+### GPU vendors
+* Nvidia 
+* AMD 
+* Intel 
+* **_NOT_** Apple Metal
+  * You may be able to get the shader pack to work by disabling some settings: try _SH Skylight_ and _Colored Shadows_.
+### Shader loaders
 * Iris - version 1.5 and above
 * OptiFine - on Minecraft 1.16.5 and above
 * Photon is also compatible with [Distant Horizons](https://www.curseforge.com/minecraft/mc-mods/distant-horizons)
@@ -73,6 +82,10 @@ tar -a -c -f "Photon_1.3b x Physicsmod.zip" "shaders" "LICENSE"
   * Forge 1.20.1: use `colorwheel-forge-1.2.4+mc1.20.1.jar`
   * NeoForge 1.21.1: use `colorwheel-neoforge-1.2.4+mc1.21.1.jar`
 * Apple Metal: Disable _SH Skylight_ and _Colored Shadows_
+### Special mod support
+* [Distant Horizons](https://www.curseforge.com/minecraft/mc-mods/distant-horizons)
+* [Voxy](https://modrinth.com/mod/voxy)
+* [Photonics](https://modrinth.com/mod/photonics)
 
 ## Showcase videos
 

@@ -11,9 +11,9 @@
 
 #include "/include/global.glsl"
 
-layout (local_size_x = 32) in;
+layout(local_size_x = 32) in;
 
-#if   VOXEL_VOLUME_SIZE == 64
+#if VOXEL_VOLUME_SIZE == 64
 const ivec3 workGroups = ivec3(2, 64, 64);
 #elif VOXEL_VOLUME_SIZE == 96
 const ivec3 workGroups = ivec3(3, 96, 96);
@@ -45,13 +45,13 @@ uniform int frameCounter;
 #include "/include/lighting/lpv/floodfill.glsl"
 
 void main() {
-	if ((frameCounter & 1) == 0) {
-		update_lpv(light_img_a, light_sampler_b);
-	} else {
-		update_lpv(light_img_b, light_sampler_a);
-	}
+    if ((frameCounter & 1) == 0) {
+        update_lpv(light_img_a, light_sampler_b);
+    } else {
+        update_lpv(light_img_b, light_sampler_a);
+    }
 }
 
 #ifndef COLORED_LIGHTS
-	#error "This program should be disabled if colored lights are disabled"
+#error "This program should be disabled if colored lights are disabled"
 #endif
