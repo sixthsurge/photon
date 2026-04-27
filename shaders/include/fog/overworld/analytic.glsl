@@ -26,7 +26,11 @@ vec2 air_fog_analytic_airmass(
                0.0,
                ray_length
            )
-        * (0.5 * OVERWORLD_FOG_INTENSITY * PROFILE_FOG_DENSITY_MULT);
+        * (0.5 * OVERWORLD_FOG_INTENSITY
+#ifdef BORDER_FOG
+            * PROFILE_FOG_DENSITY_MULT
+#endif
+        );
 }
 
 mat2x3 air_fog_analytic(

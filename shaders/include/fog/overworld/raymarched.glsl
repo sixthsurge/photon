@@ -31,7 +31,11 @@ vec2 air_fog_density(vec3 world_pos) {
     density.y *= 4.0 * sqr(noise);
 #endif
 
-    return density * (0.5 * OVERWORLD_FOG_INTENSITY * PROFILE_FOG_DENSITY_MULT);
+    return density * (0.5 * OVERWORLD_FOG_INTENSITY
+#ifdef BORDER_FOG
+        * PROFILE_FOG_DENSITY_MULT
+#endif
+    );
 }
 
 mat2x3 raymarch_air_fog(

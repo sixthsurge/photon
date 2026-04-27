@@ -2,7 +2,9 @@
 
 <h1 align = "center">Photon Shaders - Reimagined</h1>
 
-<p align = "center">A custom Minecraft shader pack, reimagined from <a href="https://github.com/sixthsurge/photon">Photon</a> by <a href="https://github.com/sixthsurge">sixthsurge</a>, with visual style profiles, Physics Mod ocean physics compatibility and advanced Colorwheel support</p>
+<p align = "center">Clean upstream PR branch - Physics Mod ocean support and native Colorwheel integration only. No Reimagined visual changes. See <a href="https://github.com/realBritakee/photon-reimagined/tree/reimagined">reimagined</a> for the full custom version.</p>
+
+<p align = "center">A custom Minecraft shader pack based on <a href="https://github.com/sixthsurge/photon">Photon</a> by <a href="https://github.com/sixthsurge">sixthsurge</a>, with Physics Mod ocean physics compatibility and advanced Colorwheel support</p>
 
 > See [CHANGELOG.md](CHANGELOG.md) for a full list of changes from the original.
 
@@ -11,7 +13,14 @@
 > 🧊 [Voxy - NeoForge Port](https://github.com/realBritakee/voxy-neoforge) - compatible Voxy build for 1.20.1/1.21.1 with Physics Mod ocean support · [other versions](https://modrinth.com/mod/voxy)
 > 🌍 [Voxy World Gen V2](https://github.com/realBritakee/voxy_worldgen_v2) - background chunk pre-generation for Voxy · [other versions](https://modrinth.com/mod/voxy-worldgen)
 
-![Screenshot](docs/images/oceanphysics.png)
+### Reimagined
+![Reimagined](docs/images/reimagined.png)
+
+### Apocalyptic
+![Apocalyptic](docs/images/apocalyptic.png)
+
+### Original
+![Original](docs/images/original.png)
 
 ## Visual Styles
 
