@@ -10,6 +10,9 @@
 */
 
 #include "/include/global.glsl"
+// [PROFILE] profiles.glsl is included via global.glsl → settings.glsl.
+// Profile-specific sky/atmosphere tweaks (e.g. PROFILE_ATMOSPHERE_SATURATION_MULT).
+// Add #if PROFILE == PROFILE_REIMAGINED blocks here when diverging profiles.
 
 layout(location = 0) out vec3 sky_map;
 

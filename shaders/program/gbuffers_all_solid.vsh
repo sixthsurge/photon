@@ -12,17 +12,12 @@
 #include "/include/global.glsl"
 
 out vec2 uv;
+out vec2 light_levels;
 out vec3 scene_pos;
 out vec4 tint;
 
 flat out uint material_mask;
 out mat3 tbn;
-
-#if defined COLORWHEEL
-vec2 light_levels;
-#else
-out vec2 light_levels;
-#endif
 
 #if defined POM
 out vec2 atlas_tile_coord;
@@ -33,8 +28,6 @@ flat out vec2 atlas_tile_scale;
 
 #if defined PROGRAM_GBUFFERS_TERRAIN
 out float vanilla_ao;
-#elif defined COLORWHEEL
-float vanilla_ao;
 #endif
 
 #if defined PROGRAM_GBUFFERS_ENTITIES || defined PROGRAM_GBUFFERS_HAND
@@ -104,7 +97,11 @@ uniform int currentRenderedItemId;
 #include "/include/vertex/utility.glsl"
 
 void main() {
+#if defined PROGRAM_GBUFFERS_PARTICLES && defined IS_IRIS
+    uv = gl_MultiTexCoord0.xy;
+#else
     uv = (gl_TextureMatrix[0] * gl_MultiTexCoord0).xy;
+#endif
     light_levels = clamp01(gl_MultiTexCoord1.xy * rcp(240.0));
     tint = gl_Color;
     material_mask = get_material_mask();
@@ -131,7 +128,7 @@ void main() {
 #endif
 #endif
 
-#if defined PROGRAM_GBUFFERS_ENTITIES && !defined COLORWHEEL
+#if defined PROGRAM_GBUFFERS_ENTITIES
     // Fix fire entity not glowing with Colored Lights
     if (light_levels.x > 0.99) {
         material_mask = 40;

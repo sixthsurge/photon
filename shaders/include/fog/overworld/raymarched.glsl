@@ -11,6 +11,7 @@
 #include "/include/utility/random.glsl"
 #include "/include/utility/space_conversion.glsl"
 
+
 vec2 air_fog_density(vec3 world_pos) {
     const vec2 mul = -rcp(air_fog_falloff_half_life);
     const vec2 add = -mul * air_fog_falloff_start;
@@ -30,7 +31,7 @@ vec2 air_fog_density(vec3 world_pos) {
     density.y *= 4.0 * sqr(noise);
 #endif
 
-    return density * (0.5 * OVERWORLD_FOG_INTENSITY);
+    return density * (0.5 * OVERWORLD_FOG_INTENSITY * PROFILE_FOG_DENSITY_MULT);
 }
 
 mat2x3 raymarch_air_fog(

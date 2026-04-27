@@ -4,6 +4,7 @@
 #include "/include/lighting/lpv/blocklight.glsl"
 #include "/include/utility/fast_math.glsl"
 
+
 vec3 sample_lpv(vec3 position_world) {
     vec3 voxel_pos = scene_to_voxel_space(position_world - cameraPosition);
     vec3 sample_pos = voxel_pos / vec3(voxel_volume_size);
@@ -25,7 +26,7 @@ vec2 overworld_fog_density_no_noise(vec3 position_world) {
     // fade away below sea level
     density *= linear_step(air_fog_volume_bottom, SEA_LEVEL, position_world.y);
 
-    return density * (0.5 * OVERWORLD_FOG_INTENSITY);
+    return density * (0.5 * OVERWORLD_FOG_INTENSITY * PROFILE_FOG_DENSITY_MULT);
 }
 #endif
 

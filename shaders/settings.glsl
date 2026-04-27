@@ -12,6 +12,17 @@
 #if !defined SETTINGS_INCLUDED
 #define SETTINGS_INCLUDED
 
+// ------------------
+//   Visual Profile
+// ------------------
+
+  #ifndef PROFILE
+    #define PROFILE 0 // [0 1 2]
+  #endif
+
+// Profile IDs and per-profile defines (must come before other settings)
+#include "/settings/profiles.glsl"
+
 const int noiseTextureResolution = 512;
 
 const bool shadowHardwareFiltering1 = true;
@@ -529,7 +540,12 @@ const float wetnessHalflife         = 70.0;
 //   Miscellaneous
 // -----------------
 
-  #define INFO 2 // [0 1 2 3]
+  #ifndef INFO
+    #define INFO 2 // [0 1 2 3]
+  #endif
+  #ifndef ORIGINAL_CREATOR
+    #define ORIGINAL_CREATOR 0 // [0 1 2 3]
+  #endif
 
   #define DEBUG_VIEW_NONE      0
   #define DEBUG_VIEW_SAMPLER   1

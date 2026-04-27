@@ -1,5 +1,7 @@
 #if !defined INCLUDE_FOG_OVERWORLD_CONSTANTS
 #define INCLUDE_FOG_OVERWORLD_CONSTANTS
+// [PROFILE] PROFILE_FOG_DENSITY_MULT is defined in settings/profiles.glsl (via global.glsl).
+// Wrap fog density values in #if PROFILE blocks here when diverging profiles.
 
 const uint air_fog_min_step_count = 8;
 const uint air_fog_max_step_count = 25;

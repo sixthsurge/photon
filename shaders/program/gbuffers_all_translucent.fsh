@@ -11,6 +11,9 @@
 */
 
 #include "/include/global.glsl"
+// [PROFILE] profiles.glsl is included via global.glsl → settings.glsl.
+// Profile-specific water absorption tweaks (e.g. PROFILE_WATER_ABSORPTION_MULT).
+// Add #if PROFILE == PROFILE_REIMAGINED blocks here when diverging profiles.
 
 #ifdef PROGRAM_GBUFFERS_WATER
 layout(location = 0) out vec4 refraction_data;

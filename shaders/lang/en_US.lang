@@ -1,9 +1,19 @@
 # Profiles
 
-profile.low                            = §eLow
-profile.medium                         = §aMedium
-profile.high                           = §bHigh
-profile.ultra                          = §dUltra
+profile.potato                         = §8Potato
+profile.verylow                        = §7Very Low
+profile.low                            = §aLow
+profile.medium                         = §2Medium
+profile.high                           = §6High
+profile.veryhigh                       = §eVery High
+profile.ultra                          = §4Ultra
+profile.potato.comment                 = Absolute minimum quality for very old or integrated hardware. 512 shadow map, 4-chunk shadow distance, no PCF, no VL, no reflections, no AO. Squeeze out every frame you can.
+profile.verylow.comment                = Bare minimum with slightly more shadow range. 1024 shadow map, 4-chunk distance, no PCF filtering, no VL, no reflections. For weak laptops and integrated graphics.
+profile.low.comment                    = Basic quality for budget hardware. PCF shadow filtering and volumetric fog enabled, 6-chunk shadow distance. Good starting point for low-end GPUs and older mid-range.
+profile.medium.comment                 = Balanced for mid-range hardware. Colored shadows, VPS soft shadows, GTAO ambient occlusion and VL all active. Targets GTX 1060-class GPUs and above.
+profile.high.comment                   = High quality for modern GPUs. Adds screen-space reflections, water caustics, water parallax, entity shadows and SSRT distant shadows. RTX 2070 or equivalent recommended.
+profile.veryhigh.comment               = Near-maximum quality. All high-tier effects plus colored block lighting. Targets high-end GPUs like RTX 3080 or RX 6800 XT. Expect significant VRAM use with colored lights.
+profile.ultra.comment                  = Maximum quality, no compromises. 4096 shadow map, 16-chunk distance, colored light shafts, block entity shadows. High-end GPU required. Heavy performance cost.
 
 # Screens
 
@@ -73,11 +83,24 @@ screen.nether_color                    = Static Color
 
 screen.distance_view                   = Distance View
 
-option.INFO                            = Photon Shaders
-value.INFO.0                           = §eby SixthSurge
-value.INFO.1                           = §aby SixthSurge
-value.INFO.2                           = §bby SixthSurge
-value.INFO.3                           = §dby SixthSurge
+option.INFO                            = Reimagined
+option.INFO.comment                    = Photon Shaders - Reimagined by Britakee. A custom shader pack built on top of Photon by sixthsurge, extended with Physics Mod ocean physics and Colorwheel support for Flywheel-based mods like Create.
+option.PROFILE                         = Visual Style
+option.PROFILE.comment                 = Selects the overall visual style of the shader. Reimagined is the default look with vibrant colors and natural lighting. Original matches classic Photon. Apocalyptic adds desaturated skies, darker ambient light, dimmer sun, and heavier night fog for a post-apocalyptic feel.
+value.PROFILE.0                        = §6Reimagined
+value.PROFILE.1                        = §7Apocalyptic
+value.PROFILE.2                        = §aOriginal
+value.INFO.0                           = §6by Britakee
+value.INFO.1                           = §eby Britakee
+value.INFO.2                           = §bby Britakee
+value.INFO.3                           = §dby Britakee
+
+option.ORIGINAL_CREATOR                = Photon Shaders
+option.ORIGINAL_CREATOR.comment        = Original Photon Shaders by sixthsurge
+value.ORIGINAL_CREATOR.0               = §6by sixthsurge
+value.ORIGINAL_CREATOR.1               = §eby sixthsurge
+value.ORIGINAL_CREATOR.2               = §bby sixthsurge
+value.ORIGINAL_CREATOR.3               = §dby sixthsurge
 
 # World settings
 
@@ -117,7 +140,7 @@ option.WEATHER_WIND_VARIATION_SPEED        = Windiness Variation Speed
 # Lighting settings
 
 option.COLORED_LIGHTS                  = Colored Lights
-option.COLORED_LIGHTS.comment          = Variable-color block lighting using flood fill algorithm. Requires Iris 1.6 or above
+option.COLORED_LIGHTS.comment          = Replaces vanilla flat lighting with per-block colored light using a voxel flood fill. Torches glow warm, redstone glows red, and so on. Heavy GPU and VRAM cost, requires Iris 1.6+. Enabled at Very High and Ultra quality profiles.
 option.HANDHELD_LIGHTING               = Handheld Lighting
 option.HANDHELD_LIGHTING.comment       = Handheld items cast light on the world. If coloured lighting is enabled the handheld lighting will be coloured like the lights themselves
 option.HANDHELD_LIGHTING_INTENSITY     = Handheld Lighting Intensity
@@ -138,6 +161,7 @@ option.SHADING_STRENGTH                = Shading Strength
 option.SHADING_STRENGTH.comment        = Adjusts the contrast of direct light shading. Reducing this option makes faces facing away from the sun that aren't in shadow brighter; increasing it makes them darker
 
 option.SHADOW                          = Shadow Mapping
+option.SHADOW.comment                  = Renders real-time shadows cast by the sun and moon onto terrain and entities. Disabling removes all directional shadows and frees a large chunk of GPU time. Most other shadow-related settings depend on this being enabled.
 option.SHADOW_PCF                      = Shadow Map Filtering
 option.SHADOW_SSRT                     = SSRT Distant Shadows
 option.SHADOW_SSRT_STEPS               = SSRT Shadow Steps
@@ -160,7 +184,7 @@ option.SSS_STEPS                       = SSS Steps
 option.SSS_STEPS.comment               = Increase to reduce noise on foliage and other materials with SSS, at the cost of performance.
 
 option.SHADER_AO                       = Shader AO
-option.SHADER_AO.comment               = AO method used. Off - no shader AO. SSAO - lower quality but requires fewer samples/less filtering. GTAO - better quality but requires more samples/filtering
+option.SHADER_AO.comment               = Ambient occlusion method. GTAO gives better quality with more accurate contact shadows, SSAO is cheaper. Enabled from Medium (GTAO) or Low (SSAO). Both have moderate GPU cost.
 value.SHADER_AO.SHADER_AO_NONE         = Off
 value.SHADER_AO.SHADER_AO_SSAO         = SSAO
 value.SHADER_AO.SHADER_AO_GTAO         = GTAO
@@ -171,7 +195,7 @@ option.SSAO_RADIUS.comment             = Adjusts the radius of SSAO - distance w
 option.SSAO_STEPS                      = SSAO Steps
 option.SSAO_STEPS.comment              = Controls how noisy the SSAO appears
 option.GTAO_RADIUS                     = GTAO Radius
-option.GTAO_RADIUS.comment             = Adjusts the radius of GTAO - distance which objects can occlude each otherdistance which objects can occlude each other
+option.GTAO_RADIUS.comment             = Controls how far away surfaces can cast ambient occlusion. Larger values catch broader shadows but may cause halos around thin objects.
 option.GTAO_SLICES                     = GTAO Slices
 option.GTAO_SLICES.comment             = Controls how noisy the GTAO appears
 option.GTAO_HORIZON_STEPS              = GTAO Horizon Steps
@@ -438,7 +462,7 @@ option.OVERWORLD_FOG_INTENSITY              = Overworld Fog Intensity
 option.NETHER_FOG_INTENSITY                 = Nether Fog Intensity
 option.VL                                   = Volumetric Fog
 option.LPV_VL.comment                       = Light sources illuminate the fog. Requires Colored Lights! 
-option.VL.comment                           = Adds light shafts and variable fog density
+option.VL.comment                           = Simulates light scattering through the atmosphere, producing god rays, haze, and volumetric fog. Moderate GPU cost that scales with fog density and view distance. Required for cloudy fog noise and colored light shafts. Enabled from the Low quality profile.
 option.VL_RENDER_SCALE                      = VL Render Scale
 option.AIR_FOG_CLOUDY_NOISE                 = Cloudy Fog
 option.AIR_FOG_CLOUDY_NOISE.comment         = Subtle cloudy shapes in the fog, best visible in the morning.\nRequires volumetric fog!
@@ -553,7 +577,7 @@ value.TEXTURE_FORMAT.TEXTURE_FORMAT_LAB = labPBR
 value.TEXTURE_FORMAT.TEXTURE_FORMAT_OLD = Old PBR
 
 option.ENVIRONMENT_REFLECTIONS         = Environment Reflections
-option.ENVIRONMENT_REFLECTIONS.comment = Screen-space reflections. Makes water and shiny blocks reflect their environment. Big performance impact
+option.ENVIRONMENT_REFLECTIONS.comment = Adds screen-space reflections to water, metals, and glossy surfaces. Reflects whatever is currently visible on screen, so off-screen objects won't appear in reflections. Significant GPU cost that increases with ray count and step settings below. Enabled from the High quality profile.
 option.SKY_REFLECTIONS                 = Sky Reflections
 option.SKY_REFLECTIONS.comment         = Makes water and shiny blocks reflect the sky
 option.SSR_ROUGHNESS_SUPPORT           = Roughness Support
@@ -572,9 +596,7 @@ option.SSR_ROUGHNESS_THRESHOLD.comment = Adjusts how smooth a surface must be fo
 # Water settings
 
 option.WATER_CAUSTICS                  = Water Caustics
-option.WATER_CAUSTICS.comment          = Dancing light patterns beneath water
-option.WATER_CAUSTICS_INTENSITY        = Water Caustics Intensity
-option.WATER_CAUSTICS.comment          = Adjust the brightness of water caustics
+option.WATER_CAUSTICS.comment          = Renders animated light patterns on the ocean and river floor caused by waves bending sunlight. Low to moderate GPU cost. Looks best with shadow mapping enabled. Enabled from the High quality profile.
 option.WATER_EDGE_HIGHLIGHT            = Water Edge Highlight
 option.WATER_EDGE_HIGHLIGHT.comment    = White highlights where water meets terrain. Helps to make water more easily visible in some cases
 option.WATER_EDGE_HIGHLIGHT_INTENSITY  = Water Edge Highlight Intensity
@@ -599,7 +621,8 @@ option.WATER_WAVE_SPEED_FLOWING        = Speed (Flowing)
 option.WATER_WAVE_PERSISTENCE          = Persistence
 option.WATER_WAVE_LACUNARITY           = Lacunarity
 option.WATER_PARALLAX                  = Water Parallax
-option.WATER_PARALLAX.comment          = Makes water waves appear 3D
+option.WATER_PARALLAX.comment          = Adds apparent depth to water surface waves using parallax mapping, making them look three-dimensional instead of flat. Small GPU cost. Works alongside Water Waves settings. Enabled from the High quality profile.
+option.WATER_CAUSTICS_INTENSITY        = Water Caustics Intensity
 option.WATER_DISPLACEMENT              = Water Displacement
 option.WATER_DISPLACEMENT.comment      = Similar to how waving leaves work, it makes the water geometry itself wave slightly, so the shore line appears less flat
 option.WATER_WAVES_HEIGHT_VARIATION           = Local Height Variation 
