@@ -19,7 +19,7 @@ out vec3 position_scene;
 out vec4 tint;
 
 flat out uint material_mask;
-flat out mat3 tbn;
+out mat3 tbn;
 
 #if defined PROGRAM_GBUFFERS_WATER
 out vec2 atlas_tile_coord;

@@ -33,7 +33,7 @@ in vec3 scene_pos;
 in vec4 tint;
 
 flat in uint material_mask;
-flat in mat3 tbn;
+in mat3 tbn;
 
 #if defined POM
 in vec2 atlas_tile_coord;
