@@ -2,7 +2,7 @@
 
 <h1 align = "center">Photon Shaders - Reimagined</h1>
 
-<p align = "center">A custom Minecraft shader pack, reimagined from <a href="https://github.com/sixthsurge/photon">Photon</a> by <a href="https://github.com/sixthsurge">sixthsurge</a>, with Physics Mod ocean physics compatibility and advanced Colorwheel support</p>
+<p align = "center">A custom Minecraft shader pack, reimagined from <a href="https://github.com/sixthsurge/photon">Photon</a> by <a href="https://github.com/sixthsurge">sixthsurge</a>, with visual style profiles, Physics Mod ocean physics compatibility and advanced Colorwheel support</p>
 
 > See [CHANGELOG.md](CHANGELOG.md) for a full list of changes from the original.
 
@@ -12,6 +12,28 @@
 > 🌍 [Voxy World Gen V2](https://github.com/realBritakee/voxy_worldgen_v2) - background chunk pre-generation for Voxy · [other versions](https://modrinth.com/mod/voxy-worldgen)
 
 ![Screenshot](docs/images/oceanphysics.png)
+
+## Visual Styles
+
+Switch between three visual profiles directly in the shader settings:
+
+* **Reimagined** (default) - enhanced cinematic look with full Photon quality
+* **Apocalyptic** - darker, desaturated post-apocalyptic atmosphere with heavy fog
+* **Original** - vanilla Photon defaults
+
+## Quality Presets
+
+7 quality presets from Potato to Ultra, each targeting specific hardware:
+
+| Preset | Shadow Res | Shadow Dist | Key Features | Target Hardware |
+|--------|-----------|-------------|-------------|----------------|
+| Potato | 512 | 64 | Bare minimum | Integrated GPUs |
+| Very Low | 1024 | 64 | Basic shadows | Weak laptops |
+| Low | 1024 | 96 | PCF + VL | Budget GPUs |
+| Medium | 2048 | 128 | Colored shadows, GTAO | GTX 1060-class |
+| High | 2048 | 192 | Reflections, caustics, SSRT | RTX 2070-class |
+| Very High | 2048 | 224 | + Colored lights | RTX 3080-class |
+| Ultra | 4096 | 256 | Everything maxed | High-end only |
 
 ## Installation
 
@@ -32,8 +54,8 @@
 
 ```bash
 # Clone the repo
-git clone https://github.com/realBritakee/photon.git
-cd photon
+git clone https://github.com/realBritakee/photon-reimagined.git
+cd photon-reimagined
 ```
 
 **Windows (PowerShell)**
