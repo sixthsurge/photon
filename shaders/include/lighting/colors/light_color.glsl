@@ -8,7 +8,7 @@ uniform float moon_phase_brightness;
 
 // Magic brightness adjustment so that auto exposure isn't needed
 float get_sun_exposure() {
-    const float base_scale = 7.0 * SUN_I;
+    const float base_scale = 7.0 * SUN_I * PROFILE_SUN_BRIGHTNESS_MULT;
 
     float blue_hour
         = linear_step(0.05, 1.0, exp(-190.0 * sqr(sun_dir.y + 0.09604)));

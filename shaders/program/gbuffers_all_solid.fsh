@@ -29,11 +29,12 @@ layout(
 #endif
 
 in vec2 uv;
+in vec2 light_levels;
 in vec3 scene_pos;
 in vec4 tint;
 
 flat in uint material_mask;
-flat in mat3 tbn;
+in mat3 tbn;
 
 #if defined POM
 in vec2 atlas_tile_coord;
@@ -42,14 +43,8 @@ flat in vec2 atlas_tile_offset;
 flat in vec2 atlas_tile_scale;
 #endif
 
-#ifdef COLORWHEEL
-vec2 light_levels;
-float vanilla_ao;
-#else
-in vec2 light_levels;
 #if defined PROGRAM_GBUFFERS_TERRAIN
 in float vanilla_ao;
-#endif
 #endif
 
 #if defined PROGRAM_GBUFFERS_ENTITIES || defined PROGRAM_GBUFFERS_HAND
@@ -298,23 +293,7 @@ void main() {
 
     //--//
 
-    vec4 base_color;
-#if defined COLORWHEEL
-    base_color = read_tex(gtexture);
-    vec4 overlayColor;
-
-    clrwl_computeFragment(
-        base_color,
-        base_color,
-        light_levels,
-        vanilla_ao,
-        overlayColor
-    );
-    light_levels = clamp((light_levels - 1.0 / 32.0) * 32.0 / 30.0, 0.0, 1.0);
-#else
-    base_color = read_tex(gtexture) * tint;
-#endif
-
+    vec4 base_color = read_tex(gtexture) * tint;
 #ifdef NORMAL_MAPPING
     vec3 normal_map = read_tex(normals).xyz;
 #endif
@@ -417,10 +396,6 @@ void main() {
 
 #if defined PROGRAM_GBUFFERS_ENTITIES
     base_color.rgb = mix(base_color.rgb, entityColor.rgb, entityColor.a);
-#endif
-
-#if defined COLORWHEEL
-    base_color.rgb = mix(base_color.rgb, overlayColor.rgb, overlayColor.a);
 #endif
 
 #if defined PROGRAM_GBUFFERS_BLOCK

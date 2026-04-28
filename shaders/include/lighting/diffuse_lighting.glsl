@@ -197,7 +197,7 @@ vec3 get_sky_lighting(
         * mix(skylight, vec3(dot(skylight, luminance_weights_rec2020)), 0.5);
 #endif
 
-    lighting += skylight * get_skylight_falloff(light_levels.y);
+    lighting += skylight * get_skylight_falloff(light_levels.y) * PROFILE_AMBIENT_BRIGHTNESS_MULT;
 
     return lighting;
 }
@@ -335,7 +335,7 @@ vec3 get_diffuse_lighting(
 // When combined gi is enabled
 // Photonics includes gi in the result of sample_photonics_direct
 #ifndef PHOTONICS_RESTIR_COMBINED_GI
-        lighting += texture2D(radiosity_indirect, uv).xyz * SKYLIGHT_I;
+        lighting += texture2D(radiosity_indirect, uv).xyz * SKYLIGHT_I * PROFILE_AMBIENT_BRIGHTNESS_MULT;
 #endif
     }
 

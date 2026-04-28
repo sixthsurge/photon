@@ -1,9 +1,9 @@
-#version 400 compatibility
+/*
+ * Photon - Colorwheel support (Nether shadow)
+ * Nether has no sun shadows in Photon (shadow.vsh discards),
+ * but Colorwheel still needs this program to exist so it doesn't fall back.
+ */
+
 #define WORLD_NETHER
-#define PROGRAM_SHADOW
-#define PROGRAM_SHADOW_SOLID
-#define PROGRAM_SHADOW_BLOCK
-#define PROGRAM_SHADOW_ENTITIES
-#define COLORWHEEL
 #define fsh
-#include "/program/shadow.fsh"
+#include "/program/clrwl_shadow.fsh"

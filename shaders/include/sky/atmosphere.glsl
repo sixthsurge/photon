@@ -113,6 +113,7 @@ vec3 atmosphere_post_processing(vec3 atmosphere) {
         atmosphere,
         ATMOSPHERE_SATURATION_BOOST_INTENSITY
             * atmosphere_saturation_boost_amount
+            * PROFILE_SKY_SATURATION_MULT
     );
 
     return atmosphere;

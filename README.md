@@ -1,5 +1,9 @@
 <br><br>
 
+> **Branch notice:** This is the `photon-main` branch - Physics Mod ocean support and native Colorwheel integration only, based on clean upstream. See [reimagined](https://github.com/realBritakee/photon-reimagined/tree/reimagined) for the full custom version with Visual Style profiles and quality presets.
+
+---
+
 <h1 align = "center">Photon Shaders</h1>
 
 <p align = "center">A gameplay-focused shader pack for Minecraft</p>
@@ -85,7 +89,21 @@
 	<br><br>
 </div>
 
+## Build
+
+Package the shaderpack into a zip ready to drop into your `shaderpacks` folder:
+
+```bash
+zip -r "Photon_1.3b.zip" shaders/ LICENSE README.md
+```
+
 ## Community
 
 - For questions, suggestions and news regarding this shader pack, head to my [discord server](https://discord.gg/ngEW66HScd)
-- You can also [give me money](https://ko-fi.com/sixthsurge) if you want to 
+- You can also [give me money](https://ko-fi.com/sixthsurge) if you want to
+
+## License
+
+Copyright (c) sixthsurge. All rights reserved.
+
+See [LICENSE](LICENSE) for full terms.

@@ -1,9 +1,7 @@
-#version 400 compatibility
+/*
+ * Photon - Colorwheel support (Overworld shadow)
+ */
+
 #define WORLD_OVERWORLD
-#define PROGRAM_SHADOW
-#define PROGRAM_SHADOW_SOLID
-#define PROGRAM_SHADOW_BLOCK
-#define PROGRAM_SHADOW_ENTITIES
-#define COLORWHEEL
 #define fsh
-#include "/program/shadow.fsh"
+#include "/program/clrwl_shadow.fsh"

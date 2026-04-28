@@ -6,6 +6,7 @@
 #include "/include/sky/atmosphere.glsl"
 #include "/include/utility/phase_functions.glsl"
 
+
 vec2 air_fog_analytic_airmass(
     vec3 ray_origin_world,
     vec3 ray_direction_world,
@@ -25,7 +26,11 @@ vec2 air_fog_analytic_airmass(
                0.0,
                ray_length
            )
-        * (0.5 * OVERWORLD_FOG_INTENSITY);
+        * (0.5 * OVERWORLD_FOG_INTENSITY
+#ifdef BORDER_FOG
+            * PROFILE_FOG_DENSITY_MULT
+#endif
+        );
 }
 
 mat2x3 air_fog_analytic(
