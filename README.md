@@ -89,6 +89,14 @@
 	<br><br>
 </div>
 
+## Build
+
+Package the shaderpack into a zip ready to drop into your `shaderpacks` folder:
+
+```bash
+zip -r "Photon_1.3b.zip" shaders/ LICENSE README.md
+```
+
 ## Community
 
 - For questions, suggestions and news regarding this shader pack, head to my [discord server](https://discord.gg/ngEW66HScd)
