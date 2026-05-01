@@ -34,7 +34,7 @@ const vec3[48] light_color = vec3[48](
     vec3(1.00, 0.57, 0.30) * 8.0, // Copper Bulbs
     vec3(0.60, 0.10, 1.00) * 12.0, // Nether portal
     vec3(0.0), // End portal
-	// Colors for modded light sources (block IDs 81-96)
+	// Colors for modded light sources (block IDs 64-79)
     vec3(1.00, 1.00, 1.00) * 10.0, // 32 - White       (block 64)
     vec3(0.85, 0.85, 0.85) *  9.0, // 33 - Light Gray  (block 65)
     vec3(0.55, 0.55, 0.55) *  8.0, // 34 - Gray        (block 66)
