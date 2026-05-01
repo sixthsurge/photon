@@ -1,7 +1,7 @@
 #if !defined INCLUDE_LIGHTING_LPV_LIGHT_COLORS
 #define INCLUDE_LIGHTING_LPV_LIGHT_COLORS
 
-const vec3[32] light_color = vec3[32](
+const vec3[48] light_color = vec3[48](
     vec3(1.00, 1.00, 1.00) * 12.0, // Strong white light
     vec3(1.00, 1.00, 1.00) * 6.0, // Medium white light
     vec3(1.00, 1.00, 1.00) * 1.0, // Weak white light
@@ -33,7 +33,24 @@ const vec3[32] light_color = vec3[32](
     vec3(0.85, 1.3, 1.0) * 3.9, // Copper torch and lanterns
     vec3(1.00, 0.57, 0.30) * 8.0, // Copper Bulbs
     vec3(0.60, 0.10, 1.00) * 12.0, // Nether portal
-    vec3(0.0) // End portal
+    vec3(0.0), // End portal
+	// Colors for modded light sources (block IDs 81-96)
+    vec3(1.00, 1.00, 1.00) * 10.0, // 32 - White       (block 64)
+    vec3(0.85, 0.85, 0.85) *  9.0, // 33 - Light Gray  (block 65)
+    vec3(0.55, 0.55, 0.55) *  8.0, // 34 - Gray        (block 66)
+    vec3(0.20, 0.20, 0.22) *  6.0, // 35 - Black       (block 67)
+    vec3(0.55, 0.35, 0.20) *  8.0, // 36 - Brown       (block 68)
+    vec3(1.00, 0.10, 0.10) * 10.0, // 37 - Red         (block 69)
+    vec3(1.00, 0.45, 0.10) * 10.0, // 38 - Orange      (block 70)
+    vec3(1.00, 0.95, 0.20) * 10.0, // 39 - Yellow      (block 71)
+    vec3(0.55, 1.00, 0.20) * 10.0, // 40 - Lime        (block 72)
+    vec3(0.15, 1.00, 0.20) * 10.0, // 41 - Green       (block 73)
+    vec3(0.15, 0.95, 1.00) * 10.0, // 42 - Cyan        (block 74)
+    vec3(0.45, 0.75, 1.00) * 10.0, // 43 - Light Blue  (block 75)
+    vec3(0.15, 0.30, 1.00) * 10.0, // 44 - Blue        (block 76)
+    vec3(0.55, 0.15, 1.00) * 10.0, // 45 - Purple      (block 77)
+    vec3(1.00, 0.20, 0.90) * 10.0, // 46 - Magenta     (block 78)
+    vec3(1.00, 0.55, 0.85) * 10.0  // 47 - Pink        (block 79)
 );
 
 const vec3[16] tint_color = vec3[16](
