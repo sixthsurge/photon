@@ -749,3 +749,12 @@ option.BOX_LINE_WIDTH           = Ancho de línea
 option.DH_OVERDRAW_DISTANCE    = Distancia de sobre-dibujo
 option.DH_OVERDRAW_FADE_LENGTH = Longitud de desvanecimiento de sobre-dibujo
 option.NOISE_ON_DH_TERRAIN       = Ruido en terreno DH
+
+option.WATER_TRAIL                     = Estela de agua
+option.WATER_TRAIL.comment             = Crea ondas continuas en la superficie del agua alrededor del jugador al caminar por o cerca del agua. Funciona en primera y tercera persona. Requiere uniforms personalizados de Iris
+option.WATER_TRAIL_STRENGTH            = Intensidad de la estela
+option.WATER_TRAIL_STRENGTH.comment    = Controla la intensidad del efecto de ondas de la estela
+option.WATER_TRAIL_MAX_DISTANCE        = Distancia máxima
+option.WATER_TRAIL_MAX_DISTANCE.comment = Distancia máxima desde el jugador a la que pueden llegar las ondas
+option.WATER_TRAIL_SPEED               = Velocidad de ondas
+option.WATER_TRAIL_SPEED.comment       = Velocidad a la que se animan las ondas concéntricas hacia afuera

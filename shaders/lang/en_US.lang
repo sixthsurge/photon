@@ -813,4 +813,11 @@ option.PHOTONICS_RESTIR_SOFT_SHADOWS      = Soft Shadows
 option.PHOTONICS_RESTIR_COMBINED_GI       = Include Skylight GI
 option.PHOTONICS_RESTIR_COMBINED_GI.comment = Whether Gi should be ran through ReSTIR's denoiser instead of its usual path. \nResults in much sharper Gi, at the cost of performance.
 
-
+option.WATER_TRAIL                     = Water Trail
+option.WATER_TRAIL.comment             = Creates continuous ripples on the water surface around the player as they walk through or near water. Works in both first and third person. Requires Iris custom uniforms
+option.WATER_TRAIL_STRENGTH            = Trail Strength
+option.WATER_TRAIL_STRENGTH.comment    = Controls the intensity of the water trail ripple effect
+option.WATER_TRAIL_MAX_DISTANCE        = Trail Max Distance
+option.WATER_TRAIL_MAX_DISTANCE.comment = Maximum distance from the player that ripples can reach
+option.WATER_TRAIL_SPEED               = Ripple Speed
+option.WATER_TRAIL_SPEED.comment       = How fast the concentric ripple waves animate outward
