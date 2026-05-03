@@ -145,6 +145,32 @@ uniform int entityId;
 uniform vec4 entityColor;
 #endif
 
+#ifdef WATER_TRAIL
+uniform vec3 waterTrailPlayerPos;
+uniform vec3 waterTrailPos0;
+uniform vec3 waterTrailPos1;
+uniform vec3 waterTrailPos2;
+uniform vec3 waterTrailPos3;
+uniform vec3 waterTrailPos4;
+uniform vec3 waterTrailPos5;
+uniform vec3 waterTrailPos6;
+uniform vec3 waterTrailPos7;
+uniform vec3 waterTrailPos8;
+uniform vec3 waterTrailPos9;
+uniform vec3 waterTrailPos10;
+uniform vec3 waterTrailPos11;
+uniform vec3 waterTrailPos12;
+uniform vec3 waterTrailPos13;
+uniform vec2 waterTrailVelocity;
+uniform vec3 waterSplashPos;
+uniform float waterSplashTime;
+uniform vec3 waterSplashExitPos;
+uniform float waterSplashExitTime;
+uniform float waterSplashVelY;
+uniform float waterSplashExitVelY;
+#endif
+
+
 vec3 light_color, ambient_color;
 
 // ------------
@@ -487,6 +513,158 @@ void main() {
                 light_levels.y,
                 flowing_water
             );
+
+#ifdef WATER_TRAIL
+            // Water trail: history-based, proximity-driven.
+            // The O(n²) spacing_fade inner loop was removed — that was the main perf cost.
+            // Replaced with a simple distance-to-player fade that achieves the same goal
+            // (suppressing stacked points) without iterating over all previous points.
+            {
+                float speed = length(waterTrailVelocity);
+                if (speed != speed || speed > 1000.0) speed = 0.0;
+
+                // Radial ripple: always active near the water surface
+                // Player above water-surface height.
+                //   >= 1.6 m: camera is higher than standing on an adjacent
+                //   block at the same Y as the water surface (camera is
+                //   ~1.62 m above the feet). Trail should NOT render here.
+                //   Lowered from 2.5 to 1.6 to fix the trail appearing while
+                //   the player stands on a block next to the water surface.
+                float player_above = waterTrailPlayerPos.y - world_pos.y;
+                float player_prox = smoothstep(1.6, 0.5, player_above) * smoothstep(-0.7, -0.2, player_above);
+                float still_factor = player_prox;
+                if (still_factor > 0.01) {
+                    vec3 still_source = vec3(waterTrailPlayerPos.x, world_pos.y, waterTrailPlayerPos.z);
+                    normal_tangent = apply_water_trail_at(
+                        normal_tangent,
+                        world_pos,
+                        still_source,
+                        WATER_TRAIL_STRENGTH * 0.15 * still_factor,
+                        WATER_TRAIL_MAX_DISTANCE * 0.55,
+                        frameTimeCounter
+                    );
+                }
+
+                float move_factor = smoothstep(0.01, 0.5, speed);
+                if (move_factor > 0.01) {
+                    float str = WATER_TRAIL_STRENGTH * 0.85 * move_factor;
+
+                    vec2 vel_dir  = waterTrailVelocity / max(speed, 0.5);
+                    vec2 vel_perp = vec2(-vel_dir.y, vel_dir.x);
+
+                    vec3 tp[14] = vec3[14](
+                        waterTrailPos0,  waterTrailPos1,
+                        waterTrailPos2,  waterTrailPos3,
+                        waterTrailPos4,  waterTrailPos5,
+                        waterTrailPos6,  waterTrailPos7,
+                        waterTrailPos8,  waterTrailPos9,
+                        waterTrailPos10, waterTrailPos11,
+                        waterTrailPos12, waterTrailPos13
+                    );
+                    const float fade[14] = float[14](
+                        1.00, 0.87, 0.74, 0.61, 0.49, 0.38, 0.28,
+                        0.19, 0.12, 0.07, 0.03, 0.01, 0.00, 0.00
+                    );
+                    const float radius[14] = float[14](
+                        0.48, 0.46, 0.44, 0.42, 0.40, 0.38, 0.36,
+                        0.34, 0.32, 0.30, 0.28, 0.26, 0.22, 0.18
+                    );
+
+                    for (int i = 0; i < 14; i++) {
+                        float pt_above = tp[i].y - world_pos.y;
+                        // Lowered from 2.5 to 1.6 (matches still ripple).
+                        // Stops motion trail from rendering while the player
+                        // walks on a block at water-surface height next to
+                        // the water.
+                        float pt_prox  = smoothstep(1.6, 1.0, pt_above) * smoothstep(-0.7, -0.2, pt_above);
+                        if (pt_prox < 0.01) continue;
+
+                        // Distance-to-player fade replaces the O(n²) spacing_fade loop.
+                        // Points close to the player (recently recorded) get full weight;
+                        // older/distant points are already suppressed by the fade[] array.
+                        float dist_to_player = length(tp[i].xz - waterTrailPlayerPos.xz);
+                        float player_fade    = smoothstep(0.05, 0.4, dist_to_player);
+
+                        float point_weight = player_fade * pt_prox;
+                        if (point_weight < 0.01) continue;
+
+                        // V-shape
+                        float v_shape = 1.0;
+                        vec2  delta_frag = world_pos.xz - tp[i].xz;
+                        float frag_dist  = length(delta_frag);
+                        if (frag_dist > 0.15) {
+                            vec2  frag_dir = delta_frag / frag_dist;
+                            float side     = abs(dot(frag_dir, vel_perp));
+                            float behind   = max(0.0, -dot(frag_dir, vel_dir));
+                            v_shape = 0.30 + 0.70 * max(side, behind * 0.5);
+                        }
+
+                        normal_tangent = apply_water_trail_at(
+                            normal_tangent,
+                            world_pos,
+                            tp[i],
+                            str * fade[i] * v_shape * point_weight,
+                            WATER_TRAIL_MAX_DISTANCE * radius[i],
+                            frameTimeCounter
+                        );
+                    }
+
+                    // Midpoint interpolation: denser trail without extra uniforms
+                    for (int i = 0; i < 13; i++) {
+                        vec3  mid       = mix(tp[i], tp[i + 1], 0.5);
+                        float mid_above = mid.y - world_pos.y;
+                        // Lowered from 2.5 to 1.6 (matches still ripple).
+                        float mid_prox  = smoothstep(1.6, 1.0, mid_above) * smoothstep(-0.7, -0.2, mid_above);
+                        if (mid_prox < 0.01) continue;
+
+                        float dist_to_player_mid = length(mid.xz - waterTrailPlayerPos.xz);
+                        float player_fade_mid    = smoothstep(0.05, 0.4, dist_to_player_mid);
+                        float point_weight_mid   = player_fade_mid * mid_prox;
+                        if (point_weight_mid < 0.01) continue;
+
+                        float mid_fade   = mix(fade[i],   fade[i + 1],   0.5);
+                        float mid_radius = mix(radius[i], radius[i + 1], 0.5);
+
+                        float v_shape_mid = 1.0;
+                        vec2  delta_mid   = world_pos.xz - mid.xz;
+                        float frag_dist_mid = length(delta_mid);
+                        if (frag_dist_mid > 0.15) {
+                            vec2  frag_dir_mid = delta_mid / frag_dist_mid;
+                            float side_mid     = abs(dot(frag_dir_mid, vel_perp));
+                            float behind_mid   = max(0.0, -dot(frag_dir_mid, vel_dir));
+                            v_shape_mid = 0.30 + 0.70 * max(side_mid, behind_mid * 0.5);
+                        }
+
+                        normal_tangent = apply_water_trail_at(
+                            normal_tangent,
+                            world_pos,
+                            mid,
+                            str * mid_fade * v_shape_mid * point_weight_mid * 0.75,
+                            WATER_TRAIL_MAX_DISTANCE * mid_radius,
+                            frameTimeCounter
+                        );
+                    }
+                }
+
+                // Splash: expanding ring on water entry/exit
+                float splash_str = WATER_TRAIL_STRENGTH * 0.40;
+
+                normal_tangent = apply_water_splash(
+                    normal_tangent, world_pos,
+                    waterSplashPos, waterSplashTime, waterSplashVelY,
+                    splash_str, WATER_TRAIL_MAX_DISTANCE * 1.5
+                );
+
+                normal_tangent = apply_water_splash(
+                    normal_tangent, world_pos,
+                    waterSplashExitPos, waterSplashExitTime, waterSplashExitVelY,
+                    splash_str * 0.6, WATER_TRAIL_MAX_DISTANCE * 1.2
+                );
+
+                normal_tangent = normalize(normal_tangent);
+            }
+#endif
+
             normal = tbn_fixed * normal_tangent;
         }
 #endif
