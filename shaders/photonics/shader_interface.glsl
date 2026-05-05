@@ -58,7 +58,7 @@ void load_fragment_variables(out vec3 albedo, out vec3 world_pos, out vec3 world
     indirect_light_color = texelFetch(colortex4, ivec2(191, 1), 0).rgb;
 #endif
 #else
-    indirect_light_color = mix(texelFetch(colortex4, ivec2(191, 1), 0).rgb, vec3(1f), 0.5);
+    indirect_light_color = mix(texelFetch(colortex4, ivec2(191, 1), 0).rgb, vec3(1.0f), 0.5);
 #endif
 #endif
 
