@@ -22,7 +22,7 @@ uniform vec2 view_pixel_size;
 #include "/include/utility/spherical_harmonics.glsl"
 #endif
 
-vec3 indirect_light_color = vec3(0f);
+vec3 indirect_light_color = vec3(0.0f);
 #define sun_direction light_dir
 
 vec3 load_world_position() {
@@ -58,7 +58,7 @@ void load_fragment_variables(out vec3 albedo, out vec3 world_pos, out vec3 world
     indirect_light_color = texelFetch(colortex4, ivec2(191, 1), 0).rgb;
 #endif
 #else
-    indirect_light_color = mix(texelFetch(colortex4, ivec2(191, 1), 0).rgb, vec3(1f), 0.5);
+    indirect_light_color = mix(texelFetch(colortex4, ivec2(191, 1), 0).rgb, vec3(1.0f), 0.5);
 #endif
 #endif
 
@@ -76,7 +76,7 @@ vec2 get_taa_jitter() {
 #endif
 
 #else
-    return vec2(0f);
+    return vec2(0.0f);
 #endif
 }
 

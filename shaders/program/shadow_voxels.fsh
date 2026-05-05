@@ -32,10 +32,10 @@ void main() {
 
     RayJob ray = RayJob(
         world_pos - world_offset - 0.01f * cage_normal, // Ray origin
-        mat3(shadowModelViewInverse) * vec3(0f, 0f, -1f), // Ray direction
-        vec3(0f),
-        vec3(0f),
-        vec3(0f),
+        mat3(shadowModelViewInverse) * vec3(0.0f, 0.0f, -1.0f), // Ray direction
+        vec3(0.0f),
+        vec3(0.0f),
+        vec3(0.0f),
         false
     );
 
@@ -46,7 +46,7 @@ void main() {
         discard;
     }
 
-    vec4 base_color = vec4(ray.result_color, 1f);
+    vec4 base_color = vec4(ray.result_color, 1.0f);
 
     shadowcolor0_out = mix(vec3(1.0), base_color.rgb * tint, base_color.a);
     shadowcolor0_out

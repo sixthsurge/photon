@@ -358,11 +358,11 @@ void main() {
 
     gl_FragDepth = screen_pos.z;
 
-    vec4 base_color = vec4(ray.result_color, 1f);
+    vec4 base_color = vec4(ray.result_color, 1.0f);
     vec3 ph_normal = ray.result_normal;
 
 #if defined SPECULAR_MAPPING
-    vec4 specular_map = vec4(0f);
+    vec4 specular_map = vec4(0.0f);
 #endif
 #endif
 
