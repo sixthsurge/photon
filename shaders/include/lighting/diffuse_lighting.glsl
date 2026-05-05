@@ -134,7 +134,7 @@ vec3 get_block_lighting(
     float ao,
     float directional_lighting
 ) {
-    vec3 lighting = vec3(0f);
+    vec3 lighting = vec3(0.0f);
 
     float blocklight_falloff
         = get_blocklight_falloff(light_levels.x, light_levels.y, ao);
@@ -167,7 +167,7 @@ vec3 get_sky_lighting(
     float ambient_sss,
     float directional_lighting
 ) {
-    vec3 lighting = vec3(0f);
+    vec3 lighting = vec3(0.0f);
 
 #if defined WORLD_OVERWORLD && defined PROGRAM_DEFERRED4 && defined SH_SKYLIGHT
 #ifdef MC_GL_RENDERER_INTEL
@@ -354,7 +354,7 @@ vec3 get_diffuse_lighting(
 
 #if defined PHOTONICS_DIFFUSE
     if (!is_lod) {
-        vec3 blocklight = vec3(0f);
+        vec3 blocklight = vec3(0.0f);
 
         blocklight += sample_photonics_direct(uv);
 

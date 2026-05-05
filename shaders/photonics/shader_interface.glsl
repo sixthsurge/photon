@@ -22,7 +22,7 @@ uniform vec2 view_pixel_size;
 #include "/include/utility/spherical_harmonics.glsl"
 #endif
 
-vec3 indirect_light_color = vec3(0f);
+vec3 indirect_light_color = vec3(0.0f);
 #define sun_direction light_dir
 
 vec3 load_world_position() {
@@ -76,7 +76,7 @@ vec2 get_taa_jitter() {
 #endif
 
 #else
-    return vec2(0f);
+    return vec2(0.0f);
 #endif
 }
 

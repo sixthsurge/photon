@@ -33,9 +33,9 @@ void main() {
     RayJob ray = RayJob(
         world_pos - world_offset - 0.01f * cage_normal, // Ray origin
         mat3(shadowModelViewInverse) * vec3(0f, 0f, -1f), // Ray direction
-        vec3(0f),
-        vec3(0f),
-        vec3(0f),
+        vec3(0.0f),
+        vec3(0.0f),
+        vec3(0.0f),
         false
     );
 

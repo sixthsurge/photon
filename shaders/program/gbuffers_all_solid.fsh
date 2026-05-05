@@ -362,7 +362,7 @@ void main() {
     vec3 ph_normal = ray.result_normal;
 
 #if defined SPECULAR_MAPPING
-    vec4 specular_map = vec4(0f);
+    vec4 specular_map = vec4(0.0f);
 #endif
 #endif
 
