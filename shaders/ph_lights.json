@@ -350,7 +350,8 @@
             "minecraft:end_portal_frame",
             "minecraft:respawn_anchor",
             "minecraft:dragon_egg",
-            "minecraft:vault"
+            "minecraft:vault",
+            { "value": "minecraft:redstone_wire[power=0]", "priority": 100 }
           ]
         }
       }
