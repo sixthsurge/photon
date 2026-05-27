@@ -1,6 +1,8 @@
 #if !defined INCLUDE_ACES_SSTS
 #define INCLUDE_ACES_SSTS
 
+#include "utility.glsl"
+
 struct TsPoint {
     float x; // ACES
     float y; // luminance
@@ -26,8 +28,6 @@ const float max_lum_rrt = 10000.0;
 const float half_min = 1e-10;
 
 const mat3 m1 = mat3(0.5, -1.0, 0.5, -1.0, 1.0, 0.5, 0.5, 0.0, 0.0);
-
-float pow10(float x) { return pow(10.0, x); }
 
 float interpolate1d(float x0, float y0, float x1, float y1, float x) {
     float t = (x - x0) / (x1 - x0);
@@ -160,26 +160,26 @@ float ssts(float x, TsParams c) {
     const int n_knots_low = 4;
     const int n_knots_high = 4;
 
-    float logx = log10(max(x, half_min));
+    float log_x = log10(max(x, half_min));
 
-    float logy;
+    float log_y;
 
-    if (logx <= log10(c.min_point.x)) {
-        logy = logx * c.min_point.slope
+    if (log_x <= log10(c.min_point.x)) {
+        log_y = log_x * c.min_point.slope
             + (log10(c.min_point.y) - c.min_point.slope * log10(c.min_point.x));
-    } else if ((logx > log10(c.min_point.x)) && (logx < log10(c.mid_point.x))) {
-        float knot_coord = (n_knots_low - 1) * (logx - log10(c.min_point.x))
+    } else if ((log_x > log10(c.min_point.x)) && (log_x < log10(c.mid_point.x))) {
+        float knot_coord = (n_knots_low - 1) * (log_x - log10(c.min_point.x))
             / (log10(c.mid_point.x) - log10(c.min_point.x));
         int j = int(floor(knot_coord));
         float t = knot_coord - float(j);
 
         vec3 cf = vec3(c.coefs_low[j], c.coefs_low[j + 1], c.coefs_low[j + 2]);
         vec3 monomials = vec3(t * t, t, 1.0);
-        logy = dot(monomials, m1 * cf);
+        log_y = dot(monomials, m1 * cf);
     } else if (
-        (logx >= log10(c.mid_point.x)) && (logx < log10(c.max_point.x))
+        (log_x >= log10(c.mid_point.x)) && (log_x < log10(c.max_point.x))
     ) {
-        float knot_coord = (n_knots_high - 1) * (logx - log10(c.mid_point.x))
+        float knot_coord = (n_knots_high - 1) * (log_x - log10(c.mid_point.x))
             / (log10(c.max_point.x) - log10(c.mid_point.x));
         int j = int(floor(knot_coord));
         float t = knot_coord - float(j);
@@ -187,13 +187,13 @@ float ssts(float x, TsParams c) {
         vec3 cf
             = vec3(c.coefs_high[j], c.coefs_high[j + 1], c.coefs_high[j + 2]);
         vec3 monomials = vec3(t * t, t, 1.0);
-        logy = dot(monomials, m1 * cf);
+        log_y = dot(monomials, m1 * cf);
     } else {
-        logy = logx * c.max_point.slope
+        log_y = log_x * c.max_point.slope
             + (log10(c.max_point.y) - c.max_point.slope * log10(c.max_point.x));
     }
 
-    return pow10(logy);
+    return pow(10.0, log_y);
 }
 
 float inv_ssts(float y, TsParams c) {
@@ -214,23 +214,23 @@ float inv_ssts(float y, TsParams c) {
         knot_y_high[i] = (c.coefs_high[i] + c.coefs_high[i + 1]) / 2.0;
     }
 
-    float logy = log10(max(y, 1e-10));
-    float logx;
+    float log_y = log10(max(y, 1e-10));
+    float log_x;
 
-    if (logy <= log10(c.min_point.y)) {
-        logx = log10(c.min_point.x);
+    if (log_y <= log10(c.min_point.y)) {
+        log_x = log10(c.min_point.x);
     } else if (
-        (logy > log10(c.min_point.y)) && (logy <= log10(c.mid_point.y))
+        (log_y > log10(c.min_point.y)) && (log_y <= log10(c.mid_point.y))
     ) {
         int j;
         vec3 cf;
-        if (logy > knot_y_low[0] && logy <= knot_y_low[1]) {
+        if (log_y > knot_y_low[0] && log_y <= knot_y_low[1]) {
             cf = vec3(c.coefs_low[0], c.coefs_low[1], c.coefs_low[2]);
             j = 0;
-        } else if (logy > knot_y_low[1] && logy <= knot_y_low[2]) {
+        } else if (log_y > knot_y_low[1] && log_y <= knot_y_low[2]) {
             cf = vec3(c.coefs_low[1], c.coefs_low[2], c.coefs_low[3]);
             j = 1;
-        } else if (logy > knot_y_low[2] && logy <= knot_y_low[3]) {
+        } else if (log_y > knot_y_low[2] && log_y <= knot_y_low[3]) {
             cf = vec3(c.coefs_low[2], c.coefs_low[3], c.coefs_low[4]);
             j = 2;
         } else {
@@ -242,21 +242,21 @@ float inv_ssts(float y, TsParams c) {
         float a = tmp.x;
         float b = tmp.y;
         float cc = tmp.z;
-        cc = cc - logy;
+        cc = cc - log_y;
 
         float d = sqrt(b * b - 4.0 * a * cc);
         float t = (2.0 * cc) / (-d - b);
-        logx = log10(c.min_point.x) + (t + float(j)) * knot_inc_low;
-    } else if ((logy > log10(c.mid_point.y)) && (logy < log10(c.max_point.y))) {
+        log_x = log10(c.min_point.x) + (t + float(j)) * knot_inc_low;
+    } else if ((log_y > log10(c.mid_point.y)) && (log_y < log10(c.max_point.y))) {
         int j;
         vec3 cf;
-        if (logy >= knot_y_high[0] && logy <= knot_y_high[1]) {
+        if (log_y >= knot_y_high[0] && log_y <= knot_y_high[1]) {
             cf = vec3(c.coefs_high[0], c.coefs_high[1], c.coefs_high[2]);
             j = 0;
-        } else if (logy > knot_y_high[1] && logy <= knot_y_high[2]) {
+        } else if (log_y > knot_y_high[1] && log_y <= knot_y_high[2]) {
             cf = vec3(c.coefs_high[1], c.coefs_high[2], c.coefs_high[3]);
             j = 1;
-        } else if (logy > knot_y_high[2] && logy <= knot_y_high[3]) {
+        } else if (log_y > knot_y_high[2] && log_y <= knot_y_high[3]) {
             cf = vec3(c.coefs_high[2], c.coefs_high[3], c.coefs_high[4]);
             j = 2;
         } else {
@@ -268,16 +268,16 @@ float inv_ssts(float y, TsParams c) {
         float a = tmp.x;
         float b = tmp.y;
         float cc = tmp.z;
-        cc = cc - logy;
+        cc = cc - log_y;
 
         float d = sqrt(b * b - 4.0 * a * cc);
         float t = (2.0 * cc) / (-d - b);
-        logx = log10(c.mid_point.x) + (t + float(j)) * knot_inc_high;
+        log_x = log10(c.mid_point.x) + (t + float(j)) * knot_inc_high;
     } else {
-        logx = log10(c.max_point.x);
+        log_x = log10(c.max_point.x);
     }
 
-    return pow10(logx);
+    return pow(10.0, log_x);
 }
 
 vec3 ssts_f3(vec3 x, TsParams c) {
@@ -287,3 +287,5 @@ vec3 ssts_f3(vec3 x, TsParams c) {
 vec3 inv_ssts_f3(vec3 x, TsParams c) {
     return vec3(inv_ssts(x.x, c), inv_ssts(x.y, c), inv_ssts(x.z, c));
 }
+#endif
+// INCLUDE_ACES_SSTS

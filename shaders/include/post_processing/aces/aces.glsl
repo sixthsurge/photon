@@ -7,9 +7,9 @@
  */
 
 #include "matrices.glsl"
+#include "ssts.glsl"
 #include "tonescales.glsl"
 #include "utility.glsl"
-#include "ssts.glsl"
 
 // Constants
 
