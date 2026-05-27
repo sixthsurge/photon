@@ -77,10 +77,13 @@ const mat3 rec2020_to_rec709 = rec2020_to_xyz * xyz_to_rec709;
 // ------------------------------
 //   Transfer functions (gamma)
 // ------------------------------
-
-#define display_eotf srgb_eotf
-#define display_eotf_inv srgb_eotf_inv
-
+#ifdef HDR_ENABLED
+    #define display_eotf(x) srgb_eotf(abs(x) * HdrGamePaperWhiteBrightness / HdrUIBrightness) * sign(x)
+    #define display_eotf_inv(x) srgb_eotf_inv(abs(x)) * HdrUIBrightness / HdrGamePaperWhiteBrightness * sign(x)
+#else
+    #define display_eotf srgb_eotf
+    #define display_eotf_inv srgb_eotf_inv
+#endif
 vec3 srgb_eotf(vec3 linear) { // linear -> sRGB
     return 1.14374
         * (-0.126893 * linear + sqrt(linear)); // from Jodie in #snippets

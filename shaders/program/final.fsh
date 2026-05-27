@@ -55,6 +55,13 @@ uniform float far;
 #include "/include/utility/space_conversion.glsl"
 #endif
 
+#if defined HDR_MOD_INSTALLED && defined HDR_ENABLED
+  uniform float HdrGamePeakBrightness;
+  uniform float HdrGamePaperWhiteBrightness;
+  uniform float HdrGameMinimumBrightness; 
+  uniform float HdrUIBrightness;
+#endif
+
 const int debug_text_scale = 2;
 ivec2 debug_text_position = ivec2(0, int(viewHeight) / debug_text_scale);
 
@@ -69,6 +76,11 @@ vec3 min_of(vec3 a, vec3 b, vec3 c, vec3 d, vec3 f) {
 vec3 max_of(vec3 a, vec3 b, vec3 c, vec3 d, vec3 f) {
     return max(a, max(b, max(c, max(d, f))));
 }
+
+// Invertible tonemapping operator (Reinhard)
+vec3 reinhard(vec3 rgb) { return rgb / (rgb + 1.0); }
+
+vec3 reinhard_inverse(vec3 rgb) { return rgb / (1.0 - rgb); }
 
 // FidelityFX contrast-adaptive sharpening filter
 // https://github.com/GPUOpen-Effects/FidelityFX-CAS
@@ -91,16 +103,29 @@ vec3 cas_filter(sampler2D sampler, ivec2 texel, const float sharpness) {
     vec3 h = texelFetch(sampler, texel + ivec2(0, 1), 0).rgb;
     vec3 i = texelFetch(sampler, texel + ivec2(1, 1), 0).rgb;
 
-    // Convert to sRGB before performing CAS
-    a = display_eotf(a);
-    b = display_eotf(b);
-    c = display_eotf(c);
-    d = display_eotf(d);
-    e = display_eotf(e);
-    f = display_eotf(f);
-    g = display_eotf(g);
-    h = display_eotf(h);
-    i = display_eotf(i);
+    #ifdef HDR_ENABLED
+        // Convert to [0,1] range with a reversible tonemap before performing CAS, to avoid clamping and maintain more precision for the filter
+        a = reinhard(a * rec709_to_rec2020);
+        b = reinhard(b * rec709_to_rec2020);
+        c = reinhard(c * rec709_to_rec2020);
+        d = reinhard(d * rec709_to_rec2020);
+        e = reinhard(e * rec709_to_rec2020);
+        f = reinhard(f * rec709_to_rec2020);
+        g = reinhard(g * rec709_to_rec2020);
+        h = reinhard(h * rec709_to_rec2020);
+        i = reinhard(i * rec709_to_rec2020);
+    #else
+        // Convert to sRGB before performing CAS
+        a = display_eotf(a);
+        b = display_eotf(b);
+        c = display_eotf(c);
+        d = display_eotf(d);
+        e = display_eotf(e);
+        f = display_eotf(f);
+        g = display_eotf(g);
+        h = display_eotf(h);
+        i = display_eotf(i);
+    #endif
 
     // Soft min and max. These are 2x bigger (factored out the extra multiply)
     vec3 min_color = min_of(d, e, f, b, h);
@@ -119,7 +144,11 @@ vec3 cas_filter(sampler2D sampler, ivec2 texel, const float sharpness) {
     // w 1 w
     // 0 w 0
     vec3 weight_sum = 1.0 + 4.0 * w;
-    return clamp01((b + d + f + h) * w + e) / weight_sum;
+    #ifdef HDR_ENABLED
+        return display_eotf(reinhard_inverse(clamp01((b + d + f + h) * w + e) / weight_sum) * rec2020_to_rec709);
+    #else
+        return clamp01((b + d + f + h) * w + e) / weight_sum;
+    #endif
 }
 
 void draw_iris_required_error_message() {
@@ -282,8 +311,9 @@ void main() {
         fragment_color = catmull_rom_filter_fast_rgb(colortex0, uv, 0.6);
         fragment_color = display_eotf(fragment_color);
     }
-
-    fragment_color = dither_8bit(fragment_color, bayer16(vec2(texel)));
+    #ifndef HDR_ENABLED
+        fragment_color = dither_8bit(fragment_color, bayer16(vec2(texel)));
+    #endif
 
 #if DEBUG_VIEW == DEBUG_VIEW_SAMPLER
     if (clamp(texel, ivec2(0), ivec2(textureSize(DEBUG_SAMPLER, 0))) == texel) {

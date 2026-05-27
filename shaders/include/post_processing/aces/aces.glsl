@@ -9,6 +9,7 @@
 #include "matrices.glsl"
 #include "tonescales.glsl"
 #include "utility.glsl"
+#include "ssts.glsl"
 
 // Constants
 
@@ -193,6 +194,32 @@ vec3 aces_odt(vec3 rgb_pre) {
     linear_c_v = mix(vec3(luminance), linear_c_v, odt_sat_factor);
 
     return linear_c_v;
+}
+
+/* Output Transform - Rec.2020 (* cd/m^2)
+ *
+ * Summary :
+ * This transform maps ACES onto a Rec.2020 ST.2084 HDR display calibrated
+ * to a D65 white point at * cd/m^2. The assumed observer adapted white is
+ * D65, and the viewing environment is that of a dark surround. Mid-gray
+ * luminance is targeted at 15 cd/m^2.
+ *
+ * Modifications :
+ * Changed input and output color spaces to ACEScg to avoid 3 unnecessary mat3
+ * transformations. The transfer function is applied later in the pipeline.
+ * Do not force a specific max luminance as it can be provided by HDR Mod.
+ * Removed unused dark to dim surround gamma adjustment in HDR. Also removed
+ * white point things as it is unneeded in the shaderpack.
+ */
+vec3 aces_output_transform(vec3 rgb_in, float y_min, float y_mid, float y_max) {
+    TsParams params_default = init_ts_params(y_min, y_max, 0.0);
+    float expShift = log2(inv_ssts(y_mid, params_default)) - log2(0.18);
+    TsParams params = init_ts_params(y_min, y_max, expShift);
+
+    vec3 rgb_pre = rrt_sweeteners(rgb_in);
+    vec3 rgb_post = ssts_f3(rgb_pre, params);
+
+    return y_to_lin_c_v(rgb_post, y_max, y_min);
 }
 
 /*
