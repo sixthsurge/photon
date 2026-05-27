@@ -670,6 +670,13 @@ value.tonemap.tonemap_ozius            = Ozius
 value.tonemap.tonemap_reinhard         = Reinhard
 value.tonemap.tonemap_reinhard_jodie   = Reinhard-Jodie
 
+option.hdr_tonemap                     = HDR Tonemap Operator
+
+value.hdr_tonemap.tonemap_aces_full    = ACES full
+value.hdr_tonemap.tonemap_uncharted_2  = Uncharted 2
+value.hdr_tonemap.tonemap_reinhard     = Reinhard
+value.hdr_tonemap.tonemap_none         = None
+
 # Color Grading
 
 option.GRADE_BRIGHTNESS                = Brightness

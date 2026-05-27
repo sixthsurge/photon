@@ -111,8 +111,8 @@ vec3 reinhard_piecewise_extended(
     extended = min(extended, x_max);
     return mix(x, extended, step(shoulder, x));
 }
-
-vec3 tonemap_reinhard_piecewise_extended(vec3 rgb) {
+#ifdef HDR_ENABLED
+vec3 tonemap_reinhard(vec3 rgb) {
     return sign(rgb)
         * reinhard_piecewise_extended(
                abs(rgb),
@@ -121,7 +121,7 @@ vec3 tonemap_reinhard_piecewise_extended(vec3 rgb) {
                36.0 / HdrGamePaperWhiteBrightness
         );
 }
-
+#endif
 float apply_hable_curve(
     float x,
     float a,
@@ -131,7 +131,8 @@ float apply_hable_curve(
     float e,
     float f
 ) {
-    float numerator = x * (a * x + c * b) + d * e; // x * (a * x + c * b) + d * e
+    float numerator
+        = x * (a * x + c * b) + d * e; // x * (a * x + c * b) + d * e
     float denominator = x * (a * x + b) + d * f; // x * (a * x + b) + d * f
     return (numerator / denominator) - (e / f);
 }
@@ -284,8 +285,8 @@ float hable_find_third_derivative_root(
            - b * b * d * e)
         / (a * a * b * (c - 1.0f));
 
-    float term_mid
-        = 96.0f * de_df * (c * d * f - d * e) / (a * b * (c - 1.0f) * (c - 1.0f));
+    float term_mid = 96.0f * de_df * (c * d * f - d * e)
+        / (a * b * (c - 1.0f) * (c - 1.0f));
 
     float de_df2 = de_df * de_df;
     float de_df3 = de_df2 * de_df;
@@ -293,7 +294,8 @@ float hable_find_third_derivative_root(
     float term_tail
         = 64.0f * de_df3 / (b * b * b * (c - 1.0f) * (c - 1.0f) * (c - 1.0f));
 
-    float tfrac = sqrt_ab * (term_top - term_mid - term_tail) / (8.0f * sqrt_df);
+    float tfrac
+        = sqrt_ab * (term_top - term_mid - term_tail) / (8.0f * sqrt_df);
 
     // (12 a^2 b c d f - 12 a^2 b d e) / (6 (a^3 b c - a^3 b))
     float tmid2_num = 12.0f * a * a * b * c * d * f - 12.0f * a * a * b * d * e;
@@ -353,8 +355,10 @@ HableUncharted2ExtendedConfig hable_create_uncharted2_extended_config(
     return cfg;
 }
 
-HableUncharted2ExtendedConfig
-hable_create_uncharted2_extended_config(float coeffs[6], float white_precompute) {
+HableUncharted2ExtendedConfig hable_create_uncharted2_extended_config(
+    float coeffs[6],
+    float white_precompute
+) {
     float pivot_point = hable_find_third_derivative_root(
         coeffs[0],
         coeffs[1],
@@ -561,8 +565,9 @@ vec3 tonemap_ozius(vec3 rgb) {
     return pow(rgb * rgb * (-2.0 * rgb + 3.0), cr / b);
 }
 
+#ifndef HDR_ENABLED
 vec3 tonemap_reinhard(vec3 rgb) { return rgb / (rgb + 1.0); }
-
+#endif
 vec3 tonemap_reinhard_jodie(vec3 rgb) {
     vec3 reinhard = rgb / (rgb + 1.0);
     return mix(rgb / (dot(rgb, luminance_weights) + 1.0), reinhard, reinhard);
