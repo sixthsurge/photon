@@ -108,8 +108,13 @@ vec3 grade_input(vec3 rgb) {
 // rgb := color in linear rec.709 [0, 1]
 vec3 grade_output(vec3 rgb) {
     // Convert to roughly perceptual RGB for color grading
+    
+    #ifdef HDR_ENABLED
+        rgb = reinhard(rgb);
+    #endif
+    
     rgb = sqrt(rgb);
-
+    
     // HSL color grading inspired by Tech's color grading setup in Lux Shaders
 
     const float orange_sat_boost = GRADE_ORANGE_SAT_BOOST;
@@ -136,7 +141,13 @@ vec3 grade_output(vec3 rgb) {
 
     rgb = gain(rgb, 1.05);
 
-    return sqr(rgb);
+    rgb = sqr(rgb);
+
+    #ifdef HDR_ENABLED
+        return reinhard_inverse(rgb);
+    #else
+        return rgb;
+    #endif
 }
 
 float vignette(vec2 uv) {
@@ -194,8 +205,8 @@ void main() {
 #endif
 #endif
 #ifdef HDR_ENABLED
+    scene_color = grade_output(scene_color);
     scene_color = scene_color * working_to_display_color;
-    // We cannot apply more color grading after an HDR tonemap.
 #else
     scene_color = clamp01(scene_color * working_to_display_color);
     scene_color = grade_output(scene_color);
