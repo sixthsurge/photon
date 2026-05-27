@@ -58,6 +58,11 @@
 #define PHOTONICS_IN_USE
 #endif
 
+// Allow user to disable HDR in config menu, even if HDR mod is installed
+#ifndef PHOTON_HDR_ENABLED
+#undef HDR_ENABLED
+#endif
+
 // Compatibility fixes
 
 #if MC_VERSION < 11700
