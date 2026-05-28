@@ -122,7 +122,33 @@ vec3 tonemap_reinhard(vec3 rgb) {
                36.0 / HdrGamePaperWhiteBrightness
         );
 }
-#endif
+
+vec3 tonemap_lottes_emulate(vec3 rgb) { 
+    const float P = HdrGamePeakBrightness / HdrGamePaperWhiteBrightness;
+    const float w = 20000 / HdrGamePaperWhiteBrightness;
+
+    //midgray change
+    rgb *= 1.2;
+
+    //contrast change
+    rgb = pow(rgb, vec3(1.075));
+
+    //toe
+    const float toe_thres = 360 / 203.f;
+    rgb /= toe_thres;
+    vec3 rgb_back = rgb;
+    bvec3 thres = greaterThan(rgb, vec3(1));
+    rgb = srgb_eotf_hq(rgb);
+    rgb = pow(rgb, vec3(2.2));
+    rgb = mix(rgb, rgb_back, thres);
+    rgb *= toe_thres;
+
+    rgb = reinhard_extended(rgb, w, P);
+    rgb = min(rgb, vec3(P));
+
+    return rgb;
+}
+
 float apply_hable_curve(
     float x,
     float a,
