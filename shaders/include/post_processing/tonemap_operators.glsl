@@ -11,7 +11,8 @@ vec3 tonemap_aces_full(vec3 rgb) {
     rgb = rgb * rec2020_to_ap0;
 
 #ifdef HDR_ENABLED
-    rgb = aces_output_transform(rgb, 0.0001f, 15.0f, HdrGamePeakBrightness)
+    // Trick to allow ACES brightness under control of the paper white.
+    rgb = aces_output_transform(rgb, 0.0001f, 0.11f * HdrGamePaperWhiteBrightness, HdrGamePeakBrightness)
         * HdrGamePeakBrightness / HdrGamePaperWhiteBrightness;
 #else
 
