@@ -58,15 +58,20 @@
 #define PHOTONICS_IN_USE
 #endif
 
-// HDRMod forced define & values for devs
-#ifndef HDR_ENABLED
-#ifdef HDR_ENABLED_ALLOW
-#define HDR_ENABLED
+// Allow user to disable HDR in config menu, even if HDRMod is installed
+#ifndef HDR_ENABLED_ALLOW
+#undef HDR_ENABLED
 #endif
-const float HdrGamePeakBrightness = 1000.f;
-const float HdrGamePaperWhiteBrightness = 203.f;
-const float HdrUIBrightness = 203.f;
-#endif
+
+// // HDRMod forced define & values for devs
+// #ifndef HDR_ENABLED
+// #ifdef HDR_ENABLED_ALLOW
+// #define HDR_ENABLED
+// #endif
+// const float HdrGamePeakBrightness = 1000.f;
+// const float HdrGamePaperWhiteBrightness = 203.f;
+// const float HdrUIBrightness = 203.f;
+// #endif
 
 // Compatibility fixes
 
