@@ -78,8 +78,8 @@ const mat3 rec2020_to_rec709 = rec2020_to_xyz * xyz_to_rec709;
 //   Transfer functions (gamma)
 // ------------------------------
 #ifdef HDR_ENABLED
-    #define display_eotf(x) srgb_eotf(abs(x) * HdrGamePaperWhiteBrightness / HdrUIBrightness) * sign(x)
-    #define display_eotf_inv(x) srgb_eotf_inv(abs(x)) * HdrUIBrightness / HdrGamePaperWhiteBrightness * sign(x)
+    #define display_eotf(x) srgb_eotf_hq_safe(x * HdrGamePaperWhiteBrightness / HdrUIBrightness * working_to_display_color)
+    #define display_eotf_inv(x) (srgb_eotf_inv_hq_safe(x) * HdrUIBrightness / HdrGamePaperWhiteBrightness * display_to_working_color)
 #else
     #define display_eotf srgb_eotf
     #define display_eotf_inv srgb_eotf_inv
@@ -94,6 +94,30 @@ vec3 srgb_eotf_inv(vec3 srgb) { // sRGB -> linear
         * (srgb * (srgb * 0.305306011 + 0.682171111)
            + 0.012522878); // https://chilliant.blogspot.com/2012/08/srgb-approximations-for-hlsl.html
 }
+
+#ifdef HDR_ENABLED
+// For HDR, accurate sRGB gamma is required to maintain peak for output.
+// from https://gamedev.stackexchange.com/questions/92015/optimized-linear-to-srgb-glsl
+vec3 srgb_eotf_hq(vec3 x) { // linear -> sRGB
+    bvec3 cutoff = lessThan(x, vec3(0.0031308));
+    vec3 higher = vec3(1.055) * pow(x, vec3(1.0 / 2.4)) - vec3(0.055);
+    vec3 lower = x * vec3(12.92);
+    return mix(higher, lower, cutoff);
+}
+vec3 srgb_eotf_hq_safe(vec3 x) {
+    return sign(x) * srgb_eotf_hq(abs(x));
+}
+
+vec3 srgb_eotf_inv_hq(vec3 x) { // sRGB -> linear
+    bvec3 cutoff = lessThan(x, vec3(0.04045));
+    vec3 higher = pow((x + vec3(0.055)) / vec3(1.055), vec3(2.4));
+    vec3 lower = x / vec3(12.92);
+    return mix(higher, lower, cutoff);
+}
+vec3 srgb_eotf_inv_hq_safe(vec3 x) {
+    return sign(x) * srgb_eotf_inv_hq(abs(x));
+}
+#endif
 
 // -------------------------------------------------
 //   Transformations between color representations

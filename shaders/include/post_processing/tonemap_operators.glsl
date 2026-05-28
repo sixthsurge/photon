@@ -12,7 +12,12 @@ vec3 tonemap_aces_full(vec3 rgb) {
 
 #ifdef HDR_ENABLED
     // Trick to allow ACES brightness under control of the paper white.
-    rgb = aces_output_transform(rgb, 0.0001f, 0.11f * HdrGamePaperWhiteBrightness, HdrGamePeakBrightness)
+    rgb = aces_output_transform(
+              rgb,
+              0.0001f,
+              0.11f * HdrGamePaperWhiteBrightness,
+              HdrGamePeakBrightness
+          )
         * HdrGamePeakBrightness / HdrGamePaperWhiteBrightness;
 #else
 
@@ -123,21 +128,21 @@ vec3 tonemap_reinhard(vec3 rgb) {
         );
 }
 
-vec3 tonemap_lottes_emulate(vec3 rgb) { 
-    const float P = HdrGamePeakBrightness / HdrGamePaperWhiteBrightness;
-    const float w = 20000 / HdrGamePaperWhiteBrightness;
+vec3 tonemap_lottes_emulate(vec3 rgb) {
+    float P = HdrGamePeakBrightness / HdrGamePaperWhiteBrightness;
+    float w = 20000 / HdrGamePaperWhiteBrightness;
 
-    //midgray change
+    // midgray change
     rgb *= 1.2;
 
-    //contrast change
+    // contrast change
     rgb = pow(rgb, vec3(1.075));
 
-    //toe
-    const float toe_thres = 360 / 203.f;
+    // toe
+    const float toe_thres = 360 / 203.0f;
     rgb /= toe_thres;
     vec3 rgb_back = rgb;
-    bvec3 thres = greaterThan(rgb, vec3(1));
+    bvec3 thres = greaterThan(rgb, vec3(1.0));
     rgb = srgb_eotf_hq(rgb);
     rgb = pow(rgb, vec3(2.2));
     rgb = mix(rgb, rgb_back, thres);

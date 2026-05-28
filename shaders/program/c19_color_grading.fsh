@@ -108,13 +108,8 @@ vec3 grade_input(vec3 rgb) {
 // rgb := color in linear rec.709 [0, 1]
 vec3 grade_output(vec3 rgb) {
     // Convert to roughly perceptual RGB for color grading
-    
-    #ifdef HDR_ENABLED
-        rgb = reinhard(rgb);
-    #endif
-    
     rgb = sqrt(rgb);
-    
+
     // HSL color grading inspired by Tech's color grading setup in Lux Shaders
 
     const float orange_sat_boost = GRADE_ORANGE_SAT_BOOST;
@@ -143,11 +138,7 @@ vec3 grade_output(vec3 rgb) {
 
     rgb = sqr(rgb);
 
-    #ifdef HDR_ENABLED
-        return reinhard_inverse(rgb);
-    #else
-        return rgb;
-    #endif
+    return rgb;
 }
 
 float vignette(vec2 uv) {
@@ -185,6 +176,7 @@ void main() {
     scene_color
         = mix(bloom, scene_color, pow(fog_transmittance, BLOOMY_FOG_INTENSITY));
 #endif
+#endif
 
     scene_color *= exposure;
 
@@ -205,8 +197,12 @@ void main() {
 #endif
 #endif
 #ifdef HDR_ENABLED
+    // TODO: not ideal ramming HDR color into LDR color grade, but it works now
+    scene_color = reinhard(scene_color);
     scene_color = grade_output(scene_color);
-    scene_color = scene_color * working_to_display_color;
+    scene_color = reinhard_inverse(scene_color);
+    // Unlike SDR path, maintain clamped rec2020 for the subsequent colorspace agnostic passes until final to prevent negative values in FXAA and other passes from breaking assumptions, then convert to display space at the end.
+    scene_color = max(scene_color, vec3(0));
 #else
     scene_color = clamp01(scene_color * working_to_display_color);
     scene_color = grade_output(scene_color);

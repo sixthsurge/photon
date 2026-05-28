@@ -105,15 +105,15 @@ vec3 cas_filter(sampler2D sampler, ivec2 texel, const float sharpness) {
 
     #ifdef HDR_ENABLED
         // Convert to [0,1] range with a reversible tonemap before performing CAS, to avoid clamping and maintain more precision for the filter
-        a = reinhard(a * rec709_to_rec2020);
-        b = reinhard(b * rec709_to_rec2020);
-        c = reinhard(c * rec709_to_rec2020);
-        d = reinhard(d * rec709_to_rec2020);
-        e = reinhard(e * rec709_to_rec2020);
-        f = reinhard(f * rec709_to_rec2020);
-        g = reinhard(g * rec709_to_rec2020);
-        h = reinhard(h * rec709_to_rec2020);
-        i = reinhard(i * rec709_to_rec2020);
+        a = reinhard(a);
+        b = reinhard(b);
+        c = reinhard(c);
+        d = reinhard(d);
+        e = reinhard(e);
+        f = reinhard(f);
+        g = reinhard(g);
+        h = reinhard(h);
+        i = reinhard(i);
     #else
         // Convert to sRGB before performing CAS
         a = display_eotf(a);
@@ -145,7 +145,7 @@ vec3 cas_filter(sampler2D sampler, ivec2 texel, const float sharpness) {
     // 0 w 0
     vec3 weight_sum = 1.0 + 4.0 * w;
     #ifdef HDR_ENABLED
-        return display_eotf(reinhard_inverse(clamp01((b + d + f + h) * w + e) / weight_sum) * rec2020_to_rec709);
+        return display_eotf(reinhard_inverse(clamp01((b + d + f + h) * w + e) / weight_sum));
     #else
         return clamp01((b + d + f + h) * w + e) / weight_sum;
     #endif
