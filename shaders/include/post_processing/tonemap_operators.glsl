@@ -101,10 +101,7 @@ vec3 tonemap_lottes_emulate(vec3 rgb) {
     float w = 20000 / HdrGamePaperWhiteBrightness;
 
     // midgray change
-    rgb *= 1.2;
-
-    // contrast change
-    rgb = pow(rgb, vec3(1.075));
+    rgb *= 1.15;
 
     // toe
     const float toe_thres = 360 / 203.0f;
