@@ -96,25 +96,27 @@ vec3 tonemap_reinhard(vec3 rgb) {
         );
 }
 
-vec3 tonemap_lottes_emulate(vec3 rgb) {
-    float P = HdrGamePeakBrightness / HdrGamePaperWhiteBrightness;
-    float w = 20000 / HdrGamePaperWhiteBrightness;
+// Lottes extension, specifically for Photon's coeffs
+vec3 tonemap_lottes_photon_hdr(vec3 rgb) {
+    float p = HdrGamePeakBrightness / HdrGamePaperWhiteBrightness;
 
-    // midgray change
-    rgb *= 1.15;
+    // Clamp rec2020
+    rgb = max(vec3(0.0), rgb); 
 
-    // toe
-    const float toe_thres = 360 / 203.0f;
-    rgb /= toe_thres;
-    vec3 rgb_back = rgb;
-    bvec3 thres = greaterThan(rgb, vec3(1.0));
-    rgb = srgb_eotf_hq(rgb);
-    rgb = pow(rgb, vec3(2.2));
-    rgb = mix(rgb, rgb_back, thres);
-    rgb *= toe_thres;
+    // Extension: piecewise steal toe and midgray change, but ignore shoulder
+    // https://www.desmos.com/calculator/r6mxnnrv8y
+    vec3 lower = tonemap_lottes(rgb);
+    vec3 higher = rgb + 0.058632;
+    bvec3 thres = greaterThan(rgb, vec3(0.268747));
+    rgb = mix(lower, higher, thres);
 
-    rgb = reinhard_extended(rgb, w, P);
-    rgb = min(rgb, vec3(P));
+    // New shoulder
+    rgb = reinhard_piecewise_extended(
+        rgb, //in
+        42.f,
+        p, //peak
+        0.268747 //start at cutoff
+    ); 
 
     return rgb;
 }
