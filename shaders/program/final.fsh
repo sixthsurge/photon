@@ -368,4 +368,8 @@ void main() {
 #endif
 }
 
+#ifdef HDR_ENABLED
+#include "/include/buffers_hdr.glsl"
+#else
 #include "/include/buffers.glsl"
+#endif

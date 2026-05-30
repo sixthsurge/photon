@@ -1,7 +1,7 @@
 /*
 (included by final.fsh)
 
-const int colortex0Format  = R11F_G11F_B10F; // full res    | vanilla sun and moon (skytextured -> d4), scene color (d4 -> temporal), bloom tiles (c5 -> c14), final color (c14 -> final)
+const int colortex0Format  = RGBA16F;        // full res    | vanilla sun and moon (skytextured -> d4), scene color (d4 -> temporal), bloom tiles (c5 -> c14), final color (c14 -> final)
 const int colortex1Format  = RGBA16;         // full res    | gbuffer data 0 (solid -> c1), TAAU min color for AABB clipping (c3 -> c4)
 const int colortex2Format  = RGBA16;         // full res    | gbuffer data 1 (solid -> c1), TAAU max color for AABB clipping (c3 -> c4)
 const int colortex3Format  = RGBA8;          // full res    | OF damage overlay/enchantment glint (solid -> d4), refraction data (translucent -> c1), bloomy fog amount (c1 -> c14)
