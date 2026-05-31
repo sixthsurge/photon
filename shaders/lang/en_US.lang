@@ -833,6 +833,6 @@ value.hdr_tonemap.tonemap_aces_full            = ACES Full
 value.hdr_tonemap.tonemap_uncharted_2          = Uncharted 2
 value.hdr_tonemap.tonemap_reinhard             = Reinhard Piecewise Extended
 value.hdr_tonemap.tonemap_gt                   = Gran Turismo Sport
-value.hdr_tonemap.tonemap_lottes_emulate       = Lottes Emulated
+value.hdr_tonemap.tonemap_lottes_photon_hdr    = Lottes Extended (Photon Coeffs)
 value.hdr_tonemap.tonemap_none                 = None
 
