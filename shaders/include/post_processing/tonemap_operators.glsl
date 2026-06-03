@@ -113,7 +113,7 @@ vec3 tonemap_lottes_photon_hdr(vec3 rgb) {
     // New shoulder
     rgb = reinhard_piecewise_extended(
         rgb, //in
-        42.f, //white clip
+        100.f, //white clip
         p, //peak
         0.268747 //start at cutoff
     ); 
