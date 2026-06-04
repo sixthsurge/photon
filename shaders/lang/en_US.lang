@@ -823,8 +823,6 @@ option.PHOTONICS_RESTIR_COMBINED_GI.comment = Whether Gi should be ran through R
 # HDRMod
 screen.hdrmod                                  = HDRMod
 screen.hdrmod.comment                          = Native HDR output via rrtt's HDRMod
-option.HDR_ENABLED_ALLOW                       = Allow HDR
-option.HDR_ENABLED_ALLOW.comment               = Disable to force SDR path, even with the mod installed.
 option.HDR_USE_FP16                            = Use FP16 for Final Color Buffer
 option.HDR_USE_FP16.comment                    = Improves precision and reduces banding, but may affect performance.
 option.hdr_tonemap                             = HDR Tonemap Operator
