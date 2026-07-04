@@ -1,0 +1,360 @@
+#define STRONG_WHITE_LIGHT_ID `*10032`
+#define MEDIUM_WHITE_LIGHT_ID `*10033`
+#define WEAK_WHITE_LIGHT_ID `*10034`
+#define STRONG_GOLDEN_LIGHT_ID `*10035`
+#define MEDIUM_GOLDEN_LIGHT_ID `*10036`
+#define WEAK_GOLDEN_LIGHT_ID `*10037`
+#define REDSTONE_COMPONENTS_ID `*10038`
+#define LAVA_ID `*10039`
+#define MEDIUM_ORANGE_LIGHT_ID `*10040`
+#define BREWING_STAND_ID `*10041`
+#define JACK_O_LANTERN_ID `*10042`
+#define SOUL_LIGHTS_ID `*10043`
+#define BEACON_ID `*10044`
+#define END_PORTAL_FRAME_ID `*10045`
+#define SCULK_ID `*10046`
+#define PINK_GLOW_ID `*10047`
+#define SEA_PICKLE_ID `*10048`
+#define NETHER_PLANTS_ID `*10049`
+#define CANDLES_ID `*10050`
+#define OCHRE_FROGLIGHT_ID `*10051`
+#define VERDANT_FROGLIGHT_ID `*10052`
+#define PEARLESCENT_FROGLIGHT_ID `*10053`
+#define ENCHANTING_TABLE_ID `*10054`
+#define AMETHYST_CLUSTER_ID `*10055`
+#define CALIBRATED_SCULK_SENSOR_ID `*10056`
+#define ACTIVE_SCULK_SENSOR_ID `*10057`
+#define REDSTONE_BLOCK_ID `*10058`
+#define OPEN_EYEBLOSSOM_ID `*10059`
+#define COPPER_LIGHTS_ID `*10060`
+#define COPPER_BULBS_ID `*10061`
+#define NETHER_PORTAL_ID `*10062`
+#define END_PORTAL_ID `*10063`
+
+
+{
+  "defines": {
+    "colors": {
+      "strong_white_light": "#ffffff",
+      "medium_white_light": "#ffffff",
+      "weak_white_light": "#ffffff",
+      "ochre_froglight": "#ffa54c",
+      "brewing_stand": "#ffa026",
+      "medium_golden_light": "#ff914c",
+      "weak_golden_light": "#ff914c",
+      "copper_bulbs": "#ff914c",
+      "strong_golden_light": "#ff8c44",
+      "nether_plants": "#ff7f3f",
+      "open_eyeblossom": "#ff7f3f",
+      "medium_orange_light": "#ff7219",
+      "lava": "#ff6019",
+      "redstone_components": "#ff2d19",
+      "redstone_block": "#ff2d19",
+      "verdant_froglight": "#dbff70",
+      "copper_lights": "#a6fec4",
+      "sculk": "#bfffd3",
+      "end_portal_frame": "#bfffd3",
+      "active_sculk_sensor": "#bfffd3",
+      "sea_pickle": "#bfff7f",
+      "pearlescent_froglight": "#bf70ff",
+      "amethyst_cluster": "#bf70ff",
+      "calibrated_sculk_sensor": "#bf70ff",
+      "pink_glow": "#9919ff",
+      "enchanting_table": "#9919ff",
+      "nether_portal": "#9919ff",
+      "soul_lights": "#72baff",
+      "beacon": "#72baff"
+    },
+    "intensities": {
+      "strong_white_light": 257,
+      "medium_white_light": 128,
+      "weak_white_light": 10,
+      "ochre_froglight": 171,
+      "brewing_stand": 86,
+      "medium_golden_light": 171,
+      "weak_golden_light": 128,
+      "bright_golden_light": 257,
+      "copper_bulbs": 171,
+      "strong_golden_light": 300,
+      "nether_plants": 86,
+      "open_eyeblossom": 64,
+      "medium_orange_light": 193,
+      "lava": 150,
+      "redstone_components": 107,
+      "redstone_block": 71,
+      "verdant_froglight": 171,
+      "copper_lights": 83,
+      "sculk": 64,
+      "end_portal_frame": 21,
+      "active_sculk_sensor": 128,
+      "sea_pickle": 21,
+      "pearlescent_froglight": 171,
+      "amethyst_cluster": 86,
+      "calibrated_sculk_sensor": 86,
+      "pink_glow": 53,
+      "enchanting_table": 43,
+      "nether_portal": 257,
+      "soul_lights": 128,
+      "beacon": 300
+    },
+    "radii": {
+      "default": 1.1
+    },
+    "falloffs": {
+      "default": 1
+    }
+  },
+  "lights": {
+    "minecraft": {
+      "radius": "*default",
+      "falloff": "*default",
+      "is_traced": true,
+      "overrides": {
+        "strong_white_light": {
+          "color": "*strong_white_light",
+          "intensity": "*strong_white_light",
+          "blocks": [
+            STRONG_WHITE_LIGHT_ID
+          ]
+        },
+        "medium_white_light": {
+          "color": "*medium_white_light",
+          "intensity": "*medium_white_light",
+          "blocks": [
+            MEDIUM_WHITE_LIGHT_ID
+          ]
+        },
+        "weak_white_light": {
+          "color": "*weak_white_light",
+          "intensity": "*weak_white_light",
+          "blocks": [
+            WEAK_WHITE_LIGHT_ID
+          ]
+        },
+        "strong_golden_light": {
+          "color": "*strong_golden_light",
+          "intensity": "*strong_golden_light",
+          "blocks": [
+            STRONG_GOLDEN_LIGHT_ID
+          ]
+        },
+        "medium_golden_light": {
+          "color": "*medium_golden_light",
+          "intensity": "*medium_golden_light",
+          "blocks": [
+            MEDIUM_GOLDEN_LIGHT_ID
+          ]
+        },
+        "weak_golden_light": {
+          "color": "*weak_golden_light",
+          "intensity": "*weak_golden_light",
+          "blocks": [
+            WEAK_GOLDEN_LIGHT_ID
+          ]
+        },
+        "redstone_components": {
+          "color": "*redstone_components",
+          "intensity": "*redstone_components",
+          "blocks": [
+            REDSTONE_COMPONENTS_ID
+          ]
+        },
+        "lava": {
+          "color": "*lava",
+          "intensity": "*lava",
+          "blocks": [
+            LAVA_ID
+          ]
+        },
+        "medium_orange_light": {
+          "color": "*medium_orange_light",
+          "intensity": "*medium_orange_light",
+          "blocks": [
+            MEDIUM_ORANGE_LIGHT_ID
+          ]
+        },
+        "brewing_stand": {
+          "color": "*brewing_stand",
+          "intensity": "*brewing_stand",
+          "blocks": [
+            BREWING_STAND_ID
+          ]
+        },
+        "bright_golden_light": {
+          "color": "*medium_golden_light",
+          "intensity": "*bright_golden_light",
+          "blocks": [
+            JACK_O_LANTERN_ID
+          ]
+        },
+        "soul_lights": {
+          "color": "*soul_lights",
+          "intensity": "*soul_lights",
+          "blocks": [
+            SOUL_LIGHTS_ID
+          ]
+        },
+        "beacon": {
+          "color": "*beacon",
+          "intensity": "*beacon",
+          "blocks": [
+            BEACON_ID
+          ]
+        },
+        "end_portal_frame": {
+          "color": "*end_portal_frame",
+          "intensity": "*end_portal_frame",
+          "blocks": [
+            END_PORTAL_FRAME_ID
+          ]
+        },
+        "sculk": {
+          "color": "*sculk",
+          "intensity": "*sculk",
+          "blocks": [
+            SCULK_ID
+          ],
+          "overrides": {
+            "sculk_not_traced": {
+              "priority": 100,
+              "is_traced": false,
+              "blocks": [
+                {
+                  "value": "minecraft:sculk_vein",
+                  "priority": 100
+                },
+                {
+                  "value": "minecraft:sculk",
+                  "priority": 100
+                }
+              ]
+            }
+          }
+        },
+        "pink_glow": {
+          "color": "*pink_glow",
+          "intensity": "*pink_glow",
+          "blocks": [
+            PINK_GLOW_ID
+          ]
+        },
+        "sea_pickle": {
+          "color": "*sea_pickle",
+          "intensity": "*sea_pickle",
+          "blocks": [
+            SEA_PICKLE_ID
+          ]
+        },
+        "nether_plants": {
+          "color": "*nether_plants",
+          "intensity": "*nether_plants",
+          "blocks": [
+            NETHER_PLANTS_ID
+          ]
+        },
+        "candles": {
+          "color": "*medium_golden_light",
+          "intensity": "*medium_golden_light",
+          "blocks": [
+            CANDLES_ID
+          ]
+        },
+        "ochre_froglight": {
+          "color": "*ochre_froglight",
+          "intensity": "*ochre_froglight",
+          "blocks": [
+            OCHRE_FROGLIGHT_ID
+          ]
+        },
+        "verdant_froglight": {
+          "color": "*verdant_froglight",
+          "intensity": "*verdant_froglight",
+          "blocks": [
+            VERDANT_FROGLIGHT_ID
+          ]
+        },
+        "pearlescent_froglight": {
+          "color": "*pearlescent_froglight",
+          "intensity": "*pearlescent_froglight",
+          "blocks": [
+            PEARLESCENT_FROGLIGHT_ID
+          ]
+        },
+        "enchanting_table": {
+          "color": "*enchanting_table",
+          "intensity": "*enchanting_table",
+          "blocks": [
+            ENCHANTING_TABLE_ID
+          ]
+        },
+        "amethyst_cluster": {
+          "color": "*amethyst_cluster",
+          "intensity": "*amethyst_cluster",
+          "blocks": [
+            AMETHYST_CLUSTER_ID
+          ]
+        },
+        "calibrated_sculk_sensor": {
+          "color": "*calibrated_sculk_sensor",
+          "intensity": "*calibrated_sculk_sensor",
+          "blocks": [
+            CALIBRATED_SCULK_SENSOR_ID
+          ]
+        },
+        "active_sculk_sensor": {
+          "color": "*active_sculk_sensor",
+          "intensity": "*active_sculk_sensor",
+          "blocks": [
+            ACTIVE_SCULK_SENSOR_ID
+          ]
+        },
+        "redstone_block": {
+          "color": "*redstone_block",
+          "intensity": "*redstone_block",
+          "blocks": [
+            REDSTONE_BLOCK_ID
+          ]
+        },
+        "open_eyeblossom": {
+          "color": "*open_eyeblossom",
+          "intensity": "*open_eyeblossom",
+          "blocks": [
+            OPEN_EYEBLOSSOM_ID
+          ]
+        },
+        "copper_lights": {
+          "color": "*copper_lights",
+          "intensity": "*copper_lights",
+          "blocks": [
+            COPPER_LIGHTS_ID
+          ]
+        },
+        "copper_bulbs": {
+          "color": "*copper_bulbs",
+          "intensity": "*copper_bulbs",
+          "blocks": [
+            COPPER_BULBS_ID
+          ]
+        },
+        "nether_portal": {
+          "color": "*nether_portal",
+          "intensity": "*nether_portal",
+          "blocks": [
+            NETHER_PORTAL_ID
+          ]
+        },
+        "disabled": {
+          "color": "#000000",
+          "intensity": 0,
+          "blocks": [
+            "minecraft:end_portal_frame",
+            "minecraft:respawn_anchor",
+            "minecraft:dragon_egg",
+            "minecraft:vault",
+            { "value": "minecraft:redstone_wire[power=0]", "priority": 100 }
+          ]
+        }
+      }
+    }
+  }
+}
