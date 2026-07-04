@@ -206,4 +206,92 @@ vec2 get_water_parallax_coord(
     );
 }
 
+// Water trail - continuous ripples following player through water
+// Creates chain of wave emitters along the player's path
+#ifdef WATER_TRAIL
+
+// Animated concentric ripples from a point source
+float water_trail_ripples(float dist, float time, float max_dist) {
+    if (dist > max_dist || dist < 0.08) return 0.0;
+
+    // Concentric rings - moderate animation speed
+    float ripple = 0.0;
+    ripple += sin(dist * 6.0  - time * 3.0) * 0.50;
+    ripple += sin(dist * 10.0 - time * 2.5) * 0.30;
+    ripple += sin(dist * 15.0 - time * 3.5) * 0.20;
+
+    // Concentrated near source, fades toward max radius
+    float atten = 1.0 / (1.0 + dist * 0.7)
+                * smoothstep(max_dist, max_dist * 0.25, dist)
+                * smoothstep(0.08, 0.30, dist);
+
+    return ripple * atten;
+}
+
+// Apply trail ripples from a single source point onto the water normal
+// Water detection is handled by Y proximity check in the main shader
+vec3 apply_water_trail_at(
+    vec3 normal_tangent,
+    vec3 world_pos,
+    vec3 source_pos,
+    float strength,
+    float max_dist,
+    float time
+) {
+    vec2 delta = world_pos.xz - source_pos.xz;
+    float dist = length(delta);
+    float y_diff = abs(world_pos.y - source_pos.y);
+
+    if (dist < max_dist && dist > 0.08 && y_diff < 20.0) {
+        float y_factor = smoothstep(20.0, 1.0, y_diff);
+        float ripple = water_trail_ripples(dist, time * WATER_TRAIL_SPEED, max_dist);
+
+        vec2 radial = delta / dist;
+        normal_tangent.xy -= radial * ripple * strength * y_factor;
+    }
+
+    return normal_tangent;
+}
+
+// Splash: single expanding ring that decays over time
+vec3 apply_water_splash(
+    vec3 normal_tangent,
+    vec3 world_pos,
+    vec3 splash_pos,
+    float splash_time,
+    float splash_velocity,
+    float strength,
+    float max_dist
+) {
+    vec2 delta = world_pos.xz - splash_pos.xz;
+    float dist = length(delta);
+    float y_diff = abs(world_pos.y - splash_pos.y);
+
+    if (dist > max_dist || y_diff > 2.0) return normal_tangent;
+
+    float elapsed = frameTimeCounter - splash_time;
+    if (elapsed < 0.0 || elapsed > 6.0) return normal_tangent;
+
+    // Ring expands outward over time
+    float ring_pos = elapsed * 1.8;
+    float ring_width = 0.4 + elapsed * 0.15;
+
+    // Ring shape: peaks at ring_pos, width grows with time
+    float ring = exp(-0.5 * pow((dist - ring_pos) / ring_width, 2.0));
+
+    // Intensity from impact velocity + decay over time
+    float impact_str = 0.3 + 0.7 * smoothstep(2.0, 15.0, abs(splash_velocity));
+    float decay = exp(-elapsed * 0.7);
+
+    // Concentric waves within the ring
+    float wave = sin(dist * 8.0 - elapsed * 4.0) * ring * decay * impact_str;
+
+    vec2 radial = delta / max(dist, 0.1);
+    normal_tangent.xy -= radial * wave * strength * smoothstep(2.0, 0.0, y_diff);
+
+    return normal_tangent;
+}
+
+#endif
+
 #endif // INCLUDE_MISC_WATER_NORMAL
