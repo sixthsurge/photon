@@ -128,6 +128,13 @@ Material get_water_material(
 void voxy_emitFragment(VoxyFragmentParameters parameters) {
     vec2 coord = gl_FragCoord.xy * view_pixel_size * rcp(taau_render_scale);
 
+    // Discard if vanilla opaque geometry is in front of this fragment, so
+    // Voxy translucent doesn't paint over vanilla entities/glints in
+    // colortex13.
+    if (texelFetch(depthtex1, ivec2(gl_FragCoord.xy), 0).x < 1.0) {
+        discard;
+    }
+
     // Get the depth of the solid layer behind this fragment (used for edge
     // highlight effect)
 
