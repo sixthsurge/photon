@@ -35,7 +35,7 @@ mat2x3 air_fog_analytic(
     float skylight,
     float shadow
 ) {
-#ifdef LOD_MOD_ACTIVE
+#ifdef LOD_MOD_ACTIVE && !defined PROGRAM_DEFERRED0
     float fog_end = float(lod_render_distance);
 #else
     float fog_end = far;
