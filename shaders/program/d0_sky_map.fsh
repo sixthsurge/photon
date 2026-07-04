@@ -10,6 +10,7 @@
 */
 
 #include "/include/global.glsl"
+#undef LOD_MOD_ACTIVE
 
 layout(location = 0) out vec3 sky_map;
 
