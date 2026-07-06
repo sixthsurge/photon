@@ -606,7 +606,6 @@ const float wetnessHalflife         = 70.0;
 
 // HDRMod settings
   #define hdr_tonemap tonemap_lottes_photon_hdr // [tonemap_lottes_photon_hdr tonemap_uncharted_2 tonemap_reinhard tonemap_aces_full tonemap_none]
-  #define HDR_ENABLED_ALLOW
   #define HDR_USE_FP16
 
 // The settings parser only detects boolean options which are used with
