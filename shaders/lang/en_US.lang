@@ -672,6 +672,13 @@ value.tonemap.tonemap_ozius            = Ozius
 value.tonemap.tonemap_reinhard         = Reinhard
 value.tonemap.tonemap_reinhard_jodie   = Reinhard-Jodie
 
+option.hdr_tonemap                     = HDR Tonemap Operator
+
+value.hdr_tonemap.tonemap_aces_full    = ACES full
+value.hdr_tonemap.tonemap_uncharted_2  = Uncharted 2
+value.hdr_tonemap.tonemap_reinhard     = Reinhard
+value.hdr_tonemap.tonemap_none         = None
+
 # Color Grading
 
 option.GRADE_BRIGHTNESS                = Brightness
@@ -815,4 +822,17 @@ option.PHOTONICS_RESTIR_SOFT_SHADOWS      = Soft Shadows
 option.PHOTONICS_RESTIR_COMBINED_GI       = Include Skylight GI
 option.PHOTONICS_RESTIR_COMBINED_GI.comment = Whether Gi should be ran through ReSTIR's denoiser instead of its usual path. \nResults in much sharper Gi, at the cost of performance.
 
+# HDRMod
+screen.hdrmod                                  = HDRMod
+screen.hdrmod.comment                          = Native HDR output via rrtt's HDRMod
+option.HDR_USE_FP16                            = Use 16bit Color Buffer
+option.HDR_USE_FP16.comment                    = Upgrade color buffer from 10/11bit to 16bit which improves precision and reduces banding at a potential performance cost.
+option.hdr_tonemap                             = HDR Tonemap Operator
+option.hdr_tonemap.comment                     = Choose the algorithm to compress HDR values for display.
+value.hdr_tonemap.tonemap_aces_full            = ACES Full
+value.hdr_tonemap.tonemap_uncharted_2          = Uncharted 2
+value.hdr_tonemap.tonemap_reinhard             = Reinhard Piecewise Extended
+value.hdr_tonemap.tonemap_gt                   = Gran Turismo Sport
+value.hdr_tonemap.tonemap_lottes_photon_hdr    = Lottes Extended (Photon Coeffs)
+value.hdr_tonemap.tonemap_none                 = None
 

@@ -605,6 +605,10 @@ const float wetnessHalflife         = 70.0;
   #define PHOTONICS_RESTIR_SOFT_SHADOWS
 //#define PHOTONICS_RESTIR_COMBINED_GI
 
+// HDRMod settings
+  #define hdr_tonemap tonemap_lottes_photon_hdr // [tonemap_lottes_photon_hdr tonemap_uncharted_2 tonemap_reinhard tonemap_aces_full tonemap_none]
+  #define HDR_USE_FP16
+
 // The settings parser only detects boolean options which are used with
 // #ifdef; it doesn't look for #if defined or other settings usages (e.g in
 // shaders.properties) so these are "decoy" usages of various settings so
@@ -659,6 +663,9 @@ const float wetnessHalflife         = 70.0;
 #endif
 
 #ifdef PHOTONICS_RESTIR_SOFT_SHADOWS
+#endif
+
+#ifdef HDR_USE_FP16
 #endif
 
 #if MC_VERSION > 12111
