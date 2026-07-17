@@ -671,4 +671,8 @@ const float wetnessHalflife         = 70.0;
   #define ATMOSPHERE_RAIN_DESATURATION_INTENSITY 0.0
 #endif
 
+#ifndef ATMOSPHERE_SATURATION_BOOST
+  #define ATMOSPHERE_SATURATION_BOOST_INTENSITY 0.0
+#endif
+
 #endif // SETTINGS_INCLUDED
