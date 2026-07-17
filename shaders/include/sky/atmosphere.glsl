@@ -111,8 +111,7 @@ vec3 atmosphere_post_processing(vec3 atmosphere) {
     atmosphere = mix(
         vec3(dot(atmosphere, luminance_weights_rec2020)),
         atmosphere,
-        ATMOSPHERE_SATURATION_BOOST_INTENSITY
-            * atmosphere_saturation_boost_amount
+        (1 + ATMOSPHERE_SATURATION_BOOST_INTENSITY * atmosphere_saturation_boost_amount)
             * (1 - rainStrength * ATMOSPHERE_RAIN_DESATURATION_INTENSITY)
     );
 
