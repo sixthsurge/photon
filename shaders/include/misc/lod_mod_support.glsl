@@ -39,6 +39,7 @@ uniform vec4 combined_projection_matrix_inverse_3;
 #define combined_depth_tex colortex15
 #define lod_depth_tex dhDepthTex
 #define lod_depth_tex_solid dhDepthTex1
+#define lod_depth_tex_shading lod_depth_tex
 #define lod_depth_tex_scale taau_render_scale
 #define lod_projection_matrix dhProjection
 #define lod_projection_matrix_inverse dhProjectionInverse
@@ -112,6 +113,7 @@ mat4 combined_projection_matrix_inverse = mat4(
 #define combined_depth_tex colortex15
 #define lod_depth_tex vxDepthTexTrans
 #define lod_depth_tex_solid vxDepthTexOpaque
+#define lod_depth_tex_shading lod_depth_tex_solid
 #define lod_depth_tex_scale 1.0
 #define lod_projection_matrix vxProj
 #define lod_projection_matrix_inverse vxProjInv
