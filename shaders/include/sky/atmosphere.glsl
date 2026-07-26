@@ -107,12 +107,12 @@ vec3 atmosphere_mie_phase_moon(float nu) {
 
 // Post-processing applied to the atmosphere color
 vec3 atmosphere_post_processing(vec3 atmosphere) {
-    // Atmosphere saturation boost
+    // Atmosphere saturation boost and rain saturation influence
     atmosphere = mix(
         vec3(dot(atmosphere, luminance_weights_rec2020)),
         atmosphere,
-        ATMOSPHERE_SATURATION_BOOST_INTENSITY
-            * atmosphere_saturation_boost_amount
+        (1 + ATMOSPHERE_SATURATION_BOOST_INTENSITY * atmosphere_saturation_boost_amount)
+            * (1 - rainStrength * ATMOSPHERE_RAIN_DESATURATION_INTENSITY)
     );
 
     return atmosphere;
