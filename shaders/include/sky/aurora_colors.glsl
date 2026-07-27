@@ -5,59 +5,48 @@
 
 // [0] - bottom color
 // [1] - top color
+// [2] - bottom color amount
 mat2x3 get_aurora_colors() {
     const mat2x3[] aurora_colors = mat2x3[](
-        mat2x3(
-            vec3(0.00, 1.00, 0.25), // green
-            vec3(0.50, 0.70, 1.00) // blue
+        mat2x3(                                     
+            vec3(0.85, 0.28, 1.00), // purple
+            vec3(0.00, 1.00, 0.04) // green
         ),
-        mat2x3(
-            vec3(0.00, 1.00, 0.25), // green
-            vec3(0.50, 0.70, 1.00) // blue
+        mat2x3(                                     // Inspired by Euphoria Patches
+            vec3(0.7, 1.00, 0.85), // light cyan
+            vec3(1.00, 0.55, 0.95) // dull magenta
         ),
-        mat2x3(
-            vec3(1.00, 0.00, 0.00), // red
-            vec3(1.00, 0.50, 0.70) // purple
+        mat2x3(                                     // Inspired by Euphoria Patches
+            vec3(0.35, 0.4, 1.00), // light blue
+            vec3(0.35, 0.4, 1.00) // light blue
         ),
-        mat2x3(
-            vec3(1.00, 0.25, 1.00), // magenta
-            vec3(0.25, 0.25, 1.00) // deep blue
+        mat2x3(                                     // Inspired by Euphoria Patches
+            vec3(0.58, 1.0, 0.58), // light green
+            vec3(0.4, 0.6, 0.4) // gray light green
         ),
-        mat2x3(
-            vec3(1.00, 0.50, 1.00), // purple
-            vec3(0.50, 0.70, 1.00) // blue
+        mat2x3(                                     // Inspired by Euphoria Patches
+            vec3(1, 0.18, 0.15), // red
+            vec3(0.12, 0.9, 0.9) // cyan
         ),
-        mat2x3(
-            vec3(1.00, 0.50, 1.00), // purple
-            vec3(0.50, 0.70, 1.00) // blue
+        mat2x3(                                     
+            vec3(0.2, 0.76, 0.8), // cyan
+            vec3(0.7, 0.04, 1.00) // deep purple
         ),
-        mat2x3(
-            vec3(1.00, 0.10, 0.00), // red
-            vec3(1.00, 1.00, 0.25) // yellow
+        mat2x3(                                     
+            vec3(0.29, 1.0, 0.32), // light green
+            vec3(1.15, 0.1, 0.15) // red
         ),
-        mat2x3(
-            vec3(1.00, 1.00, 1.00), // white
-            vec3(1.00, 0.00, 0.00) // red
+        mat2x3(                                     
+            vec3(0.08, 0.4, 1.0), // electric blue
+            vec3(1, 0.16, 0.23) // deep pink
         ),
-        mat2x3(
-            vec3(1.00, 1.00, 0.00), // yellow
-            vec3(0.10, 0.50, 1.00) // blue
+        mat2x3(                                     
+            vec3(0.29, 1.0, 0.32), // light green
+            vec3(1, 0.11, 0.16) // deep pink
         ),
-        mat2x3(
-            vec3(1.00, 0.25, 1.00), // magenta
-            vec3(0.00, 1.00, 0.25) // green
-        ),
-        mat2x3(
-            vec3(1.00, 0.70, 1.00) * 1.2, // pink
-            vec3(0.90, 0.30, 0.90) // purple
-        ),
-        mat2x3(
-            vec3(0.00, 1.00, 0.25), // green
-            vec3(0.90, 0.30, 0.90) // purple
-        ),
-        mat2x3(
-            vec3(2.00, 0.80, 0.00), // orange
-            vec3(1.00, 0.50, 0.00) // orange
+        mat2x3(                                     
+            vec3(0.9, 0.65, 0.05), // orange
+            vec3(0.9, 0.105, 0.0) // burnt orange
         )
     );
 
