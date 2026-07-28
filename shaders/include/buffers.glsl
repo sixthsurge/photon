@@ -47,3 +47,10 @@ const bool colortex16Clear = true;
 const vec4 colortex16ClearColor = vec4(0.0, 0.0, 0.0, 0.0);
 #endif
 */
+
+#if defined HDR_ENABLED && defined HDR_USE_FP16
+/*
+// Override format when HDR is enabled and HDR_USE_FP16 is defined. Improves precision and reduces banding, but may affect performance.
+const int colortex0Format  = RGBA16F;        // full res    | vanilla sun and moon (skytextured -> d4), scene color (d4 -> temporal), bloom tiles (c5 -> c14), final color (c14 -> final)
+*/
+#endif

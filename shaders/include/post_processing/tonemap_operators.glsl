@@ -4,14 +4,31 @@
 #include "/include/post_processing/aces/aces.glsl"
 #include "/include/utility/color.glsl"
 
+#ifdef HDR_ENABLED
+#include "/include/post_processing/hable.glsl"
+#include "/include/post_processing/reinhard_piecewise_extended.glsl"
+#endif
+
 // ACES RRT and ODT
 vec3 tonemap_aces_full(vec3 rgb) {
     rgb *= 1.6; // Match the exposure to the RRT
 
     rgb = rgb * rec2020_to_ap0;
 
+#ifdef HDR_ENABLED
+    // Trick to allow ACES brightness under control of the paper white.
+    rgb = aces_output_transform(
+              rgb,
+              0.0001f,
+              0.11f * HdrGamePaperWhiteBrightness,
+              HdrGamePeakBrightness
+          )
+        * HdrGamePeakBrightness / HdrGamePaperWhiteBrightness;
+#else
+
     rgb = aces_rrt(rgb);
     rgb = aces_odt(rgb);
+#endif
 
     return rgb * ap1_to_rec2020;
 }
@@ -68,6 +85,71 @@ vec3 tonemap_lottes(vec3 rgb) {
     return pow(rgb, a) / (pow(rgb, a * d) * b + c);
 }
 
+#ifdef HDR_ENABLED
+vec3 tonemap_reinhard(vec3 rgb) {
+    return sign(rgb)
+        * reinhard_piecewise_extended(
+               abs(rgb),
+               10000.0 / HdrGamePaperWhiteBrightness,
+               HdrGamePeakBrightness / HdrGamePaperWhiteBrightness,
+               36.0 / HdrGamePaperWhiteBrightness
+        );
+}
+
+// Lottes extension, specifically for Photon's coeffs
+vec3 tonemap_lottes_photon_hdr(vec3 rgb) {
+    float p = HdrGamePeakBrightness / HdrGamePaperWhiteBrightness;
+
+    // Clamp rec2020
+    rgb = max(vec3(0.0), rgb); 
+
+    // Extension: piecewise steal toe and midgray change, but ignore shoulder
+    // https://www.desmos.com/calculator/r6mxnnrv8y
+    vec3 lower = tonemap_lottes(rgb);
+    vec3 higher = rgb + 0.058632;
+    bvec3 thres = greaterThan(rgb, vec3(0.268747));
+    rgb = mix(lower, higher, thres);
+
+    // New shoulder
+    rgb = reinhard_piecewise_extended(
+        rgb, //in
+        100.f, //white clip
+        p, //peak
+        0.268747 //start at cutoff
+    ); 
+
+    return rgb;
+}
+
+vec3 tonemap_uncharted_2(vec3 rgb) {
+    const float a = 0.15;
+    const float b = 0.50;
+    const float c = 0.10;
+    const float d = 0.20;
+    const float e = 0.02;
+    const float f = 0.30;
+    const float exposure_bias = 2.0;
+    const float w = 11.2;
+    float[6] coeffs = float[6](a, b, c, d, e, f);
+    float white_precompute = 1.f / apply_hable_curve(w, a, b, c, d, e, f);
+    HableUncharted2ExtendedConfig uc2_config
+        = hable_create_uncharted2_extended_config(coeffs, white_precompute);
+
+    float peak = (HdrGamePeakBrightness / HdrGamePaperWhiteBrightness);
+    float shoulder = (36.0 / HdrGamePaperWhiteBrightness);
+
+    rgb *= exposure_bias;
+
+    rgb = apply_hable_extended(abs(rgb), uc2_config) * sign(rgb);
+    return reinhard_piecewise_extended(
+        rgb,
+        100,
+        HdrGamePeakBrightness / HdrGamePaperWhiteBrightness,
+        36.0 / HdrGamePaperWhiteBrightness
+    );
+}
+
+#else
 // Filmic tonemapping operator made by John Hable for Uncharted 2
 vec3 tonemap_uncharted_2_partial(vec3 rgb) {
     const float a = 0.15;
@@ -91,6 +173,8 @@ vec3 tonemap_uncharted_2(vec3 rgb) {
     return curr * white_scale;
 }
 
+#endif
+
 // Tone mapping operator made by Tech for his shader pack Lux
 vec3 tonemap_tech(vec3 rgb) {
     vec3 a = rgb * min(vec3(1.0), 1.0 - exp(-1.0 / 0.038 * rgb));
@@ -112,11 +196,14 @@ vec3 tonemap_ozius(vec3 rgb) {
     return pow(rgb * rgb * (-2.0 * rgb + 3.0), cr / b);
 }
 
+#ifndef HDR_ENABLED
 vec3 tonemap_reinhard(vec3 rgb) { return rgb / (rgb + 1.0); }
-
+#endif
 vec3 tonemap_reinhard_jodie(vec3 rgb) {
     vec3 reinhard = rgb / (rgb + 1.0);
     return mix(rgb / (dot(rgb, luminance_weights) + 1.0), reinhard, reinhard);
 }
+
+vec3 tonemap_none(vec3 rgb) { return rgb; }
 
 #endif // INCLUDE_MISC_TONEMAP_OPERATORS
