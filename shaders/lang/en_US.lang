@@ -264,10 +264,6 @@ option.SUN_ANGULAR_RADIUS              = Sun Angular Radius
 option.MOON_ANGULAR_RADIUS             = Moon Angular Radius
 option.SKY_GROUND                      = Sky Ground
 option.SKY_GROUND.comment              = Visible planet surface below the horizon
-option.ATMOSPHERE_SATURATION_BOOST                      = Atmosphere Saturation Boost
-option.ATMOSPHERE_SATURATION_BOOST.comment              = Increases the saturation of the sky and sunlight color depending on the time of day
-option.ATMOSPHERE_SATURATION_BOOST_INTENSITY            = Atmosphere Saturation Boost Intensity
-option.ATMOSPHERE_SATURATION_BOOST_INTENSITY.comment    = Adjust the intensity of Atmosphere Saturation Boost
 option.STARS                           = Enabled
 option.STARS.comment                   = Stars in the night sky. Low performance impact
 option.STARS_INTENSITY                 = Intensity
@@ -285,6 +281,14 @@ option.CREPUSCULAR_RAYS_STEPS_ZENITH   = Step Count - Zenith
 option.LIGHTNING_FLASH                 = Lightning Flash
 option.RAINBOWS                        = Rainbows
 option.END_SUN_EFFECT                  = End Sun Effect
+option.ATMOSPHERE_SATURATION_BOOST                    = Atmosphere Saturation Boost
+option.ATMOSPHERE_SATURATION_BOOST.comment            = Increases the saturation of the sky and sunlight color depending on the time of day
+option.ATMOSPHERE_SATURATION_BOOST_INTENSITY          = Saturation Boost Intensity
+option.ATMOSPHERE_SATURATION_BOOST_INTENSITY.comment  = Adjust the intensity of Atmosphere Saturation Boost
+option.ATMOSPHERE_RAIN_DESATURATION                   = Atmosphere Rain Desaturation
+option.ATMOSPHERE_RAIN_DESATURATION.comment           = Desaturates the atmosphere during rain, making for colder looking rain
+option.ATMOSPHERE_RAIN_DESATURATION_INTENSITY         = Desaturation Intensity
+option.ATMOSPHERE_RAIN_DESATURATION_INTENSITY.comment = Adjust the intensity of Atmosphere Rain Desaturation
 
 # Clouds
 option.CLOUDS_CUMULUS                       = Cumulus Clouds
