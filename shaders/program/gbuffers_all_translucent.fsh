@@ -569,8 +569,10 @@ void main() {
         adjusted_light_levels *= mix(0.7, 1.0, material_ao);
 
 #ifdef DIRECTIONAL_LIGHTMAPS
-        adjusted_light_levels
-            *= get_directional_lightmaps(position_scene, normal);
+        if (material_mask != MATERIAL_MULTIPART) {
+            adjusted_light_levels
+                *= get_directional_lightmaps(position_scene, normal);
+        }
 #endif
 #endif
 
