@@ -76,7 +76,7 @@ The settings menu is organized into topic-grouped screens (Materials, Reflection
 * [Distant Horizons](https://www.curseforge.com/minecraft/mc-mods/distant-horizons)
 * [Voxy](https://modrinth.com/mod/voxy)
 
-## I Highly recommend getting Luster-Main NOT Luster-Unstable because Luster-Unstable may have features that are not fully tested or is broken.
+### I Highly recommend getting Luster-Main NOT Luster-Unstable because Luster-Unstable may have features that are not fully tested or is broken.
 
 ## Acknowledgments
 
