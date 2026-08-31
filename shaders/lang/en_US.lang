@@ -196,6 +196,7 @@ option.MOON_I                          = Moonlight Intensity
 option.SKYLIGHT_I                      = Skylight Intensity
 option.BOUNCED_LIGHT_I                 = Bounced Sunlight Intensity
 option.CAVE_LIGHTING_I                 = Cave Brightness
+option.TWILIGHT_I                      = Twilight Brightness
 option.LIGHTNING_FLASH                 = Lightning Flash
 option.NETHER_USE_BIOME_COLOR          = Use Biome Color
 option.NETHER_I                        = Ambient Intensity

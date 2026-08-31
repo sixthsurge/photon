@@ -181,6 +181,7 @@ vec3 get_sky_lighting(
 #else
     vec3 skylight = sh_evaluate_irradiance(sky_sh, bent_normal, ao);
 #endif
+    skylight += 0.1 * TWILIGHT_I * (cos(12.56636 * sunAngle) + 1);
     skylight = mix(skylight_up, skylight, sqr(light_levels.y));
 #else
     vec3 skylight = ambient_color * ao;
