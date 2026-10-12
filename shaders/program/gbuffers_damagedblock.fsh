@@ -14,7 +14,11 @@
 layout(location = 0) out vec4 damage_overlay;
 
 #ifdef USE_SEPARATE_ENTITY_DRAWS
+#if MC_VERSION >= 260300
+/* RENDERTARGETS: 13 */
+#else
 /* RENDERTARGETS: 0 */
+#endif
 #else
 /* RENDERTARGETS: 3 */
 #endif
@@ -58,9 +62,18 @@ void main() {
     }
 
 #ifdef USE_SEPARATE_ENTITY_DRAWS
+#if MC_VERSION >= 260300
+    // Keep mining damage in the layer composed after the solid scene.
+    // Black with texture-derived coverage darkens the scene at crack pixels.
+    float coverage = damage_overlay.a;
+    float luminance = dot(damage_overlay.rgb, vec3(0.2126, 0.7152, 0.0722));
+    float crack = clamp(coverage * (1.0 - luminance), 0.0, 1.0);
+    damage_overlay = vec4(vec3(0.0), crack);
+#else
     damage_overlay.rgb
         = 0.5 * srgb_eotf_inv(2.0 * damage_overlay.rgb) * rec709_to_rec2020;
     damage_overlay.a = 1.0;
+#endif
 #else
     // Old overlay handling
     // alpha of 1 <=> block breaking overlay
