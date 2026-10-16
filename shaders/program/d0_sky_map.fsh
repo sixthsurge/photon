@@ -25,10 +25,11 @@ flat in vec3 sun_color;
 flat in vec3 moon_color;
 flat in vec3 sky_color;
 
-flat in float aurora_amount;
-flat in mat2x3 aurora_colors;
+flat in mat2x4 aurora_data;
 
-flat in float rainbow_amount;
+float aurora_amount;
+mat2x3 aurora_colors;
+float rainbow_amount;
 
 #include "/include/sky/clouds/parameters.glsl"
 flat in CloudsParameters clouds_params;
@@ -126,6 +127,12 @@ uniform float biome_may_snow;
 #include "/include/sky/sky.glsl"
 
 void main() {
+#if defined WORLD_OVERWORLD
+    aurora_amount = aurora_data[0].w;
+    aurora_colors = mat2x3(aurora_data[0].xyz, aurora_data[1].xyz);
+    rainbow_amount = aurora_data[1].w;
+#endif
+
     ivec2 texel = ivec2(gl_FragCoord.xy);
 
     if (texel.x == sky_map_res.x) { // Store lighting colors
