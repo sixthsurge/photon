@@ -167,7 +167,7 @@ vec3 get_sky_lighting(
     vec3 lighting = vec3(0.0f);
 
 #if defined WORLD_OVERWORLD && defined PROGRAM_DEFERRED4 && defined SH_SKYLIGHT
-    sh3 sky_sh_compat = sh3(sky_sh[0], sky_sh[1], sky_sh[2]);
+    sh3 sky_sh_compat = sh3(sky_sh_0, sky_sh_1, sky_sh_2);
 
     vec3 skylight = sh_evaluate_irradiance(sky_sh_compat, bent_normal, ao);
     skylight = mix(skylight_up, skylight, sqr(light_levels.y));
