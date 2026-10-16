@@ -26,6 +26,7 @@ flat in vec4 tint;
 uniform sampler2D gtexture;
 
 uniform int moonPhase;
+uniform float rainStrength;
 uniform int frameCounter;
 
 uniform vec3 sun_dir;

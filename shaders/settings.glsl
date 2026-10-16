@@ -668,11 +668,35 @@ const float wetnessHalflife         = 70.0;
 #endif
 
 #ifndef ATMOSPHERE_RAIN_DESATURATION
+  #undef ATMOSPHERE_RAIN_DESATURATION_INTENSITY
   #define ATMOSPHERE_RAIN_DESATURATION_INTENSITY 0.0
 #endif
 
 #ifndef ATMOSPHERE_SATURATION_BOOST
+  #undef ATMOSPHERE_SATURATION_BOOST_INTENSITY
   #define ATMOSPHERE_SATURATION_BOOST_INTENSITY 0.0
+#endif
+
+// Apple Silicon (macOS) compatibility
+// macOS exposes OpenGL 4.1 core on top of Metal: no compute shaders, no image
+// load/store and 16 texture units per program, some of which Iris reserves.
+// This moves the affected features onto paths that fit those limits.
+// FORCE_APPLE_COMPAT enables the same paths on other platforms for testing
+// (set FORCE_APPLE_COMPAT=true in the shader pack's .txt config file)
+//#define FORCE_APPLE_COMPAT
+
+#if defined MC_OS_MAC || defined FORCE_APPLE_COMPAT
+  #define APPLE_COMPAT
+
+  // Voxel colored lighting needs compute shaders and image load/store
+  #undef COLORED_LIGHTS
+
+  // Generate the sky SH in deferred (fragment) instead of deferred4_a (compute)
+  #ifdef SH_SKYLIGHT
+    #define SH_SKYLIGHT_FRAGMENT
+  #endif
+
+  // deferred4 is split into deferred4-6, see program/d4_split.glsl
 #endif
 
 #endif // SETTINGS_INCLUDED

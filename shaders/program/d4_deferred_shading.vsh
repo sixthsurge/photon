@@ -10,6 +10,7 @@
 */
 
 #include "/include/global.glsl"
+#include "/program/d4_split.glsl"
 
 out vec2 uv;
 
@@ -101,6 +102,25 @@ uniform float time_midnight;
 void main() {
     uv = gl_MultiTexCoord0.xy;
 
+#if D4_PASS == D4_PASS_SHADOWS
+    // Shadow pass needs none of the lighting inputs (no colortex4 or
+    // atmosphere LUT here, to save texture units). Still write every output:
+    // Iris zero-initializes unwritten outputs and gets arrays wrong
+    light_color = vec3(0.0);
+    ambient_color = vec3(0.0);
+#if defined WORLD_OVERWORLD
+    sun_color = vec3(0.0);
+    moon_color = vec3(0.0);
+    fog_params = get_fog_parameters(get_weather());
+    rainbow_amount = 0.0;
+#ifdef SH_SKYLIGHT
+    for (int i = 0; i < 9; ++i) {
+        sky_sh[i] = vec3(0.0);
+    }
+    skylight_up = vec3(0.0);
+#endif
+#endif
+#else
     light_color = texelFetch(colortex4, ivec2(191, 0), 0).rgb;
     ambient_color = texelFetch(colortex4, ivec2(191, 1), 0).rgb;
 
@@ -132,6 +152,7 @@ void main() {
 #endif
 
     rainbow_amount = get_rainbow_amount(weather);
+#endif
 #endif
 
     vec2 vertex_pos = gl_Vertex.xy * taau_render_scale;

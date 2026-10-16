@@ -10,7 +10,29 @@
 */
 
 #include "/include/global.glsl"
+#include "/program/d4_split.glsl"
 
+#if D4_PASS == D4_PASS_SHADOWS
+layout(location = 0) out vec3 fragment_color; // sky background (sky only)
+layout(location = 1) out vec4 shadow_data;    // shadows, sss depth
+
+/* RENDERTARGETS: 0,13 */
+#elif D4_PASS == D4_PASS_LIGHTING
+layout(location = 0) out vec3 fragment_color; // diffuse + specular highlight
+
+/* RENDERTARGETS: 0 */
+#elif D4_PASS == D4_PASS_COMPOSE
+layout(location = 0) out vec3 fragment_color;
+layout(location = 1) out vec4 colortex13_clear; // clear split shadow data
+
+#ifdef USE_SEPARATE_ENTITY_DRAWS
+/* RENDERTARGETS: 0,13 */
+#else
+layout(location = 2) out vec4 colortex3_clear;
+
+/* RENDERTARGETS: 0,13,3 */
+#endif
+#else
 layout(location = 0) out vec3 fragment_color;
 
 #ifdef USE_SEPARATE_ENTITY_DRAWS
@@ -19,6 +41,7 @@ layout(location = 0) out vec3 fragment_color;
 layout(location = 1) out vec4 colortex3_clear;
 
 /* RENDERTARGETS: 0,3 */
+#endif
 #endif
 
 in vec2 uv;
@@ -64,7 +87,10 @@ uniform sampler2D colortex14; // ambient lighting history data
 uniform sampler2D colortex3; // OF damage overlay, armor glint
 #endif
 
-#if defined WORLD_OVERWORLD && defined GALAXY
+#if D4_PASS == D4_PASS_LIGHTING
+uniform sampler2D colortex13; // shadows from deferred4
+#define galaxy_sampler colortex13 // unused in this pass
+#elif defined WORLD_OVERWORLD && defined GALAXY
 uniform sampler2D colortex13;
 #define galaxy_sampler colortex13
 #endif
@@ -150,10 +176,15 @@ uniform float time_midnight;
 uniform float world_age;
 uniform float eye_skylight;
 
+// Only the pass that samples them may request mipmaps: Iris regenerates them
+// before every pass that does, and with the Apple split this file is three
+// passes
+#if D4_NEEDS(D4_PASS_COMPOSE)
 /*
 const bool colortex5MipmapEnabled = true;
 const bool colortex11MipmapEnabled = true;
 */
+#endif
 
 // ------------
 //   Includes
@@ -169,11 +200,18 @@ const bool colortex11MipmapEnabled = true;
 #include "/include/fog/simple_fog.glsl"
 #include "/include/lighting/diffuse_lighting.glsl"
 #include "/include/lighting/shadows/common.glsl"
+#if D4_PASS == D4_PASS_LIGHTING
+#include "/include/lighting/shadows/distance_fade.glsl"
+#else
 #include "/include/lighting/shadows/pcss.glsl"
+#endif
 #include "/include/lighting/shadows/ssrt.glsl"
 #include "/include/lighting/specular_lighting.glsl"
 #include "/include/misc/lod_mod_support.glsl"
 #include "/include/misc/purkinje_shift.glsl"
+#if D4_PASS == D4_PASS_COMPOSE
+#define SKY_BACKGROUND_IN_COLORTEX0
+#endif
 #include "/include/sky/sky.glsl"
 #include "/include/surface/edge_highlight.glsl"
 #include "/include/surface/material.glsl"
@@ -196,8 +234,14 @@ const bool colortex11MipmapEnabled = true;
 #endif
 
 void main() {
-#if !defined USE_SEPARATE_ENTITY_DRAWS
+#if !defined USE_SEPARATE_ENTITY_DRAWS && D4_NEEDS(D4_PASS_COMPOSE)
     colortex3_clear = vec4(0.0);
+#endif
+#if D4_PASS == D4_PASS_COMPOSE
+    colortex13_clear = vec4(0.0);
+#endif
+#if D4_PASS == D4_PASS_SHADOWS
+    shadow_data = vec4(0.0);
 #endif
 
     ivec2 texel = ivec2(gl_FragCoord.xy);
@@ -209,7 +253,7 @@ void main() {
 #if defined NORMAL_MAPPING || defined SPECULAR_MAPPING
     vec4 gbuffer_data_1 = texelFetch(colortex2, texel, 0);
 #endif
-#if !defined USE_SEPARATE_ENTITY_DRAWS
+#if !defined USE_SEPARATE_ENTITY_DRAWS && D4_NEEDS(D4_PASS_LIGHTING)
     vec4 overlays = texelFetch(colortex3, texel, 0);
 #endif
 
@@ -239,7 +283,7 @@ void main() {
     vec3 direction_world
         = normalize(position_scene - gbufferModelViewInverse[3].xyz);
 
-#if defined WORLD_OVERWORLD
+#if defined WORLD_OVERWORLD && D4_NEEDS(D4_PASS_COMPOSE)
     // Atmosphere
 
     vec3 atmosphere = atmosphere_scattering(
@@ -295,6 +339,18 @@ void main() {
 #endif
 
     if (depth == 1.0) { // Sky
+#if D4_PASS == D4_PASS_SHADOWS
+#if defined WORLD_OVERWORLD
+        fragment_color = draw_sky_background(
+            direction_world,
+            texelFetch(colortex0, texel, 0).rgb
+        );
+#else
+        fragment_color = texelFetch(colortex0, texel, 0).rgb;
+#endif
+#elif D4_PASS == D4_PASS_LIGHTING
+        fragment_color = texelFetch(colortex0, texel, 0).rgb;
+#else
 #if defined WORLD_OVERWORLD
         fragment_color = draw_sky(
             direction_world,
@@ -317,7 +373,9 @@ void main() {
 
         // Apply purkinje shift
         fragment_color = purkinje_shift(fragment_color, vec2(0.0, 1.0));
+#endif
     } else { // Terrain
+#if D4_NEEDS(D4_PASS_LIGHTING)
         // Sample ambient occlusion a while before using it (latency hiding)
 
         vec2 half_res_pos = gl_FragCoord.xy * (0.5 / taau_render_scale) - 0.5;
@@ -337,6 +395,7 @@ void main() {
         float ambient_depth_10 = texelFetch(colortex14, p10, 0).x;
         float ambient_depth_01 = texelFetch(colortex14, p01, 0).x;
         float ambient_depth_11 = texelFetch(colortex14, p11, 0).x;
+#endif
 
         // Unpack gbuffer data
 
@@ -352,7 +411,7 @@ void main() {
         vec3 flat_normal = decode_unit_vector(data[2]);
         vec2 light_levels = data[3];
 
-#if !defined USE_SEPARATE_ENTITY_DRAWS
+#if !defined USE_SEPARATE_ENTITY_DRAWS && D4_NEEDS(D4_PASS_LIGHTING)
         uint overlay_id = uint(255.0 * overlays.a);
         albedo = overlay_id == 0u ? albedo + overlays.rgb
                                   : albedo; // enchantment glint
@@ -415,6 +474,7 @@ void main() {
         }
 #endif
 
+#if D4_NEEDS(D4_PASS_LIGHTING)
         // Upscale ambient occlusion
 
         float lin_z = screen_to_view_space_depth(
@@ -470,6 +530,7 @@ void main() {
             ao = 1.0;
             bent_normal = normal;
         }
+#endif
 
         // Calculate lighting dot products
 
@@ -480,6 +541,10 @@ void main() {
         float NoH = (NoL + NoV) * halfway_norm;
         float LoH = LoV * halfway_norm + halfway_norm;
 
+#if D4_PASS == D4_PASS_COMPOSE
+        // Diffuse lighting and specular highlight from deferred5
+        fragment_color = texelFetch(colortex0, texel, 0).rgb;
+#else
         // Cloud shadows
 
 #if defined WORLD_OVERWORLD && defined CLOUD_SHADOWS
@@ -496,6 +561,16 @@ void main() {
         float sss_depth = 0.0;
 
         if (NoL > 1e-3 || material.sss_amount > 1e-3) {
+#if D4_PASS == D4_PASS_LIGHTING
+            vec4 split_shadows = texelFetch(colortex13, texel, 0);
+            shadows = split_shadows.rgb;
+            sss_depth = split_shadows.a;
+            shadow_distance_fade = get_shadow_distance_fade(
+                position_scene,
+                flat_normal,
+                light_levels.y
+            );
+#else
             // Calculate near shadows
             vec3 shadow_near = vec3(0.0);
             float shadow_distant = 0.0;
@@ -550,6 +625,7 @@ void main() {
     && (defined SPECULAR_MAPPING || defined NORMAL_MAPPING)
             shadows *= float(!parallax_shadow);
 #endif
+#endif
         }
 #else
         const vec3 shadows = vec3(1.0);
@@ -557,6 +633,10 @@ void main() {
         const float sss_depth = 0.0;
 #endif
 
+#if D4_PASS == D4_PASS_SHADOWS
+        shadow_data = vec4(shadows, sss_depth);
+        fragment_color = vec3(0.0);
+#else
         // Diffuse lighting
 
         fragment_color = get_diffuse_lighting(
@@ -594,6 +674,10 @@ void main() {
             += get_specular_highlight(material, NoL, NoV, NoH, LoV, LoH)
             * light_color * shadows * cloud_shadows * ao;
 #endif
+#endif // D4_PASS == D4_PASS_SHADOWS
+#endif // D4_PASS == D4_PASS_COMPOSE
+
+#if D4_NEEDS(D4_PASS_COMPOSE)
 
         // Specular reflections
 
@@ -692,5 +776,6 @@ void main() {
         // Apply purkinje shift
 
         fragment_color = purkinje_shift(fragment_color, light_levels);
+#endif // D4_NEEDS(D4_PASS_COMPOSE)
     }
 }

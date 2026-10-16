@@ -34,6 +34,7 @@ uniform sampler2D gtexture;
 uniform sampler2D noisetex;
 
 uniform int moonPhase;
+uniform float rainStrength;
 uniform int renderStage;
 
 uniform vec3 view_sun_dir;
