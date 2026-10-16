@@ -34,7 +34,7 @@ flat in vec3 moon_color;
 flat in OverworldFogParameters fog_params;
 
 #if defined SH_SKYLIGHT
-flat in vec3 sky_sh[9];
+flat in mat3 sky_sh[3];
 flat in vec3 skylight_up;
 #endif
 
