@@ -313,6 +313,12 @@ void main() {
     light_levels = clamp((light_levels - 1.0 / 32.0) * 32.0 / 30.0, 0.0, 1.0);
 #else
     base_color = read_tex(gtexture) * tint;
+
+#if defined IRIS_INLINE_GLINT
+    if (mc_hasGlint()) {
+        base_color.rgb += sqr(mc_sampleGlint());
+    }
+#endif
 #endif
 
 #ifdef NORMAL_MAPPING
