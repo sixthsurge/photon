@@ -14,7 +14,11 @@
 layout(location = 0) out vec4 damage_overlay;
 
 #ifdef USE_SEPARATE_ENTITY_DRAWS
+#if MC_VERSION >= 260300
+/* RENDERTARGETS: 3 */
+#else
 /* RENDERTARGETS: 0 */
+#endif
 #else
 /* RENDERTARGETS: 3 */
 #endif
@@ -57,7 +61,7 @@ void main() {
         discard;
     }
 
-#ifdef USE_SEPARATE_ENTITY_DRAWS
+#if ((defined USE_SEPARATE_ENTITY_DRAWS) && MC_VERSION < 260300)
     damage_overlay.rgb
         = 0.5 * srgb_eotf_inv(2.0 * damage_overlay.rgb) * rec709_to_rec2020;
     damage_overlay.a = 1.0;

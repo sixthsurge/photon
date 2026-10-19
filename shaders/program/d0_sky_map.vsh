@@ -21,10 +21,9 @@ flat out vec3 sun_color;
 flat out vec3 moon_color;
 flat out vec3 sky_color;
 
-flat out float aurora_amount;
-flat out mat2x3 aurora_colors;
-
-flat out float rainbow_amount;
+// literally saves 2 locations, enough to make macOS work
+// adding literally anything else here will break it again. beward.
+flat out mat2x4 aurora_data;
 
 #include "/include/sky/clouds/parameters.glsl"
 flat out CloudsParameters clouds_params;
@@ -136,13 +135,18 @@ void main() {
     ambient_color = get_ambient_color();
 
 #if defined WORLD_OVERWORLD
-    aurora_amount = get_aurora_amount();
-    aurora_colors = get_aurora_colors();
+    float aurora_amount = get_aurora_amount();
+    mat2x3 aurora_colors = get_aurora_colors();
 
     Weather weather = get_weather();
-    rainbow_amount = get_rainbow_amount(weather);
+    float rainbow_amount = get_rainbow_amount(weather);
     clouds_params = get_clouds_parameters(weather);
     fog_params = get_fog_parameters(weather);
+
+    aurora_data = mat2x4(
+        vec4(aurora_colors[0], aurora_amount),
+        vec4(aurora_colors[1], rainbow_amount)
+    );
 
     // Aurora clouds influence
     vec3 aurora_lighting

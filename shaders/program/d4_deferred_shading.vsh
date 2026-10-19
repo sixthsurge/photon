@@ -24,7 +24,9 @@ flat out vec3 moon_color;
 flat out OverworldFogParameters fog_params;
 
 #if defined SH_SKYLIGHT
-flat out vec3 sky_sh[9];
+flat out mat3 sky_sh_0;
+flat out mat3 sky_sh_1;
+flat out mat3 sky_sh_2;
 flat out vec3 skylight_up;
 #endif
 
@@ -111,15 +113,21 @@ void main() {
 
 #ifdef SH_SKYLIGHT
     // Sample sky SH
-    sky_sh[0] = texelFetch(colortex4, ivec2(191, 2), 0).rgb;
-    sky_sh[1] = texelFetch(colortex4, ivec2(191, 3), 0).rgb;
-    sky_sh[2] = texelFetch(colortex4, ivec2(191, 4), 0).rgb;
-    sky_sh[3] = texelFetch(colortex4, ivec2(191, 5), 0).rgb;
-    sky_sh[4] = texelFetch(colortex4, ivec2(191, 6), 0).rgb;
-    sky_sh[5] = texelFetch(colortex4, ivec2(191, 7), 0).rgb;
-    sky_sh[6] = texelFetch(colortex4, ivec2(191, 8), 0).rgb;
-    sky_sh[7] = texelFetch(colortex4, ivec2(191, 9), 0).rgb;
-    sky_sh[8] = texelFetch(colortex4, ivec2(191, 10), 0).rgb;
+    sky_sh_0 = mat3(
+        texelFetch(colortex4, ivec2(191, 2), 0).rgb,
+        texelFetch(colortex4, ivec2(191, 3), 0).rgb,
+        texelFetch(colortex4, ivec2(191, 4), 0).rgb
+    );
+    sky_sh_1 = mat3(
+        texelFetch(colortex4, ivec2(191, 5), 0).rgb,
+        texelFetch(colortex4, ivec2(191, 6), 0).rgb,
+        texelFetch(colortex4, ivec2(191, 7), 0).rgb
+    );
+    sky_sh_2 = mat3(
+        texelFetch(colortex4, ivec2(191, 8), 0).rgb,
+        texelFetch(colortex4, ivec2(191, 9), 0).rgb,
+        texelFetch(colortex4, ivec2(191, 10), 0).rgb
+    );
     skylight_up = texelFetch(colortex4, ivec2(191, 11), 0).rgb;
 #endif
 

@@ -541,6 +541,12 @@ void main() {
             return;
         }
 
+#if defined IRIS_INLINE_GLINT
+        if (mc_hasGlint()) {
+            fragment_color.rgb += sqr(mc_sampleGlint());
+        }
+#endif
+
         material = material_from(
             fragment_color.rgb,
             material_mask,
