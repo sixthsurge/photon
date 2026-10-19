@@ -9,8 +9,11 @@
 --------------------------------------------------------------------------------
 */
 
-// Enable subgroup arithmetic if available, but do not use it on Intel Windows + OpenGL.
-#if (defined MC_GL_KHR_shader_subgroup_arithmetic) && (defined IRIS_VULKAN || !defined MC_GL_VENDOR_INTEL || !defined MC_OS_WINDOWS)
+// Enable subgroup arithmetic if available, but do not use it on Intel Windows +
+// OpenGL.
+#if (defined MC_GL_KHR_shader_subgroup_arithmetic) \
+    && (defined IRIS_VULKAN || !defined MC_GL_VENDOR_INTEL \
+        || !defined MC_OS_WINDOWS)
 #extension GL_KHR_shader_subgroup_arithmetic : enable
 #endif
 
@@ -24,9 +27,12 @@ layout(rgba16f) writeonly uniform image2D colorimg4;
 
 uniform sampler2D colortex4;
 
-#if (defined MC_GL_KHR_shader_subgroup_arithmetic) && (defined IRIS_VULKAN || !defined MC_GL_VENDOR_INTEL || !defined MC_OS_WINDOWS)
-// 32 here is to match the *potential* number of subgroups in the workgroup. 
-// On NVIDIA/AMD, it's likely we're wasting memory here, but it ensures we won't crash and die on Intel.
+#if (defined MC_GL_KHR_shader_subgroup_arithmetic) \
+    && (defined IRIS_VULKAN || !defined MC_GL_VENDOR_INTEL \
+        || !defined MC_OS_WINDOWS)
+// 32 here is to match the *potential* number of subgroups in the workgroup.
+// On NVIDIA/AMD, it's likely we're wasting memory here, but it ensures we won't
+// crash and die on Intel.
 shared vec3 shared_memory[32][9];
 #else
 shared vec3 shared_memory[256][9];
@@ -94,7 +100,9 @@ void main() {
 
     mat3 coeff = sh_coeff_order_2(direction);
 
-    #if (defined MC_GL_KHR_shader_subgroup_arithmetic) && (defined IRIS_VULKAN || !defined MC_GL_VENDOR_INTEL || !defined MC_OS_WINDOWS)
+#if (defined MC_GL_KHR_shader_subgroup_arithmetic) \
+    && (defined IRIS_VULKAN || !defined MC_GL_VENDOR_INTEL \
+        || !defined MC_OS_WINDOWS)
     for (uint band = 0u; band < 9u; ++band) {
         float c = coeff[band / 3u][band % 3u];
 
@@ -105,7 +113,6 @@ void main() {
         }
     }
 
-    
     barrier();
 
     if (gl_SubgroupID != 0u) {
@@ -115,7 +122,8 @@ void main() {
     for (uint band = 0u; band < 9u; ++band) {
         vec3 sum = vec3(0.0);
 
-        for (uint s = gl_SubgroupInvocationID; s < gl_NumSubgroups; s += gl_SubgroupSize) {
+        for (uint s = gl_SubgroupInvocationID; s < gl_NumSubgroups;
+             s += gl_SubgroupSize) {
             sum += shared_memory[s][band];
         }
 
@@ -127,8 +135,7 @@ void main() {
     }
 #else
     for (uint band = 0u; band < 9u; ++band) {
-        shared_memory[i][band]
-            = radiance * coeff[band / 3u][band % 3u]
+        shared_memory[i][band] = radiance * coeff[band / 3u][band % 3u]
             * (tau / float(sample_count));
     }
 
@@ -148,7 +155,8 @@ void main() {
     }
     */
 
-    // Loop manually unrolled as Intel doesn't seem to like barrier() calls in loops
+    // Loop manually unrolled as Intel doesn't seem to like barrier() calls in
+    // loops
 #define PARALLEL_REDUCTION_ITER(STRIDE) \
     if (i < (STRIDE)) { \
         for (uint band = 0u; band < 9u; ++band) { \
