@@ -84,6 +84,22 @@ void main() {
         return;
     }
 
+#ifdef DISTANT_HORIZONS_TEXTURES
+    if (dh_hasTexture()) {
+        vec4 tile = dh_sampleTexture();
+        vec3 adjusted_color =
+            mix(color, clamp01(color * tile.rgb * 2.0), tile.a);
+        gbuffer_data_0.x = pack_unorm_2x8(adjusted_color.rg);
+        gbuffer_data_0.y = pack_unorm_2x8(
+            adjusted_color.b,
+            clamp01(float(material_mask) * rcp(255.0))
+        );
+        gbuffer_data_0.z = pack_unorm_2x8(encode_unit_vector(normal));
+        gbuffer_data_0.w = pack_unorm_2x8(light_levels);
+        return;
+    }
+#endif
+
 #ifdef NOISE_ON_DH_TERRAIN
     mat3 tbn = get_tbn_matrix(normal);
     vec3 world_pos = scene_pos + cameraPosition;
