@@ -77,6 +77,7 @@ uniform vec2 taa_offset;
 #define TAAU_FLICKER_REDUCTION \
     1.0 // Increases ghosting but reduces flickering caused by aggressive
         // clipping
+#define TAAU_DEPTH_REJECTION (2.0 / 1024.0)
 
 /*
 (needed by vertex stage for auto exposure)
@@ -98,6 +99,10 @@ vec3 max_of(vec3 a, vec3 b, vec3 c, vec3 d, vec3 f) {
 vec3 reinhard(vec3 rgb) { return rgb / (rgb + 1.0); }
 
 vec3 reinhard_inverse(vec3 rgb) { return rgb / (1.0 - rgb); }
+
+float history_depth(vec3 view_pos) {
+    return clamp01(log2(1.0 + length(view_pos)) * rcp(log2(1.0 + far)));
+}
 
 // Estimates the closest fragment in a 5x5 radius with 5 samples in a cross
 // pattern Improves reprojection for objects in motion
@@ -294,22 +299,46 @@ void main() {
         = closest.xy - reproject_scene_space(closest_scene, hand, is_lod).xy;
     vec2 previous_uv = uv - velocity;
 
+    bool history_in_bounds = clamp01(previous_uv) == previous_uv;
+    ivec2 previous_texel = clamp(
+        ivec2(previous_uv * view_res),
+        ivec2(0),
+        ivec2(view_res) - 1
+    );
+    bool history_sample_valid
+        = history_in_bounds && previous_texel != ivec2(0);
+
     vec3 history_color
         = catmull_rom_filter_fast_rgb(colortex5, previous_uv, 0.6);
     history_color = max0(history_color); // Eliminate NaNs in the history
 
-    float pixel_age = texelFetch(colortex5, ivec2(previous_uv * view_res), 0).a;
-    pixel_age
-        = max0(pixel_age * float(clamp01(previous_uv) == previous_uv) + 1.0);
+#ifdef TAAU
+    vec3 camera_offset
+        = hand ? vec3(0.0) : cameraPosition - previousCameraPosition;
+    vec3 closest_previous_view = transform(
+        gbufferPreviousModelView,
+        closest_scene + camera_offset
+    );
+    float previous_depth = texelFetch(colortex5, previous_texel, 0).a;
+    bool history_valid = history_sample_valid
+        && abs(previous_depth - history_depth(closest_previous_view))
+            < TAAU_DEPTH_REJECTION;
+#else
+    float pixel_age = texelFetch(colortex5, previous_texel, 0).a;
+    pixel_age = max0(pixel_age * float(history_sample_valid) + 1.0);
+#endif
 
     // Distance factor to favour responsiveness closer to the camera and image
     // stability further away
     float distance_factor = 1.0 - exp2(-0.025 * length(closest_view));
 
-    // Dynamic blend weight lending equal weight to all frames in the history,
-    // drastically reducing time taken to converge when upscaling
+    // Favor responsiveness near the camera and stability in the distance.
     float blend_weight = mix(0.35, 0.10, distance_factor);
+#ifdef TAAU
+    float alpha = history_valid ? blend_weight : 1.0;
+#else
     float alpha = max(1.0 / pixel_age, blend_weight);
+#endif
 
 #ifndef TAAU
     // Native resolution TAA
@@ -357,8 +386,10 @@ void main() {
         : get_flicker_reduction(history_color, min_color, max_color);
     history_color = ycocg_to_rgb(history_color);
 
-    alpha *= pow(confidence, TAAU_CONFIDENCE_REJECTION);
-    alpha *= 1.0 - TAAU_FLICKER_REDUCTION * flicker_reduction;
+    if (history_valid) {
+        alpha *= pow(confidence, TAAU_CONFIDENCE_REJECTION);
+        alpha *= 1.0 - TAAU_FLICKER_REDUCTION * flicker_reduction;
+    }
 #endif
 
     // Offcenter rejection from Jessie, which is originally by Zombye
@@ -375,14 +406,18 @@ void main() {
     current_color = mix(history_color, current_color, alpha);
     current_color = reinhard_inverse(current_color);
 
+#ifdef TAAU
+    result = vec4(current_color, history_depth(closest_view));
+#else
     result = vec4(current_color, pixel_age * offcenter_rejection);
+#endif
 #else // TAA disabled
     result = texelFetch(colortex0, texel, 0);
 #endif
 
     // Store exposure in the alpha component of the bottom left texel of the
     // history buffer
-    if (texel == ivec2(0)) {
+    if (ivec2(gl_FragCoord.xy) == ivec2(0)) {
         result.a = exposure;
     }
 
