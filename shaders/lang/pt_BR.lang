@@ -1,0 +1,819 @@
+# Perfis
+
+profile.low                            = §eBaixo
+profile.medium                         = §aMédio
+profile.high                           = §bAlto
+profile.ultra                          = §dUltra
+
+# Menus
+
+screen.world                           = Mundo
+screen.lighting                        = Iluminação
+screen.sky                             = Céu
+screen.fog                             = Névoa
+screen.materials                       = Materiais
+screen.water                           = Água
+screen.post                            = Pós-processamento
+screen.misc                            = Diversos
+screen.mods                            = Opções de mods
+
+screen.weather                         = Clima
+screen.colored_lights                  = Opções de luzes coloridas
+screen.rp_settings                     = Opções do pacote de recursos
+screen.reflections                     = Reflexos
+screen.refraction                      = Refração
+screen.light_sources                   = Fontes de luz
+screen.shadows                         = Sombras
+screen.ao                              = Oclusão de ambiente
+screen.color_grading                   = Ajustes de cor
+screen.exposure                        = Exposição
+screen.lpv_vl                          = Luzes coloridas na névoa
+screen.box                             = Contorno de seleção
+screen.developer                       = Opções de desenvolvimento
+
+screen.distant_horizons                = Distant Horizons
+screen.photonics                       = Photonics
+screen.photonics_sharp                 = Opções do Sharp
+screen.photonics_restir                = Opções do ReSTIR
+
+screen.aurora                          = Aurora
+screen.clouds                          = Nuvens
+screen.crepuscular_rays                = Raios crepusculares
+screen.stars                           = Estrelas
+screen.clouds_cumulus                  = Opções de nuvens cumulus
+screen.clouds_altocumulus              = Opções de nuvens altocumulus
+screen.clouds_cumulus_congestus        = Opções de cumulus congestus
+screen.clouds_cirrus                   = Opções de cirrus/cirrocumulus
+screen.clouds_minecrafty               = Opções de nuvens em blocos
+screen.clouds_noctilucent              = Opções de nuvens noctilucentes
+
+screen.fog_rlh                         = Névoa de Rayleigh
+screen.fog_mie                         = Névoa de Mie
+screen.sunlight_color                  = Cor da luz solar
+screen.moonlight_color                 = Cor da luz da lua
+screen.blocklight_color                = Cor da luz dos blocos
+screen.sunlight_morning                = Manhã
+screen.sunlight_noon                   = Meio-dia
+screen.sunlight_evening                = Entardecer
+screen.light_nether                    = Nether
+screen.light_end                       = End
+screen.fog_rlh_normal                  = Cor normal
+screen.fog_rlh_rain                    = Cor na chuva
+screen.fog_rlh_arid                    = Cor em áreas áridas/desertos
+screen.fog_rlh_snowy                   = Cor em regiões nevadas
+screen.fog_rlh_taiga                   = Cor na taiga
+screen.fog_rlh_jungle                  = Cor na selva
+screen.fog_rlh_swamp                   = Cor no pântano
+screen.water_waves                     = Ondas na água
+screen.water_fog_coeff                 = Coeficientes da névoa aquática
+
+screen.end_light_color                 = Cor da luz
+screen.end_ambient_color               = Cor ambiente
+screen.nether_color                    = Cor fixa
+
+screen.distance_view                   = Visualização de distância
+
+option.INFO                            = Photon Shaders
+value.INFO.0                           = §epor SixthSurge
+value.INFO.1                           = §apor SixthSurge
+value.INFO.2                           = §bpor SixthSurge
+value.INFO.3                           = §dpor SixthSurge
+
+# Opções do mundo
+
+option.WAVING_PLANTS                   = Plantas ao vento
+option.WAVING_PLANTS.comment           = As plantas no solo balançam ao vento.\n\nPara adicionar um bloco à lista de plantas que balançam, abra shaders/block.properties e adicione-o à categoria correspondente (10016, 10017 ou 10018)
+option.WAVING_LEAVES                   = Folhas ao vento
+option.WAVING_LEAVES.comment           = Os blocos de folhas balançam ao vento.\n\nPara adicionar um bloco à lista de folhas que balançam, abra shaders/block.properties e adicione-o à categoria correspondente (10019)
+option.SLANTED_RAIN                    = Chuva inclinada
+option.SLANTED_RAIN.comment            = Inclina as partículas de chuva, dando mais ambientação aos dias chuvosos
+option.RAIN_OPACITY                    = Opacidade da chuva
+option.RAIN_OPACITY.comment            = Ajusta a opacidade das partículas de chuva
+option.SEA_LEVEL                       = Nível do mar
+option.SEA_LEVEL.comment               = A coordenada Y do mar/solo.\n\n-60.0: Superplano a partir da versão 1.18.\n4.0: Superplano anterior à versão 1.18.\n63.0: Normal.
+option.SNOW_OPACITY                    = Opacidade da neve
+option.SNOW_OPACITY.comment            = Ajusta a opacidade das partículas de neve
+option.EDGE_HIGHLIGHT                  = Realce de bordas
+option.EDGE_HIGHLIGHT.comment          = Efeito de realce nas bordas inspirado em Minecraft Dungeons
+option.EDGE_HIGHLIGHT_SCALE            = Escala do realce de bordas
+option.EDGE_HIGHLIGHT_SCALE.comment    = Controla a espessura do realce nas bordas; ajuste este valor à resolução do seu pacote de recursos
+option.MOON_PHASE_AFFECTS_BRIGHTNESS   = Iluminação pelas fases da lua
+option.MOON_PHASE_AFFECTS_BRIGHTNESS.comment = A luminosidade noturna varia conforme a fase da lua
+option.DESERT_SANDSTORM                = Tempestade de areia
+option.DESERT_SANDSTORM.comment        = Cria uma tempestade de areia durante a chuva em biomas de deserto
+option.END_GLOW                        = Brilho no End
+option.END_GLOW.comment                = Efeito de brilho ondulante no End. Requer Névoa volumétrica
+
+# Clima
+option.RANDOM_WEATHER_VARIATION            = Variação aleatória
+option.BIOME_WEATHER_VARIATION             = Variação por bioma
+option.WEATHER_TEMPERATURE_BIAS            = Tendência da temperatura
+option.WEATHER_HUMIDITY_BIAS               = Tendência da umidade
+option.WEATHER_WIND_BIAS                   = Tendência do vento
+option.WEATHER_TEMPERATURE_VARIATION_SPEED = Ritmo de variação da temperatura
+option.WEATHER_HUMIDITY_VARIATION_SPEED    = Ritmo de variação da umidade
+option.WEATHER_WIND_VARIATION_SPEED        = Ritmo de variação do vento
+
+# Opções de iluminação
+
+option.COLORED_LIGHTS                  = Luzes coloridas
+option.COLORED_LIGHTS.comment          = Iluminação de blocos com cores variáveis usando um algoritmo de preenchimento por propagação (flood fill). Requer Iris 1.6 ou superior
+option.HANDHELD_LIGHTING               = Luz dos itens nas mãos
+option.HANDHELD_LIGHTING.comment       = Os itens nas mãos iluminam o mundo. Se a opção Luzes coloridas estiver ativada, a iluminação terá a cor das próprias fontes de luz
+option.HANDHELD_LIGHTING_INTENSITY     = Intensidade da luz nas mãos
+option.HANDHELD_LIGHTING_INTENSITY.comment = Ajusta o brilho das fontes de luz seguradas nas mãos
+option.AO_IN_SUNLIGHT                  = AO na luz solar
+option.AO_IN_SUNLIGHT.comment          = Aplica a oclusão de ambiente do shader nas áreas iluminadas diretamente pelo sol ou pela lua
+option.CLOUD_SHADOWS                   = Sombras das nuvens
+option.CLOUD_SHADOWS.comment           = Sombras projetadas pelas nuvens no terreno
+option.CLOUD_SHADOWS_INTENSITY         = Intensidade das sombras de nuvens
+option.CLOUD_SHADOWS_INTENSITY.comment = Ajusta a intensidade das sombras das nuvens
+option.SH_SKYLIGHT                     = Luz do céu com SH
+option.SH_SKYLIGHT.comment             = Usa codificação por harmônicos esféricos (SH) para a luz direcional do céu na Superfície, produzindo um resultado bastante natural.\nFunciona bem em conjunto com GTAO
+option.SSS_SHEEN                       = Brilho da vegetação (SSS)
+option.SSS_SHEEN.comment               = Brilho especular em plantas e folhas. Ajuda a integrar o brilho da grama alta e de outras plantas ao brilho da grama no solo
+option.SSS_INTENSITY                   = Intensidade de SSS
+option.SSS_INTENSITY.comment           = Ajusta o brilho da dispersão subsuperficial (SSS)
+option.SHADING_STRENGTH                = Intensidade do sombreamento
+option.SHADING_STRENGTH.comment        = Ajusta o contraste da luz direta. Valores menores clareiam as faces voltadas para o lado oposto ao sol que não estão na sombra; valores maiores as escurecem
+
+option.SHADOW                          = Mapeamento de sombras
+option.SHADOW_PCF                      = Filtro do mapa de sombras
+option.SHADOW_SSRT                     = Sombras distantes com SSRT
+option.SHADOW_SSRT_STEPS               = Passos das sombras SSRT
+option.SHADOW_COLOR                    = Sombras coloridas
+option.SHADOW_COLOR.comment            = Blocos translúcidos projetam sombras com suas cores
+option.SHADOW_VPS                      = Sombras com penumbra variável
+option.SHADOW_VPS.comment              = As sombras ficam mais suaves à medida que se afastam do objeto que as projeta
+option.shadowMapResolution             = Resolução das sombras
+option.shadowDistance                  = Distância das sombras
+option.sunPathRotation                 = Rotação da trajetória solar
+option.SHADOW_PENUMBRA_SCALE           = Suavidade das sombras
+option.SHADOW_PENUMBRA_SCALE.comment   = Ajusta a suavidade das sombras
+option.ENTITY_SHADOWS                  = Sombras de entidades
+option.ENTITY_SHADOWS.comment          = Permite que entidades projetem sombras.\nDesative para melhorar o desempenho em bases de sobrevivência com grandes fazendas
+option.BLOCK_ENTITY_SHADOWS            = Sombras de entidades de bloco
+option.PIXELATED_SHADOWS               = Sombras pixeladas
+option.PIXELATED_SHADOWS.comment       = Alinha as sombras aos pixels das texturas dos blocos, criando uma aparência pixelada
+option.PIXELATED_SHADOWS_RESOLUTION    = Resolução das sombras pixeladas
+option.SSS_STEPS                       = Passos de SSS
+option.SSS_STEPS.comment               = Aumente para reduzir o ruído na folhagem e em outros materiais com SSS, ao custo de desempenho.
+
+option.SHADER_AO                       = AO do shader
+option.SHADER_AO.comment               = Escolhe o método de oclusão de ambiente (AO). Desativado: sem AO do shader. SSAO: menor qualidade, com menos amostras e filtragem. GTAO: maior qualidade, com mais amostras e filtragem
+value.SHADER_AO.SHADER_AO_NONE         = Desativado
+value.SHADER_AO.SHADER_AO_SSAO         = SSAO
+value.SHADER_AO.SHADER_AO_GTAO         = GTAO
+option.VANILLA_AO                      = AO do Minecraft
+option.VANILLA_AO.comment              = Oclusão de ambiente nativa do Minecraft
+option.VANILLA_AO_INTENSITY            = Intensidade da AO do Minecraft
+option.VANILLA_AO_INTENSITY.comment    = Ajusta a intensidade da oclusão de ambiente nativa do Minecraft
+option.SSAO_RADIUS                     = Raio da SSAO
+option.SSAO_RADIUS.comment             = Ajusta o raio da SSAO: a distância dentro da qual os objetos podem causar oclusão uns nos outros
+option.SSAO_STEPS                      = Passos da SSAO
+option.SSAO_STEPS.comment              = Controla a quantidade de ruído da SSAO
+option.GTAO_RADIUS                     = Raio da GTAO
+option.GTAO_RADIUS.comment             = Ajusta o raio da GTAO: a distância dentro da qual os objetos podem causar oclusão uns nos outros
+option.GTAO_SLICES                     = Fatias da GTAO
+option.GTAO_SLICES.comment             = Controla a quantidade de ruído da GTAO
+option.GTAO_HORIZON_STEPS              = Passos do horizonte da GTAO
+option.GTAO_HORIZON_STEPS.comment      = Controla a precisão da GTAO. Uma quantidade maior de passos também aumenta a intensidade do efeito
+
+option.SUN_NR                          = §c▍ §fVermelho
+option.SUN_NG                          = §a▍ §fVerde
+option.SUN_NB                          = §9▍ §fAzul
+option.SUN_MR                          = §c▍ §fVermelho
+option.SUN_MG                          = §a▍ §fVerde
+option.SUN_MB                          = §9▍ §fAzul
+option.SUN_ER                          = §c▍ §fVermelho
+option.SUN_EG                          = §a▍ §fVerde
+option.SUN_EB                          = §9▍ §fAzul
+option.SUN_I                           = Intensidade da luz solar
+option.MOON_R                          = §c▍ §fVermelho
+option.MOON_G                          = §a▍ §fVerde
+option.MOON_B                          = §9▍ §fAzul
+option.MOON_I                          = Intensidade da luz da lua
+option.SKYLIGHT_I                      = Intensidade da luz do céu
+option.BOUNCED_LIGHT_I                 = Intensidade da luz solar rebatida
+option.CAVE_LIGHTING_I                 = Brilho das cavernas
+option.LIGHTNING_FLASH                 = Clarão dos relâmpagos
+option.NETHER_USE_BIOME_COLOR          = Usar cor do bioma
+option.NETHER_I                        = Intensidade da luz ambiente
+option.NETHER_S                        = Saturação da luz ambiente
+option.NETHER_R                        = §c▍ §fVermelho
+option.NETHER_G                        = §a▍ §fVerde
+option.NETHER_B                        = §9▍ §fAzul
+option.END_LIGHT_R                     = §c▍ §fVermelho
+option.END_LIGHT_G                     = §a▍ §fVerde
+option.END_LIGHT_B                     = §9▍ §fAzul
+option.END_LIGHT_I                     = Intensidade da luz
+option.END_AMBIENT_R                   = §c▍ §fVermelho
+option.END_AMBIENT_G                   = §a▍ §fVerde
+option.END_AMBIENT_B                   = §9▍ §fAzul
+option.END_AMBIENT_I                   = Intensidade da luz ambiente
+option.BLOCKLIGHT_R                    = §c▍ §fVermelho
+option.BLOCKLIGHT_G                    = §a▍ §fVerde
+option.BLOCKLIGHT_B                    = §9▍ §fAzul
+option.BLOCKLIGHT_I                    = Intensidade da luz dos blocos
+
+option.COLORED_LIGHTS_VANILLA_LIGHTMAP_CONTRIBUTION                 = Contribuição da luz do Minecraft
+option.COLORED_LIGHTS_VANILLA_LIGHTMAP_CONTRIBUTION_FALLOFF         = Atenuação da contribuição
+option.COLORED_LIGHTS_VANILLA_LIGHTMAP_CONTRIBUTION_FALLOFF.comment = Altera a atenuação da contribuição do mapa de luz do Minecraft.\nQuadrática: a iluminação é mais forte na fonte e diminui rapidamente.\nLinear: a iluminação é suave e alcança uma distância maior da fonte
+option.VOXEL_VOLUME_SIZE                                            = Tamanho do volume de voxels
+option.VOXEL_VOLUME_SIZE.comment                                    = Ajusta o tamanho do volume no qual a iluminação colorida é calculada. Alto impacto no desempenho; também é afetado pela distância das sombras
+suffix.VOXEL_VOLUME_SIZE                                            = m³
+option.VOXEL_VOLUME_CENTER                                          = Centro do volume de voxels
+option.VOXEL_VOLUME_CENTER.comment                                  = À frente: o volume de voxels fica centralizado à frente do jogador, deixando uma parte maior dele visível
+
+value.COLORED_LIGHTS_VANILLA_LIGHTMAP_CONTRIBUTION_FALLOFF.COLORED_LIGHTS_VANILLA_LIGHTMAP_CONTRIBUTION_FALLOFF_SQUARED = Quadrática
+value.COLORED_LIGHTS_VANILLA_LIGHTMAP_CONTRIBUTION_FALLOFF.COLORED_LIGHTS_VANILLA_LIGHTMAP_CONTRIBUTION_FALLOFF_LINEAR  = Linear
+
+value.VOXEL_VOLUME_CENTER.VOXEL_VOLUME_CENTER_AHEAD  = À frente
+value.VOXEL_VOLUME_CENTER.VOXEL_VOLUME_CENTER_PLAYER = Jogador
+
+suffix.shadowMapResolution             = ²
+suffix.sunPathRotation                 = °
+
+value.shadowDistance.48.0              = 3 chunks
+value.shadowDistance.64.0              = 4 chunks
+value.shadowDistance.80.0              = 5 chunks
+value.shadowDistance.96.0              = 6 chunks
+value.shadowDistance.112.0             = 7 chunks
+value.shadowDistance.128.0             = 8 chunks
+value.shadowDistance.144.0             = 9 chunks
+value.shadowDistance.160.0             = 10 chunks
+value.shadowDistance.176.0             = 11 chunks
+value.shadowDistance.192.0             = 12 chunks
+value.shadowDistance.208.0             = 13 chunks
+value.shadowDistance.224.0             = 14 chunks
+value.shadowDistance.240.0             = 15 chunks
+value.shadowDistance.256.0             = 16 chunks
+value.shadowDistance.320.0             = 20 chunks
+value.shadowDistance.384.0             = 24 chunks
+value.shadowDistance.512.0             = 32 chunks
+value.shadowDistance.768.0             = 48 chunks
+value.shadowDistance.1024.0            = 64 chunks
+value.shadowDistance.2048.0            = 128 chunks
+value.shadowDistance.4096.0            = 256 chunks
+
+# Opções do céu
+
+option.VANILLA_SUN                     = Sol do Minecraft
+option.VANILLA_MOON                    = Lua do Minecraft
+option.SUN_ANGULAR_RADIUS              = Raio angular do sol
+option.MOON_ANGULAR_RADIUS             = Raio angular da lua
+option.SKY_GROUND                      = Superfície abaixo do horizonte
+option.SKY_GROUND.comment              = Superfície visível do planeta abaixo do horizonte
+option.STARS                           = Estrelas
+option.STARS.comment                   = Estrelas no céu noturno. Baixo impacto no desempenho
+option.STARS_INTENSITY                 = Intensidade
+option.STARS_INTENSITY.comment         = Controla o brilho das estrelas no céu noturno
+option.STARS_COVERAGE                  = Cobertura
+option.STARS_COVERAGE.comment          = Controla a quantidade de estrelas no céu noturno
+option.GALAXY                          = Galáxia
+option.GALAXY.comment                  = Imagem de uma galáxia no céu noturno
+option.GALAXY_INTENSITY                = Intensidade da galáxia
+option.GALAXY_INTENSITY.comment        = Controla o brilho da galáxia no céu noturno
+option.CREPUSCULAR_RAYS                = Raios crepusculares
+option.CREPUSCULAR_RAYS_INTENSITY      = Intensidade
+option.CREPUSCULAR_RAYS_STEPS_HORIZON  = Passos - horizonte
+option.CREPUSCULAR_RAYS_STEPS_ZENITH   = Passos - zênite
+option.RAINBOWS                        = Arco-íris
+option.END_SUN_EFFECT                  = Efeito solar do End
+option.ATMOSPHERE_SATURATION_BOOST                    = Reforço de saturação atmosférica
+option.ATMOSPHERE_SATURATION_BOOST.comment            = Aumenta a saturação das cores do céu e da luz solar de acordo com a hora do dia
+option.ATMOSPHERE_SATURATION_BOOST_INTENSITY          = Intensidade do reforço de saturação
+option.ATMOSPHERE_SATURATION_BOOST_INTENSITY.comment  = Ajusta a intensidade do reforço de saturação atmosférica
+option.ATMOSPHERE_RAIN_DESATURATION                   = Dessaturação na chuva
+option.ATMOSPHERE_RAIN_DESATURATION.comment           = Reduz a saturação da atmosfera durante a chuva, dando a ela uma aparência mais fria
+option.ATMOSPHERE_RAIN_DESATURATION_INTENSITY         = Intensidade da dessaturação
+option.ATMOSPHERE_RAIN_DESATURATION_INTENSITY.comment = Ajusta a intensidade da dessaturação da atmosfera durante a chuva
+
+# Nuvens
+option.CLOUDS_CUMULUS                       = Nuvens cumulus
+option.CLOUDS_CUMULUS.comment               = Nuvens volumétricas de baixa altitude com aparência de cumulus
+option.CLOUDS_CUMULUS_PRIMARY_STEPS_H       = Passos primários - horizonte
+option.CLOUDS_CUMULUS_PRIMARY_STEPS_Z       = Passos primários - zênite
+option.CLOUDS_CUMULUS_LIGHTING_STEPS        = Passos de iluminação
+option.CLOUDS_CUMULUS_AMBIENT_STEPS         = Passos de luz ambiente
+option.CLOUDS_CUMULUS_ALTITUDE              = Altitude
+suffix.CLOUDS_CUMULUS_ALTITUDE              = m
+option.CLOUDS_CUMULUS_THICKNESS             = Espessura
+option.CLOUDS_CUMULUS_DENSITY               = Densidade
+option.CLOUDS_CUMULUS_COVERAGE              = Cobertura
+option.CLOUDS_CUMULUS_SIZE                  = Tamanho
+option.CLOUDS_CUMULUS_DETAIL_STRENGTH       = Intensidade dos detalhes
+option.CLOUDS_CUMULUS_WIND_SPEED            = Velocidade do vento
+suffix.CLOUDS_CUMULUS_WIND_SPEED            = m/s
+option.CLOUDS_CUMULUS_WIND_ANGLE            = Ângulo do vento
+suffix.CLOUDS_CUMULUS_WIND_ANGLE            = °
+option.CLOUDS_CUMULUS_PRECOMPUTE_LOCAL_COVERAGE         = Pré-calcular cobertura local
+option.CLOUDS_CUMULUS_PRECOMPUTE_LOCAL_COVERAGE.comment = Otimização agressiva para nuvens cumulus. Reduz a distância máxima de renderização das nuvens e pode causar deformações em seus contornos quando a câmera se move. Desative ao tirar capturas de tela acima das nuvens
+
+option.CLOUDS_ALTOCUMULUS                       = Nuvens altocumulus
+option.CLOUDS_ALTOCUMULUS.comment               = Nuvens volumétricas de média altitude com aparência de altocumulus
+option.CLOUDS_ALTOCUMULUS_PRIMARY_STEPS_H       = Passos primários - horizonte
+option.CLOUDS_ALTOCUMULUS_PRIMARY_STEPS_Z       = Passos primários - zênite
+option.CLOUDS_ALTOCUMULUS_LIGHTING_STEPS        = Passos de iluminação
+option.CLOUDS_ALTOCUMULUS_AMBIENT_STEPS         = Passos de luz ambiente
+option.CLOUDS_ALTOCUMULUS_ALTITUDE              = Altitude
+suffix.CLOUDS_ALTOCUMULUS_ALTITUDE              = m
+option.CLOUDS_ALTOCUMULUS_THICKNESS             = Espessura
+option.CLOUDS_ALTOCUMULUS_DENSITY               = Densidade
+option.CLOUDS_ALTOCUMULUS_COVERAGE              = Cobertura
+option.CLOUDS_ALTOCUMULUS_SIZE                  = Tamanho
+option.CLOUDS_ALTOCUMULUS_DETAIL_STRENGTH       = Intensidade dos detalhes
+option.CLOUDS_ALTOCUMULUS_WIND_SPEED            = Velocidade do vento
+suffix.CLOUDS_ALTOCUMULUS_WIND_SPEED            = m/s
+option.CLOUDS_ALTOCUMULUS_WIND_ANGLE            = Ângulo do vento
+suffix.CLOUDS_ALTOCUMULUS_WIND_ANGLE            = °
+
+option.CLOUDS_CUMULUS_CONGESTUS                       = Nuvens cumulus congestus
+option.CLOUDS_CUMULUS_CONGESTUS.comment               = Nuvens volumétricas enormes e distantes
+option.CLOUDS_CUMULUS_CONGESTUS_PRIMARY_STEPS_H       = Passos primários - horizonte
+option.CLOUDS_CUMULUS_CONGESTUS_PRIMARY_STEPS_Z       = Passos primários - zênite
+option.CLOUDS_CUMULUS_CONGESTUS_LIGHTING_STEPS        = Passos de iluminação
+option.CLOUDS_CUMULUS_CONGESTUS_AMBIENT_STEPS         = Passos de luz ambiente
+option.CLOUDS_CUMULUS_CONGESTUS_ALTITUDE              = Altitude
+suffix.CLOUDS_CUMULUS_CONGESTUS_ALTITUDE              = m
+option.CLOUDS_CUMULUS_CONGESTUS_THICKNESS             = Espessura
+option.CLOUDS_CUMULUS_CONGESTUS_DENSITY               = Densidade
+option.CLOUDS_CUMULUS_CONGESTUS_COVERAGE              = Cobertura
+option.CLOUDS_CUMULUS_CONGESTUS_SIZE                  = Tamanho
+option.CLOUDS_CUMULUS_CONGESTUS_DETAIL_STRENGTH       = Intensidade dos detalhes
+option.CLOUDS_CUMULUS_CONGESTUS_WIND_SPEED            = Velocidade do vento
+suffix.CLOUDS_CUMULUS_CONGESTUS_WIND_SPEED            = m/s
+option.CLOUDS_CUMULUS_CONGESTUS_WIND_ANGLE            = Ângulo do vento
+suffix.CLOUDS_CUMULUS_CONGESTUS_WIND_ANGLE            = °
+
+option.CLOUDS_NOCTILUCENT               = Nuvens noctilucentes
+
+option.BLOCKY_CLOUDS                     = Nuvens em blocos
+option.BLOCKY_CLOUDS.comment             = Nuvens volumétricas no estilo do Minecraft. Ativar esta opção desativa todos os outros tipos de nuvem
+option.BLOCKY_CLOUDS_LAYER_2             = Segunda camada
+option.BLOCKY_CLOUDS_LAYER_2.comment     = Uma segunda camada de nuvens volumétricas no estilo do Minecraft! Ativar esta opção dobra o impacto das nuvens no desempenho
+option.BLOCKY_CLOUDS_THICKNESS           = Espessura
+option.BLOCKY_CLOUDS_THICKNESS.comment   = Ajusta a espessura das nuvens
+option.BLOCKY_CLOUDS_ALTITUDE            = Altitude
+option.BLOCKY_CLOUDS_ALTITUDE.comment    = Ajusta a altitude das nuvens
+suffix.BLOCKY_CLOUDS_ALTITUDE            = m
+option.BLOCKY_CLOUDS_ALTITUDE_2          = Altitude da segunda camada
+option.BLOCKY_CLOUDS_ALTITUDE_2.comment  = Ajusta a altitude da segunda camada de nuvens
+suffix.BLOCKY_CLOUDS_ALTITUDE_2          = m
+option.BLOCKY_CLOUDS_ROUNDNESS           = Arredondamento
+option.BLOCKY_CLOUDS_ROUNDNESS.comment   = Arredondamento das bordas das nuvens
+option.BLOCKY_CLOUDS_SHARPNESS           = Nitidez
+option.BLOCKY_CLOUDS_SHARPNESS.comment   = Nitidez das bordas das nuvens
+option.BLOCKY_CLOUDS_PRIMARY_STEPS       = Passos primários
+option.BLOCKY_CLOUDS_LIGHTING_STEPS      = Passos de iluminação
+option.BLOCKY_CLOUDS_DENSITY             = Densidade
+option.BLOCKY_CLOUDS_DENSITY.comment     = Ajusta a densidade das nuvens. Valores mais altos aumentam o ruído
+option.BLOCKY_CLOUDS_BRIGHTNESS          = Brilho
+option.BLOCKY_CLOUDS_BOTTOMLIGHT         = Brilho da parte inferior
+option.BLOCKY_CLOUDS_BOTTOMLIGHT.comment = Aumenta o brilho da parte inferior das nuvens
+option.BLOCKY_CLOUDS_SIZE                = Tamanho
+option.BLOCKY_CLOUDS_ATMOSPHERIC_SCATTERING         = Dispersão atmosférica
+option.BLOCKY_CLOUDS_ATMOSPHERIC_SCATTERING.comment = Quando ativado, dá às nuvens um tom levemente avermelhado. O efeito aumenta com a distância
+option.BLOCKY_CLOUDS_WIND_SPEED          = Velocidade do vento
+suffix.BLOCKY_CLOUDS_WIND_SPEED          = m/s
+option.BLOCKY_CLOUDS_WIND_ANGLE          = Ângulo do vento
+suffix.BLOCKY_CLOUDS_WIND_ANGLE          = °
+
+option.CLOUDS_TEMPORAL_UPSCALING       = Ampliação temporal
+option.CLOUDS_AERIAL_PERSPECTIVE_BOOST = Reforço da perspectiva aérea
+option.CLOUDS_SCALE                    = Escala
+option.CLOUDS_SCALE.comment            = Redimensiona todas as nuvens para deixá-las em uma altitude acessível durante o jogo. Com 1.0, mantém dimensões e altitudes realistas, com a primeira camada a 800 blocos de altitude por padrão. Valores maiores tornam as nuvens menores e mais próximas do solo. Também afeta o tamanho das sombras das nuvens
+suffix.CLOUDS_SCALE                    = ×
+value.CLOUDS_TEMPORAL_UPSCALING.1      = Desativado
+value.CLOUDS_TEMPORAL_UPSCALING.2      = 4×
+value.CLOUDS_TEMPORAL_UPSCALING.3      = 9×
+value.CLOUDS_TEMPORAL_UPSCALING.4      = 16×
+
+option.CLOUDS_CIRRUS                       = Nuvens cirrus/cirrocumulus
+option.CLOUDS_CIRRUS.comment               = Nuvens cirrus e cirrocumulus planas
+option.CLOUDS_CIRRUS_LIGHTING_STEPS        = Passos de iluminação
+option.CLOUDS_CIRRUS_AMBIENT_STEPS         = Passos de luz ambiente
+option.CLOUDS_CIRRUS_ALTITUDE              = Altitude
+suffix.CLOUDS_CIRRUS_ALTITUDE              = m
+option.CLOUDS_CIRRUS_THICKNESS             = Espessura
+option.CLOUDS_CIRRUS_DENSITY               = Densidade dos cirrus
+option.CLOUDS_CIRRUS_COVERAGE              = Cobertura dos cirrus
+option.CLOUDS_CIRRUS_SIZE                  = Tamanho dos cirrus
+option.CLOUDS_CIRRUS_DETAIL_STRENGTH       = Detalhes dos cirrus
+option.CLOUDS_CIRRUS_CURL_STRENGTH         = Turbulência dos cirrus
+option.CLOUDS_CIRRUS_WIND_SPEED            = Velocidade do vento
+suffix.CLOUDS_CIRRUS_WIND_SPEED            = m/s
+option.CLOUDS_CIRRUS_WIND_ANGLE            = Ângulo do vento
+suffix.CLOUDS_CIRRUS_WIND_ANGLE            = °
+option.CLOUDS_CIRROCUMULUS_DENSITY         = Densidade dos cirrocumulus
+option.CLOUDS_CIRROCUMULUS_COVERAGE        = Cobertura dos cirrocumulus
+option.CLOUDS_CIRROCUMULUS_SIZE            = Tamanho dos cirrocumulus
+option.CLOUDS_CIRROCUMULUS_DETAIL_STRENGTH = Detalhes dos cirrocumulus
+option.CLOUDS_CIRROCUMULUS_CURL_STRENGTH   = Turbulência dos cirrocumulus
+
+option.CLOUDS_NOCTILUCENT_INTENSITY    = Intensidade
+option.CLOUDS_NOCTILUCENT_RARITY       = Raridade
+
+option.AURORA_NORMAL                   = Aurora em qualquer bioma
+option.AURORA_SNOW                     = Aurora em biomas nevados
+option.AURORA_BRIGHTNESS               = Brilho da aurora
+option.AURORA_FREQUENCY                = Frequência da aurora
+option.AURORA_CLOUD_LIGHTING           = Contribuição de luz nas nuvens
+option.AURORA_GROUND_LIGHTING          = Contribuição de luz no terreno
+
+value.AURORA_NORMAL.AURORA_NEVER       = Nunca
+value.AURORA_NORMAL.AURORA_RARELY      = Raramente
+value.AURORA_NORMAL.AURORA_ALWAYS      = Sempre
+
+value.AURORA_SNOW.AURORA_NEVER         = Nunca
+value.AURORA_SNOW.AURORA_RARELY        = Raramente
+value.AURORA_SNOW.AURORA_ALWAYS        = Sempre
+
+# Opções de névoa
+
+option.BORDER_FOG                           = Névoa no limite de visão
+option.BORDER_FOG.comment                   = Névoa densa nas bordas da distância de renderização para ocultar os limites dos chunks
+option.CAVE_FOG                             = Névoa das cavernas
+option.CAVE_FOG.comment                     = Névoa leve e ligeiramente luminosa aplicada no subsolo. Dá mais ambientação às grandes cavernas e ajuda a visualizar seu formato
+option.BLOOMY_FOG                           = Névoa com bloom
+option.BLOOMY_FOG.comment                   = Bloom intenso na névoa. Dá a impressão de que a luz de objetos brilhantes se dispersa na névoa e ilumina a área atrás deles. Custo de desempenho quase nulo
+option.BLOOMY_FOG_INTENSITY                 = Intensidade do bloom na névoa
+option.BLOOMY_FOG_INTENSITY.comment         = Ajusta a intensidade do bloom na névoa
+option.OVERWORLD_FOG_INTENSITY              = Intensidade da névoa na Superfície
+option.NETHER_FOG_INTENSITY                 = Intensidade da névoa no Nether
+option.VL                                   = Névoa volumétrica
+option.LPV_VL.comment                       = As fontes de luz iluminam a névoa. Requer Luzes coloridas!
+option.VL.comment                           = Adiciona feixes de luz e densidade variável à névoa
+option.VL_RENDER_SCALE                      = Escala da névoa volumétrica
+option.AIR_FOG_CLOUDY_NOISE                 = Névoa com formas de nuvem
+option.AIR_FOG_CLOUDY_NOISE.comment         = Formas sutis de nuvens na névoa, mais visíveis pela manhã.\nRequer Névoa volumétrica!
+option.AIR_FOG_COLORED_LIGHT_SHAFTS         = Feixes de luz coloridos
+option.AIR_FOG_COLORED_LIGHT_SHAFTS.comment = Os feixes de luz que atravessam objetos translúcidos recebem a cor desses objetos
+
+# Névoa volumétrica com luzes coloridas
+option.LPV_VL                          = Luzes coloridas na névoa
+option.LPV_VL_STEPS                    = Passos
+option.LPV_VL_INTENSITY_OVERWORLD      = Intensidade na Superfície
+option.LPV_VL_INTENSITY_UNDERGROUND    = Intensidade no subsolo
+option.LPV_VL_INTENSITY_NETHER         = Intensidade no Nether
+option.LPV_VL_INTENSITY_END            = Intensidade no End
+
+# Névoa de Rayleigh
+option.AIR_FOG_RAYLEIGH_FALLOFF_START             = Início da atenuação de Rayleigh
+option.AIR_FOG_RAYLEIGH_FALLOFF_START.comment     = Altitude acima do nível do mar na qual a névoa de Rayleigh começa a diminuir
+option.AIR_FOG_RAYLEIGH_FALLOFF_HALF_LIFE         = Meia atenuação de Rayleigh
+option.AIR_FOG_RAYLEIGH_FALLOFF_HALF_LIFE.comment = Altura adicional, a partir do Início da atenuação de Rayleigh, necessária para reduzir a densidade da névoa de Rayleigh à metade
+
+option.AIR_FOG_RAYLEIGH_DENSITY        = Densidade normal
+option.AIR_FOG_RAYLEIGH_R              = §c▍ §fVermelho
+option.AIR_FOG_RAYLEIGH_G              = §a▍ §fVerde
+option.AIR_FOG_RAYLEIGH_B              = §9▍ §fAzul
+
+option.AIR_FOG_RAYLEIGH_DENSITY_RAIN   = Densidade na chuva
+option.AIR_FOG_RAYLEIGH_R_RAIN         = §c▍ §fVermelho
+option.AIR_FOG_RAYLEIGH_G_RAIN         = §a▍ §fVerde
+option.AIR_FOG_RAYLEIGH_B_RAIN         = §9▍ §fAzul
+
+option.AIR_FOG_RAYLEIGH_DENSITY_ARID   = Densidade em áreas áridas
+option.AIR_FOG_RAYLEIGH_R_ARID         = §c▍ §fVermelho
+option.AIR_FOG_RAYLEIGH_G_ARID         = §a▍ §fVerde
+option.AIR_FOG_RAYLEIGH_B_ARID         = §9▍ §fAzul
+
+option.AIR_FOG_RAYLEIGH_DENSITY_SNOWY  = Densidade em regiões nevadas
+option.AIR_FOG_RAYLEIGH_R_SNOWY        = §c▍ §fVermelho
+option.AIR_FOG_RAYLEIGH_G_SNOWY        = §a▍ §fVerde
+option.AIR_FOG_RAYLEIGH_B_SNOWY        = §9▍ §fAzul
+
+option.AIR_FOG_RAYLEIGH_DENSITY_TAIGA  = Densidade na taiga
+option.AIR_FOG_RAYLEIGH_R_TAIGA        = §c▍ §fVermelho
+option.AIR_FOG_RAYLEIGH_G_TAIGA        = §a▍ §fVerde
+option.AIR_FOG_RAYLEIGH_B_TAIGA        = §9▍ §fAzul
+
+option.AIR_FOG_RAYLEIGH_DENSITY_JUNGLE = Densidade na selva
+option.AIR_FOG_RAYLEIGH_R_JUNGLE       = §c▍ §fVermelho
+option.AIR_FOG_RAYLEIGH_G_JUNGLE       = §a▍ §fVerde
+option.AIR_FOG_RAYLEIGH_B_JUNGLE       = §9▍ §fAzul
+
+option.AIR_FOG_RAYLEIGH_DENSITY_SWAMP  = Densidade no pântano
+option.AIR_FOG_RAYLEIGH_R_SWAMP        = §c▍ §fVermelho
+option.AIR_FOG_RAYLEIGH_G_SWAMP        = §a▍ §fVerde
+option.AIR_FOG_RAYLEIGH_B_SWAMP        = §9▍ §fAzul
+
+# Névoa de Mie
+option.AIR_FOG_MIE_DENSITY_MORNING           = Densidade de manhã
+option.AIR_FOG_MIE_DENSITY_NOON              = Densidade ao meio-dia
+option.AIR_FOG_MIE_DENSITY_EVENING           = Densidade ao entardecer
+option.AIR_FOG_MIE_DENSITY_MIDNIGHT          = Densidade à meia-noite
+option.AIR_FOG_MIE_DENSITY_RAIN              = Densidade na chuva
+option.AIR_FOG_MIE_DENSITY_BLUE_HOUR         = Densidade na alvorada/crepúsculo
+option.AIR_FOG_MIE_FALLOFF_START             = Início da atenuação por altitude
+option.AIR_FOG_MIE_FALLOFF_START.comment     = Altitude acima do nível do mar na qual a névoa de Mie começa a diminuir
+option.AIR_FOG_MIE_FALLOFF_HALF_LIFE         = Meia atenuação por altitude
+option.AIR_FOG_MIE_FALLOFF_HALF_LIFE.comment = Altura adicional, a partir do Início da atenuação por altitude, necessária para reduzir a densidade da névoa de Mie à metade
+
+
+# Opções de materiais
+
+option.NORMAL_MAPPING                  = Mapeamento de normais
+option.NORMAL_MAPPING.comment          = Usa os mapas de normais fornecidos pelo pacote de recursos. Ative se estiver usando um pacote de recursos PBR
+option.SPECULAR_MAPPING                = Mapeamento especular
+option.SPECULAR_MAPPING.comment        = Usa os mapas especulares fornecidos pelo pacote de recursos. Ative se estiver usando um pacote de recursos PBR
+option.POM                             = Oclusão por paralaxe (POM)
+option.TEXTURE_FORMAT                  = Formato das texturas
+option.TEXTURE_FORMAT.comment          = Formato usado pelo pacote de recursos. A maioria dos pacotes atuais usa labPBR; pacotes feitos para SEUS podem usar Old PBR.
+option.HARDCODED_SPECULAR              = Reflexos especulares fixos
+option.HARDCODED_SPECULAR.comment      = Reflexos especulares predefinidos para alguns blocos, como metais
+option.HARDCODED_EMISSION              = Emissão predefinida
+option.HARDCODED_EMISSION.comment      = Emissão de luz predefinida para alguns blocos, como tochas
+option.HARDCODED_SSS                   = SSS predefinido
+option.HARDCODED_SSS.comment           = Dispersão subsuperficial predefinida para alguns blocos, como folhas
+option.RAIN_PUDDLES                    = Poças de chuva
+option.EMISSION_STRENGTH               = Intensidade da emissão
+option.EMISSION_STRENGTH.comment       = Ajusta o brilho de objetos emissivos, como tochas. Afeta apenas o brilho da própria fonte, sem alterar a intensidade da luz que ela projeta. Também afeta as emissões predefinidas
+option.DIRECTIONAL_LIGHTMAPS           = Mapas de luz direcionais
+option.DIRECTIONAL_LIGHTMAPS.comment   = Faz com que os mapas de normais afetem a luz dos blocos e do céu. Pode causar alguns problemas visuais devido às limitações do método
+option.DIRECTIONAL_LIGHTMAPS_INTENSITY = Força dos mapas direcionais
+option.DIRECTIONAL_LIGHTMAPS_INTENSITY.comment = Ajusta a intensidade dos mapas de luz direcionais
+option.POM_DEPTH                       = Profundidade da paralaxe
+option.POM_DEPTH.comment               = Define a profundidade aparente do relevo criado pelo POM dentro de um bloco
+option.POM_SAMPLES                     = Amostras da paralaxe
+option.POM_SAMPLES.comment             = Ajusta a qualidade do POM, ao custo de desempenho
+option.POM_SHADOW                      = Autossombreamento do POM
+option.POM_SHADOW.comment              = Autossombreamento do POM. Requer Mapeamento especular!
+option.POM_SHADOW_SAMPLES              = Amostras de autossombra do POM
+option.POM_SHADOW_SAMPLES.comment      = Ajusta a qualidade das sombras de paralaxe, ao custo de desempenho
+option.POM_SLOPE_NORMALS               = Normais das inclinações do POM
+option.POM_DISTANCE                    = Distância do POM
+option.REFRACTION                      = Refração
+value.REFRACTION.REFRACTION_OFF        = Desativado
+value.REFRACTION.REFRACTION_ALL        = Tudo
+value.REFRACTION.REFRACTION_WATER_ONLY = Somente água
+option.REFRACTION_INTENSITY            = Intensidade da refração
+option.REFRACTION_INTENSITY.comment    = Ajusta a intensidade da refração nos materiais afetados pelo modo selecionado
+
+suffix.POM_DEPTH                       = m
+suffix.POM_DISTANCE                    = m
+
+value.TEXTURE_FORMAT.TEXTURE_FORMAT_LAB = labPBR
+value.TEXTURE_FORMAT.TEXTURE_FORMAT_OLD = Old PBR
+
+option.ENVIRONMENT_REFLECTIONS         = Reflexos do ambiente
+option.ENVIRONMENT_REFLECTIONS.comment = Reflexos em espaço de tela. Faz com que a água e os blocos brilhantes reflitam o ambiente ao redor. Alto impacto no desempenho
+option.SKY_REFLECTIONS                 = Reflexos do céu
+option.SKY_REFLECTIONS.comment         = Faz com que a água e os blocos brilhantes reflitam o céu
+option.SSR_ROUGHNESS_SUPPORT           = Suporte à rugosidade
+option.SSR_ROUGHNESS_SUPPORT.comment   = Faz os reflexos de superfícies rugosas apresentarem a rugosidade dessas superfícies. Alto impacto no desempenho
+option.SSR_RAY_COUNT                   = Quantidade de raios
+option.SSR_RAY_COUNT.comment           = Quantidade de raios traçados para reflexos rugosos. Mais raios reduzem o ruído, mas pioram o desempenho
+option.SSR_INTERSECTION_STEPS_SMOOTH   = Passos de interseção - lisos
+option.SSR_INTERSECTION_STEPS_SMOOTH.comment = Ajusta a precisão dos reflexos lisos, ao custo de desempenho
+option.SSR_INTERSECTION_STEPS_ROUGH    = Passos de interseção - rugosos
+option.SSR_INTERSECTION_STEPS_ROUGH.comment = Ajusta a precisão dos reflexos rugosos, ao custo de desempenho
+option.SSR_REFINEMENT_STEPS            = Passos de refinamento
+option.SSR_REFINEMENT_STEPS.comment    = Ajusta a precisão de todos os reflexos, ao custo de desempenho
+option.SSR_ROUGHNESS_THRESHOLD         = Limiar de rugosidade
+option.SSR_ROUGHNESS_THRESHOLD.comment = Ajusta o quanto uma superfície precisa ser lisa para exibir reflexos
+
+# Opções de água
+
+option.WATER_CAUSTICS                  = Cáusticas da água
+option.WATER_CAUSTICS.comment          = Padrões de luz em movimento sob a água
+option.WATER_CAUSTICS_INTENSITY        = Intensidade das cáusticas
+option.WATER_CAUSTICS_INTENSITY.comment          = Ajusta o brilho das cáusticas da água
+option.WATER_EDGE_HIGHLIGHT            = Realce nas margens da água
+option.WATER_EDGE_HIGHLIGHT.comment    = Realces brancos nos pontos em que a água encontra o terreno. Ajudam a tornar a água mais visível em algumas situações
+option.WATER_EDGE_HIGHLIGHT_INTENSITY  = Intensidade do realce nas margens
+option.SNELLS_WINDOW                   = Janela de Snell
+option.SNELLS_WINDOW.comment           = Simula a reflexão interna total na superfície da água, vista de baixo
+option.WATER_TEXTURE                   = Textura da água
+option.WATER_TEXTURE.comment           = Como usar a textura de água do Minecraft.\n\nDesativado: não usa textura de água.\nRealces: a textura adiciona realces à água, como no Bedrock RTX.\nPadrão do Minecraft: a textura da água é usada como qualquer outra textura
+option.BIOME_WATER_COLOR               = Água com cor do bioma
+option.BIOME_WATER_COLOR.comment       = A absorção da água leva em conta a cor da água do bioma
+
+value.WATER_TEXTURE.WATER_TEXTURE_OFF                   = Desativado
+value.WATER_TEXTURE.WATER_TEXTURE_HIGHLIGHT             = Realces
+value.WATER_TEXTURE.WATER_TEXTURE_VANILLA               = Padrão do Minecraft
+value.WATER_TEXTURE.WATER_TEXTURE_HIGHLIGHT_UNDERGROUND = Realces (somente no subsolo)
+
+option.WATER_WAVES                     = Ondas na água
+option.WATER_WAVE_ITERATIONS           = Iterações
+option.WATER_WAVE_STRENGTH             = Intensidade
+option.WATER_WAVE_FREQUENCY            = Frequência
+option.WATER_WAVE_SPEED_STILL          = Velocidade (água parada)
+option.WATER_WAVE_SPEED_FLOWING        = Velocidade (água corrente)
+option.WATER_WAVE_PERSISTENCE          = Persistência
+option.WATER_WAVE_LACUNARITY           = Lacunaridade
+option.WATER_PARALLAX                  = Paralaxe da água
+option.WATER_PARALLAX.comment          = Faz as ondas da água parecerem tridimensionais
+option.WATER_DISPLACEMENT              = Deslocamento da água
+option.WATER_DISPLACEMENT.comment      = De forma semelhante às folhas ao vento, faz a própria geometria da água ondular levemente, deixando a linha da margem menos plana
+option.WATER_WAVES_HEIGHT_VARIATION           = Variação local de altura
+option.WATER_WAVES_HEIGHT_VARIATION.comment   = A altura das ondas da água varia de um ponto a outro
+
+option.WATER_ABSORPTION_R              = §c▍ §fAbsorção de vermelho
+option.WATER_ABSORPTION_G              = §a▍ §fAbsorção de verde
+option.WATER_ABSORPTION_B              = §9▍ §fAbsorção de azul
+option.WATER_SCATTERING                = Dispersão
+
+option.WATER_ABSORPTION_R_UNDERWATER   = §c▍ §fAbsorção de vermelho sob a água
+option.WATER_ABSORPTION_G_UNDERWATER   = §a▍ §fAbsorção de verde sob a água
+option.WATER_ABSORPTION_B_UNDERWATER   = §9▍ §fAbsorção de azul sob a água
+option.WATER_SCATTERING_UNDERWATER     = Dispersão sob a água
+
+# Opções de pós-processamento
+
+option.BLOOM                           = Bloom
+option.BLOOM.comment                   = Efeito de brilho suave ao redor de áreas claras e fontes de luz
+option.BLOOM_INTENSITY                 = Intensidade do bloom
+option.BLOOM_INTENSITY.comment         = Ajusta o quanto o bloom afeta a imagem final
+option.BLOOM_SPREAD                    = Alcance do bloom
+option.BLOOM_UPSAMPLING_FILTER         = Filtro de ampliação do bloom
+value.BLOOM_UPSAMPLING_FILTER.texture  = Bilinear
+value.BLOOM_UPSAMPLING_FILTER.bicubic_filter = Bicúbico
+option.BLOOM_SPREAD.comment            = Ajusta o alcance do bloom
+option.DOF                             = Profundidade de campo (DoF)
+option.DOF.comment                     = Simula o foco da câmera, desfocando os objetos fora da distância de foco (profundidade de campo, ou DoF)
+option.DOF_INTENSITY                   = Intensidade de DoF
+option.DOF_INTENSITY.comment           = Ajusta a intensidade da profundidade de campo
+option.DOF_SAMPLES                     = Amostras de DoF
+option.DOF_SAMPLES.comment             = Quantidade de amostras da profundidade de campo. Mais amostras melhoram a qualidade do desfoque, ao custo de desempenho
+option.DOF_FOCUS                       = Distância de foco
+option.DOF_FOCUS.comment               = Distância na qual a imagem fica em foco quando a profundidade de campo está ativada
+option.MOTION_BLUR                     = Desfoque de movimento
+option.MOTION_BLUR.comment             = Aplica um desfoque cinematográfico ao movimento. Pode dar mais fluidez visual em taxas de quadros baixas, mas causar enjoo
+option.MOTION_BLUR_INTENSITY           = Força do desfoque de movimento
+option.MOTION_BLUR_INTENSITY.comment   = Ajusta a intensidade do desfoque de movimento
+option.TAA                             = TAA
+option.TAA.comment                     = Antisserrilhamento temporal. Melhora bastante a qualidade da imagem e reduz o ruído, mas também pode causar artefatos temporais, como cintilação e rastros. Necessário para Ampliação com TAA!
+option.FXAA                            = FXAA
+option.FXAA.comment                    = Suaviza os contornos. Atua em conjunto com o TAA, ajudando especialmente durante o movimento. Muito útil com TAAU
+option.TAAU                            = Ampliação com TAA
+option.TAAU.comment                    = Renderiza a cena em resolução reduzida e usa TAA para ampliar a imagem. Melhora bastante o desempenho, mas pode reduzir a qualidade da imagem e aumentar os artefatos temporais
+option.TAAU_RENDER_SCALE               = Escala de renderização do TAAU
+option.TAAU_RENDER_SCALE.comment       = Escala da resolução usada pelo TAAU (Ampliação com TAA). Em uma tela de 1920x1080, o valor 0.75 (padrão) renderiza a cena em 1440x810 antes da ampliação
+option.CAS                             = Nitidez da imagem
+option.CAS.comment                     = Aplica um filtro de nitidez à imagem final, com intensidade adaptada ao contraste local
+option.CAS_INTENSITY                   = Intensidade da nitidez
+option.CAS_INTENSITY.comment           = Ajusta o efeito da nitidez na imagem
+option.VIGNETTE                        = Vinheta
+option.VIGNETTE.comment                = Escurece as bordas da tela
+option.VIGNETTE_INTENSITY              = Intensidade da vinheta
+option.VIGNETTE_INTENSITY.comment      = Ajusta a intensidade da vinheta
+
+value.DOF_FOCUS.-1.0                   = Automático
+
+option.tonemap                         = Operador de mapeamento de tons
+
+value.tonemap.tonemap_aces_fit         = ACES Fit
+value.tonemap.tonemap_aces_full        = ACES completo
+value.tonemap.tonemap_hejl_2015        = Hejl 2015
+value.tonemap.tonemap_hejl_burgess     = Hejl-Burgess
+value.tonemap.tonemap_lottes           = Lottes
+value.tonemap.tonemap_uncharted_2      = Uncharted 2
+value.tonemap.tonemap_tech             = Tech
+value.tonemap.tonemap_ozius            = Ozius
+value.tonemap.tonemap_reinhard         = Reinhard
+value.tonemap.tonemap_reinhard_jodie   = Reinhard-Jodie
+
+# Ajustes de cor
+
+option.GRADE_BRIGHTNESS                = Brilho
+option.GRADE_CONTRAST                  = Contraste
+option.GRADE_SATURATION                = Saturação
+option.GRADE_WHITE_BALANCE             = Balanço de branco
+option.GRADE_ORANGE_SAT_BOOST          = §6▍ §fSaturação de laranja
+option.GRADE_TEAL_SAT_BOOST            = §b▍ §fSaturação de azul-petróleo
+option.GRADE_GREEN_SAT_BOOST           = §a▍ §fSaturação de verde
+option.GRADE_GREEN_HUE_SHIFT           = §a▍ §fDesvio de matiz do verde
+suffix.GRADE_WHITE_BALANCE             = K
+suffix.GRADE_GREEN_HUE_SHIFT           = °
+
+option.PURKINJE_SHIFT                  = Efeito Purkinje
+option.PURKINJE_SHIFT.comment          = Simula o efeito da pouca iluminação na visão humana, reduzindo a saturação de todas as cores e escurecendo os tons vermelhos
+option.PURKINJE_SHIFT_INTENSITY        = Intensidade do efeito Purkinje
+
+# Exposição
+
+option.AUTO_EXPOSURE                         = Exposição automática
+option.AUTO_EXPOSURE_BIAS                    = Compensação de exposição
+option.AUTO_EXPOSURE_MIN                     = Exposição mínima
+option.AUTO_EXPOSURE_MAX                     = Exposição máxima
+option.AUTO_EXPOSURE_RATE_DIM_TO_BRIGHT      = Rapidez de adaptação ao claro
+option.AUTO_EXPOSURE_RATE_BRIGHT_TO_DIM      = Rapidez de adaptação ao escuro
+option.MANUAL_EXPOSURE_VALUE                 = Valor da exposição manual
+option.MANUAL_EXPOSURE_USE_SCREEN_BRIGHTNESS = Usar controle de brilho
+option.MANUAL_EXPOSURE_USE_SCREEN_BRIGHTNESS.comment = O valor da exposição varia entre Exposição mínima e Exposição máxima de acordo com o controle de Brilho no menu de configurações de vídeo
+option.HISTOGRAM_BINS                        = Intervalos do histograma
+option.HISTOGRAM_TARGET                      = Alvo do histograma (CDF)
+
+value.AUTO_EXPOSURE.AUTO_EXPOSURE_SIMPLE    = Simples
+value.AUTO_EXPOSURE.AUTO_EXPOSURE_HISTOGRAM = Histograma
+value.AUTO_EXPOSURE.AUTO_EXPOSURE_OFF       = Desativado
+
+# Opções diversas
+
+option.DEBUG_VIEW                      = Visualização de depuração
+option.DEBUG_SAMPLER                   = Amostrador de depuração
+option.WHITE_WORLD                     = Mundo branco
+option.WHITE_WORLD.comment             = Define todas as texturas de albedo como brancas
+option.TONEMAP_COMPARISON              = Comparar mapeamentos de tons
+option.TONEMAP_COMPARISON.comment      = Compara duas funções de mapeamento de tons nas metades esquerda e direita da tela
+option.tonemap_left                    = Mapeamento de tons à esquerda
+option.tonemap_right                   = Mapeamento de tons à direita
+option.FANCY_NETHER_PORTAL             = Portal do Nether aprimorado
+option.FANCY_NETHER_PORTAL.comment     = Efeito aprimorado do portal do Nether inspirado no Complementary Reimagined Shaders, de EminGT. Obrigado ao Emin por permitir o uso da ideia! Pode não funcionar tão bem com alguns pacotes de recursos
+option.CUSTOM_SKY                      = Céu personalizado
+option.CUSTOM_SKY.comment              = Ativa céus personalizados dos pacotes de recursos
+option.CUSTOM_SKY_BRIGHTNESS           = Brilho do céu personalizado
+option.CUSTOM_SKY_BRIGHTNESS.comment   = Ajusta o brilho do céu personalizado
+option.ENCHANTMENT_GLINT_BRIGHTNESS    = Brilho dos encantamentos
+option.DITHERED_TRANSLUCENCY_FALLBACK  = Translucidez por pontilhado
+option.DITHERED_TRANSLUCENCY_FALLBACK.comment = Quando separateEntityDraws está ativado, simula translucidez com um padrão de pontos nos objetos que não podem usar transparência normal.
+
+value.DEBUG_VIEW.DEBUG_VIEW_NONE       = Desativado
+value.DEBUG_VIEW.DEBUG_VIEW_SAMPLER    = Amostrador
+value.DEBUG_VIEW.DEBUG_VIEW_HISTOGRAM  = Histograma
+value.DEBUG_VIEW.DEBUG_VIEW_WEATHER    = Clima
+
+value.tonemap_left.tonemap_aces_fit       = ACES Fit
+value.tonemap_left.tonemap_aces_full      = ACES completo
+value.tonemap_left.tonemap_lottes         = Lottes
+value.tonemap_left.tonemap_hejl_2015      = Hejl 2015
+value.tonemap_left.tonemap_hejl_burgess   = Hejl-Burgess
+value.tonemap_left.tonemap_uncharted_2    = Uncharted 2
+value.tonemap_left.tonemap_tech           = Tech
+value.tonemap_left.tonemap_ozius          = Ozius
+value.tonemap_left.tonemap_reinhard       = Reinhard
+value.tonemap_left.tonemap_reinhard_jodie = Reinhard-Jodie
+
+value.tonemap_right.tonemap_aces_fit       = ACES Fit
+value.tonemap_right.tonemap_aces_full      = ACES completo
+value.tonemap_right.tonemap_lottes         = Lottes
+value.tonemap_right.tonemap_hejl_burgess   = Hejl-Burgess
+value.tonemap_right.tonemap_hejl_2015      = Hejl 2015
+value.tonemap_right.tonemap_uncharted_2    = Uncharted 2
+value.tonemap_right.tonemap_tech           = Tech
+value.tonemap_right.tonemap_ozius          = Ozius
+value.tonemap_right.tonemap_reinhard       = Reinhard
+value.tonemap_right.tonemap_reinhard_jodie = Reinhard-Jodie
+
+# Visualização de distância
+
+option.DISTANCE_VIEW                   = Exibir mapa de distâncias
+option.DISTANCE_VIEW_METHOD            = Método
+option.DISTANCE_VIEW_MAX_DISTANCE      = Distância máxima
+suffix.DISTANCE_VIEW_MAX_DISTANCE      = m
+
+value.DISTANCE_VIEW_METHOD.DISTANCE_VIEW_DISTANCE = Distância
+value.DISTANCE_VIEW_METHOD.DISTANCE_VIEW_DEPTH    = Profundidade
+
+# Contorno de seleção
+
+option.BOX_MODE                 = Modo
+option.BOX_MODE.comment         = Modo do contorno de seleção
+value.BOX_MODE.BOX_MODE_NONE    = Padrão
+value.BOX_MODE.BOX_MODE_COLOR   = Cor personalizada
+value.BOX_MODE.BOX_MODE_RAINBOW = Arco-íris
+option.BOX_COLOR_R              = §c▍ §fVermelho
+option.BOX_COLOR_G              = §a▍ §fVerde
+option.BOX_COLOR_B              = §9▍ §fAzul
+option.BOX_EMISSION             = Emissão
+option.BOX_EMISSION.comment     = Amplifica os valores de cor para além de 1. Requer bloom.
+option.BOX_LINE_WIDTH           = Espessura da linha
+
+# Distant Horizons
+
+option.DH_OVERDRAW_DISTANCE     = Distância de sobreposição
+option.DH_OVERDRAW_FADE_LENGTH  = Largura da faixa de transição
+option.NOISE_ON_DH_TERRAIN      = Ruído no terreno do DH
+
+# Photonics
+
+option.PHOTONICS_ENABLED              = Usar Photonics
+option.PHOTONICS_LIGHTING_MODE        = Modo de iluminação
+option.PHOTONICS_LIGHTING_MODE.comment = Algoritmo de iluminação usado pelo Photonics.\n\nSharp: iluminação simples e sem ruído; a quantidade de luzes é limitada por Máximo de amostras.\nReSTIR: suporta mais luzes, até o valor de Máximo de luzes, mas pode apresentar ruído em certas áreas.
+value.PHOTONICS_LIGHTING_MODE.SIMPLE  = Sharp
+value.PHOTONICS_LIGHTING_MODE.RESTIR  = ReSTIR
+option.PHOTONICS_ALPHA_MODE           = Modo de transparência
+option.PHOTONICS_ALPHA_MODE.comment   = Altera como o Photonics lida com voxels transparentes.\n\nOpaco: trata voxels transparentes como opacos.\nPor bloco: usa o primeiro voxel transparente e ignora o restante do bloco.\nPor voxel: usa todos os voxels transparentes de um bloco (ALTO IMPACTO NO DESEMPENHO)
+value.PHOTONICS_ALPHA_MODE.NONE       = Opaco
+value.PHOTONICS_ALPHA_MODE.BLOCK      = Por bloco
+value.PHOTONICS_ALPHA_MODE.VOXEL      = Por voxel
+option.PHOTONICS_MAX_LIGHTS           = Máximo de luzes
+option.PHOTONICS_MAX_LIGHTS.comment   = Quantidade máxima de fontes de luz rastreadas que o Photonics pode carregar
+option.PHOTONICS_GLINT_STRENGTH       = Força da luz de encantamentos
+option.PHOTONICS_GLINT_STRENGTH.comment = Ajusta a contribuição dos itens encantados para a iluminação nas mãos
+value.PHOTONICS_GLINT_STRENGTH.0      = Desativado
+option.PHOTONICS_TWO_HANDHELD_RAYS    = Raios separados para cada mão
+option.PHOTONICS_TWO_HANDHELD_RAYS.comment = Permite que as luzes de ambas as mãos projetem sombras. Quando desativado, apenas uma sombra é projetada
+option.PHOTONICS_SHARP_MAX_SAMPLES    = Máximo de amostras
+option.PHOTONICS_RESTIR_INITIAL_SAMPLES   = Amostras iniciais
+option.PHOTONICS_RESTIR_SPR_SAMPLES       = Amostras de reúso espacial
+value.PHOTONICS_RESTIR_SPR_SAMPLES.0      = Desativado
+option.PHOTONICS_RESTIR_SPR_RADIUS        = Raio de reúso espacial
+option.PHOTONICS_RESTIR_ACCUMULATION      = Quadros de acumulação
+option.PHOTONICS_RESTIR_ACCUMULATION.comment = Quantidade máxima de quadros usados pelo ReSTIR para acumulação. Valores menores fazem a iluminação responder mais rapidamente, ao custo de mais ruído.
+option.PHOTONICS_RESTIR_DENOISER_PASSES   = Passagens de redução de ruído
+option.PHOTONICS_RESTIR_SOFT_SHADOWS      = Sombras suaves
+option.PHOTONICS_RESTIR_COMBINED_GI       = Incluir GI da luz do céu
+option.PHOTONICS_RESTIR_COMBINED_GI.comment = Usa o redutor de ruído do ReSTIR para processar a iluminação global (GI).\nDeixa essa iluminação mais nítida, ao custo de desempenho.
