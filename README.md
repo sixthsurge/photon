@@ -18,6 +18,7 @@
   * [Patatagod69](https://github.com/PatataNL) - Dutch
   * sincerity - Estonian
   * [Theuska](https://github.com/Theuska) - Brazilian Portuguese
+  * [FourthEcho](https://github.com/FourthEcho) - German
 * [Emin](https://github.com/EminGT) - Shadow bias method from [Complementary Reimagined](https://www.complementary.dev/shaders/) (fully fixes peter panning and light leaking underground!)
 * [DrDesten](https://github.com/DrDesten) - Depth tolerance calculation for SSR (helps to prevent false reflections)
 * [Essentuan](https://github.com/Essentuan) - Photonics mod support
