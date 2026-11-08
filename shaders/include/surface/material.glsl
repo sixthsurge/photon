@@ -825,7 +825,7 @@ Material material_from(
         }
     }
 
-    if (64u <= material_mask && material_mask < 80u) {
+    if (81u <= material_mask && material_mask < 97u) {
 // Stained glass, honey and slime
 #ifdef HARDCODED_SPECULAR
         material.f0 = vec3(0.04);
