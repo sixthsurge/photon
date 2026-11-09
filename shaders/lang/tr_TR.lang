@@ -819,4 +819,5 @@ option.PHOTONICS_RESTIR_SOFT_SHADOWS      = Yumuşak Gölgeler
 option.PHOTONICS_RESTIR_COMBINED_GI       = Gökyüzü Işığı GI'ı Dahil Et
 option.PHOTONICS_RESTIR_COMBINED_GI.comment = GI'ın olağan yolu yerine ReSTIR'in gürültü gidericisinden geçirilip geçirilmeyeceği.\nÇok daha keskin GI sağlar; bedeli performanstır.
 
+# Settings Menu Reorder additions (English fallback)
 

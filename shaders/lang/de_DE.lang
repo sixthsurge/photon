@@ -821,3 +821,6 @@ option.PHOTONICS_RESTIR_DENOISER_PASSES   = Entrauscher-Durchläufe
 option.PHOTONICS_RESTIR_SOFT_SHADOWS      = Weiche Schatten
 option.PHOTONICS_RESTIR_COMBINED_GI       = Himmelslicht-GI einbeziehen
 option.PHOTONICS_RESTIR_COMBINED_GI.comment = Ob GI durch den Entrauscher von ReSTIR statt durch den gewohnten Pfad geleitet werden soll.\nFührt zu viel schärferem GI, auf Kosten der Leistung.
+
+# Settings Menu Reorder additions (English fallback)
+
