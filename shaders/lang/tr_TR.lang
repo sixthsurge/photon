@@ -883,7 +883,6 @@ option.AURORA_SNOW.comment = Sets how frequently auroras appear in snowy biomes.
 option.POM.comment = Enables parallax occlusion mapping for supported resource-pack textures.
 option.RAIN_PUDDLES.comment = Creates reflective puddles on suitable surfaces during rain.
 option.REFRACTION.comment = Selects which surfaces receive screen-space refraction.
-option.WATER_CAUSTICS_INTENSITY.comment = Controls the brightness of caustic light patterns beneath the water surface.
 option.WATER_WAVES.comment = Enables animated wave patterns on the water surface.
 option.BLOOM_UPSAMPLING_FILTER.comment = Selects the filter used when upscaling the bloom effect.
 option.tonemap.comment = Selects the tone-mapping operator used to convert HDR colors for display.
