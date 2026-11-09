@@ -108,7 +108,7 @@ vec3 shadow_pcf(
 
     int step_count
         = int(SHADOW_PCF_STEPS_MIN + SHADOW_PCF_STEPS_SCALE * filter_scale);
-    step_count = min(step_count, SHADOW_PCF_STEPS_MAX);
+    step_count = min(step_count, SHADOW_PCF_ITERATIONS);
 
     float shadow = 0.0;
 
@@ -251,12 +251,13 @@ vec3 get_filtered_shadows(
     penumbra_size = min(penumbra_size, SHADOW_BLOCKER_SEARCH_RADIUS);
     penumbra_size *= shadowProjection[0].x;
 #else
-    float penumbra_size
-        = sqrt(0.5) * shadow_map_pixel_size * SHADOW_PENUMBRA_SCALE;
+    float penumbra_size = sqrt(0.5) * shadow_map_pixel_size;
 
     // Increase blur radius to approximate subsurface scattering
     penumbra_size *= 1.0 + 7.0 * sss_amount;
 #endif
+
+    penumbra_size *= SHADOW_SOFTNESS;
 
 #ifdef SHADOW_COLOR
     // Calculate position without light leaking fix applied, for colored shadow
@@ -283,6 +284,11 @@ vec3 get_filtered_shadows(
     );
 #else
     vec3 shadow = shadow_basic(shadow_screen_pos);
+#endif
+
+#ifdef SHADOW_COLOR
+    float shadow_luminance = dot(shadow, vec3(0.2126, 0.7152, 0.0722));
+    shadow = mix(vec3(shadow_luminance), shadow, SHADOW_COLOR_STRENGTH);
 #endif
 
     return shadow;

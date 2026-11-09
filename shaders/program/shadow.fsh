@@ -163,9 +163,6 @@ void main() {
             1.0
         );
 #endif
-    } else if (material_mask == 97u) { // Tinted glass
-        // 0 is treated as opaque by shadow_basic and goes to shadowtex1
-        shadowcolor0_out = vec3(rcp(255.0));
     } else {
         vec4 base_color = textureLod(tex, uv, 0);
         if (base_color.a < 0.1) {

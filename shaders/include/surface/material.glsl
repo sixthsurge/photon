@@ -825,8 +825,8 @@ Material material_from(
         }
     }
 
-    if (81u <= material_mask && material_mask < 98u) {
-// Stained/tinted glass, honey and slime
+    if (64u <= material_mask && material_mask < 80u) {
+// Stained glass, honey and slime
 #ifdef HARDCODED_SPECULAR
         material.f0 = vec3(0.04);
         material.roughness = 0.1;

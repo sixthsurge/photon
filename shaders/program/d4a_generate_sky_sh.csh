@@ -87,18 +87,24 @@ void main() {
     return;
 #endif
 
-    const uint sample_count = 256;
+    const uint sample_count = uint(SH_SKYLIGHT_QUALITY);
     uint i = uint(gl_LocalInvocationID.x);
 
     // Calculate SH coefficients for each sample
 
     float skylight_boost = get_skylight_boost();
 
-    vec3 direction = uniform_hemisphere_sample(vec3(0.0, 1.0, 0.0), r2(int(i)));
-    vec3 radiance
-        = texture(colortex4, project_sky(direction)).rgb * skylight_boost;
+    // Keep the workgroup size fixed and zero unused samples for lower quality.
+    vec3 radiance = vec3(0.0);
+    mat3 coeff = mat3(0.0);
 
-    mat3 coeff = sh_coeff_order_2(direction);
+    if (i < sample_count) {
+        vec3 direction
+            = uniform_hemisphere_sample(vec3(0.0, 1.0, 0.0), r2(int(i)));
+        radiance = texture(colortex4, project_sky(direction)).rgb
+            * skylight_boost * SH_SKYLIGHT_INTENSITY;
+        coeff = sh_coeff_order_2(direction);
+    }
 
 #if (defined MC_GL_KHR_shader_subgroup_arithmetic) \
     && (defined IRIS_VULKAN || !defined MC_GL_VENDOR_INTEL \

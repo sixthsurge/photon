@@ -6,8 +6,7 @@
         defined PROGRAM_SHADOW_FALLBACK || defined PROGRAM_SHADOW_SOLID \
         || defined PROGRAM_SHADOW_CUTOUT \
     )
-#undef WAVING_PLANTS
-#undef WAVING_LEAVES
+#undef WIND_EFFECTS
 #endif
 
 #if !defined PROGRAM_GBUFFERS_WATER \
@@ -17,7 +16,7 @@
 
 #include "/include/misc/material_masks.glsl"
 
-#if defined WAVING_PLANTS || defined WAVING_LEAVES
+#ifdef WIND_EFFECTS
 #include "/include/weather/core.glsl"
 #endif
 
@@ -75,7 +74,7 @@ float get_water_displacement(vec3 world_pos, float skylight) {
 }
 #endif
 
-#if defined WAVING_PLANTS || defined WAVING_LEAVES
+#ifdef WIND_EFFECTS
 vec3 get_wind_displacement(
     vec3 world_pos,
     float wind_speed,
@@ -139,7 +138,7 @@ vec3 animate_vertex(
             return world_pos;
 #endif
 
-#ifdef WAVING_PLANTS
+#ifdef WIND_EFFECTS
         case MATERIAL_SMALL_PLANTS:
         case MATERIAL_OPEN_EYEBLOSSOM:
             return world_pos
@@ -174,7 +173,7 @@ vec3 animate_vertex(
                    + player_displacement);
 #endif
 
-#ifdef WAVING_LEAVES
+#ifdef WIND_EFFECTS
         case MATERIAL_LEAVES:
             return world_pos
                 + get_wind_displacement(
