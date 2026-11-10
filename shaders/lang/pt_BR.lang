@@ -818,7 +818,6 @@ option.PHOTONICS_RESTIR_SOFT_SHADOWS      = Sombras suaves
 option.PHOTONICS_RESTIR_COMBINED_GI       = Incluir GI da luz do céu
 option.PHOTONICS_RESTIR_COMBINED_GI.comment = Usa o redutor de ruído do ReSTIR para processar a iluminação global (GI).\nDeixa essa iluminação mais nítida, ao custo de desempenho.
 
-# Settings Menu Reorder additions (English fallback)
 screen.ambient_lighting                 = Ambient Lighting
 screen.direct_lighting                 = Direct Lighting
 screen.fog_general                       = General
