@@ -467,6 +467,7 @@ option.BLOOMY_FOG.comment = Esto da la apariencia de que la luz de objetos brill
 option.BLOOMY_FOG_INTENSITY = Intensidad de la niebla luminosa
 option.BLOOMY_FOG_INTENSITY.comment = Ajusta la intensidad de la "niebla luminosa"
 option.OVERWORLD_FOG_INTENSITY = Intensidad de la niebla en el Overworld
+option.NETHER_FOG_INTENSITY = Intensidad de la niebla en el Nether
 option.VL = Niebla volumétrica
 option.LPV_VL.comment = Las fuentes de luz iluminan la niebla. ¡Requiere luces de colores!
 option.VL.comment = Agrega haces de luz y densidad de niebla variable

@@ -436,6 +436,7 @@ option.BLOOMY_FOG.comment              = 雾气的强烈泛光. 使得明亮事�
 option.BLOOMY_FOG_INTENSITY            = 泛光雾强度
 option.BLOOMY_FOG_INTENSITY.comment    = 调节泛光雾的强度.
 option.OVERWORLD_FOG_INTENSITY         = 主世界雾气强度
+option.NETHER_FOG_INTENSITY            = 下界雾气强度
 option.VL                              = 体积雾
 option.LPV_VL.comment                  = 光源可点亮雾气. 需启用彩色光源! 
 option.VL.comment                      = 添加光轴和可变雾气密度.

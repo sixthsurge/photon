@@ -431,6 +431,7 @@ option.BLOOMY_FOG.comment              = Aura luminosa intensa nella nebbia. Da 
 option.BLOOMY_FOG_INTENSITY            = Intensità aura nebbiosa
 option.BLOOMY_FOG_INTENSITY.comment    = Modifica l'intensità dell'aura nebbiosa
 option.OVERWORLD_FOG_INTENSITY         = Intensità Nebbia Overworld
+option.NETHER_FOG_INTENSITY            = Intensità Nebbia Nether
 option.VL                              = Illuminazione Volumetrica
 comment.LPV_VL                         = Fonti di luce illuminano la nebbia. Richiede luci colorate! 
 option.VL.comment                      = Aggiunge raggi di luce e variabile nebbia volumetrica

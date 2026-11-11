@@ -497,6 +497,7 @@ option.BLOOMY_FOG.comment                   = Intense bloom in fog. This gives t
 option.BLOOMY_FOG_INTENSITY                 = Bloomy Fog Intensity
 option.BLOOMY_FOG_INTENSITY.comment         = Adjusts the intensity of "bloomy fog"
 option.OVERWORLD_FOG_INTENSITY              = Overworld Fog Intensity
+option.NETHER_FOG_INTENSITY                 = Nether Fog Intensity
 option.VL                                   = Volumetric Fog
 option.LPV_VL.comment                       = Light sources illuminate the fog. Requires Colored Lights! 
 option.VL.comment                           = Adds light shafts and variable fog density

@@ -451,6 +451,7 @@ option.BLOOMY_FOG.comment                   = 안개 속의 강한 블룸 효과
 option.BLOOMY_FOG_INTENSITY                 = 블룸 안개 강도
 option.BLOOMY_FOG_INTENSITY.comment         = "블룸 안개"의 강도를 조절합니다
 option.OVERWORLD_FOG_INTENSITY              = 오버월드 안개 강도
+option.NETHER_FOG_INTENSITY                 = 네더 안개 강도
 option.VL                                   = 볼류메트릭 안개
 option.LPV_VL.comment                       = 광원이 안개를 비춥니다. 유색 조명이 필요합니다!
 option.VL.comment                           = 빛줄기(광축)와 가변 안개 밀도를 추가합니다

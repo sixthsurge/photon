@@ -440,6 +440,7 @@ option.BLOOMY_FOG.comment              = Intense gloed in de mist. Dit geeft de 
 option.BLOOMY_FOG_INTENSITY            = Mist Gloed Intensiteit
 option.BLOOMY_FOG_INTENSITY.comment    = Wijzigt de intensiteit van Gloed Mist.
 option.OVERWORLD_FOG_INTENSITY         = Overworld Mist Intensiteit
+option.NETHER_FOG_INTENSITY            = Nether Mist Intensiteit
 option.VL                              = Volumetrische Mist
 option.LPV_VL.comment                  = Lichtbronnen belichten de mist. Vereist Gekleurde Lichtbronnen!
 option.VL.comment                      = Voegt lichtstralen en variabele mist-dichtheid toe.

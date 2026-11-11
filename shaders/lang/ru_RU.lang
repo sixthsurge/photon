@@ -450,6 +450,7 @@ option.BLOOMY_FOG.comment              = Интенсивное свечение
 option.BLOOMY_FOG_INTENSITY            = Сила светящегося тумана
 option.BLOOMY_FOG_INTENSITY.comment    = Регулирует силу "светящегося тумана"
 option.OVERWORLD_FOG_INTENSITY         = Сила тумана верхнего мира
+option.NETHER_FOG_INTENSITY            = Сила тумана нижнего мира
 option.VL                              = Объемное освещение (VL)
 option.LPV_VL.comment                  = Источники света освещают туман. Требует включённого цветного освщения! 
 option.VL.comment                      = Создает световые волны и переменную плотность тумана

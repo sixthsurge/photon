@@ -434,6 +434,7 @@ option.BLOOMY_FOG.comment              = Intensiivne helendus udus. Tekitab mulj
 option.BLOOMY_FOG_INTENSITY            = Helendava udu intensiivsus
 option.BLOOMY_FOG_INTENSITY.comment    = Reguleerib helendava udu tugevust
 option.OVERWORLD_FOG_INTENSITY         = Overworldi udu intensiivsus
+option.NETHER_FOG_INTENSITY            = Netheri udu intensiivsus
 option.VL                              = Mahuline udu
 option.LPV_VL.comment                  = Valgusallikad valgustavad udu. Vajab värvilist valgust!
 option.VL.comment                      = Lisab valguskiiri ja muutuvat udu tihedust

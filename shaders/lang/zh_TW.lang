@@ -434,6 +434,7 @@ option.BLOOMY_FOG.comment              = 霧中強光暈效果，營造光線散
 option.BLOOMY_FOG_INTENSITY            = 光暈霧強度
 option.BLOOMY_FOG_INTENSITY.comment    = 調整「光暈之霧」強度
 option.OVERWORLD_FOG_INTENSITY         = 主世界霧強度
+option.NETHER_FOG_INTENSITY            = 地獄霧強度
 option.VL                              = 體積霧
 option.VL.comment                      = 新增光柱與可變霧密度
 option.LPV_VL.comment                  = 光源照亮體積霧，需要有色光線支援
