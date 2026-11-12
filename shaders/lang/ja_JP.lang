@@ -1,0 +1,822 @@
+# Profiles
+
+profile.low                            = §e低
+profile.medium                         = §a中
+profile.high                           = §b高
+profile.ultra                          = §dウルトラ
+
+# Screens
+
+screen.world                           = ワールド
+screen.lighting                        = ライティング
+screen.sky                             = 空
+screen.fog                             = 霧
+screen.materials                       = マテリアル
+screen.water                           = 水
+screen.post                            = ポストプロセス
+screen.misc                            = その他
+screen.mods                            = Mod オプション
+
+screen.weather                         = 天候
+screen.colored_lights                  = 色付きライトの設定
+screen.rp_settings                     = リソースパックの設定
+screen.reflections                     = 反射
+screen.refraction                      = 屈折
+screen.light_sources                   = 光源
+screen.shadows                         = 影
+screen.ao                              = アンビエントオクルージョン
+screen.color_grading                   = カラーグレーディング
+screen.exposure                        = 露出
+screen.lpv_vl                          = 色付きライトの霧の散乱
+screen.box                             = 選択ボックス
+screen.developer                       = 開発者向けオプション
+
+screen.distant_horizons                = Distant Horizons
+screen.photonics                       = Photonics
+screen.photonics_sharp                 = Sharp の設定
+screen.photonics_restir                = ReSTIR の設定
+
+screen.aurora                          = オーロラ
+screen.clouds                          = 雲
+screen.crepuscular_rays                = 薄明光線
+screen.stars                           = 星
+screen.clouds_cumulus                  = 積雲の設定
+screen.clouds_altocumulus              = 高積雲の設定
+screen.clouds_cumulus_congestus        = 雄大積雲の設定
+screen.clouds_cirrus                   = 巻雲・巻積雲の設定
+screen.clouds_minecrafty               = ブロック状の雲の設定
+screen.clouds_noctilucent              = 夜光雲の設定
+
+screen.fog_rlh                         = レイリー霧
+screen.fog_mie                         = ミー霧
+screen.sunlight_color                  = 太陽光の色
+screen.moonlight_color                 = 月光の色
+screen.blocklight_color                = ブロックライトの色
+screen.sunlight_morning                = 朝
+screen.sunlight_noon                   = 正午
+screen.sunlight_evening                = 夕方
+screen.light_nether                    = ネザー
+screen.light_end                       = ジ・エンド
+screen.fog_rlh_normal                  = 通常時の色
+screen.fog_rlh_rain                    = 雨天時の色
+screen.fog_rlh_arid                    = 乾燥地帯・砂漠の色
+screen.fog_rlh_snowy                   = 雪地帯の色
+screen.fog_rlh_taiga                   = タイガの色
+screen.fog_rlh_jungle                  = ジャングルの色
+screen.fog_rlh_swamp                   = 沼地の色
+screen.water_waves                     = 水の波
+screen.water_fog_coeff                 = 水の霧の係数
+
+screen.end_light_color                 = 光の色
+screen.end_ambient_color               = 環境光の色
+screen.nether_color                    = 固定色
+
+screen.distance_view                   = 距離ビュー
+
+option.INFO                            = Photon Shaders
+value.INFO.0                           = §eSixthSurge 作
+value.INFO.1                           = §aSixthSurge 作
+value.INFO.2                           = §bSixthSurge 作
+value.INFO.3                           = §dSixthSurge 作
+
+# World settings
+
+option.WAVING_PLANTS                   = 植物の揺れ
+option.WAVING_PLANTS.comment           = 地面に生える植物が風で揺れます。\n\n揺れる植物のリストにブロックを追加するには、shaders/block.properties を開き、該当するカテゴリ（10016、10017、10018）に追加してください。
+option.WAVING_LEAVES                   = 葉の揺れ
+option.WAVING_LEAVES.comment           = 葉のブロックが風で揺れます。\n\n揺れる葉ブロックのリストにブロックを追加するには、shaders/block.properties を開き、該当するカテゴリ（10019）に追加してください。
+option.SLANTED_RAIN                    = 斜めの雨
+option.SLANTED_RAIN.comment            = 雨のパーティクルを斜めにします。雨の日の雰囲気が少し増します。
+option.RAIN_OPACITY                    = 雨の不透明度
+option.RAIN_OPACITY.comment            = 雨のパーティクルの不透明度を調整します。
+option.SEA_LEVEL                       = 海面の高さ
+option.SEA_LEVEL.comment               = 海・地面の y 座標です。\n\n-60.0: 1.18 以降のスーパーフラット。\n4.0: 1.18 より前のスーパーフラット。\n63.0: 通常。
+option.SNOW_OPACITY                    = 雪の不透明度
+option.SNOW_OPACITY.comment            = 雪のパーティクルの不透明度を調整します。
+option.EDGE_HIGHLIGHT                  = エッジハイライト
+option.EDGE_HIGHLIGHT.comment          = Minecraft Dungeons にインスパイアされた、エッジを強調する効果です。
+option.EDGE_HIGHLIGHT_SCALE            = エッジハイライトのスケール
+option.EDGE_HIGHLIGHT_SCALE.comment    = エッジハイライトの太さを調整します。リソースパックの解像度に合わせて変更してください。
+option.MOON_PHASE_AFFECTS_BRIGHTNESS   = 月の満ち欠けがライティングに影響
+option.MOON_PHASE_AFFECTS_BRIGHTNESS.comment = 夜の明るさが、月の満ち欠けの影響を受けます。
+option.DESERT_SANDSTORM                = 砂漠の砂嵐
+option.DESERT_SANDSTORM.comment        = 砂漠バイオームで雨が降ると、砂嵐になります。
+option.END_GLOW                        = ジ・エンドの輝き
+option.END_GLOW.comment                = ジ・エンドで揺らめく発光エフェクトです。ボリュメトリックフォグが必要です。
+
+# Weather
+option.RANDOM_WEATHER_VARIATION            = ランダムな変化
+option.BIOME_WEATHER_VARIATION             = バイオームによる変化
+option.WEATHER_TEMPERATURE_BIAS            = 気温の偏り
+option.WEATHER_HUMIDITY_BIAS               = 湿度の偏り
+option.WEATHER_WIND_BIAS                   = 風の強さの偏り
+option.WEATHER_TEMPERATURE_VARIATION_SPEED = 気温の変化の速さ
+option.WEATHER_HUMIDITY_VARIATION_SPEED    = 湿度の変化の速さ
+option.WEATHER_WIND_VARIATION_SPEED        = 風の強さの変化の速さ
+
+# Lighting settings
+
+option.COLORED_LIGHTS                  = 色付きライト
+option.COLORED_LIGHTS.comment          = フラッドフィルアルゴリズムを使い、ブロックの光を色付きにします。Iris 1.6 以上が必要です。
+option.HANDHELD_LIGHTING               = 手持ちライト
+option.HANDHELD_LIGHTING.comment       = 手に持ったアイテムが周囲を照らします。色付きライトが有効な場合は、手持ちの光も光源と同じ色になります。
+option.HANDHELD_LIGHTING_INTENSITY     = 手持ちライトの強さ
+option.HANDHELD_LIGHTING_INTENSITY.comment = 手に持った光源の明るさを調整します。
+option.AO_IN_SUNLIGHT                  = 太陽光下の AO
+option.AO_IN_SUNLIGHT.comment          = 直射の太陽光・月光の下でも、シェーダーのアンビエントオクルージョンを適用するかどうかです。
+option.CLOUD_SHADOWS                   = 雲の影
+option.CLOUD_SHADOWS.comment           = 雲が地面に落とす影です。
+option.CLOUD_SHADOWS_INTENSITY         = 雲の影の強さ
+option.CLOUD_SHADOWS_INTENSITY.comment = 雲の影の強さを調整します。
+option.SH_SKYLIGHT                     = SH スカイライト
+option.SH_SKYLIGHT.comment             = オーバーワールドの指向性スカイライトに球面調和関数のエンコードを使います。とても自然な見た目になります。\nGTAO と相性がよいです。
+option.SSS_SHEEN                       = SSS の光沢
+option.SSS_SHEEN.comment               = 植物や葉に、鏡面反射の「光沢」効果を加えます。背の高い草などが、草の鏡面反射となじみやすくなります。
+option.SSS_INTENSITY                   = SSS の強さ
+option.SSS_INTENSITY.comment           = 表面下散乱（SSS）の明るさを調整します。
+option.SHADING_STRENGTH                = シェーディングの強さ
+option.SHADING_STRENGTH.comment        = 直接光のシェーディングのコントラストを調整します。下げると、太陽と反対を向いていて影になっていない面が明るくなり、上げると暗くなります。
+
+option.SHADOW                          = シャドウマッピング
+option.SHADOW_PCF                      = シャドウマップのフィルタリング
+option.SHADOW_SSRT                     = SSRT による遠距離の影
+option.SHADOW_SSRT_STEPS               = SSRT 影のステップ数
+option.SHADOW_COLOR                    = 色付きの影
+option.SHADOW_COLOR.comment            = 半透明のブロックが、色付きの影を落とします。
+option.SHADOW_VPS                      = 可変半影の影
+option.SHADOW_VPS.comment              = 影を落とす物から離れるほど、影がやわらかくなります。
+option.shadowMapResolution             = 影の解像度
+option.shadowDistance                  = 影の描画距離
+option.sunPathRotation                 = 太陽の軌道の回転
+option.SHADOW_PENUMBRA_SCALE           = 影のやわらかさ
+option.SHADOW_PENUMBRA_SCALE.comment   = 影のやわらかさを調整します。
+option.ENTITY_SHADOWS                  = エンティティの影
+option.ENTITY_SHADOWS.comment          = エンティティが影を落とすかどうかです。\n大規模な農場があるサバイバルの拠点では、無効にするとパフォーマンスが改善します。
+option.BLOCK_ENTITY_SHADOWS            = ブロックエンティティの影
+option.PIXELATED_SHADOWS               = ピクセル化した影
+option.PIXELATED_SHADOWS.comment       = 影がブロックのテクセルに吸着し、ピクセル風の見た目になります。
+option.PIXELATED_SHADOWS_RESOLUTION    = ピクセル化した影の解像度
+option.SSS_STEPS                       = SSS のステップ数
+option.SSS_STEPS.comment               = 増やすと、葉など SSS を持つマテリアルのノイズが減りますが、パフォーマンスが低下します。
+
+option.SHADER_AO                       = シェーダー AO
+option.SHADER_AO.comment               = 使用する AO の方式です。オフ - シェーダー AO を使いません。SSAO - 品質は低めですが、サンプル数やフィルタリングが少なくて済みます。GTAO - 品質は高めですが、サンプル数やフィルタリングが多く必要です。
+value.SHADER_AO.SHADER_AO_NONE         = オフ
+value.SHADER_AO.SHADER_AO_SSAO         = SSAO
+value.SHADER_AO.SHADER_AO_GTAO         = GTAO
+option.VANILLA_AO                      = バニラ AO
+option.VANILLA_AO.comment              = Minecraft 標準のアンビエントオクルージョンです。
+option.VANILLA_AO_INTENSITY            = バニラ AO の強さ
+option.VANILLA_AO_INTENSITY.comment    = Minecraft 標準のアンビエントオクルージョンの強さを調整します。
+option.SSAO_RADIUS                     = SSAO の半径
+option.SSAO_RADIUS.comment             = SSAO の半径を調整します。物体どうしが遮蔽し合える距離です。
+option.SSAO_STEPS                      = SSAO のステップ数
+option.SSAO_STEPS.comment              = SSAO のノイズの目立ちやすさを調整します。
+option.GTAO_RADIUS                     = GTAO の半径
+option.GTAO_RADIUS.comment             = GTAO の半径を調整します。物体どうしが遮蔽し合える距離です。
+option.GTAO_SLICES                     = GTAO のスライス数
+option.GTAO_SLICES.comment             = GTAO のノイズの目立ちやすさを調整します。
+option.GTAO_HORIZON_STEPS              = GTAO のホライズンステップ数
+option.GTAO_HORIZON_STEPS.comment      = GTAO の精度を調整します。ステップ数を増やすと、効果の強さも増します。
+
+option.SUN_NR                          = §c▍ §f赤
+option.SUN_NG                          = §a▍ §f緑
+option.SUN_NB                          = §9▍ §f青
+option.SUN_MR                          = §c▍ §f赤
+option.SUN_MG                          = §a▍ §f緑
+option.SUN_MB                          = §9▍ §f青
+option.SUN_ER                          = §c▍ §f赤
+option.SUN_EG                          = §a▍ §f緑
+option.SUN_EB                          = §9▍ §f青
+option.SUN_I                           = 太陽光の強さ
+option.MOON_R                          = §c▍ §f赤
+option.MOON_G                          = §a▍ §f緑
+option.MOON_B                          = §9▍ §f青
+option.MOON_I                          = 月光の強さ
+option.SKYLIGHT_I                      = スカイライトの強さ
+option.BOUNCED_LIGHT_I                 = 太陽光の間接光の強さ
+option.CAVE_LIGHTING_I                 = 洞窟の明るさ
+option.LIGHTNING_FLASH                 = 雷の閃光
+option.NETHER_USE_BIOME_COLOR          = バイオームの色を使う
+option.NETHER_I                        = 環境光の強さ
+option.NETHER_S                        = 環境光の彩度
+option.NETHER_R                        = §c▍ §f赤
+option.NETHER_G                        = §a▍ §f緑
+option.NETHER_B                        = §9▍ §f青
+option.END_LIGHT_R                     = §c▍ §f赤
+option.END_LIGHT_G                     = §a▍ §f緑
+option.END_LIGHT_B                     = §9▍ §f青
+option.END_LIGHT_I                     = 光の強さ
+option.END_AMBIENT_R                   = §c▍ §f赤
+option.END_AMBIENT_G                   = §a▍ §f緑
+option.END_AMBIENT_B                   = §9▍ §f青
+option.END_AMBIENT_I                   = 環境光の強さ
+option.BLOCKLIGHT_R                    = §c▍ §f赤
+option.BLOCKLIGHT_G                    = §a▍ §f緑
+option.BLOCKLIGHT_B                    = §9▍ §f青
+option.BLOCKLIGHT_I                    = ブロックライトの強さ
+
+option.COLORED_LIGHTS_VANILLA_LIGHTMAP_CONTRIBUTION                 = バニラのライトマップの寄与度
+option.COLORED_LIGHTS_VANILLA_LIGHTMAP_CONTRIBUTION_FALLOFF         = 寄与の減衰
+option.COLORED_LIGHTS_VANILLA_LIGHTMAP_CONTRIBUTION_FALLOFF.comment = バニラのライトマップが寄与する度合いの、減衰のしかたを変えます。\n2 乗: 光源の近くは明るく、急速に弱まります。\nリニア: 光はやわらかく、光源から遠くまで届きます。
+option.VOXEL_VOLUME_SIZE                                            = ボクセルボリュームのサイズ
+option.VOXEL_VOLUME_SIZE.comment                                    = 色付きライトを計算するボリュームのサイズを調整します。パフォーマンスへの影響が大きく、影の描画距離の影響も受けます。
+suffix.VOXEL_VOLUME_SIZE                                            = m³
+option.VOXEL_VOLUME_CENTER                                          = ボクセルボリュームの中心
+option.VOXEL_VOLUME_CENTER.comment                                  = 前方: ボクセルボリュームがプレイヤーの前方を中心とし、より多くの範囲が視界に入ります。
+
+value.COLORED_LIGHTS_VANILLA_LIGHTMAP_CONTRIBUTION_FALLOFF.COLORED_LIGHTS_VANILLA_LIGHTMAP_CONTRIBUTION_FALLOFF_SQUARED = 2 乗
+value.COLORED_LIGHTS_VANILLA_LIGHTMAP_CONTRIBUTION_FALLOFF.COLORED_LIGHTS_VANILLA_LIGHTMAP_CONTRIBUTION_FALLOFF_LINEAR  = リニア
+
+value.VOXEL_VOLUME_CENTER.VOXEL_VOLUME_CENTER_AHEAD  = 前方
+value.VOXEL_VOLUME_CENTER.VOXEL_VOLUME_CENTER_PLAYER = プレイヤー
+
+suffix.shadowMapResolution             = ²
+suffix.sunPathRotation                 = °
+
+value.shadowDistance.48.0              = 3 チャンク
+value.shadowDistance.64.0              = 4 チャンク
+value.shadowDistance.80.0              = 5 チャンク
+value.shadowDistance.96.0              = 6 チャンク
+value.shadowDistance.112.0             = 7 チャンク
+value.shadowDistance.128.0             = 8 チャンク
+value.shadowDistance.144.0             = 9 チャンク
+value.shadowDistance.160.0             = 10 チャンク
+value.shadowDistance.176.0             = 11 チャンク
+value.shadowDistance.192.0             = 12 チャンク
+value.shadowDistance.208.0             = 13 チャンク
+value.shadowDistance.224.0             = 14 チャンク
+value.shadowDistance.240.0             = 15 チャンク
+value.shadowDistance.256.0             = 16 チャンク
+value.shadowDistance.320.0             = 20 チャンク
+value.shadowDistance.384.0             = 24 チャンク
+value.shadowDistance.512.0             = 32 チャンク
+value.shadowDistance.768.0             = 48 チャンク
+value.shadowDistance.1024.0            = 64 チャンク
+value.shadowDistance.2048.0            = 128 チャンク
+value.shadowDistance.4096.0            = 256 チャンク
+
+# Sky settings
+
+option.VANILLA_SUN                     = バニラの太陽
+option.VANILLA_MOON                    = バニラの月
+option.SUN_ANGULAR_RADIUS              = 太陽の角半径
+option.MOON_ANGULAR_RADIUS             = 月の角半径
+option.SKY_GROUND                      = 空の地面
+option.SKY_GROUND.comment              = 地平線の下に見える、惑星の表面です。
+option.STARS                           = 有効
+option.STARS.comment                   = 夜空の星です。パフォーマンスへの影響は小さいです。
+option.STARS_INTENSITY                 = 強さ
+option.STARS_INTENSITY.comment         = 夜空の星の明るさを調整します。
+option.STARS_COVERAGE                  = 星の数
+option.STARS_COVERAGE.comment          = 夜空の星の数を調整します。
+option.GALAXY                          = 銀河
+option.GALAXY.comment                  = 夜空に銀河の画像を表示します。
+option.GALAXY_INTENSITY                = 銀河の強さ
+option.GALAXY_INTENSITY.comment        = 夜空の銀河の明るさを調整します。
+option.CREPUSCULAR_RAYS                = 有効
+option.CREPUSCULAR_RAYS_INTENSITY      = 強さ
+option.CREPUSCULAR_RAYS_STEPS_HORIZON  = ステップ数 - 地平線
+option.CREPUSCULAR_RAYS_STEPS_ZENITH   = ステップ数 - 天頂
+option.LIGHTNING_FLASH                 = 雷の閃光
+option.RAINBOWS                        = 虹
+option.END_SUN_EFFECT                  = ジ・エンドの太陽エフェクト
+option.ATMOSPHERE_SATURATION_BOOST                    = 大気の彩度ブースト
+option.ATMOSPHERE_SATURATION_BOOST.comment            = 時間帯に応じて、空と太陽光の色の彩度を上げます。
+option.ATMOSPHERE_SATURATION_BOOST_INTENSITY          = 彩度ブーストの強さ
+option.ATMOSPHERE_SATURATION_BOOST_INTENSITY.comment  = 大気の彩度ブーストの強さを調整します。
+option.ATMOSPHERE_RAIN_DESATURATION                   = 雨天時の大気の彩度低下
+option.ATMOSPHERE_RAIN_DESATURATION.comment           = 雨の間は大気の彩度を下げ、より冷たい雰囲気の雨にします。
+option.ATMOSPHERE_RAIN_DESATURATION_INTENSITY         = 彩度低下の強さ
+option.ATMOSPHERE_RAIN_DESATURATION_INTENSITY.comment = 雨天時の大気の彩度低下の強さを調整します。
+
+# Clouds
+option.CLOUDS_CUMULUS                       = 積雲
+option.CLOUDS_CUMULUS.comment               = 積雲に似せた、低高度のボリュメトリッククラウドです。
+option.CLOUDS_CUMULUS_PRIMARY_STEPS_H       = メインステップ数 - 地平線
+option.CLOUDS_CUMULUS_PRIMARY_STEPS_Z       = メインステップ数 - 天頂
+option.CLOUDS_CUMULUS_LIGHTING_STEPS        = ライティングステップ数
+option.CLOUDS_CUMULUS_AMBIENT_STEPS         = 環境光ステップ数
+option.CLOUDS_CUMULUS_ALTITUDE              = 高度
+suffix.CLOUDS_CUMULUS_ALTITUDE              = m
+option.CLOUDS_CUMULUS_THICKNESS             = 厚さ
+option.CLOUDS_CUMULUS_DENSITY               = 密度
+option.CLOUDS_CUMULUS_COVERAGE              = 雲量
+option.CLOUDS_CUMULUS_SIZE                  = サイズ
+option.CLOUDS_CUMULUS_DETAIL_STRENGTH       = ディテールの強さ
+option.CLOUDS_CUMULUS_WIND_SPEED            = 風速
+suffix.CLOUDS_CUMULUS_WIND_SPEED            = m/s
+option.CLOUDS_CUMULUS_WIND_ANGLE            = 風の角度
+suffix.CLOUDS_CUMULUS_WIND_ANGLE            = °
+option.CLOUDS_CUMULUS_PRECOMPUTE_LOCAL_COVERAGE         = 局所的な雲量の事前計算
+option.CLOUDS_CUMULUS_PRECOMPUTE_LOCAL_COVERAGE.comment = 積雲向けの積極的な最適化です。雲を描画できる最大距離が短くなり、カメラを動かしたときに雲の形が変化するようなアーティファクトが出ることがあります。雲の上でスクリーンショットを撮るときは無効にしてください。
+
+option.CLOUDS_ALTOCUMULUS                       = 高積雲
+option.CLOUDS_ALTOCUMULUS.comment               = 高積雲に似せた、中高度のボリュメトリッククラウドです。
+option.CLOUDS_ALTOCUMULUS_PRIMARY_STEPS_H       = メインステップ数 - 地平線
+option.CLOUDS_ALTOCUMULUS_PRIMARY_STEPS_Z       = メインステップ数 - 天頂
+option.CLOUDS_ALTOCUMULUS_LIGHTING_STEPS        = ライティングステップ数
+option.CLOUDS_ALTOCUMULUS_AMBIENT_STEPS         = 環境光ステップ数
+option.CLOUDS_ALTOCUMULUS_ALTITUDE              = 高度
+suffix.CLOUDS_ALTOCUMULUS_ALTITUDE              = m
+option.CLOUDS_ALTOCUMULUS_THICKNESS             = 厚さ
+option.CLOUDS_ALTOCUMULUS_DENSITY               = 密度
+option.CLOUDS_ALTOCUMULUS_COVERAGE              = 雲量
+option.CLOUDS_ALTOCUMULUS_SIZE                  = サイズ
+option.CLOUDS_ALTOCUMULUS_DETAIL_STRENGTH       = ディテールの強さ
+option.CLOUDS_ALTOCUMULUS_WIND_SPEED            = 風速
+suffix.CLOUDS_ALTOCUMULUS_WIND_SPEED            = m/s
+option.CLOUDS_ALTOCUMULUS_WIND_ANGLE            = 風の角度
+suffix.CLOUDS_ALTOCUMULUS_WIND_ANGLE            = °
+
+option.CLOUDS_CUMULUS_CONGESTUS                       = 雄大積雲
+option.CLOUDS_CUMULUS_CONGESTUS.comment               = 巨大で遠くに見える、ボリュメトリッククラウドです。
+option.CLOUDS_CUMULUS_CONGESTUS_PRIMARY_STEPS_H       = メインステップ数 - 地平線
+option.CLOUDS_CUMULUS_CONGESTUS_PRIMARY_STEPS_Z       = メインステップ数 - 天頂
+option.CLOUDS_CUMULUS_CONGESTUS_LIGHTING_STEPS        = ライティングステップ数
+option.CLOUDS_CUMULUS_CONGESTUS_AMBIENT_STEPS         = 環境光ステップ数
+option.CLOUDS_CUMULUS_CONGESTUS_ALTITUDE              = 高度
+suffix.CLOUDS_CUMULUS_CONGESTUS_ALTITUDE              = m
+option.CLOUDS_CUMULUS_CONGESTUS_THICKNESS             = 厚さ
+option.CLOUDS_CUMULUS_CONGESTUS_DENSITY               = 密度
+option.CLOUDS_CUMULUS_CONGESTUS_COVERAGE              = 雲量
+option.CLOUDS_CUMULUS_CONGESTUS_SIZE                  = サイズ
+option.CLOUDS_CUMULUS_CONGESTUS_DETAIL_STRENGTH       = ディテールの強さ
+option.CLOUDS_CUMULUS_CONGESTUS_WIND_SPEED            = 風速
+suffix.CLOUDS_CUMULUS_CONGESTUS_WIND_SPEED            = m/s
+option.CLOUDS_CUMULUS_CONGESTUS_WIND_ANGLE            = 風の角度
+suffix.CLOUDS_CUMULUS_CONGESTUS_WIND_ANGLE            = °
+
+option.CLOUDS_NOCTILUCENT               = 夜光雲
+
+option.BLOCKY_CLOUDS                     = ブロック状の雲
+option.BLOCKY_CLOUDS.comment             = バニラ風のボリュメトリッククラウドです。有効にすると、他のすべての種類の雲が無効になります。
+option.BLOCKY_CLOUDS_LAYER_2             = 2 層目
+option.BLOCKY_CLOUDS_LAYER_2.comment     = マイクラ風のボリュメトリッククラウドを、もう 1 層追加します。有効にすると、雲によるパフォーマンスへの影響が 2 倍になるので注意してください。
+option.BLOCKY_CLOUDS_THICKNESS           = 厚さ
+option.BLOCKY_CLOUDS_THICKNESS.comment   = 雲の厚さを調整します。
+option.BLOCKY_CLOUDS_ALTITUDE            = 高度
+option.BLOCKY_CLOUDS_ALTITUDE.comment    = 雲の高さを調整します。
+suffix.BLOCKY_CLOUDS_ALTITUDE            = m
+option.BLOCKY_CLOUDS_ALTITUDE_2          = 2 層目の高度
+option.BLOCKY_CLOUDS_ALTITUDE_2.comment  = 2 層目の雲の高さを調整します。
+suffix.BLOCKY_CLOUDS_ALTITUDE_2          = m
+option.BLOCKY_CLOUDS_ROUNDNESS           = 丸み
+option.BLOCKY_CLOUDS_ROUNDNESS.comment   = 雲の縁の丸みです。
+option.BLOCKY_CLOUDS_SHARPNESS           = シャープさ
+option.BLOCKY_CLOUDS_SHARPNESS.comment   = 雲の縁のシャープさです。
+option.BLOCKY_CLOUDS_PRIMARY_STEPS       = メインステップ数
+option.BLOCKY_CLOUDS_LIGHTING_STEPS      = ライティングステップ数
+option.BLOCKY_CLOUDS_DENSITY             = 密度
+option.BLOCKY_CLOUDS_DENSITY.comment     = 雲の密度を調整します。値を大きくするとノイズが増えます。
+option.BLOCKY_CLOUDS_BRIGHTNESS          = 明るさ
+option.BLOCKY_CLOUDS_BOTTOMLIGHT         = 下面の明るさ
+option.BLOCKY_CLOUDS_BOTTOMLIGHT.comment = 雲の下側の明るさを上げます。
+option.BLOCKY_CLOUDS_SIZE                = サイズ
+option.BLOCKY_CLOUDS_ATMOSPHERIC_SCATTERING         = 大気散乱
+option.BLOCKY_CLOUDS_ATMOSPHERIC_SCATTERING.comment = 有効にすると、雲がわずかに赤みがかります。この効果は距離が遠いほど強くなります。
+option.BLOCKY_CLOUDS_WIND_SPEED          = 風速
+suffix.BLOCKY_CLOUDS_WIND_SPEED          = m/s
+option.BLOCKY_CLOUDS_WIND_ANGLE          = 風の角度
+suffix.BLOCKY_CLOUDS_WIND_ANGLE          = °
+
+option.CLOUDS_TEMPORAL_UPSCALING       = テンポラルアップスケーリング
+option.CLOUDS_AERIAL_PERSPECTIVE_BOOST = 空気遠近法ブースト
+option.CLOUDS_SCALE                    = スケール
+option.CLOUDS_SCALE.comment            = すべての雲に適用される拡大率で、現実的なサイズと高度の雲を、ゲームプレイ中に届く高度まで引き下げます。この値が 1.0 のとき、雲は現実的な位置に配置され、デフォルトでは 1 層目が 800 ブロックの高さになります。値を大きくすると、雲は小さくなり、より地面に近い位置にできます。雲の影の大きさにも影響します。
+suffix.CLOUDS_SCALE                    = ×
+value.CLOUDS_TEMPORAL_UPSCALING.1      = オフ
+value.CLOUDS_TEMPORAL_UPSCALING.2      = 4×
+value.CLOUDS_TEMPORAL_UPSCALING.3      = 9×
+value.CLOUDS_TEMPORAL_UPSCALING.4      = 16×
+
+option.CLOUDS_CIRRUS                       = 巻雲・巻積雲
+option.CLOUDS_CIRRUS.comment               = 平面状の巻雲と巻積雲です。
+option.CLOUDS_CIRRUS_LIGHTING_STEPS        = ライティングステップ数
+option.CLOUDS_CIRRUS_AMBIENT_STEPS         = 環境光ステップ数
+option.CLOUDS_CIRRUS_ALTITUDE              = 高度
+suffix.CLOUDS_CIRRUS_ALTITUDE              = m
+option.CLOUDS_CIRRUS_THICKNESS             = 厚さ
+option.CLOUDS_CIRRUS_DENSITY               = 巻雲の密度
+option.CLOUDS_CIRRUS_COVERAGE              = 巻雲の雲量
+option.CLOUDS_CIRRUS_SIZE                  = 巻雲のサイズ
+option.CLOUDS_CIRRUS_DETAIL_STRENGTH       = 巻雲のディテールの強さ
+option.CLOUDS_CIRRUS_CURL_STRENGTH         = 巻雲のカールの強さ
+option.CLOUDS_CIRRUS_WIND_SPEED            = 風速
+suffix.CLOUDS_CIRRUS_WIND_SPEED            = m/s
+option.CLOUDS_CIRRUS_WIND_ANGLE            = 風の角度
+suffix.CLOUDS_CIRRUS_WIND_ANGLE            = °
+option.CLOUDS_CIRROCUMULUS_DENSITY         = 巻積雲の密度
+option.CLOUDS_CIRROCUMULUS_COVERAGE        = 巻積雲の雲量
+option.CLOUDS_CIRROCUMULUS_SIZE            = 巻積雲のサイズ
+option.CLOUDS_CIRROCUMULUS_DETAIL_STRENGTH = 巻積雲のディテールの強さ
+option.CLOUDS_CIRROCUMULUS_CURL_STRENGTH   = 巻積雲のカールの強さ
+
+option.CLOUDS_NOCTILUCENT_INTENSITY    = 強さ
+option.CLOUDS_NOCTILUCENT_RARITY       = 希少度
+
+option.AURORA_NORMAL                   = どのバイオームでもオーロラ
+option.AURORA_SNOW                     = 雪のバイオームのオーロラ
+option.AURORA_BRIGHTNESS               = オーロラの明るさ
+option.AURORA_FREQUENCY                = オーロラの頻度
+option.AURORA_CLOUD_LIGHTING           = 雲への光の寄与
+option.AURORA_GROUND_LIGHTING          = 地面への光の寄与
+
+value.AURORA_NORMAL.AURORA_NEVER       = なし
+value.AURORA_NORMAL.AURORA_RARELY      = まれに
+value.AURORA_NORMAL.AURORA_ALWAYS      = 常に
+
+value.AURORA_SNOW.AURORA_NEVER         = なし
+value.AURORA_SNOW.AURORA_RARELY        = まれに
+value.AURORA_SNOW.AURORA_ALWAYS        = 常に
+
+# Fog settings
+
+option.BORDER_FOG                           = 境界の霧
+option.BORDER_FOG.comment                   = 描画距離の端を覆う濃い霧で、チャンクの境目を隠します。
+option.CAVE_FOG                             = 洞窟の霧
+option.CAVE_FOG.comment                     = 地下に、ほのかに光る薄い霧を発生させます。大きな洞窟の雰囲気がぐっと増し、洞窟の形も見やすくなります。
+option.BLOOMY_FOG                           = 霧のブルーム
+option.BLOOMY_FOG.comment                   = 霧に強いブルームをかけます。明るい物体の光が霧の中で散乱して見え、その背後も照らされます。パフォーマンスへの負荷はほぼありません。
+option.BLOOMY_FOG_INTENSITY                 = 霧のブルームの強さ
+option.BLOOMY_FOG_INTENSITY.comment         = 「霧のブルーム」の強さを調整します。
+option.OVERWORLD_FOG_INTENSITY              = オーバーワールドの霧の強さ
+option.NETHER_FOG_INTENSITY                 = ネザーの霧の強さ
+option.VL                                   = ボリュメトリックフォグ
+option.LPV_VL.comment                       = 光源が霧を照らします。色付きライトが必要です！
+option.VL.comment                           = 光の筋と、場所によって変わる霧の密度を加えます。
+option.VL_RENDER_SCALE                      = VL の描画スケール
+option.AIR_FOG_CLOUDY_NOISE                 = 雲状の霧
+option.AIR_FOG_CLOUDY_NOISE.comment         = 霧の中に、雲のようなほのかな形を加えます。朝に最も見えやすくなります。\nボリュメトリックフォグが必要です！
+option.AIR_FOG_COLORED_LIGHT_SHAFTS         = 色付きの光の筋
+option.AIR_FOG_COLORED_LIGHT_SHAFTS.comment = 半透明の物体を通り抜けた光の筋が、その色に染まります。
+
+# LPV VL
+option.LPV_VL                          = 有効
+option.LPV_VL_STEPS                    = ステップ数
+option.LPV_VL_INTENSITY_OVERWORLD      = オーバーワールドでの強さ
+option.LPV_VL_INTENSITY_UNDERGROUND    = 地下での強さ
+option.LPV_VL_INTENSITY_NETHER         = ネザーでの強さ
+option.LPV_VL_INTENSITY_END            = ジ・エンドでの強さ
+
+# Rayleigh Fog
+option.AIR_FOG_RAYLEIGH_FALLOFF_START             = レイリー減衰の開始高度
+option.AIR_FOG_RAYLEIGH_FALLOFF_START.comment     = レイリー霧が薄くなり始める、海面からの高度です。
+option.AIR_FOG_RAYLEIGH_FALLOFF_HALF_LIFE         = レイリー減衰の半減高度
+option.AIR_FOG_RAYLEIGH_FALLOFF_HALF_LIFE.comment = レイリー減衰の開始高度から上で、レイリー霧の密度が半分になる高度です。
+
+option.AIR_FOG_RAYLEIGH_DENSITY        = 通常時の密度
+option.AIR_FOG_RAYLEIGH_R              = §c▍ §f赤
+option.AIR_FOG_RAYLEIGH_G              = §a▍ §f緑
+option.AIR_FOG_RAYLEIGH_B              = §9▍ §f青
+
+option.AIR_FOG_RAYLEIGH_DENSITY_RAIN   = 雨天時の密度
+option.AIR_FOG_RAYLEIGH_R_RAIN         = §c▍ §f赤
+option.AIR_FOG_RAYLEIGH_G_RAIN         = §a▍ §f緑
+option.AIR_FOG_RAYLEIGH_B_RAIN         = §9▍ §f青
+
+option.AIR_FOG_RAYLEIGH_DENSITY_ARID   = 乾燥地帯・砂漠の密度
+option.AIR_FOG_RAYLEIGH_R_ARID         = §c▍ §f赤
+option.AIR_FOG_RAYLEIGH_G_ARID         = §a▍ §f緑
+option.AIR_FOG_RAYLEIGH_B_ARID         = §9▍ §f青
+
+option.AIR_FOG_RAYLEIGH_DENSITY_SNOWY  = 雪地帯の密度
+option.AIR_FOG_RAYLEIGH_R_SNOWY        = §c▍ §f赤
+option.AIR_FOG_RAYLEIGH_G_SNOWY        = §a▍ §f緑
+option.AIR_FOG_RAYLEIGH_B_SNOWY        = §9▍ §f青
+
+option.AIR_FOG_RAYLEIGH_DENSITY_TAIGA  = タイガの密度
+option.AIR_FOG_RAYLEIGH_R_TAIGA        = §c▍ §f赤
+option.AIR_FOG_RAYLEIGH_G_TAIGA        = §a▍ §f緑
+option.AIR_FOG_RAYLEIGH_B_TAIGA        = §9▍ §f青
+
+option.AIR_FOG_RAYLEIGH_DENSITY_JUNGLE = ジャングルの密度
+option.AIR_FOG_RAYLEIGH_R_JUNGLE       = §c▍ §f赤
+option.AIR_FOG_RAYLEIGH_G_JUNGLE       = §a▍ §f緑
+option.AIR_FOG_RAYLEIGH_B_JUNGLE       = §9▍ §f青
+
+option.AIR_FOG_RAYLEIGH_DENSITY_SWAMP  = 沼地の密度
+option.AIR_FOG_RAYLEIGH_R_SWAMP        = §c▍ §f赤
+option.AIR_FOG_RAYLEIGH_G_SWAMP        = §a▍ §f緑
+option.AIR_FOG_RAYLEIGH_B_SWAMP        = §9▍ §f青
+
+# Mie Fog
+option.AIR_FOG_MIE_DENSITY_MORNING           = 朝の密度
+option.AIR_FOG_MIE_DENSITY_NOON              = 正午の密度
+option.AIR_FOG_MIE_DENSITY_EVENING           = 夕方の密度
+option.AIR_FOG_MIE_DENSITY_MIDNIGHT          = 真夜中の密度
+option.AIR_FOG_MIE_DENSITY_RAIN              = 雨天時の密度
+option.AIR_FOG_MIE_DENSITY_BLUE_HOUR         = 夜明け・夕暮れの密度
+option.AIR_FOG_MIE_FALLOFF_START             = フェード開始高度
+option.AIR_FOG_MIE_FALLOFF_START.comment     = ミー霧が薄くなり始める、海面からの高度です。
+option.AIR_FOG_MIE_FALLOFF_HALF_LIFE         = フェード半減高度
+option.AIR_FOG_MIE_FALLOFF_HALF_LIFE.comment = フェード開始高度から上で、ミー霧の密度が半分になる高度です。
+
+
+# Materials settings
+
+option.NORMAL_MAPPING                  = ノーマルマッピング
+option.NORMAL_MAPPING.comment          = リソースパックのノーマルマップを使うかどうかです。「PBR」リソースパックを使っている場合は有効にしてください。
+option.SPECULAR_MAPPING                = スペキュラマッピング
+option.SPECULAR_MAPPING.comment        = リソースパックのスペキュラマップを使うかどうかです。「PBR」リソースパックを使っている場合は有効にしてください。
+option.POM                             = パララックスオクルージョンマッピング
+option.TEXTURE_FORMAT                  = テクスチャ形式
+option.TEXTURE_FORMAT.comment          = リソースパックが使っているテクスチャ形式です。最近のリソースパックの多くは labPBR を使っていますが、SEUS で動くよう作られたパックは OldPBR を使っていることがあります。
+option.HARDCODED_SPECULAR              = ハードコードされたスペキュラ
+option.HARDCODED_SPECULAR.comment      = 一部のブロック（金属など）に、ハードコードされた鏡面反射を適用します。
+option.HARDCODED_EMISSION              = ハードコードされた発光
+option.HARDCODED_EMISSION.comment      = 一部のブロック（松明など）に、ハードコードされた発光を適用します。
+option.HARDCODED_SSS                   = ハードコードされた SSS
+option.HARDCODED_SSS.comment           = 一部のブロック（葉など）に、ハードコードされた表面下散乱を適用します。
+option.RAIN_PUDDLES                    = 雨の水たまり
+option.EMISSION_STRENGTH               = 発光の強さ
+option.EMISSION_STRENGTH.comment       = 松明のような発光する物体の明るさを調整します。放たれる光の明るさには影響せず、光源そのものの明るさだけが変わります。ハードコードされた発光にも影響します。
+option.DIRECTIONAL_LIGHTMAPS           = 指向性ライトマップ
+option.DIRECTIONAL_LIGHTMAPS.comment   = ブロックライトとスカイライトが、ノーマルマップの影響を受けるようになります。この方式の制約により、見た目に問題が出ることがあります。
+option.DIRECTIONAL_LIGHTMAPS_INTENSITY = 指向性ライトマップの強さ
+option.DIRECTIONAL_LIGHTMAPS_INTENSITY.comment = 指向性ライトマップの強さを調整します。
+option.POM_DEPTH                       = パララックスの深さ
+option.POM_DEPTH.comment               = POM がブロックの内側へどこまで凹めるかです。
+option.POM_SAMPLES                     = パララックスのサンプル数
+option.POM_SAMPLES.comment             = POM の品質を調整します。パフォーマンスとのトレードオフになります。
+option.POM_SHADOW                      = POM のセルフシャドウ
+option.POM_SHADOW.comment              = POM のセルフシャドウです。スペキュラマッピングが必要です！
+option.POM_SHADOW_SAMPLES              = POM セルフシャドウのサンプル数
+option.POM_SHADOW_SAMPLES.comment      = パララックスシャドウの品質を調整します。パフォーマンスとのトレードオフになります。
+option.POM_SLOPE_NORMALS               = POM の傾斜法線
+option.POM_DISTANCE                    = POM の距離
+option.REFRACTION                      = 屈折
+value.REFRACTION.REFRACTION_OFF        = オフ
+value.REFRACTION.REFRACTION_ALL        = すべて
+value.REFRACTION.REFRACTION_WATER_ONLY = 水のみ
+option.REFRACTION_INTENSITY            = 屈折の強さ
+option.REFRACTION_INTENSITY.comment    = 水面での屈折の強さを調整します。
+
+suffix.POM_DEPTH                       = m
+suffix.POM_DISTANCE                    = m
+
+value.TEXTURE_FORMAT.TEXTURE_FORMAT_LAB = labPBR
+value.TEXTURE_FORMAT.TEXTURE_FORMAT_OLD = Old PBR
+
+option.ENVIRONMENT_REFLECTIONS         = 環境反射
+option.ENVIRONMENT_REFLECTIONS.comment = スクリーンスペース反射です。水や光沢のあるブロックに、周囲の景色が映ります。パフォーマンスへの影響が大きいです。
+option.SKY_REFLECTIONS                 = 空の反射
+option.SKY_REFLECTIONS.comment         = 水や光沢のあるブロックに、空が映ります。
+option.SSR_ROUGHNESS_SUPPORT           = 粗さへの対応
+option.SSR_ROUGHNESS_SUPPORT.comment   = ざらざらした面の反射を、実際にざらついて見えるようにします。パフォーマンスへの影響が大きいです。
+option.SSR_RAY_COUNT                   = レイ数
+option.SSR_RAY_COUNT.comment           = ざらついた反射のためにトレースするレイの数です。レイが多いほどノイズは減りますが、パフォーマンスは悪くなります。
+option.SSR_INTERSECTION_STEPS_SMOOTH   = 交差判定ステップ数 - なめらか
+option.SSR_INTERSECTION_STEPS_SMOOTH.comment = なめらかな反射の精度を調整します。パフォーマンスとのトレードオフになります。
+option.SSR_INTERSECTION_STEPS_ROUGH    = 交差判定ステップ数 - ざらざら
+option.SSR_INTERSECTION_STEPS_ROUGH.comment = ざらついた反射の精度を調整します。パフォーマンスとのトレードオフになります。
+option.SSR_REFINEMENT_STEPS            = 補正ステップ数
+option.SSR_REFINEMENT_STEPS.comment    = すべての反射の精度を調整します。パフォーマンスとのトレードオフになります。
+option.SSR_ROUGHNESS_THRESHOLD         = 粗さのしきい値
+option.SSR_ROUGHNESS_THRESHOLD.comment = 反射が現れるために、面がどのくらいなめらかである必要があるかを調整します。
+
+# Water settings
+
+option.WATER_CAUSTICS                  = 水のコースティクス
+option.WATER_CAUSTICS.comment          = 水中で揺らめく光の模様です。
+option.WATER_CAUSTICS_INTENSITY        = 水のコースティクスの強さ
+option.WATER_CAUSTICS.comment          = 水のコースティクスの明るさを調整します。
+option.WATER_EDGE_HIGHLIGHT            = 水際のハイライト
+option.WATER_EDGE_HIGHLIGHT.comment    = 水と地形が接する部分に白いハイライトを入れます。場合によって、水が見つけやすくなります。
+option.WATER_EDGE_HIGHLIGHT_INTENSITY  = 水際のハイライトの強さ
+option.SNELLS_WINDOW                   = スネルの窓
+option.SNELLS_WINDOW.comment           = 水中での全反射です。
+option.WATER_TEXTURE                   = 水のテクスチャ
+option.WATER_TEXTURE.comment           = バニラの水テクスチャの使い方です。\n\nオフ - 水テクスチャを使いません。\nハイライト: 水テクスチャで水面にハイライトを加えます。Bedrock RTX と同じような仕組みです。\nバニラ: 水テクスチャを、ほかのテクスチャと同じように使います。
+option.BIOME_WATER_COLOR               = バイオームの色の水
+option.BIOME_WATER_COLOR.comment       = 水の吸収に、バイオームの水の色を反映します。
+
+value.WATER_TEXTURE.WATER_TEXTURE_OFF                   = オフ
+value.WATER_TEXTURE.WATER_TEXTURE_HIGHLIGHT             = ハイライト
+value.WATER_TEXTURE.WATER_TEXTURE_VANILLA               = バニラ
+value.WATER_TEXTURE.WATER_TEXTURE_HIGHLIGHT_UNDERGROUND = ハイライト（地下のみ）
+
+option.WATER_WAVES                     = 有効
+option.WATER_WAVE_ITERATIONS           = 反復回数
+option.WATER_WAVE_STRENGTH             = 強さ
+option.WATER_WAVE_FREQUENCY            = 周波数
+option.WATER_WAVE_SPEED_STILL          = 速度（静水）
+option.WATER_WAVE_SPEED_FLOWING        = 速度（流水）
+option.WATER_WAVE_PERSISTENCE          = パーシスタンス
+option.WATER_WAVE_LACUNARITY           = ラクナリティ
+option.WATER_PARALLAX                  = 水のパララックス
+option.WATER_PARALLAX.comment          = 水の波を立体的に見せます。
+option.WATER_DISPLACEMENT              = 水の変位
+option.WATER_DISPLACEMENT.comment      = 揺れる葉と同じように、水のジオメトリ自体をわずかに揺らして、水際が平坦に見えにくくします。
+option.WATER_WAVES_HEIGHT_VARIATION           = 場所ごとの高さの変化
+option.WATER_WAVES_HEIGHT_VARIATION.comment   = 水の波の高さが、場所によって変わります。
+
+option.WATER_ABSORPTION_R              = §c▍ §f赤の吸収
+option.WATER_ABSORPTION_G              = §a▍ §f緑の吸収
+option.WATER_ABSORPTION_B              = §9▍ §f青の吸収
+option.WATER_SCATTERING                = 散乱
+
+option.WATER_ABSORPTION_R_UNDERWATER   = §c▍ §f赤の吸収 - 水中
+option.WATER_ABSORPTION_G_UNDERWATER   = §a▍ §f緑の吸収 - 水中
+option.WATER_ABSORPTION_B_UNDERWATER   = §9▍ §f青の吸収 - 水中
+option.WATER_SCATTERING_UNDERWATER     = 散乱 - 水中
+
+# Post-processing settings
+
+option.BLOOM                           = ブルーム
+option.BLOOM.comment                   = 明るい部分や光源のまわりに、やわらかい「グロー」効果を加えます。
+option.BLOOM_INTENSITY                 = ブルームの強さ
+option.BLOOM_INTENSITY.comment         = ブルームが最終的な映像にどのくらい影響するかを調整します。
+option.BLOOM_SPREAD                    = ブルームの広がり
+option.BLOOM_UPSAMPLING_FILTER         = ブルームのアップサンプリングフィルター
+value.BLOOM_UPSAMPLING_FILTER.texture  = バイリニア
+value.BLOOM_UPSAMPLING_FILTER.bicubic_filter = バイキュービック
+option.BLOOM_SPREAD.comment            = ブルームがどのくらい広がるかを調整します。
+option.DOF                             = 被写界深度
+option.DOF.comment                     = カメラのピント効果です。ピントが合っていない部分をぼかします。
+option.DOF_INTENSITY                   = DOF の強さ
+option.DOF_INTENSITY.comment           = 被写界深度の強さを調整します。
+option.DOF_SAMPLES                     = DOF のサンプル数
+option.DOF_SAMPLES.comment             = 被写界深度で取るサンプルの数です。多いほどぼかしの品質は上がりますが、パフォーマンスを消費します。
+option.DOF_FOCUS                       = DOF のピント位置
+option.DOF_FOCUS.comment               = 被写界深度の焦点距離です。
+option.MOTION_BLUR                     = モーションブラー
+option.MOTION_BLUR.comment             = 動きに合わせたシネマティックなぼかしです。低いフレームレートを滑らかに見せるのにも役立ちますが、画面酔いの原因になることがあります。
+option.MOTION_BLUR_INTENSITY           = モーションブラーの強さ
+option.MOTION_BLUR_INTENSITY.comment   = モーションブラーの強さを調整します。
+option.TAA                             = TAA
+option.TAA.comment                     = テンポラルアンチエイリアスです。画質とノイズを大幅に改善しますが、ちらつきやゴーストのような時間的アーティファクトが出ることもあります。TAA アップスケーリングに必要です！
+option.FXAA                            = FXAA
+option.FXAA.comment                    = エッジをやわらげます。TAA と併用すると、特に動いているときに効果的です。TAAU との併用でとても役立ちます。
+option.TAAU                            = TAA アップスケーリング
+option.TAAU.comment                    = scene_color を低い解像度で描画し、TAA でアップスケールします。パフォーマンスが大幅に向上しますが、画質が下がったり、時間的アーティファクトが増えたりすることがあります。
+option.TAAU_RENDER_SCALE               = TAAU の描画スケール
+option.TAAU_RENDER_SCALE.comment       = TAA アップスケーリングが有効なときに、scene_color を描画する解像度のスケールです。元の解像度が 1920x1080 で TAAU の描画スケールが 0.75（デフォルト）の場合、scene_color は 1440x810 で描画されます。
+option.CAS                             = 画像のシャープ化
+option.CAS.comment                     = 最終的な画像をシャープにします（コントラスト適応型シャープニング）。
+option.CAS_INTENSITY                   = 画像のシャープ化の強さ
+option.CAS_INTENSITY.comment           = 画像のシャープ化が画像に与える効果の強さを調整します。
+option.VIGNETTE                        = ビネット
+option.VIGNETTE.comment                = 画面の端を暗くします。
+option.VIGNETTE_INTENSITY              = ビネットの強さ
+option.VIGNETTE_INTENSITY.comment      = ビネットの強さを調整します。
+
+value.DOF_FOCUS.-1.0                   = 自動
+
+option.tonemap                         = トーンマップの方式
+
+value.tonemap.tonemap_aces_fit         = ACES Fit
+value.tonemap.tonemap_aces_full        = ACES Full
+value.tonemap.tonemap_hejl_2015        = Hejl 2015
+value.tonemap.tonemap_hejl_burgess     = Hejl-Burgess
+value.tonemap.tonemap_lottes           = Lottes
+value.tonemap.tonemap_uncharted_2      = Uncharted 2
+value.tonemap.tonemap_tech             = Tech
+value.tonemap.tonemap_ozius            = Ozius
+value.tonemap.tonemap_reinhard         = Reinhard
+value.tonemap.tonemap_reinhard_jodie   = Reinhard-Jodie
+
+# Color Grading
+
+option.GRADE_BRIGHTNESS                = 明るさ
+option.GRADE_CONTRAST                  = コントラスト
+option.GRADE_SATURATION                = 彩度
+option.GRADE_WHITE_BALANCE             = ホワイトバランス
+option.GRADE_ORANGE_SAT_BOOST          = §6▍ §fオレンジの彩度ブースト
+option.GRADE_TEAL_SAT_BOOST            = §b▍ §fティールの彩度ブースト
+option.GRADE_GREEN_SAT_BOOST           = §a▍ §f緑の彩度ブースト
+option.GRADE_GREEN_HUE_SHIFT           = §a▍ §f緑の色相シフト
+suffix.GRADE_WHITE_BALANCE             = K
+suffix.GRADE_GREEN_HUE_SHIFT           = °
+
+option.PURKINJE_SHIFT                  = プルキンエ現象
+option.PURKINJE_SHIFT.comment          = 暗い場所での人間の視覚を再現します。すべての色の彩度を下げ、赤系の色を暗くします。
+option.PURKINJE_SHIFT_INTENSITY        = プルキンエ現象の強さ
+
+# Exposure
+
+option.AUTO_EXPOSURE                         = 自動露出
+option.AUTO_EXPOSURE_BIAS                    = 露出補正
+option.AUTO_EXPOSURE_MIN                     = 最小露出
+option.AUTO_EXPOSURE_MAX                     = 最大露出
+option.AUTO_EXPOSURE_RATE_DIM_TO_BRIGHT      = 露出の変化速度 - 上昇時
+option.AUTO_EXPOSURE_RATE_BRIGHT_TO_DIM      = 露出の変化速度 - 低下時
+option.MANUAL_EXPOSURE_VALUE                 = 手動の露出値
+option.MANUAL_EXPOSURE_USE_SCREEN_BRIGHTNESS = 明るさスライダーを使う
+option.MANUAL_EXPOSURE_USE_SCREEN_BRIGHTNESS.comment = ビデオ設定メニューの明るさスライダーに応じて、露出値が最小露出と最大露出の間で補間されます。
+option.HISTOGRAM_BINS                        = ヒストグラムのビン数
+option.HISTOGRAM_TARGET                      = ヒストグラムの目標 CDF 値
+
+value.AUTO_EXPOSURE.AUTO_EXPOSURE_SIMPLE    = シンプル
+value.AUTO_EXPOSURE.AUTO_EXPOSURE_HISTOGRAM = ヒストグラム
+value.AUTO_EXPOSURE.AUTO_EXPOSURE_OFF       = オフ
+
+# Misc settings
+
+option.DEBUG_VIEW                      = デバッグ表示
+option.DEBUG_SAMPLER                   = デバッグ用サンプラー
+option.WHITE_WORLD                     = 真っ白な世界
+option.WHITE_WORLD.comment             = すべてのアルベドテクスチャを白にします。
+option.TONEMAP_COMPARISON              = トーンマップの比較
+option.TONEMAP_COMPARISON.comment      = 画面の左半分と右半分で、2 つのトーンマップ関数を比較します。
+option.tonemap_left                    = 左のトーンマップ
+option.tonemap_right                   = 右のトーンマップ
+option.FANCY_NETHER_PORTAL             = 凝ったネザーポータル
+option.FANCY_NETHER_PORTAL.comment     = EminGT さんの Complementary Reimagined Shaders に着想を得た、凝ったネザーポータルの効果です。アイデアを使わせてくれた Emin さんに感謝します！リソースパックによっては、あまりうまく動作しないことがあります。
+option.CUSTOM_SKY                      = カスタムスカイ
+option.CUSTOM_SKY.comment              = リソースパックのカスタムスカイを有効にします。
+option.CUSTOM_SKY_BRIGHTNESS           = カスタムスカイの明るさ
+option.CUSTOM_SKY_BRIGHTNESS.comment   = カスタムスカイの明るさを調整します。
+option.ENCHANTMENT_GLINT_BRIGHTNESS    = エンチャントの輝きの明るさ
+option.DITHERED_TRANSLUCENCY_FALLBACK  = ディザリング半透明のフォールバック
+comment.DITHERED_TRANSLUCENCY_FALLBACK = separateEntityDraws が有効なときに、半透明にすべきなのにできないオブジェクトの見た目を、ディザリングによる半透明で改善します。
+
+value.DEBUG_VIEW.DEBUG_VIEW_NONE       = オフ
+value.DEBUG_VIEW.DEBUG_VIEW_SAMPLER    = サンプラー
+value.DEBUG_VIEW.DEBUG_VIEW_HISTOGRAM  = ヒストグラム
+value.DEBUG_VIEW.DEBUG_VIEW_WEATHER    = 天候
+
+value.tonemap_left.tonemap_aces_fit       = ACES Fit
+value.tonemap_left.tonemap_aces_full      = ACES Full
+value.tonemap_left.tonemap_lottes         = Lottes
+value.tonemap_left.tonemap_hejl_2015      = Hejl 2015
+value.tonemap_left.tonemap_hejl_burgess   = Hejl-Burgess
+value.tonemap_left.tonemap_uncharted_2    = Uncharted 2
+value.tonemap_left.tonemap_tech           = Tech
+value.tonemap_left.tonemap_ozius          = Ozius
+value.tonemap_left.tonemap_reinhard       = Reinhard
+value.tonemap_left.tonemap_reinhard_jodie = Reinhard-Jodie
+
+value.tonemap_right.tonemap_aces_fit       = ACES Fit
+value.tonemap_right.tonemap_aces_full      = ACES Full
+value.tonemap_right.tonemap_lottes         = Lottes
+value.tonemap_right.tonemap_hejl_burgess   = Hejl-Burgess
+value.tonemap_right.tonemap_hejl_2015      = Hejl 2015
+value.tonemap_right.tonemap_uncharted_2    = Uncharted 2
+value.tonemap_right.tonemap_tech           = Tech
+value.tonemap_right.tonemap_ozius          = Ozius
+value.tonemap_right.tonemap_reinhard       = Reinhard
+value.tonemap_right.tonemap_reinhard_jodie = Reinhard-Jodie
+
+# Distance View 
+
+option.DISTANCE_VIEW                   = 有効
+option.DISTANCE_VIEW_METHOD            = 方式
+option.DISTANCE_VIEW_MAX_DISTANCE      = 最大距離
+suffix.DISTANCE_VIEW_MAX_DISTANCE      = m
+
+value.DISTANCE_VIEW_METHOD.DISTANCE_VIEW_DISTANCE = 距離
+value.DISTANCE_VIEW_METHOD.DISTANCE_VIEW_DEPTH    = 深度
+
+# Box
+
+option.BOX_MODE                 = モード
+option.BOX_MODE.comment         = 選択ボックスのモードです。
+value.BOX_MODE.BOX_MODE_NONE    = デフォルト
+value.BOX_MODE.BOX_MODE_COLOR   = カスタムカラー
+value.BOX_MODE.BOX_MODE_RAINBOW = 虹色
+option.BOX_COLOR_R              = §c▍ §f赤
+option.BOX_COLOR_G              = §a▍ §f緑
+option.BOX_COLOR_B              = §9▍ §f青
+option.BOX_EMISSION             = 発光
+option.BOX_EMISSION.comment     = 色を 1 より大きくスケールします。ブルームが必要です。
+option.BOX_LINE_WIDTH           = 線の太さ
+
+# Distant Horizons
+
+option.DH_OVERDRAW_DISTANCE     = オーバードロー距離
+option.DH_OVERDRAW_FADE_LENGTH  = オーバードローのフェード長
+option.NOISE_ON_DH_TERRAIN      = DH 地形のノイズ
+
+# Photonics
+
+option.PHOTONICS_ENABLED              = Photonics を使う
+option.PHOTONICS_LIGHTING_MODE        = ライティングモード
+option.PHOTONICS_LIGHTING_MODE.comment = Photonics がライティングに使うアルゴリズムです。\n\nSharp - ノイズのない、とてもシンプルなアルゴリズムですが、光源の数に上限があります（最大サンプル数）。\nReSTIR - ライティングに ReSTIR を使います。光源の数に制限はありません（最大ライト数）が、場所によってはノイズが出ることがあります。
+value.PHOTONICS_LIGHTING_MODE.SIMPLE  = Sharp
+value.PHOTONICS_LIGHTING_MODE.RESTIR  = ReSTIR
+option.PHOTONICS_ALPHA_MODE           = 透過モード
+option.PHOTONICS_ALPHA_MODE.comment   = Photonics が透明なボクセルをどう扱うかを変更します。\n\n不透明 - 透明なボクセルを不透明として扱います。\nブロックごと - 最初の透明なボクセルを使い、そのブロックの残りは飛ばします。\nボクセルごと - ブロック内のすべての透明なボクセルを使います（パフォーマンスへの影響が非常に大きい）。
+value.PHOTONICS_ALPHA_MODE.NONE       = 不透明
+value.PHOTONICS_ALPHA_MODE.BLOCK      = ブロックごと
+value.PHOTONICS_ALPHA_MODE.VOXEL      = ボクセルごと
+option.PHOTONICS_MAX_LIGHTS           = 最大ライト数
+option.PHOTONICS_MAX_LIGHTS.comment   = 読み込めるトレース済みライトの最大数です。
+option.PHOTONICS_GLINT_STRENGTH       = エンチャントの輝きの強さ
+option.PHOTONICS_GLINT_STRENGTH.comment = 手持ちライトでの、エンチャントされたアイテムの輝きの強さです。
+value.PHOTONICS_GLINT_STRENGTH.0      = オフ
+option.PHOTONICS_TWO_HANDHELD_RAYS    = 手持ちライトのレイを分ける
+option.PHOTONICS_TWO_HANDHELD_RAYS.comment = 両手に持った光源の両方が影を落とすかどうかです。無効の場合、影は 1 つだけ落ちます。
+option.PHOTONICS_SHARP_MAX_SAMPLES    = 最大サンプル数
+option.PHOTONICS_RESTIR_INITIAL_SAMPLES   = 初期サンプル数
+option.PHOTONICS_RESTIR_SPR_SAMPLES       = 空間再利用のサンプル数
+value.PHOTONICS_RESTIR_SPR_SAMPLES.0      = オフ
+option.PHOTONICS_RESTIR_SPR_RADIUS        = 空間再利用の半径
+option.PHOTONICS_RESTIR_ACCUMULATION      = 蓄積フレーム数
+option.PHOTONICS_RESTIR_ACCUMULATION.comment = ReSTIR が蓄積に使うフレームの最大数です。値を小さくするとライティングの反応が速くなりますが、ノイズが増えます。
+option.PHOTONICS_RESTIR_DENOISER_PASSES   = デノイザーのパス数
+option.PHOTONICS_RESTIR_SOFT_SHADOWS      = やわらかい影
+option.PHOTONICS_RESTIR_COMBINED_GI       = スカイライト GI を含める
+option.PHOTONICS_RESTIR_COMBINED_GI.comment = GI を通常の経路ではなく、ReSTIR のデノイザーに通すかどうかです。\nGI がかなりシャープになりますが、パフォーマンスは低下します。
+
+
