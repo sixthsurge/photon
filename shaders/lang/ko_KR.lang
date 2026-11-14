@@ -795,7 +795,7 @@ option.BOX_LINE_WIDTH           = 선 굵기
 
 
 screen.end_dimension                        = 엔드
-screen.shadow_quality                       = 품질
+screen.shadow_quality                       = Samples (SH Samples)
 screen.sss_settings                         = SSS 설정
 option.END_FOG_INTENSITY                    = 엔드 안개 강도
 option.END_FOG_INTENSITY.comment            = 엔드의 볼류메트릭 안개 밀도를 조절합니다. 볼류메트릭 안개가 필요합니다.
