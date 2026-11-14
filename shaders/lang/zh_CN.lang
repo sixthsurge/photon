@@ -791,7 +791,7 @@ option.NOISE_ON_DH_TERRAIN     = DH 地形噪声
 option.NOISE_ON_DH_TERRAIN.comment = 将着色器噪声应用于 Distant Horizons 地形。
 
 screen.end_dimension                        = 末地
-screen.shadow_quality                       = 质量
+screen.shadow_quality                       = Samples (SH Samples)
 screen.sss_settings                         = SSS 设置
 option.END_FOG_INTENSITY                    = 末地雾气强度
 option.END_FOG_INTENSITY.comment            = 调整末地体积雾的密度。需要启用体积雾。
