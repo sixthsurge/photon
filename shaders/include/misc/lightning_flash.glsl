@@ -13,6 +13,6 @@ uniform float lightning_flash_of;
 #define LIGHTNING_FLASH_UNIFORM 0.0
 #endif
 
-const float lightning_flash_intensity = 4.0;
+const float lightning_flash_intensity = LIGHTNING_FLASH_INTENSITY;
 
 #endif // INCLUDE_MISC_LIGHTNING_FLASH

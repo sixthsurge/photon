@@ -94,7 +94,7 @@ float weather_wind() {
         noise_1d(world_age * wind_variation_speed + 83.236)
     );
 #else
-    float wind = 0.5;
+    float wind = WIND_INTENSITY_OVERRIDE;
 #endif
 
     // Weather-based variation

@@ -96,7 +96,7 @@ vec3 draw_rainbows(
         * smoothstep(0.0, 0.05, direction_world.y);
     ;
 
-    return fragment_color + rainbow_color * rainbow_fade;
+    return fragment_color + rainbow_color * rainbow_fade * RAINBOW_INTENSITY;
 }
 
 #endif // INCLUDE_SKY_RAINBOW
