@@ -789,7 +789,7 @@ option.NOISE_ON_DH_TERRAIN     = Ruis Op DH Terrein
 option.NOISE_ON_DH_TERRAIN.comment = Past shaderruis toe op Distant Horizons-terrein.
 
 screen.end_dimension                        = De End
-screen.shadow_quality                       = Kwaliteit
+screen.shadow_quality                       = Samples (SH Samples)
 screen.sss_settings                         = SSS-instellingen
 option.END_FOG_INTENSITY                    = Endmistintensiteit
 option.END_FOG_INTENSITY.comment            = Past de dichtheid van volumetrische mist in de End aan. Vereist volumetrische mist.
