@@ -858,7 +858,7 @@ option.PHOTONICS_RESTIR_COMBINED_GI.comment = Si la GI debe pasar por el denoise
 
 
 screen.end_dimension                        = El End
-screen.shadow_quality                       = Calidad
+screen.shadow_quality                       = Samples (SH Samples)
 screen.sss_settings                         = Ajustes de SSS
 option.END_FOG_INTENSITY                    = Intensidad de la niebla del End
 option.END_FOG_INTENSITY.comment            = Ajusta la densidad de la niebla volumétrica en el End. Requiere niebla volumétrica.
