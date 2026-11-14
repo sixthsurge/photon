@@ -775,7 +775,7 @@ option.NOISE_ON_DH_TERRAIN = Rumore visivo nel terreno DH
 option.NOISE_ON_DH_TERRAIN.comment = Applica il rumore dello shader al terreno di Distant Horizons.
 
 screen.end_dimension                        = L'End
-screen.shadow_quality                       = Qualità
+screen.shadow_quality                       = Samples (SH Samples)
 screen.sss_settings                         = Impostazioni SSS
 option.END_FOG_INTENSITY                    = Intensità della nebbia dell'End
 option.END_FOG_INTENSITY.comment            = Regola la densità della nebbia volumetrica nell'End. Richiede la nebbia volumetrica.
