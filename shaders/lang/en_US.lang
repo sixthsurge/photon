@@ -79,9 +79,9 @@ screen.fog_environment                   = Environment Fog
 screen.water_fog_coeff_surface           = Surface
 screen.water_fog_coeff_underwater        = Underwater
 screen.shadow_general                  = General
-screen.shadow_quality                   = Shadow Quality
-screen.shadow_style                     = Shadow Style
-screen.end_dimension                    = End Dimension
+screen.shadow_quality                       = Quality
+screen.shadow_style                         = Style
+screen.end_dimension                        = The End
 screen.bloom                             = Bloom
 screen.dof                               = Depth of Field
 screen.anti_aliasing                     = Anti-Aliasing
@@ -191,7 +191,7 @@ option.BLOCK_ENTITY_SHADOWS            = Block Entity Shadows
 option.BLOCK_ENTITY_SHADOWS.comment = Allows block entities, such as chests and signs, to cast shadows.
 option.PIXELATED_SHADOWS               = Pixelated Shadows
 option.PIXELATED_SHADOWS.comment       = Shadows snap to block texels, creating a pixelated look
-option.PIXELATED_SHADOWS_RESOLUTION    = Pixelated Shadow Resolution
+option.PIXELATED_SHADOWS_RESOLUTION         = Resolution
 option.PIXELATED_SHADOWS_RESOLUTION.comment = Sets the pixel grid size used to align shadows with block texels.
 option.SSS_STEPS                       = SSS Steps 
 option.SSS_STEPS.comment               = Increase to reduce noise on foliage and other materials with SSS, at the cost of performance.
@@ -893,3 +893,7 @@ option.PHOTONICS_RESTIR_COMBINED_GI       = Include Skylight GI
 option.PHOTONICS_RESTIR_COMBINED_GI.comment = Whether Gi should be ran through ReSTIR's denoiser instead of its usual path. \nResults in much sharper Gi, at the cost of performance.
 
 
+
+screen.sss_settings                         = SSS Settings
+option.END_FOG_INTENSITY                    = End Fog Intensity
+option.END_FOG_INTENSITY.comment            = Adjusts the density of volumetric fog in The End. Requires Volumetric Fog.

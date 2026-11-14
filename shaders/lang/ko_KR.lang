@@ -24,7 +24,7 @@ screen.refraction                      = 굴절
 screen.light_sources                   = 광원
 screen.ambient_lighting                 = 환경 조명
 screen.direct_lighting                 = 직접 조명
-screen.shadow_style                     = 그림자 스타일
+screen.shadow_style                         = 스타일
 screen.ao                              = 주변광 차폐 (AO)
 screen.color_grading                   = 색 보정
 screen.exposure                        = 노출
@@ -172,7 +172,7 @@ option.ENTITY_SHADOWS.comment          = 엔티티가 그림자를 드리울 수
 option.BLOCK_ENTITY_SHADOWS            = 블록 엔티티 그림자
 option.PIXELATED_SHADOWS               = 픽셀화된 그림자
 option.PIXELATED_SHADOWS.comment       = 그림자가 블록 텍셀에 맞춰져 픽셀화된 모습을 연출합니다
-option.PIXELATED_SHADOWS_RESOLUTION    = 픽셀화된 그림자 해상도
+option.PIXELATED_SHADOWS_RESOLUTION         = 해상도
 option.SSS_STEPS                       = SSS 단계
 option.SSS_STEPS.comment               = 값을 높이면 SSS가 적용된 식물이나 기타 재질의 노이즈가 줄어들지만 성능 비용이 발생합니다.
 option.SSS_SHEEN_INTENSITY = SSS 광택 강도
@@ -793,3 +793,9 @@ option.BOX_EMISSION             = 발광
 option.BOX_EMISSION.comment     = 색상을 1 이상으로 스케일합니다. 블룸이 필요합니다.
 option.BOX_LINE_WIDTH           = 선 굵기
 
+
+screen.end_dimension                        = 엔드
+screen.shadow_quality                       = 품질
+screen.sss_settings                         = SSS 설정
+option.END_FOG_INTENSITY                    = 엔드 안개 강도
+option.END_FOG_INTENSITY.comment            = 엔드의 볼류메트릭 안개 밀도를 조절합니다. 볼류메트릭 안개가 필요합니다.

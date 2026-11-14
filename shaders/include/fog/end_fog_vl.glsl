@@ -150,7 +150,7 @@ mat2x3 raymarch_end_fog(
 #define shadow 1.0
 #endif
 
-        float density = end_fog_density(world_pos) * step_length;
+        float density = end_fog_density(world_pos) * END_FOG_INTENSITY * step_length;
 
         vec3 step_optical_depth = extinction_coeff * density;
         vec3 step_transmittance = exp(-step_optical_depth);

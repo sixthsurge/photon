@@ -24,7 +24,7 @@ screen.refraction                      = Rifrazione
 screen.light_sources                   = Fonti di luce
 screen.ambient_lighting                 = Illuminazione ambientale
 screen.direct_lighting                 = Illuminazione diretta
-screen.shadow_style                     = Stile delle ombre
+screen.shadow_style                         = Stile
 screen.ao                              = Occlusione ambientale
 screen.color_grading                   = Gradiente di Colore
 screen.exposure                        = Esposizione
@@ -168,7 +168,7 @@ option.ENTITY_SHADOWS.comment          = Se acceso le entità possono creare omb
 option.BLOCK_ENTITY_SHADOWS            = Ombre Entità Blocchi
 option.PIXELATED_SHADOWS               = Ombre Pixellate
 option.PIXELATED_SHADOWS.comment       = Ombre suddivise in piccoli blocchi, creando un look pixellato
-option.PIXELATED_SHADOWS_RESOLUTION    = Risoluzione Ombre Pixellate
+option.PIXELATED_SHADOWS_RESOLUTION         = Risoluzione
 option.SSS_STEPS                       = Passaggi SSS 
 option.SSS_STEPS.comment               = Aumenta per ridurre il rumore nel fogliame o materiali con SSS, al costo delle performance.
 option.SSS_SHEEN_INTENSITY = Intensità lucentezza SSS
@@ -773,3 +773,9 @@ option.BOX_LINE_WIDTH           = Larghezza Linea
 
 option.NOISE_ON_DH_TERRAIN = Rumore visivo nel terreno DH
 option.NOISE_ON_DH_TERRAIN.comment = Applica il rumore dello shader al terreno di Distant Horizons.
+
+screen.end_dimension                        = L'End
+screen.shadow_quality                       = Qualità
+screen.sss_settings                         = Impostazioni SSS
+option.END_FOG_INTENSITY                    = Intensità della nebbia dell'End
+option.END_FOG_INTENSITY.comment            = Regola la densità della nebbia volumetrica nell'End. Richiede la nebbia volumetrica.

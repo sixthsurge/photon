@@ -25,7 +25,7 @@ screen.refraction = Refracción
 screen.light_sources = Fuentes de luz
 screen.ambient_lighting                 = Iluminación ambiental
 screen.direct_lighting                 = Iluminación directa
-screen.shadow_style                     = Estilo de sombras
+screen.shadow_style                         = Estilo
 screen.ao = Oclusión ambiental
 screen.color_grading = Gradación de color
 screen.exposure = Exposición
@@ -176,7 +176,7 @@ option.ENTITY_SHADOWS.comment = Si las entidades pueden proyectar sombras.\nDesh
 option.BLOCK_ENTITY_SHADOWS = Sombras de entidades de bloque
 option.PIXELATED_SHADOWS = Sombras pixeladas
 option.PIXELATED_SHADOWS.comment = Las sombras se ajustan para bloquear los texels, creando una apariencia pixelada
-option.PIXELATED_SHADOWS_RESOLUTION = Resolución de sombras pixeladas
+option.PIXELATED_SHADOWS_RESOLUTION         = Resolución
 option.SSS_STEPS = Pasos de SSS
 option.SSS_STEPS.comment = Aumenta para reducir el ruido en el follaje y otros materiales con SSS, a costa del rendimiento.
 option.SSS_SHEEN_INTENSITY = Intensidad del brillo SSS
@@ -856,3 +856,9 @@ option.PHOTONICS_RESTIR_COMBINED_GI = Incluir GI de luz del cielo
 option.PHOTONICS_RESTIR_COMBINED_GI.comment = Si la GI debe pasar por el denoiser de ReSTIR en lugar de su ruta habitual. \nEsto da como resultado una GI mucho más nítida, a costa de rendimiento.
 
 
+
+screen.end_dimension                        = El End
+screen.shadow_quality                       = Calidad
+screen.sss_settings                         = Ajustes de SSS
+option.END_FOG_INTENSITY                    = Intensidad de la niebla del End
+option.END_FOG_INTENSITY.comment            = Ajusta la densidad de la niebla volumétrica en el End. Requiere niebla volumétrica.
