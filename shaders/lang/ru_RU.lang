@@ -796,7 +796,7 @@ option.NOISE_ON_DH_TERRAIN     = Шум на ландшафте DH
 option.NOISE_ON_DH_TERRAIN.comment = Применяет шейдерный шум к рельефу Distant Horizons.
 
 screen.end_dimension                        = Энд
-screen.shadow_quality                       = Качество
+screen.shadow_quality                       = Samples (SH Samples)
 screen.sss_settings                         = Настройки SSS
 option.END_FOG_INTENSITY                    = Плотность тумана Энда
 option.END_FOG_INTENSITY.comment            = Настраивает плотность объёмного тумана в Энде. Требуется объёмный туман.
