@@ -780,7 +780,7 @@ option.NOISE_ON_DH_TERRAIN     = 地平線地形雜訊
 option.NOISE_ON_DH_TERRAIN.comment = 將著色器雜訊套用至 Distant Horizons 地形。
 
 screen.end_dimension                        = 終界
-screen.shadow_quality                       = 品質
+screen.shadow_quality                       = Samples (SH Samples)
 screen.sss_settings                         = SSS 設定
 option.END_FOG_INTENSITY                    = 終界霧強度
 option.END_FOG_INTENSITY.comment            = 調整終界體積霧的密度。需要啟用體積霧。
